@@ -42,7 +42,7 @@ describe('src/core/viz/expressions/Animation', () => {
             t._setTimestamp(0);
             t.pause();
             t._setTimestamp(1);
-            expect(t.getProgress()).toEqual(0);
+            expect(t.getProgressPct()).toEqual(0);
         });
     });
 
@@ -53,7 +53,7 @@ describe('src/core/viz/expressions/Animation', () => {
             t.pause();
             t.play();
             t._setTimestamp(1);
-            expect(t.getProgress()).toEqual(0.1);
+            expect(t.getProgressPct()).toEqual(0.1);
         });
     });
 
@@ -64,17 +64,17 @@ describe('src/core/viz/expressions/Animation', () => {
             t.stop();
             t._setTimestamp(1);
 
-            expect(t.getProgress()).toEqual(0);
+            expect(t.getProgressPct()).toEqual(0);
         });
 
         it('should reset the simulation time', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(1);
-            expect(t.getProgress()).toEqual(0.1);
+            expect(t.getProgressPct()).toEqual(0.1);
 
             t.stop();
-            expect(t.getProgress()).toEqual(0);
+            expect(t.getProgressPct()).toEqual(0);
         });
     });
 
@@ -83,10 +83,10 @@ describe('src/core/viz/expressions/Animation', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(5);
-            expect(t.getProgress()).toEqual(0.5);
+            expect(t.getProgressPct()).toEqual(0.5);
             t.setProgressPct(0.4);
             t._setTimestamp(6);
-            expect(t.getProgress()).toEqual(0.5);
+            expect(t.getProgressPct()).toEqual(0.5);
         });
     });
 
@@ -112,8 +112,8 @@ describe('src/core/viz/expressions/Animation', () => {
         it('should update the simulation time when the date is valid', () => {
             const date = new Date('2018-06-14T00:00:00.070Z');
             t.setTimestamp(date);
-            expect(t.getProgressPct().getTime()).toEqual(date.getTime());
-            expect(t.getProgress()).toEqual(0.8);
+            expect(t.getProgressValue().getTime()).toEqual(date.getTime());
+            expect(t.getProgressPct()).toEqual(0.8);
         });
     });
 
@@ -123,13 +123,13 @@ describe('src/core/viz/expressions/Animation', () => {
             const t = s.animation(1, 10, s.fade(1));
             t._setTimestamp(0);
             t._setTimestamp(1);
-            expect(t.getProgress()).toEqual(0.1);
+            expect(t.getProgressPct()).toEqual(0.1);
             t.stop();
-            expect(t.getProgress()).toEqual(0);
+            expect(t.getProgressPct()).toEqual(0);
             t.play();
-            expect(t.getProgress()).toEqual(0);
+            expect(t.getProgressPct()).toEqual(0);
             t._setTimestamp(2);
-            expect(t.getProgress()).toEqual(0.1);
+            expect(t.getProgressPct()).toEqual(0.1);
         });
     });
 });
