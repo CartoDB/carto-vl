@@ -1,6 +1,6 @@
 import { compileProgram } from '../../utils';
-import lineVertexShader from './line-vertex-shader.glsl';
-import lineFragmentShader from './line-fragment-shader.glsl';
+import lineVertexShader from './lineVertexShader.glsl';
+import lineFragmentShader from './lineFragmentShader.glsl';
 
 export default class LineShader {
     constructor(gl) {

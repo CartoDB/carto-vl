@@ -1,6 +1,6 @@
 import { compileProgram } from '../../utils';
-import triangleVertexShader from './triangle-vertex-shader.glsl';
-import triangleFragmentShader from './triangle-fragment-shader.glsl';
+import triangleVertexShader from './triangleVertexShader.glsl';
+import triangleFragmentShader from './triangleFragmentShader.glsl';
 
 export default class TriangleShader {
     constructor(gl) {

@@ -1,6 +1,6 @@
 import { compileProgram } from '../../utils';
-import pointVertexShader from './point-vertex-shader.glsl';
-import pointFragmentShader from './point-fragment-shader.glsl';
+import pointVertexShader from './pointVertexShader.glsl';
+import pointFragmentShader from './pointFragmentShader.glsl';
 
 export default class PointShader {
     constructor(gl) {

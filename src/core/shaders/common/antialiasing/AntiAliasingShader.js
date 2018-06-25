@@ -1,6 +1,6 @@
 import { compileProgram } from '../../utils';
-import antialiasingVertexShader from './antialiasing-vertex-shader.glsl';
-import antialiasingFragmentShader from './antialiasing-fragment-shader.glsl';
+import antialiasingVertexShader from './antialiasingVertexShader.glsl';
+import antialiasingFragmentShader from './antialiasingFragmentShader.glsl';
 
 export default class AntiAliasingShader {
     constructor(gl) {
