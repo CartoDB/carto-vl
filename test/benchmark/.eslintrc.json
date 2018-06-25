@@ -1,6 +1,5 @@
 {
     "globals": {
-        "suite": true,
-        "benchmark": true
+        "falcon": true,
     }
 }
