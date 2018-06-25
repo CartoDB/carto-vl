@@ -90,7 +90,6 @@
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
     "serve": "yarn build:dev && yarn docs && http-server",
-    "bump": "npm version prerelease",
     "bump:minor": "npm version minor",
     "bump:patch": "npm version patch",
     "release": "./scripts/release.sh",
