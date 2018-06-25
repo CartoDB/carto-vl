@@ -55,10 +55,12 @@ export default class Base {
         }
         
         return `
+            \n
             #ifndef DEF_${this._uid}
             #define DEF_${this._uid}
             ${glslCode}
-            #endif`;
+            #endif
+            \n`;
     }
 
     _getDependencies() {
