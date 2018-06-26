@@ -169,20 +169,31 @@ describe('src/core/viz/expressions/ramp', () => {
             describe('and there are the same number of categories than colors', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
                     it('should not show interpolation', () => {
-                        const categories = ['A', 'B', 'C', 'D'];
-                        const colors = [red, blue, yellow, purple];
+                        const categories = ['A', 'B', 'C'];
+                        const colors = [red, green, yellow];
+                        let r;
+                        let actual, expected;
 
-                        categories.forEach((category, index) => {
-                            const r = ramp(buckets(category, categories), colors);
-                            let actual, expected;
+                        r = ramp(buckets('A', categories), colors);
+                        r._compile(METADATA);
 
-                            r._compile(METADATA);
+                        actual = r.eval();
+                        expected = red._nameToRGBA();
+                        expect(actual).toEqual(expected);
 
-                            actual = r.eval();
-                            expected = colors[index]._nameToRGBA();
-                            
-                            checkRGBAThreshold.call(this, actual, expected);
-                        });
+                        r = ramp(buckets('B', categories), colors);
+                        r._compile(METADATA);
+
+                        actual = r.eval();
+                        expected = green._nameToRGBA();
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets('C', categories), colors);
+                        r._compile(METADATA);
+
+                        actual = r.eval();
+                        expected = yellow._nameToRGBA();
+                        expect(actual).toEqual(expected);
                     });
 
                     it('should use the last color for the last category', () => {

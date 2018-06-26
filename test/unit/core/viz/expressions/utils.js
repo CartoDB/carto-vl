@@ -193,17 +193,15 @@ function compile(expression) {
     return expression;
 }
 
-export function checkRGBAThreshold(actual, expected) {
-    const COLOR_THRESHOLD = 20;
-    const ALPHA_THRESHOLD = 10;
-    expect(actual.r).not.toBeGreaterThan(expected.r + COLOR_THRESHOLD);
-    expect(actual.r).not.toBeLessThan(expected.r - COLOR_THRESHOLD);
+export function checkRGBAThreshold(actual, expected, colorThreshold=0, alphaThreshold=0) {
+    expect(actual.r).not.toBeGreaterThan(expected.r + colorThreshold);
+    expect(actual.r).not.toBeLessThan(expected.r - colorThreshold);
 
-    expect(actual.g).not.toBeGreaterThan(expected.g + COLOR_THRESHOLD);
-    expect(actual.g).not.toBeLessThan(expected.g - COLOR_THRESHOLD);
+    expect(actual.g).not.toBeGreaterThan(expected.g + colorThreshold);
+    expect(actual.g).not.toBeLessThan(expected.g - colorThreshold);
 
-    expect(actual.b).not.toBeGreaterThan(expected.b + COLOR_THRESHOLD);
-    expect(actual.b).not.toBeLessThan(expected.b - COLOR_THRESHOLD);
+    expect(actual.b).not.toBeGreaterThan(expected.b + colorThreshold);
+    expect(actual.b).not.toBeLessThan(expected.b - colorThreshold);
 
-    expect(actual.a).toBeCloseTo(expected.a, ALPHA_THRESHOLD);
+    expect(actual.a).toBeCloseTo(expected.a, alphaThreshold);
 }
