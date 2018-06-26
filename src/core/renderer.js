@@ -225,8 +225,7 @@ class Renderer {
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: 1. / this._zoom, // Used by zoom expression
-            columns: []
+            zoom: 1 / this._zoom, // Used by zoom expression
         };
 
         if (!tiles.length) {
@@ -244,7 +243,7 @@ class Renderer {
 
         this._runViewportAggregations(renderLayer);
 
-        
+
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const TID = shader.tid;
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
