@@ -145,16 +145,14 @@ class Renderer {
     }
 
     _computeDrawMetadata(renderLayer) {
-        console.info('computeDrawMetadata');
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const aspect = this.getAspect();
-        let drawMetadata = {
+        const scale = 1. / this._zoom;
+        const drawMetadata = {
             zoom: 1. / this._zoom,
             columns: []
         };
-
-        const scale = 1. / this._zoom;
 
         const rootExprs = viz._getRootExpressions();
         // Performance optimization to avoid doing DFS at each feature iteration
@@ -174,19 +172,12 @@ class Renderer {
             return drawMetadata;
         }
         dataframes.forEach(dataframe => {
-            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
-            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
-            const minx = (-1 + dataframe.vertexOffset[0]) / dataframe.vertexScale[0];
-            const maxx = (1 + dataframe.vertexOffset[0]) / dataframe.vertexScale[0];
-            const miny = (-1 + dataframe.vertexOffset[1]) / dataframe.vertexScale[1];
-            const maxy = (1 + dataframe.vertexOffset[1]) / dataframe.vertexScale[1];
-
             const propertyNames = Object.keys(dataframe.properties);
             const propertyNamesLength = propertyNames.length;
             const feature = {};
 
             for (let i = 0; i < dataframe.numFeatures; i++) {
-                if (dataframe.inViewport(i, minx, miny, maxx, maxy)) {
+                if (dataframe.inViewport(i, scale, this._center, aspect)) {
 
                     for (let j = 0; j < propertyNamesLength; j++) {
                         const name = propertyNames[j];
