@@ -6,6 +6,11 @@ import { Asc, Desc } from './viz/functions';
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
+ * The renderer use fuzzy logic where < 0.5 means false and >= 0.5 means true
+ */
+const FILTERING_THRESHOLD = 0.5;
+
+/**
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
@@ -177,7 +182,7 @@ class Renderer {
                 const feature = this._featureFromDataFrame(dataframe, i);
 
                 // Ignore filtered features
-                if (viz.filter.eval(feature) < 0.5) {
+                if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
                     continue;
                 }
 
