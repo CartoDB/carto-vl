@@ -17,10 +17,10 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
                 IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']]),
             });
             expr._resetViewportAgg();
-            expr._accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
-            expr._accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
-            expr._accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });
-            expr._accumViewportAgg({ price: 2, cat: 2, numeric_with_nulls: 2 });
+            expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
+            expr.accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
+            expr.accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 2, cat: 2, numeric_with_nulls: 2 });
         }
 
         describe('viewportMin()', () => {

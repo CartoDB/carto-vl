@@ -131,24 +131,34 @@ export default class Dataframe {
         }
     }
 
-    inViewport(featureIndex, minx, miny, maxx, maxy) {
+    inViewport(featureIndex, scale, center, aspect) {
+        const { minx, miny, maxx, maxy } = this._getBounds(scale, center, aspect);
+
         switch (this.type) {
-            case 'point':
-            {
+            case 'point': {
                 const x = this.geom[2 * featureIndex + 0];
                 const y = this.geom[2 * featureIndex + 1];
                 return x > minx && x < maxx && y > miny && y < maxy;
             }
             case 'line':
-            case 'polygon':
-            {
+            case 'polygon': {
                 const aabb = this._aabb[featureIndex];
                 return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
-
             }
             default:
                 return false;
         }
+    }
+
+    _getBounds(scale, center, aspect) {
+        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
+        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
+        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+
+        return { minx, maxx, miny, maxy };
     }
 
     _getPointsAtPosition(p, viz) {
