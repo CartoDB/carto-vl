@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html>
+
 <head>
   <title>Raw Sprite | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -48,7 +51,7 @@
     const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
     width: 25
-    symbol: sprite('./walmart.svg')
+    symbol: sprite('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
     `);
 
     const layer = new carto.Layer('layer', source, viz);

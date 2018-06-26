@@ -21,21 +21,17 @@ export default class RenderLayer {
         this.dataframes.push(dataframe);
     }
 
-    // Removes a dataframe for the renderer. Freeing its resources.
-    removeDataframe(dataframe) {
-        this.dataframes = this.dataframes.filter(df => df !== dataframe);
-    }
-
     getActiveDataframes() {
+        this.dataframes = this.dataframes.filter(df => !df.freed);
         return this.dataframes.filter(df => df.active);
     }
 
     hasDataframes() {
-        return this.dataframes.length > 0;
+        return this.getActiveDataframes().length > 0;
     }
 
     getNumFeatures() {
-        return this.dataframes.filter(d => d.active).map(d => d.numFeatures).reduce((x, y) => x + y, 0);
+        return this.getActiveDataframes().map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
     _checkDataframeType(dataframe) {

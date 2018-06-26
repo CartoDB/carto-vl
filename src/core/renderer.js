@@ -24,7 +24,7 @@ const FILTERING_THRESHOLD = 0.5;
  *
  * Large values imply a small overhead too.
  */
-const RTT_WIDTH = 1024;
+export const RTT_WIDTH = 1024;
 
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.

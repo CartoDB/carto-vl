@@ -19,9 +19,9 @@ describe('src/core/viz/expressions/classifier', () => {
         const $price = property('price');
         function prepare(expr) {
             expr._compile({
-                columns: [
-                    { name: 'price', type: 'number', min: 0, max: 5 },
-                ],
+                properties: {
+                    price: { type: 'number', min: 0, max: 5 },
+                },
                 sample: [
                     { price: 0 },
                     { price: 1 },

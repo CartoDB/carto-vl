@@ -7,16 +7,14 @@ describe('src/core/viz/expressions/viewportAggregation', () => {
     describe('viewport filtering', () => {
         function fakeDrawMetadata(expr) {
             expr._compile({
-                columns: [
-                    { name: 'numeric_with_nulls', type: 'number' },
-                    { name: 'price', type: 'number' },
-                    { name: 'cat', type: 'category', categoryNames: ['a', 'b', 'c'] }
-                ],
-                categoryIDsToName: {
-                    0: 'a',
-                    1: 'b',
-                    2: 'c',
-                }
+                properties: {
+                    numeric_with_nulls: { type: 'number' },
+                    price: { type: 'number' },
+                    cat: {
+                        type: 'category', categories: { a: 0, b: 0, c: 0 },
+                    }
+                },
+                IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']]),
             });
             expr._resetViewportAgg();
             expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });

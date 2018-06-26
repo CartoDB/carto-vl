@@ -168,15 +168,14 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
         }
         this._source = source;
         this.requestData();
 
+        viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
@@ -185,6 +184,7 @@ export default class Layer {
         if (this._viz) {
             this._viz.onChange(null);
         }
+        viz.setDefaultsIfRequired(this._renderLayer.type);
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
@@ -217,7 +217,7 @@ export default class Layer {
         try {
             this._checkViz(viz);
             viz.setDefaultsIfRequired(this.metadata.geomType);
-            if (this._viz) {
+            if (this._viz && !this._source.requiresNewMetadata(viz)) {
                 Object.keys(this._viz.variables).map(varName => {
                     // If an existing variable is not re-declared we add it to the new viz
                     if (!viz.variables[varName]) {
@@ -243,6 +243,7 @@ export default class Layer {
                 if (this._viz) {
                     this._viz.onChange(null);
                 }
+                viz.setDefaultsIfRequired(this._renderLayer.type);
                 this._viz = viz;
                 this._viz.onChange(this._vizChanged.bind(this));
             });
@@ -321,7 +322,7 @@ export default class Layer {
     _fire(eventType, eventData) {
         try {
             return this._emitter.emit(eventType, eventData);
-        } catch(err) {
+        } catch (err) {
             console.error(err);
         }
     }
@@ -331,20 +332,17 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
+        dataframe.setFreeObserver(() => {
+            this._integrator.invalidateWebGLState();
+            this._integrator.needRefresh();
+        });
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
+        if (this._viz) {
+            this._viz.setDefaultsIfRequired(dataframe.type);
+        }
         this._integrator.needRefresh();
         this._isUpdated = true;
-    }
-
-    /**
-     * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataFrameRemoved(dataframe) {
-        this._renderLayer.removeDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-        this._integrator.needRefresh();
     }
 
     /**
