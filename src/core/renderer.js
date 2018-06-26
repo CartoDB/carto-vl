@@ -150,8 +150,6 @@ class Renderer {
     _runViewportAggregations(renderLayer) {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
-        const aspect = this.getAspect();
-        const scale = 1. / this._zoom;
 
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
@@ -162,7 +160,7 @@ class Renderer {
 
         viewportExpressions.forEach(expr => expr._resetViewportAgg());
 
-        // Keep track of features processed in viewPort expressions
+        // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
         dataframes.forEach(dataframe => {
@@ -172,7 +170,7 @@ class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!dataframe.inViewport(i, scale, this._center, aspect)) {
+                if (!this._isFeatureInViewport(dataframe, i)) {
                     continue;
                 }
 
@@ -186,6 +184,14 @@ class Renderer {
                 viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
             }
         });
+    }
+
+    /**
+     * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
+     */
+    _isFeatureInViewport(dataframe, index) {
+        const scale = 1 / this._zoom;
+        return dataframe.inViewport(index, scale, this._center, this.getAspect());
     }
 
     /**
@@ -302,7 +308,7 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const s = 1. / this._zoom;
+        const scale = 1. / this._zoom;
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
@@ -329,20 +335,20 @@ class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (s / aspect) * tile.scale,
-                s * tile.scale);
+                (scale / aspect) * tile.scale,
+                scale * tile.scale);
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (s / aspect) * (this._center.x - tile.center.x),
-                s * (this._center.y - tile.center.y));
+                (scale / aspect) * (this._center.x - tile.center.x),
+                scale * (this._center.y - tile.center.y));
             if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type == 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
-            tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
+            tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
 
-            tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+            tile.vertexOffset = [(scale / aspect) * (this._center.x - tile.center.x), scale * (this._center.y - tile.center.y)];
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
