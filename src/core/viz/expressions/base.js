@@ -69,9 +69,6 @@ export default class Base {
         this._getChildren().map(child => child._resolveAliases(aliases));
     }
 
-    _updateDrawMetadata(metadata) {
-        this._getChildren().map(child => child._updateDrawMetadata(metadata));
-    }
     _compile(metadata) {
         this._getChildren().map(child => child._compile(metadata));
     }
@@ -113,7 +110,7 @@ export default class Base {
     _resetViewportAgg() {
         this._getChildren().forEach(child => child._resetViewportAgg());
     }
-    
+
     accumViewportAgg(feature) {
         this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
