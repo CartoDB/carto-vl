@@ -48,7 +48,7 @@
     const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
     width: 25
-    symbol: sprite('./walmart.svg')
+    symbol: sprite('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
     `);
 
     const layer = new carto.Layer('layer', source, viz);
