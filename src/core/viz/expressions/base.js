@@ -50,17 +50,17 @@ export default class Base {
     }
 
     _prefaceCode(glslCode) {
-        if (!glslCode) {
-            return '';
-        }
-        
+        return glslCode
+            ? `\n${this._parseGLSLCode(glslCode)}\n`
+            : '';
+    }
+
+    _buildGLSLCode(glslCode) {
         return `
-            \n
             #ifndef DEF_${this._uid}
             #define DEF_${this._uid}
             ${glslCode}
-            #endif
-            \n`;
+            #endif`;
     }
 
     _getDependencies() {
