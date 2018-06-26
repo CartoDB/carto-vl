@@ -52,7 +52,7 @@
     // Define layer
     const source = new carto.source.Dataset('taxi_50k');
     const viz = new carto.Viz(`
-      filter: torque(linear($tpep_pickup_datetime,time('2016-05-01T00:00:07Z'),time('2016-05-06T10:40:59Z')),30,fade(0.1,0.5))
+      filter: animation(linear($tpep_pickup_datetime,time('2016-05-01T00:00:07Z'),time('2016-05-06T10:40:59Z')),30,fade(0.1,0.5))
     `);
     const layer = new carto.Layer('layer', source, viz);
 

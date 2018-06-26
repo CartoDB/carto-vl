@@ -3,7 +3,7 @@ import { In, Nin } from '../core/viz/expressions/belongs';
 import Between from '../core/viz/expressions/between';
 import Property from '../core/viz/expressions/basic/property';
 import Blend from '../core/viz/expressions/blend';
-import Animate from '../core/viz/expressions/animate';
+import Transition from '../core/viz/expressions/transition';
 import NumberExpression from '../core/viz/expressions/basic/number';
 import ConstantExpression from '../core/viz/expressions/basic/constant';
 import CategoryExpression from '../core/viz/expressions/basic/category';
@@ -75,7 +75,7 @@ class AggregationFiltering {
     }
 
     _removeBlend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Animate) {
+        if (f instanceof Blend && f.originalMix instanceof Transition) {
             return f.b;
         }
         return f;
@@ -331,7 +331,7 @@ class PreaggregationFiltering {
     }
 
     _blend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Animate) {
+        if (f instanceof Blend && f.originalMix instanceof Transition) {
             return this._filter(f.b);
         }
     }

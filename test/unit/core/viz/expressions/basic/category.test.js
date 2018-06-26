@@ -35,6 +35,7 @@ describe('src/core/viz/expressions/basic/category', () => {
                 'cat2': 2,
             }
         };
+        
         it('should return the value from the metadata', () => {
             const categoryExpresion = s.category('cat0');
             categoryExpresion._compile(fakeMetadata);

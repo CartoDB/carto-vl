@@ -51,14 +51,15 @@ export default class Property extends BaseExpression {
         }
         return feature[this.name];
     }
+
     _compile(meta) {
-        const metaColumn = meta.columns.find(c => c.name == this.name);
+        const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
         if (this.type == 'category') {
-            this.numCategories = metaColumn.categoryNames.length;
+            this.numCategories = metaColumn.categories.length;
         }
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }

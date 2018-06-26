@@ -37,9 +37,13 @@ export default class Top extends BaseExpression {
     eval(feature) {
         const p = this.property.eval(feature);
         const buckets = Math.round(this.buckets.eval());
-        const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
+        const metaColumn = this._meta.properties[this.property.name];
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
+
         let ret;
-        metaColumn.categoryNames.map((name, i) => {
+        orderedCategoryNames.map((name, i) => {
             if (i == p) {
                 ret = i < buckets ? i + 1 : 0;
             }
@@ -83,10 +87,15 @@ export default class Top extends BaseExpression {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
             let colorValues = new Uint8Array(4 * width);
-            const metaColumn = this._meta.columns.find(c => c.name == this.property.name);
-            metaColumn.categoryNames.map((name, i) => {
+            const metaColumn = this._meta.properties[this.property.name];
+
+            const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+                b.frequency - a.frequency
+            );
+
+            orderedCategoryNames.map((cat, i) => {
                 if (i < buckets) {
-                    colorValues[4 * this._meta.categoryIDs[name] + 3] = (i + 1);
+                    colorValues[4 * this._meta.categoryToID.get(cat.name) + 3] = (i + 1);
                 }
             });
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);

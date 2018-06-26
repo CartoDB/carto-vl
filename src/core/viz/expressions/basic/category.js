@@ -25,11 +25,7 @@ export default class BaseCategory extends BaseExpression {
         return this.expr;
     }
     
-    eval() {
-        if (this._metadata && this._metadata.categoryIDs[this.expr]) {
-            return this._metadata.categoryIDs[this.expr];
-        }
-        
+    eval() {        
         return this.expr;
     }
     
@@ -53,7 +49,7 @@ export default class BaseCategory extends BaseExpression {
     }
     
     _preDraw(program, drawMetadata, gl) {
-        const id = this._metadata.categoryIDs[this.expr];
+        const id = this._metadata.categoryToID.get(this.expr);
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
 }

@@ -1,5 +1,6 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 import * as s from '../../../../../src/core/viz/functions';
+import Metadata from '../../../../../src/core/metadata';
 
 describe('src/core/viz/expressions/buckets', () => {
     describe('error control', () => {
@@ -18,26 +19,19 @@ describe('src/core/viz/expressions/buckets', () => {
         let bucketExpression;
 
         describe('when input type is category', () => {
-            const METADATA = {
-                columns: [
-                    {
-                        name: 'city',
+            const METADATA = new Metadata({
+                properties: {
+                    city: {
                         type: 'category',
-                        categoryNames: [
-                            'Madrid',
-                            'Murcia',
-                            'Pontevedra',
-                            'Barcelona'
-                        ],
-                    },
-                ],
-                categoryIDs: {
-                    'Mardrid': 'Madrid',
-                    'Murcia': 'Murcia',
-                    'Pontevedra': 'Pontevedra',
-                    'Barcelona': 'Barcelona'
+                        categories: [
+                            { city: 'Murcia' }, 
+                            { city: 'Madrid' },
+                            { city: 'Pontevedra' },
+                            { city: 'Barcelona' }
+                        ]
+                    }
                 }
-            };
+            });
 
             let $cities = s.property('city');
 
@@ -155,14 +149,13 @@ describe('src/core/viz/expressions/buckets', () => {
         });
 
         describe('when input type is number', () => {
-            const METADATA = {
-                columns: [
-                    {
-                        name: 'price',
-                        type: 'number',
+            const METADATA = new Metadata({
+                properties: {
+                    price: {
+                        type: 'number'
                     }
-                ]
-            };
+                }
+            });
 
             const $price = s.property('price');
 

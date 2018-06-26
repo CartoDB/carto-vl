@@ -7,6 +7,8 @@
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
+ *  - **symbol** - show a sprite instead in the place of points
+ *  - **symbolPlacement** - when using `symbol`, offset to apply to the sprite
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
  * For example the point diameter could be using the `add` expression:
@@ -121,7 +123,7 @@
  * @api
  */
 
-import Animate from './expressions/animate';
+import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
@@ -205,8 +207,8 @@ import Time from './expressions/time';
 
 import Top from './expressions/top';
 
-import { Fade } from './expressions/torque';
-import { Torque } from './expressions/torque';
+import { Fade } from './expressions/Fade';
+import { Animation } from './expressions/Animation';
 
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
@@ -231,10 +233,9 @@ import Sprite from './expressions/sprite';
 import Placement from './expressions/placement';
 import Sprites from './expressions/sprites';
 
-
 /* Expose classes as constructor functions */
 
-export const animate = (...args) => new Animate(...args);
+export const transition = (...args) => new Transition(...args);
 
 export const array = (...args) => new BaseArray(...args);
 
@@ -331,7 +332,11 @@ export { time as date };
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
-export const torque = (...args) => new Torque(...args);
+export const animation = (...args) => new Animation(...args);
+export const torque = (...args) => {
+    console.warn('DeprecationWarning: "torque" expression is deprecated. Please use "animation" instead.');
+    return new Animation(...args);
+};
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);

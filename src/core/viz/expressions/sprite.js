@@ -4,7 +4,9 @@ import { checkString } from './utils';
 /**
  * Sprite. Load an image and use it as a symbol.
  *
- * Note: images have to be square
+ * Note: sprite RGB color will be overridden if the viz `color` property is set.
+ *
+ * Limitation: images have to be square.
  *
  * @param {string} url - Image path
  *

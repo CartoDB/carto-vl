@@ -19,9 +19,9 @@ describe('src/core/viz/expressions/classifier', () => {
         const $price = property('price');
         function prepare(expr) {
             expr._compile({
-                columns: [
-                    { name: 'price', type: 'number', min: 0, max: 5 },
-                ],
+                properties: {
+                    price: { type: 'number', min: 0, max: 5 },
+                },
                 sample: [
                     { price: 0 },
                     { price: 1 },
@@ -32,14 +32,14 @@ describe('src/core/viz/expressions/classifier', () => {
                 ]
             });
             expr._resetViewportAgg();
-            expr._accumViewportAgg({ price: 0 });
-            expr._accumViewportAgg({ price: 1 });
+            expr.accumViewportAgg({ price: 0 });
+            expr.accumViewportAgg({ price: 1 });
 
-            expr._accumViewportAgg({ price: 2 });
-            expr._accumViewportAgg({ price: 3 });
+            expr.accumViewportAgg({ price: 2 });
+            expr.accumViewportAgg({ price: 3 });
 
-            expr._accumViewportAgg({ price: 4 });
-            expr._accumViewportAgg({ price: 5 });
+            expr.accumViewportAgg({ price: 4 });
+            expr.accumViewportAgg({ price: 5 });
         }
         it('globalQuantiles($price, 2)', () => {
             const q = globalQuantiles($price, 2);

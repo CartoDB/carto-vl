@@ -404,7 +404,7 @@ describe('src/client/windshaft-filtering', () => {
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);
@@ -772,7 +772,7 @@ describe('src/client/windshaft-filtering', () => {
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);
