@@ -344,8 +344,19 @@ export default class Ramp extends BaseExpression {
 }
 
 function interpolate(low, high, m) {
-    const cielabLow = sRGBToCielab({...low});
-    const cielabHigh = sRGBToCielab({...high});
+    const cielabLow = sRGBToCielab({
+        r: low.r,
+        g: low.g,
+        b: low.b,
+        a: low.a,
+    });
+    
+    const cielabHigh = sRGBToCielab({
+        r: high.r,
+        g: high.g,
+        b: high.b,
+        a: high.a,
+    });
 
     const cielabInterpolated = {
         l: (1 - m) * cielabLow.l + m * cielabHigh.l,
