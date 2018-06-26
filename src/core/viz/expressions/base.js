@@ -1,5 +1,5 @@
 import { implicitCast } from './utils';
-import { blend, animate } from '../functions';
+import { blend, transition } from '../functions';
 import * as schema from '../../schema';
 
 /**
@@ -171,7 +171,7 @@ export default class Base {
         //TODO blendFunc = 'linear'
         final = implicitCast(final);
         const parent = this.parent;
-        const blender = blend(this, final, animate(duration));
+        const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
         return final;
@@ -183,7 +183,7 @@ export default class Base {
         }
         final = implicitCast(final);
         const parent = this.parent;
-        const blender = blend(final, this, animate(duration), interpolator);
+        const blender = blend(final, this, transition(duration), interpolator);
         parent.replaceChild(this, blender);
         blender.notify();
     }
