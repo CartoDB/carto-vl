@@ -386,8 +386,8 @@ export default class Layer {
         });
     }
 
-    _onMapData(type, map, beforeLayerID) {
-        switch (type) {
+    _onMapData(dataType, map, beforeLayerID) {
+        switch (dataType) {
             case mapboxDataType.STYLE:
                 if (map.isStyleLoaded()) {
                     this._onMapLoaded(map, beforeLayerID);
@@ -399,7 +399,7 @@ export default class Layer {
                 }
                 break;
             default:
-                throw new Error(`Unkown data type: ${type}`);
+                throw new Error(`Unkown data type: ${dataType}`);
         }
     }
 
