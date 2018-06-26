@@ -13,31 +13,6 @@ body {
     font-family: 'Open Sans', sans-serif;
 }
 
-#map {
-    flex: 1;
-}
-
-.cvl-MapInfo {
-    position: absolute;
-    font-size: 12px;
-    padding: 5px;
-    font-weight: 200;
-    background: white;
-    top: 0;
-    margin: 0;
-}
-
-.cvl-FeaturesInfo {
-    position: absolute;
-    top: 0;
-    background: white;
-    margin: 0;
-    right: 0;
-    padding: 5px;
-    font-weight: 200;
-    font-size: 12px;
-}
-
 .cvl-Container {
     display: flex;
     width: 100%;
@@ -48,6 +23,7 @@ body {
     padding: 0 15px;
     width: 350px;
     overflow: scroll;
+    margin-bottom: 15px;
 }
 
 .cvl-Sidebar--label {
@@ -110,25 +86,30 @@ body {
     border-image: initial;
     border-color: rgb(23, 133, 251);
     padding: 6px 8px;
+    resize: vertical;
 }
 
 .cvl-Sidebar--Textarea,
 .cvl-Main--Textarea {
     width: 100%;
     font-family: Monospace;
+    resize: vertical;
+    font-size: 16px;
 }
 
 .cvl-Debugger {
+    margin: 0;
+    position: absolute;
+    left: 0;
     right: 0;
     top: 0;
-    position: absolute;
     z-index: 1;
     width: 100%;
-    height: 580px;
-    max-height: 580px;
-    background-color: rgba(218, 22, 22, 0.5);
+    overflow: scroll;
+    background-color: rgba(218, 22, 22, 0.6);
     color: #ffffff;
     padding: 30px;
+    font-size: 14px;
     display: none;
 }
 
@@ -181,5 +162,79 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    margin: 15px;
+}
+
+.loader {
+    left: 0;
+    right: 0;
+    height: 5px;
+    width: 100%;
+    position: absolute;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.loader:before {
+    display: block;
+    position: absolute;
+    content: "";
+    left: -200px;
+    width: 200px;
+    height: 5px;
+    background-color: rgb(23, 133, 251);
+    animation: loading 2s linear infinite;
+}
+
+@keyframes loading {
+    from {
+        left: -200px;
+        width: 30%;
+    }
+    50% {
+        width: 30%;
+    }
+    70% {
+        width: 70%;
+    }
+    80% {
+        left: 50%;
+    }
+    95% {
+        left: 120%;
+    }
+    to {
+        left: 100%;
+    }
+}
+
+.cvl-Main--MapWrapper {
     position: relative;
+    flex: 1;
+}
+
+.map {
+    height: 100%;
+}
+
+.cvl-MapInfo {
+    position: absolute;
+    bottom: 0;
+    padding: 0 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    color: rgba(0, 0, 0, 0.75);
+    font-size: 13px;
+}
+
+.cvl-FeaturesInfo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    position: absolute;
+    padding: 0 5px;
+    background-color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+    color: rgba(0, 0, 0, 0.75);
+    font-size: 13px;
 }

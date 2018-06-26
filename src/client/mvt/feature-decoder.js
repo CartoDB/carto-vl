@@ -97,11 +97,11 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
                 // case 1: both inside, push B vertex
                 preClippedVertices2.push(b);
             } else if (insideA) {
-                // case 2: just A outside, push intersection
+                // case 2: just B outside, push intersection
                 const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
                 preClippedVertices2.push(intersectionPoint);
             } else if (insideB) {
-                // case 4: just B outside: push intersection, push B
+                // case 4: just A outside: push intersection, push B
                 const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
                 preClippedVertices2.push(intersectionPoint);
                 preClippedVertices2.push(b);
