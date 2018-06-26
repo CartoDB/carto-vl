@@ -25,6 +25,7 @@ export default class MVT extends Base {
      *
      * @param {object} data - A MVT data object
      * @param {object} metadata - A carto.source.mvt.Metadata object
+     * @param {string} layerId - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
@@ -37,15 +38,16 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @IGNOREapi
      */
-    constructor(templateURL, metadata = new Metadata()) {
+    constructor(templateURL, metadata = new Metadata(), layerId = undefined) {
         super();
         this._templateURL = templateURL;
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
+        this._layerID = layerId;
     }
 
     _clone() {
-        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)));
+        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._layerID);
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
@@ -67,7 +69,16 @@ export default class MVT extends Base {
             return { empty: true };
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
-        const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
+
+        if (Object.keys(tile.layers).length > 1 && !this._layerID) {
+            throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
+        }
+
+        const mvtLayer = tile.layers[this._layerID || Object.keys(tile.layers)[0]];
+
+        if (!mvtLayer) {
+            throw new Error(`LayerID '${this._layerID}' doesn't exist on the MVT tile`);
+        }
 
         const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
 
