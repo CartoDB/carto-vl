@@ -213,7 +213,7 @@ export class GlobalEqIntervals extends Classifier {
     _compile(metadata) {
         super._compile(metadata);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
-        const { min, max } = metadata.columns.find(c => c.name == this.input.name);
+        const { min, max } = metadata.properties[this.input.name];
 
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;

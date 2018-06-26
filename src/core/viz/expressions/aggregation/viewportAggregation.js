@@ -395,7 +395,7 @@ export class ViewportHistogram extends BaseExpression {
                 });
             } else {
                 this._cached = [...this._histogram].map(([x, y]) => {
-                    return { x: this._metatada.categoryIDsToName[x], y };
+                    return { x: this._metatada.IDToCategory.get(x), y };
                 });
             }
         }

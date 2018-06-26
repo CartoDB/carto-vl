@@ -19,7 +19,7 @@ const INITIAL_TIMESTAMP = Date.now();
  *
  * Large values imply a small overhead too.
  */
-const RTT_WIDTH = 1024;
+export const RTT_WIDTH = 1024;
 
 /**
  * @description Renderer constructor. Use it to create a new renderer bound to the provided canvas.
@@ -150,7 +150,7 @@ class Renderer {
         const aspect = this.getAspect();
         let drawMetadata = {
             zoom: 1. / this._zoom,
-            columns: []
+            columns: [] // What is this?
         };
 
         const s = 1. / this._zoom;

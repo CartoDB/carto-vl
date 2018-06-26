@@ -1,19 +1,18 @@
 import * as s from '../../../../../src/core/viz/functions';
 import { isArgConstructorTimeTyped } from '../../../../../src/core/viz/expressions/utils';
+import Metadata from '../../../../../src/core/metadata';
 
-const metadata = {
-    columns: [
-        {
-            name: 'number',
-            type: 'number'
+const metadata = new Metadata({
+    properties: {
+        number: {
+            type: 'number',
         },
-        {
-            name: 'category',
+        category: {
             type: 'category',
-            categoryNames: ['category0', 'category1', 'category2']
+            categories: [{ name: 'category0' }, { name: 'category1' }, { name: 'category2' }],
         }
-    ],
-};
+    },
+});
 
 // Validate feature independence checks at constructor and compile times, mark the dependent argument with 'dependent' in argTypes
 export function validateFeatureDependentErrors(expressionName, argTypes) {
@@ -32,7 +31,11 @@ export function validateFeatureDependentErrors(expressionName, argTypes) {
             const expr = s[expressionName](...args.map(arg => arg[0]));
             v.alias = s.property('wadus');
             expect(() =>
-                expr._compile({ columns: [{ name: 'wadus', type: 'number' }] })
+                expr._compile({
+                    properties: {
+                        wadus: { type: 'number' }
+                    }
+                })
             ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
         });
     }
