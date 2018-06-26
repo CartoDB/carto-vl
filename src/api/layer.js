@@ -9,6 +9,11 @@ import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
+const mapboxDataType = Object.freeze({
+    STYLE: 'style',
+    SOURCE: 'source'
+});
+
 /**
  *
  * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
@@ -376,12 +381,25 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        if (map.isStyleLoaded()) {
-            this._onMapLoaded(map, beforeLayerID);
-        } else {
-            map.on('load', () => {
-                this._onMapLoaded(map, beforeLayerID);
-            });
+        map.once('data', (event) => {
+            this._onMapData(event.dataType, map, beforeLayerID);
+        });
+    }
+
+    _onMapData(type, map, beforeLayerID) {
+        switch (type) {
+            case mapboxDataType.STYLE:
+                if (map.isStyleLoaded()) {
+                    this._onMapLoaded(map, beforeLayerID);
+                }
+                break;
+            case mapboxDataType.SOURCE:
+                if (map.areTilesLoaded()) {
+                    this._onMapLoaded(map, beforeLayerID);
+                }
+                break;
+            default:
+                throw new Error(`Unkown data type: ${type}`);
         }
     }
 
