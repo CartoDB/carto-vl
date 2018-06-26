@@ -142,7 +142,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should use last color for "others"', () => {
+                    it('should use last color for the remaining categories', () => {
                         const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                         r._compile(METADATA);
@@ -166,7 +166,7 @@ describe('src/core/viz/expressions/ramp', () => {
                 });
             });
 
-            describe('and there are the same categories than colors', () => {
+            describe('and there are the same number of categories than colors', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
                     it('should not show interpolation', () => {
                         const categories = ['A', 'B', 'C', 'D'];
@@ -194,7 +194,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         checkRGBAThreshold.call(this, actual, expected);
                     });
 
-                    it('should use the default color for "others"', () => {
+                    it('should use last color for the remaining categories', () => {
                         const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                         r._compile(METADATA);
 
@@ -227,7 +227,7 @@ describe('src/core/viz/expressions/ramp', () => {
 
             describe('and there are the more categories than colors', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
-                    it('should use the default color for others', () => {
+                    it('should use the default color for the remaining categories', () => {
                         const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
 
                         r._compile(METADATA);
@@ -286,7 +286,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).toEqual(expected);                        
                     });
     
-                    it('should set the last color to "others"', () => {
+                    it('should use last color for the remaining categories', () => {
                         const r = ramp(buckets('Madrid', CATEGORIES), palettes.PRISM);
     
                         r._compile(METADATA);
@@ -311,7 +311,7 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).not.toEqual(expected);                        
                     });
 
-                    it('should not set the "others" color to the last category', () => {
+                    it('should not set the last ramp color to the last category', () => {
                         const r = ramp(buckets('Zaragoza', CATEGORIES), palettes.PRISM);
     
                         r._compile(METADATA);
@@ -336,7 +336,7 @@ describe('src/core/viz/expressions/ramp', () => {
                 let actual;
                 let expected;
 
-                describe('and there are less or equal than 7 categories', () => {
+                describe('and there are less or equal categories than the max quantitative ramp length (7)', () => {
                     const CATEGORIES = [10, 20, 30];
                     const RAMP_COLORS = cartocolor.Burg[CATEGORIES.length];
                     
@@ -353,7 +353,7 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
                 });
     
-                describe('and there are more than 7 categories', () => {
+                describe('and there are more categories than the max quantitative ramp length (7)', () => {
                     it('should show interpolation', () => {
                         const CATEGORIES = [10, 20, 30, 40, 50, 60, 70, 80, 90];
                         const RAMP_COLORS = cartocolor.Burg[7];
@@ -366,7 +366,6 @@ describe('src/core/viz/expressions/ramp', () => {
                         expected = hexToRgb(RAMP_COLORS[0]);
         
                         expect(actual).toEqual(expected);
-
 
                         r = ramp(buckets(10, CATEGORIES), palettes.BURG);
 
