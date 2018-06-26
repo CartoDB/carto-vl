@@ -51,7 +51,7 @@ export default class Base {
 
     _prefaceCode(glslCode) {
         return glslCode
-            ? `\n${this._parseGLSLCode(glslCode)}\n`
+            ? `\n${this._buildGLSLCode(glslCode)}\n`
             : '';
     }
 
