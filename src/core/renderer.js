@@ -144,24 +144,23 @@ class Renderer {
         return 1;
     }
 
-    _computeDrawMetadata(renderLayer) {
+    /**
+     * Run aggregation functions over the visible features.
+     */
+    _runViewportAggregations(renderLayer) {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const aspect = this.getAspect();
         const scale = 1. / this._zoom;
-        const drawMetadata = {
-            zoom: 1. / this._zoom,
-            columns: []
-        };
 
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg());
-
         if (!viewportExpressions.length) {
-            return drawMetadata;
+            return;
         }
+
+        viewportExpressions.forEach(expr => expr._resetViewportAgg());
 
         // Keep track of features processed in viewPort expressions
         const processedFeaturesIDs = new Set();
@@ -187,8 +186,6 @@ class Renderer {
                 viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
             }
         });
-
-        return drawMetadata;
     }
 
     /**
@@ -222,11 +219,15 @@ class Renderer {
         return feature;
     }
 
-    renderLayer(layer) {
-        const tiles = layer.getActiveDataframes();
-        const viz = layer.viz;
+    renderLayer(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
+        const drawMetadata = {
+            zoom: 1. / this._zoom, // Used by zoom expression
+            columns: []
+        };
 
         if (!tiles.length) {
             return;
@@ -241,8 +242,9 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
 
-        const drawMetadata = this._computeDrawMetadata(layer);
+        this._runViewportAggregations(renderLayer);
 
+        
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const TID = shader.tid;
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
@@ -280,7 +282,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -303,7 +305,7 @@ class Renderer {
 
         const s = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
@@ -417,7 +419,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
