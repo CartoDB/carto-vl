@@ -7,8 +7,12 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add layer",
+                    "title": "Add CARTO dataset layer",
                     "file": "basics/add-layer.html"
+                },
+                {
+                    "title": "Add GeoJSON layer",
+                    "file": "basics/add-layer-geojson.html"
                 },
                 {
                     "title": "Style layer",
