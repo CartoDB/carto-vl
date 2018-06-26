@@ -45,7 +45,7 @@ export default class Base {
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
-    isFeatureDependent(){
+    isFeatureDependent() {
         return this._getChildren().some(child => child.isFeatureDependent());
     }
 
@@ -178,6 +178,9 @@ export default class Base {
     }
 
     _blendFrom(final, duration = 500, interpolator = null) {
+        if (this.default && final.default) {
+            return;
+        }
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(final, this, animate(duration), interpolator);
