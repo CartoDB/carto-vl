@@ -1,4 +1,5 @@
 import BaseExpression from './base';
+import { number } from '../functions';
 import * as util from '../../../api/util';
 
 /**
@@ -25,18 +26,37 @@ import * as util from '../../../api/util';
  */
 export default class Time extends BaseExpression {
     constructor(date) {
-        super({});
+        super({ _impostor: number(0) });
         // TODO improve type check
         this.type = 'time';
         this.date = util.castDate(date);
-        this.inlineMaker = () => undefined;
+        this.inlineMaker = inline => inline._impostor;
     }
+    
+    _compile(meta) {
+        this.metadata = meta;
+        const inputMin = this.metadata.columns.find(c => c.name == this.dateProperty.name).min.getTime();
+        const inputMax = this.metadata.columns.find(c => c.name == this.dateProperty.name).max.getTime();
+        const inputDiff = inputMax - inputMin;
+
+        const t = this.date.getTime();
+        const tMapped = (t - inputMin) / inputDiff;
+
+        this._impostor.expr = tMapped;
+    }
+    
+    getMappedValue() {
+        return this._impostor.expr;
+    }
+    
     get value() {
         return this.eval();
     }
+    
     eval() {
         return this.date;
     }
+    
     isAnimated() {
         return false;
     }

@@ -33,9 +33,17 @@ export default class Between extends BaseExpression {
         lowerLimit = implicitCast(lowerLimit);
         upperLimit = implicitCast(upperLimit);
 
-        checkLooseType('between', 'value', 0, 'number', value);
-        checkLooseType('between', 'lowerLimit', 1, 'number', lowerLimit);
-        checkLooseType('between', 'upperLimit', 2, 'number', upperLimit);
+        checkLooseType('between', 'value', 0, ['number', 'date'], value);
+        if (value.type == 'number') {
+            checkLooseType('between', 'lowerLimit', 1, 'number', lowerLimit);
+            checkLooseType('between', 'upperLimit', 2, 'number', upperLimit);
+        } else if (value.type == 'date') {
+            checkLooseType('between', 'lowerLimit', 1, 'time', lowerLimit);
+            checkLooseType('between', 'upperLimit', 2, 'time', upperLimit);
+        } else {
+            checkLooseType('between', 'lowerLimit', 1, ['number', 'time'], lowerLimit);
+            checkLooseType('between', 'upperLimit', 2, ['number', 'time'], upperLimit);
+        }
 
         super({ value, lowerLimit, upperLimit });
         this.type = 'number';
@@ -47,11 +55,25 @@ export default class Between extends BaseExpression {
         return (value >= lower && value <= upper) ? 1 : 0;
     }
     _compile(meta) {
+        this.value._compile(meta);
+        checkType('between', 'value', 0, ['number', 'date'], this.value);
+
+        this.lowerLimit.dateProperty = this.value;
+        this.upperLimit.dateProperty = this.value;
+
+        if (this.value.type != 'number') {
+            checkType('between', 'lowerLimit', 1, 'time', this.lowerLimit);
+            checkType('between', 'upperLimit', 2, 'time', this.upperLimit);
+        } else {
+            checkLooseType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
+            checkLooseType('between', 'upperLimit', 2, 'number', this.upperLimit);
+        }
         super._compile(meta);
 
-        checkType('between', 'value', 0, 'number', this.value);
-        checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
-        checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
+        if (this.value.type == 'number') {
+            checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
+            checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
+        }
 
         this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }

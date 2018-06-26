@@ -11,7 +11,13 @@ const metadata = {
             name: 'category',
             type: 'category',
             categoryNames: ['category0', 'category1', 'category2']
-        }
+        },
+        {
+            name: 'date',
+            type: 'date',
+            min: new Date('2022-03-09T00:00:00Z'),
+            max: new Date('2022-03-09T00:00:00Z')
+        },
     ],
 };
 
@@ -130,6 +136,10 @@ function getSimpleArg(type) {
     switch (type) {
         case 'number':
             return [s.number(0), '0'];
+        case 'date':
+            return [s.property('date'), '$date'];
+        case 'time':
+            return [s.time('2022-03-09T00:00:00Z'), 'time(\'2022-03-09T00:00:00Z\')'];
         case 'number-array':
             return [s.array([s.number(0)]), '[0]'];
         case 'number-property':
@@ -159,6 +169,10 @@ function getPropertyArg(type) {
         case 'number':
         case 'number-property':
             return [s.property('number'), '$number'];
+        case 'date':
+            return [s.property('date'), '$date'];
+        case 'time':
+            return [s.time('2022-03-09T00:00:00Z'), 'time(\'2022-03-09T00:00:00Z\')'];
         case 'number-array':
             return [s.array([s.number(0)]), '[0]'];
         case 'category':

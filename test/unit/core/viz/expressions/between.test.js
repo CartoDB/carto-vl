@@ -1,17 +1,20 @@
 import * as s from '../../../../../src/core/viz/functions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateDynamicType } from './utils';
 
 describe('src/core/viz/expressions/between', () => {
     describe('error control', () => {
         validateDynamicTypeErrors('between', ['category', 'number', 'number']);
         validateDynamicTypeErrors('between', ['number', 'category', 'number']);
         validateDynamicTypeErrors('between', ['number', 'number', 'category']);
-        validateStaticTypeErrors('between', ['number', 'number', 'color']);
-        validateStaticTypeErrors('between', ['color', 'number', 'color']);
+        validateDynamicTypeErrors('between', ['number', 'number', 'category']);
+        validateDynamicTypeErrors('between', ['date', 'time', 'number']);
+        validateDynamicTypeErrors('between', ['number', 'time', 'number']);
+        validateDynamicTypeErrors('between', ['number', 'number', 'time']);
+        validateDynamicTypeErrors('between', ['color', 'number', 'color']);
     });
 
     describe('type', () => {
-        validateStaticType('between', ['number', 'number', 'number'], 'number');
+        validateDynamicType('between', ['number', 'number', 'number'], 'number');
     });
 
     describe('eval', () => {
