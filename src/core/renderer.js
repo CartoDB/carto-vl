@@ -154,48 +154,72 @@ class Renderer {
             columns: []
         };
 
-        const rootExprs = viz._getRootExpressions();
         // Performance optimization to avoid doing DFS at each feature iteration
-        const viewportExprs = [];
+        const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
+
+        viewportExpressions.forEach(expr => expr._resetViewportAgg());
+
+        if (!viewportExpressions.length) {
+            return drawMetadata;
+        }
+
+        // Keep track of features processed in viewPort expressions
+        const processedFeaturesIDs = new Set();
+
+        dataframes.forEach(dataframe => {
+            for (let i = 0; i < dataframe.numFeatures; i++) {
+                // If feature has been acumulated ignore it
+                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                    continue;
+                }
+                // Ignore features outside viewport
+                if (!dataframe.inViewport(i, scale, this._center, aspect)) {
+                    continue;
+                }
+
+                const feature = this._featureFromDataFrame(dataframe, i);
+
+                // Ignore filtered features
+                if (viz.filter.eval(feature) < 0.5) {
+                    continue;
+                }
+
+                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+            }
+        });
+
+        return drawMetadata;
+    }
+
+    /**
+     * Perform a depth first search through the expression tree collecting all viewport expressions.
+     */
+    _getViewportExpressions(rootExpressions) {
+        const viewportExpressions = [];
+
         function dfs(expr) {
             if (expr._isViewport) {
-                viewportExprs.push(expr);
+                viewportExpressions.push(expr);
             } else {
                 expr._getChildren().map(dfs);
             }
         }
-        rootExprs.map(dfs);
-        const numViewportExprs = viewportExprs.length;
-        viewportExprs.forEach(expr => expr._resetViewportAgg());
 
-        if (!viewportExprs.length) {
-            return drawMetadata;
+        rootExpressions.map(dfs);
+        return viewportExpressions;
+    }
+
+    /**
+     * Build a feature object from a dataframe and an index copying all the properties.
+     */
+    _featureFromDataFrame(dataframe, index) {
+        const propertyNames = Object.keys(dataframe.properties);
+        const feature = {};
+        for (let i = 0; i < propertyNames.length; i++) {
+            const name = propertyNames[i];
+            feature[name] = dataframe.properties[name][index];
         }
-        dataframes.forEach(dataframe => {
-            const propertyNames = Object.keys(dataframe.properties);
-            const propertyNamesLength = propertyNames.length;
-            const feature = {};
-
-            for (let i = 0; i < dataframe.numFeatures; i++) {
-                if (dataframe.inViewport(i, scale, this._center, aspect)) {
-
-                    for (let j = 0; j < propertyNamesLength; j++) {
-                        const name = propertyNames[j];
-                        feature[name] = dataframe.properties[name][i];
-                    }
-
-                    if (viz.filter.eval(feature) < 0.5) {
-                        continue;
-                    }
-
-                    for (let j = 0; j < numViewportExprs; j++) {
-                        const expr = viewportExprs[j];
-                        expr.accumViewportAgg(feature);
-                    }
-                }
-            }
-        });
-        return drawMetadata;
+        return feature;
     }
 
     renderLayer(layer) {
