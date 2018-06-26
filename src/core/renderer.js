@@ -145,7 +145,8 @@ class Renderer {
     }
 
     _computeDrawMetadata(renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
+        console.info('computeDrawMetadata');
+        const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const aspect = this.getAspect();
         let drawMetadata = {
@@ -153,7 +154,7 @@ class Renderer {
             columns: []
         };
 
-        const s = 1. / this._zoom;
+        const scale = 1. / this._zoom;
 
         const rootExprs = viz._getRootExpressions();
         // Performance optimization to avoid doing DFS at each feature iteration
@@ -172,33 +173,33 @@ class Renderer {
         if (!viewportExprs.length) {
             return drawMetadata;
         }
-        tiles.forEach(d => {
-            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
+        dataframes.forEach(dataframe => {
+            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
+            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
+            const minx = (-1 + dataframe.vertexOffset[0]) / dataframe.vertexScale[0];
+            const maxx = (1 + dataframe.vertexOffset[0]) / dataframe.vertexScale[0];
+            const miny = (-1 + dataframe.vertexOffset[1]) / dataframe.vertexScale[1];
+            const maxy = (1 + dataframe.vertexOffset[1]) / dataframe.vertexScale[1];
 
-            const propertyNames = Object.keys(d.properties);
+            const propertyNames = Object.keys(dataframe.properties);
             const propertyNamesLength = propertyNames.length;
-            const f = {};
+            const feature = {};
 
-            for (let i = 0; i < d.numFeatures; i++) {
-                if (d.inViewport(i, minx, miny, maxx, maxy)) {
+            for (let i = 0; i < dataframe.numFeatures; i++) {
+                if (dataframe.inViewport(i, minx, miny, maxx, maxy)) {
 
                     for (let j = 0; j < propertyNamesLength; j++) {
                         const name = propertyNames[j];
-                        f[name] = d.properties[name][i];
+                        feature[name] = dataframe.properties[name][i];
                     }
 
-                    if (viz.filter.eval(f) < 0.5) {
+                    if (viz.filter.eval(feature) < 0.5) {
                         continue;
                     }
 
                     for (let j = 0; j < numViewportExprs; j++) {
                         const expr = viewportExprs[j];
-                        expr.accumViewportAgg(f);
+                        expr.accumViewportAgg(feature);
                     }
                 }
             }
