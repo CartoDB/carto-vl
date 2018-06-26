@@ -198,7 +198,7 @@ class Renderer {
 
                     for (let j = 0; j < numViewportExprs; j++) {
                         const expr = viewportExprs[j];
-                        expr._accumViewportAgg(f);
+                        expr.accumViewportAgg(f);
                     }
                 }
             }
