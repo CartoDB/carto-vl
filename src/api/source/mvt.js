@@ -87,9 +87,12 @@ export default class MVT extends Base {
         let featureGeometries = [];
         let numFeatures = 0;
         const decodedProperties = {};
-        const decodingPropertyNames = Object.keys(metadata.properties).
+        const decodingPropertyNames = [];
+        Object.keys(metadata.properties).
             filter(propertyName => metadata.properties[propertyName].type != 'geometry').
-            map(propertyName => metadata.properties[propertyName].sourceName || propertyName);
+            forEach(propertyName => {
+                decodingPropertyNames.push(...metadata.propertyNames(propertyName));
+            });
         decodingPropertyNames.forEach(propertyName => {
             decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
         });

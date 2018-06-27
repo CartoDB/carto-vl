@@ -362,7 +362,11 @@ export default class Windshaft {
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
             const basename = R.schema.column.getBase(aggName);
-            properties[basename].sourceName = aggName;
+            const fnName = R.schema.column.getAggFN(aggName);
+            if (!properties[basename].aggregations) {
+                properties[basename].aggregations = {};
+            }
+            properties[basename].aggregations[fnName] = aggName;
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);
