@@ -69,12 +69,12 @@ export default class MVT extends Base {
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
 
-        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
+        const { points, featureGeometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
 
 
         const rs = rsys.getRsysFromTile(x, y, z);
         const dataframeGeometry = this._metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-        const dataframe = this._generateDataFrame(rs, dataframeGeometry, properties, mvtLayer.length, this._metadata.geomType);
+        const dataframe = this._generateDataFrame(rs, dataframeGeometry, properties, numFeatures, this._metadata.geomType);
         return dataframe;
     }
 
@@ -85,6 +85,7 @@ export default class MVT extends Base {
             points = new Float32Array(mvtLayer.length * 2);
         }
         let featureGeometries = [];
+        let numFeatures = 0;
         const decodedProperties = {};
         const decodingPropertyNames = Object.keys(metadata.properties).
             filter(propertyName => metadata.properties[propertyName].type != 'geometry').
@@ -115,8 +116,15 @@ export default class MVT extends Base {
                 }
             }
             if (metadata.geomType == geometryTypes.POINT) {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                // Tiles may contain points in the border;
+                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
+                if (x < -1 || x >= 1 || y < -1 || y >= 1) {
+                    continue;
+                }
+                points[2 * numFeatures + 0] = x;
+                points[2 * numFeatures + 1] = y;
             } else if (metadata.geomType == geometryTypes.POLYGON) {
                 const decodedPolygons = decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
@@ -128,10 +136,11 @@ export default class MVT extends Base {
             }
             decodingPropertyNames.forEach(propertyName => {
                 const propertyValue = f.properties[propertyName];
-                decodedProperties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
+                decodedProperties[propertyName][numFeatures] = this.decodeProperty(propertyName, propertyValue);
             });
+            ++numFeatures;
         }
-        return { properties: decodedProperties, points, featureGeometries };
+        return { properties: decodedProperties, points, featureGeometries, numFeatures };
     }
 
     decodeProperty(propertyName, propertyValue) {
