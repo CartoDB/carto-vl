@@ -6,6 +6,9 @@ import Property from './basic/property';
 import Variable from './basic/variable';
 import { castDate } from '../../../api/util';
 
+let waitingForLayer = new Set();
+let waitingForOthers = new Set();
+
 /**
  * Create an animated temporal filter (animation).
  *
@@ -87,6 +90,8 @@ export class Animation extends BaseExpression {
         this.type = 'number';
         this._originalInput = originalInput;
         this._paused = false;
+
+        waitingForLayer.add(this);
     }
 
     isAnimated() {
@@ -97,7 +102,15 @@ export class Animation extends BaseExpression {
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
-        if (this._lastTime !== undefined) {
+        if (this._lastTime === undefined) {
+            waitingForLayer.delete(this);
+            waitingForOthers.add(this);
+            if (waitingForLayer.size > 0) {
+                return;
+            }
+            [...waitingForOthers.values()].map(anim => anim._lastTime = timestamp);
+            return;
+        } else {
             deltaTime = timestamp - this._lastTime;
         }
 
@@ -178,7 +191,7 @@ export class Animation extends BaseExpression {
 
     /**
      * Get the animation progress.
-     * 
+     *
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
@@ -199,7 +212,7 @@ export class Animation extends BaseExpression {
      */
     setProgressPct(progress) {
         progress = Number.parseFloat(progress);
-        
+
         if (progress < 0 || progress > 1) {
             throw new TypeError(`animation.setProgressPct requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
@@ -263,10 +276,10 @@ export class Animation extends BaseExpression {
         this.preface = `
             #ifndef ANIMATION
             #define ANIMATION
-            
+
             float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
                 float x = 0.;
-                
+
                 // Check for NaN
                 if (_input <= 0.0 || 0.0 <= _input){
                     x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
