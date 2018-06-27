@@ -186,6 +186,12 @@ export default class Dataframe {
 
             // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
             const scale = diameter / 2 * widthScale;
+            if (!viz.symbol.default) {
+                const offset = viz.symbolPlacement.eval();
+                center.x += offset[0] * scale;
+                center.y += offset[1] * scale;
+            }
+
             const inside = pointInCircle(p, center, scale);
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
