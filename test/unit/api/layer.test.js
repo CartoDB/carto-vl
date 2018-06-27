@@ -130,7 +130,7 @@ describe('api/layer', () => {
     });
 
     describe('.addTo', () => {
-        fdescribe('._addToMGLMap', () => {
+        describe('._addToMGLMap', () => {
             let layer;
             
             const sourcedataEvent = {
