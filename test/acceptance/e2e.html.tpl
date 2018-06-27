@@ -14,8 +14,5 @@
   <body>
     <div id="map"></div>
     <script src="<%- file %>"></script>
-    <script>
-      layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
-    </script>
   </body>
 </html>

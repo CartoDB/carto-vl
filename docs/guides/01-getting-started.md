@@ -9,7 +9,7 @@ The easiest way to use CARTO VL is to include the required files from our CDN. T
 ```html
 <head>
   <!-- Include CARTO VL JS -->
-  <script src="https://libs.cartocdn.com/carto-vl/v0.4.0/carto-vl.js"></script>
+  <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->

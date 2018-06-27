@@ -1,13 +1,12 @@
 import * as util from './util';
 import * as s from '../core/viz/functions';
 import * as schema from '../core/schema';
-import * as shaders from '../core/shaders';
+import * as shaders from '../core/shaders/index';
 import { compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
 import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
-import { symbolizerGLSL } from '../core/shaders/symbolizer';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -60,11 +59,13 @@ export default class Viz {
     * @memberof carto
     * @api
     *
-    * @property {Color} color - fill color of points and polygons and color of lines
+    * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original sprite RGB channels
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {Sprite} symbol - show a sprite instead in the place of points
+    * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the sprite
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
@@ -186,8 +187,12 @@ export default class Viz {
     }
 
     setDefaultsIfRequired(geomType) {
+        if (this._appliedDefaults) {
+            return;
+        }
         let defaults = this._getDefaultGeomStyle(geomType);
         if (defaults) {
+            this._appliedDefaults = true;
             if (this.color.default) {
                 this.color = defaults.COLOR_EXPRESSION();
             }
@@ -212,16 +217,14 @@ export default class Viz {
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        }
-        if (geomType === 'line') {
+        } else if (geomType === 'line') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
             };
-        }
-        if (geomType === 'polygon') {
+        } else if (geomType === 'polygon') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
@@ -281,15 +284,15 @@ export default class Viz {
         this.symbol._bind(metadata);
         this.filter._bind(metadata);
 
-        this.colorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.color });
-        this.widthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.width });
-        this.strokeColorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.strokeColor });
-        this.strokeWidthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.strokeWidth });
-        this.filterShader = compileShader(gl, shaders.styleFilterGLSL, { filter: this.filter });
+        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color });
+        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width });
+        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor });
+        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
+        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter });
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
-            this.symbolShader = compileShader(gl, symbolizerGLSL, {
+            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
             });
@@ -400,11 +403,13 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {Color} color - fill color of points and polygons and color of lines
+         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original sprite RGB channels
          * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
          * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
          * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
          * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+         * @property {Sprite} symbol - show a sprite instead in the place of points
+         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the sprite
          * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
          * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.

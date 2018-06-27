@@ -211,7 +211,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             zeroFn(this);
         }
 
-        _accumViewportAgg(feature) {
+        accumViewportAgg(feature) {
             accumFn(this, this.property.eval(feature));
         }
 
@@ -296,7 +296,7 @@ export class ViewportPercentile extends BaseExpression {
         this._array = [];
     }
 
-    _accumViewportAgg(feature) {
+    accumViewportAgg(feature) {
         const v = this.property.eval(feature);
         this._array.push(v);
     }
@@ -357,7 +357,7 @@ export class ViewportHistogram extends BaseExpression {
         this._histogram = new Map();
     }
 
-    _accumViewportAgg(feature) {
+    accumViewportAgg(feature) {
         const x = this.x.eval(feature);
         const weight = this.weight.eval(feature);
         const count = this._histogram.get(x) || 0;
@@ -395,7 +395,7 @@ export class ViewportHistogram extends BaseExpression {
                 });
             } else {
                 this._cached = [...this._histogram].map(([x, y]) => {
-                    return { x: this._metatada.categoryIDsToName[x], y };
+                    return { x: this._metatada.IDToCategory.get(x), y };
                 });
             }
         }

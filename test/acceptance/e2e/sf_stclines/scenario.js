@@ -19,3 +19,4 @@ const viz = new carto.Viz({
 const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);
+layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
