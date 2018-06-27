@@ -381,25 +381,21 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        map.once('data', (event) => {
-            this._onMapData(event.dataType, map, beforeLayerID);
-        });
+        this._isSourceLoaded = false;
+        
+        map.on('sourcedata', this._onMapSourcedata);
+        map.on('load', this._onMapLoad.bind(this, map, beforeLayerID));
     }
 
-    _onMapData(dataType, map, beforeLayerID) {
-        switch (dataType) {
-            case mapboxDataType.STYLE:
-                if (map.isStyleLoaded()) {
-                    this._onMapLoaded(map, beforeLayerID);
-                }
-                break;
-            case mapboxDataType.SOURCE:
-                if (map.areTilesLoaded()) {
-                    this._onMapLoaded(map, beforeLayerID);
-                }
-                break;
-            default:
-                throw new Error(`Unkown data type: ${dataType}`);
+    _onMapSourcedata(event) {
+        this._isSourceLoaded = event.isSourceLoaded;   
+    }
+
+    _onMapLoad(map, beforeLayerID) {
+        if (map.isStyleLoaded() || this._isSourceLoaded) {
+            map.off('sourcedata', this._onMapSourcedata);
+            map.off('load', this._onMapLoad);
+            this._onMapLoaded(map, beforeLayerID);
         }
     }
 
