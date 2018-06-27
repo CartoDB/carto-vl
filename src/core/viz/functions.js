@@ -225,6 +225,7 @@ import Variable from './expressions/basic/variable';
 
 import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
+import { ViewportList } from './expressions/viewportList';
 
 import XYZ from './expressions/xyz';
 
@@ -361,6 +362,7 @@ export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 export const viewportHistogram = (...args) => new ViewportHistogram(...args);
+export const viewportList = (...args) => new ViewportList(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
