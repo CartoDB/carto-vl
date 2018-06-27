@@ -284,7 +284,10 @@ export default class Dataframe {
         return { id, properties };
     }
 
-    _addProperty(propertyName, propertiesFloat32Array) {
+    _addProperty(propertyName) {
+        if (Object.keys(this.propertyTex).length<32){
+            this.getPropertyTexture(propertyName);
+        }
     }
 
     getPropertyTexture(propertyName) {
@@ -315,8 +318,7 @@ export default class Dataframe {
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties(properties) {
         Object.keys(properties).forEach(propertyName => {
-            this._addProperty(propertyName, properties[propertyName]);
-            this.properties[propertyName] = properties[propertyName];
+            this._addProperty(propertyName);
         });
     }
 
