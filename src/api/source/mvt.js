@@ -9,7 +9,7 @@ import { RTT_WIDTH } from '../../core/renderer';
 import Metadata from '../../core/metadata';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
-const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
+// const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -68,70 +68,64 @@ export default class MVT extends Base {
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-
-        const { points, featureGeometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
-
-
+        const { geometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframeGeometry = this._metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-        const dataframe = this._generateDataFrame(rs, dataframeGeometry, properties, mvtLayer.length, this._metadata.geomType);
+        const dataframe = this._generateDataFrame(rs, geometries, properties, mvtLayer.length, this._metadata.geomType);
+
         return dataframe;
     }
 
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
-        let points;
-        if (metadata.geomType == geometryTypes.POINT) {
-            points = new Float32Array(mvtLayer.length * 2);
+        switch (metadata.geomType) {
+            case geometryTypes.POINT:
+                return this._decode(mvtLayer, metadata, mvt_extent);
+            case geometryTypes.LINE:
+                return this._decode(mvtLayer, metadata, mvt_extent, decodeLines);
+            case geometryTypes.POLYGON:
+                return this._decode(mvtLayer, metadata, mvt_extent, decodePolygons);
+            default:
+                throw new Error('MVT: invalid geometry type');
         }
-        let featureGeometries = [];
-        const decodedProperties = {};
-        const decodingPropertyNames = Object.keys(metadata.properties).
-            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
-            map(propertyName => metadata.properties[propertyName].sourceName || propertyName);
-        decodingPropertyNames.forEach(propertyName => {
-            decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
-        });
+    }
+
+    _decode(mvtLayer, metadata, mvt_extent, decodeFn) {
+        const { properties, propertyNames } = this._getPropertyNames(metadata, mvtLayer.length);
+        const geometries = decodeFn ? [] : new Float32Array(mvtLayer.length * 2);
+
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             const geom = f.loadGeometry();
-            const mvtGeomType = f.type;
-            if (metadata.geomType === undefined) {
-                switch (mvtGeomType) {
-                    case mvtDecoderGeomTypes.point:
-                        metadata.geomType = geometryTypes.POINT;
-                        break;
-                    case mvtDecoderGeomTypes.line:
-                        metadata.geomType = geometryTypes.LINE;
-                        break;
-                    case mvtDecoderGeomTypes.polygon:
-                        metadata.geomType = geometryTypes.POLYGON;
-                        break;
-                    default:
-                        throw new Error('MVT: invalid geometry type');
-                }
-                if (metadata.geomType == geometryTypes.POINT) {
-                    points = new Float32Array(mvtLayer.length * 2);
-                }
+            if (decodeFn) {
+                const decodedPolygons = decodeFn(geom, mvt_extent);
+                geometries.push(decodedPolygons);
             }
-            if (metadata.geomType == geometryTypes.POINT) {
-                points[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                points[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-            } else if (metadata.geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = decodePolygons(geom, mvt_extent);
-                featureGeometries.push(decodedPolygons);
-            } else if (metadata.geomType == geometryTypes.LINE) {
-                const decodedLines = decodeLines(geom, mvt_extent);
-                featureGeometries.push(decodedLines);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
+            else {
+                geometries[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                geometries[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
             }
-            decodingPropertyNames.forEach(propertyName => {
-                const propertyValue = f.properties[propertyName];
-                decodedProperties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
-            });
+            this._decodeProperties(propertyNames, properties, f, i);
         }
-        return { properties: decodedProperties, points, featureGeometries };
+
+        return { properties, geometries };
+    }
+
+    _getPropertyNames(metadata, length) {
+        const properties = {};
+        const propertyNames = Object.keys(metadata.properties)
+            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
+            .map(propertyName => metadata.properties[propertyName].sourceName || propertyName);
+
+        propertyNames.forEach(propertyName => properties[propertyName] = new Float32Array(length + RTT_WIDTH));
+
+        return { properties, propertyNames };
+    }
+
+    _decodeProperties(propertyNames, properties, feature, i) {
+        propertyNames.forEach(propertyName => {
+            const propertyValue = feature.properties[propertyName];
+            properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
+        });
     }
 
     decodeProperty(propertyName, propertyValue) {
