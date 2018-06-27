@@ -131,51 +131,104 @@ describe('api/layer', () => {
 
     describe('.addTo', () => {
         describe('._addToMGLMap', () => {
-            let layer;
-            let eventId = 'data';            
-            const event = {
-                dataType: 'style'
-            };
-
-            const mapMock = {
-                isStyleLoaded: () => true,
-                areTilesLoaded: () => false,
-                once: (id, callback) => {
-                    if (id === eventId) {
-                        callback(event);
+            describe('and dataType is style', () => {
+            
+                let layer;
+                let eventId = 'data';            
+                const event = {
+                    dataType: 'style'
+                };
+    
+                const mapMock = {
+                    isStyleLoaded: jasmine.createSpy('isStyleLoaded').and.returnValue(true),
+                    areTilesLoaded: jasmine.createSpy('areTilesLoaded').and.returnValue(true),
+                    once: (id, callback) => {
+                        if (id === eventId) {
+                            callback(event);
+                        }
                     }
-                }
-            };
-
-            beforeEach(() => {
-                layer = new Layer('layer0', source, viz);
-                layer._onMapLoaded = () => { };
-                spyOn(layer, '_onMapLoaded');
+                };
+    
+                beforeEach(() => {
+                    layer = new Layer('layer0', source, viz);
+                    layer._onMapLoaded = () => { };
+                    spyOn(layer, '_onMapLoaded');
+                });
+    
+                it('should call onMapLoaded when the map is loaded', () => {
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).toHaveBeenCalled();
+                });
+    
+                it('should not call onMapLoaded when the map is not loaded', () => {
+                    mapMock.isStyleLoaded = jasmine.createSpy('isStyleLoaded').and.returnValue(false),
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).not.toHaveBeenCalled();
+                });
+    
+                it('should call onMapLoaded when the map `data` event is triggered', () => {
+                    mapMock.isStyleLoaded = jasmine.createSpy('isStyleLoaded').and.returnValue(true),
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).toHaveBeenCalled();
+                });
+    
+                it('should not call onMapLoaded when other map event is triggered', () => {
+                    eventId = 'other';
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).not.toHaveBeenCalled();
+                });
             });
 
-            it('should call onMapLoaded when the map is loaded', () => {
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalled();
-            });
-
-            it('should not call onMapLoaded when the map is not loaded', () => {
-                mapMock.isStyleLoaded = () => false;
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).not.toHaveBeenCalled();
-            });
-
-            it('should call onMapLoaded when the map `data` event is triggered', () => {
-                mapMock.isStyleLoaded = () => true;
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalled();
-            });
-
-            it('should not call onMapLoaded when other map event is triggered', () => {
-                eventId = 'other';
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).not.toHaveBeenCalled();
+            describe('and dataType is source', () => {
+            
+                let layer;
+                let eventId = 'data';            
+                const event = {
+                    dataType: 'source'
+                };
+    
+                const mapMock = {
+                    isStyleLoaded: jasmine.createSpy('isStyleLoaded').and.returnValue(false),
+                    areTilesLoaded: jasmine.createSpy('areTilesLoaded').and.returnValue(true),
+                    once: (id, callback) => {
+                        if (id === eventId) {
+                            callback(event);
+                        }
+                    }
+                };
+    
+                beforeEach(() => {
+                    layer = new Layer('layer0', source, viz);
+                    layer._onMapLoaded = () => { };
+                    spyOn(layer, '_onMapLoaded');
+                });
+    
+                it('should call onMapLoaded when the map is loaded', () => {
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).toHaveBeenCalled();
+                });
+    
+                it('should not call onMapLoaded when the map is not loaded', () => {
+                    mapMock.areTilesLoaded = jasmine.createSpy('areTilesLoaded').and.returnValue(false),
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).not.toHaveBeenCalled();
+                });
+    
+                it('should call onMapLoaded when the map `data` event is triggered', () => {
+                    mapMock.areTilesLoaded = jasmine.createSpy('areTilesLoaded').and.returnValue(true),
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).toHaveBeenCalled();
+                });
+    
+                it('should not call onMapLoaded when other map event is triggered', () => {
+                    eventId = 'other';
+                    layer._addToMGLMap(mapMock);
+                    expect(layer._onMapLoaded).not.toHaveBeenCalled();
+                });
             });
         });
+
+
     });
 
     describe('.getFeaturesAtPosition', () => {
