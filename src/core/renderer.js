@@ -269,7 +269,7 @@ class Renderer {
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
                 gl.uniform1i(TID[name], i);
             });
 
@@ -398,7 +398,7 @@ class Renderer {
                 freeTexUnit = drawMetadata.freeTexUnit;
                 Object.keys(viz.symbolShader.tid).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
                     gl.uniform1i(viz.symbolShader.tid[name], freeTexUnit);
                     freeTexUnit++;
                 });
