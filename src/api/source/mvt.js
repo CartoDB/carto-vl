@@ -18,6 +18,12 @@ const geometryTypes = {
     POLYGON: 'polygon'
 };
 
+const MVT_TO_CARTO_TYPES = {
+    1: geometryTypes.POINT,
+    2: geometryTypes.LINE,
+    3: geometryTypes.POLYGON
+};
+
 export default class MVT extends Base {
 
     /**
@@ -91,7 +97,7 @@ export default class MVT extends Base {
                 throw new Error('MVT: invalid geometry type');
         }
     }
-    
+
     _autoDiscoverType(mvtLayer) {
         const type = mvtLayer.feature(0).type;
         switch (type) {
@@ -112,6 +118,7 @@ export default class MVT extends Base {
 
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
+            this._checkType(f, metadata.geomType);
             const geom = f.loadGeometry();
             if (decodeFn) {
                 const decodedPolygons = decodeFn(geom, mvt_extent);
@@ -125,6 +132,15 @@ export default class MVT extends Base {
         }
 
         return { properties, geometries };
+    }
+
+    // Currently only mvtLayers with the same type in every feature are supported
+    _checkType(feature, expected) {
+        const type = feature.type;
+        const actual = MVT_TO_CARTO_TYPES[type];
+        if (actual !== expected) {
+            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
+        }
     }
 
     _getPropertyNames(metadata, length) {
