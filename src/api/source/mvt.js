@@ -24,8 +24,8 @@ export default class MVT extends Base {
      * Create a carto.source.MVT.
      *
      * @param {object} data - A MVT data object
-     * @param {object} metadata - A carto.source.mvt.Metadata object
-     * @param {string} layerId - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
+     * @param {object} [metadata] - A carto.source.mvt.Metadata object
+     * @param {string} [layerId] - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
