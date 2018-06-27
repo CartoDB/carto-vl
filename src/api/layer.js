@@ -9,11 +9,6 @@ import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../core/viz/functions';
 import RenderLayer from '../core/renderLayer';
 
-const mapboxDataType = Object.freeze({
-    STYLE: 'style',
-    SOURCE: 'source'
-});
-
 /**
  *
  * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
