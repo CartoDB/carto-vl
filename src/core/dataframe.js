@@ -13,11 +13,10 @@ export default class Dataframe {
         this.geom = geom;
         this.properties = properties;
         this.scale = scale;
-        this.size = size;
         this.type = type;
         this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
-        this.numVertex = this.decodedGeom.vertices.length / 2;
-        this.numFeatures = this.decodedGeom.breakpoints.length || this.numVertex;
+        this.numVertex = type === 'point' ? size : this.decodedGeom.vertices.length / 2;
+        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID

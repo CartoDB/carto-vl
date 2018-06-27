@@ -1,6 +1,5 @@
 import * as earcut from 'earcut';
 
-
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
@@ -38,8 +37,14 @@ function decodePoint(vertices) {
     };
 }
 
-function isClipped(l) {
-    return l[0] == -1 || l[0] == 1 || l[1] == -1 || l[1] == 1;
+function isClipped(polygon, i, j) {
+    if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {
+        if (polygon.clippedType[polygon.clipped.indexOf(i)] &
+            polygon.clippedType[polygon.clipped.indexOf(j)]) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function decodePolygon(geometry) {
@@ -66,7 +71,7 @@ function decodePolygon(geometry) {
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
 
-                if (isClipped(a) && isClipped(b)) {
+                if (isClipped(polygon, i, i + 2)) {
                     continue;
                 }
 

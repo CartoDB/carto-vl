@@ -1,13 +1,12 @@
 import * as util from './util';
 import * as s from '../core/viz/functions';
 import * as schema from '../core/schema';
-import * as shaders from '../core/shaders';
+import * as shaders from '../core/shaders/index';
 import { compileShader } from '../core/viz/shader-compiler';
 import { parseVizDefinition } from '../core/viz/parser';
 import BaseExpression from '../core/viz/expressions/base';
 import { implicitCast } from '../core/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
-import { symbolizerGLSL } from '../core/shaders/symbolizer';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -285,15 +284,15 @@ export default class Viz {
         this.symbol._bind(metadata);
         this.filter._bind(metadata);
 
-        this.colorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.color });
-        this.widthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.width });
-        this.strokeColorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.strokeColor });
-        this.strokeWidthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.strokeWidth });
-        this.filterShader = compileShader(gl, shaders.styleFilterGLSL, { filter: this.filter });
+        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color });
+        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width });
+        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor });
+        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
+        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter });
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
-            this.symbolShader = compileShader(gl, symbolizerGLSL, {
+            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
             });
