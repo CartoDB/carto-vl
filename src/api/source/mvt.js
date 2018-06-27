@@ -9,7 +9,7 @@ import { RTT_WIDTH } from '../../core/renderer';
 import Metadata from '../../core/metadata';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
-// const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
+const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
 
 const geometryTypes = {
     UNKNOWN: 'unknown',
@@ -77,6 +77,9 @@ export default class MVT extends Base {
 
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
+        if (!metadata.geomType) {
+            metadata.geomType = this._autoDiscoverType(mvtLayer);
+        }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
                 return this._decode(mvtLayer, metadata, mvt_extent);
@@ -84,6 +87,20 @@ export default class MVT extends Base {
                 return this._decode(mvtLayer, metadata, mvt_extent, decodeLines);
             case geometryTypes.POLYGON:
                 return this._decode(mvtLayer, metadata, mvt_extent, decodePolygons);
+            default:
+                throw new Error('MVT: invalid geometry type');
+        }
+    }
+    
+    _autoDiscoverType(mvtLayer) {
+        const type = mvtLayer.feature(0).type;
+        switch (type) {
+            case mvtDecoderGeomTypes.point:
+                return geometryTypes.POINT;
+            case mvtDecoderGeomTypes.line:
+                return geometryTypes.LINE;
+            case mvtDecoderGeomTypes.polygon:
+                return geometryTypes.POLYGON;
             default:
                 throw new Error('MVT: invalid geometry type');
         }
