@@ -155,7 +155,11 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
         clippedTypes = clippedTypes2;
     }
 
-    if (preClippedVertices.length > 3) {
+    // rings with less than 3 vertices are degenerate
+    const MIN_VALID_NUM_VERTICES = 3;
+
+    // preClippedVertices is closed by repeating the first vertex
+    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES+1) {
         if (isHole) {
             polygon.holes.push(polygon.flat.length / 2);
         }
