@@ -113,7 +113,7 @@ export default class MVT extends Base {
     }
 
     _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
-        const { properties, propertyNames } = this._getPropertyNames(metadata, mvtLayer.length);
+        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
 
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
@@ -142,7 +142,7 @@ export default class MVT extends Base {
         }
     }
 
-    _getPropertyNames(metadata, length) {
+    _initializePropertyArrays(metadata, length) {
         const properties = {};
         const propertyNames = Object.keys(metadata.properties)
             .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
