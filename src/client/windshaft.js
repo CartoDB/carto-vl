@@ -1,25 +1,13 @@
 import * as R from '../core/renderer';
-import * as rsys from './rsys';
-import Dataframe from '../core/dataframe';
-import * as Protobuf from 'pbf';
-import * as LRU from 'lru-cache';
 import * as windshaftFiltering from './windshaft-filtering';
-import { VectorTile } from '@mapbox/vector-tile';
 import Metadata from '../core/metadata';
 import { version } from '../../package';
 import Time from '../core/viz/expressions/time';
 
-import featureDecoder from './mvt/feature-decoder';
+import MVT from '../api/source/mvt';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
-
-const geometryTypes = {
-    UNKNOWN: 'unknown',
-    POINT: 'point',
-    LINE: 'line',
-    POLYGON: 'polygon'
-};
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -31,37 +19,18 @@ export default class Windshaft {
 
     constructor(source) {
         this._source = source;
-
         this._exclusive = true;
 
-        this._requestGroupID = 0;
-        this._oldDataframes = [];
         this._MNS = null;
         this._promiseMNS = null;
-        this._categoryStringToIDMap = {};
-        this._numCategories = 0;
-        const lruOptions = {
-            max: 1000
-            // TODO improve cache length heuristic
-            , length: function () { return 1; }
-            , dispose: (key, promise) => {
-                promise.then(dataframe => {
-                    if (!dataframe.empty) {
-                        dataframe.free();
-                        this._removeDataframe(dataframe);
-                    }
-                });
-            }
-            , maxAge: 1000 * 60 * 60
-        };
-        this.cache = LRU(lruOptions);
         this.inProgressInstantiations = {};
+
     }
 
-    _bindLayer(addDataframe, removeDataframe, dataLoadedCallback) {
+    bindLayer(addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
-        this._removeDataframe = removeDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
+        this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
     _getInstantiationID(MNS, resolution, filtering, choices) {
@@ -81,6 +50,7 @@ export default class Windshaft {
      */
     async getMetadata(viz) {
         const MNS = viz.getMinimumNeededSchema();
+        this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         // Force to include `cartodb_id` in the MNS columns.
@@ -95,6 +65,30 @@ export default class Windshaft {
         return this.metadata;
     }
 
+    requiresNewMetadata(viz) {
+        const MNS = viz.getMinimumNeededSchema();
+        this._checkAcceptableMNS(MNS);
+        const resolution = viz.resolution;
+        const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
+        if (!MNS.columns.includes('cartodb_id')) {
+            MNS.columns.push('cartodb_id');
+        }
+        return this._needToInstantiate(MNS, resolution, filtering);
+    }
+
+    _checkAcceptableMNS(MNS) {
+        const columnAgg = {};
+        MNS.columns.map(column => {
+            const basename = R.schema.column.getBase(column);
+            const isAgg = R.schema.column.isAggregated(column);
+            if (columnAgg[basename] === undefined) {
+                columnAgg[basename] = isAgg;
+            } else if (columnAgg[basename] !== isAgg) {
+                throw new Error(`Incompatible combination of cluster aggregation with un-aggregated property: '${basename}'`);
+            }
+        });
+    }
+
     /**
      * After calling getMetadata(), data for a viewport can be obtained with this function.
      * So long as the viz doesn't change, getData() can be called repeatedly for different
@@ -103,33 +97,9 @@ export default class Windshaft {
      * @param {*} viewport
      */
     getData(viewport) {
-        if (this._isInstantiated()) {
-            const tiles = rsys.rTiles(viewport);
-            this._getTiles(tiles);
+        if (this._mvtClient) {
+            return this._mvtClient.requestData(viewport);// FIXME extend
         }
-    }
-
-    _getTiles(tiles) {
-        this._requestGroupID++;
-        let completedTiles = [];
-        let needToComplete = tiles.length;
-        const requestGroupID = this._requestGroupID;
-        tiles.forEach(t => {
-            const { x, y, z } = t;
-            this.getDataframe(x, y, z).then(dataframe => {
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
-                    this._oldDataframes.map(d => d.active = false);
-                    completedTiles.map(d => d.active = true);
-                    this._oldDataframes = completedTiles;
-                    this._dataLoadedCallback();
-                }
-            });
-        });
     }
 
     /**
@@ -150,22 +120,6 @@ export default class Windshaft {
 
     _isInstantiated() {
         return !!this.metadata;
-    }
-
-    _getCategoryIDFromString(category, readonly = true) {
-        if (category === undefined) {
-            category = 'null';
-        }
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        if (readonly) {
-            console.warn(`category ${category} not present in metadata`);
-            return -1;
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _intantiationChoices(metadata) {
@@ -214,16 +168,46 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        this._oldDataframes = [];
-        this.cache.reset();
+        if (this._mvtClient) {
+            this._mvtClient.free();
+        }
+        this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
+        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
+        this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
+            const basename = R.schema.column.getBase(propertyName);
+            const column = this.metadata.properties[basename];
+            if (!column) {
+                return;
+            }
+            switch (column.type) {
+                case 'date':
+                {
+                    const d = Date.parse(propertyValue);
+                    const min = column.min;
+                    const max = column.max;
+                    const n = (d - min) / (max.getTime() - min.getTime());
+                    return n;
+                }
+                case 'category':
+                    return this.metadata.categorizeString(propertyValue);
+                case 'number':
+                    return propertyValue;
+                default:
+                    throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+            }
+        };
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
+        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
-
+    _getSubdomain(x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
+    }
     async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
@@ -312,23 +296,9 @@ export default class Windshaft {
     }
 
     free() {
-        this.cache.reset();
-        this._oldDataframes = [];
-    }
-
-    _generateDataFrame(rs, geometry, properties, size, type) {
-        const dataframe = new Dataframe({
-            active: false,
-            center: rs.center,
-            geom: geometry,
-            properties: properties,
-            scale: rs.scale,
-            size: size,
-            type: type,
-            metadata: this.metadata,
-        });
-
-        return dataframe;
+        if (this._mvtClient) {
+            this._mvtClient.free();
+        }
     }
 
     async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
@@ -368,7 +338,7 @@ export default class Windshaft {
         this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
         };
     }
 
@@ -384,156 +354,39 @@ export default class Windshaft {
         };
     }
 
-    getDataframe(x, y, z) {
-        const id = `${x},${y},${z}`;
-        const c = this.cache.get(id);
-        if (c) {
-            return c;
-        }
-        const promise = this.requestDataframe(x, y, z);
-        this.cache.set(id, promise);
-        return promise;
-    }
-
-    requestDataframe(x, y, z) {
-        const mvt_extent = 4096;
-        return fetch(this._getTileUrl(x, y, z))
-            .then(rawData => rawData.arrayBuffer())
-            .then(response => {
-
-                if (response.byteLength == 0 || response == 'null') {
-                    return { empty: true };
-                }
-                let tile = new VectorTile(new Protobuf(response));
-                const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-                let fieldMap = {};
-
-                const numFields = [];
-                const catFields = [];
-                const dateFields = [];
-                this._MNS.columns.map(name => {
-                    const basename = R.schema.column.getBase(name);
-                    const type = this.metadata.columns.find(c => c.name == basename).type;
-                    if (type == 'category') {
-                        catFields.push(name);
-                    } else if (type == 'number') {
-                        numFields.push(name);
-                    } else if (type == 'date') {
-                        dateFields.push(name);
-                    } else {
-                        throw new Error(`Column type '${type}' not supported`);
-                    }
-
-                });
-                catFields.map((name, i) => fieldMap[name] = i);
-                numFields.map((name, i) => fieldMap[name] = i + catFields.length);
-                dateFields.map((name, i) => fieldMap[name] = i + catFields.length + numFields.length);
-
-                const { points, featureGeometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this.metadata, mvt_extent, catFields, numFields, dateFields);
-
-                let rs = rsys.getRsysFromTile(x, y, z);
-                let dataframeProperties = {};
-                Object.keys(fieldMap).map((name, pid) => {
-                    dataframeProperties[name] = properties[pid];
-                });
-                let dataFrameGeometry = this.metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-                const dataframe = this._generateDataFrame(rs, dataFrameGeometry, dataframeProperties, numFeatures, this.metadata.geomType);
-                this._addDataframe(dataframe);
-                return dataframe;
-            });
-    }
-
-    _getTileUrl(x, y, z) {
-        return this.urlTemplate.replace('{x}', x).replace('{y}', y).replace('{z}', z).replace('{s}', this._getSubdomain(x, y));
-    }
-
-    _getSubdomain(x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
-    }
-
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
-        const properties = [];
-        for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
-            properties.push(new Float32Array(mvtLayer.length + 1024));
-        }
-        let points;
-        if (metadata.geomType == geometryTypes.POINT) {
-            points = new Float32Array(mvtLayer.length * 2);
-        }
-        let featureGeometries = [];
-        let numFeatures = 0;
-        for (let i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            const geom = f.loadGeometry();
-            if (metadata.geomType == geometryTypes.POINT) {
-                const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
-                // Tiles may contain points in the border;
-                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
-                if (x < -1 || x >= 1 || y < -1 || y >= 1) {
-                    continue;
-                }
-                points[2 * numFeatures + 0] = x;
-                points[2 * numFeatures + 1] = y;
-
-            } else if (metadata.geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
-                featureGeometries.push(decodedPolygons);
-            } else if (metadata.geomType == geometryTypes.LINE) {
-                const decodedLines = featureDecoder.decodeLines(geom, mvt_extent);
-                featureGeometries.push(decodedLines);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
-            }
-
-            catFields.map((name, index) => {
-                properties[index][numFeatures] = this._getCategoryIDFromString(f.properties[name]);
-            });
-            numFields.map((name, index) => {
-                properties[index + catFields.length][numFeatures] = Number(f.properties[name]);
-            });
-            dateFields.map((name, index) => {
-                const d = f.properties[name] * 1000;
-                const metadataColumn = metadata.columns.find(c => c.name == name);
-                const min = metadataColumn.min;
-                const max = metadataColumn.max;
-                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[index + catFields.length + numFields.length][numFeatures] = n;
-            });
-            numFeatures += 1;
-        }
-
-        return { properties, points, featureGeometries, numFeatures };
-    }
-
-    _adaptMetadata(meta) {
+    _adaptMetadata(meta, agg) {
         const { stats, aggregation, dates_as_numbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
-        const columns = Object.keys(stats.columns)
-            .map(name => Object.assign({ name }, stats.columns[name]))
-            .map(col => Object.assign(col, { type: adaptColumnType(col.type) }))
-            .filter(col => ['number', 'date', 'category'].includes(col.type));
-        const categoryIDs = {};
-        columns.forEach(column => {
-            if (column.type === 'category' && column.categories) {
-                column.categories.forEach(category => {
-                    categoryIDs[category.category] = this._getCategoryIDFromString(category.category, false);
+
+        const properties = stats.columns;
+        Object.keys(agg.columns).forEach(aggName => {
+            const basename = R.schema.column.getBase(aggName);
+            properties[basename].sourceName = aggName;
+        });
+        Object.values(properties).map(property => {
+            property.type = adaptColumnType(property.type);
+        });
+
+        Object.keys(properties).forEach(propertyName => {
+            const property = properties[propertyName];
+            if (property.type === 'category' && property.categories) {
+                property.categories.forEach(category => {
+                    category.name = category.category;
+                    delete category.category;
                 });
-                column.categoryNames = column.categories.map(cat => cat.category);
-            }
-            else if (dates_as_numbers && dates_as_numbers.includes(column.name)) {
-                column.type = 'date';
+            } else if (dates_as_numbers && dates_as_numbers.includes(propertyName)) {
+                property.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
-                    if (column[fn]) {
-                        column[fn] = new Time(column[fn]*1000).value;
+                    if (property[fn]) {
+                        property[fn] = new Time(property[fn] * 1000).value;
                     }
                 });
             }
         });
 
-        return new Metadata(categoryIDs, columns, featureCount, stats.sample, geomType, aggregation.mvt);
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
+        return metadata;
     }
 }
 
@@ -598,7 +451,3 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
         return promiseGenerator(finalAssumptions);
     }
 }
-
-/**
- * Responsabilities: get tiles, decode tiles, return dataframe promises, optionally: cache, coalesce all layer with a source engine, return bound dataframes
- */

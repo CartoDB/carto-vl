@@ -1,5 +1,5 @@
 import { implicitCast } from './utils';
-import { blend, animate } from '../functions';
+import { blend, transition } from '../functions';
 import * as schema from '../../schema';
 
 /**
@@ -45,7 +45,7 @@ export default class Base {
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
-    isFeatureDependent(){
+    isFeatureDependent() {
         return this._getChildren().some(child => child.isFeatureDependent());
     }
 
@@ -69,9 +69,6 @@ export default class Base {
         this._getChildren().map(child => child._resolveAliases(aliases));
     }
 
-    _updateDrawMetadata(metadata) {
-        this._getChildren().map(child => child._updateDrawMetadata(metadata));
-    }
     _compile(metadata) {
         this._getChildren().map(child => child._compile(metadata));
     }
@@ -113,8 +110,9 @@ export default class Base {
     _resetViewportAgg() {
         this._getChildren().forEach(child => child._resetViewportAgg());
     }
-    _accumViewportAgg(f) {
-        this._getChildren().forEach(child => child._accumViewportAgg(f));
+
+    accumViewportAgg(feature) {
+        this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
 
     /**
@@ -171,16 +169,19 @@ export default class Base {
         //TODO blendFunc = 'linear'
         final = implicitCast(final);
         const parent = this.parent;
-        const blender = blend(this, final, animate(duration));
+        const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
         return final;
     }
 
     _blendFrom(final, duration = 500, interpolator = null) {
+        if (this.default && final.default) {
+            return;
+        }
         final = implicitCast(final);
         const parent = this.parent;
-        const blender = blend(final, this, animate(duration), interpolator);
+        const blender = blend(final, this, transition(duration), interpolator);
         parent.replaceChild(this, blender);
         blender.notify();
     }

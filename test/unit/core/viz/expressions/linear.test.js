@@ -18,7 +18,7 @@ describe('src/core/viz/expressions/linear', () => {
     });
 
     describe('min/max', () => {
-        it('should default to globalMin(input) and globalMax(input)', ()=>{
+        it('should default to globalMin(input) and globalMax(input)', () => {
             const l = s.linear(s.prop('wadus'));
             expect(l.min).toEqual(jasmine.any(GlobalMin));
             expect(l.max).toEqual(jasmine.any(GlobalMax));
@@ -39,16 +39,17 @@ describe('src/core/viz/expressions/linear', () => {
         });
     });
 
-    describe('regression', ()=>{
-        it('should eval correctly with date properties', ()=>{
+    describe('regression', () => {
+        it('should eval correctly with date properties', () => {
             const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
             l._compile({
-                columns: [{
-                    type:'date',
-                    name: 'wadus',
-                    min: new Date('1880-01-01T00:00:07Z'),
-                    max: new Date('1880-01-01T00:00:09Z')
-                }]
+                properties: {
+                    wadus: {
+                        type: 'date',
+                        min: new Date('1880-01-01T00:00:07Z'),
+                        max: new Date('1880-01-01T00:00:09Z'),
+                    }
+                }
             });
             expect(l.eval({
                 wadus: 0.5

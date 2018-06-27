@@ -43,7 +43,7 @@
     const source = new carto.source.Dataset('parcels');
     const s = carto.expressions;
     const viz = new carto.Viz(`
-    filter: ((  torque(linear($ccyrblt, 1873, 2018), 20, fade(0, 100000))  +0.1   ) and neq($ccyrblt, 0))
+    filter: ((animation(linear($ccyrblt, 1873, 2018), 20, fade(0, 100000))  +0.1   ) and neq($ccyrblt, 0))
     color: ramp(linear(($total_valu/$area ), 0, (globalPercentile($total_valu, 99))/1000    )  , ag_sunset)
     strokeColor: rgba(255,255,255,0.2)
     strokeWidth: 0

@@ -8,6 +8,18 @@ export class Polygon {
     }
 }
 
+export function decodeLines(geometries, mvt_extent) {
+    let decodedGeometries = [];
+    geometries.map(l => {
+        let line = [];
+        l.map(point => {
+            line.push([2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1]);
+        });
+        decodedGeometries.push(...clipLine(line));
+    });
+    return decodedGeometries;
+}
+
 /*
     All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.
     It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)
@@ -241,23 +253,3 @@ function clipLine(line) {
 
     return clippedLines;
 }
-
-function decodeLines(geometries, mvt_extent) {
-    let decodedGeometries = [];
-    geometries.map(l => {
-        let line = [];
-        l.map(point => {
-            line.push([2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1]);
-        });
-        decodedGeometries.push(...clipLine(line));
-    });
-    return decodedGeometries;
-}
-
-
-export default {
-    decodePolygons,
-    decodeLines,
-    isClockWise,
-    clipPolygon
-};

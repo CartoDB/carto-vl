@@ -3,7 +3,7 @@
 
 <head>
     <!-- Include CARTO VL JS -->
-    <script src="https://libs.cartocdn.com/carto-vl/v0.4.0/carto-vl.js"></script>
+    <script src="../../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
@@ -39,7 +39,7 @@
         const source = new carto.source.Dataset('bird_journey');
         // Add better styles
         const viz = new carto.Viz(`
-            filter: torque($date_time,30,fade(1,1))
+            filter: animation($date_time,30,fade(1,1))
         `);
         // Create the layer
         const layer = new carto.Layer('layer', source, viz);

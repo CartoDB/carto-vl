@@ -62,6 +62,10 @@ export default class Dataframe {
         }
     }
 
+    setFreeObserver(freeObserver) {
+        this.freeObserver = freeObserver;
+    }
+
     bind(renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -73,6 +77,7 @@ export default class Dataframe {
 
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
+        this.height = height;
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
@@ -125,24 +130,34 @@ export default class Dataframe {
         }
     }
 
-    inViewport(featureIndex, minx, miny, maxx, maxy) {
+    inViewport(featureIndex, scale, center, aspect) {
+        const { minx, miny, maxx, maxy } = this._getBounds(scale, center, aspect);
+
         switch (this.type) {
-            case 'point':
-            {
+            case 'point': {
                 const x = this.geom[2 * featureIndex + 0];
                 const y = this.geom[2 * featureIndex + 1];
                 return x > minx && x < maxx && y > miny && y < maxy;
             }
             case 'line':
-            case 'polygon':
-            {
+            case 'polygon': {
                 const aabb = this._aabb[featureIndex];
                 return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
-
             }
             default:
                 return false;
         }
+    }
+
+    _getBounds(scale, center, aspect) {
+        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
+        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
+        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+
+        return { minx, maxx, miny, maxy };
     }
 
     _getPointsAtPosition(p, viz) {
@@ -258,9 +273,9 @@ export default class Dataframe {
             if (propertyName === 'cartodb_id') {
                 id = prop;
             } else {
-                const column = this.metadata.columns.find(c => c.name == propertyName);
+                const column = this.metadata.properties[propertyName];
                 if (column && column.type == 'category') {
-                    prop = this.metadata.categoryIDsToName[prop];
+                    prop = this.metadata.IDToCategory.get(prop);
                 }
                 properties[propertyName] = prop;
             }
@@ -334,14 +349,14 @@ export default class Dataframe {
             gl.deleteTexture(this.texFilter);
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
-            this.texColor = 'freed';
-            this.texWidth = 'freed';
-            this.texStrokeColor = 'freed';
-            this.texStrokeWidth = 'freed';
-            this.texFilter = 'freed';
-            this.vertexBuffer = 'freed';
-            this.featureIDBuffer = 'freed';
-            this.propertyTex = null;
+        }
+        const freeObserver = this.freeObserver;
+        Object.keys(this).map(key => {
+            this[key] = null;
+        });
+        this.freed = true;
+        if (freeObserver) {
+            freeObserver(this);
         }
     }
 }
