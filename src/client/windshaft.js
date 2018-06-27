@@ -452,18 +452,6 @@ export default class Windshaft {
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
 
-    _decodeLines(geom, featureGeometries, mvt_extent) {
-        let geometry = [];
-        geom.map(l => {
-            let line = [];
-            l.map(point => {
-                line.push(2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1);
-            });
-            geometry.push(line);
-        });
-        featureGeometries.push(geometry);
-    }
-
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent, catFields, numFields, dateFields) {
         const properties = [];
         for (let i = 0; i < catFields.length + numFields.length + dateFields.length; i++) {
@@ -484,7 +472,8 @@ export default class Windshaft {
                 const decodedPolygons = featureDecoder.decodePolygons(geom, mvt_extent);
                 featureGeometries.push(decodedPolygons);
             } else if (metadata.geomType == geometryTypes.LINE) {
-                this._decodeLines(geom, featureGeometries, mvt_extent);
+                const decodedLines = featureDecoder.decodeLines(geom, mvt_extent);
+                featureGeometries.push(decodedLines);
             } else {
                 throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
             }
