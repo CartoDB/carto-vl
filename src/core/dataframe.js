@@ -18,49 +18,66 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
-        if (this.type == 'polygon') {
-            this._aabb = [];
-            geom.forEach(feature => {
-                const aabb = {
-                    minx: Number.POSITIVE_INFINITY,
-                    miny: Number.POSITIVE_INFINITY,
-                    maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY,
-                };
-                feature.forEach(polygon => {
-                    const vertices = polygon.flat;
-                    const numVertices = polygon.holes[0] || polygon.flat.length / 2;
-                    for (let i = 0; i < numVertices; i++) {
-                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
-                    }
-                });
-                this._aabb.push(aabb);
-            });
-        } else if (this.type == 'line') {
-            this._aabb = [];
-            geom.forEach(feature => {
-                const aabb = {
-                    minx: Number.POSITIVE_INFINITY,
-                    miny: Number.POSITIVE_INFINITY,
-                    maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY,
-                };
-                feature.forEach(line => {
-                    const vertices = line;
-                    const numVertices = line.length;
-                    for (let i = 0; i < numVertices; i++) {
-                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
-                    }
-                });
-                this._aabb.push(aabb);
-            });
+        this._aabb = this._getAABB(this.type);
+    }
+
+    _getAABB(type) {
+        if (type === 'point') {
+            return [];
         }
+
+        let aabb = {
+            minx: Number.POSITIVE_INFINITY,
+            miny: Number.POSITIVE_INFINITY,
+            maxx: Number.NEGATIVE_INFINITY,
+            maxy: Number.NEGATIVE_INFINITY,
+        };
+
+        this.geom.forEach(feature => {
+            feature.forEach(featureVertices => {
+                const { vertices, numVertices } = this._getGeomAABBVertices(type, featureVertices);
+                aabb = this._updateAABB(aabb, vertices, numVertices);
+            });
+        });
+
+        return aabb;
+    }
+
+    _getGeomAABBVertices(type, vertices) {
+        const geomVertices = {
+            polygon: function () {
+                return {
+                    vertices: vertices.flat,
+                    numVertices: vertices.flat.length / 2
+                };
+            },
+
+            line: function () {
+                return {
+                    vertices: vertices,
+                    numVertices: vertices.length
+                };
+            }
+        };
+
+        try {
+            return geomVertices[type]();
+        } catch (error) {
+            throw new Error(`Invalid type ${type}`);
+        }
+    }
+
+    _updateAABB(aabb, vertices, numVertices) {
+        const aabbUpdated = {};
+
+        for (let i = 0; i < numVertices; i++) {
+            aabbUpdated.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+            aabbUpdated.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+            aabbUpdated.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+            aabbUpdated.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+        }
+
+        return aabbUpdated;
     }
 
     setFreeObserver(freeObserver) {
@@ -91,6 +108,7 @@ export default class Dataframe {
 
         const ids = new Float32Array(vertices.length);
         let index = 0;
+        
         for (let i = 0; i < vertices.length; i += 2) {
             if (!breakpoints.length) {
                 if (i > 0) {
@@ -105,6 +123,7 @@ export default class Dataframe {
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
+        
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -153,6 +172,7 @@ export default class Dataframe {
     _getBounds(scale, center, aspect) {
         this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
         this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+
         const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
         const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
         const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
@@ -243,7 +263,9 @@ export default class Dataframe {
                 x: vertices[i + 4] + normals[i + 4] * scale,
                 y: vertices[i + 5] + normals[i + 5] * scale
             };
+
             const inside = pointInTriangle(p, v1, v2, v3);
+
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
