@@ -28,12 +28,24 @@ export function decodeLines(geom, mvt_extent) {
 export function decodePolygons(geometries, mvtExtent) {
     let currentPolygon = null;
     let decoded = [];
+    let invertedOrientation;
+    geometries.forEach(geom => {
+        let area = signedPolygonArea(geom);
+        if (area == 0) {
+            return;
+        }
+        if (invertedOrientation === undefined) {
+            // According to the MVT spec this condition cannot happen for
+            // MVT spec compliant tiles, but many buggy implementations
+            // don't comply with this rule when generating tiles
+            // Also, other implementations accept this out-of-the-spec condition
+            invertedOrientation = area > 0;
+        }
+        const isExternalPolygon = invertedOrientation ? area > 0 : area < 0;
 
-    geometries.forEach((geom, index) => {
-        const isExternalPolygon = isClockWise(geom);
+
+
         const preClippedVertices = _getPreClippedVertices(geom, mvtExtent);
-
-        _checkIsFirstPolygonInternal(isExternalPolygon, index);
 
         if (isExternalPolygon) {
             if (currentPolygon) {
@@ -53,14 +65,15 @@ export function decodePolygons(geometries, mvtExtent) {
     return decoded;
 }
 
-export function isClockWise(vertices) {
+export function signedPolygonArea(vertices) {
+    // https://en.wikipedia.org/wiki/Shoelace_formula
     let a = 0;
     for (let i = 0; i < vertices.length; i++) {
         let j = (i + 1) % vertices.length;
         a += vertices[i].x * vertices[j].y;
         a -= vertices[j].x * vertices[i].y;
     }
-    return a > 0;
+    return a / 2;
 }
 
 export function clipPolygon(preClippedVertices, polygon, isHole) {
@@ -125,14 +138,6 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     }
 
     return polygon;
-}
-
-function _checkIsFirstPolygonInternal(isExternalPolygon, index) {
-    const IS_FIRST_POLYGON = index === 0;
-
-    if (!isExternalPolygon && IS_FIRST_POLYGON) {
-        throw new Error('Invalid MVT tile: first polygon ring MUST be external');
-    }
 }
 
 function _getPreClippedVertices(geom, mvtExtent) {
