@@ -18,6 +18,12 @@ const geometryTypes = {
     POLYGON: 'polygon'
 };
 
+const MVT_TO_CARTO_TYPES = {
+    1: geometryTypes.POINT,
+    2: geometryTypes.LINE,
+    3: geometryTypes.POLYGON
+};
+
 export default class MVT extends Base {
 
     /**
@@ -68,57 +74,61 @@ export default class MVT extends Base {
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-
-        const { points, featureGeometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
-
-
+        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframeGeometry = this._metadata.geomType == geometryTypes.POINT ? points : featureGeometries;
-        const dataframe = this._generateDataFrame(rs, dataframeGeometry, properties, numFeatures, this._metadata.geomType);
+        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, this._metadata.geomType);
+
         return dataframe;
     }
 
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
-        let points;
-        if (metadata.geomType == geometryTypes.POINT) {
-            points = new Float32Array(mvtLayer.length * 2);
+        if (!mvtLayer.length) {
+            return { properties: [], geometries: {}, numFeatures: 0 };
         }
-        let featureGeometries = [];
+        if (!metadata.geomType) {
+            metadata.geomType = this._autoDiscoverType(mvtLayer);
+        }
+        switch (metadata.geomType) {
+            case geometryTypes.POINT:
+                return this._decode(mvtLayer, metadata, mvt_extent, new Float32Array(mvtLayer.length * 2));
+            case geometryTypes.LINE:
+                return this._decode(mvtLayer, metadata, mvt_extent, [], decodeLines);
+            case geometryTypes.POLYGON:
+                return this._decode(mvtLayer, metadata, mvt_extent, [], decodePolygons);
+            default:
+                throw new Error('MVT: invalid geometry type');
+        }
+    }
+
+    _autoDiscoverType(mvtLayer) {
+        const type = mvtLayer.feature(0).type;
+        switch (type) {
+            case mvtDecoderGeomTypes.point:
+                return geometryTypes.POINT;
+            case mvtDecoderGeomTypes.line:
+                return geometryTypes.LINE;
+            case mvtDecoderGeomTypes.polygon:
+                return geometryTypes.POLYGON;
+            default:
+                throw new Error('MVT: invalid geometry type');
+        }
+    }
+
+    _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         let numFeatures = 0;
-        const decodedProperties = {};
-        const decodingPropertyNames = [];
-        Object.keys(metadata.properties).
-            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
-            forEach(propertyName => {
-                decodingPropertyNames.push(...metadata.propertyNames(propertyName));
-            });
-        decodingPropertyNames.forEach(propertyName => {
-            decodedProperties[propertyName] = new Float32Array(mvtLayer.length + RTT_WIDTH);
-        });
+        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
+            this._checkType(f, metadata.geomType);
             const geom = f.loadGeometry();
-            const mvtGeomType = f.type;
-            if (metadata.geomType === undefined) {
-                switch (mvtGeomType) {
-                    case mvtDecoderGeomTypes.point:
-                        metadata.geomType = geometryTypes.POINT;
-                        break;
-                    case mvtDecoderGeomTypes.line:
-                        metadata.geomType = geometryTypes.LINE;
-                        break;
-                    case mvtDecoderGeomTypes.polygon:
-                        metadata.geomType = geometryTypes.POLYGON;
-                        break;
-                    default:
-                        throw new Error('MVT: invalid geometry type');
-                }
-                if (metadata.geomType == geometryTypes.POINT) {
-                    points = new Float32Array(mvtLayer.length * 2);
-                }
+            if (decodeFn) {
+                const decodedPolygons = decodeFn(geom, mvt_extent);
+                geometries.push(decodedPolygons);
+                this._decodeProperties(propertyNames, properties, f, i);
+                numFeatures++;
             }
-            if (metadata.geomType == geometryTypes.POINT) {
+            else {
                 const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                 // Tiles may contain points in the border;
@@ -126,24 +136,44 @@ export default class MVT extends Base {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                points[2 * numFeatures + 0] = x;
-                points[2 * numFeatures + 1] = y;
-            } else if (metadata.geomType == geometryTypes.POLYGON) {
-                const decodedPolygons = decodePolygons(geom, mvt_extent);
-                featureGeometries.push(decodedPolygons);
-            } else if (metadata.geomType == geometryTypes.LINE) {
-                const decodedLines = decodeLines(geom, mvt_extent);
-                featureGeometries.push(decodedLines);
-            } else {
-                throw new Error(`Unimplemented geometry type: '${metadata.geomType}'`);
+                geometries[2 * numFeatures + 0] = x;
+                geometries[2 * numFeatures + 1] = y;
+                this._decodeProperties(propertyNames, properties, f, numFeatures);
+                numFeatures++;
             }
-            decodingPropertyNames.forEach(propertyName => {
-                const propertyValue = f.properties[propertyName];
-                decodedProperties[propertyName][numFeatures] = this.decodeProperty(propertyName, propertyValue);
-            });
-            ++numFeatures;
         }
-        return { properties: decodedProperties, points, featureGeometries, numFeatures };
+
+        return { properties, geometries, numFeatures };
+    }
+
+    // Currently only mvtLayers with the same type in every feature are supported
+    _checkType(feature, expected) {
+        const type = feature.type;
+        const actual = MVT_TO_CARTO_TYPES[type];
+        if (actual !== expected) {
+            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
+        }
+    }
+
+    _initializePropertyArrays(metadata, length) {
+        const properties = {};
+        const propertyNames = [];
+        Object.keys(metadata.properties).
+            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
+            forEach(propertyName => {
+                propertyNames.push(...metadata.propertyNames(propertyName));
+            });
+
+        propertyNames.forEach(propertyName => properties[propertyName] = new Float32Array(length + RTT_WIDTH));
+
+        return { properties, propertyNames };
+    }
+
+    _decodeProperties(propertyNames, properties, feature, i) {
+        propertyNames.forEach(propertyName => {
+            const propertyValue = feature.properties[propertyName];
+            properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
+        });
     }
 
     decodeProperty(propertyName, propertyValue) {
