@@ -63,11 +63,8 @@ export default class Sprite extends Base {
 
     _applyToShaderSource() {
         return {
-            preface: this._prefaceCode(`
-        uniform sampler2D texSprite${this._uid};
-        `),
-            inline:
-                `texture2D(texSprite${this._uid}, spriteUV).rgba`
+            preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
+            inline: `texture2D(texSprite${this._uid}, spriteUV).rgba`
         };
     }
 
