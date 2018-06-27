@@ -69,18 +69,28 @@ const CLIPMAX = 1;
 const CLIPMIN = -CLIPMAX;
 
 const clippingEdges = [
-    p => p[0] <= CLIPMAX,
-    p => p[1] <= CLIPMAX,
-    p => p[0] >= CLIPMIN,
-    p => p[1] >= CLIPMIN,
+    {
+        // Right edge; x <= CLIPMAX for points inside
+        inside: p => p[0] <= CLIPMAX,
+        intersect: (a, b) => geometryUtils.intersect(a, b, [CLIPMAX, -100], [CLIPMAX, 100])
+    },
+    {
+        // Top edge; y <= CLIPMAX for points inside
+        inside: p => p[1] <= CLIPMAX,
+        intersect: (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMAX], [100, CLIPMAX])
+    },
+    {
+        // Left edge; x >= CLIPMIN for points inside
+        inside: p => p[0] >= CLIPMIN,
+        intersect: (a, b) => geometryUtils.intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100])
+    },
+    {
+        // Bottom edge; y >= CLIPMIN for points inside
+        inside: p => p[1] >= CLIPMIN,
+        intersect: (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMIN], [100, CLIPMIN])
+    }
 ];
-
-const clippingEdgeIntersectFn = [
-    (a, b) => geometryUtils.intersect(a, b, [CLIPMAX, -100], [CLIPMAX, 100]),
-    (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMAX], [100, CLIPMAX]),
-    (a, b) => geometryUtils.intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100]),
-    (a, b) => geometryUtils.intersect(a, b, [-100, CLIPMIN], [100, CLIPMIN]),
-];
+const numberOfEdges = clippingEdges.length;
 
 export function clipPolygon(preClippedVertices, polygon, isHole) {
     // Sutherland-Hodgman Algorithm to clip polygons to the tile
@@ -89,7 +99,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     let clippedTypes = {};
 
     // for each clipping edge
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < numberOfEdges; i++) {
         const preClippedVertices2 = [];
         const clippedTypes2 = {};
 
@@ -112,8 +122,8 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
             const a = preClippedVertices[k];
             const b = preClippedVertices[k + 1];
 
-            const insideA = clippingEdges[i](a);
-            const insideB = clippingEdges[i](b);
+            const insideA = clippingEdges[i].inside(a);
+            const insideB = clippingEdges[i].inside(b);
 
             if (insideA && insideB) {
                 // case 1: both inside, push B vertex
@@ -121,12 +131,12 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
                 preClippedVertices2.push(b);
             } else if (insideA) {
                 // case 2: just B outside, push intersection
-                const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                const intersectionPoint = clippingEdges[i].intersect(a, b);
                 setClippedType(preClippedVertices2.length, k + 1, i);
                 preClippedVertices2.push(intersectionPoint);
             } else if (insideB) {
                 // case 4: just A outside: push intersection, push B
-                const intersectionPoint = clippingEdgeIntersectFn[i](a, b);
+                const intersectionPoint = clippingEdges[i].intersect(a, b);
                 setClippedType(preClippedVertices2.length, k, i);
                 preClippedVertices2.push(intersectionPoint);
                 setClippedType(preClippedVertices2.length, k + 1);
@@ -190,16 +200,16 @@ function clipLine(line) {
     const clippedLines = [];
     function clipType(point) {
         let type = 0;
-        for (let i = 0; i < 4; i++) {
-            type = type | (clippingEdges[i](point) ? 0 : (1 << i));
+        for (let i = 0; i < numberOfEdges; i++) {
+            type = type | (clippingEdges[i].inside(point) ? 0 : (1 << i));
         }
         return type;
     }
     function intersect(point1, point2, type) {
-        for (let i = 0; i < 4; i++) {
+        for (let i = 0; i < numberOfEdges; i++) {
             const mask = 1 << i;
             if (type & mask) {
-                const p = clippingEdgeIntersectFn[i](point1, point2);
+                const p = clippingEdges[i].intersect(point1, point2);
                 type = clipType(p) & ~mask;
                 return [p, type];
             }
