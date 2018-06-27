@@ -83,6 +83,9 @@ export default class MVT extends Base {
 
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
+        if (!mvtLayer.length) {
+            return { properties: [], geometries: {} };
+        }
         if (!metadata.geomType) {
             metadata.geomType = this._autoDiscoverType(mvtLayer);
         }
