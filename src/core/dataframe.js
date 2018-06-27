@@ -1,6 +1,10 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
 
+// Maximum number of property textures that will be uploaded automatically to the GPU
+// in a non-lazy manner
+const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
+
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
     constructor({ center, scale, geom, properties, type, active, size, metadata }) {
@@ -285,7 +289,7 @@ export default class Dataframe {
     }
 
     _addProperty(propertyName) {
-        if (Object.keys(this.propertyTex).length<32){
+        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
             this.getPropertyTexture(propertyName);
         }
     }
