@@ -74,9 +74,9 @@ export default class MVT extends Base {
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
         const mvtLayer = tile.layers[Object.keys(tile.layers)[0]];
-        const { geometries, properties } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
+        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframe = this._generateDataFrame(rs, geometries, properties, mvtLayer.length, this._metadata.geomType);
+        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, this._metadata.geomType);
 
         return dataframe;
     }
@@ -84,7 +84,7 @@ export default class MVT extends Base {
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
         if (!mvtLayer.length) {
-            return { properties: [], geometries: {} };
+            return { properties: [], geometries: {}, numFeatures: 0 };
         }
         if (!metadata.geomType) {
             metadata.geomType = this._autoDiscoverType(mvtLayer);
@@ -116,6 +116,7 @@ export default class MVT extends Base {
     }
 
     _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
+        let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
 
         for (let i = 0; i < mvtLayer.length; i++) {
@@ -125,15 +126,25 @@ export default class MVT extends Base {
             if (decodeFn) {
                 const decodedPolygons = decodeFn(geom, mvt_extent);
                 geometries.push(decodedPolygons);
+                this._decodeProperties(propertyNames, properties, f, i);
+                numFeatures++;
             }
             else {
-                geometries[2 * i + 0] = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                geometries[2 * i + 1] = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
+                const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                // Tiles may contain points in the border;
+                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
+                if (x < -1 || x >= 1 || y < -1 || y >= 1) {
+                    continue;
+                }
+                geometries[2 * numFeatures + 0] = x;
+                geometries[2 * numFeatures + 1] = y;
+                this._decodeProperties(propertyNames, properties, f, numFeatures);
+                numFeatures++;
             }
-            this._decodeProperties(propertyNames, properties, f, i);
         }
 
-        return { properties, geometries };
+        return { properties, geometries, numFeatures };
     }
 
     // Currently only mvtLayers with the same type in every feature are supported
