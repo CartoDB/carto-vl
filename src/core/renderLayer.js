@@ -27,7 +27,7 @@ export default class RenderLayer {
     }
 
     getActiveDataframes() {
-        return this.dataframes.filter(df => df.active);
+        return this.dataframes.filter(df => df.active && df.numVertex);
     }
 
     hasDataframes() {
