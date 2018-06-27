@@ -88,11 +88,11 @@ export default class MVT extends Base {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvt_extent);
+                return this._decode(mvtLayer, metadata, mvt_extent, new Float32Array(mvtLayer.length * 2));
             case geometryTypes.LINE:
-                return this._decode(mvtLayer, metadata, mvt_extent, decodeLines);
+                return this._decode(mvtLayer, metadata, mvt_extent, [], decodeLines);
             case geometryTypes.POLYGON:
-                return this._decode(mvtLayer, metadata, mvt_extent, decodePolygons);
+                return this._decode(mvtLayer, metadata, mvt_extent, [], decodePolygons);
             default:
                 throw new Error('MVT: invalid geometry type');
         }
@@ -112,9 +112,8 @@ export default class MVT extends Base {
         }
     }
 
-    _decode(mvtLayer, metadata, mvt_extent, decodeFn) {
+    _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         const { properties, propertyNames } = this._getPropertyNames(metadata, mvtLayer.length);
-        const geometries = decodeFn ? [] : new Float32Array(mvtLayer.length * 2);
 
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
