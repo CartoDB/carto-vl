@@ -3,6 +3,7 @@ import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes } from '../../../../../src/core/viz/functions';
 import * as s from '../../../../../src/core/viz/functions';
 import { hexToRgb } from '../../../../../src/core/viz/expressions/utils';
+import Metadata from '../../../../../src/core/metadata';
 
 describe('src/core/viz/expressions/ramp', () => {
     describe('error control', () => {
@@ -79,28 +80,20 @@ describe('src/core/viz/expressions/ramp', () => {
 
     describe('.eval with buckets', () => {
         describe('when palettes are color arrays', () => {
-            const METADATA = {
-                columns: [
-                    {
-                        name: 'grade',
+            const METADATA = new Metadata({
+                properties: {
+                    grade: {
                         type: 'category',
-                        categoryNames: [
-                            'A',
-                            'B',
-                            'C',
-                            'D',
-                            'E'
-                        ],
-                    },
-                ],
-                categoryIDs: {
-                    'A': 'A',
-                    'B': 'B',
-                    'C': 'C',
-                    'D': 'D',
-                    'E': 'E'
+                        categories: [
+                            { grade: 'A' }, 
+                            { grade: 'B' },
+                            { grade: 'C' },
+                            { grade: 'D' },
+                            { grade: 'E' }
+                        ]
+                    }
                 }
-            };
+            });
             
             const red = s.namedColor('red');
             const blue = s.namedColor('blue');
@@ -253,32 +246,22 @@ describe('src/core/viz/expressions/ramp', () => {
 
         describe('when palettes are defined palettes', () => {
             describe('and palettes are qualitative', () => {
-                const METADATA = {
-                    columns: [
-                        {
-                            name: 'city',
+                const METADATA = new Metadata({
+                    properties: {
+                        city: {
                             type: 'category',
-                            categoryNames: [
-                                'Murcia',
-                                'Madrid',
-                                'Pontevedra',
-                                'Barcelona',
-                                'Alicante',
-                                'Cordoba',
-                                'Zaragoza'
-                            ],
-                        },
-                    ],
-                    categoryIDs: {
-                        'Murcia': 'Murcia',
-                        'Madrid': 'Madrid',
-                        'Pontevedra': 'Pontevedra',
-                        'Barcelona': 'Barcelona',
-                        'Alicante': 'Alicante',
-                        'Cordoba': 'Cordoba',
-                        'Zaragoza': 'Zaragoza'
+                            categories: [
+                                { city: 'Murcia' }, 
+                                { city: 'Madrid' },
+                                { city: 'Pontevedra' },
+                                { city: 'Barcelona' },
+                                { city: 'Alicante' },
+                                { city: 'Cordoba' },
+                                { city: 'Zaragoza' }
+                            ]
+                        }
                     }
-                };
+                });
 
                 let actual;
                 let expected;
@@ -335,14 +318,13 @@ describe('src/core/viz/expressions/ramp', () => {
             });
 
             describe('and palettes are quantitative', () => {
-                const METADATA = {
-                    columns: [
-                        {
-                            name: 'number',
+                const METADATA = new Metadata({
+                    properties: {
+                        grade: {
                             type: 'number'
                         }
-                    ]
-                };
+                    }
+                });
 
                 let actual;
                 let expected;
