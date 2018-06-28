@@ -1,3 +1,5 @@
+const webpackConfig = require('../../../webpack/webpack.config.js');
+
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
@@ -13,10 +15,7 @@ module.exports = function (config) {
         preprocessors: {
             'index.test.js': ['webpack', 'sourcemap'],
         },
-        webpack: {
-            devtool: 'inline-source-map',
-            mode: 'development'
-        },
+        webpack: webpackConfig,
         customLaunchers: {
             // Add no-sandbox flag due a bug. https://github.com/karma-runner/karma-chrome-launcher/issues/158
             ChromeHeadlessNoSandbox: {

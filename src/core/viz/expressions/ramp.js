@@ -181,15 +181,13 @@ export default class Ramp extends BaseExpression {
                 inline: `${sprites.inline}(spriteUV, ${input.inline})`
             };
         }
-    
-        return { 
-            preface: this._prefaceCode(
-                input.preface + `
+
+        return {
+            preface: this._prefaceCode(input.preface + `
                 uniform sampler2D texRamp${this._uid};
                 uniform float keyMin${this._uid};
                 uniform float keyWidth${this._uid};`
             ),
-            
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
                 ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
