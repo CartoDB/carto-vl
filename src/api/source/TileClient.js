@@ -1,4 +1,3 @@
-import { validateTemplateURL } from '../url';
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../../client/rsys';
 
@@ -8,7 +7,6 @@ export default class TileClient {
         if (!Array.isArray(templateURLs)) {
             templateURLs = [templateURLs];
         }
-        templateURLs.map(validateTemplateURL);
         this._templateURLs = templateURLs;
         this._requestGroupID = 0;
         this._oldDataframes = [];
