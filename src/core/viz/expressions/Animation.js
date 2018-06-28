@@ -102,11 +102,11 @@ export class Animation extends BaseExpression {
             waitingForOthers.add(this);
         }
         if (waitingForOthers.has(this)) {
-            waitingForLayer = new Set([...waitingForLayer].filter(expr=>{
-                while (expr.parent){
+            waitingForLayer = new Set([...waitingForLayer].filter(expr => {
+                while (expr.parent) {
                     expr = expr.parent;
                 }
-                if (expr._getRootExpressions){
+                if (expr._getRootExpressions) {
                     // The animation hasn't been removed from the viz
                     return true;
                 }
@@ -117,7 +117,7 @@ export class Animation extends BaseExpression {
             }
             [...waitingForOthers.values()].map(anim => {
                 if (anim._paused === 'default') {
-                    anim._paused = false;
+                    anim.play();
                 }
             });
             waitingForOthers.clear();
