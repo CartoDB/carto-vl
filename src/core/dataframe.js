@@ -178,7 +178,7 @@ export default class Dataframe {
 
         switch (this.type) {
             case 'point':
-                return this._isPointInViewport(geometry, viewport);
+                return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
             case 'polygon':
                 return this._isPolygonInViewport(geometry, viewport);
@@ -187,8 +187,11 @@ export default class Dataframe {
         }
     }
 
-    _isPointInViewport() {
-        return false; //FIXME
+    _isPointInViewport(featureIndex, scale, center, aspect) {
+        const { minx, maxx, miny, maxy } = this._getBounds(scale, center, aspect);
+        const x = this.geom[2 * featureIndex + 0];
+        const y = this.geom[2 * featureIndex + 1];	
+        return x > minx && x < maxx && y > miny && y < maxy;
     }
 
     _isPolygonInViewport(feature, viewport) {
