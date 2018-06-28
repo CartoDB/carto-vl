@@ -1,9 +1,9 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
+import Polygon from './geometries/Polygon';
 
 export default class Dataframe {
-    // `type` is one of 'point' or 'line' or 'polygon'
-    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
+    constructor({ center, scale, geom, properties, type, active, size, metadata}) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -18,32 +18,62 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
-        this._aabb = this._getAABB(this.type);
+        this._featureGeometries = this._getFeatureGeometries();
     }
 
-    _getAABB(type) {
+    _getFeatureGeometries() {
+        const type = this.type;
+
         if (type === 'point') {
             return [];
         }
 
-        let aabb = {
-            minx: Number.POSITIVE_INFINITY,
-            miny: Number.POSITIVE_INFINITY,
-            maxx: Number.NEGATIVE_INFINITY,
-            maxy: Number.NEGATIVE_INFINITY,
-        };
+        const featureGeometries = [];
 
         this.geom.forEach(feature => {
             feature.forEach(featureVertices => {
-                const { vertices, numVertices } = this._getGeomAABBVertices(type, featureVertices);
-                aabb = this._updateAABB(aabb, vertices, numVertices);
+                const vertices = this._getGeomVertices(type, featureVertices);
+                featureGeometries.push(new Polygon(0, 0, vertices));
             });
         });
 
-        return aabb;
+        return featureGeometries;
     }
 
-    _getGeomAABBVertices(type, vertices) {
+    _getGeomVertices(type, vertices) {
+        const geomVertices = {
+            polygon: function () {
+                const polygonVertices = [];
+                const numVertices = vertices.flat.length / 2;
+
+                for (let i = 0; i < numVertices; i++) {
+                    let vertex = [vertices.flat[2 * i + 0], vertices.flat[2 * i + 1]];
+                    polygonVertices.push(vertex);
+                }
+
+                return polygonVertices;
+            },
+
+            line: function () {
+                const lineVertices = [];
+
+                for (let i = 0; i < vertices.length; i++) {
+                    let vertex = [vertices[2 * i + 0], vertices[2 * i + 1]];
+                    lineVertices.push(vertex);
+                }
+
+                return lineVertices;
+            }
+        };
+
+        try {
+            return geomVertices[type]();
+        } catch (error) {
+            throw new Error(`Invalid type ${type}`);
+        }
+    }
+
+    _getVertices(type, vertices) {
         const geomVertices = {
             polygon: function () {
                 return {
@@ -65,19 +95,6 @@ export default class Dataframe {
         } catch (error) {
             throw new Error(`Invalid type ${type}`);
         }
-    }
-
-    _updateAABB(aabb, vertices, numVertices) {
-        const aabbUpdated = {};
-
-        for (let i = 0; i < numVertices; i++) {
-            aabbUpdated.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-            aabbUpdated.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-            aabbUpdated.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-            aabbUpdated.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
-        }
-
-        return aabbUpdated;
     }
 
     setFreeObserver(freeObserver) {
@@ -108,7 +125,7 @@ export default class Dataframe {
 
         const ids = new Float32Array(vertices.length);
         let index = 0;
-        
+
         for (let i = 0; i < vertices.length; i += 2) {
             if (!breakpoints.length) {
                 if (i > 0) {
@@ -123,7 +140,7 @@ export default class Dataframe {
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
-        
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -151,22 +168,32 @@ export default class Dataframe {
     }
 
     inViewport(featureIndex, scale, center, aspect) {
-        const { minx, miny, maxx, maxy } = this._getBounds(scale, center, aspect);
+        return this._geometryInViewport(featureIndex, scale, center, aspect); // FIXME
+    }
+
+    _geometryInViewport(featureIndex, scale, center, aspect) {
+        const height = scale * (center.y - this.center.y);
+        const width = (scale / aspect) * (center.x - this.center.x);
+        const viewport = this._getViewportGeometry(center, width, height);
+        const geometry = this._featureGeometries[featureIndex];
 
         switch (this.type) {
-            case 'point': {
-                const x = this.geom[2 * featureIndex + 0];
-                const y = this.geom[2 * featureIndex + 1];
-                return x > minx && x < maxx && y > miny && y < maxy;
-            }
+            case 'point':
+                return this._isPointInViewport(geometry, viewport);
             case 'line':
-            case 'polygon': {
-                const aabb = this._aabb[featureIndex];
-                return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
-            }
+            case 'polygon':
+                return this._isPolygonInViewport(geometry, viewport);
             default:
                 return false;
         }
+    }
+
+    _isPointInViewport() {
+        return false; //FIXME
+    }
+
+    _isPolygonInViewport(feature, viewport) {
+        return feature.collides(viewport);
     }
 
     _getBounds(scale, center, aspect) {
@@ -181,8 +208,25 @@ export default class Dataframe {
         return { minx, maxx, miny, maxy };
     }
 
+    _getViewportGeometry(center, width, height) {
+        const w = width / 2;
+        const h = height / 2;
+
+        const vertices = [
+            [center.x - w, center.y - h],
+            [center.x + w, center.y - h],
+            [center.x - w, center.y + h],
+            [center.x + w, center.y + h]
+        ];
+
+        return new Polygon(0, 0, vertices);
+    }
+
     _getPointsAtPosition(p, viz) {
-        p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
+        p = wToR(p.x, p.y, {
+            center: this.center,
+            scale: this.scale
+        });
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
@@ -222,7 +266,10 @@ export default class Dataframe {
         return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
     }
     _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
-        const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
+        const p = wToR(pos.x, pos.y, {
+            center: this.center,
+            scale: this.scale
+        });
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
@@ -303,7 +350,10 @@ export default class Dataframe {
                 properties[propertyName] = prop;
             }
         });
-        return { id, properties };
+        return {
+            id,
+            properties
+        };
     }
 
     _addProperty(propertyName, propertiesFloat32Array) {
