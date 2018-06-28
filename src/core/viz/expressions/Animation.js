@@ -105,14 +105,18 @@ export class Animation extends BaseExpression {
             if (waitingForLayer.size > 0) {
                 return;
             }
-            [...waitingForOthers.values()].map(anim => anim.play());
+            [...waitingForOthers.values()].map(anim => {
+                if (anim._paused === 'default') {
+                    anim._paused = false;
+                }
+            });
             waitingForOthers.clear();
         }
     }
 
     _postShaderCompile(program, gl) {
         waitingForLayer.add(this);
-        this.pause();
+        this._paused = 'default';
         super._postShaderCompile(program, gl);
     }
 
