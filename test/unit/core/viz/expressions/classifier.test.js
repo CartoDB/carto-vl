@@ -32,14 +32,14 @@ describe('src/core/viz/expressions/classifier', () => {
                 ]
             });
             expr._resetViewportAgg();
-            expr._accumViewportAgg({ price: 0 });
-            expr._accumViewportAgg({ price: 1 });
+            expr.accumViewportAgg({ price: 0 });
+            expr.accumViewportAgg({ price: 1 });
 
-            expr._accumViewportAgg({ price: 2 });
-            expr._accumViewportAgg({ price: 3 });
+            expr.accumViewportAgg({ price: 2 });
+            expr.accumViewportAgg({ price: 3 });
 
-            expr._accumViewportAgg({ price: 4 });
-            expr._accumViewportAgg({ price: 5 });
+            expr.accumViewportAgg({ price: 4 });
+            expr.accumViewportAgg({ price: 5 });
         }
         it('globalQuantiles($price, 2)', () => {
             const q = globalQuantiles($price, 2);

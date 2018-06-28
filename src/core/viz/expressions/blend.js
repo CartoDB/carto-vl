@@ -1,5 +1,5 @@
 import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression } from './utils';
-import Animate from './animate';
+import Transition from './transition';
 import BaseExpression from './base';
 
 /**
@@ -82,7 +82,7 @@ export default class Blend extends BaseExpression {
     }
     _preDraw(...args) {
         super._preDraw(...args);
-        if (this.originalMix instanceof Animate && !this.originalMix.isAnimated()) {
+        if (this.originalMix instanceof Transition && !this.originalMix.isAnimated()) {
             this.parent.replaceChild(this, this.b);
             this.notify();
         }

@@ -39,7 +39,7 @@
         const source = new carto.source.Dataset('bird_journey');
         // Add better styles
         const viz = new carto.Viz(`
-            filter: torque($date_time,10,fade(0,0.5))
+            filter: animation($date_time,10,fade(0,0.5))
             color: ramp(buckets($bird_name,["Sanne","Eric","Nico"]),[deeppink,yellow,turquoise,gray])
             width: 4
             strokeWidth: 0

@@ -6,6 +6,11 @@ import { Asc, Desc } from './viz/functions';
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
+ * The renderer use fuzzy logic where < 0.5 means false and >= 0.5 means true
+ */
+const FILTERING_THRESHOLD = 0.5;
+
+/**
  * @typedef {object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
@@ -144,73 +149,95 @@ class Renderer {
         return 1;
     }
 
-    _computeDrawMetadata(renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
+    /**
+     * Run aggregation functions over the visible features.
+     */
+    _runViewportAggregations(renderLayer) {
+        const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
-        const aspect = this.getAspect();
-        let drawMetadata = {
-            zoom: 1. / this._zoom,
-            columns: [] // What is this?
-        };
 
-        const s = 1. / this._zoom;
-
-        const rootExprs = viz._getRootExpressions();
         // Performance optimization to avoid doing DFS at each feature iteration
-        const viewportExprs = [];
+        const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
+
+        if (!viewportExpressions.length) {
+            return;
+        }
+
+        viewportExpressions.forEach(expr => expr._resetViewportAgg());
+
+        // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
+        const processedFeaturesIDs = new Set();
+
+        dataframes.forEach(dataframe => {
+            for (let i = 0; i < dataframe.numFeatures; i++) {
+                // If feature has been acumulated ignore it
+                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                    continue;
+                }
+                // Ignore features outside viewport
+                if (!this._isFeatureInViewport(dataframe, i)) {
+                    continue;
+                }
+
+                const feature = this._featureFromDataFrame(dataframe, i);
+
+                // Ignore filtered features
+                if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
+                    continue;
+                }
+
+                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+            }
+        });
+    }
+
+    /**
+     * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
+     */
+    _isFeatureInViewport(dataframe, index) {
+        const scale = 1 / this._zoom;
+        return dataframe.inViewport(index, scale, this._center, this.getAspect());
+    }
+
+    /**
+     * Perform a depth first search through the expression tree collecting all viewport expressions.
+     */
+    _getViewportExpressions(rootExpressions) {
+        const viewportExpressions = [];
+
         function dfs(expr) {
             if (expr._isViewport) {
-                viewportExprs.push(expr);
+                viewportExpressions.push(expr);
             } else {
                 expr._getChildren().map(dfs);
             }
         }
-        rootExprs.map(dfs);
-        const numViewportExprs = viewportExprs.length;
-        viewportExprs.forEach(expr => expr._resetViewportAgg());
 
-        if (!viewportExprs.length) {
-            return drawMetadata;
-        }
-        tiles.forEach(d => {
-            d.vertexScale = [(s / aspect) * d.scale, s * d.scale];
-            d.vertexOffset = [(s / aspect) * (this._center.x - d.center.x), s * (this._center.y - d.center.y)];
-            const minx = (-1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const maxx = (1 + d.vertexOffset[0]) / d.vertexScale[0];
-            const miny = (-1 + d.vertexOffset[1]) / d.vertexScale[1];
-            const maxy = (1 + d.vertexOffset[1]) / d.vertexScale[1];
-
-            const propertyNames = Object.keys(d.properties);
-            const propertyNamesLength = propertyNames.length;
-            const f = {};
-
-            for (let i = 0; i < d.numFeatures; i++) {
-                if (d.inViewport(i, minx, miny, maxx, maxy)) {
-
-                    for (let j = 0; j < propertyNamesLength; j++) {
-                        const name = propertyNames[j];
-                        f[name] = d.properties[name][i];
-                    }
-
-                    if (viz.filter.eval(f) < 0.5) {
-                        continue;
-                    }
-
-                    for (let j = 0; j < numViewportExprs; j++) {
-                        const expr = viewportExprs[j];
-                        expr._accumViewportAgg(f);
-                    }
-                }
-            }
-        });
-        return drawMetadata;
+        rootExpressions.map(dfs);
+        return viewportExpressions;
     }
 
-    renderLayer(layer) {
-        const tiles = layer.getActiveDataframes();
-        const viz = layer.viz;
+    /**
+     * Build a feature object from a dataframe and an index copying all the properties.
+     */
+    _featureFromDataFrame(dataframe, index) {
+        const propertyNames = Object.keys(dataframe.properties);
+        const feature = {};
+        for (let i = 0; i < propertyNames.length; i++) {
+            const name = propertyNames[i];
+            feature[name] = dataframe.properties[name][index];
+        }
+        return feature;
+    }
+
+    renderLayer(renderLayer) {
+        const tiles = renderLayer.getActiveDataframes();
+        const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
+        const drawMetadata = {
+            zoom: 1 / this._zoom, // Used by zoom expression
+        };
 
         if (!tiles.length) {
             return;
@@ -225,11 +252,8 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
 
-        const drawMetadata = this._computeDrawMetadata(layer);
+        this._runViewportAggregations(renderLayer);
 
-        Object.values(viz.variables).map(v => {
-            v._updateDrawMetadata(drawMetadata);
-        });
 
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const TID = shader.tid;
@@ -241,12 +265,11 @@ class Renderer {
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(TID).length;
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-            vizExpr._updateDrawMetadata(drawMetadata);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(TID).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
                 gl.uniform1i(TID[name], i);
             });
 
@@ -269,7 +292,7 @@ class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -290,9 +313,9 @@ class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const s = 1. / this._zoom;
+        const scale = 1. / this._zoom;
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(layer);
+        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
@@ -317,20 +340,20 @@ class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (s / aspect) * tile.scale,
-                s * tile.scale);
+                (scale / aspect) * tile.scale,
+                scale * tile.scale);
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (s / aspect) * (this._center.x - tile.center.x),
-                s * (this._center.y - tile.center.y));
+                (scale / aspect) * (this._center.x - tile.center.x),
+                scale * (this._center.y - tile.center.y));
             if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type == 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
-            tile.vertexScale = [(s / aspect) * tile.scale, s * tile.scale];
+            tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
 
-            tile.vertexOffset = [(s / aspect) * (this._center.x - tile.center.x), s * (this._center.y - tile.center.y)];
+            tile.vertexOffset = [(scale / aspect) * (this._center.x - tile.center.x), scale * (this._center.y - tile.center.y)];
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
@@ -367,17 +390,15 @@ class Renderer {
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.tid).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-                viz.symbol._updateDrawMetadata(drawMetadata);
                 viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
-                viz.symbolPlacement._updateDrawMetadata(drawMetadata);
                 viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
                 Object.keys(viz.symbolShader.tid).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.propertyTex[tile.propertyID[name]]);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
                     gl.uniform1i(viz.symbolShader.tid[name], freeTexUnit);
                     freeTexUnit++;
                 });
@@ -408,7 +429,7 @@ class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (layer.type != 'point') {
+        if (renderLayer.type != 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 

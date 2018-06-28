@@ -182,7 +182,8 @@ export default class Windshaft {
             switch (column.type) {
                 case 'date':
                 {
-                    const d = Date.parse(propertyValue);
+                    const d = new Date();
+                    d.setTime(1000*propertyValue);
                     const min = column.min;
                     const max = column.max;
                     const n = (d - min) / (max.getTime() - min.getTime());
@@ -305,7 +306,7 @@ export default class Windshaft {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 0
+                mvt: 1
             },
             layers: [
                 {

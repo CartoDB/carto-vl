@@ -39,7 +39,7 @@
         const source = new carto.source.Dataset('bird_journey');
         // Add better styles
         const viz = new carto.Viz(`
-            filter: torque($date_time,10,fade(1,1))
+            filter: animation($date_time,10,fade(1,1))
         `);
         // Create the layer
         const layer = new carto.Layer('layer', source, viz);

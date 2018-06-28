@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { number } from '../functions';
 
 /**
- * Get the current timestamp. This is an advanced form of animation, `torque` is preferred.
+ * Get the current timestamp. This is an advanced form of animation, `animation` expression is preferred.
  *
  * @return {Number}
  *

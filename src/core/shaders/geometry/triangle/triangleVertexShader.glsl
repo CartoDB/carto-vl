@@ -1,5 +1,3 @@
-export const VS = `
-
 precision mediump float;
 
 attribute vec2 vertexPosition;
@@ -48,13 +46,4 @@ void main(void) {
     }
     color = vec4(c.rgb*c.a, c.a);
     gl_Position  = p;
-}`;
-
-export const FS = `
-precision lowp float;
-
-varying lowp vec4 color;
-
-void main(void) {
-    gl_FragColor = color;
-}`;
+}
