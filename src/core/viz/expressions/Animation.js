@@ -102,6 +102,16 @@ export class Animation extends BaseExpression {
             waitingForOthers.add(this);
         }
         if (waitingForOthers.has(this)) {
+            waitingForLayer = new Set([...waitingForLayer].filter(expr=>{
+                while (expr.parent){
+                    expr = expr.parent;
+                }
+                if (expr._getRootExpressions){
+                    // The animation hasn't been removed from the viz
+                    return true;
+                }
+                return false;
+            }));
             if (waitingForLayer.size > 0) {
                 return;
             }
