@@ -90,27 +90,42 @@ export class Animation extends BaseExpression {
         this.type = 'number';
         this._originalInput = originalInput;
         this._paused = false;
-
-        waitingForLayer.add(this);
     }
 
     isAnimated() {
         return !this.paused;
     }
 
-    _setTimestamp(timestamp) {
-        let deltaTime = 0;
-        const speed = 1 / this.duration.value;
-
-        if (this._lastTime === undefined) {
+    _dataReady() {
+        if (waitingForLayer.has(this)) {
             waitingForLayer.delete(this);
             waitingForOthers.add(this);
+        }
+        if (waitingForOthers.has(this)) {
             if (waitingForLayer.size > 0) {
                 return;
             }
-            [...waitingForOthers.values()].map(anim => anim._lastTime = timestamp);
+            [...waitingForOthers.values()].map(anim => anim.play());
+            waitingForOthers.clear();
+        }
+    }
+
+    _postShaderCompile(program, gl) {
+        waitingForLayer.add(this);
+        this.pause();
+        super._postShaderCompile(program, gl);
+    }
+
+    _setTimestamp(timestamp) {
+        super._setTimestamp(timestamp);
+
+        if (this._paused && this._lastTime === undefined) {
             return;
-        } else {
+        }
+        let deltaTime = 0;
+        const speed = 1 / this.duration.value;
+
+        if (this._lastTime !== undefined) {
             deltaTime = timestamp - this._lastTime;
         }
 
@@ -121,8 +136,6 @@ export class Animation extends BaseExpression {
         }
 
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
-
-        super._setTimestamp(timestamp);
     }
 
     eval(feature) {

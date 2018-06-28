@@ -242,6 +242,7 @@ class Renderer {
         if (!tiles.length) {
             return;
         }
+        viz._getRootExpressions().map(expr => expr._dataReady());
 
         gl.enable(gl.CULL_FACE);
 
