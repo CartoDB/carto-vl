@@ -178,8 +178,6 @@ import Linear from './expressions/linear';
 
 import { NamedColor } from './expressions/color/named-color';
 
-import Near from './expressions/near';
-
 import Now from './expressions/now';
 
 import BaseNumber from './expressions/basic/number';
