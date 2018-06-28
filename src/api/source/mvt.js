@@ -46,6 +46,9 @@ export default class MVT extends Base {
     constructor(templateURL, metadata = new Metadata()) {
         super();
         this._templateURL = templateURL;
+        if (!(metadata instanceof Metadata)) {
+            metadata = new Metadata(metadata);
+        }
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
     }
