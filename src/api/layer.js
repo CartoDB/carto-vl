@@ -376,21 +376,12 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        this._isSourceLoaded = false;
-        
-        map.on('sourcedata', this._onMapSourcedata);
-        map.on('load', this._onMapLoad.bind(this, map, beforeLayerID));
-    }
-
-    _onMapSourcedata(event) {
-        this._isSourceLoaded = event.isSourceLoaded;   
-    }
-
-    _onMapLoad(map, beforeLayerID) {
-        if (map.isStyleLoaded() || this._isSourceLoaded) {
-            map.off('sourcedata', this._onMapSourcedata);
-            map.off('load', this._onMapLoad);
+        if (map._loaded) {
             this._onMapLoaded(map, beforeLayerID);
+        } else {
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
         }
     }
 
