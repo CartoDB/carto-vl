@@ -1,5 +1,5 @@
 import * as earcut from 'earcut';
-
+import { getJointNormal, getLineNormal } from '../utils/geometry';
 
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
@@ -46,6 +46,7 @@ function decodePolygon(geometry) {
     let vertices = []; //Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    
     geometry.forEach(feature => {
         feature.forEach(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
@@ -101,8 +102,10 @@ function decodePolygon(geometry) {
                 vertices.push(b[0], b[1]);
             }
         });
+
         breakpoints.push(vertices.length);
     });
+
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
@@ -162,26 +165,6 @@ function decodeLine(geom) {
         breakpoints,
         normals: new Float32Array(normals)
     };
-}
-
-function getLineNormal(a, b) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    return normalize([-dy, dx]);
-}
-
-function getJointNormal(a, b, c) {
-    const u = normalize([a[0] - b[0], a[1] - b[1]]);
-    const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = - u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
-    }
-}
-
-function normalize(v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-    return [v[0] / s, v[1] / s];
 }
 
 export default { decodeGeom };
