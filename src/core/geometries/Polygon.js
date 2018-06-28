@@ -1,4 +1,4 @@
-import Geometry from './geometry';
+import Geometry from './Geometry';
 
 /**
  * A polygon used to detect collisions
