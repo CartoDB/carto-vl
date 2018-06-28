@@ -1,6 +1,10 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
 
+// Maximum number of property textures that will be uploaded automatically to the GPU
+// in a non-lazy manner
+const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
+
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
     constructor({ center, scale, geom, properties, type, active, size, metadata }) {
@@ -289,25 +293,26 @@ export default class Dataframe {
         return { id, properties };
     }
 
-    _addProperty(propertyName, propertiesFloat32Array) {
-        if (!this.renderer) {
-            // Properties will be bound to the GL context on the initial this.bind() call
-            return;
+    _addProperty(propertyName) {
+        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
+            this.getPropertyTexture(propertyName);
         }
+    }
+
+    getPropertyTexture(propertyName) {
+        if (this.propertyTex[propertyName]) {
+            return this.propertyTex[propertyName];
+        }
+
+        const propertiesFloat32Array = this.properties[propertyName];
         // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
         this.height = height;
 
-        let propertyID = this.propertyID[propertyName];
-        if (propertyID === undefined) {
-            propertyID = this.propertyCount;
-            this.propertyCount++;
-            this.propertyID[propertyName] = propertyID;
-        }
-        this.propertyTex[propertyID] = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyID]);
+        this.propertyTex[propertyName] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
             width, height, 0, gl.ALPHA, gl.FLOAT,
             propertiesFloat32Array);
@@ -315,14 +320,14 @@ export default class Dataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        return this.propertyTex[propertyName];
     }
 
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties(properties) {
         Object.keys(properties).forEach(propertyName => {
-            this._addProperty(propertyName, properties[propertyName]);
-            this.properties[propertyName] = properties[propertyName];
+            this._addProperty(propertyName);
         });
     }
 
