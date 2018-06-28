@@ -296,8 +296,6 @@ export const linear = (...args) => new Linear(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
-export const near = (...args) => new Near(...args);
-
 export const now = (...args) => new Now(...args);
 
 export const number = (...args) => new BaseNumber(...args);
