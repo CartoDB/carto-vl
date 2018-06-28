@@ -17,7 +17,7 @@ import { getJointNormal, getLineNormal } from '../utils/geometry';
             ]
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
-// The geom will be an array of coordinates in this case
+// The geom will be an array of coordinates in this case`
 export function decodeGeom(geomType, geom) {
     if (geomType == 'point') {
         return decodePoint(geom);
@@ -38,8 +38,14 @@ function decodePoint(vertices) {
     };
 }
 
-function isClipped(l) {
-    return l[0] == -1 || l[0] == 1 || l[1] == -1 || l[1] == 1;
+function isClipped(polygon, i, j) {
+    if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {
+        if (polygon.clippedType[polygon.clipped.indexOf(i)] &
+            polygon.clippedType[polygon.clipped.indexOf(j)]) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function decodePolygon(geometry) {
@@ -67,7 +73,7 @@ function decodePolygon(geometry) {
                 const a = [lineString[i + 0], lineString[i + 1]];
                 const b = [lineString[i + 2], lineString[i + 3]];
 
-                if (isClipped(a) && isClipped(b)) {
+                if (isClipped(polygon, i, i + 2)) {
                     continue;
                 }
 
