@@ -1,10 +1,6 @@
 /**
  * Determines if two bodies are colliding using the Separating Axis Theorem
- * @private
- * @param {Circle|Polygon|Point} a The source body to test
- * @param {Circle|Polygon|Point} b The target body to test against
- * @param {Boolean} [aabb = true] Set to false to skip the AABB test (useful if you use your own collision heuristic)
- * @returns {Boolean}
+ * https://github.com/Prozi/detect-collisions/
  */
 export default function SAT(a, b, aabb = true) {
     const a_polygon = a._polygon;
@@ -44,13 +40,6 @@ export default function SAT(a, b, aabb = true) {
         if (b_polygon && b._dirty_normals) {
             b._calculateNormals();
         }
-
-        // collision = (
-        //     a_polygon && b_polygon ? polygonPolygon(a, b) :
-        //     a_polygon ? polygonCircle(a, b, false) :
-        //     b_polygon ? polygonCircle(b, a, true) :
-        //     circleCircle(a, b)
-        // );
     }
 
     return polygonPolygon(a, b);
@@ -58,9 +47,8 @@ export default function SAT(a, b, aabb = true) {
 
 /**
  * Determines if two bodies' axis aligned bounding boxes are colliding
- * @param {Circle|Polygon|Point} a The source body to test
- * @param {Circle|Polygon|Point} b The target body to test against
  */
+
 function aabbAABB(a, b) {
     const a_polygon = a._polygon;
     const a_x = a_polygon ? 0 : a.x;
@@ -85,10 +73,8 @@ function aabbAABB(a, b) {
 
 /**
  * Determines if two polygons are colliding
- * @param {Polygon} a The source polygon to test
- * @param {Polygon} b The target polygon to test against
- * @returns {Boolean}
  */
+
 function polygonPolygon(a, b) {
     const a_count = a._coords.length;
     const b_count = b._coords.length;
@@ -127,11 +113,6 @@ function polygonPolygon(a, b) {
 
 /**
  * Determines if two polygons are separated by an axis
- * @param {Array<Number[]>} a_coords The coordinates of the polygon to test
- * @param {Array<Number[]>} b_coords The coordinates of the polygon to test against
- * @param {Number} x The X direction of the axis
- * @param {Number} y The Y direction of the axis
- * @returns {Boolean}
  */
 function separatingAxis(a_coords, b_coords, x, y) {
     const a_count = a_coords.length;

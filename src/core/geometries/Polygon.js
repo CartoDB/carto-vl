@@ -2,18 +2,10 @@ import Geometry from './geometry';
 
 /**
  * A polygon used to detect collisions
+ * https://github.com/Prozi/detect-collisions/
  */
 
 export default class Polygon extends Geometry {
-    /**
-     * @constructor
-     * @param {Number} [x = 0] The starting X coordinate
-     * @param {Number} [y = 0] The starting Y coordinate
-     * @param {Array<Number[]>} [points = []] An array of coordinate pairs making up the polygon - [[x1, y1], [x2, y2], ...]
-     * @param {Number} [angle = 0] The starting rotation in radians
-     * @param {Number} [scale_x = 1] The starting scale along the X axis
-     * @param {Number} [scale_y = 1] The starting scale long the Y axis
-     */
     constructor(x = 0, y = 0, points = [], angle = 0, scale_x = 1, scale_y = 1) {
         super(x, y);
 
@@ -42,8 +34,8 @@ export default class Polygon extends Geometry {
 
     /**
      * Sets the points making up the polygon. It's important to use this function when changing the polygon's shape to ensure internal data is also updated.
-     * @param {Array<Number[]>} new_points An array of coordinate pairs making up the polygon - [[x1, y1], [x2, y2], ...]
      */
+
     setPoints(new_points) {
         const count = new_points.length;
 
