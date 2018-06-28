@@ -53,7 +53,7 @@
 
     const source = new carto.source.Dataset('public.pop_density_points');
     let viz = new carto.Viz(`
-      @list: viewportList()
+      @list: viewportFeatures()
       @dens: $dn
       width: 20
       filter: $dn > 150

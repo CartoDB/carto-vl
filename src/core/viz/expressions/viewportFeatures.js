@@ -1,10 +1,10 @@
 import BaseExpression from './base';
 
-export class ViewportList extends BaseExpression {
+export class ViewportFeatures extends BaseExpression {
     constructor() {
         super({});
         this.expr = [];
-        // this.type = 'array';
+        this.type = 'featureList';
         this._isViewport = true;
     }
 
