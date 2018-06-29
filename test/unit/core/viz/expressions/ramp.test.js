@@ -291,15 +291,7 @@ describe('src/core/viz/expressions/ramp', () => {
                 });
             });
 
-            describe('when categories are quantitative', () => {
-                const METADATA = new Metadata({
-                    properties: {
-                        grade: {
-                            type: 'number'
-                        }
-                    }
-                });
-                
+            describe('when categories are quantitative', () => {                
                 const red = s.namedColor('red');
                 const blue = s.namedColor('blue');
                 const yellow = s.namedColor('yellow');
