@@ -222,7 +222,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.isQualitative() && input.numCategories >= palette.colors.length
+        const subPaletteNumber = palette.isQualitative() && palette.colors && input.numCategories >= palette.colors.length
             ? input.numCategories
             : this.maxKey;
 
