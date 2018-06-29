@@ -292,52 +292,149 @@ describe('src/core/viz/expressions/ramp', () => {
             });
 
             describe('when categories are quantitative', () => {
-                describe('and there are less buckets than colors', () => {
-                    const METADATA = new Metadata({
-                        properties: {
-                            grade: {
-                                type: 'number',
-                                categories: [
-                                    { grade: 10 }, 
-                                    { grade: 20 },
-                                    { grade: 30 },
-                                    { grade: 40 },
-                                    { grade: 50 }
-                                ]
-                            }
+                const METADATA = new Metadata({
+                    properties: {
+                        grade: {
+                            type: 'number'
                         }
-                    });
-                    
-                    const red = s.namedColor('red');
-                    const blue = s.namedColor('blue');
-                    const yellow = s.namedColor('yellow');
-                    const purple = s.namedColor('purple');
-                    const green = s.namedColor('green');
-                    const orange = s.namedColor('orange');
-    
+                    }
+                });
+                
+                const red = s.namedColor('red');
+                const blue = s.namedColor('blue');
+                const yellow = s.namedColor('yellow');
+                const purple = s.namedColor('purple');
+                const green = s.namedColor('green');
+                const orange = s.namedColor('orange');
+
+                describe('and there are less buckets than colors', () => {
+                    const RANGES = [10, 20, 30];
+                    const COLORS = [red, blue, yellow, purple, green, orange];
+                    let r;
+
                     let actual;
                     let expected;
                     
-                    describe('and not all the values can be classified in a bucket', () => {
-                        it('should not show interpolation', () => {
+                    it('should not show interpolation', () => {
+                        r = ramp(buckets(1, RANGES), COLORS);
 
-                        });
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[0]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
 
-                        it('should ignore the remaining colors', () => {
+                        r = ramp(buckets(11, RANGES), COLORS);
 
-                        });
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[1]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets(21, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[2]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+
+                    it('should ignore the remaining colors and use the last color for the rest of the buckets', () => {
+                        r = ramp(buckets(31, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = orange._nameToRGBA();
                     });
                 });
 
                 describe('and there are the same number of buckets than colors', () => {
+                    const RANGES = [10, 20, 30];
+                    const COLORS = [red, blue, yellow];
+                    let r;
+
+                    let actual;
+                    let expected;
+
                     it('should not show interpolation', () => {
-                    
+                        r = ramp(buckets(1, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[0]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets(11, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[1]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets(21, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[2]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+                    });
+
+                    it('should use the default color for the rest of the buckets', () => {
+                        r = ramp(buckets(31, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = r.defaultOtherColor._nameToRGBA();
                     });
                 });
 
                 describe('and there are more buckets than colors', () => {
+                    const RANGES = [10, 20, 30, 40, 50];
+                    const COLORS = [red, blue, yellow];
+                    let r;
+
+                    let actual;
+                    let expected;
+
                     it('should show interpolation', () => {
-                    
+                        r = ramp(buckets(1, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[0]._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
+
+                        r = ramp(buckets(11, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[1]._nameToRGBA();
+        
+                        expect(actual).not.toEqual(expected);
+
+                        r = ramp(buckets(21, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = COLORS[2]._nameToRGBA();
+        
+                        expect(actual).not.toEqual(expected);
+                    });
+
+                    it('should use the default color for the rest', () => {
+                        r = ramp(buckets(51, RANGES), COLORS);
+
+                        r._compile();
+                        actual = r.eval();
+                        expected = r.defaultOtherColor._nameToRGBA();
+        
+                        expect(actual).toEqual(expected);
                     });
                 });
             });

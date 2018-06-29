@@ -151,8 +151,8 @@ export default class Ramp extends BaseExpression {
         };
     }
     
-    _compile(meta) {
-        super._compile(meta);
+    _compile(metadata) {
+        super._compile(metadata);
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
         
         if (this.palette.type === paletteTypes.SPRITE) {
@@ -216,7 +216,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        return input.numCategories > palette.colors.length
+        return input.type === inputTypes.CATEGORY && input.numCategories > palette.colors.length
             ? _addOtherColorToColors(palette.colors, this.defaultOtherColor.eval())
             : _checkColorInterpolation(input.type, input.numCategories, palette.colors, this.defaultOtherColor.eval());
     }
@@ -386,7 +386,6 @@ function _avoidInterpolation(numCategories, colors) {
         }
     }
 
-    console.log('!!!', colorArray);
     return colorArray;
 }
 
