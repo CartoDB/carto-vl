@@ -4,9 +4,10 @@
 
 CARTO VL is a JavaScript library for developers to create vector-based visualizations inside Location Intelligence applications.
 
-| ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/points.png) | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/lines.png) |
-|---|---|
-| ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/aggregation.png) | ![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/polygons.png) |
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interpolated-lines.82265604.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interactivity.44cada98.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/polygon-animation.bf485125.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/line-animation.c9c09239.gif)
 
 ## Features
 
@@ -21,12 +22,15 @@ CARTO VL is a JavaScript library for developers to create vector-based visualiza
 Run this
 
 ```
-CODE
+width: zoom()
+color: ramp(buckets($dn, [80, 100, 140]), prism)
+strokeWidth: 0
+filter: $dn > 60
 ```
 
 To see
 
-![IMAGE]()
+![IMAGE](https://github.com/CartoDB/carto-vl/blob/master/docs/images/map-example.png)
 
 ## Getting Started
 
