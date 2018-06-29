@@ -98,6 +98,7 @@ export default class Buckets extends BaseExpression {
         this.numCategories = list.elems.length + 1;
         this.list = list;
         this.type = 'category';
+        this.isBuckets = true;
     }
 
     eval(feature) {
@@ -126,7 +127,7 @@ export default class Buckets extends BaseExpression {
     _compile(metadata) {
         super._compile(metadata);
 
-        if (this.input.type != 'number' && this.input.type != 'category') {
+        if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
         

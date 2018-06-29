@@ -216,9 +216,11 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        return input.numCategories > palette.colors.length
-            ? _addOtherColorToColors(palette.colors, this.defaultOtherColor.eval())
-            : _checkColorInterpolation(input.type, input.numCategories, palette.colors, this.defaultOtherColor.eval());
+        const otherColor = this.defaultOtherColor.eval();
+
+        return input.numCategories -1 < palette.colors.length
+            ? _checkColorInterpolation(input.numCategories, palette.colors, input, otherColor)
+            : _addOtherColorToColors(palette.colors, otherColor, input);
     }
 
     _getSubPalettes(input, palette) {
@@ -231,7 +233,7 @@ export default class Ramp extends BaseExpression {
             : palette.getLongestSubPalette();
         
         return palette.isQuantitative() && input.numCategories > colors.length
-            ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval())
+            ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval(), input)
             : colors;
     }
     
@@ -371,27 +373,30 @@ function _removeOtherFromColors (colors) {
     return colors.slice(0, colors.length - 1);
 }
 
-function _addOtherColorToColors (colors, otherColor) {
-    return [...colors, otherColor];
+function _addOtherColorToColors (colors, otherColor, input) {
+    return input.isBuckets ? [...colors, otherColor] : colors;
 }
 
-function _avoidInterpolation(numCategories, colors) {
+function _avoidInterpolation(numCategories, colors, input, otherColor) {
     const colorArray = [];
+    const colorForRemainingCategories = colors[numCategories - 1]
+        ? colors[numCategories - 1]
+        : otherColor;
 
     for (let i = 0; i < colors.length; i++) {
         if (i < numCategories - 1) {
             colorArray.push(colors[i]);
         } else if (i === colors.length - 1) {
-            colorArray.push(colors[colors.length - 1]);
+            colorArray.push(colorForRemainingCategories);
         }
     }
 
     return colorArray;
 }
 
-function _checkColorInterpolation(type, numCategories, colors, otherColor) {
-    return type === inputTypes.CATEGORY && numCategories !== colors.length
-        ? _avoidInterpolation(numCategories, colors, otherColor)
+function _checkColorInterpolation(numCategories, colors, input, otherColor) {
+    return numCategories -1 < colors.length
+        ? _avoidInterpolation(numCategories, colors, input, otherColor)
         : colors;
 }
 

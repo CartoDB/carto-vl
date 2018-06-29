@@ -179,7 +179,7 @@ describe('src/core/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = purple._nameToRGBA();
+                            expected = green._nameToRGBA();
             
                             expect(actual).toEqual(expected);
 
@@ -187,7 +187,7 @@ describe('src/core/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = purple._nameToRGBA();
+                            expected = green._nameToRGBA();
             
                             expect(actual).toEqual(expected);
                         });
@@ -276,10 +276,10 @@ describe('src/core/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('and there are the more categories than colors', () => {
+                describe('and there are more categories than colors', () => {
                     describe('and not all categories in the dataset have a bucket defined', () => {
                         it('should use the default color for the remaining categories', () => {
-                            const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+                            const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue]);
 
                             r._compile(METADATA);
                             actual = r.eval();
@@ -376,12 +376,12 @@ describe('src/core/viz/expressions/ramp', () => {
                         expect(actual).toEqual(expected);
                     });
 
-                    it('should use the default color for the rest of the buckets', () => {
+                    it('should use the last color for the rest of the buckets', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
                         r._compile();
                         actual = r.eval();
-                        expected = r.defaultOtherColor._nameToRGBA();
+                        expected = yellow._nameToRGBA();
                     });
                 });
 
