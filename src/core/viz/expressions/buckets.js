@@ -70,12 +70,14 @@ export default class Buckets extends BaseExpression {
         list = implicitCast(list);
 
         let looseType = undefined;
+        
         if (input.type) {
             if (input.type !== 'number' && input.type !== 'category') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
         }
+        
         list.elems.map((item, index) => {
             if (item.type) {
                 if (looseType && looseType != item.type) {
@@ -90,6 +92,7 @@ export default class Buckets extends BaseExpression {
         let children = {
             input
         };
+
         list.elems.map((item, index) => children[`arg${index}`] = item);
         super(children);
         this.numCategories = list.elems.length + 1;
@@ -122,8 +125,7 @@ export default class Buckets extends BaseExpression {
 
     _compile(metadata) {
         super._compile(metadata);
-        this.isBucketComplete = this.input.type === 'category' && this.list.elems.length === this.input.numCategories;
-        
+
         if (this.input.type != 'number' && this.input.type != 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }

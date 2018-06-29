@@ -97,7 +97,7 @@ export default class Ramp extends BaseExpression {
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOtherColor = new NamedColor('gray');
-        
+
         try {
             if (palette.type === paletteTypes.NUMBER_ARRAY) {
                 this.palette.floats = this.palette.eval();
@@ -188,6 +188,7 @@ export default class Ramp extends BaseExpression {
                 uniform float keyMin${this._uid};
                 uniform float keyWidth${this._uid};`
             ),
+
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
                 ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
@@ -215,13 +216,13 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        return input.isBucketComplete !== undefined && input.numCategories > palette.colors.length
+        return input.numCategories > palette.colors.length
             ? _addOtherColorToColors(palette.colors, this.defaultOtherColor.eval())
-            : palette.colors;
+            : _checkColorInterpolation(input.type, input.numCategories, palette.colors, this.defaultOtherColor.eval());
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.isQualitative() && input.isBucketComplete === undefined
+        const subPaletteNumber = palette.isQualitative() && input.numCategories >= palette.colors.length
             ? input.numCategories
             : this.maxKey;
 
@@ -229,7 +230,7 @@ export default class Ramp extends BaseExpression {
             ? palette.subPalettes[subPaletteNumber]
             : palette.getLongestSubPalette();
         
-        return palette.isQuantitative() && input.isBucketComplete !== undefined && input.numCategories > colors.length
+        return palette.isQuantitative() && input.numCategories > colors.length
             ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval())
             : colors;
     }
@@ -374,8 +375,27 @@ function _addOtherColorToColors (colors, otherColor) {
     return [...colors, otherColor];
 }
 
+function _avoidInterpolation(numCategories, colors) {
+    const colorArray = [];
+
+    for (let i = 0; i < colors.length; i++) {
+        if (i < numCategories - 1) {
+            colorArray.push(colors[i]);
+        } else if (i === colors.length - 1) {
+            colorArray.push(colors[colors.length - 1]);
+        }
+    }
+
+    console.log('!!!', colorArray);
+    return colorArray;
+}
+
+function _checkColorInterpolation(type, numCategories, colors, otherColor) {
+    return type === inputTypes.CATEGORY && numCategories !== colors.length
+        ? _avoidInterpolation(numCategories, colors, otherColor)
+        : colors;
+}
+
 function _needsToRemoveOtherCategory (input, palette, colors) {
-    return input.isBucketComplete !== undefined
-        ? palette.isQualitative() && input.isBucketComplete && input.numCategories > colors.length
-        : true;
+    return palette.isQualitative() && input.isBucketComplete && input.numCategories > colors.length;
 }

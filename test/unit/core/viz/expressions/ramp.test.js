@@ -80,169 +80,269 @@ describe('src/core/viz/expressions/ramp', () => {
 
     describe('.eval with buckets', () => {
         describe('when palettes are color arrays', () => {
-            const METADATA = new Metadata({
-                properties: {
-                    grade: {
-                        type: 'category',
-                        categories: [
-                            { grade: 'A' }, 
-                            { grade: 'B' },
-                            { grade: 'C' },
-                            { grade: 'D' },
-                            { grade: 'E' }
-                        ]
+            describe('when categories are qualitative', () => {
+                const METADATA = new Metadata({
+                    properties: {
+                        grade: {
+                            type: 'category',
+                            categories: [
+                                { grade: 'A' }, 
+                                { grade: 'B' },
+                                { grade: 'C' },
+                                { grade: 'D' },
+                                { grade: 'E' }
+                            ]
+                        }
                     }
-                }
-            });
+                });
+                
+                const red = s.namedColor('red');
+                const blue = s.namedColor('blue');
+                const yellow = s.namedColor('yellow');
+                const purple = s.namedColor('purple');
+                const green = s.namedColor('green');
+                const orange = s.namedColor('orange');
+
+                let actual;
+                let expected;
+
+                describe('and there are less categories than colors', () => {
+                    describe('and not all categories in the dataset have a bucket defined', () => {
+                        it('should not show interpolation', () => {
+                            let r;
+                            
+                            r = ramp(buckets('A', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = red._nameToRGBA();
             
-            const red = s.namedColor('red');
-            const blue = s.namedColor('blue');
-            const yellow = s.namedColor('yellow');
-            const purple = s.namedColor('purple');
-            const green = s.namedColor('green');
-            const orange = s.namedColor('orange');
+                            expect(actual).toEqual(expected);
 
-            let actual;
-            let expected;
+                            r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-            describe('and there are less categories than colors', () => {
-                describe('and not all categories in the dataset have a bucket defined', () => {
-                    it('should not show interpolation', () => {
-                        let r;
-                        
-                        r = ramp(buckets('A', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = blue._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = red._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
+                            r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                        r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = yellow._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+                        });
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = blue._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
+                        it('should use last color for the remaining categories', () => {
+                            const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                        r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = purple._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+                        });
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = yellow._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
+                        it('should use only the same number of colors as categories', () => {
+                            const COLORS = [red, blue, yellow, green, orange, purple];
+                            const CATEGORIES = ['A', 'B', 'C'];
+                            let r;
+                            
+                            r = ramp(buckets('A', CATEGORIES), COLORS);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = red._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('B', CATEGORIES), COLORS);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = blue._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('C', CATEGORIES), COLORS);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = yellow._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('D', CATEGORIES), COLORS);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = purple._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('E', CATEGORIES), COLORS);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = purple._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+                        });
                     });
 
-                    it('should use last color for the remaining categories', () => {
-                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                    describe('and all categories in the dataset have a bucket defined', () => {
+                        it('should show interpolation', () => {
+                            const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = purple._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
-                    });
-                });
-
-                describe('and all categories in the dataset have a bucket defined', () => {
-                    it('should show interpolation', () => {
-                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
-
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = orange._nameToRGBA();
-        
-                        expect(actual).not.toEqual(expected);
-                    });
-                });
-            });
-
-            describe('and there are the same number of categories than colors', () => {
-                describe('and not all categories in the dataset have a bucket defined', () => {
-                    it('should not show interpolation', () => {
-                        const categories = ['A', 'B', 'C'];
-                        const colors = [red, green, yellow];
-                        let r;
-                        let actual, expected;
-
-                        r = ramp(buckets('A', categories), colors);
-                        r._compile(METADATA);
-
-                        actual = r.eval();
-                        expected = red._nameToRGBA();
-                        expect(actual).toEqual(expected);
-
-                        r = ramp(buckets('B', categories), colors);
-                        r._compile(METADATA);
-
-                        actual = r.eval();
-                        expected = green._nameToRGBA();
-                        expect(actual).toEqual(expected);
-
-                        r = ramp(buckets('C', categories), colors);
-                        r._compile(METADATA);
-
-                        actual = r.eval();
-                        expected = yellow._nameToRGBA();
-                        expect(actual).toEqual(expected);
-                    });
-
-                    it('should use the last color for the last category', () => {
-                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
-                        r._compile(METADATA);
-
-                        actual = r.eval();
-                        expected = r.defaultOtherColor._nameToRGBA();
-                        checkRGBAThreshold.call(this, actual, expected);
-                    });
-
-                    it('should use last color for the remaining categories', () => {
-                        const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
-                        r._compile(METADATA);
-
-                        actual = r.eval();
-                        expected = r.defaultOtherColor._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = orange._nameToRGBA();
+            
+                            expect(actual).not.toEqual(expected);
+                        });
                     });
                 });
 
-                describe('and all categories in the dataset have a bucket defined', () => {
-                    it('should not show interpolation', () => {
-                        const categories = ['A', 'B', 'C', 'D', 'E'];
-                        const colors = [red, blue, yellow, purple, green];
-
-                        categories.forEach((category, index) => {
-                            const r = ramp(buckets(category, categories), colors);
+                describe('and there are the same number of categories than colors', () => {
+                    describe('and not all categories in the dataset have a bucket defined', () => {
+                        it('should not show interpolation', () => {
+                            const categories = ['A', 'B', 'C'];
+                            const colors = [red, green, yellow];
+                            let r;
                             let actual, expected;
 
+                            r = ramp(buckets('A', categories), colors);
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = colors[index]._nameToRGBA();
-                            
+                            expected = red._nameToRGBA();
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('B', categories), colors);
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = green._nameToRGBA();
+                            expect(actual).toEqual(expected);
+
+                            r = ramp(buckets('C', categories), colors);
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = yellow._nameToRGBA();
+                            expect(actual).toEqual(expected);
+                        });
+
+                        it('should use the last color for the last category', () => {
+                            const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = r.defaultOtherColor._nameToRGBA();
                             checkRGBAThreshold.call(this, actual, expected);
+                        });
+
+                        it('should use last color for the remaining categories', () => {
+                            const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
+                            r._compile(METADATA);
+
+                            actual = r.eval();
+                            expected = r.defaultOtherColor._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
+                        });
+                    });
+
+                    describe('and all categories in the dataset have a bucket defined', () => {
+                        it('should not show interpolation', () => {
+                            const categories = ['A', 'B', 'C', 'D', 'E'];
+                            const colors = [red, blue, yellow, purple, green];
+
+                            categories.forEach((category, index) => {
+                                const r = ramp(buckets(category, categories), colors);
+                                let actual, expected;
+
+                                r._compile(METADATA);
+
+                                actual = r.eval();
+                                expected = colors[index]._nameToRGBA();
+                                
+                                checkRGBAThreshold.call(this, actual, expected);
+                            });
+                        });
+                    });
+                });
+
+                describe('and there are the more categories than colors', () => {
+                    describe('and not all categories in the dataset have a bucket defined', () => {
+                        it('should use the default color for the remaining categories', () => {
+                            const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = r.defaultOtherColor._nameToRGBA();
+            
+                            expect(actual).toEqual(expected);
                         });
                     });
                 });
             });
 
-            describe('and there are the more categories than colors', () => {
-                describe('and not all categories in the dataset have a bucket defined', () => {
-                    it('should use the default color for the remaining categories', () => {
-                        const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue, purple]);
+            describe('when categories are quantitative', () => {
+                describe('and there are less buckets than colors', () => {
+                    const METADATA = new Metadata({
+                        properties: {
+                            grade: {
+                                type: 'number',
+                                categories: [
+                                    { grade: 10 }, 
+                                    { grade: 20 },
+                                    { grade: 30 },
+                                    { grade: 40 },
+                                    { grade: 50 }
+                                ]
+                            }
+                        }
+                    });
+                    
+                    const red = s.namedColor('red');
+                    const blue = s.namedColor('blue');
+                    const yellow = s.namedColor('yellow');
+                    const purple = s.namedColor('purple');
+                    const green = s.namedColor('green');
+                    const orange = s.namedColor('orange');
+    
+                    let actual;
+                    let expected;
+                    
+                    describe('and not all the values can be classified in a bucket', () => {
+                        it('should not show interpolation', () => {
 
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = r.defaultOtherColor._nameToRGBA();
-        
-                        expect(actual).toEqual(expected);
+                        });
+
+                        it('should ignore the remaining colors', () => {
+
+                        });
+                    });
+                });
+
+                describe('and there are the same number of buckets than colors', () => {
+                    it('should not show interpolation', () => {
+                    
+                    });
+                });
+
+                describe('and there are more buckets than colors', () => {
+                    it('should show interpolation', () => {
+                    
                     });
                 });
             });
         });
+    
 
         describe('when palettes are defined palettes', () => {
             describe('and palettes are qualitative', () => {
