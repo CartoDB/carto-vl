@@ -387,7 +387,7 @@ class Renderer {
 
             if (!viz.symbol._default) {
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
-                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.tids).length;
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.textureIds).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
@@ -395,10 +395,10 @@ class Renderer {
                 viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
-                Object.keys(viz.symbolShader.tids).forEach(name => {
+                Object.keys(viz.symbolShader.textureIds).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                     gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
-                    gl.uniform1i(viz.symbolShader.tids[name], freeTexUnit);
+                    gl.uniform1i(viz.symbolShader.textureIds[name], freeTexUnit);
                     freeTexUnit++;
                 });
 
