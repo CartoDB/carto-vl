@@ -50,7 +50,8 @@ Then, start by getting familiarized with [CARTO VL's Syntax](https://carto.com/d
 
 Also, take a look at our [examples](https://carto.com/developers/carto-vl/examples/) to understand the possibilities and inspire you!
 
-An alternative way is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl).
+An alternative way is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl), you can also take a look at an example [here](https://github.com/CartoDB/carto-vl-webpack-demo
+)
 
 ```
 npm i @carto/carto-vl
