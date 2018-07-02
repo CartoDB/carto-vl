@@ -165,11 +165,35 @@ class Renderer {
 
         viewportExpressions.forEach(expr => expr._resetViewportAgg());
 
+        const viewportExpressionsLength = viewportExpressions.length;
+
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
+
+        this.aspect= this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
+            const propertyNames = Object.keys(dataframe.properties);
+            const propertyNamesLength = propertyNames.length;
+
             for (let i = 0; i < dataframe.numFeatures; i++) {
+                let feature;
+                if (!dataframe.cachedFeatures){
+                    dataframe.cachedFeatures = [];
+                }
+                if (!dataframe.cachedFeatures[i]) {
+                    feature = {};
+                    for (let j = 0; j < propertyNamesLength; j++) {
+                        const name = propertyNames[j];
+                        feature[name] = dataframe.properties[name][i];
+                    }
+                    dataframe.cachedFeatures.push(feature);
+                } else {
+                    feature = dataframe.cachedFeatures[i];
+                }
+
+
+
                 // If feature has been acumulated ignore it
                 if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
                     continue;
@@ -179,24 +203,25 @@ class Renderer {
                     continue;
                 }
 
-                const feature = this._featureFromDataFrame(dataframe, i);
-
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
                     continue;
                 }
 
-                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+                for (let j = 0; j < viewportExpressionsLength; j++) {
+                    viewportExpressions[j].accumViewportAgg(feature);
+                }
             }
         });
     }
 
     /**
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
+     * NOTE: requires `this.aspect` to be set
      */
     _isFeatureInViewport(dataframe, index) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, this.getAspect());
+        return dataframe.inViewport(index, scale, this._center, this.aspect);
     }
 
     /**
