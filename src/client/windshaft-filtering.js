@@ -407,7 +407,7 @@ function getSQL(node) {
 }
 
 function sqlQ(value) {
-    if (isFinite(value)) {
+    if (Number.isFinite(value)) {
         return String(value);
     }
     return `'${value.replace(/\'/g,'\'\'')}'`;
