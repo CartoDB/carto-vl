@@ -2,6 +2,34 @@ import BaseExpression from './base';
 import * as schema from '../../../core/schema';
 import Property from './basic/property';
 
+/**
+ * Generates a list of features in the viewport
+ *
+ * For each feature, the properties specified as arguments to this expression will be available.
+ * Filtered features will not be present in the list.
+ * This expression cannot be used in the visualization, it can only be used in JavaScript code as in the example below.
+ *
+ * @param {...Property} properties - properties that will appear in the feature list
+ * @return {Array} list of features
+ *
+ * @example <caption>Define and use a list of features. (String)</caption>
+ * const source = carto.source.Dataset('data');
+ * const viz = new carto.Viz(`
+ *          \@list: viewportFeatures($value, $category)
+ * `);
+ * const layer = carto.Layer('layer', source, viz);
+ * ...
+ *
+ * layer.on('updated', () => {
+ *    viz.variables.list.eval().forEach(feature => {
+ *        console.log('value:', feature.value, 'category:', feature.category);
+ *  });
+ *
+ * @memberof carto.expressions
+ * @name viewportFeatures
+ * @function
+ * @api
+ */
 export class ViewportFeatures extends BaseExpression {
     constructor(...properties) {
         if (properties.some(p => !(p instanceof Property))) {
