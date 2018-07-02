@@ -113,9 +113,11 @@ CARTO VL is still in Beta but we encourage you to start playing with it and to p
 
 ## Works with
 
-[Mapbox GL](https://github.com/mapbox/mapbox-gl-js)
+CARTO VL is a geo-spatial data visualization library. However it doesn't include basemap rendering capabilities. Therefore, CARTO VL needs to be used with Mapbox GL as a basemap provider. You'll need to use Mapbox GL for controlling the center and zoom level of your map too. The integration is seamless, but you will need to use one of our patched versions as shown in the examples.
 
-<!-- David rellena esto -->
+For more information about Mapbox GL visit the
+[github page](https://github.com/mapbox/mapbox-gl-js).
+
 
 ## Versioning
 
