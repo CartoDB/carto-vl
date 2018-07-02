@@ -38,8 +38,7 @@ export default class Metadata {
         const prop = this.properties[propertyName];
         if (prop.aggregations) {
             return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);
-        } else {
-            return [propertyName];
         }
+        return [propertyName];
     }
 }
