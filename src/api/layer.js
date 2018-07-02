@@ -7,7 +7,7 @@ import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
 import { cubic } from '../renderer/viz/expressions';
-import RenderLayer from '../renderer/renderLayer';
+import RenderLayer from '../renderer/RenderLayer';
 
 /**
  *
