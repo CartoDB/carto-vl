@@ -1,52 +1,130 @@
 # Developers
 
-* [Getting Started](#setup)
-* [Testing](#testing)
-* [Documentation](#documentation)
+CARTO VL is an open-source library. We are more than happy to receive your contributions to the code and its documentation.
 
-## <a name="setup"> Getting started </a>
+## <a name="prerequisites">Prerequisites</a>
 
-To build the library node `node >=6.11.5` is required, once you have a compatible node version you can start developing.
+To clone and run this library, you'll need [Node.js](https://nodejs.org/en/download/) >=6.11.5 (which comes with [npm](http://npmjs.com)) installed on your computer.
 
-### Install dependencies
+## <a name="install">Install</a>
 
-    yarn
+Run this commands from your command line:
 
-### Build the library
+```bash
+# Clone this repository
+$ git clone https://github.com/CartoDB/carto-vl
 
-    yarn build
+# Go into the repository
+$ cd carto-vl
 
-## <a name="testing"> Testing </a>
+# Install dependencies
+$ yarn
 
-- [Unit tests](https://github.com/CartoDB/carto-vl/blob/master/test/unit/README.md)
-- [Integration tests](https://github.com/CartoDB/carto-vl/blob/master/test/integration/README.md)
-- [Acceptance tests](https://github.com/CartoDB/carto-vl/blob/master/test/acceptance/README.md)
+# Bundle the library
+$ yarn build
+```
 
-## <a name="documentation"> Documentation </a>
+## <a name="tests">Tests</a>
 
-You **can generate generate the documentation to have an up to date version**.
+### Unit tests
 
-### Public documentation
+<!-- Add description -->
 
-This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
- - Getting started introduction with a basic example.
- - Detailed information about how styling expressions.
- - Full reference for the public API.
+```bash
+# Running the tests
+$ yarn test
 
-For generating the public documentation, you should run:
+# To watch the unit tests
+$ yarn test:watch
 
-    yarn docs
+# To launch the unit tests in the browser
+$ yarn test:browser
+```
 
-### Serve docs and examples
+### Integration tests
 
-The recommended way to navigate the documentation and check the examples is running the following command:
+Automatically test the **user activity** using local data sources (GeoJSON).
 
-    yarn serve
+```bash
+# Running the tests
+$ yarn test:user
 
-### Internal documentation
+# To watch the user tests
+$ yarn test:user:watch
+```
 
-It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
+With these you can also test the **renderer** using local data sources (GeoJSON) and a static map. The local GeoJSON files are located in the `common/sources` directory.
 
-To generate the docs for the private API, you need to execute:
+```bash
+# Running the tests
+$ yarn test:render
+```
 
-    yarn docs:all
+#### Generating new references
+
+To create new tests, crate a new folder with a new `scenario.js` file and run the following command:
+
+```
+yarn test:render:prepare
+```
+
+#### Modify old references
+
+Manually remove your old reference images and run this command to create new ones:
+
+```
+yarn test:render:prepare
+```
+
+#### Filtering tests
+
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
+
+#### Ignoring tests
+
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
+
+### Acceptance tests (E2E tests)
+
+This end to end tests cover the entire library by perfoming tests againts real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images.
+
+```bash
+# Running the tests
+$ yarn test:e2e
+```
+
+#### Generating new references
+
+To create new tests, crate a new folder with a new `scenario.js` file and run the following command:
+
+```
+yarn test:e2e:prepare
+```
+
+#### Modify old references
+
+Manually remove your old reference images and run this command to create new ones:
+
+```
+yarn test:e2e:prepare
+```
+
+#### Filtering tests
+
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
+
+#### Ignoring tests
+
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
+
+## <a name="documentation">Document your changes</a>
+
+This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+
+```bash
+# Generate the public documentation
+$ yarn docs
+
+# Serve docs and examples
+$ yarn serve
+```
