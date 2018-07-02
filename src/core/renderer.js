@@ -185,7 +185,7 @@ class Renderer {
                 viewportExpressions.forEach(viewportExpression => {
                     if (viewportExpression._requiredProperties) {
                         const propNames = viewportExpression._requiredProperties.map(p => p.name);
-                        viewportExpression.accumViewportAgg(this._featureFromDataFrame(dataframe, i, propNames));
+                        viewportExpression.accumViewportAgg(this._featureFromDataFrame(dataframe, i, propNames, true));
                     } else {
                         viewportExpression.accumViewportAgg(feature);
                     }
@@ -223,12 +223,16 @@ class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame(dataframe, index, propertyNames = null) {
+    _featureFromDataFrame(dataframe, index, propertyNames = null, decodeCategories = false) {
         propertyNames = propertyNames || Object.keys(dataframe.properties);
         const feature = {};
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
-            feature[name] = dataframe.properties[name][index];
+            let value = dataframe.properties[name][index];
+            if (decodeCategories && dataframe.metadata.properties[name].type === 'category') {
+                value = dataframe.metadata.IDToCategory.get(value);
+            }
+            feature[name] = value;
         }
         return feature;
     }
