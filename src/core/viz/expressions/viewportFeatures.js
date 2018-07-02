@@ -16,7 +16,7 @@ export class ViewportFeatures extends BaseExpression {
         this._requiredProperties = properties;
     }
 
-    _compile(metadata) {
+    _compile() {
         throw new Error('viewportFeatures cannot be used in visualizations');
     }
 

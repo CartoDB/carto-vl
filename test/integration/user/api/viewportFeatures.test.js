@@ -58,11 +58,10 @@ const features = {
 };
 
 describe('viewportFeatures', () => {
-    let div, map, source1, viz1, layer1, source2, viz2, layer2, interactivity;
+    let map, source1, viz1, layer1, source2, viz2, layer2;
 
     beforeEach(() => {
         const setup = util.createMap('map');
-        div = setup.div;
         map = setup.map;
 
         source1 = new carto.source.GeoJSON(features);
