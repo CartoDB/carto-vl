@@ -21,9 +21,10 @@ import Property from './basic/property';
  * ...
  *
  * layer.on('updated', () => {
- *    viz.variables.list.eval().forEach(feature => {
- *        console.log('value:', feature.value, 'category:', feature.category);
- *  });
+ *     viz.variables.list.eval().forEach(feature => {
+ *         console.log('value:', feature.value, 'category:', feature.category);
+ *     });
+ * });
  *
  * @memberof carto.expressions
  * @name viewportFeatures
