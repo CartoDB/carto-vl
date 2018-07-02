@@ -1,6 +1,6 @@
-import stylerVertexShader from './stylerVertexShader.glsl';
-import stylerFragmentShader from './stylerFragmentShader.glsl';
 import stylerEncodeWidth from './stylerEncodeWidth.glsl';
+import stylerFragmentShader from './stylerFragmentShader.glsl';
+import stylerVertexShader from './stylerVertexShader.glsl';
 
 export const colorShaderGLSL = {
     vertexShader: `${stylerVertexShader}`,

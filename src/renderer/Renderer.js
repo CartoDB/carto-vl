@@ -1,4 +1,4 @@
-import * as shaders from './shaders';
+import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
 
 const INITIAL_TIMESTAMP = Date.now();
