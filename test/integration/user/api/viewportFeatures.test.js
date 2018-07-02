@@ -1,8 +1,6 @@
 import * as carto from '../../../../src';
 import * as util from '../../util';
 
-// More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
-
 const feature1 = {
     type: 'Feature',
     geometry: {
