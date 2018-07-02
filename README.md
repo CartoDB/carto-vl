@@ -1,14 +1,9 @@
-# CARTO VL
+# **CARTO VL**
 
 [![CircleCI](https://circleci.com/gh/CartoDB/carto-vl.svg?style=svg)](https://circleci.com/gh/CartoDB/carto-vl)
 
-CARTO VL is a JavaScript library for developers to create vector-based visualizations inside Location Intelligence applications.
+**CARTO VL** is a JavaScript library for developers to create vector-based visualizations inside Location Intelligence applications.
 The library is currently in its Beta version and we welcome [your feedback](#Feedback) and requests to make it even better!
-
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interpolated-lines.82265604.gif)
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interactivity.44cada98.gif)
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/polygon-animation.bf485125.gif)
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/line-animation.c9c09239.gif)
 
 ## Features
 
@@ -17,6 +12,11 @@ The library is currently in its Beta version and we welcome [your feedback](#Fee
 - Ability to modify geometries directly in the browser. This is a powerful solution for animated visualizations of points, lines, and polygons.
 - With CARTO VL, developers have full control over everything happening on the map and can provide rich reactions to user interactions.
 - New and intuitive map styling language that is designed specifically for multi-scale, thematic cartography. With just a few lines, complex visualizations can be created. Non-programmers can create their first map easily, while programmers will still be able to exploit the full potential of the CARTO ecosystem.
+
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interpolated-lines.82265604.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interactivity.44cada98.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/polygon-animation.bf485125.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/line-animation.c9c09239.gif)
 
 ## Example
 
@@ -34,8 +34,6 @@ To see
 ![IMAGE](https://github.com/CartoDB/carto-vl/blob/master/docs/images/map-example.png)
 
 ## I want to make a map
-
-Vamos!
 
 To start, you will need a basic HTML file structure to display your map in a browser. We recommend you to follow this [Getting started](https://carto.com/developers/carto-vl/guides/getting-started/) guide to create a basic map.
 
@@ -57,15 +55,20 @@ Great! Let's get you set up!
 
 ### Install
 
-First, clone the `carto-vl` repository.
+To clone and run this library, you'll need [Git](https://git-scm.com) and [Node.js](https://nodejs.org/en/download/) (which comes with [npm](http://npmjs.com)) installed on your computer. From your command line:
 
-```
-```
+```bash
+# Clone this repository
+$ git clone https://github.com/CartoDB/carto-vl
 
-Then, install the dependencies. Note that `node >=6.11.5` is required.
+# Go into the repository
+$ cd carto-vl
 
-```
-yarn
+# Install dependencies (node >=6.11.5 is required)
+$ yarn
+
+# Run the app
+$ yarn build
 ```
 
 /// Add segment about tests
@@ -111,11 +114,11 @@ CARTO VL is still in Beta but we encourage you to start playing with it and to p
 
 - [Mapbox GL](https://github.com/mapbox/mapbox-gl-js)
 
-### Versioning
+## Versioning
 
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/CartoDB/carto-vl/tags).
 
-### Authors
+## Authors
 
 - [David Manzanares](https://github.com/davidmanzanares)
 - [Jesús Arroyo Torrens](https://github.com/Jesus89)
@@ -126,6 +129,6 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 - [Mamata Akella](https://github.com/makella)
 - [Ariana Escobar](https://github.com/arianaescobar)
 
-### License
+## License
 
 This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
