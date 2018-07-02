@@ -140,12 +140,12 @@ export default class Ramp extends BaseExpression {
         }
         return {
             preface: this._prefaceCode(input.preface + `
-        uniform sampler2D texRamp${this._uid};
-        uniform float keyMin${this._uid};
-        uniform float keyWidth${this._uid};
-        `),
-            inline: this.palette.type == 'number-array' ?
-                `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
+                uniform sampler2D texRamp${this._uid};
+                uniform float keyMin${this._uid};
+                uniform float keyWidth${this._uid};`
+            ),
+            inline: this.palette.type == 'number-array'
+                ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }

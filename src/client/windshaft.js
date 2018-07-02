@@ -182,7 +182,8 @@ export default class Windshaft {
             switch (column.type) {
                 case 'date':
                 {
-                    const d = Date.parse(propertyValue);
+                    const d = new Date();
+                    d.setTime(1000*propertyValue);
                     const min = column.min;
                     const max = column.max;
                     const n = (d - min) / (max.getTime() - min.getTime());
@@ -305,7 +306,7 @@ export default class Windshaft {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
-                'mvt': 0
+                mvt: 1
             },
             layers: [
                 {
@@ -362,7 +363,11 @@ export default class Windshaft {
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
             const basename = R.schema.column.getBase(aggName);
-            properties[basename].sourceName = aggName;
+            const fnName = R.schema.column.getAggFN(aggName);
+            if (!properties[basename].aggregations) {
+                properties[basename].aggregations = {};
+            }
+            properties[basename].aggregations[fnName] = aggName;
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

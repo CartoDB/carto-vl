@@ -178,8 +178,6 @@ import Linear from './expressions/linear';
 
 import { NamedColor } from './expressions/color/named-color';
 
-import Near from './expressions/near';
-
 import Now from './expressions/now';
 
 import BaseNumber from './expressions/basic/number';
@@ -296,8 +294,6 @@ export const ilinear = (...args) => new ILinear(...args);
 export const linear = (...args) => new Linear(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
-
-export const near = (...args) => new Near(...args);
 
 export const now = (...args) => new Now(...args);
 
