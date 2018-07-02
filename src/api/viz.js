@@ -295,7 +295,7 @@ export default class Viz {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
-            });
+            }, this);
         }
     }
 
