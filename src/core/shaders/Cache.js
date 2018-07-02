@@ -11,9 +11,8 @@ export default class Cache {
     get(gl, shadercode) {
         if (this.caches.has(gl)) {
             let cache = this.caches.get(gl);
-            if (cache[shadercode]) {
-                return cache[shadercode];
-            }
+
+            return cache[shadercode];
         }
     }
 
@@ -22,7 +21,7 @@ export default class Cache {
             let cache = this.caches.get(gl);
             cache[shadercode] = shader;
         } else {
-            let cache = new WeakMap;
+            let cache = {};
             cache[shadercode] = shader;
             this.caches.set(gl, cache);
         }

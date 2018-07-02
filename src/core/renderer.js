@@ -242,35 +242,35 @@ class Renderer {
         if (!tiles.length) {
             return;
         }
+        
+        viz._getRootExpressions().map(expr => expr._dataReady());
 
         gl.enable(gl.CULL_FACE);
-
         gl.disable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.STENCIL_TEST);
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-
         this._runViewportAggregations(renderLayer);
 
-
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
-            const TID = shader.tid;
+            const textureId = shader.textureIds.get(viz);
+            
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
-            drawMetadata.freeTexUnit = Object.keys(TID).length;
+            drawMetadata.freeTexUnit = Object.keys(textureId).length;
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            Object.keys(TID).forEach((name, i) => {
+            Object.keys(textureId).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
                 gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
-                gl.uniform1i(TID[name], i);
+                gl.uniform1i(textureId[name], i);
             });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
@@ -280,6 +280,7 @@ class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
+        
         tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
         tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
         tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));

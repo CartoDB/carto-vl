@@ -14,7 +14,7 @@ class IDGenerator {
     }
 }
 
-export function compileShader(gl, template, expressions) {
+export function compileShader(gl, template, expressions, viz) {
     let tid = {};
     const getPropertyAccessCode = name => {
         if (tid[name] === undefined) {
@@ -22,8 +22,11 @@ export function compileShader(gl, template, expressions) {
         }
         return `texture2D(propertyTex${tid[name]}, featureID).a`;
     };
+    
     let codes = {};
+    
     const idGen = new IDGenerator();
+    
     Object.keys(expressions).forEach(exprName => {
         const expr = expressions[exprName];
         expr._setUID(idGen);
@@ -35,13 +38,20 @@ export function compileShader(gl, template, expressions) {
     codes.propertyPreface = Object.keys(tid).map(name => `uniform sampler2D propertyTex${tid[name]};`).join('\n');
 
     const shader = createShaderFromTemplate(gl, template, codes);
+    
     Object.keys(tid).map(name => {
         tid[name] = gl.getUniformLocation(shader.program, `propertyTex${tid[name]}`);
     });
+    
     Object.values(expressions).forEach(expr => {
         expr._postShaderCompile(shader.program, gl);
     });
 
-    shader.tid = tid;
+    if (!shader.textureIds) {
+        shader.textureIds = new Map();
+    }
+
+    shader.textureIds.set(viz, tid);
+
     return shader;
 }
