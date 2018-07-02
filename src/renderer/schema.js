@@ -30,11 +30,11 @@ export function union(a, b) {
     };
 }
 
-export function equals(a,b){
-    if (!a || !b){
+export function equals(a, b) {
+    if (!a || !b) {
         return false;
     }
-    return a.columns.length==b.columns.length && a.columns.every(v=> b.columns.includes(v));
+    return a.columns.length == b.columns.length && a.columns.every(v => b.columns.includes(v));
 }
 
 const AGG_PREFIX = '_cdb_agg_';
@@ -57,3 +57,5 @@ export const column = {
     }
 };
 
+
+export default { column, equals, union, IDENTITY };

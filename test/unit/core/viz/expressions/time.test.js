@@ -1,6 +1,6 @@
-import Time from '../../../../../src/core/viz/expressions/time';
+import Time from '../../../../../src/renderer/viz/expressions/time';
 
-describe('src/core/viz/expressions/time', () => {
+describe('src/renderer/viz/expressions/time', () => {
     const expectedDate = new Date('2016-05-30T13:45:00+05:00');
     it('should return a valid date when the parameter is a ISO_8601 string', () => {
         const time = new Time('2016-05-30T13:45:00+05:00');

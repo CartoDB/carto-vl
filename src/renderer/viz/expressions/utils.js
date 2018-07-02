@@ -1,4 +1,4 @@
-import { number, category, array } from '../functions';
+import { number, category, array } from '../expressions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;

@@ -1,6 +1,6 @@
 
 import jsep from 'jsep';
-import * as functions from './functions';
+import * as functions from './expressions';
 import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES, NamedColor } from './expressions/color/named-color';
 import Hex from './expressions/color/hex';

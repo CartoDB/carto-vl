@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { number, viewportHistogram, viewportMax, viewportMin } from '../functions';
+import { number, viewportHistogram, viewportMax, viewportMin } from '../expressions';
 import { checkNumber, checkInstance, checkType } from './utils';
 import Property from './basic/property';
 import * as schema from '../../schema';

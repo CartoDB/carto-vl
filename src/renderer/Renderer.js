@@ -1,7 +1,5 @@
 import * as shaders from './shaders';
-import * as schema from './schema';
-import Dataframe from './dataframe';
-import { Asc, Desc } from './viz/functions';
+import { Asc, Desc } from './viz/expressions';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -38,7 +36,7 @@ export const RTT_WIDTH = 1024;
  * @param {HTMLElement} canvas - the WebGL context will be created on this element
  */
 
-class Renderer {
+export default class Renderer {
     constructor(canvas) {
         if (canvas) {
             this.gl = canvas.getContext('webgl');
@@ -481,5 +479,3 @@ function getOrderingRenderBuckets(renderLayer) {
         orderingMaxs
     };
 }
-
-export { Renderer, Dataframe, schema };

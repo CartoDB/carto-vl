@@ -18,8 +18,8 @@ export function compileProgram(gl, glslvertexShader, glslfragmentShader) {
         return programCache.get(gl, code);
     }
     const shader = {};
-    const vertexShader = compileShader(gl, glslvertexShader, gl.VERTEX_SHADER);
-    const fragmentShader = compileShader(gl, glslfragmentShader, gl.FRAGMENT_SHADER);
+    const vertexShader = _compileShader(gl, glslvertexShader, gl.VERTEX_SHADER);
+    const fragmentShader = _compileShader(gl, glslfragmentShader, gl.FRAGMENT_SHADER);
 
     shader.program = gl.createProgram();
 
@@ -39,7 +39,7 @@ export function compileProgram(gl, glslvertexShader, glslfragmentShader) {
     return shader;
 }
 
-function compileShader(gl, sourceCode, type) {
+function _compileShader(gl, sourceCode, type) {
     if (shaderCache.has(gl, sourceCode)) {
         return shaderCache.get(gl, sourceCode);
     }

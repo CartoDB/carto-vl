@@ -1,6 +1,6 @@
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
-describe('src/core/viz/expressions/top', () => {
+describe('src/renderer/viz/expressions/top', () => {
     describe('error control', () => {
         validateFeatureDependentErrors('top', ['category-property', 'dependent']);
         validateTypeErrors('top', ['number', 10]);

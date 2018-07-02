@@ -1,4 +1,4 @@
-describe('src/core/viz/expressions/palettes', () => {
+describe('src/renderer/viz/expressions/palettes', () => {
     describe('error control', () => {
     });
 

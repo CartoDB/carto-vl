@@ -1,4 +1,4 @@
-import { createShaderFromTemplate } from '../shaders/utils';
+import { createShaderFromTemplate } from './utils';
 
 class IDGenerator {
     constructor() {

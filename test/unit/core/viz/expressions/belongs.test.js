@@ -1,8 +1,8 @@
-import * as s from '../../../../../src/core/viz/functions';
+import Metadata from '../../../../../src/renderer/Metadata';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import Metadata from '../../../../../src/core/metadata';
 
-describe('src/core/viz/expressions/belongs', () => {
+describe('src/renderer/viz/expressions/belongs', () => {
     const fakeMetadata = new Metadata({
         properties: {
             category: {

@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { checkExpression, checkLooseType, implicitCast, checkType } from './utils';
-import { globalMin, globalMax } from '../functions';
+import { globalMin, globalMax } from '../expressions';
 
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will

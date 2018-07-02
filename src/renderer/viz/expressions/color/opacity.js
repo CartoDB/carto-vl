@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { number } from '../../functions';
+import { number } from '../../expressions';
 import { checkLooseType, checkType } from '../utils';
 
 /**

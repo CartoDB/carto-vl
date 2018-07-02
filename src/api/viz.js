@@ -1,11 +1,11 @@
 import * as util from './util';
-import * as s from '../core/viz/functions';
-import * as schema from '../core/schema';
-import * as shaders from '../core/shaders/index';
-import { compileShader } from '../core/viz/shader-compiler';
-import { parseVizDefinition } from '../core/viz/parser';
-import BaseExpression from '../core/viz/expressions/base';
-import { implicitCast } from '../core/viz/expressions/utils';
+import * as s from '../renderer/viz/expressions';
+import * as schema from '../renderer/schema';
+import * as shaders from '../renderer/shaders/index';
+import { compileShader } from '../renderer/shaders/shaderCompiler';
+import { parseVizDefinition } from '../renderer/viz/parser';
+import BaseExpression from '../renderer/viz/expressions/base';
+import { implicitCast } from '../renderer/viz/expressions/utils';
 import CartoValidationError from './error-handling/carto-validation-error';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));

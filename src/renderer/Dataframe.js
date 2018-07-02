@@ -196,7 +196,7 @@ export default class Dataframe {
                 center.y += offset[1] * scale;
             }
 
-            const inside = pointInCircle(p, center, scale);
+            const inside = _pointInCircle(p, center, scale);
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
             }
@@ -252,7 +252,7 @@ export default class Dataframe {
                 x: vertices[i + 4] + normals[i + 4] * scale,
                 y: vertices[i + 5] + normals[i + 5] * scale
             };
-            const inside = pointInTriangle(p, v1, v2, v3);
+            const inside = _pointInTriangle(p, v1, v2, v3);
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
@@ -374,21 +374,21 @@ export default class Dataframe {
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
 // Parameters in {x: 0, y:0} form
-export function pointInTriangle(p, v1, v2, v3) {
+export function _pointInTriangle(p, v1, v2, v3) {
     // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
     // contains an explanation of both this algorithm and one based on barycentric coordinates,
     // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
 
-    if (equal(v1, v2) || equal(v2, v3) || equal(v3, v1)) {
+    if (_equal(v1, v2) || _equal(v2, v3) || _equal(v3, v1)) {
         // Avoid zero area triangle
         return false;
     }
 
     // A point is inside a triangle or in one of the triangles edges
     // if the point is in the three half-plane defined by the 3 edges
-    const b1 = halfPlaneTest(p, v1, v2) < 0;
-    const b2 = halfPlaneTest(p, v2, v3) < 0;
-    const b3 = halfPlaneTest(p, v3, v1) < 0;
+    const b1 = _halfPlaneTest(p, v1, v2) < 0;
+    const b2 = _halfPlaneTest(p, v2, v3) < 0;
+    const b3 = _halfPlaneTest(p, v3, v1) < 0;
 
     return (b1 == b2) && (b2 == b3);
 }
@@ -397,17 +397,17 @@ export function pointInTriangle(p, v1, v2, v3) {
 // Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
 // returns >0 if the point is OUTSIDE
 // Parameters in {x: 0, y:0} form
-function halfPlaneTest(p, a, b) {
+function _halfPlaneTest(p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
-function equal(a, b) {
+function _equal(a, b) {
     return (a.x == b.x) && (a.y == b.y);
 }
 
-function pointInCircle(p, center, scale) {
+function _pointInCircle(p, center, scale) {
     const diff = {
         x: p.x - center.x,
         y: p.y - center.y

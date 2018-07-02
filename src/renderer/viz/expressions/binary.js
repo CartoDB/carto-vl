@@ -1,4 +1,4 @@
-import { number } from '../functions';
+import { number } from '../expressions';
 import { implicitCast } from './utils';
 import BaseExpression from './base';
 

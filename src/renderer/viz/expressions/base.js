@@ -1,5 +1,5 @@
 import { implicitCast } from './utils';
-import { blend, transition } from '../functions';
+import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
 
 /**

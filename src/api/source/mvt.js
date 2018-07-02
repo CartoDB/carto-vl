@@ -1,12 +1,12 @@
-import * as rsys from '../../client/rsys';
-import Dataframe from '../../core/dataframe';
-import * as Protobuf from 'pbf';
 import { VectorTile } from '@mapbox/vector-tile';
+import * as Protobuf from 'pbf';
 import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
-import TileClient from './TileClient';
+import * as rsys from '../../client/rsys';
+import Dataframe from '../../renderer/Dataframe';
+import Metadata from '../../renderer/Metadata';
+import { RTT_WIDTH } from '../../renderer/Renderer';
 import Base from './base';
-import { RTT_WIDTH } from '../../core/renderer';
-import Metadata from '../../core/metadata';
+import TileClient from './TileClient';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };

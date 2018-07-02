@@ -1,14 +1,14 @@
-import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/viz/expressions/binary';
-import { In, Nin } from '../core/viz/expressions/belongs';
-import Between from '../core/viz/expressions/between';
-import Property from '../core/viz/expressions/basic/property';
-import Blend from '../core/viz/expressions/blend';
-import Transition from '../core/viz/expressions/transition';
-import NumberExpression from '../core/viz/expressions/basic/number';
-import ConstantExpression from '../core/viz/expressions/basic/constant';
-import CategoryExpression from '../core/viz/expressions/basic/category';
-import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/aggregation/clusterAggregation';
-import * as schema from '../core/schema';
+import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../renderer/viz/expressions/binary';
+import { In, Nin } from '../renderer/viz/expressions/belongs';
+import Between from '../renderer/viz/expressions/between';
+import Property from '../renderer/viz/expressions/basic/property';
+import Blend from '../renderer/viz/expressions/blend';
+import Transition from '../renderer/viz/expressions/transition';
+import NumberExpression from '../renderer/viz/expressions/basic/number';
+import ConstantExpression from '../renderer/viz/expressions/basic/constant';
+import CategoryExpression from '../renderer/viz/expressions/basic/category';
+import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../renderer/viz/expressions/aggregation/clusterAggregation';
+import * as schema from '../renderer/schema';
 
 class AggregationFiltering {
 
