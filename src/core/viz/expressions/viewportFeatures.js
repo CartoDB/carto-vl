@@ -1,11 +1,20 @@
 import BaseExpression from './base';
+import * as schema from '../../../core/schema';
 
 export class ViewportFeatures extends BaseExpression {
-    constructor() {
-        super({});
+    constructor(...properties) {
+        // TODO: check properties type
+
+        super({}); // { properties: properties } ?
         this.expr = [];
         this.type = 'featureList';
         this._isViewport = true;
+
+        this._requiredProperties = properties;
+    }
+
+    _getMinimumNeededSchema() {
+        return this._requiredProperties.map(p => p._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
     isFeatureDependent() {

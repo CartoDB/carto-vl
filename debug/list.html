@@ -53,8 +53,9 @@
 
     const source = new carto.source.Dataset('public.pop_density_points');
     let viz = new carto.Viz(`
-      @list: viewportFeatures()
-      @dens: $dn
+      @list: viewportFeatures($dn, $cartodb_id)
+      @anotheList: viewportFeatures($dn)
+      // @dens: $dn
       width: 20
       filter: $dn > 150
     `);
@@ -62,6 +63,7 @@
     layer.addTo(map, 'background');
     layer.on('updated', () => {
       console.log('Features:',viz.variables.list.eval());
+      console.log('Other Features:',viz.variables.anotheList.eval());
     });
   </script>
 </body>

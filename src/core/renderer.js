@@ -159,10 +159,6 @@ class Renderer {
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
 
-        if (!viewportExpressions.length) {
-            return;
-        }
-
         viewportExpressions.forEach(expr => expr._resetViewportAgg());
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
@@ -186,7 +182,14 @@ class Renderer {
                     continue;
                 }
 
-                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+                viewportExpressions.forEach(viewportExpression => {
+                    if (viewportExpression._requiredProperties) {
+                        const propNames = viewportExpression._requiredProperties.map(p => p.name);
+                        viewportExpression.accumViewportAgg(this._featureFromDataFrame(dataframe, i, propNames));
+                    } else {
+                        viewportExpression.accumViewportAgg(feature);
+                    }
+                });
             }
         });
     }
@@ -220,8 +223,8 @@ class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame(dataframe, index) {
-        const propertyNames = Object.keys(dataframe.properties);
+    _featureFromDataFrame(dataframe, index, propertyNames = null) {
+        propertyNames = propertyNames || Object.keys(dataframe.properties);
         const feature = {};
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
