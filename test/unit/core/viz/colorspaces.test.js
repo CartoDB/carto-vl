@@ -1,6 +1,6 @@
-import { cielabToSRGB, sRGBToCielab } from '../../../../src/core/viz/colorspaces';
+import { cielabToSRGB, sRGBToCielab } from '../../../../src/renderer/viz/colorspaces';
 
-describe('src/core/viz/colorspaces', () => {
+describe('src/renderer/viz/colorspaces', () => {
     it('cielabToSRGB(sRGBToCielab(color)) must equal color', () => {
         const color = { r: 0.8, g: 0.6, b: 0.2, a: 0.8 };
         expect(cielabToSRGB(sRGBToCielab(color)).r).toBeCloseTo(color.r);

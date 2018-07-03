@@ -1,6 +1,6 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/cielab', () => {
+describe('src/renderer/viz/expressions/cielab', () => {
     describe('error control', () => {
         validateStaticTypeErrors('cielab', ['number', 'number']);
 

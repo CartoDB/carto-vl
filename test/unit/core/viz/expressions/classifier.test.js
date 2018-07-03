@@ -1,7 +1,7 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, viewportQuantiles } from '../../../../../src/core/viz/functions';
+import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, viewportQuantiles } from '../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/classifier', () => {
+describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateStaticTypeErrors('viewportQuantiles', []);
         validateStaticTypeErrors('viewportQuantiles', ['number']);
