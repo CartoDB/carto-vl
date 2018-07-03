@@ -1,6 +1,6 @@
 import mitt from 'mitt';
-import Layer from './layer';
-import { WM_R, projectToWebMercator } from './util';
+import Layer from '../Layer';
+import { WM_R, projectToWebMercator } from '../utils/util';
 import { wToR } from '../client/rsys';
 
 /**

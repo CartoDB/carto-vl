@@ -1,5 +1,5 @@
-import * as util from '../util';
-import CartoValidationError from '../error-handling/carto-validation-error';
+import * as util from '../utils/util';
+import CartoValidationError from '../errors/carto-validation-error';
 
 let defaultAuth = undefined;
 

@@ -1,12 +1,12 @@
-import { compileShader } from '../renderer/shaders/shaderCompiler';
-import { implicitCast } from '../renderer/viz/expressions/utils';
-import { parseVizDefinition } from '../renderer/viz/parser';
-import * as s from '../renderer/viz/expressions';
-import * as util from './util';
-import BaseExpression from '../renderer/viz/expressions/base';
-import CartoValidationError from './error-handling/carto-validation-error';
-import schema from '../renderer/schema';
-import shaders from '../renderer/shaders/index';
+import schema from './renderer/schema';
+import shaders from './renderer/shaders/index';
+import { compileShader } from './renderer/shaders/shaderCompiler';
+import * as s from './renderer/viz/expressions';
+import BaseExpression from './renderer/viz/expressions/base';
+import { implicitCast } from './renderer/viz/expressions/utils';
+import { parseVizDefinition } from './renderer/viz/parser';
+import util from './utils/util';
+import CartoValidationError from './errors/carto-validation-error';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));

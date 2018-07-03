@@ -1,6 +1,6 @@
 import mitt from 'mitt';
-import Renderer from '../../renderer/Renderer';
-import * as util from '../util';
+import Renderer from '../renderer/Renderer';
+import util from '../utils/util';
 
 let uid = 0;
 
@@ -23,14 +23,14 @@ class MGLIntegrator {
         this.map = map;
         this.invalidateWebGLState = null;
         this.moveObservers = {};
-        
+
         this._emitter = mitt();
         this._layers = [];
         this._paintedLayers = 0;
         this._isRendererInitialized = false;
-        
+
         this._suscribeToMapEvents(map);
-        this.invalidateWebGLState = () => {};
+        this.invalidateWebGLState = () => { };
     }
 
     on(name, cb) {
@@ -69,7 +69,7 @@ class MGLIntegrator {
 
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-        
+
             if (!this._isRendererInitialized) {
                 this._isRendererInitialized = true;
                 this.invalidateWebGLState = invalidate;

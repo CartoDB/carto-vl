@@ -1,9 +1,9 @@
-import * as rsys from '../../client/rsys';
-import Dataframe from '../../renderer/Dataframe';
-import Metadata from '../../renderer/Metadata';
-import CartoValidationError from '../error-handling/carto-validation-error';
-import * as util from '../util';
-import Base from './base';
+import * as rsys from '../client/rsys';
+import Dataframe from '../renderer/Dataframe';
+import Metadata from '../renderer/Metadata';
+import CartoValidationError from '../errors/carto-validation-error';
+import util from '../utils/util';
+import Base from './Base';
 
 const SAMPLE_TARGET_SIZE = 1000;
 

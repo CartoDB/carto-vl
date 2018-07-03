@@ -1,4 +1,4 @@
-import Renderer from '../../renderer/Renderer';
+import Renderer from '../renderer/Renderer';
 
 let integrator = null;
 export default function getCartoMapIntegrator(map) {

@@ -1,13 +1,13 @@
 import mitt from 'mitt';
-import * as util from './util';
-import SourceBase from './source/base';
-import Viz from './viz';
-import CartoMap from './map';
+import CartoValidationError from './errors/carto-validation-error';
 import getCMIntegrator from './integrator/carto';
+import CartoMap from './integrator/Map';
 import getMGLIntegrator from './integrator/mapbox-gl';
-import CartoValidationError from './error-handling/carto-validation-error';
-import { cubic } from '../renderer/viz/expressions';
-import RenderLayer from '../renderer/RenderLayer';
+import RenderLayer from './renderer/RenderLayer';
+import { cubic } from './renderer/viz/expressions';
+import SourceBase from './sources/Base';
+import util from './utils/util';
+import Viz from './Viz';
 
 /**
  *

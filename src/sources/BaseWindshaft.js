@@ -1,6 +1,6 @@
-import Base from './base';
-import Windshaft from '../../client/windshaft';
-import { validateServerURL } from '../url';
+import Base from './Base';
+import Windshaft from '../client/windshaft';
+import { validateServerURL } from '../utils/url';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 

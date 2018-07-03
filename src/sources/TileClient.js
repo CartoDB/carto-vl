@@ -1,5 +1,5 @@
 import DataframeCache from './DataframeCache';
-import { rTiles } from '../../client/rsys';
+import { rTiles } from '../client/rsys';
 
 
 export default class TileClient {

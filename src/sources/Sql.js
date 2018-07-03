@@ -1,6 +1,6 @@
-import * as util from '../util';
-import BaseWindshaft from './base-windshaft';
-import CartoValidationError from '../error-handling/carto-validation-error';
+import CartoValidationError from '../errors/carto-validation-error';
+import util from '../utils/util';
+import BaseWindshaft from './BaseWindshaft';
 
 export default class SQL extends BaseWindshaft {
 
