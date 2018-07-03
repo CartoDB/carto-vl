@@ -1,6 +1,6 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/globalAggregation', () => {
+describe('src/renderer/viz/expressions/globalAggregation', () => {
     const $price = s.property('price');
     describe('global filtering', () => {
         const fakeMetadata = {

@@ -1,7 +1,7 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
-import { rgb, rgba } from '../../../../../../src/core/viz/functions';
+import { rgb, rgba } from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/rgb', () => {
+describe('src/renderer/viz/expressions/rgb', () => {
     describe('error control', () => {
         validateStaticTypeErrors('rgba', []);
         validateStaticTypeErrors('rgba', ['number', 'number', 'number']);

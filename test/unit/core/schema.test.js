@@ -1,6 +1,6 @@
-import * as schema from '../../../src/core/schema';
+import schema from '../../../src/renderer/schema';
 
-describe('src/core/', () => {
+describe('src/renderer/', () => {
     describe('schema', () => {
         it('different schemas shouldn\'t be equal', () => {
             const a = { columns: ['a', 'b'] };

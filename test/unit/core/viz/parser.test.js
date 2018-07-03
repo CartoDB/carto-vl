@@ -1,8 +1,8 @@
 /* eslint quotes: "off" */
 
-import { parseVizDefinition, cleanComments } from '../../../../src/core/viz/parser';
+import { parseVizDefinition, cleanComments } from '../../../../src/renderer/viz/parser';
 
-describe('src/core/viz/parser', () => {
+describe('src/renderer/viz/parser', () => {
 
     // TODO: missing lots of tests here
 

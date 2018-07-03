@@ -1,6 +1,6 @@
-import Dataframe, { pointInTriangle } from '../../../src/core/dataframe';
+import Dataframe, { _pointInTriangle as pointInTriangle } from '../../../src/renderer/Dataframe';
 
-describe('src/core/dataframe', () => {
+describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
         describe('when dataframe is point type', () => {
             const dataframe = new Dataframe({
@@ -34,7 +34,7 @@ describe('src/core/dataframe', () => {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
                 filter: { eval: () => 1. },
-                symbol: {default: true},
+                symbol: { default: true },
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 

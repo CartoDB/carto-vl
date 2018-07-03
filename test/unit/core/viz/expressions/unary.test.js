@@ -1,4 +1,4 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
 
@@ -6,7 +6,7 @@ import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors
 s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
 
-describe('src/core/viz/expressions/unary', () => {
+describe('src/renderer/viz/expressions/unary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER', () => {
             validateDynamicTypeErrors('sin', ['category']);

@@ -1,7 +1,7 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
-import { ramp, buckets } from '../../../../../src/core/viz/functions';
+import { ramp, buckets } from '../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/ramp', () => {
+describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
         validateStaticTypeErrors('ramp', []);
         validateStaticTypeErrors('ramp', ['number']);
