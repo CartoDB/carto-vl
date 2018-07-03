@@ -181,7 +181,7 @@ export default class Renderer {
                     continue;
                 }
 
-                let feature = this._featureFromDataFrame(dataframe, i);
+                const feature = this._featureFromDataFrame(dataframe, i);
 
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
