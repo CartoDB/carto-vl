@@ -31,7 +31,7 @@ import Property from './basic/property';
  * @function
  * @api
  */
-export class ViewportFeatures extends BaseExpression {
+export default class ViewportFeatures extends BaseExpression {
     constructor(...properties) {
         if (properties.some(p => !(p instanceof Property))) {
             throw new Error('viewportFeatures arguments can only be properties');

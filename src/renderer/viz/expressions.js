@@ -223,7 +223,7 @@ import Variable from './expressions/basic/variable';
 
 import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
-import { ViewportFeatures } from './expressions/viewportFeatures';
+import ViewportFeatures from './expressions/viewportFeatures';
 
 import XYZ from './expressions/xyz';
 
