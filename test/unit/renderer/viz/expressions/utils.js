@@ -6,6 +6,8 @@ const metadata = new Metadata({
     properties: {
         number: {
             type: 'number',
+            min: 0,
+            max: 10,
         },
         category: {
             type: 'category',
