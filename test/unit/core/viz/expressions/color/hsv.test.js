@@ -1,7 +1,7 @@
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
-import { hsv, hsva } from '../../../../../../src/core/viz/functions';
+import { hsv, hsva } from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/hsv', () => {
+describe('src/renderer/viz/expressions/hsv', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hsv', []);
         validateStaticTypeErrors('hsv', ['number']);

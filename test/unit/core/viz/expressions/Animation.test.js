@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
 
-describe('src/core/viz/expressions/Animation', () => {
+describe('src/renderer/viz/expressions/Animation', () => {
     describe('error control', () => {
         validateFeatureDependentErrors('animation', [0.5, 'dependent']);
         validateTypeErrors('animation', ['category', 10]);

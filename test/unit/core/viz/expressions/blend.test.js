@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
 
-describe('src/core/viz/expressions/blend', () => {
+describe('src/renderer/viz/expressions/blend', () => {
     describe('error control', () => {
         validateStaticTypeErrors('blend', []);
         validateStaticTypeErrors('blend', ['number']);

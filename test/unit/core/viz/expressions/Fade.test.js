@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateTypeErrors, validateStaticType } from './utils';
 
-describe('src/core/viz/expressions/Fade', () => {
+describe('src/renderer/viz/expressions/Fade', () => {
     describe('error control', () => {
         validateTypeErrors('fade', ['color']);
         validateTypeErrors('fade', [undefined, 'color']);
