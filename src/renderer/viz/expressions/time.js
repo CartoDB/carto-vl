@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import * as util from '../../../api/util';
+import * as util from '../../../utils/util';
 
 /**
  * Time contant expression

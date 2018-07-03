@@ -4,7 +4,7 @@ import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import Variable from './basic/variable';
-import { castDate } from '../../../api/util';
+import { castDate } from '../../../utils/util';
 
 /**
  * Create an animated temporal filter (animation).
