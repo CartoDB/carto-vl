@@ -41,8 +41,8 @@
             paint: { 'background-color': 'black' }
         }]
       },
-      center: [0, 0],
-      zoom: 5 ,
+      center: [-100, 40],
+      zoom: 3,
       dragRotate: false
     });
 
@@ -51,19 +51,18 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('public.pop_density_points');
+    const source = new carto.source.Dataset('walmarts');
     let viz = new carto.Viz(`
-      @list: viewportFeatures($dn, $cartodb_id)
-      @anotheList: viewportFeatures($dn)
-      // @dens: $dn
+      @list: viewportFeatures($zip, $sttext)
+      @anotheList: viewportFeatures($zip)
       width: 20
-      filter: $dn > 150
+      filter: $zip > 50000
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     layer.on('updated', () => {
-      console.log('Features:',viz.variables.list.eval());
-      console.log('Other Features:',viz.variables.anotheList.eval());
+      console.log('Features:',viz.variables.list.value);
+      console.log('Other Features:',viz.variables.anotheList.value);
     });
   </script>
 </body>
