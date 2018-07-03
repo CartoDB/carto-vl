@@ -163,9 +163,13 @@ export default class Renderer {
 
         viewportExpressions.forEach(expr => expr._resetViewportAgg());
 
+        const viewportExpressionsLength = viewportExpressions.length;
+
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
+
+        const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 // If feature has been acumulated ignore it
@@ -173,7 +177,7 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i)) {
+                if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
 
@@ -184,17 +188,20 @@ export default class Renderer {
                     continue;
                 }
 
-                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+                for (let j = 0; j < viewportExpressionsLength; j++) {
+                    viewportExpressions[j].accumViewportAgg(feature);
+                }
             }
         });
     }
 
     /**
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
+     * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport(dataframe, index) {
+    _isFeatureInViewport(dataframe, index, aspect) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, this.getAspect());
+        return dataframe.inViewport(index, scale, this._center, aspect);
     }
 
     /**
@@ -219,12 +226,21 @@ export default class Renderer {
      * Build a feature object from a dataframe and an index copying all the properties.
      */
     _featureFromDataFrame(dataframe, index) {
-        const propertyNames = Object.keys(dataframe.properties);
+        if (!dataframe.cachedFeatures) {
+            dataframe.cachedFeatures = [];
+        }
+
+        if (dataframe.cachedFeatures[index] !== undefined) {
+            return dataframe.cachedFeatures[index];
+        }
+
         const feature = {};
+        const propertyNames = Object.keys(dataframe.properties);
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
             feature[name] = dataframe.properties[name][index];
         }
+        dataframe.cachedFeatures.push(feature);
         return feature;
     }
 
