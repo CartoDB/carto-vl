@@ -1,5 +1,5 @@
-import { blend, property, animate, notEquals } from '../core/viz/functions';
-import { parseVizExpression } from '../core/viz/parser';
+import { blend, property, transition, notEquals } from '../renderer/viz/expressions';
+import { parseVizExpression } from '../renderer/viz/parser';
 
 /**
  *
@@ -32,8 +32,8 @@ function _generateResetFunction(propertyName, feature, customizedFeatures, viz) 
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
             customizedFeatures[feature.id][propertyName].replaceChild(
                 customizedFeatures[feature.id][propertyName].mix,
-                // animate(0) is used to ensure that blend._predraw() "GC" collects it
-                blend(notEquals(property('cartodb_id'), feature.id), animate(0), animate(duration))
+                // transition(0) is used to ensure that blend._predraw() "GC" collects it
+                blend(notEquals(property('cartodb_id'), feature.id), transition(0), transition(duration))
             );
             viz[propertyName].notify();
             customizedFeatures[feature.id][propertyName] = undefined;
@@ -54,7 +54,7 @@ function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz
         const blendExpr = blend(
             newExpression,
             viz[propertyName],
-            blend(1, notEquals(property('cartodb_id'), feature.id), animate(duration))
+            blend(1, notEquals(property('cartodb_id'), feature.id), transition(duration))
         );
         trackFeatureViz(feature.id, propertyName, blendExpr, customizedFeatures);
         viz.replaceChild(

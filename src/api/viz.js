@@ -1,13 +1,12 @@
+import { compileShader } from '../renderer/shaders/shaderCompiler';
+import { implicitCast } from '../renderer/viz/expressions/utils';
+import { parseVizDefinition } from '../renderer/viz/parser';
+import * as s from '../renderer/viz/expressions';
 import * as util from './util';
-import * as s from '../core/viz/functions';
-import * as schema from '../core/schema';
-import * as shaders from '../core/shaders';
-import { compileShader } from '../core/viz/shader-compiler';
-import { parseVizDefinition } from '../core/viz/parser';
-import BaseExpression from '../core/viz/expressions/base';
-import { implicitCast } from '../core/viz/expressions/utils';
+import BaseExpression from '../renderer/viz/expressions/base';
 import CartoValidationError from './error-handling/carto-validation-error';
-import { symbolizerGLSL } from '../core/shaders/symbolizer';
+import schema from '../renderer/schema';
+import shaders from '../renderer/shaders/index';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -188,8 +187,12 @@ export default class Viz {
     }
 
     setDefaultsIfRequired(geomType) {
+        if (this._appliedDefaults) {
+            return;
+        }
         let defaults = this._getDefaultGeomStyle(geomType);
         if (defaults) {
+            this._appliedDefaults = true;
             if (this.color.default) {
                 this.color = defaults.COLOR_EXPRESSION();
             }
@@ -214,16 +217,14 @@ export default class Viz {
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        }
-        if (geomType === 'line') {
+        } else if (geomType === 'line') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
             };
-        }
-        if (geomType === 'polygon') {
+        } else if (geomType === 'polygon') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
@@ -283,18 +284,18 @@ export default class Viz {
         this.symbol._bind(metadata);
         this.filter._bind(metadata);
 
-        this.colorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.color });
-        this.widthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.width });
-        this.strokeColorShader = compileShader(gl, shaders.styleColorGLSL, { color: this.strokeColor });
-        this.strokeWidthShader = compileShader(gl, shaders.styleWidthGLSL, { width: this.strokeWidth });
-        this.filterShader = compileShader(gl, shaders.styleFilterGLSL, { filter: this.filter });
+        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
+        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
+        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
+        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
+        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
-            this.symbolShader = compileShader(gl, symbolizerGLSL, {
+            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
-            });
+            }, this);
         }
     }
 

@@ -1,6 +1,6 @@
-import Dataframe, { pointInTriangle } from '../../../src/core/dataframe';
+import Dataframe, { _pointInTriangle as pointInTriangle } from '../../../src/renderer/Dataframe';
 
-describe('src/core/dataframe', () => {
+describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
         describe('when dataframe is point type', () => {
             const dataframe = new Dataframe({
@@ -18,14 +18,14 @@ describe('src/core/dataframe', () => {
                 size: 2,
                 active: true,
                 metadata: {
-                    columns: [{
-                        name: 'id',
-                        type: 'number'
-                    },
-                    {
-                        name: 'cartodb_id',
-                        type: 'number'
-                    }]
+                    properties: {
+                        id: {
+                            type: 'number',
+                        },
+                        cartodb_id: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const feature1 = { id: 0, properties: { id: 1 } };
@@ -34,6 +34,7 @@ describe('src/core/dataframe', () => {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
                 filter: { eval: () => 1. },
+                symbol: { default: true },
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -78,13 +79,14 @@ describe('src/core/dataframe', () => {
                 size: 1,
                 active: true,
                 metadata: {
-                    columns: [{
-                        name: 'numeric_prop',
-                        type: 'number'
-                    }, {
-                        name: 'cartodb_id',
-                        type: 'number'
-                    }]
+                    properties: {
+                        numeric_prop: {
+                            type: 'number',
+                        },
+                        cartodb_id: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const feature1 = {
@@ -139,15 +141,14 @@ describe('src/core/dataframe', () => {
                 size: 1,
                 active: true,
                 metadata: {
-                    columns: [
-                        {
-                            name: 'cartodb_id',
-                            type: 'number'
+                    properties: {
+                        id: {
+                            type: 'number',
                         },
-                        {
-                            name: 'numeric_property',
-                            type: 'number'
-                        }]
+                        numeric_property: {
+                            type: 'number',
+                        }
+                    }
                 }
             });
             const viz = {

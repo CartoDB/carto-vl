@@ -1,7 +1,7 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/basic/category', () => {
+describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
         validateStaticTypeErrors('category', []);
         validateStaticTypeErrors('category', [undefined]);
@@ -22,25 +22,4 @@ describe('src/core/viz/expressions/basic/category', () => {
         });
     });
 
-    describe('.eval', () => {
-        const fakeMetadata = {
-            columns: [{
-                type: 'category',
-                name: 'category',
-                categoryNames: ['cat0', 'cat1', 'cat2']
-            }],
-            categoryIDs: {
-                'cat0': 0,
-                'cat1': 1,
-                'cat2': 2,
-            }
-        };
-        it('should return the value from the metadata', () => {
-            const categoryExpresion = s.category('cat0');
-            categoryExpresion._compile(fakeMetadata);
-            const actual = categoryExpresion.eval();
-
-            expect(actual).toEqual(0);
-        });
-    });
 });

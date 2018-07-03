@@ -104,9 +104,8 @@ describe('api/source/geojson', () => {
         it('should compute metadata for numeric and category properties', done => {
             const source = new GeoJSON(createData());
             const expected = {
-                columns: [
-                    {
-                        name: 'cartodb_id',
+                properties: {
+                    cartodb_id: {
                         type: 'number',
                         min: Number.POSITIVE_INFINITY,
                         max: Number.NEGATIVE_INFINITY,
@@ -114,8 +113,7 @@ describe('api/source/geojson', () => {
                         sum: 0,
                         count: 0
                     },
-                    {
-                        name: 'numeric',
+                    numeric: {
                         type: 'number',
                         min: 1,
                         max: 2,
@@ -123,15 +121,10 @@ describe('api/source/geojson', () => {
                         sum: 3,
                         count: 2
                     },
-                    {
-                        name: 'category',
+                    category:{
                         type: 'category',
                         categoryNames: ['red', 'blue'],
                     },
-                ],
-                categoryIDs: {
-                    red: 0,
-                    blue: 1
                 },
                 featureCount: 2,
                 sample: [
@@ -274,9 +267,8 @@ describe('api/source/geojson', () => {
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
-        const fakeRemoveDataframe = jasmine.createSpy('removeDataframe');
         const fakeDataLoaded = jasmine.createSpy('dataLoaded');
-        source.bindLayer(fakeAddDataframe, fakeRemoveDataframe, fakeDataLoaded);
+        source.bindLayer(fakeAddDataframe, fakeDataLoaded);
         expect(fakeDataLoaded).not.toHaveBeenCalled();
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();

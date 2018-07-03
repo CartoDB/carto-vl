@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Add layer | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Add layer</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Add one CARTO layer to your map</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-73.97720677029952, 40.77784846220871],
+      zoom: 13,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
+    });
+
+    async function loadMVT() {
+      const mapConfig = {
+        buffersize: { mvt: 0 },
+        layers: [
+          {
+            id: 'europeLayer',
+            type: 'mapnik',
+            options: {
+              sql: `SELECT * FROM mnmappluto`
+            }
+          }
+        ]
+      }
+      const response = await fetch('https://cartovl.carto.com/api/v1/map', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(mapConfig)
+      });
+      const layergroup = await response.json();
+      const tilejson = layergroup.metadata.tilejson.vector;
+      const source = new carto.source.MVT(tilejson.tiles[0], {
+        properties: {
+          numfloors: { type: 'number' }
+        }
+      }, 'europeLayer');
+
+      const viz = new carto.Viz(`
+      color: ramp(linear($numfloors 0, 20), temps)
+      strokeWidth: 0
+      `);
+      const layer = new carto.Layer('layer', source, viz);
+
+      layer.addTo(map, 'watername_ocean');
+      layer.on('loaded', hideLoader);
+
+      function hideLoader() {
+        document.getElementById('loader').style.opacity = '0';
+      }
+    }
+
+    loadMVT();
+  </script>
+</body>
+
+</html>

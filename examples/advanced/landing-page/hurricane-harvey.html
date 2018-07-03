@@ -42,7 +42,7 @@
     const source = new carto.source.Dataset('table_30');
     const viz = new carto.Viz(`
       color: opacity(ramp(linear($sum_qpf,1,120),temps),($e_totpop/$area_sqmi)/500)
-      filter: torque(linear($sum_qpf,144.5, 1.5),5,fade(0,100))+0.1
+      filter: animation(linear($sum_qpf,144.5, 1.5),5,fade(0,100))+0.1
       strokeWidth: 0
     `);
     const layer = new carto.Layer('layer', source, viz);

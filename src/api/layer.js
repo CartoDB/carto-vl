@@ -6,8 +6,8 @@ import CartoMap from './map';
 import getCMIntegrator from './integrator/carto';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import CartoValidationError from './error-handling/carto-validation-error';
-import { cubic } from '../core/viz/functions';
-import RenderLayer from '../core/renderLayer';
+import { cubic } from '../renderer/viz/expressions';
+import RenderLayer from '../renderer/RenderLayer';
 
 /**
  *
@@ -62,8 +62,10 @@ export default class Layer {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
+        this._oldDataframes = new Set();
 
         this._init(id, source, viz);
+
     }
 
     _init(id, source, viz) {
@@ -86,7 +88,7 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this._isLoaded = false;
-        this._isUpdated = false;
+        this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
     }
@@ -168,15 +170,14 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataFrameRemoved.bind(this), this._onDataLoaded.bind(this));
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
         if (this._source !== source) {
             this._freeSource();
         }
         this._source = source;
         this.requestData();
 
+        viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
             throw new Error('Another atomic change was done before this one committed');
@@ -185,6 +186,7 @@ export default class Layer {
         if (this._viz) {
             this._viz.onChange(null);
         }
+        viz.setDefaultsIfRequired(this._renderLayer.type);
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
@@ -217,7 +219,7 @@ export default class Layer {
         try {
             this._checkViz(viz);
             viz.setDefaultsIfRequired(this.metadata.geomType);
-            if (this._viz) {
+            if (this._viz && !this._source.requiresNewMetadata(viz)) {
                 Object.keys(this._viz.variables).map(varName => {
                     // If an existing variable is not re-declared we add it to the new viz
                     if (!viz.variables[varName]) {
@@ -243,6 +245,7 @@ export default class Layer {
                 if (this._viz) {
                     this._viz.onChange(null);
                 }
+                viz.setDefaultsIfRequired(this._renderLayer.type);
                 this._viz = viz;
                 this._viz.onChange(this._vizChanged.bind(this));
             });
@@ -272,7 +275,7 @@ export default class Layer {
             return;
         }
         this._source.requestData(this._getViewport());
-        this._isUpdated = true;
+        this._fireUpdateOnNextRender = true;
     }
 
     hasDataframes() {
@@ -307,8 +310,10 @@ export default class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
-            if (this._viz.isAnimated() || this._isUpdated) {
-                this._isUpdated = false;
+            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+
+                this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
+                this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
             if (!this._isLoaded && this.state == 'dataLoaded') {
@@ -321,7 +326,7 @@ export default class Layer {
     _fire(eventType, eventData) {
         try {
             return this._emitter.emit(eventType, eventData);
-        } catch(err) {
+        } catch (err) {
             console.error(err);
         }
     }
@@ -331,20 +336,17 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
+        dataframe.setFreeObserver(() => {
+            this._integrator.invalidateWebGLState();
+            this._integrator.needRefresh();
+        });
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
+        if (this._viz) {
+            this._viz.setDefaultsIfRequired(dataframe.type);
+        }
         this._integrator.needRefresh();
-        this._isUpdated = true;
-    }
-
-    /**
-     * Callback executed when the client removes dataframe
-     * @param {Dataframe} dataframe
-     */
-    _onDataFrameRemoved(dataframe) {
-        this._renderLayer.removeDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
-        this._integrator.needRefresh();
+        this._fireUpdateOnNextRender = true;
     }
 
     /**

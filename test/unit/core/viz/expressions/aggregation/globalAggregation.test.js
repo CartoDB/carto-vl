@@ -1,19 +1,19 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/globalAggregation', () => {
+describe('src/renderer/viz/expressions/globalAggregation', () => {
     const $price = s.property('price');
     describe('global filtering', () => {
         const fakeMetadata = {
-            columns: [{
-                type: 'number',
-                name: 'price',
-                min: 0,
-                avg: 1,
-                max: 2,
-                sum: 3,
-                count: 4,
-
-            }],
+            properties: {
+                price: {
+                    type: 'number',
+                    min: 0,
+                    avg: 1,
+                    max: 2,
+                    sum: 3,
+                    count: 4,
+                }
+            },
         };
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);
@@ -49,12 +49,14 @@ describe('src/core/viz/expressions/globalAggregation', () => {
             fakeMetadata.sample = [];
             for (let i = 0; i <= 1000; i++) {
                 fakeMetadata.sample.push({
-                    'price': i / 1000 * (fakeMetadata.columns[0].max - fakeMetadata.columns[0].min) + fakeMetadata.columns[0].min,
+                    'price': i / 1000 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min,
                 });
             }
             const globalPercentile = s.globalPercentile($price, 30);
             globalPercentile._compile(fakeMetadata);
-            expect(globalPercentile.value).toBeCloseTo(0.3 * (fakeMetadata.columns[0].max - fakeMetadata.columns[0].min) + fakeMetadata.columns[0].min, 2);
+            expect(globalPercentile.value).toBeCloseTo(
+                0.3 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min,
+                2);
         });
     });
 });

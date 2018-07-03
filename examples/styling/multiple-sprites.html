@@ -54,7 +54,7 @@
     const viz = new carto.Viz(`
     width: (sqrt($pop_max) * 0.003)*zoom()
     color: ramp(linear($pop_max, 0, 10000000), prism)
-    symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('./marker.svg'), sprite('./star.svg')]))
+    symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg'), sprite('https://libs.cartocdn.com/carto-vl/assets/star.svg')]))
     symbolPlacement: align_bottom
     `);
 

@@ -1,6 +1,6 @@
 import * as f from '../../../src/client/windshaft-filtering';
 import Viz from '../../../src/api/viz';
-import * as s from '../../../src/core/viz/functions';
+import * as s from '../../../src/renderer/viz/expressions';
 
 function preFilters(f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
@@ -404,7 +404,7 @@ describe('src/client/windshaft-filtering', () => {
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);
@@ -772,7 +772,7 @@ describe('src/client/windshaft-filtering', () => {
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);

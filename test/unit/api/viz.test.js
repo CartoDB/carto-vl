@@ -1,5 +1,5 @@
 import Viz from '../../../src/api/viz';
-import * as s from '../../../src/core/viz/functions';
+import * as s from '../../../src/renderer/viz/expressions';
 
 // Generic Style defaults
 
