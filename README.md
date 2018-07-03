@@ -50,8 +50,8 @@ Then, start by getting familiarized with [CARTO VL's Syntax](https://carto.com/d
 
 Also, take a look at our [examples](https://carto.com/developers/carto-vl/examples/) to understand the possibilities and inspire you!
 
-An alternative way is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl), you can also take a look at an example [here](https://github.com/CartoDB/carto-vl-webpack-demo
-)
+An alternative way is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl). Take a look at an example [here](https://github.com/CartoDB/carto-vl-webpack-demo
+).
 
 ```
 npm i @carto/carto-vl
@@ -114,11 +114,7 @@ CARTO VL is still in Beta but we encourage you to start playing with it and to p
 
 ## Works with
 
-CARTO VL is a geo-spatial data visualization library. However it doesn't include basemap rendering capabilities. Therefore, CARTO VL needs to be used with Mapbox GL as a basemap provider. You'll need to use Mapbox GL for controlling the center and zoom level of your map too. The integration is seamless, but you will need to use one of our patched versions as shown in the examples.
-
-For more information about Mapbox GL visit the
-[github page](https://github.com/mapbox/mapbox-gl-js).
-
+CARTO VL is a geo-spatial data visualization library. However it doesn't include basemap rendering capabilities. Therefore, CARTO VL needs to be used with [Mapbox GL](https://github.com/mapbox/mapbox-gl-js) as a basemap provider. You'll need to use Mapbox GL for controlling the center and zoom level of your map too. The integration is seamless, but you will need to use one of our patched versions as shown in the examples.
 
 ## Versioning
 
