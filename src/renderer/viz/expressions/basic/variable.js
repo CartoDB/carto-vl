@@ -27,46 +27,52 @@ import { checkString } from '../utils';
  * @function
  * @api
  */
-export default class Variable extends BaseExpression {
-    constructor(name) {
-        checkString('variable', 'name', 0, name);
-        if (name == '') {
-            throw new Error('variable(): invalid parameter, zero-length string');
-        }
+export class Variable extends BaseExpression {
+    constructor() {
         super({});
-        this.name = name;
     }
-    isFeatureDependent(){
-        return this.alias? this.alias.isFeatureDependent(): undefined;
+}
+function isFunction(functionToCheck) {
+    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
+}
+export default function variable(name) {
+    checkString('variable', 'name', 0, name);
+    if (name == '') {
+        throw new Error('variable(): invalid parameter, zero-length string');
     }
-    get value() {
-        return this.eval();
-    }
-    eval(feature) {
-        if (this.alias) {
-            return this.alias.eval(feature);
-        }
-    }
-    _resolveAliases(aliases) {
-        if (aliases[this.name]) {
-            this.childrenNames.push('alias');
-            this.childrenNames = [...(new Set(this.childrenNames))];
-            this.alias = aliases[this.name];
+    let alias;
+    const resolve = aliases => {
+        if (aliases[name]) {
+            alias = aliases[name];
         } else {
-            throw new Error(`variable() name '${this.name}' doesn't exist`);
+            throw new Error(`variable() name '${name}' doesn't exist`);
         }
-    }
-    _compile(meta) {
-        this.alias._compile(meta);
-        this.type = this.alias.type;
-    }
-    _applyToShaderSource(getGLSLforProperty) {
-        return this.alias._applyToShaderSource(getGLSLforProperty);
-    }
-    _getDependencies() {
-        return [this.alias];
-    }
-    _getMinimumNeededSchema() {
-        return this.alias._getMinimumNeededSchema();
-    }
+    };
+    let aliaser = {
+        set: (obj, prop, value) => {
+            if (prop == 'parent') {
+                obj[prop] = value;
+            } else if (alias && alias[prop]) {
+                alias[prop] = value;
+            } else {
+                return false;
+            }
+            // Indicate success
+            return true;
+        },
+        get: (obj, prop) => {
+            if (prop == '_resolveAliases') {
+                return resolve;
+            }
+            if (alias && alias[prop]) {
+                if (isFunction(alias[prop])) {
+                    return alias[prop].bind(alias);
+                }
+                return alias[prop];
+            }
+            return obj[prop];
+        }
+    };
+    const proxy = new Proxy(new Variable(), aliaser);
+    return proxy;
 }

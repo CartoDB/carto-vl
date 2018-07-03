@@ -347,7 +347,7 @@ export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
 export const sprites = (...args) => new Sprites(...args);
 
-export const variable = (...args) => new Variable(...args);
+export const variable = (...args) => Variable(...args);
 export { variable as var };
 
 export const viewportAvg = (...args) => new ViewportAvg(...args);
