@@ -284,18 +284,18 @@ export default class Viz {
         this.symbol._bind(metadata);
         this.filter._bind(metadata);
 
-        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color });
-        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width });
-        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor });
-        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
-        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter });
+        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
+        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
+        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
+        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
+        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
-            });
+            }, this);
         }
     }
 
