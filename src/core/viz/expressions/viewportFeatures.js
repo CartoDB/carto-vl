@@ -10,7 +10,7 @@ import Property from './basic/property';
  * This expression cannot be used in the visualization, it can only be used in JavaScript code as in the example below.
  *
  * @param {...Property} properties - properties that will appear in the feature list
- * @return {Array} list of features
+ * @return {ViewportFeatures} ViewportFeatures
  *
  * @example <caption>Define and use a list of features. (String)</caption>
  * const source = carto.source.Dataset('data');
@@ -21,7 +21,7 @@ import Property from './basic/property';
  * ...
  *
  * layer.on('updated', () => {
- *     viz.variables.list.eval().forEach(feature => {
+ *     viz.variables.list.value.forEach(feature => {
  *         console.log('value:', feature.value, 'category:', feature.category);
  *     });
  * });
