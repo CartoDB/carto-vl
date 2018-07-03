@@ -7,7 +7,7 @@ import Property from './basic/property';
  *
  * For each feature, the properties specified as arguments to this expression will be available.
  * Filtered features will not be present in the list.
- * This expression cannot be used in the visualization, it can only be used in JavaScript code as in the example below.
+ * This expression cannot be used for rendering, it can only be used in JavaScript code as in the example below.
  *
  * @param {...Property} properties - properties that will appear in the feature list
  * @return {ViewportFeatures} ViewportFeatures
