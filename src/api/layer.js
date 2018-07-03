@@ -62,8 +62,10 @@ export default class Layer {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
+        this._oldDataframes = new Set();
 
         this._init(id, source, viz);
+
     }
 
     _init(id, source, viz) {
@@ -86,7 +88,7 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this._isLoaded = false;
-        this._isUpdated = false;
+        this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
     }
@@ -273,7 +275,7 @@ export default class Layer {
             return;
         }
         this._source.requestData(this._getViewport());
-        this._isUpdated = true;
+        this._fireUpdateOnNextRender = true;
     }
 
     hasDataframes() {
@@ -308,8 +310,10 @@ export default class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
-            if (this._viz.isAnimated() || this._isUpdated) {
-                this._isUpdated = false;
+            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+
+                this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
+                this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
             if (!this._isLoaded && this.state == 'dataLoaded') {
@@ -342,7 +346,7 @@ export default class Layer {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
         this._integrator.needRefresh();
-        this._isUpdated = true;
+        this._fireUpdateOnNextRender = true;
     }
 
     /**

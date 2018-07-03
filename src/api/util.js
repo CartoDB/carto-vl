@@ -34,7 +34,7 @@ function isObject(value) {
 /**
  * Transform the given parameter into a Date object.
  * When a number is given as a parameter is asummed to be a milliseconds epoch.
- * @param {Date|number|string} date 
+ * @param {Date|number|string} date
  */
 function castDate(date) {
     if (date instanceof Date) {
@@ -49,6 +49,10 @@ function castDate(date) {
     return new Date(date);
 }
 
+function isSetsEqual(a, b) {
+    return a.size === b.size && [...a].every(value => b.has(value));
+}
+
 export {
     WM_R,
     WM_2R,
@@ -57,5 +61,6 @@ export {
     isString,
     isNumber,
     isObject,
-    castDate
+    castDate,
+    isSetsEqual
 };
