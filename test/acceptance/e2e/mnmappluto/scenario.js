@@ -12,7 +12,7 @@ carto.setDefaultAuth({
 
 const source = new carto.source.Dataset('mnmappluto');
 const viz = new carto.Viz(`
-    color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])
+    color: ramp(linear($numfloors), prism)
     strokeWidth: 0
 `);
 const layer = new carto.Layer('myCartoLayer', source, viz);

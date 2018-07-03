@@ -33,12 +33,16 @@ async function loadMVT() {
 
     const source = new carto.source.MVT(tilejson.tiles[0], {
         properties: {
-            numfloors: { type: 'number' }
+            numfloors: {
+                type: 'number',
+                min: 1,
+                max: 130,
+            }
         }
     });
 
     const viz = new carto.Viz(`
-        color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])
+        color: ramp(linear($numfloors), prism)
         strokeWidth: 0
     `);
     const layer = new carto.Layer('myCartoLayer', source, viz);

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feature Lists</title> | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: '20px', left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background',
+            type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [-100, 40],
+      zoom: 3,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('walmarts');
+    let viz = new carto.Viz(`
+      @list: viewportFeatures($zip, $sttext)
+      @anotheList: viewportFeatures($zip)
+      width: 20
+      filter: $zip > 50000
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    layer.on('updated', () => {
+      console.log('Features:',viz.variables.list.value);
+      console.log('Other Features:',viz.variables.anotheList.value);
+    });
+  </script>
+</body>
+</html>
