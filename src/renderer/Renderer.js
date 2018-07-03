@@ -157,6 +157,10 @@ export default class Renderer {
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
 
+        if (!viewportExpressions.length) {
+            return;
+        }
+
         // Assume that all dataframes of a renderLayer share the same metadata
         const metadata = dataframes.length ? dataframes[0].metadata : {};
 
