@@ -310,8 +310,7 @@ export default class Layer {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
-            const isSetsEqual = (a, b) => a.size === b.size && [...a].every(value => b.has(value));
-            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
 
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
@@ -348,7 +347,6 @@ export default class Layer {
         }
         this._integrator.needRefresh();
         this._fireUpdateOnNextRender = true;
-        console.log('to be fired');
     }
 
     /**

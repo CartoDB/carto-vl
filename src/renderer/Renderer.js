@@ -183,9 +183,7 @@ export default class Renderer {
                     continue;
                 }
 
-                viewportExpressions.forEach(viewportExpression => {
-                    viewportExpression.accumViewportAgg(feature);
-                });
+                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
             }
         });
     }
