@@ -378,14 +378,10 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
-        if (map.isStyleLoaded()) {
+        try {
             this._onMapLoaded(map, beforeLayerID);
-        } else {
-            try {
-                this._onMapLoaded(map, beforeLayerID);
-            } catch (error) {
-                map.on('load', this._onMapLoaded.bind(this));
-            }
+        } catch (error) {
+            map.on('load', this._onMapLoaded.bind(this));
         }
     }
 
