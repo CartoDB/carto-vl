@@ -206,25 +206,25 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromPaletteType (input, palette) {
-        const otherColor = this.defaultOtherColor.eval();
-
         let colors = input.numCategories
             ? this._getSubPalettes(input, palette)
             : palette.getLongestSubPalette();
-            
-        return _checkColorInterpolation(input.type, input.numCategories, colors, otherColor);
+
+        return _needsToRemoveOtherCategory(input, palette, colors)
+            ? _removeOtherFromColors(colors)
+            : colors;
     }
 
     _getColorsFromColorArrayType (input, palette) {
         const otherColor = this.defaultOtherColor.eval();
 
         return input.numCategories -1 < palette.colors.length
-            ? _checkColorInterpolation(input.type, input.numCategories, palette.colors, otherColor)
+            ? _checkColorInterpolation(input.numCategories, palette.colors, input, otherColor)
             : _addOtherColorToColors(palette.colors, otherColor, input);
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.isQualitative()
+        const subPaletteNumber = palette.isQualitative() && palette.colors && input.numCategories >= palette.colors.length
             ? input.numCategories
             : this.maxKey;
 
@@ -232,7 +232,7 @@ export default class Ramp extends BaseExpression {
             ? palette.subPalettes[subPaletteNumber]
             : palette.getLongestSubPalette();
         
-        return input.numCategories > colors.length
+        return palette.isQuantitative() && input.numCategories > colors.length
             ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval(), input)
             : colors;
     }
@@ -369,29 +369,24 @@ function interpolate(low, high, m) {
     return cielabToSRGB(cielabInterpolated);
 }
 
+function _removeOtherFromColors (colors) {
+    return colors.slice(0, colors.length - 1);
+}
+
 function _addOtherColorToColors (colors, otherColor, input) {
     return input.isBuckets ? [...colors, otherColor] : colors;
 }
 
-function _avoidInterpolation(type, numCategories, colors, otherColor) {
-    console.log('!!!');
-
+function _avoidInterpolation(numCategories, colors, input, otherColor) {
     const colorArray = [];
-
-    const extra = type === inputTypes.NUMBER ? 0 : 1;
-
-    const max = numCategories === colors.length
-        ? colors.length - extra
-        : colors.length - (colors.length - numCategories) - extra;
-
-    const colorForRemainingCategories = colors[max]
-        ? colors[max]
+    const colorForRemainingCategories = colors[numCategories - 1]
+        ? colors[numCategories - 1]
         : otherColor;
 
     for (let i = 0; i < colors.length; i++) {
-        if (i < max) {
+        if (i < numCategories - 1) {
             colorArray.push(colors[i]);
-        } else if (i === max) {
+        } else if (i === colors.length - 1) {
             colorArray.push(colorForRemainingCategories);
         }
     }
@@ -399,12 +394,12 @@ function _avoidInterpolation(type, numCategories, colors, otherColor) {
     return colorArray;
 }
 
-function _checkColorInterpolation(type, numCategories, colors, otherColor) {
-    if (!numCategories) {
-        colors.pop();
-    }
-
-    return numCategories <= colors.length
-        ? _avoidInterpolation(type, numCategories, colors, otherColor)
+function _checkColorInterpolation(numCategories, colors, input, otherColor) {
+    return numCategories -1 < colors.length
+        ? _avoidInterpolation(numCategories, colors, input, otherColor)
         : colors;
+}
+
+function _needsToRemoveOtherCategory (input, palette, colors) {
+    return palette.isQualitative() && input.isBuckets && input.numCategories > colors.length;
 }
