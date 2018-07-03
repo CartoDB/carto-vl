@@ -1,6 +1,6 @@
-import * as s from '../../../../../src/core/viz/functions';
-import { isArgConstructorTimeTyped } from '../../../../../src/core/viz/expressions/utils';
-import Metadata from '../../../../../src/core/metadata';
+import Metadata from '../../../../../src/renderer/Metadata';
+import * as s from '../../../../../src/renderer/viz/expressions';
+import { isArgConstructorTimeTyped } from '../../../../../src/renderer/viz/expressions/utils';
 
 const metadata = new Metadata({
     properties: {

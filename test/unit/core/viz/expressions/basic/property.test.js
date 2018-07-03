@@ -1,7 +1,7 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/basic/property', () => {
+describe('src/renderer/viz/expressions/basic/property', () => {
     describe('error control', () => {
         validateStaticTypeErrors('property', []);
         validateStaticTypeErrors('property', [undefined]);

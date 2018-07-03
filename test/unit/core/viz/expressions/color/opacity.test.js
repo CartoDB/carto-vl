@@ -1,7 +1,7 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from '../utils';
-import { opacity, rgba, mul, variable, rgb } from '../../../../../../src/core/viz/functions';
+import { opacity, rgba, mul, variable, rgb } from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/opacity', () => {
+describe('src/renderer/viz/expressions/opacity', () => {
     describe('error control', () => {
         validateStaticTypeErrors('opacity', []);
         validateStaticTypeErrors('opacity', ['number']);

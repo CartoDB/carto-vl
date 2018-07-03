@@ -1,6 +1,6 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/basic/array', () => {
+describe('src/renderer/viz/expressions/basic/array', () => {
     describe('error control', () => {
     });
 

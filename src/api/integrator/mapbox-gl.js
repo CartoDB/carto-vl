@@ -1,5 +1,5 @@
 import mitt from 'mitt';
-import * as R from '../../core/renderer';
+import Renderer from '../../renderer/Renderer';
 import * as util from '../util';
 
 let uid = 0;
@@ -19,7 +19,7 @@ export default function getMGLIntegrator(map) {
  */
 class MGLIntegrator {
     constructor(map) {
-        this.renderer = new R.Renderer();
+        this.renderer = new Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
         this.moveObservers = {};

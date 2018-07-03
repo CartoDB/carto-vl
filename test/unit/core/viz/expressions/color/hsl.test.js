@@ -1,7 +1,7 @@
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
-import { hsl, hsla } from '../../../../../../src/core/viz/functions';
+import { hsl, hsla } from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/hsl', () => {
+describe('src/renderer/viz/expressions/hsl', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hsl', []);
         validateStaticTypeErrors('hsl', ['number']);
