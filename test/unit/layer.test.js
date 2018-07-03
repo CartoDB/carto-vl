@@ -1,8 +1,5 @@
-import Layer from '../../../src/api/layer';
-import Viz from '../../../src/api/viz';
-import Dataset from '../../../src/sources/Dataset';
-import GeoJSON from '../../../src/sources/Geojson';
-import SQL from '../../../src/sources/Sql';
+import { Layer, Viz, source } from '../../src/index';
+const { Dataset, GeoJSON, SQL } = source;
 
 describe('api/layer', () => {
     let source;

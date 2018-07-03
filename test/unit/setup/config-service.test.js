@@ -1,4 +1,4 @@
-import { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig } from '../../../../src/api/setup/config-service';
+import { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig } from '../../../src/setup/config-service';
 
 describe('api/setup/config-service', () => {
     const config = {

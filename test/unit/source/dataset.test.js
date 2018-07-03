@@ -1,4 +1,4 @@
-import Dataset from '../../../../src/sources/Dataset';
+import Dataset from '../../../src/sources/Dataset';
 
 describe('sources/dataset', () => {
     const tableName = 'table0';

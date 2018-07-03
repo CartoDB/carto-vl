@@ -1,4 +1,4 @@
-import GeoJSON from '../../../../src/sources/Geojson';
+import GeoJSON from '../../../src/sources/Geojson';
 
 describe('sources/geojson', () => {
 

@@ -1,5 +1,4 @@
-import Viz from '../../../src/api/viz';
-import * as s from '../../../src/renderer/viz/expressions';
+import { Viz, expressions as s } from '../../src/index';
 
 // Generic Style defaults
 
@@ -253,11 +252,11 @@ describe('api/viz', () => {
 
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
-            expect(viz.variables.a.value).toEqual([1,2,3]);
-            viz = new Viz({ variables: { a: s.array([1,2,3]) } });
-            expect(viz.variables.a.value).toEqual([1,2,3]);
-            viz = new Viz({ variables: { a: [1,2,3] } }); // Implicit cast
-            expect(viz.variables.a.value).toEqual([1,2,3]);
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
+            viz = new Viz({ variables: { a: s.array([1, 2, 3]) } });
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
+            viz = new Viz({ variables: { a: [1, 2, 3] } }); // Implicit cast
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
         });
 
         it('should work with numeric expressions', () => {
@@ -270,13 +269,13 @@ describe('api/viz', () => {
         it('should work with other variables', () => {
             let viz = new Viz('@a: [@v, 2, 3] @v: 1');
             expect(viz.variables.v.value).toEqual(1);
-            expect(viz.variables.a.value).toEqual([1,2,3]);
-            viz = new Viz({ variables: { a: s.array([s.var('v'),2,3]), v: s.number(1) } });
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
+            viz = new Viz({ variables: { a: s.array([s.var('v'), 2, 3]), v: s.number(1) } });
             expect(viz.variables.v.value).toEqual(1);
-            expect(viz.variables.a.value).toEqual([1,2,3]);
-            viz = new Viz({ variables: { a: [1,2,3], v: 1 } }); // Implicit cast
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
+            viz = new Viz({ variables: { a: [1, 2, 3], v: 1 } }); // Implicit cast
             expect(viz.variables.v.value).toEqual(1);
-            expect(viz.variables.a.value).toEqual([1,2,3]);
+            expect(viz.variables.a.value).toEqual([1, 2, 3]);
         });
 
         it('should work with strings', () => {
@@ -290,42 +289,50 @@ describe('api/viz', () => {
 
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
-            expect(viz.variables.a.value).toEqual(['a','b','c']);
-            viz = new Viz({ variables: { a: s.array(['a','b','c']) } });
-            expect(viz.variables.a.value).toEqual(['a','b','c']);
-            viz = new Viz({ variables: { a: ['a','b','c'] } }); // Implicit cast
-            expect(viz.variables.a.value).toEqual(['a','b','c']);
+            expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
+            viz = new Viz({ variables: { a: s.array(['a', 'b', 'c']) } });
+            expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
+            viz = new Viz({ variables: { a: ['a', 'b', 'c'] } }); // Implicit cast
+            expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
         });
 
         it('should work with colors', () => {
             let viz = new Viz('@a: red');
-            expect(viz.variables.a.value).toEqual({r: 255, g: 0, b: 0, a: 1});
+            expect(viz.variables.a.value).toEqual({ r: 255, g: 0, b: 0, a: 1 });
             viz = new Viz({ variables: { a: s.namedColor('red') } });
-            expect(viz.variables.a.value).toEqual({r: 255, g: 0, b: 0, a: 1});
+            expect(viz.variables.a.value).toEqual({ r: 255, g: 0, b: 0, a: 1 });
         });
 
         it('should work with arrays of colors', () => {
             let viz = new Viz('@a: [red, lime, blue]');
             expect(viz.variables.a.value).toEqual([
-                {r: 255, g: 0, b: 0, a: 1},
-                {r: 0, g: 255, b: 0, a: 1},
-                {r: 0, g: 0, b: 255, a: 1}]);
-            viz = new Viz({ variables: { a: s.array([
-                s.namedColor('red'),
-                s.namedColor('lime'),
-                s.namedColor('blue')]) } });
+                { r: 255, g: 0, b: 0, a: 1 },
+                { r: 0, g: 255, b: 0, a: 1 },
+                { r: 0, g: 0, b: 255, a: 1 }]);
+            viz = new Viz({
+                variables: {
+                    a: s.array([
+                        s.namedColor('red'),
+                        s.namedColor('lime'),
+                        s.namedColor('blue')])
+                }
+            });
             expect(viz.variables.a.value).toEqual([
-                {r: 255, g: 0, b: 0, a: 1},
-                {r: 0, g: 255, b: 0, a: 1},
-                {r: 0, g: 0, b: 255, a: 1}]);
-            viz = new Viz({ variables: { a: [
-                s.namedColor('red'),
-                s.namedColor('lime'),
-                s.namedColor('blue')] } }); // Implicit cast
+                { r: 255, g: 0, b: 0, a: 1 },
+                { r: 0, g: 255, b: 0, a: 1 },
+                { r: 0, g: 0, b: 255, a: 1 }]);
+            viz = new Viz({
+                variables: {
+                    a: [
+                        s.namedColor('red'),
+                        s.namedColor('lime'),
+                        s.namedColor('blue')]
+                }
+            }); // Implicit cast
             expect(viz.variables.a.value).toEqual([
-                {r: 255, g: 0, b: 0, a: 1},
-                {r: 0, g: 255, b: 0, a: 1},
-                {r: 0, g: 0, b: 255, a: 1}]);
+                { r: 255, g: 0, b: 0, a: 1 },
+                { r: 0, g: 255, b: 0, a: 1 },
+                { r: 0, g: 0, b: 255, a: 1 }]);
         });
 
         it('should work with dates', () => {

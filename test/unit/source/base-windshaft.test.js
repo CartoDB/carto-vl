@@ -1,4 +1,4 @@
-import SourceBase from '../../../../src/sources/BaseWindshaft';
+import SourceBase from '../../../src/sources/BaseWindshaft';
 
 describe('sources/base-windshaft', () => {
     const auth = {

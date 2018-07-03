@@ -1,7 +1,5 @@
-import Interactivity from '../../../src/api/interactivity';
-import Layer from '../../../src/api/layer';
-import Viz from '../../../src/api/viz';
-import Dataset from '../../../src/sources/Dataset';
+import { Interactivity, Viz, Layer, source } from '../../src/index';
+const { Dataset } = source;
 
 describe('api/interactivity', () => {
     describe('constructor', () => {
@@ -14,7 +12,7 @@ describe('api/interactivity', () => {
             });
             viz = new Viz();
             layer = new Layer('layer', source, viz);
-            mockIntegrator = { on: () => {} };
+            mockIntegrator = { on: () => { } };
             layer.getIntegrator = () => mockIntegrator;
         });
 
@@ -55,7 +53,7 @@ describe('api/interactivity', () => {
 
         xit('should throw an error when the layers have different integrator', () => {
             const layer2 = new Layer('layer2', source, viz);
-            const mockIntegrator2 = { on: () => {} };
+            const mockIntegrator2 = { on: () => { } };
             layer2.getIntegrator = () => mockIntegrator2;
 
             expect(() => new Interactivity([layer, layer2])).toThrowError('Invalid argument, all layers must belong to the same map');

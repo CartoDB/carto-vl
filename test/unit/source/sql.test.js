@@ -1,4 +1,4 @@
-import SQL from '../../../../src/sources/Sql';
+import SQL from '../../../src/sources/Sql';
 
 describe('sources/sql', () => {
     const query = 'SELECT * from table0';

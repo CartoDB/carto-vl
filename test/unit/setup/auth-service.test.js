@@ -1,4 +1,4 @@
-import { setDefaultAuth, getDefaultAuth, checkAuth, cleanDefaultAuth } from '../../../../src/api/setup/auth-service';
+import { setDefaultAuth, getDefaultAuth, checkAuth, cleanDefaultAuth } from '../../../src/setup/auth-service';
 
 describe('api/setup/auth-service', () => {
     const auth = {
