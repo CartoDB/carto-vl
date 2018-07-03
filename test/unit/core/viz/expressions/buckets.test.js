@@ -1,6 +1,6 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
-import Metadata from '../../../../../src/renderer/metadata';
+import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
