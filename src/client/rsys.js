@@ -60,7 +60,7 @@ function rToW(r, x, y) {
  * @param {RSys} r - target ref. system
  * @return {RPoint} R coordinates
  */
-function wToR(x, y, r) {
+export function wToR(x, y, r) {
     return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
 }
 
@@ -91,7 +91,7 @@ function rZoom(zoom) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function rTiles(bounds) {
+export function rTiles(bounds) {
     return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
 }
 
@@ -127,7 +127,7 @@ function wRectangleTiles(z, wr) {
  * @param {*} z
  * @returns {RSys}
  */
-function getRsysFromTile(x, y, z) {
+export function getRsysFromTile(x, y, z) {
     return {
         center: {
             x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
@@ -137,4 +137,4 @@ function getRsysFromTile(x, y, z) {
     };
 }
 
-export { rTiles, getRsysFromTile, wToR };
+export default { rTiles, getRsysFromTile, wToR };

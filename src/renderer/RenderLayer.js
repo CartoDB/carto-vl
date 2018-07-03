@@ -1,4 +1,4 @@
-import Feature from '../api/feature';
+import Feature from '../interactivity/feature';
 
 export default class RenderLayer {
     constructor() {

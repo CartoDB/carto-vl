@@ -18,29 +18,21 @@
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
 
+import { setDefaultAuth } from './setup/auth-service';
+import { setDefaultConfig } from './setup/config-service';
+import Viz from './Viz';
+import Map from './integrator/Map';
+import Interactivity from './interactivity/Interactivity';
+import Layer from './Layer';
 import * as expressions from './renderer/viz/expressions';
-import GeoJSON from './api/source/geojson';
-import Dataset from './api/source/dataset';
-import SQL from './api/source/sql';
-import MVT from './api/source/mvt';
-import Layer from './api/layer';
-import Viz from './api/viz';
-import { setDefaultAuth } from './api/setup/auth-service';
-import { setDefaultConfig } from './api/setup/config-service';
-import Map from './api/map';
-import Interactivity from './api/interactivity';
+import Dataset from './sources/Dataset';
+import GeoJSON from './sources/Geojson';
+import MVT from './sources/Mvt';
+import SQL from './sources/Sql';
 
 // Namespaces
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export {
-    setDefaultAuth,
-    setDefaultConfig,
-    source,
-    expressions,
-    Layer,
-    Viz,
-    Map,
-    Interactivity,
-};
+export { setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+
