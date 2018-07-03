@@ -171,26 +171,17 @@ export default class Renderer {
 
         this.aspect= this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
-            const propertyNames = Object.keys(dataframe.properties);
-            const propertyNamesLength = propertyNames.length;
-
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 let feature;
                 if (!dataframe.cachedFeatures){
                     dataframe.cachedFeatures = [];
                 }
                 if (!dataframe.cachedFeatures[i]) {
-                    feature = {};
-                    for (let j = 0; j < propertyNamesLength; j++) {
-                        const name = propertyNames[j];
-                        feature[name] = dataframe.properties[name][i];
-                    }
+                    feature = this._featureFromDataFrame(dataframe, i);
                     dataframe.cachedFeatures.push(feature);
                 } else {
                     feature = dataframe.cachedFeatures[i];
                 }
-
-
 
                 // If feature has been acumulated ignore it
                 if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
