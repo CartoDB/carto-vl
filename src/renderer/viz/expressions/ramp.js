@@ -212,14 +212,14 @@ export default class Ramp extends BaseExpression {
             ? this._getSubPalettes(input, palette)
             : palette.getLongestSubPalette();
             
-        return _checkColorInterpolation(input.isBuckets, input.numCategories, colors, otherColor);
+        return _checkColorInterpolation(input.type, input.numCategories, colors, otherColor);
     }
 
     _getColorsFromColorArrayType (input, palette) {
         const otherColor = this.defaultOtherColor.eval();
 
         return input.numCategories -1 < palette.colors.length
-            ? _checkColorInterpolation(input.isBuckets, input.numCategories, palette.colors, otherColor)
+            ? _checkColorInterpolation(input.type, input.numCategories, palette.colors, otherColor)
             : _addOtherColorToColors(palette.colors, otherColor, input);
     }
 
@@ -373,12 +373,16 @@ function _addOtherColorToColors (colors, otherColor, input) {
     return input.isBuckets ? [...colors, otherColor] : colors;
 }
 
-function _avoidInterpolation(isBuckets, numCategories, colors, otherColor) {
+function _avoidInterpolation(type, numCategories, colors, otherColor) {
+    console.log('!!!');
+
     const colorArray = [];
 
+    const extra = type === inputTypes.NUMBER ? 0 : 1;
+
     const max = numCategories === colors.length
-        ? colors.length - 1
-        : colors.length - (colors.length - numCategories) - 1;
+        ? colors.length - extra
+        : colors.length - (colors.length - numCategories) - extra;
 
     const colorForRemainingCategories = colors[max]
         ? colors[max]
@@ -395,8 +399,12 @@ function _avoidInterpolation(isBuckets, numCategories, colors, otherColor) {
     return colorArray;
 }
 
-function _checkColorInterpolation(isBuckets, numCategories, colors, otherColor) {
+function _checkColorInterpolation(type, numCategories, colors, otherColor) {
+    if (!numCategories) {
+        colors.pop();
+    }
+
     return numCategories <= colors.length
-        ? _avoidInterpolation(isBuckets, numCategories, colors, otherColor)
+        ? _avoidInterpolation(type, numCategories, colors, otherColor)
         : colors;
 }
