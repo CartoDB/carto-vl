@@ -1,5 +1,5 @@
-import { blend, property, transition, notEquals } from '../core/viz/functions';
-import { parseVizExpression } from '../core/viz/parser';
+import { blend, property, transition, notEquals } from '../renderer/viz/expressions';
+import { parseVizExpression } from '../renderer/viz/parser';
 
 /**
  *

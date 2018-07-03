@@ -1,7 +1,7 @@
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
-import { hex } from '../../../../../../src/core/viz/functions';
+import { hex } from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/hex', () => {
+describe('src/renderer/viz/expressions/hex', () => {
     describe('error control', () => {
         validateStaticTypeErrors('hex', []);
         validateStaticTypeErrors('hex', ['number']);

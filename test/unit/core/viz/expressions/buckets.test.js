@@ -1,8 +1,8 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import * as s from '../../../../../src/core/viz/functions';
-import Metadata from '../../../../../src/core/metadata';
+import * as s from '../../../../../src/renderer/viz/expressions';
+import Metadata from '../../../../../src/renderer/metadata';
 
-describe('src/core/viz/expressions/buckets', () => {
+describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
         validateDynamicTypeErrors('buckets', ['number', 'category-array']);
         validateDynamicTypeErrors('buckets', ['category', 'number-array']);

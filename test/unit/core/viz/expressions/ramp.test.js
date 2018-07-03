@@ -1,11 +1,11 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, checkRGBAThreshold } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes } from '../../../../../src/core/viz/functions';
-import * as s from '../../../../../src/core/viz/functions';
-import { hexToRgb } from '../../../../../src/core/viz/expressions/utils';
-import Metadata from '../../../../../src/core/metadata';
+import { ramp, buckets, palettes } from '../../../../../src/renderer/viz/expressions';
+import * as s from '../../../../../src/renderer/viz/expressions';
+import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
+import Metadata from '../../../../../src/renderer/Metadata';
 
-describe('src/core/viz/expressions/ramp', () => {
+describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
         validateStaticTypeErrors('ramp', []);
         validateStaticTypeErrors('ramp', ['number']);

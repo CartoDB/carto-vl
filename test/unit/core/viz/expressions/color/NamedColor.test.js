@@ -1,5 +1,5 @@
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
-import { namedColor } from '../../../../../../src/core/viz/functions';
+import { namedColor } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/core/viz/expressions/NamedColor', () => {
     describe('error control', () => {

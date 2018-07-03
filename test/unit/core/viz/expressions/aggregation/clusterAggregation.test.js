@@ -1,7 +1,7 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/clusterAggregation', () => {
+describe('src/renderer/viz/expressions/clusterAggregation', () => {
     const fakeFeature = {
         _cdb_agg_max_price: 1,
         _cdb_agg_min_price: 2,

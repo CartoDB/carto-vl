@@ -1,7 +1,7 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
 
-describe('src/core/viz/expressions/basic/category', () => {
+describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
         validateStaticTypeErrors('category', []);
         validateStaticTypeErrors('category', [undefined]);
