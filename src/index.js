@@ -18,7 +18,7 @@
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
 
-import * as expressions from './core/viz/functions';
+import * as expressions from './renderer/viz/expressions';
 import GeoJSON from './api/source/geojson';
 import Dataset from './api/source/dataset';
 import SQL from './api/source/sql';

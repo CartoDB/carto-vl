@@ -1,10 +1,10 @@
-import * as R from '../core/renderer';
-import * as windshaftFiltering from './windshaft-filtering';
-import Metadata from '../core/metadata';
 import { version } from '../../package';
-import Time from '../core/viz/expressions/time';
-
 import MVT from '../api/source/mvt';
+import Metadata from '../renderer/Metadata';
+import schema from '../renderer/schema';
+import Time from '../renderer/viz/expressions/time';
+import * as windshaftFiltering from './windshaft-filtering';
+
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -79,8 +79,8 @@ export default class Windshaft {
     _checkAcceptableMNS(MNS) {
         const columnAgg = {};
         MNS.columns.map(column => {
-            const basename = R.schema.column.getBase(column);
-            const isAgg = R.schema.column.isAggregated(column);
+            const basename = schema.column.getBase(column);
+            const isAgg = schema.column.isAggregated(column);
             if (columnAgg[basename] === undefined) {
                 columnAgg[basename] = isAgg;
             } else if (columnAgg[basename] !== isAgg) {
@@ -110,7 +110,7 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
-        return !R.schema.equals(this._MNS, MNS)
+        return !schema.equals(this._MNS, MNS)
             || resolution != this.resolution
             || (
                 JSON.stringify(filtering) != JSON.stringify(this.filtering)
@@ -174,7 +174,7 @@ export default class Windshaft {
         this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const basename = R.schema.column.getBase(propertyName);
+            const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
             if (!column) {
                 return;
@@ -244,7 +244,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation(MNS) {
-        return MNS.columns.some(column => R.schema.column.isAggregated(column));
+        return MNS.columns.some(column => schema.column.isAggregated(column));
     }
 
     _generateAggregation(MNS, resolution) {
@@ -259,10 +259,10 @@ export default class Windshaft {
         MNS.columns
             .forEach(name => {
                 if (name !== 'cartodb_id') {
-                    if (R.schema.column.isAggregated(name)) {
+                    if (schema.column.isAggregated(name)) {
                         aggregation.columns[name] = {
-                            aggregate_function: R.schema.column.getAggFN(name),
-                            aggregated_column: R.schema.column.getBase(name)
+                            aggregate_function: schema.column.getAggFN(name),
+                            aggregated_column: schema.column.getBase(name)
                         };
                     } else {
                         aggregation.dimensions[name] = name;
@@ -274,7 +274,7 @@ export default class Windshaft {
     }
 
     _buildSelectClause(MNS) {
-        const columns = MNS.columns.map(name => R.schema.column.getBase(name))
+        const columns = MNS.columns.map(name => schema.column.getBase(name))
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
     }
@@ -362,8 +362,12 @@ export default class Windshaft {
 
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
-            const basename = R.schema.column.getBase(aggName);
-            properties[basename].sourceName = aggName;
+            const basename = schema.column.getBase(aggName);
+            const fnName = schema.column.getAggFN(aggName);
+            if (!properties[basename].aggregations) {
+                properties[basename].aggregations = {};
+            }
+            properties[basename].aggregations[fnName] = aggName;
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

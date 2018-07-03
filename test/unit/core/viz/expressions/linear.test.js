@@ -1,8 +1,8 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { GlobalMin, GlobalMax } from '../../../../../src/core/viz/expressions/aggregation/globalAggregation';
+import { GlobalMin, GlobalMax } from '../../../../../src/renderer/viz/expressions/aggregation/globalAggregation';
 
-describe('src/core/viz/expressions/linear', () => {
+describe('src/renderer/viz/expressions/linear', () => {
     describe('error control', () => {
         validateStaticTypeErrors('linear', []);
         validateStaticTypeErrors('linear', ['number', 'number']);

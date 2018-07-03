@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/ordering', () => {
+describe('src/renderer/viz/expressions/ordering', () => {
     describe('error control', () => {
         validateStaticTypeErrors('asc', []);
         validateStaticTypeErrors('asc', [undefined]);

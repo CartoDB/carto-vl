@@ -1,6 +1,6 @@
-import * as s from '../../../../../../src/core/viz/functions';
+import * as s from '../../../../../../src/renderer/viz/expressions';
 
-describe('src/core/viz/expressions/viewportAggregation', () => {
+describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
     const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');

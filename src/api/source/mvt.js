@@ -1,12 +1,12 @@
-import * as rsys from '../../client/rsys';
-import Dataframe from '../../core/dataframe';
-import * as Protobuf from 'pbf';
 import { VectorTile } from '@mapbox/vector-tile';
+import * as Protobuf from 'pbf';
 import { decodeLines, decodePolygons } from '../../client/mvt/feature-decoder';
-import TileClient from './TileClient';
+import * as rsys from '../../client/rsys';
+import Dataframe from '../../renderer/Dataframe';
+import Metadata from '../../renderer/Metadata';
+import { RTT_WIDTH } from '../../renderer/Renderer';
 import Base from './base';
-import { RTT_WIDTH } from '../../core/renderer';
-import Metadata from '../../core/metadata';
+import TileClient from './TileClient';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -47,6 +47,9 @@ export default class MVT extends Base {
     constructor(templateURL, metadata = new Metadata(), layerId = undefined) {
         super();
         this._templateURL = templateURL;
+        if (!(metadata instanceof Metadata)) {
+            metadata = new Metadata(metadata);
+        }
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
         this._layerID = layerId;
@@ -130,7 +133,6 @@ export default class MVT extends Base {
     _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
-
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -170,9 +172,12 @@ export default class MVT extends Base {
 
     _initializePropertyArrays(metadata, length) {
         const properties = {};
-        const propertyNames = Object.keys(metadata.properties)
-            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
-            .map(propertyName => metadata.properties[propertyName].sourceName || propertyName);
+        const propertyNames = [];
+        Object.keys(metadata.properties).
+            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
+            forEach(propertyName => {
+                propertyNames.push(...metadata.propertyNames(propertyName));
+            });
 
         propertyNames.forEach(propertyName => properties[propertyName] = new Float32Array(length + RTT_WIDTH));
 

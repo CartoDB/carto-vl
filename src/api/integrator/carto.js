@@ -1,4 +1,4 @@
-import * as R from '../../core/renderer';
+import Renderer from '../../renderer/Renderer';
 
 let integrator = null;
 export default function getCartoMapIntegrator(map) {
@@ -11,9 +11,9 @@ export default function getCartoMapIntegrator(map) {
 class CartoMapIntegrator {
     constructor(map) {
         this.map = map;
-        this.renderer = new R.Renderer();
+        this.renderer = new Renderer();
         this.renderer._initGL(this.map._gl);
-        this.invalidateWebGLState = () => {};
+        this.invalidateWebGLState = () => { };
     }
 
     addLayer(layerId, layer) {
