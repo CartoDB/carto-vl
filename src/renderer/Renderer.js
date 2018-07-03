@@ -172,8 +172,6 @@ export default class Renderer {
         this.aspect= this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
-                let feature = this._featureFromDataFrame(dataframe, i);
-
                 // If feature has been acumulated ignore it
                 if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
                     continue;
@@ -182,6 +180,8 @@ export default class Renderer {
                 if (!this._isFeatureInViewport(dataframe, i)) {
                     continue;
                 }
+
+                let feature = this._featureFromDataFrame(dataframe, i);
 
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
