@@ -50,7 +50,7 @@
         buffersize: { mvt: 0 },
         layers: [
           {
-            id: 'europe',
+            id: 'europeLayer',
             type: 'mapnik',
             options: {
               sql: `SELECT * FROM mnmappluto`
@@ -68,12 +68,11 @@
       });
       const layergroup = await response.json();
       const tilejson = layergroup.metadata.tilejson.vector;
-
       const source = new carto.source.MVT(tilejson.tiles[0], {
         properties: {
           numfloors: { type: 'number' }
         }
-      });
+      }, 'europeLayer');
 
       const viz = new carto.Viz(`
       color: ramp(linear($numfloors 0, 20), temps)

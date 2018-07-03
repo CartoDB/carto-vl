@@ -1,6 +1,6 @@
-import Cache from '../../../../src/core/shaders/Cache';
+import Cache from '../../../../src/renderer/shaders/Cache';
 
-describe('src/core/shaders/shader-cache', () => {
+describe('src/renderer/shaders/shader-cache', () => {
     let cache;
     beforeEach(() => {
         cache = new Cache();

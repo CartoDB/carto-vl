@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/transition', () => {
+describe('src/renderer/viz/expressions/transition', () => {
     describe('error control', () => {
         validateStaticTypeErrors('transition', [undefined]);
         validateStaticTypeErrors('transition', ['123']);

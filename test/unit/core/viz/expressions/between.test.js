@@ -1,7 +1,7 @@
-import * as s from '../../../../../src/core/viz/functions';
+import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/between', () => {
+describe('src/renderer/viz/expressions/between', () => {
     describe('error control', () => {
         validateDynamicTypeErrors('between', ['category', 'number', 'number']);
         validateDynamicTypeErrors('between', ['number', 'category', 'number']);

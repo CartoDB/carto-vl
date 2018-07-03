@@ -1,6 +1,6 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/core/viz/expressions/buckets', () => {
+describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
         validateDynamicTypeErrors('buckets', ['number', 'category-array']);
         validateDynamicTypeErrors('buckets', ['category', 'number-array']);
