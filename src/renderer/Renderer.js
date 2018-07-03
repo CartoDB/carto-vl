@@ -169,7 +169,7 @@ export default class Renderer {
         const processedFeaturesIDs = new Set();
 
 
-        this.aspect= this.gl.canvas.width / this.gl.canvas.height;
+        const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 // If feature has been acumulated ignore it
@@ -177,7 +177,7 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i)) {
+                if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
 
@@ -199,9 +199,9 @@ export default class Renderer {
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
      * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport(dataframe, index) {
+    _isFeatureInViewport(dataframe, index, aspect) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, this.aspect);
+        return dataframe.inViewport(index, scale, this._center, aspect);
     }
 
     /**
@@ -227,7 +227,7 @@ export default class Renderer {
      */
     _featureFromDataFrame(dataframe, index) {
         let feature;
-        if (!dataframe.cachedFeatures){
+        if (!dataframe.cachedFeatures) {
             dataframe.cachedFeatures = [];
         }
         if (!dataframe.cachedFeatures[index]) {
