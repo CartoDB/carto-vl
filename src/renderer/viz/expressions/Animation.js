@@ -3,7 +3,6 @@ import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
-import Variable from './basic/variable';
 import { castDate } from '../../../utils/util';
 
 /**
