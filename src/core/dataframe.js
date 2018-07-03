@@ -19,80 +19,14 @@ export default class Dataframe {
         this.propertyCount = 0;
         this._featureGeometries = this._getFeatureGeometries();
     }
-
+    
     _getFeatureGeometries() {
-        const type = this.type;
-
-        if (type === 'point') {
-            return [];
-        }
-
+        const vertices = this.decodedGeom.vertices;
         const featureGeometries = [];
 
-        this.geom.forEach(feature => {
-            feature.forEach(featureVertices => {
-                const vertices = this._getGeomVertices(type, featureVertices);
-                featureGeometries.push(new Polygon(0, 0, vertices));
-            });
-        });
-
-        return featureGeometries;
-    }
-
-    _getGeomVertices(type, vertices) {
-        const geomVertices = {
-            polygon: function () {
-                const polygonVertices = [];
-                const numVertices = vertices.flat.length / 2;
-
-                for (let i = 0; i < numVertices; i++) {
-                    let vertex = [vertices.flat[2 * i + 0], vertices.flat[2 * i + 1]];
-                    polygonVertices.push(vertex);
-                }
-
-                return polygonVertices;
-            },
-
-            line: function () {
-                const lineVertices = [];
-
-                for (let i = 0; i < vertices.length; i++) {
-                    let vertex = [vertices[2 * i + 0], vertices[2 * i + 1]];
-                    lineVertices.push(vertex);
-                }
-
-                return lineVertices;
-            }
-        };
-
-        try {
-            return geomVertices[type]();
-        } catch (error) {
-            throw new Error(`Invalid type ${type}`);
-        }
-    }
-
-    _getVertices(type, vertices) {
-        const geomVertices = {
-            polygon: function () {
-                return {
-                    vertices: vertices.flat,
-                    numVertices: vertices.flat.length / 2
-                };
-            },
-
-            line: function () {
-                return {
-                    vertices: vertices,
-                    numVertices: vertices.length
-                };
-            }
-        };
-
-        try {
-            return geomVertices[type]();
-        } catch (error) {
-            throw new Error(`Invalid type ${type}`);
+        for (let i = 0; i < vertices.length; i+=3) {
+            const triangle = [vertices[i], vertices[i+1], vertices[i+2]];
+            featureGeometries.push(new Polygon(0, 0, triangle));
         }
     }
 
@@ -174,14 +108,14 @@ export default class Dataframe {
         const height = scale * (center.y - this.center.y);
         const width = (scale / aspect) * (center.x - this.center.x);
         const viewport = this._getViewportGeometry(center, width, height);
-        const geometry = this._featureGeometries[featureIndex];
+        const triangles = this._featureGeometries[featureIndex];
 
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
             case 'polygon':
-                return this._isPolygonInViewport(geometry, viewport);
+                return this._isPolygonInViewport(triangles, viewport);
             default:
                 return false;
         }
@@ -194,8 +128,14 @@ export default class Dataframe {
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport(feature, viewport) {
-        return feature.collides(viewport);
+    _isPolygonInViewport(triangles, viewport) {
+        for (let i = 0; i < triangles.length; i++) {
+            if (triangles[i].collides(viewport)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _getBounds(scale, center, aspect) {
