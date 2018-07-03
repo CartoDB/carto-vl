@@ -48,6 +48,9 @@ export default function variable(name) {
             throw new Error(`variable() name '${name}' doesn't exist`);
         }
     };
+    const _getDependencies = ()=>{
+        return alias;
+    };
     let aliaser = {
         set: (obj, prop, value) => {
             if (prop == 'parent') {
@@ -63,6 +66,8 @@ export default function variable(name) {
         get: (obj, prop) => {
             if (prop == '_resolveAliases') {
                 return resolve;
+            } else if (prop == '_getDependencies') {
+                return _getDependencies;
             }
             if (alias && alias[prop]) {
                 if (isFunction(alias[prop])) {
