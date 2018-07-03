@@ -458,15 +458,19 @@ describe('src/core/viz/expressions/ramp', () => {
                 describe('and not all categories in the dataset have a bucket defined', () => {
                     const CATEGORIES = ['Pontevedra', 'Zaragoza', 'Cordoba', 'Alicante', 'Murcia'];
                     const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-                
+
                     it('should not show interpolation', () => {
-                        const r = ramp(buckets('Cordoba', CATEGORIES), palettes.PRISM);
+                        let r;
+                        
+                        CATEGORIES.forEach((category, index) => {
+                            r = ramp(buckets(category, CATEGORIES), palettes.PRISM);
     
-                        r._compile(METADATA);
-                        actual = r.eval();
-                        expected = hexToRgb(RAMP_COLORS[2]);
-        
-                        expect(actual).toEqual(expected);                        
+                            r._compile(METADATA);
+                            actual = r.eval();
+                            expected = hexToRgb(RAMP_COLORS[index]);
+            
+                            expect(actual).toEqual(expected);  
+                        });                      
                     });
     
                     it('should use last color for the remaining categories', () => {
