@@ -132,11 +132,7 @@ describe('api/layer', () => {
     describe('.addTo', () => {
         describe('._addToMGLMap', () => {
             let layer;
-            
-            const sourcedataEvent = {
-                isSourceLoaded: false
-            };
-            
+
             const loadEvent = {};
             
             const mapMock = {
@@ -145,13 +141,7 @@ describe('api/layer', () => {
                     if (id === 'load') {
                         callback.call(layer, loadEvent);
                     }
-
-                    if (id === 'sourcedata') {
-                        callback.call(layer, sourcedataEvent);
-                    }
-                },
-
-                off: () => {}
+                }
             };
 
             beforeEach(() => {
@@ -161,27 +151,6 @@ describe('api/layer', () => {
             });
 
             it('should call onMapLoaded when the map is loaded', () => {
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalled();
-            });
-
-            it('should not call onMapLoaded when the map style and source are not loaded', () => {
-                sourcedataEvent.isSourceLoaded = false;
-                mapMock.isStyleLoaded = jasmine.createSpy('isStyleLoaded').and.returnValue(false),
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).not.toHaveBeenCalled();
-            });
-
-            it('should call onMapLoaded when the style is loaded but the sourcedata is not', () => {
-                sourcedataEvent.isSourceLoaded = false;
-                mapMock.isStyleLoaded = jasmine.createSpy('isStyleLoaded').and.returnValue(true),
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalled();
-            });
-
-            it('should call onMapLoaded when the style is not loaded and the sourcedata is', () => {
-                sourcedataEvent.isSourceLoaded = true;
-                mapMock.isStyleLoaded = jasmine.createSpy('isStyleLoaded').and.returnValue(false),
                 layer._addToMGLMap(mapMock);
                 expect(layer._onMapLoaded).toHaveBeenCalled();
             });
