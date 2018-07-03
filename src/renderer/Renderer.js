@@ -172,16 +172,7 @@ export default class Renderer {
         this.aspect= this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
-                let feature;
-                if (!dataframe.cachedFeatures){
-                    dataframe.cachedFeatures = [];
-                }
-                if (!dataframe.cachedFeatures[i]) {
-                    feature = this._featureFromDataFrame(dataframe, i);
-                    dataframe.cachedFeatures.push(feature);
-                } else {
-                    feature = dataframe.cachedFeatures[i];
-                }
+                let feature = this._featureFromDataFrame(dataframe, i);
 
                 // If feature has been acumulated ignore it
                 if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
@@ -235,11 +226,20 @@ export default class Renderer {
      * Build a feature object from a dataframe and an index copying all the properties.
      */
     _featureFromDataFrame(dataframe, index) {
-        const propertyNames = Object.keys(dataframe.properties);
-        const feature = {};
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            feature[name] = dataframe.properties[name][index];
+        let feature;
+        if (!dataframe.cachedFeatures){
+            dataframe.cachedFeatures = [];
+        }
+        if (!dataframe.cachedFeatures[index]) {
+            feature = {};
+            const propertyNames = Object.keys(dataframe.properties);
+            for (let i = 0; i < propertyNames.length; i++) {
+                const name = propertyNames[i];
+                feature[name] = dataframe.properties[name][index];
+            }
+            dataframe.cachedFeatures.push(feature);
+        } else {
+            feature = dataframe.cachedFeatures[index];
         }
         return feature;
     }
