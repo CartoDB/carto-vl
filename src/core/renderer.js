@@ -159,7 +159,10 @@ class Renderer {
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg());
+        // Assume that all dataframes of a renderLayer share the same metadata
+        const metadata = dataframes.length ? dataframes[0].metadata : {};
+
+        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
@@ -183,12 +186,7 @@ class Renderer {
                 }
 
                 viewportExpressions.forEach(viewportExpression => {
-                    if (viewportExpression._requiredProperties) {
-                        const propNames = viewportExpression._requiredProperties.map(p => p.name);
-                        viewportExpression.accumViewportAgg(this._featureFromDataFrame(dataframe, i, propNames, true));
-                    } else {
-                        viewportExpression.accumViewportAgg(feature);
-                    }
+                    viewportExpression.accumViewportAgg(feature);
                 });
             }
         });
@@ -223,16 +221,12 @@ class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame(dataframe, index, propertyNames = null, decodeCategories = false) {
-        propertyNames = propertyNames || Object.keys(dataframe.properties);
+    _featureFromDataFrame(dataframe, index) {
+        const propertyNames = Object.keys(dataframe.properties);
         const feature = {};
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
-            let value = dataframe.properties[name][index];
-            if (decodeCategories && dataframe.metadata.properties[name].type === 'category') {
-                value = dataframe.metadata.IDToCategory.get(value);
-            }
-            feature[name] = value;
+            feature[name] = dataframe.properties[name][index];
         }
         return feature;
     }

@@ -65,11 +65,26 @@ export class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg() {
+    _resetViewportAgg(metadata) {
+        this._metadata = metadata;
+        this._columns = this._getMinimumNeededSchema().columns;
         this.expr = [];
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(feature);
+        this.expr.push(_adaptFeature(feature, this._columns, this._metadata));
     }
+}
+
+function _adaptFeature(feature, propertyNames, metadata) {
+    const adaptedFeature = {};
+    for (let i = 0; i < propertyNames.length; i++) {
+        const name = propertyNames[i];
+        let value = feature[name];
+        if (metadata.properties[name].type === 'category') {
+            value = metadata.IDToCategory.get(value);
+        }
+        adaptedFeature[name] = value;
+    }
+    return adaptedFeature;
 }
