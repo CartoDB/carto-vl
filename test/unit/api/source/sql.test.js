@@ -1,6 +1,6 @@
-import SQL from '../../../../src/api/source/sql';
+import SQL from '../../../../src/sources/Sql';
 
-describe('api/source/sql', () => {
+describe('sources/sql', () => {
     const query = 'SELECT * from table0';
     const auth = {
         user: 'test',

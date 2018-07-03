@@ -1,7 +1,7 @@
-import Dataset from '../../../src/api/source/dataset';
-import Viz from '../../../src/api/viz';
-import Layer from '../../../src/api/layer';
 import Interactivity from '../../../src/api/interactivity';
+import Layer from '../../../src/api/layer';
+import Viz from '../../../src/api/viz';
+import Dataset from '../../../src/sources/Dataset';
 
 describe('api/interactivity', () => {
     describe('constructor', () => {

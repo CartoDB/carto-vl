@@ -1,6 +1,6 @@
-import Dataset from '../../../../src/api/source/dataset';
+import Dataset from '../../../../src/sources/Dataset';
 
-describe('api/source/dataset', () => {
+describe('sources/dataset', () => {
     const tableName = 'table0';
     const auth = {
         user: 'test',

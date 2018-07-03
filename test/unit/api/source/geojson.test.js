@@ -1,6 +1,6 @@
-import GeoJSON from '../../../../src/api/source/geojson';
+import GeoJSON from '../../../../src/sources/Geojson';
 
-describe('api/source/geojson', () => {
+describe('sources/geojson', () => {
 
 
     const createVizMock = (columns = []) => {

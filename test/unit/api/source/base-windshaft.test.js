@@ -1,6 +1,6 @@
-import SourceBase from '../../../../src/api/source/base-windshaft';
+import SourceBase from '../../../../src/sources/BaseWindshaft';
 
-describe('api/source/base-windshaft', () => {
+describe('sources/base-windshaft', () => {
     const auth = {
         user: 'test',
         apiKey: '1234567890'

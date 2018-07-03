@@ -1,5 +1,5 @@
 
-describe('api/source/mvt', () => {
+describe('sources/mvt', () => {
     describe('constructor', () => {
     });
 });
