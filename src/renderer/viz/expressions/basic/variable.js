@@ -48,14 +48,16 @@ export default function variable(name) {
             throw new Error(`variable() name '${name}' doesn't exist`);
         }
     };
-    const _getDependencies = ()=>{
-        return alias;
+    const _getDependencies = () => {
+        return [alias];
     };
     let aliaser = {
         set: (obj, prop, value) => {
             if (prop == 'parent') {
                 obj[prop] = value;
-            } else if (alias && alias[prop]) {
+            } else if (prop == 'notify') {
+                return obj[prop];
+            } else if(alias && alias[prop]) {
                 alias[prop] = value;
             } else {
                 return false;
@@ -68,6 +70,8 @@ export default function variable(name) {
                 return resolve;
             } else if (prop == '_getDependencies') {
                 return _getDependencies;
+            } else if (prop == 'notify') {
+                return obj[prop];
             }
             if (alias && alias[prop]) {
                 if (isFunction(alias[prop])) {
