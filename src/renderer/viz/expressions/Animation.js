@@ -6,6 +6,9 @@ import Property from './basic/property';
 import Variable from './basic/variable';
 import { castDate } from '../../../utils/util';
 
+let waitingForLayer = new Set();
+let waitingForOthers = new Set();
+
 /**
  * Create an animated temporal filter (animation).
  *
@@ -93,7 +96,46 @@ export class Animation extends BaseExpression {
         return !this.paused;
     }
 
+    _dataReady() {
+        if (waitingForLayer.has(this)) {
+            waitingForLayer.delete(this);
+            waitingForOthers.add(this);
+        }
+        if (waitingForOthers.has(this)) {
+            waitingForLayer = new Set([...waitingForLayer].filter(expr => {
+                while (expr.parent) {
+                    expr = expr.parent;
+                }
+                if (expr._getRootExpressions) {
+                    // The animation hasn't been removed from the viz
+                    return true;
+                }
+                return false;
+            }));
+            if (waitingForLayer.size > 0) {
+                return;
+            }
+            [...waitingForOthers.values()].map(anim => {
+                if (anim._paused === 'default') {
+                    anim.play();
+                }
+            });
+            waitingForOthers.clear();
+        }
+    }
+
+    _postShaderCompile(program, gl) {
+        waitingForLayer.add(this);
+        this._paused = 'default';
+        super._postShaderCompile(program, gl);
+    }
+
     _setTimestamp(timestamp) {
+        super._setTimestamp(timestamp);
+
+        if (this._paused && this._lastTime === undefined) {
+            return;
+        }
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -108,8 +150,6 @@ export class Animation extends BaseExpression {
         }
 
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
-
-        super._setTimestamp(timestamp);
     }
 
     eval(feature) {
@@ -178,7 +218,7 @@ export class Animation extends BaseExpression {
 
     /**
      * Get the animation progress.
-     * 
+     *
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
@@ -199,7 +239,7 @@ export class Animation extends BaseExpression {
      */
     setProgressPct(progress) {
         progress = Number.parseFloat(progress);
-        
+
         if (progress < 0 || progress > 1) {
             throw new TypeError(`animation.setProgressPct requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
@@ -263,10 +303,10 @@ export class Animation extends BaseExpression {
         this.preface = `
             #ifndef ANIMATION
             #define ANIMATION
-            
+
             float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
                 float x = 0.;
-                
+
                 // Check for NaN
                 if (_input <= 0.0 || 0.0 <= _input){
                     x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
