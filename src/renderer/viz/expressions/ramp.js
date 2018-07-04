@@ -210,7 +210,7 @@ export default class Ramp extends BaseExpression {
             ? this._getSubPalettes(input, palette)
             : palette.getLongestSubPalette();
 
-        return _needsToRemoveOtherCategory(input, palette, colors)
+        return input.numCategories > colors.length
             ? _removeOtherFromColors(colors)
             : colors;
     }
@@ -218,21 +218,17 @@ export default class Ramp extends BaseExpression {
     _getColorsFromColorArrayType (input, palette) {
         const otherColor = this.defaultOtherColor.eval();
 
-        return input.numCategories -1 < palette.colors.length
-            ? _checkColorInterpolation(input.numCategories, palette.colors, input, otherColor)
+        return this.maxKey < palette.colors.length
+            ? _checkColorInterpolation(input.numCategories, palette.colors, otherColor)
             : _addOtherColorToColors(palette.colors, otherColor, input);
     }
 
     _getSubPalettes(input, palette) {
-        const subPaletteNumber = palette.isQualitative() && palette.colors && input.numCategories >= palette.colors.length
-            ? input.numCategories
-            : this.maxKey;
-
-        const colors = palette.subPalettes[subPaletteNumber]
-            ? palette.subPalettes[subPaletteNumber]
+        const colors = palette.subPalettes[this.maxKey]
+            ? palette.subPalettes[this.maxKey]
             : palette.getLongestSubPalette();
         
-        return palette.isQuantitative() && input.numCategories > colors.length
+        return input.numCategories > colors.length
             ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval(), input)
             : colors;
     }
@@ -374,10 +370,10 @@ function _removeOtherFromColors (colors) {
 }
 
 function _addOtherColorToColors (colors, otherColor, input) {
-    return input.isBuckets ? [...colors, otherColor] : colors;
+    return input.type === inputTypes.CATEGORY ? [...colors, otherColor] : colors;
 }
 
-function _avoidInterpolation(numCategories, colors, input, otherColor) {
+function _avoidInterpolation(numCategories, colors, otherColor) {
     const colorArray = [];
     const colorForRemainingCategories = colors[numCategories - 1]
         ? colors[numCategories - 1]
@@ -394,12 +390,8 @@ function _avoidInterpolation(numCategories, colors, input, otherColor) {
     return colorArray;
 }
 
-function _checkColorInterpolation(numCategories, colors, input, otherColor) {
-    return numCategories -1 < colors.length
-        ? _avoidInterpolation(numCategories, colors, input, otherColor)
+function _checkColorInterpolation(numCategories, colors, otherColor) {
+    return numCategories < colors.length
+        ? _avoidInterpolation(numCategories, colors, otherColor)
         : colors;
-}
-
-function _needsToRemoveOtherCategory (input, palette, colors) {
-    return palette.isQualitative() && input.isBuckets && input.numCategories > colors.length;
 }
