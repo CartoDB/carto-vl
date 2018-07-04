@@ -68,13 +68,11 @@ let waitingForOthers = new Set();
 export class Animation extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
-        let originalInput = input;
+        input = implicitCast(input);
+        const originalInput = input;
 
-        if (input.valueOf() instanceof Property) {
+        if (input.isA(Property)) {
             input = linear(input, globalMin(input), globalMax(input));
-        } else {
-            input = implicitCast(input);
-            originalInput = input;
         }
 
         checkLooseType('animation', 'input', 0, 'number', input);
