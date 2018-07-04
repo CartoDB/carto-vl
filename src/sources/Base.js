@@ -17,4 +17,52 @@ export default class Base {
      */
     constructor() {
     }
+
+    /**
+     * Connects a source with a layer setting callbacks
+     * @abstract
+     */
+    bindLayer() {
+
+    }
+
+    /**
+     * Get the metadata for the source
+     * @abstract
+     */
+    requestMetadata() {
+
+    }
+
+    /**
+     * Get the data, generates dataframes and call dataLoaded when complete
+     * @abstract
+     */
+    requestData() {
+
+    }
+
+    /**
+     * Check if the availiable metadata is suitable for the given Viz
+     * @abstract
+     */
+    requiresNewMetadata() {
+
+    }
+
+    /**
+     * Removes all dataframes and clears caches
+     * @abstract
+     */
+    free() {
+
+    }
+
+    /**
+     * Creates a new equal source
+     * @abstract
+     */
+    clone() {
+
+    }
 }
