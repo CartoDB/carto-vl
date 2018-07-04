@@ -1,0 +1,25 @@
+## Introduction to Sprites
+
+### Built-in sprites
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5jb2xvcjogcmdiKDIwNCwwLDApXG5zeW1ib2w6IGNyb3NzIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
+
+### External sprites
+http://127.0.0.1:8080/examples/styling/sprite.html
+
+(crossOrigin)
+
+### Matching categories with sprites
+http://127.0.0.1:8080/examples/styling/multiple-sprites.html
+
+
+### Sprite placement
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlciIsImYiOnsibG5nIjoyLjE2NzYwNjQ1ODgxMTE3ODUsImxhdCI6NDEuNDA4MDEzMzc2NzQyMjV9LCJnIjoxNy4wNDI5MjMzNjE0MTkyMSwiaCI6IlZveWFnZXIifQ==
+
+### Coloring sprites
+
+#### Overriding sprite color
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlclxuY29sb3I6IHdoaXRlIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
+
+#### Modifying sprite color
+
+Flowers??
