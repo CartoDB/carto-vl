@@ -70,7 +70,7 @@ export class Animation extends BaseExpression {
         duration = implicitCast(duration);
         let originalInput = input;
 
-        if (input instanceof Property) {
+        if (input.isA(Property)) {
             input = linear(input, globalMin(input), globalMax(input));
         } else {
             input = implicitCast(input);
