@@ -6,6 +6,8 @@ const metadata = new Metadata({
     properties: {
         number: {
             type: 'number',
+            min: 0,
+            max: 10,
         },
         category: {
             type: 'category',
@@ -29,7 +31,7 @@ export function validateFeatureDependentErrors(expressionName, argTypes) {
         const args = argTypes.map(type => type == 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
-            v.alias = s.property('wadus');
+            v._resolveAliases({var1: s.property('wadus')});
             expect(() =>
                 expr._compile({
                     properties: {
