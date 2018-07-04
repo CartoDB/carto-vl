@@ -129,48 +129,27 @@ describe('api/layer', () => {
     describe('.addTo', () => {
         describe('._addToMGLMap', () => {
             let layer;
+
+            const loadEvent = {};
+            
+            const mapMock = {
+                isStyleLoaded: jasmine.createSpy('isStyleLoaded').and.returnValue(true),
+                on: (id, callback) => {
+                    if (id === 'load') {
+                        callback.call(layer, loadEvent);
+                    }
+                }
+            };
+
             beforeEach(() => {
                 layer = new Layer('layer0', source, viz);
-                layer._onMapLoaded = () => { };
+                layer._onMapLoaded = () => {};
                 spyOn(layer, '_onMapLoaded');
             });
 
             it('should call onMapLoaded when the map is loaded', () => {
-                const mapMock = { isStyleLoaded: () => true };
                 layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
-            });
-
-            it('should not call onMapLoaded when the map is not loaded', () => {
-                const mapMock = { isStyleLoaded: () => false, on: () => { } };
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).not.toHaveBeenCalled();
-            });
-
-            it('should call onMapLoaded when the map `load` event is triggered', () => {
-                const mapMock = {
-                    isStyleLoaded: () => false,
-                    on: (id, callback) => {
-                        if (id === 'load') {
-                            callback();
-                        }
-                    }
-                };
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalledWith(mapMock, undefined);
-            });
-
-            it('should not call onMapLoaded when other the map event is triggered', () => {
-                const mapMock = {
-                    isStyleLoaded: () => false,
-                    on: (id, callback) => {
-                        if (id === 'other') {
-                            callback();
-                        }
-                    }
-                };
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).not.toHaveBeenCalled();
+                expect(layer._onMapLoaded).toHaveBeenCalled();
             });
         });
     });
