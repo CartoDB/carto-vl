@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
-import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
+import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
 import { NamedColor } from './color/NamedColor';
 
@@ -22,7 +22,7 @@ const inputTypes = {
 };
 
 const COLOR_ARRAY_LENGTH = 256;
-const COLOR_VALUES = COLOR_ARRAY_LENGTH - 1;
+const MAX_BYTE_VALUE = 255;
 
 
 /**
@@ -141,13 +141,13 @@ export default class Ramp extends BaseExpression {
     }
     
     _getColorValue(pixelValues, m) {
-        const index = Math.round(m * COLOR_VALUES);
+        const index = Math.round(m * MAX_BYTE_VALUE);
 
         return {
             r: Math.round(pixelValues[index * 4 + 0]),
             g: Math.round(pixelValues[index * 4 + 1]),
             b: Math.round(pixelValues[index * 4 + 2]),
-            a: Math.round(pixelValues[index * 4 + 3]) / COLOR_VALUES
+            a: Math.round(pixelValues[index * 4 + 3]) / MAX_BYTE_VALUE
         };
     }
     
@@ -200,66 +200,10 @@ export default class Ramp extends BaseExpression {
             return palette.colors;
         }
 
+        const othersColor = this.defaultOtherColor.eval();
         return palette.type === paletteTypes.PALETTE
-            ? this._getColorsFromPaletteType(input, palette)
-            : this._getColorsFromColorArrayType(input, palette);
-    }
-
-    _getColorsFromPaletteType (input, palette) {
-        let colors = input.numCategories
-            ? this._getSubPalettes(input, palette)
-            : palette.getLongestSubPalette();
-
-        return input.numCategories > colors.length
-            ? _removeOtherFromColors(colors)
-            : colors;
-    }
-
-    _getColorsFromColorArrayType (input, palette) {
-        return input.type === inputTypes.CATEGORY
-            ? this._getColorsFromColorArrayTypeCategorical(this.maxKey, palette.colors)
-            : this._getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
-    }
-
-    _getColorsFromColorArrayTypeCategorical(numCategories, colors) {        
-        let otherColor;
-
-        if (numCategories < colors.length) {
-            otherColor = colors[numCategories];
-        } 
-
-        if (numCategories >= colors.length) {
-            otherColor = this.defaultOtherColor.eval();
-            colors = _addOtherColorToColors(colors, otherColor);
-        }
-        
-        return _avoidInterpolation(numCategories, colors, otherColor);
-    }
-
-    _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
-        let otherColor;
-        
-        if (numCategories < colors.length) {
-            otherColor = colors[numCategories];
-            return _avoidInterpolation(numCategories, colors, otherColor);
-        } 
-
-        if (numCategories === colors.length) {
-            otherColor = colors[colors.length - 1];
-            return _avoidInterpolation(numCategories, colors, otherColor);
-        }
-        
-        return colors;
-    }
-
-    _getSubPalettes(input, palette) {
-        const colors = palette.subPalettes[this.maxKey]
-            ? palette.subPalettes[this.maxKey]
-            : palette.getLongestSubPalette();
-        
-        return input.numCategories > colors.length
-            ? _addOtherColorToColors(colors,  this.defaultOtherColor.eval(), input)
-            : colors;
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, othersColor)
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, othersColor);
     }
     
     _postShaderCompile(program, gl) {
@@ -294,19 +238,19 @@ export default class Ramp extends BaseExpression {
     _computeTextureColor() {
         const pixelValues = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
-        
+
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
             const vlowRaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
             const vhighRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vlow = [vlowRaw.r / COLOR_VALUES, vlowRaw.g / COLOR_VALUES, vlowRaw.b / COLOR_VALUES, vlowRaw.a];
-            const vhigh = [vhighRaw.r / COLOR_VALUES, vhighRaw.g / COLOR_VALUES, vhighRaw.b / COLOR_VALUES, vhighRaw.a];
+            const vlow = [vlowRaw.r / MAX_BYTE_VALUE, vlowRaw.g / MAX_BYTE_VALUE, vlowRaw.b / MAX_BYTE_VALUE, vlowRaw.a];
+            const vhigh = [vhighRaw.r / MAX_BYTE_VALUE, vhighRaw.g / MAX_BYTE_VALUE, vhighRaw.b / MAX_BYTE_VALUE, vhighRaw.a];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
             const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
-            pixelValues[4 * i + 0] = Math.round(v.r * COLOR_VALUES);
-            pixelValues[4 * i + 1] = Math.round(v.g * COLOR_VALUES);
-            pixelValues[4 * i + 2] = Math.round(v.b * COLOR_VALUES);
-            pixelValues[4 * i + 3] = Math.round(v.a * COLOR_VALUES);
+            pixelValues[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
+            pixelValues[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);
+            pixelValues[4 * i + 2] = Math.round(v.b * MAX_BYTE_VALUE);
+            pixelValues[4 * i + 3] = Math.round(v.a * MAX_BYTE_VALUE);
         }
 
         return pixelValues;
@@ -317,9 +261,9 @@ export default class Ramp extends BaseExpression {
         const floats = this.palette.floats;
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vlowRaw = floats[Math.floor(i / COLOR_VALUES * (floats.length - 1))];
-            const vhighRaw = floats[Math.ceil(i / COLOR_VALUES * (floats.length - 1))];
-            const m = i / COLOR_VALUES * (floats.length - 1) - Math.floor(i / COLOR_VALUES * (floats.length - 1));
+            const vlowRaw = floats[Math.floor(i / MAX_BYTE_VALUE * (floats.length - 1))];
+            const vhighRaw = floats[Math.ceil(i / MAX_BYTE_VALUE * (floats.length - 1))];
+            const m = i / MAX_BYTE_VALUE * (floats.length - 1) - Math.floor(i / MAX_BYTE_VALUE * (floats.length - 1));
             pixelValues[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
@@ -369,29 +313,61 @@ export default class Ramp extends BaseExpression {
     }
 }
 
-function interpolate(low, high, m) {
-    const cielabLow = sRGBToCielab({
-        r: low.r,
-        g: low.g,
-        b: low.b,
-        a: low.a,
-    });
+function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
+    let colors = input.numCategories
+        ? _getSubPalettes(input, palette, numCategories, othersColor)
+        : palette.getLongestSubPalette();
+
+    return input.numCategories > colors.length
+        ? _removeOtherFromColors(colors)
+        : colors;
+}
+
+function _getSubPalettes(input, palette, numCategories, othersColor) {
+    const colors = palette.subPalettes[numCategories]
+        ? palette.subPalettes[numCategories]
+        : palette.getLongestSubPalette();
     
-    const cielabHigh = sRGBToCielab({
-        r: high.r,
-        g: high.g,
-        b: high.b,
-        a: high.a,
-    });
+    return input.numCategories > colors.length
+        ? _addOtherColorToColors(colors, othersColor)
+        : colors;
+}
 
-    const cielabInterpolated = {
-        l: (1 - m) * cielabLow.l + m * cielabHigh.l,
-        a: (1 - m) * cielabLow.a + m * cielabHigh.a,
-        b: (1 - m) * cielabLow.b + m * cielabHigh.b,
-        alpha: (1 - m) * cielabLow.alpha + m * cielabHigh.alpha,
-    };
+function _getColorsFromColorArrayTypeCategorical(numCategories, colors, othersColor) {
+    let otherColor;
 
-    return cielabToSRGB(cielabInterpolated);
+    if (numCategories < colors.length) {
+        otherColor = colors[numCategories];
+    } 
+
+    if (numCategories >= colors.length) {
+        otherColor = othersColor;
+        colors = _addOtherColorToColors(colors, otherColor);
+    }
+    
+    return _avoidShowingInterpolation(numCategories, colors, otherColor);
+}
+
+function _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
+    let otherColor;
+    
+    if (numCategories < colors.length) {
+        otherColor = colors[numCategories];
+        return _avoidShowingInterpolation(numCategories, colors, otherColor);
+    } 
+
+    if (numCategories === colors.length) {
+        otherColor = colors[colors.length - 1];
+        return _avoidShowingInterpolation(numCategories, colors, otherColor);
+    }
+    
+    return colors;
+}
+
+function _getColorsFromColorArrayType(input, palette, numCategories, othersColor) {
+    return input.type === inputTypes.CATEGORY
+        ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
+        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
 }
 
 function _removeOtherFromColors (colors) {
@@ -402,7 +378,7 @@ function _addOtherColorToColors (colors, otherColor) {
     return [...colors, otherColor];
 }
 
-function _avoidInterpolation(numCategories, colors, othersColor) {
+function _avoidShowingInterpolation(numCategories, colors, othersColor) {
     const colorArray = [];
 
     for (let i = 0; i < colors.length; i++) {

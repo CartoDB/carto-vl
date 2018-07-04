@@ -7,6 +7,31 @@ export function cielabToSRGB(cielab) {
     return XYZToSRGB(cielabToXYZ(cielab));
 }
 
+export function interpolate(low, high, m) {
+    const cielabLow = sRGBToCielab({
+        r: low.r,
+        g: low.g,
+        b: low.b,
+        a: low.a,
+    });
+    
+    const cielabHigh = sRGBToCielab({
+        r: high.r,
+        g: high.g,
+        b: high.b,
+        a: high.a,
+    });
+
+    const cielabInterpolated = {
+        l: (1 - m) * cielabLow.l + m * cielabHigh.l,
+        a: (1 - m) * cielabLow.a + m * cielabHigh.a,
+        b: (1 - m) * cielabLow.b + m * cielabHigh.b,
+        alpha: (1 - m) * cielabLow.alpha + m * cielabHigh.alpha,
+    };
+
+    return cielabToSRGB(cielabInterpolated);
+}
+
 
 // Following functionality has been inspired by http://www.getreuer.info/home/colorspace
 // License:
@@ -35,6 +60,7 @@ function sRGBToXYZ(srgb) {
         a
     };
 }
+
 function sRGBToLinearRGB({ r, g, b, a }) {
     // http://en.wikipedia.org/wiki/SRGB
     const inverseGammaCorrection = t =>
