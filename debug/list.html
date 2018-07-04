@@ -53,10 +53,11 @@
 
     const source = new carto.source.Dataset('walmarts');
     let viz = new carto.Viz(`
-      @list: viewportFeatures($zip, $sttext)
+      @number: $zip
+      @list: viewportFeatures(@number, $sttext)
       @anotheList: viewportFeatures($zip)
-      width: 20
-      filter: $zip > 50000
+      width: 20 // + 0*@number
+      // filter: $zip > 50000
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
