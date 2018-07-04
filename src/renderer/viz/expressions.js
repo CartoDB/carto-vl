@@ -219,7 +219,7 @@ import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
 
-import Variable from './expressions/basic/variable';
+import variableFn from './expressions/basic/variable';
 
 import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
@@ -348,7 +348,7 @@ export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
 export const sprites = (...args) => new Sprites(...args);
 
-export const variable = (...args) => new Variable(...args);
+export const variable = (...args) => variableFn(...args);
 export { variable as var };
 
 export const viewportAvg = (...args) => new ViewportAvg(...args);

@@ -170,6 +170,9 @@ function generateGlobalAggregattion(metadataPropertyName) {
             this.property._compile(metadata);
             this.type = 'number';
             super.inlineMaker = inline => inline._value;
+            if (metadata.properties[this.property.name][metadataPropertyName] === undefined){
+                throw new Error(`Metadata ${metadataPropertyName} for property ${this.property.name} is not defined`);
+            }
             this._value.expr = metadata.properties[this.property.name][metadataPropertyName];
         }
         _getMinimumNeededSchema() {
