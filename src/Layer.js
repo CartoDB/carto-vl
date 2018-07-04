@@ -154,7 +154,7 @@ export default class Layer {
     async update(source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
-        source = source._clone();
+        source = source.clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         const loadSpritesPromise = viz.loadSprites();

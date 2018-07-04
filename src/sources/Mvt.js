@@ -55,7 +55,7 @@ export default class MVT extends Base {
         this._layerID = layerId;
     }
 
-    _clone() {
+    clone() {
         return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._layerID);
     }
 
