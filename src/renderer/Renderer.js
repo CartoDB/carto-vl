@@ -253,7 +253,7 @@ export default class Renderer {
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: 1 / this._zoom / 1024 * gl.drawingBufferHeight / (window.devicePixelRatio || 1), // Used by zoom expression
+            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)), // Used by zoom expression
         };
 
         if (!tiles.length) {
