@@ -7,6 +7,9 @@ import Metadata from '../renderer/Metadata';
 import { RTT_WIDTH } from '../renderer/Renderer';
 import Base from './Base';
 import TileClient from './TileClient';
+import DataframeCache from './DataframeCache';
+import { add } from '../renderer/viz/expressions';
+
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -53,6 +56,10 @@ export default class MVT extends Base {
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
         this._layerID = layerId;
+
+        this._requestGroupID = 0;
+        this._oldDataframes = [];
+        this._cache = new DataframeCache();
     }
 
     clone() {
@@ -60,7 +67,8 @@ export default class MVT extends Base {
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
-        this._tileClient.bindLayer(addDataframe, dataLoadedCallback);
+        this._addDataframe = addDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     async requestMetadata() {
@@ -68,7 +76,43 @@ export default class MVT extends Base {
     }
 
     requestData(viewport) {
-        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this));
+        const tiles = rsys.rTiles(viewport);
+        this._getTiles(tiles);
+    }
+
+    _getTiles(tiles) {
+        this._requestGroupID++;
+        let completedTiles = [];
+        let needToComplete = tiles.length;
+        const requestGroupID = this._requestGroupID;
+        tiles.forEach(async ({ x, y, z }) => {
+            let dataframePromise;
+            if (this._cache.get(`${x},${y},${z}`)) {
+                dataframePromise = this._cache.get(`${x},${y},${z}`);
+            } else {
+                dataframePromise = this._requestDataframe(x, y, z);
+            }
+
+            const dataframe = await dataframePromise;
+            dataframe.empty ? needToComplete-- : completedTiles.push(dataframe);
+
+            if (completedTiles.length == needToComplete && requestGroupID == this._requestGroupID) {
+                this._oldDataframes.map(d => d.active = false);
+                completedTiles.map(d => d.active = true);
+                this._oldDataframes = completedTiles;
+                this._dataLoadedCallback();
+            }
+        });
+    }
+
+    async _requestDataframe(x, y, z) {
+        const response = await this._tileClient.getTile(x, y, z);
+        const dataframe = await this.responseToDataframeTransformer(response, x, y, z);
+        this._cache.set(`${x},${y},${z}`, Promise.resolve(dataframe));
+        if (!dataframe.empty) {
+            this._addDataframe(dataframe);
+        }
+        return dataframe;
     }
 
     async responseToDataframeTransformer(response, x, y, z) {
@@ -92,7 +136,6 @@ export default class MVT extends Base {
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
         const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, this._metadata.geomType);
-
         return dataframe;
     }
 
