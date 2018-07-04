@@ -378,9 +378,15 @@ export default class Layer {
     }
 
     _addToMGLMap(map, beforeLayerID) {
+        const STYLE_ERROR_REGEX = /Style is not done loading/;
+
         try {
             this._onMapLoaded(map, beforeLayerID);
         } catch (error) {
+            if (!STYLE_ERROR_REGEX.test(error)) {
+                throw new Error(error);
+            }
+
             map.on('load', () => {
                 this._onMapLoaded(map, beforeLayerID);
             });
