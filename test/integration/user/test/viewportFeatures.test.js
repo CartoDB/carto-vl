@@ -47,7 +47,8 @@ describe('viewportFeatures', () => {
 
         source2 = new carto.source.GeoJSON(features);
         viz2 = new carto.Viz(`
-            @list2all: viewportFeatures($value,$category,$id)
+            @cat: $category
+            @list2all: viewportFeatures($value,@cat,$id)
             @list2value: viewportFeatures($value)
         `);
         layer2 = new carto.Layer('layer2', source2, viz2);
@@ -81,14 +82,6 @@ describe('viewportFeatures', () => {
             expect(viz2.variables.list2value.eval()).toEqual(expectedValue);
             done();
         });
-    });
-
-    it ('should return an error if viewportFeatures arguments are not all properties', done => {
-        const s = carto.expressions;
-        expect(
-            () => s.viewportFeatures(s.prop('id'), s.constant(11))
-        ).toThrowError(/arguments can only be properties/);
-        done();
     });
 });
 
@@ -191,5 +184,34 @@ describe('viewportFeatures on a zoomed-in map', () => {
             expect(viz2.variables.list2value.eval()).toEqual(expectedValue);
             done();
         });
+    });
+});
+
+describe('viewportFeatures with invalid parameters', () => {
+    let map, source, viz, layer;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        map = setup.map;
+
+        source = new carto.source.GeoJSON(features);
+        viz = new carto.Viz(`
+            @list: viewportFeatures($value,$category,11)
+        `);
+        layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map);
+
+    });
+
+    it ('should fail with proper error', done => {
+        expect(
+            () => {
+                // FIXME: this isn't nice (calling the private method _resetViewportAgg to force the check here)
+                // but, how to avoid the exception happening asynchronously?
+                viz.variables.list._resetViewportAgg()
+            }
+        ).toThrowError(/arguments can only be properties/);
+        done();
     });
 });
