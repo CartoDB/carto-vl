@@ -253,7 +253,7 @@ export default class Renderer {
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: 1 / this._zoom, // Used by zoom expression
+            zoom: 1 / this._zoom / 1024 * gl.drawingBufferHeight / (window.devicePixelRatio || 1), // Used by zoom expression
         };
 
         if (!tiles.length) {
@@ -272,7 +272,7 @@ export default class Renderer {
 
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);
-            
+
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -296,7 +296,7 @@ export default class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        
+
         tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
         tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
         tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
