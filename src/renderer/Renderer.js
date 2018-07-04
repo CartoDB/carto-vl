@@ -157,6 +157,10 @@ export default class Renderer {
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
 
+        if (!viewportExpressions.length) {
+            return;
+        }
+
         // Assume that all dataframes of a renderLayer share the same metadata
         const metadata = dataframes.length ? dataframes[0].metadata : {};
 
@@ -255,6 +259,7 @@ export default class Renderer {
         if (!tiles.length) {
             return;
         }
+        viz._getRootExpressions().map(expr => expr._dataReady());
 
         gl.enable(gl.CULL_FACE);
         gl.disable(gl.BLEND);

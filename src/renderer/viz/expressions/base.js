@@ -45,6 +45,10 @@ export default class Base {
         this._getChildren().map(child => child._setUID(idGenerator));
     }
 
+    _dataReady(){
+        this._getChildren().map(child => child._dataReady());
+    }
+
     isFeatureDependent() {
         return this._getChildren().some(child => child.isFeatureDependent());
     }

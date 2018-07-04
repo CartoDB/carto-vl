@@ -1,5 +1,5 @@
 import { version } from '../../package';
-import MVT from '../api/source/mvt';
+import MVT from '../sources/Mvt';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
