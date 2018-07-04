@@ -381,7 +381,9 @@ export default class Layer {
         try {
             this._onMapLoaded(map, beforeLayerID);
         } catch (error) {
-            map.on('load', this._onMapLoaded.bind(this));
+            map.on('load', () => {
+                this._onMapLoaded(map, beforeLayerID);
+            });
         }
     }
 
