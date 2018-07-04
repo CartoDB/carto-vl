@@ -216,11 +216,40 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromColorArrayType (input, palette) {
-        const otherColor = this.defaultOtherColor.eval();
+        return input.type === inputTypes.CATEGORY
+            ? this._getColorsFromColorArrayTypeCategorical(this.maxKey, palette.colors)
+            : this._getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
+    }
 
-        return this.maxKey < palette.colors.length
-            ? _checkColorInterpolation(input.numCategories, palette.colors, otherColor)
-            : _addOtherColorToColors(palette.colors, otherColor, input);
+    _getColorsFromColorArrayTypeCategorical(numCategories, colors) {        
+        let otherColor;
+
+        if (numCategories < colors.length) {
+            otherColor = colors[numCategories];
+        } 
+
+        if (numCategories >= colors.length) {
+            otherColor = this.defaultOtherColor.eval();
+            colors = _addOtherColorToColors(colors, otherColor);
+        }
+        
+        return _avoidInterpolation(numCategories, colors, otherColor);
+    }
+
+    _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
+        let otherColor;
+        
+        if (numCategories < colors.length) {
+            otherColor = colors[numCategories];
+            return _avoidInterpolation(numCategories, colors, otherColor);
+        } 
+
+        if (numCategories === colors.length) {
+            otherColor = colors[colors.length - 1];
+            return _avoidInterpolation(numCategories, colors, otherColor);
+        }
+        
+        return colors;
     }
 
     _getSubPalettes(input, palette) {
@@ -369,29 +398,20 @@ function _removeOtherFromColors (colors) {
     return colors.slice(0, colors.length - 1);
 }
 
-function _addOtherColorToColors (colors, otherColor, input) {
-    return input.type === inputTypes.CATEGORY ? [...colors, otherColor] : colors;
+function _addOtherColorToColors (colors, otherColor) {
+    return [...colors, otherColor];
 }
 
-function _avoidInterpolation(numCategories, colors, otherColor) {
+function _avoidInterpolation(numCategories, colors, othersColor) {
     const colorArray = [];
-    const colorForRemainingCategories = colors[numCategories - 1]
-        ? colors[numCategories - 1]
-        : otherColor;
 
     for (let i = 0; i < colors.length; i++) {
-        if (i < numCategories - 1) {
+        if (i < numCategories) {
             colorArray.push(colors[i]);
-        } else if (i === colors.length - 1) {
-            colorArray.push(colorForRemainingCategories);
+        } else if (i === numCategories) {
+            colorArray.push(othersColor);
         }
     }
 
     return colorArray;
-}
-
-function _checkColorInterpolation(numCategories, colors, otherColor) {
-    return numCategories < colors.length
-        ? _avoidInterpolation(numCategories, colors, otherColor)
-        : colors;
 }
