@@ -1,5 +1,4 @@
 import BaseExpression from './base';
-import * as schema from '../../../renderer/schema';
 import Property from './basic/property';
 import { implicitCast } from './utils';
 
@@ -64,7 +63,6 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg(metadata) {
-        const p = Property;
         if (this._requiredProperties.some(p => !(p.valueOf() instanceof Property))) {
             throw new Error('viewportFeatures arguments can only be properties');
         }
