@@ -325,9 +325,12 @@ function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
         othersColor = colors[numCategories];
     }
 
-    return _isClassifier(input) // FIXME change to input.isA(Classifier) when merged
-        ? _avoidShowingInterpolation(numCategories, colors, othersColor)
-        : colors;
+    if (_isClassifier(input)) {// FIXME change to input.isA(Classifier) when merged
+        colors = _getSubPalettes(palette, input.numCategories);
+        othersColor = colors[numCategories];
+    }
+
+    return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
 
 function _getSubPalettes(palette, numCategories) {
@@ -384,7 +387,6 @@ function _addOtherColorToColors (colors, otherColor) {
 }
 
 function _avoidShowingInterpolation(numCategories, colors, othersColor) {
-    console.log('!!!', othersColor);
     const colorArray = [];
 
     for (let i = 0; i < colors.length; i++) {
@@ -394,8 +396,6 @@ function _avoidShowingInterpolation(numCategories, colors, othersColor) {
             colorArray.push(othersColor);
         }
     }
-
-    console.log('!!!', colorArray);
 
     return colorArray;
 }
