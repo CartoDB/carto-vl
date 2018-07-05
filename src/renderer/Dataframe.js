@@ -117,6 +117,12 @@ export default class Dataframe {
             gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.normals, gl.STATIC_DRAW);
         }
 
+        if (this.decodedGeom.bLine) {
+            this.bBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.bBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.bLine, gl.STATIC_DRAW);
+        }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }

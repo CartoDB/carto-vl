@@ -272,7 +272,7 @@ export default class Renderer {
 
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);
-            
+
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -296,7 +296,7 @@ export default class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        
+
         tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
         tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
         tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
@@ -434,6 +434,11 @@ export default class Renderer {
                 gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
                 freeTexUnit++;
             }
+            if (tile.type == 'line'){
+                gl.enableVertexAttribArray(renderer.lineBAttr);
+                gl.bindBuffer(gl.ARRAY_BUFFER, tile.bBuffer);
+                gl.vertexAttribPointer(renderer.lineBAttr, 2, gl.FLOAT, false, 0, 0);
+            }
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
@@ -441,6 +446,9 @@ export default class Renderer {
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (tile.type == 'line' || tile.type == 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
+            }
+            if (tile.type == 'line'){
+                gl.disableVertexAttribArray(renderer.lineBAttr);
             }
         });
         orderingMins.map((_, orderingIndex) => {

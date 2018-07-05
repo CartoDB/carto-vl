@@ -8,6 +8,7 @@ export default class LineShader {
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
         this.normalAttr = gl.getAttribLocation(this.program, 'normal');
+        this.lineBAttr = gl.getAttribLocation(this.program, 'vertexB');
         this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
         this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
         this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');

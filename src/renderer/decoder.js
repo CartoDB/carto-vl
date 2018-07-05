@@ -118,6 +118,7 @@ function decodePolygon(geometry) {
 function decodeLine(geom) {
     let vertices = [];
     let normals = [];
+    let bline = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geom.map(feature => {
         feature.map(lineString => {
@@ -149,6 +150,10 @@ function decodeLine(geom) {
                 vertices.push(a[0], a[1]);
                 vertices.push(b[0], b[1]);
 
+                bline.push(b[0], b[1]);
+                bline.push(b[0], b[1]);
+                bline.push(a[0], a[1]);
+
                 // Second triangle
 
                 normals.push(na[0], na[1]);
@@ -158,6 +163,10 @@ function decodeLine(geom) {
                 vertices.push(a[0], a[1]);
                 vertices.push(b[0], b[1]);
                 vertices.push(b[0], b[1]);
+
+                bline.push(b[0], b[1]);
+                bline.push(a[0], a[1]);
+                bline.push(a[0], a[1]);
             }
         });
         breakpoints.push(vertices.length);
@@ -165,7 +174,8 @@ function decodeLine(geom) {
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: new Float32Array(normals),
+        bLine: new Float32Array(bline)
     };
 }
 
