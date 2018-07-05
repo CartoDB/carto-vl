@@ -1,5 +1,4 @@
 import { version } from '../../package';
-import MVT from '../sources/Mvt';
 import MvtClient from '../sources/MvtClient';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
