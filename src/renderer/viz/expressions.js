@@ -176,7 +176,7 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import { NamedColor } from './expressions/color/NamedColor';
+import NamedColor from './expressions/color/NamedColor';
 
 import Now from './expressions/now';
 

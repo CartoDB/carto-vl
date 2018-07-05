@@ -2,8 +2,10 @@ import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
 import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
-import { NamedColor } from './color/NamedColor';
+import NamedColor from './color/NamedColor';
 import { Classifier } from './classifier';
+import Property from './basic/property';
+import Buckets from './buckets';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -313,8 +315,14 @@ export default class Ramp extends BaseExpression {
 }
 
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
-    let colors;
+    return _isBuckets(input) 
+        ? _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersColor)
+        : _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor);
+}
 
+function _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersColor) {
+    let colors;
+    
     if (palette.isQuantitative()) {
         colors = _getSubPalettes(palette, numCategories);
         colors.push(othersColor);
@@ -325,10 +333,12 @@ function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
         othersColor = colors[numCategories];
     }
 
-    if (_isClassifier(input)) {// FIXME change to input.isA(Classifier) when merged
-        colors = _getSubPalettes(palette, input.numCategories);
-        othersColor = colors[numCategories];
-    }
+    return _avoidShowingInterpolation(numCategories, colors, othersColor);
+}
+
+function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
+    const colors = _getSubPalettes(palette, input.numCategories);
+    othersColor = colors[numCategories];
 
     return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
@@ -349,6 +359,14 @@ function _getColorsFromColorArrayType(input, palette, numCategories, othersColor
 
 function _isClassifier(input) {
     return input.valueOf() instanceof Classifier;
+}
+
+function _isProperty(input) {
+    return input.valueOf() instanceof Property;
+}
+
+function _isBuckets(input) {
+    return input.valueOf() instanceof Buckets;
 }
 
 function _getColorsFromColorArrayTypeCategorical(numCategories, colors, othersColor) {
