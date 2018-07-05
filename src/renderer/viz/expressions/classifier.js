@@ -19,17 +19,22 @@ export class Classifier extends BaseExpression {
         this.breakpoints = breakpoints;
         this.type = 'category';
     }
+
     eval(feature) {
         const input = this.input.eval(feature);
-        const q = this.breakpoints.findIndex(br => input <= br);
-        return q;
+        return this.breakpoints.findIndex((br) => {
+            return input <= br.expr;
+        });
     }
+
     _genBreakpoints() {
     }
+
     getBreakpointList() {
         this._genBreakpoints();
         return this.breakpoints.map(br => br.expr);
     }
+
     _applyToShaderSource(getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
@@ -37,23 +42,25 @@ export class Classifier extends BaseExpression {
         const funcName = `classifier${this.classifierUID}`;
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-        return ${index.toFixed(2)};
-    }`;
+                return ${index.toFixed(2)};
+            }`;
         const funcBody = this.breakpoints.map(elif).join('');
         const preface = `float ${funcName}(float x){
-    ${funcBody}
-    return ${this.breakpoints.length.toFixed(1)};
-}`;
+            ${funcBody}
+            return ${this.breakpoints.length.toFixed(1)};
+        }`;
         return {
             preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
             inline: `${funcName}(${childInlines.input})`
         };
     }
+
     _preDraw(program, drawMetadata, gl) {
         this._genBreakpoints();
         // TODO
         super._preDraw(program, drawMetadata, gl);
     }
+
     _getColumnName() {
         if (this.input.aggName) {
             // Property has aggregation
@@ -97,13 +104,16 @@ export class ViewportQuantiles extends Classifier {
         let children = {
             input
         };
+
         children._histogram = viewportHistogram(input);
         super(children, buckets);
     }
+
     _compile(metadata) {
         super._compile(metadata);
         checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
+
     _genBreakpoints() {
         const hist = this._histogram.value;
 
@@ -168,12 +178,14 @@ export class GlobalQuantiles extends Classifier {
 
     _compile(metadata) {
         super._compile(metadata);
+        const sample = metadata.sample.map(s => s[this.input.name]);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
-        const copy = metadata.sample.map(s => s[this.input.name]);
-        copy.sort((x, y) => x - y);
+        
+        sample.sort((x, y) => x - y);
+        
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
-            breakpoint.expr = copy[Math.floor(p * copy.length)];
+            breakpoint.expr = sample[Math.floor(p * sample.length)];
         });
     }
 }
@@ -209,11 +221,13 @@ export class GlobalEqIntervals extends Classifier {
         checkNumber('globalEqIntervals', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
+
     _compile(metadata) {
         super._compile(metadata);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
         const { min, max } = metadata.properties[this.input.name];
-
+        this.min = min;
+        this.max = max;
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
             breakpoint.expr = min + (max - min) * p;

@@ -4,6 +4,8 @@ import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
+import { Classifier } from './classifier';
+import Linear from './linear';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -119,14 +121,23 @@ export default class Ramp extends BaseExpression {
 
     eval(feature) {
         const pixelValues = this._computeTextureIfNeeded();
-
         const input = this.input.eval(feature);
-        const numValues = pixelValues.length - 1;
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
-        return this.type === rampTypes.NUMBER
-            ? this._getValue(pixelValues, numValues, m)
-            : this._getColorValue(pixelValues, m);
+        if (input !== -1) {
+            const numValues = pixelValues.length - 1;
+            const m = (input - this.minKey) / (this.maxKey - this.minKey);
+            
+            const color = this.type === rampTypes.NUMBER
+                ? this._getValue(pixelValues, numValues, m)
+                : this._getColorValue(pixelValues, m);
+            
+            this._texCategories = null;
+            this._GLtexCategories = null;
+
+            return color;
+        }
+
+        return null;
     }
 
     _getValue(pixelValues, numValues, m) {
@@ -335,10 +346,13 @@ function _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersC
 }
 
 function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
-    const colors = _getSubPalettes(palette, input.numCategories);
-    othersColor = colors[numCategories];
+    let colors;
 
-    return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    colors = _getSubPalettes(palette, input.numCategories);
+    colors.pop();
+    othersColor = colors[input.numCategories];
+
+    return _avoidShowingInterpolation(input.numCategories, colors, othersColor);
 }
 
 function _getSubPalettes(palette, numCategories) {
@@ -351,12 +365,16 @@ function _getSubPalettes(palette, numCategories) {
 
 function _getColorsFromColorArrayType(input, palette, numCategories, othersColor) {
     return input.type === inputTypes.CATEGORY
-        ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
+        ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, othersColor)
         : _getColorsFromColorArrayTypeNumeric(numCategories, palette.colors);
 }
 
-function _getColorsFromColorArrayTypeCategorical(numCategories, colors, othersColor) {
+function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, othersColor) {
     let otherColor;
+
+    if (input.isA(Classifier) && numCategories < colors.length) {
+        return colors;
+    }
 
     if (numCategories < colors.length) {
         otherColor = colors[numCategories];

@@ -1,9 +1,10 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, checkRGBAThreshold } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles } from '../../../../../src/renderer/viz/expressions';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
+import { ReadStream } from 'tty';
 
 const DEFAULT_COLOR = s.namedColor('gray');
 
@@ -562,6 +563,171 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         expected = hexToRgb(RAMP_COLORS[1]);
         
                         expect(actual).not.toEqual(expected);
+                    });
+                });
+            });
+        });
+    });
+
+    describe('.eval with numeric expressions', () => {
+        describe('when palettes are color arrays', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    price: { type: 'number', min: 0, max: 5 },
+                },
+                sample: [
+                    { price: 0 },
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                ]
+            });
+
+            const $price = s.property('price');
+            const red = s.namedColor('red');
+            const blue = s.namedColor('blue');
+            const yellow = s.namedColor('yellow');
+            const purple = s.namedColor('purple');
+            const green = s.namedColor('green');
+
+            let actual;
+            let expected;
+
+            describe('classification', () => {
+                describe('and there are less categories than colors', () => {
+                    it('should show interpolation', () => {
+                        const q = globalQuantiles($price, 4);
+                        const r = ramp(q,[red, blue, yellow, purple, green]);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1 });
+                        expected = red._nameToRGBA();
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 2.1 });
+                        expected = blue._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 3.1});
+                        expected = yellow._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+                    });
+                });
+
+                describe('and there are the same number of categories than colors', () => {
+                    it('should not show interpolation', () => {
+                        const q = globalQuantiles($price, 4);
+                        const r = ramp(q,[red, blue, yellow]);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1 });
+                        expected = red._nameToRGBA();
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 2.1 });
+                        expected = blue._nameToRGBA();
+                        
+                        expect(actual).toEqual(expected);
+                        
+                        actual = r.eval({price: 3.1});
+                        expected = yellow._nameToRGBA();
+                        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('and there are more categories than colors', () => {
+                    it('should show interpolation', () => {
+                        const q = globalQuantiles($price, 3);
+                        const r = ramp(q,[red, blue]);
+                        r._compile(METADATA);
+
+                        actual = r.eval({price: 1});
+                        expected = red._nameToRGBA();
+                        
+                        expect(actual).toEqual(expected);
+                        
+                        actual = r.eval({price: 3});
+                        expected = blue._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+                    });
+                });
+            });
+
+            describe('interpolation', () => {
+
+            });
+        });
+
+        describe('when palettes are defined palettes', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    price: { type: 'number', min: 0, max: 10 },
+                },
+                sample: [
+                    { price: 0 },
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                    { price: 6 },
+                    { price: 7 },
+                    { price: 8 },
+                    { price: 9 },
+                    { price: 10 }
+                ]
+            });
+
+            const $price = s.property('price');
+            let actual;
+            let expected;
+
+            describe('classification', () => {
+                describe('and there are less categories than colors', () => {
+                    xit('should not show interpolation', () => {
+                        const RAMP_COLORS = cartocolor.Sunset[3];
+                        const q = globalQuantiles($price, 4);
+                        const r = ramp(q, palettes.SUNSET);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1 });
+                        expected = hexToRgb(RAMP_COLORS[0]);
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 2.1 });
+                        expected = hexToRgb(RAMP_COLORS[1]);
+                        
+                        expect(actual).toEqual(expected);
+                        
+                        actual = r.eval({price: 3.1});
+                        expected = hexToRgb(RAMP_COLORS[2]);
+                        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('and there are the same number of categories than colors', () => {
+                    it('should not show interpolation', () => {
+                        const q = globalQuantiles($price, 4);
+                        const r = ramp(q, palettes.PRISM);
+                        r._compile(METADATA);
+                    });
+                });
+
+                describe('and there are more categories than colors', () => {
+                    it('should show interpolation', () => {
+                        const q = globalQuantiles($price, 3);
+                        const r = ramp(q, palettes.PRISM);
+                        r._compile(METADATA);
                     });
                 });
             });
