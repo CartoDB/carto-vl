@@ -1,32 +1,35 @@
-## Introduction to Sprites
+## Introduction to Image Markers
 
-CARTO VL has support for sprites, replacing the typical points by images. Those images can be builtin or external and they can also be colored and placed by CARTO VL expressions.
+CARTO VL supports the use of sprites to render point data with image markers. Image markers can be accessed directly from CARTO VL's built-in symbol library, or from external sources via an HTTP request. Any image (built-in or external) can be colored, sized and placed using CARTO VL expressions.
 
-### Built-in sprites
+### Built-in image markers
 
-We provide a set of built-in images ready to be used without additional HTTP requests. You can use the `symbol` property with the name of a built-in sprite to see it.
+To access image markers from the built-in symbol library, use the `symbol` property with the name of the image:
+
 ```js
 symbol: cross
 ```
 
 http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5jb2xvcjogcmdiKDIwNCwwLDApXG5zeW1ib2w6IGNyb3NzIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
 
-### External sprites
+### External image markers
 
-Images can be loaded by providing URL links to them. Keep in mind that the server must respond with the appropriate CORS headers.
+External image markers can be loaded with a URL link. 
 
-You can use the `sprite` expression to create a new sprite with an external image:
+Note: Keep in mind that the server must respond with the appropriate CORS headers for the image file to be properly loaded.
+
+To access external images, use the `symbol` property with the image URL inside of the `sprite` expression:
 ```js
 symbol: sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
 ```
 
 http://127.0.0.1:8080/examples/styling/sprite.html
 
-### Matching categories with sprites
+### Assign image markers to categories
 
-You can use multiple sprites by assigning different sprites to different points, matching by a categorical expression.
+You can match specific images to specific categories in your data with a categorical expression.
 
-This example will match the first category (features with less than 10 million people) with the first image, and the second category (features with more than 10 million people) with the second image.
+The example below matches the first category (features with less than 10 million people) with the first image (`marker.svg`), and the second category (features with more than 10 million people) with the second image (`star.svg`).
 
 ```js
 symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg'), sprite('https://libs.cartocdn.com/carto-vl/assets/star.svg')]))
@@ -34,29 +37,29 @@ symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('https://libs.cartocd
 http://127.0.0.1:8080/examples/styling/multiple-sprites.html
 
 
-### Sprite placement
+### Image marker placement
 
-The placement or alignment of the images is controllable. By default they will be aligned to the bottom, so that the typical marker arrow points to the original feature location. However, that's not the desired behavior if the sprite is, for example, a cross. For those cases you should control it with the `symbolPlacement` property.
+The placement and alignment of image markers is controlled using the `symbolPlacement` property. By default, image markers are bottom-aligned meaning the marker arrow points to the original feature's location. If that is not the desired behavior, you can modify the placement with the `symbolPlacement` property.
 
-The `symbolPlacement` property accepts one of the built-in constants (ALIGN_BOTTOM and ALIGN_CENTER) or a placement expression (TODO link to reference).
+The `symbolPlacement` property accepts one of two default constants (`ALIGN_BOTTOM` or `ALIGN_CENTER`) or a placement expression (TODO link to reference).
 
 http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlciIsImYiOnsibG5nIjoyLjE2NzYwNjQ1ODgxMTE3ODUsImxhdCI6NDEuNDA4MDEzMzc2NzQyMjV9LCJnIjoxNy4wNDI5MjMzNjE0MTkyMSwiaCI6IlZveWFnZXIifQ==
 
-### Coloring sprites
+### Coloring image markers
 
-The color of the images can be left as-is, overridden or modified.
+The color of image markers can be customized with the `color` property.
 
-The color won't be overridden, if the `color` property is not set.
+#### Global color
 
-#### Overriding sprite color
-
-The color (RGB channels) of the images can be overridden by setting a `color` property. For example:
+The example below uses the `color` property to override the default color, to `yellow`:
 
 ```js
 symbol: cross
 color: yellow
 ```
 http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlclxuY29sb3I6IHdoaXRlIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
+
+#### Color by value
 
 #### Modifying sprite color
 
