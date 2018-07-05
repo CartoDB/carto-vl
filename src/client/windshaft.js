@@ -171,7 +171,11 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
+        let templateURL = this._subdomains.map(s => urlTemplate.replace('{s}', s));
+        if (this._subdomains.length === 0) {
+            templateURL = urlTemplate.replace('{s}', this._getSubdomain(0, 0));
+        }
+        this._mvtClient = new MVT(templateURL);
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
