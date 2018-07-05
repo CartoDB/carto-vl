@@ -331,7 +331,7 @@ export default class Windshaft {
                 }
             };
         }
-        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const response = await fetch(getMapRequest(conf, mapConfigAgg));
         const layergroup = await response.json();
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
@@ -340,18 +340,6 @@ export default class Windshaft {
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
             metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
-        };
-    }
-
-    _getRequestConfig(mapConfigAgg) {
-        return {
-            method: 'POST',
-            headers: {
-
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(mapConfigAgg),
         };
     }
 
@@ -393,6 +381,21 @@ export default class Windshaft {
         const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
         return metadata;
     }
+}
+
+function getMapRequest(conf, mapConfigAgg) {
+    const mapConfig = JSON.stringify(mapConfigAgg);
+
+    const request = new Request(endpoint(conf), {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: mapConfig
+    });
+
+    return request;
 }
 
 const endpoint = (conf, path = '') => {
