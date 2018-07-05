@@ -37,7 +37,7 @@ function checkFeatures(list, expectedList) {
     expect(list.length).toEqual(expectedList.length);
     for (let i=0; i<list.length; ++i) {
         const actual = {};
-        const expected = expectedList;
+        const expected = expectedList[i];
         Object.keys(expected).forEach(prop => actual[prop] = list[i][prop]);
         expect(actual).toEqual(expected);
     }
