@@ -287,12 +287,10 @@ export default class Windshaft {
     }
 
     _getConfig() {
-        // for local environments, which require direct access to Maps and SQL API ports, end the configured URL with "{local}"
         return {
             apiKey: this._source._apiKey,
             username: this._source._username,
-            mapsServerURL: this._source._serverURL.maps,
-            sqlServerURL: this._source._serverURL.sql
+            serverURL: this._source._serverURL
         };
     }
 
@@ -396,7 +394,7 @@ export default class Windshaft {
 }
 
 const endpoint = (conf, path = '') => {
-    let url = `${conf.mapsServerURL}/api/v1/map`;
+    let url = `${conf.serverURL}/api/v1/map`;
     if (path) {
         url += '/' + path;
     }
