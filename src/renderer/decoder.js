@@ -179,8 +179,10 @@ function getJointNormal(a, b, c) {
     const u = normalize([a[0] - b[0], a[1] - b[1]]);
     const v = normalize([c[0] - b[0], c[1] - b[1]]);
     const sin = - u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
+    const x = (u[0] + v[0]);
+    const y = (u[1] + v[1]);
+    if (Math.abs(sin) > 1E-8 && Math.max(Math.abs(x), Math.abs(y)) < 1) {
+        return [x/sin, y/sin];
     }
 }
 
