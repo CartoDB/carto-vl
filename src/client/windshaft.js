@@ -398,7 +398,7 @@ function getMapRequest(conf, mapConfigAgg) {
     return request;
 }
 
-const endpoint = (conf, path = '') => {
+const endpoint = (conf, path = null) => {
     let url = `${conf.mapsServerURL}/api/v1/map`;
     if (path) {
         url += '/' + path;
