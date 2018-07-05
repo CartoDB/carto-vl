@@ -1,5 +1,6 @@
 import { version } from '../../package';
 import MVT from '../sources/Mvt';
+import MvtClient from '../sources/MvtClient';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
@@ -24,45 +25,43 @@ export default class Windshaft {
         this._MNS = null;
         this._promiseMNS = null;
         this.inProgressInstantiations = {};
-
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
-        this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
-    }
-
-    _getInstantiationID(MNS, resolution, filtering, choices) {
-        return JSON.stringify({
-            MNS,
-            resolution,
-            filtering: choices.backendFilters ? filtering : null,
-            options: choices
+        this._mvtClient.setCallbacks({
+            onDataFrameLoaded: addDataframe,
+            onDataLoaded: dataLoadedCallback,
         });
     }
 
     /**
-     * Should be called whenever the viz changes (even if metadata is not going to be used)
-     * This not only computes metadata: it also updates the map (instantiates) for the new viz if needed
-     * Returns  a promise to a Metadata
-     * @param {*} viz
-     */
+    * Should be called whenever the viz changes (even if metadata is not going to be used)
+    * This not only computes metadata: it also updates the map (instantiates) for the new viz if needed
+    * Returns  a promise to a Metadata
+    * @param {*} viz
+    */
     async getMetadata(viz) {
-        const MNS = viz.getMinimumNeededSchema();
-        this._checkAcceptableMNS(MNS);
+        const minimunRequiredSchema = viz.getMinimumNeededSchema();
+        this._checkAcceptableMNS(minimunRequiredSchema);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
-        // Force to include `cartodb_id` in the MNS columns.
-        // TODO: revisit this request to Maps API
-        if (!MNS.columns.includes('cartodb_id')) {
-            MNS.columns.push('cartodb_id');
-        }
-        if (this._needToInstantiate(MNS, resolution, filtering)) {
-            const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
+
+        this._fixSchema(minimunRequiredSchema);
+
+        if (this._needToInstantiate(minimunRequiredSchema, resolution, filtering)) {
+            const instantiationData = await this._repeatableInstantiate(minimunRequiredSchema, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
         return this.metadata;
+    }
+
+    // Force to include `cartodb_id` in the MNS columns.
+    // TODO: revisit this request to Maps API
+    _fixSchema(minimunRequiredSchema) {
+        if (!minimunRequiredSchema.columns.includes('cartodb_id')) {
+            minimunRequiredSchema.columns.push('cartodb_id');
+        }
+        return minimunRequiredSchema;
     }
 
     requiresNewMetadata(viz) {
@@ -76,19 +75,6 @@ export default class Windshaft {
         return this._needToInstantiate(MNS, resolution, filtering);
     }
 
-    _checkAcceptableMNS(MNS) {
-        const columnAgg = {};
-        MNS.columns.map(column => {
-            const basename = schema.column.getBase(column);
-            const isAgg = schema.column.isAggregated(column);
-            if (columnAgg[basename] === undefined) {
-                columnAgg[basename] = isAgg;
-            } else if (columnAgg[basename] !== isAgg) {
-                throw new Error(`Incompatible combination of cluster aggregation with un-aggregated property: '${basename}'`);
-            }
-        });
-    }
-
     /**
      * After calling getMetadata(), data for a viewport can be obtained with this function.
      * So long as the viz doesn't change, getData() can be called repeatedly for different
@@ -100,6 +86,29 @@ export default class Windshaft {
         if (this._mvtClient) {
             return this._mvtClient.requestData(viewport);// FIXME extend
         }
+    }
+
+
+    _getInstantiationID(MNS, resolution, filtering, choices) {
+        return JSON.stringify({
+            MNS,
+            resolution,
+            filtering: choices.backendFilters ? filtering : null,
+            options: choices
+        });
+    }
+
+    _checkAcceptableMNS(minimunNeededSchema) {
+        const columnAgg = {};
+        minimunNeededSchema.columns.map(column => {
+            const basename = schema.column.getBase(column);
+            const isAgg = schema.column.isAggregated(column);
+            if (columnAgg[basename] === undefined) {
+                columnAgg[basename] = isAgg;
+            } else if (columnAgg[basename] !== isAgg) {
+                throw new Error(`Incompatible combination of cluster aggregation with un-aggregated property: '${basename}'`);
+            }
+        });
     }
 
     /**
@@ -168,11 +177,11 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
+        console.warn('_updateStateAfterInstantiating');
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
-        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
+        this._mvtClient = new MvtClient(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
@@ -183,7 +192,7 @@ export default class Windshaft {
                 case 'date':
                 {
                     const d = new Date();
-                    d.setTime(1000*propertyValue);
+                    d.setTime(1000 * propertyValue);
                     const min = column.min;
                     const max = column.max;
                     const n = (d - min) / (max.getTime() - min.getTime());
@@ -205,10 +214,12 @@ export default class Windshaft {
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
+
     _getSubdomain(x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
+
     async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];

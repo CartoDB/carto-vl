@@ -57,7 +57,6 @@ export default class MVT extends Base {
     }
 
     free() {
-        this._oldDataframes = [];
         this._mvtClient.free();
     }
 }

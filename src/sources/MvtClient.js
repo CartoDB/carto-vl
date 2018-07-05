@@ -82,7 +82,7 @@ export default class MvtClient extends Base {
             response = await response;
             const dataframe = await this._responseToDataFrame(response, x, y, z);
             if (!dataframe.empty) {
-                this._onDataFrameLoaded(dataframe);
+                this._onDataFrameLoaded && this._onDataFrameLoaded(dataframe);
                 completedTiles.push(dataframe);
             } else {
                 needToComplete--;
@@ -92,15 +92,17 @@ export default class MvtClient extends Base {
                 this._oldDataframes.map(d => d.active = false);
                 completedTiles.map(d => d.active = true);
                 this._oldDataframes = completedTiles;
-                this._onDataLoaded();
+                this._onDataLoaded && this._onDataLoaded();
             }
         });
     }
 
     async _responseToDataFrame(response, x, y, z) {
+        
         if (this._cache.get(`${x},${y},${z}`)) {
             return this._cache.get(`${x},${y},${z}`);
         }
+        response = response.clone();
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength == 0 || response == 'null') {
@@ -246,6 +248,7 @@ export default class MvtClient extends Base {
     }
 
     free() {
-        this._tileClient.free();
+        this._oldDataframes = [];
+        this._cache.free();
     }
 }

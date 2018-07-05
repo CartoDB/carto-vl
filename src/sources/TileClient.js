@@ -1,5 +1,3 @@
-import DataframeCache from './DataframeCache';
-
 export default class TileClient {
     constructor(templateURLs) {
         if (!Array.isArray(templateURLs)) {
@@ -7,8 +5,7 @@ export default class TileClient {
         }
         this._templateURLs = templateURLs;
         this._requestGroupID = 0;
-        this._cache = new DataframeCache();
-
+        this._cache = {};
     }
 
     getTiles(tiles) {
@@ -16,7 +13,12 @@ export default class TileClient {
     }
 
     _getTile(x, y, z) {
-        return fetch(this._getTileUrl(x, y, z));
+        // if (this._cache[`${x},${y},${z}`]) {
+        //     return this._cache[`${x},${y},${z}`];
+        // }
+        const promise = fetch(this._getTileUrl(x, y, z));
+        // this._cache[`${x},${y},${z}`] = promise;
+        return promise;
     }
 
     _getTileUrl(x, y, z) {
