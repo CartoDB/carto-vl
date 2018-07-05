@@ -313,7 +313,7 @@ export default class Ramp extends BaseExpression {
 }
 
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
-    return _isBuckets(input) 
+    return input.isA(Buckets)
         ? _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersColor)
         : _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor);
 }
@@ -353,10 +353,6 @@ function _getColorsFromColorArrayType(input, palette, numCategories, othersColor
     return input.type === inputTypes.CATEGORY
         ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
         : _getColorsFromColorArrayTypeNumeric(numCategories, palette.colors);
-}
-
-function _isBuckets(input) {
-    return input.valueOf() instanceof Buckets;
 }
 
 function _getColorsFromColorArrayTypeCategorical(numCategories, colors, othersColor) {
