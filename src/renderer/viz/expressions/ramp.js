@@ -3,8 +3,6 @@ import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkI
 import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
-import { Classifier } from './classifier';
-import Property from './basic/property';
 import Buckets from './buckets';
 
 const paletteTypes = {
@@ -355,14 +353,6 @@ function _getColorsFromColorArrayType(input, palette, numCategories, othersColor
     return input.type === inputTypes.CATEGORY
         ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
         : _getColorsFromColorArrayTypeNumeric(numCategories, palette.colors);
-}
-
-function _isClassifier(input) {
-    return input.valueOf() instanceof Classifier;
-}
-
-function _isProperty(input) {
-    return input.valueOf() instanceof Property;
 }
 
 function _isBuckets(input) {
