@@ -3,7 +3,6 @@ import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
-import Variable from './basic/variable';
 import { castDate } from '../../../utils/util';
 
 let waitingForLayer = new Set();
@@ -69,13 +68,11 @@ let waitingForOthers = new Set();
 export class Animation extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
-        let originalInput = input;
+        input = implicitCast(input);
+        const originalInput = input;
 
-        if (input instanceof Property) {
+        if (input.isA(Property)) {
             input = linear(input, globalMin(input), globalMax(input));
-        } else {
-            input = implicitCast(input);
-            originalInput = input;
         }
 
         checkLooseType('animation', 'input', 0, 'number', input);
@@ -153,7 +150,7 @@ export class Animation extends BaseExpression {
     }
 
     eval(feature) {
-        const input = this.input.eval(feature);
+        const input = this._input.eval(feature);
 
         if (Number.isNaN(input)) {
             return 0;
@@ -179,8 +176,8 @@ export class Animation extends BaseExpression {
      */
     getProgressValue() {
         const progress = this.progress.eval(); //from 0 to 1
-        const min = this.input.min.eval();
-        const max = this.input.max.eval();
+        const min = this._input.min.eval();
+        const max = this._input.max.eval();
 
         if (!(min instanceof Date)) {
             return progress * (max - min) + min;
@@ -284,10 +281,6 @@ export class Animation extends BaseExpression {
         this._paused = true;
     }
 
-    get input() {
-        return this._input instanceof Variable ? this._input.alias : this._input;
-    }
-
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
@@ -296,7 +289,7 @@ export class Animation extends BaseExpression {
         checkType('animation', 'duration', 1, 'number', this.duration);
         super._compile(meta);
 
-        checkType('animation', 'input', 0, 'number', this.input);
+        checkType('animation', 'input', 0, 'number', this._input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
 

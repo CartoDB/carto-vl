@@ -1,6 +1,6 @@
 import BaseExpression from './base';
-import * as schema from '../../../renderer/schema';
 import Property from './basic/property';
+import { implicitCast } from './utils';
 
 /**
  * Generates a list of features in the viewport
@@ -33,24 +33,21 @@ import Property from './basic/property';
  */
 export default class ViewportFeatures extends BaseExpression {
     constructor(...properties) {
-        if (properties.some(p => !(p instanceof Property))) {
-            throw new Error('viewportFeatures arguments can only be properties');
-        }
+        properties = properties.map(p => implicitCast(p));
 
-        super({});
+        // We need to set all the properties as children of the expression
+        // in order for variables to be resolved.
+        // And as an additional bonus we don't need to define _getMinimumNeededSchema
+        super(_childrenFromProperties(properties));
+
         this.expr = [];
         this.type = 'featureList';
         this._isViewport = true;
-
         this._requiredProperties = properties;
     }
 
     _compile() {
         throw new Error('viewportFeatures cannot be used in visualizations');
-    }
-
-    _getMinimumNeededSchema() {
-        return this._requiredProperties.map(p => p._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
     isFeatureDependent() {
@@ -66,6 +63,9 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg(metadata) {
+        if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+            throw new Error('viewportFeatures arguments can only be properties');
+        }
         this._metadata = metadata;
         this._columns = this._getMinimumNeededSchema().columns;
         this.expr = [];
@@ -87,4 +87,11 @@ function _adaptFeature(feature, propertyNames, metadata) {
         adaptedFeature[name] = value;
     }
     return adaptedFeature;
+}
+
+function _childrenFromProperties(properties) {
+    let i = 0;
+    const childContainer = {};
+    properties.forEach(property => childContainer['p'+ ++i] = property);
+    return childContainer;
 }
