@@ -5,6 +5,8 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
+const DEFAULT_COLOR = s.namedColor('gray');
+
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
         validateStaticTypeErrors('ramp', []);
@@ -241,7 +243,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = r.defaultOtherColor._nameToRGBA();
+                            expected = DEFAULT_COLOR._nameToRGBA();
                             checkRGBAThreshold.call(this, actual, expected);
                         });
 
@@ -250,7 +252,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = r.defaultOtherColor._nameToRGBA();
+                            expected = DEFAULT_COLOR._nameToRGBA();
             
                             expect(actual).toEqual(expected);
                         });
@@ -283,7 +285,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = r.defaultOtherColor._nameToRGBA();
+                            expected = DEFAULT_COLOR._nameToRGBA();
             
                             expect(actual).toEqual(expected);
                         });
@@ -424,7 +426,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = r.defaultOtherColor._nameToRGBA();
+                        expected = DEFAULT_COLOR._nameToRGBA();
         
                         expect(actual).toEqual(expected);
                     });
@@ -470,7 +472,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             expected = hexToRgb(RAMP_COLORS[index]);
             
                             expect(actual).toEqual(expected);  
-                        });                      
+                        });             
                     });
     
                     it('should use last color for the remaining categories', () => {
@@ -528,7 +530,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     
                     it('should not show interpolation', () => {
                         CATEGORIES.forEach((category, index) => {
-                            const r = ramp(buckets(category - 1, [10, 20, 30]), palettes.BURG);
+                            const r = ramp(buckets(category - 1, CATEGORIES), palettes.BURG);
 
                             r._compile(METADATA);
                             actual = r.eval();

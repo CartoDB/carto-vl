@@ -3,6 +3,7 @@ import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkI
 import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
 import { NamedColor } from './color/NamedColor';
+import { Classifier } from './classifier';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -23,7 +24,6 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
-
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -96,7 +96,6 @@ export default class Ramp extends BaseExpression {
         this.maxKey = 1;
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-        this.defaultOtherColor = new NamedColor('gray');
 
         try {
             if (palette.type === paletteTypes.NUMBER_ARRAY) {
@@ -200,10 +199,10 @@ export default class Ramp extends BaseExpression {
             return palette.colors;
         }
 
-        const othersColor = this.defaultOtherColor.eval();
+        const othersColor = new NamedColor('gray');
         return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, othersColor)
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, othersColor);
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, othersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, othersColor.eval());
     }
     
     _postShaderCompile(program, gl) {
@@ -314,23 +313,39 @@ export default class Ramp extends BaseExpression {
 }
 
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
-    let colors = input.numCategories
-        ? _getSubPalettes(input, palette, numCategories, othersColor)
-        : palette.getLongestSubPalette();
+    let colors;
 
-    return input.numCategories > colors.length
-        ? _removeOtherFromColors(colors)
+    if (palette.isQuantitative()) {
+        colors = _getSubPalettes(palette, numCategories);
+        colors.push(othersColor);
+    }
+
+    if (palette.isQualitative()) {
+        colors = _getSubPalettes(palette, numCategories);
+        othersColor = colors[numCategories];
+    }
+
+    return _isClassifier(input) // FIXME change to input.isA(Classifier) when merged
+        ? _avoidShowingInterpolation(numCategories, colors, othersColor)
         : colors;
 }
 
-function _getSubPalettes(input, palette, numCategories, othersColor) {
+function _getSubPalettes(palette, numCategories) {
     const colors = palette.subPalettes[numCategories]
         ? palette.subPalettes[numCategories]
         : palette.getLongestSubPalette();
     
-    return input.numCategories > colors.length
-        ? _addOtherColorToColors(colors, othersColor)
-        : colors;
+    return colors;
+}
+
+function _getColorsFromColorArrayType(input, palette, numCategories, othersColor) {
+    return input.type === inputTypes.CATEGORY
+        ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
+        : _getColorsFromColorArrayTypeNumeric(numCategories, palette.colors);
+}
+
+function _isClassifier(input) {
+    return input.valueOf() instanceof Classifier;
 }
 
 function _getColorsFromColorArrayTypeCategorical(numCategories, colors, othersColor) {
@@ -364,21 +379,12 @@ function _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
     return colors;
 }
 
-function _getColorsFromColorArrayType(input, palette, numCategories, othersColor) {
-    return input.type === inputTypes.CATEGORY
-        ? _getColorsFromColorArrayTypeCategorical(numCategories, palette.colors, othersColor)
-        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
-}
-
-function _removeOtherFromColors (colors) {
-    return colors.slice(0, colors.length - 1);
-}
-
 function _addOtherColorToColors (colors, otherColor) {
     return [...colors, otherColor];
 }
 
 function _avoidShowingInterpolation(numCategories, colors, othersColor) {
+    console.log('!!!', othersColor);
     const colorArray = [];
 
     for (let i = 0; i < colors.length; i++) {
@@ -388,6 +394,8 @@ function _avoidShowingInterpolation(numCategories, colors, othersColor) {
             colorArray.push(othersColor);
         }
     }
+
+    console.log('!!!', colorArray);
 
     return colorArray;
 }

@@ -5,9 +5,7 @@ import Property from './basic/property';
 import * as schema from '../../schema';
 
 let classifierUID = 0;
-
-
-class Classifier extends BaseExpression {
+export class Classifier extends BaseExpression {
     constructor(children, buckets) {
         let breakpoints = [];
         for (let i = 0; i < buckets - 1; i++) {
@@ -167,6 +165,7 @@ export class GlobalQuantiles extends Classifier {
         checkNumber('globalQuantiles', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
+
     _compile(metadata) {
         super._compile(metadata);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
