@@ -18,6 +18,7 @@ varying lowp vec4 color;
 varying highp vec2 lineA;
 varying highp vec2 lineB;
 varying highp vec2 pos;
+varying highp float width;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
 float decodeWidth(float x){
@@ -39,7 +40,7 @@ void main(void) {
     color.a *= filtering;
     color.rgb *= color.a;
     float size = decodeWidth(texture2D(widthTex, featureID).a);
-
+    width = size;
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
 
     if (size==0. || color.a==0.){
@@ -58,7 +59,6 @@ void main(void) {
         lineB = A;
         lineA = B;
     }
-
 
     pos = p.xy;
 

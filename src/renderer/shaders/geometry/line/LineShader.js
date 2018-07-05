@@ -15,5 +15,6 @@ export default class LineShader {
         this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
         this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
+        this.resY = gl.getUniformLocation(this.program, 'resY');
     }
 }

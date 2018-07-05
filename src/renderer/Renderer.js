@@ -438,6 +438,8 @@ export default class Renderer {
                 gl.enableVertexAttribArray(renderer.lineBAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.bBuffer);
                 gl.vertexAttribPointer(renderer.lineBAttr, 2, gl.FLOAT, false, 0, 0);
+
+                gl.uniform1f(renderer.resY, gl.drawingBufferHeight);
             }
 
             gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
