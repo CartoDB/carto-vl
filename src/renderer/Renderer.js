@@ -487,10 +487,10 @@ function getOrderingRenderBuckets(renderLayer) {
     let orderingMaxs = [1000];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
-    if (orderer instanceof Asc) {
+    if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
-    } else if (orderer instanceof Desc) {
+    } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
     }
