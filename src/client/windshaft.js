@@ -389,7 +389,7 @@ const endpoint = (url, parameters = []) => `${url}?${parameters.join('&')}`;
 const param = (key, value) => `${key}=${encodeURIComponent(value)}`;
 const authParam = conf => param('api_key', conf.apiKey);
 const mapsApiUrl = (conf, path = null) => {
-    let url = `${conf.mapsServerURL}/api/v1/map`;
+    let url = `${conf.serverURL}/api/v1/map`;
     if (path) {
         url += path;
     }
