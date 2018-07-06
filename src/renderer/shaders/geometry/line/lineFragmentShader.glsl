@@ -16,9 +16,10 @@ float sdCapsule( vec2 p, vec2 a, vec2 b, float r ){
 
 void main(void) {
     float f = 0.01/length(lineA-pos);
-    f = sdCapsule(pos, lineA, lineB, 2.*width/resY)>0.? 0.:1.;
+    f = sdCapsule(pos, lineA, lineB, width/resY)>0.? 0.:1.;
     float r = 0.01/length(lineA-pos);
     float g = 0.01/length(lineB-pos);
-    gl_FragColor = vec4(r,g, 0. ,r+g);
+    //gl_FragColor = vec4(r,g, 0. ,r+g);
+    gl_FragColor = vec4(10000.*sdCapsule(pos, lineA, lineB, width/resY));
     gl_FragColor = vec4(f*color);
 }
