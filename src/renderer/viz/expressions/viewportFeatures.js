@@ -2,7 +2,6 @@ import BaseExpression from './base';
 import Property from './basic/property';
 import { implicitCast } from './utils';
 import ViewportFeature from '../../ViewportFeature';
-import mem from 'mem';
 
 /**
  * Generates a list of features in the viewport
@@ -79,19 +78,13 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(this._createFeature(feature));
-    }
-
-    _createViewportFeature(feature) {
-        return new ViewportFeature(
+        this.expr.push(new ViewportFeature(
             feature, 
             this.viewportFeature.properties, 
             this.viewportFeature.metadata
-        );
+        ));
     }
 }
-
-ViewportFeatures.prototype._createFeature = mem(ViewportFeatures.prototype._createViewportFeature);
 
 function _childrenFromProperties(properties) {
     const childContainer = {};
