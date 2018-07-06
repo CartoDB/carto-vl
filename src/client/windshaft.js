@@ -383,45 +383,51 @@ export default class Windshaft {
     }
 }
 
-function getMapRequest(conf, mapConfigAgg) {
-    const mapConfig = JSON.stringify(mapConfigAgg);
+const endpoint = (url, parameters = []) => `${url}?${parameters.join('&')}`;
+const param = (key, value) => `${key}=${encodeURIComponent(value)}`;
+const authParam = conf => param('api_key', conf.apiKey);
+const mapsApiUrl = (conf, path = null) => {
+    let url = `${conf.mapsServerURL}/api/v1/map`;
+    if (path) {
+        url += path;
+    }
+    return url;
+};
 
-    const request = new Request(endpoint(conf), {
+const REQUEST_GET_MAX_URL_LENGTH = 2048;
+function getMapRequest(conf, mapConfig) {
+    const mapConfigPayload = JSON.stringify(mapConfig);
+    const auth = authParam(conf);
+    const client = param('client', `vl-${version}`)
+
+    const getParams = [auth, client, param('config', mapConfigPayload)];
+    const getUrl = endpoint(mapsApiUrl(conf), getParams);
+    if (getUrl.length < REQUEST_GET_MAX_URL_LENGTH) {
+        return new Request(getUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+    }
+
+    return new Request(endpoint(mapsApiUrl(conf), [auth, client]), {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: mapConfig
+        body: mapConfigPayload
     });
-
-    return request;
 }
-
-const endpoint = (conf, path = null) => {
-    let url = `${conf.mapsServerURL}/api/v1/map`;
-    if (path) {
-        url += '/' + path;
-    }
-    url = authURL(url, conf);
-    return url;
-};
 
 function getLayerUrl(layergroup, layerIndex, conf) {
+    const params = [authParam(conf)];
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
-        return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
+        return endpoint(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, params);
     }
-    return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
-}
-
-function authURL(url, conf) {
-    if (conf.apiKey) {
-        const sep = url.includes('?') ? '&' : '?';
-        url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
-        url += '&client=' + encodeURIComponent('vl-' + version);
-    }
-    return url;
+    return endpoint(mapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
 }
 
 function adaptGeometryType(type) {
