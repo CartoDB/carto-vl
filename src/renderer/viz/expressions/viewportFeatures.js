@@ -64,11 +64,12 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg(metadata) {
+    resetViewportAgg(metadata) {
         if (!this.viewportFeature) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
+            
             const properties = this._getMinimumNeededSchema().columns;
             this.viewportFeature = { properties, metadata };
         }
@@ -77,17 +78,18 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(new ViewportFeature(
-            feature, 
-            this.viewportFeature.properties, 
-            this.viewportFeature.metadata)
+        this.expr.push(
+            new ViewportFeature(
+                feature, 
+                this.viewportFeature.properties, 
+                this.viewportFeature.metadata
+            )
         );
     }
 }
 
 function _childrenFromProperties(properties) {
-    let i = 0;
     const childContainer = {};
-    properties.forEach(property => childContainer['p'+ ++i] = property);
+    properties.forEach((property, index) => childContainer[`p${index+1}`] = property);
     return childContainer;
 }

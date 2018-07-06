@@ -218,9 +218,9 @@ describe('viewportFeatures with invalid parameters', () => {
     it ('should fail with proper error', done => {
         expect(
             () => {
-                // FIXME: this isn't nice (calling the private method _resetViewportAgg to force the check here)
+                // FIXME: this isn't nice (calling the private method resetViewportAgg to force the check here)
                 // but, how to avoid the exception happening asynchronously?
-                viz.variables.list._resetViewportAgg();
+                viz.variables.list.resetViewportAgg();
             }
         ).toThrowError(/arguments can only be properties/);
         done();
