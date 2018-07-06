@@ -230,7 +230,7 @@ export default class Renderer {
      */
     _featureFromDataFrame(dataframe, index) {
         if (!dataframe.cachedFeatures) {
-            dataframe.cachedFeatures = new Array(dataframe.numFeatures);
+            dataframe.cachedFeatures = [];
         }
 
         if (dataframe.cachedFeatures[index] !== undefined) {
