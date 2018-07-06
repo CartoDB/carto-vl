@@ -400,7 +400,7 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 function getMapRequest(conf, mapConfig) {
     const mapConfigPayload = JSON.stringify(mapConfig);
     const auth = authParam(conf);
-    const client = param('client', `vl-${version}`)
+    const client = param('client', `vl-${version}`);
 
     const getParams = [auth, client, param('config', mapConfigPayload)];
     const getUrl = endpoint(mapsApiUrl(conf), getParams);
