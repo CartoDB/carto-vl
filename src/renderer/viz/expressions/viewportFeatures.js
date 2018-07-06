@@ -75,7 +75,6 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg(feature) {
-        // this.expr.push(_adaptFeature(feature, this._columns, this._metadata));
         this.expr.push(new this.viewportFeature(feature));
     }
 
