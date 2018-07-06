@@ -11,11 +11,14 @@ const metadata = {
     properties: {}
 };
 
-let vizSpec = 'color: ramp(linear($attr_0, 0, 1000), temps)';
+let wadus = [];
+let vizSpec = 'color: ramp(linear($attr_0, 0, 1000), temps)\n';
 for (let i = 0; i < 600; i++) {
     metadata.properties['attr_' + i] = { type: 'number' };
     vizSpec += `@A${i}: $attr_${i}\n`;
+    wadus.push(`$attr_${i}`);
 }
+vizSpec += `\n@wadus: viewportFeatures(${wadus.join()})`;
 
 const source = new carto.source.MVT('./test.mvt', metadata);
 const viz = new carto.Viz(vizSpec);
