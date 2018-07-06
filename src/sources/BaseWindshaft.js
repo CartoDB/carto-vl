@@ -3,8 +3,8 @@ import Base from './Base';
 import { validateServerURL } from '../utils/url';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
-import * as windshaftFiltering from '../client/windshaft-filtering';
-import WindshaftClient from '../client/WindshaftClient';
+import * as windshaftFiltering from '../client/windshaft/windshaft-filtering';
+import WindshaftClient from '../client/windshaft/WindshaftClient';
 import MvtClient from './MvtClient';
 
 const MIN_FILTERING = 2000000;

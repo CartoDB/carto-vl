@@ -1,8 +1,9 @@
-import { version } from '../../package';
-import Metadata from '../renderer/Metadata';
-import schema from '../renderer/schema';
-import Time from '../renderer/viz/expressions/time';
+import { version } from '../../../package';
+import Metadata from '../../renderer/Metadata';
+import schema from '../../renderer/schema';
+import Time from '../../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
+import sqlHelper from './sqlHelper';
 
 
 const SAMPLE_ROWS = 1000;
@@ -25,10 +26,10 @@ export default class Windshaft {
     }
 
     async instantiateMap(MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
-        const conf = this._getConfig();
+        const conf = this._getConfig(this._source);
         const agg = await this._generateAggregation(MNS, resolution);
-        let select = this._buildSelectClause(MNS);
-        let aggSQL = this._buildQuery(select);
+        let select = sqlHelper.buildSelectClause(MNS);
+        let aggSQL = sqlHelper.buildQuery(select,undefined, this._source);
 
         const query = `(${aggSQL}) AS tmp`;
 
@@ -45,7 +46,7 @@ export default class Windshaft {
             }
         }
         if (backendFilters) {
-            const filteredSQL = this._buildQuery(select, backendFilters);
+            const filteredSQL = sqlHelper.buildQuery(select, backendFilters, this._source);
             backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
             aggSQL = filteredSQL;
         }
@@ -56,11 +57,11 @@ export default class Windshaft {
         return { MNS, resolution, filters, metadata, url, subdomains };
     }
 
-    _getConfig() {
+    _getConfig(source) {
         return {
-            apiKey: this._source._apiKey,
-            username: this._source._username,
-            serverURL: this._source._serverURL
+            apiKey: source._apiKey,
+            username: source._username,
+            serverURL: source._serverURL
         };
     }
 
@@ -119,7 +120,7 @@ export default class Windshaft {
                 }
             };
         }
-        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const response = await fetch(getEndPoint(conf), this._getRequestConfig(mapConfigAgg));
         const layergroup = await response.json();
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
@@ -182,39 +183,28 @@ export default class Windshaft {
         return metadata;
     }
 
-    _buildQuery(select, filters) {
-        const columns = select.join();
-        const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
-        const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
-        return `SELECT ${columns} FROM ${relation} ${condition}`;
-    }
-
-    _buildSelectClause(MNS) {
-        const columns = MNS.columns.map(name => schema.column.getBase(name))
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
-        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
-    }
-
     _requiresAggregation(MNS) {
         return MNS.columns.some(column => schema.column.isAggregated(column));
     }
 }
 
-const endpoint = (conf, path = '') => {
-    let url = `${conf.serverURL}/api/v1/map`;
-    if (path) {
-        url += '/' + path;
-    }
-    url = authURL(url, conf);
-    return url;
-};
+
 
 function getLayerUrl(layergroup, layerIndex, conf) {
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
         return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
     }
-    return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
+    return getEndPoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
+}
+
+function getEndPoint(conf, path = '') {
+    let url = `${conf.serverURL}/api/v1/map`;
+    if (path) {
+        url += '/' + path;
+    }
+    url = authURL(url, conf);
+    return url;
 }
 
 function authURL(url, conf) {
