@@ -169,16 +169,16 @@ export default class Renderer {
         const viewportExpressionsLength = viewportExpressions.length;
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
-        const processedFeaturesIDs = new Set();
+        // const processedFeaturesIDs = new Set();
 
 
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
-                    continue;
-                }
+                // if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                //     continue;
+                // }
                 // Ignore features outside viewport
                 if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
@@ -253,7 +253,7 @@ export default class Renderer {
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: 1 / this._zoom, // Used by zoom expression
+            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)), // Used by zoom expression
         };
 
         if (!tiles.length) {
@@ -272,7 +272,7 @@ export default class Renderer {
 
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);
-            
+
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
@@ -296,7 +296,7 @@ export default class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
-        
+
         tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
         tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
         tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
@@ -487,10 +487,10 @@ function getOrderingRenderBuckets(renderLayer) {
     let orderingMaxs = [1000];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
-    if (orderer instanceof Asc) {
+    if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
-    } else if (orderer instanceof Desc) {
+    } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
     }

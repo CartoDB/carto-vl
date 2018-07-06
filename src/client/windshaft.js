@@ -176,11 +176,15 @@ export default class Windshaft {
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
-        console.warn('_updateStateAfterInstantiating');
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MvtClient(this._subdomains.map(s => urlTemplate.replace('{s}', s)));
+        let templateURL = this._subdomains.map(s => urlTemplate.replace('{s}', s));
+        if (this._subdomains.length === 0) {
+            templateURL = urlTemplate.replace('{s}', this._getSubdomain(0, 0));
+        }
+        this._mvtClient = new MvtClient(templateURL);
+        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
@@ -297,12 +301,10 @@ export default class Windshaft {
     }
 
     _getConfig() {
-        // for local environments, which require direct access to Maps and SQL API ports, end the configured URL with "{local}"
         return {
             apiKey: this._source._apiKey,
             username: this._source._username,
-            mapsServerURL: this._source._serverURL.maps,
-            sqlServerURL: this._source._serverURL.sql
+            serverURL: this._source._serverURL
         };
     }
 
@@ -406,7 +408,7 @@ export default class Windshaft {
 }
 
 const endpoint = (conf, path = '') => {
-    let url = `${conf.mapsServerURL}/api/v1/map`;
+    let url = `${conf.serverURL}/api/v1/map`;
     if (path) {
         url += '/' + path;
     }

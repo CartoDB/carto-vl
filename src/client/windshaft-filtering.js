@@ -54,14 +54,14 @@ class AggregationFiltering {
     }
 
     _and(f) {
-        if (f instanceof And) {
+        if (f.isA(And)) {
             return this._and(f.a).concat(this._and(f.b)).filter(Boolean);
         }
         return [this._or(f)].filter(Boolean);
     }
 
     _or(f) {
-        if (f instanceof Or) {
+        if (f.isA(Or)) {
             let a = this._basicCondition(f.a);
             let b = this._basicCondition(f.b);
             if (a && b) {
@@ -75,7 +75,7 @@ class AggregationFiltering {
     }
 
     _removeBlend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Transition) {
+        if (f.isA(Blend) && f.originalMix.isA(Transition)) {
             return f.b;
         }
         return f;
@@ -92,13 +92,13 @@ class AggregationFiltering {
 
     _value(f) {
         f = this._removeBlend(f);
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
+        if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
             return f.expr;
         }
     }
 
     _between(f) {
-        if (f instanceof Between) {
+        if (f.isA(Between)) {
             let p = this._aggregation(f.value);
             let lo = p && this._value(f.lowerLimit);
             let hi = p && lo && this._value(f.upperLimit);
@@ -113,7 +113,7 @@ class AggregationFiltering {
     }
 
     _in(f) {
-        if (f instanceof In) {
+        if (f.isA(In)) {
             let p = this._aggregation(f.value);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
             if (p && values.length > 0 && values.length == f.list.elems.length) {
@@ -126,7 +126,7 @@ class AggregationFiltering {
     }
 
     _notIn(f) {
-        if (f instanceof Nin) {
+        if (f.isA(Nin)) {
             let p = this._aggregation(f.value);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
             if (p && values.length > 0 && values.length == f.list.elems.length) {
@@ -164,7 +164,7 @@ class AggregationFiltering {
 
     _aggregation(f) {
         f = this._removeBlend(f);
-        if (f instanceof ClusterAvg || f instanceof ClusterMax || f instanceof ClusterMin || f instanceof ClusterMode || f instanceof ClusterSum) {
+        if (f.isA(ClusterAvg) || f.isA(ClusterMax) || f.isA(ClusterMin) || f.isA(ClusterMode) || f.isA(ClusterSum)) {
             let p = this._property(f.property);
             if (p) {
                 p.property = schema.column.aggColumn(p.property, f.aggName);
@@ -181,7 +181,7 @@ class AggregationFiltering {
 
     _property(f) {
         f = this._removeBlend(f);
-        if (f instanceof Property) {
+        if (f.isA(Property)) {
             return {
                 property: f.name,
                 filters: []
@@ -191,7 +191,7 @@ class AggregationFiltering {
 
     _cmpOp(f, opClass, opParam, inverseOpParam) {
         inverseOpParam = inverseOpParam || opParam;
-        if (f instanceof opClass) {
+        if (f.isA(opClass)) {
             let p = this._aggregation(f.a);
             let v = p && this._value(f.b);
             let op = opParam;
@@ -260,7 +260,7 @@ class PreaggregationFiltering {
     }
 
     _and(f) {
-        if (f instanceof And) {
+        if (f.isA(And)) {
             // we can ignore nonsupported (null) subexpressions that are combined with AND
             // and keep the supported ones as a partial filter
             const l = [this._filter(f.a), this._filter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
@@ -278,7 +278,7 @@ class PreaggregationFiltering {
     }
 
     _or(f) {
-        if (f instanceof Or) {
+        if (f.isA(Or)) {
             // if any subexpression is not supported the OR combination isn't supported either
             let a = this._filter(f.a);
             let b = this._filter(f.b);
@@ -317,7 +317,7 @@ class PreaggregationFiltering {
     }
 
     _cmpOp(f, opClass, type) {
-        if (f instanceof opClass) {
+        if (f.isA(opClass)) {
             let a = this._property(f.a) || this._value(f.a);
             let b = this._property(f.b) || this._value(f.b);
             if (a && b) {
@@ -331,13 +331,13 @@ class PreaggregationFiltering {
     }
 
     _blend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Transition) {
+        if (f.isA(Blend) && f.originalMix.isA(Transition)) {
             return this._filter(f.b);
         }
     }
 
     _property(f) {
-        if (f instanceof Property) {
+        if (f.isA(Property)) {
             return {
                 type: 'property',
                 property: f.name
@@ -346,7 +346,7 @@ class PreaggregationFiltering {
     }
 
     _value(f) {
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
+        if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
             return {
                 type: 'value',
                 value: f.expr
@@ -355,7 +355,7 @@ class PreaggregationFiltering {
     }
 
     _in(f) {
-        if (f instanceof In) {
+        if (f.isA(In)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length == f.list.elems.length) {
@@ -369,7 +369,7 @@ class PreaggregationFiltering {
     }
 
     _notIn(f) {
-        if (f instanceof Nin) {
+        if (f.isA(Nin)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length == f.list.elems.length) {
@@ -383,7 +383,7 @@ class PreaggregationFiltering {
     }
 
     _between(f) {
-        if (f instanceof Between) {
+        if (f.isA(Between)) {
             let p = this._property(f.value);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);

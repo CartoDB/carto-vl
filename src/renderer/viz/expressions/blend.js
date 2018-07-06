@@ -26,7 +26,7 @@ import BaseExpression from './base';
  *                linear(zoom(), 2^10, 2^14)
  *          )
  * `);
- * 
+ *
  * @memberof carto.expressions
  * @name blend
  * @function
@@ -82,7 +82,7 @@ export default class Blend extends BaseExpression {
     }
     _preDraw(...args) {
         super._preDraw(...args);
-        if (this.originalMix instanceof Transition && !this.originalMix.isAnimated()) {
+        if (this.originalMix.isA(Transition) && !this.originalMix.isAnimated()) {
             this.parent.replaceChild(this, this.b);
             this.notify();
         }

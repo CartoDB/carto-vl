@@ -207,4 +207,8 @@ export default class Base {
     eval(feature) {
         throw new Error('Unimplemented');
     }
+
+    isA(expressionClass) {
+        return this instanceof expressionClass;
+    }
 }
