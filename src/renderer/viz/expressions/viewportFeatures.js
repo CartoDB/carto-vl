@@ -78,20 +78,20 @@ export default class ViewportFeatures extends BaseExpression {
         this.expr = [];
     }
 
-    accumViewportAgg() {
-        return mem(this._accum);
+    accumViewportAgg(feature) {
+        this.expr.push(this._createFeature(feature));
     }
 
-    _accum(feature) {
-        this.expr.push(
-            new ViewportFeature(
-                feature, 
-                this.viewportFeature.properties, 
-                this.viewportFeature.metadata
-            )
+    _createViewportFeature(feature) {
+        return new ViewportFeature(
+            feature, 
+            this.viewportFeature.properties, 
+            this.viewportFeature.metadata
         );
     }
 }
+
+ViewportFeatures.prototype._createFeature = mem(ViewportFeatures.prototype._createViewportFeature);
 
 function _childrenFromProperties(properties) {
     const childContainer = {};
