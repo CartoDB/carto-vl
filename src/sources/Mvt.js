@@ -1,6 +1,6 @@
 import Metadata from '../renderer/Metadata';
 import Base from './Base';
-import MvtClient from './MvtClient';
+import MvtClient from '../client/MvtClient';
 
 
 export default class MVT extends Base {

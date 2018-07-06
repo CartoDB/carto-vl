@@ -13,7 +13,7 @@ export default class WindshaftClient {
 
     /**
      * Manage comunication with CARTO servers.
-     * @param {BaseWindshaft} source
+     * @param {WindshaftSource} source
      */
     constructor(windshaftSource) {
         this._source = windshaftSource;

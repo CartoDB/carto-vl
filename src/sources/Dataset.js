@@ -1,8 +1,8 @@
 import CartoValidationError from '../errors/carto-validation-error';
 import util from '../utils/util';
-import BaseWindshaft from './BaseWindshaft';
+import WindshaftSource from './WindshaftSource';
 
-export default class Dataset extends BaseWindshaft {
+export default class Dataset extends WindshaftSource {
 
     /**
      * A dataset defines the data that will be displayed in a layer and is equivalent

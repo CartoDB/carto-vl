@@ -5,11 +5,11 @@ import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 import * as windshaftFiltering from '../client/windshaft/windshaft-filtering';
 import WindshaftClient from '../client/windshaft/WindshaftClient';
-import MvtClient from './MvtClient';
+import MvtClient from '../client/MvtClient';
 
 const MIN_FILTERING = 2000000;
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
-export default class BaseWindshaft extends Base {
+export default class WindshaftSource extends Base {
 
     constructor() {
         super();

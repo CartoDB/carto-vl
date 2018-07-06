@@ -5,7 +5,6 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
 import { RTT_WIDTH } from '../renderer/Renderer';
-import Base from './Base';
 import TileClient from './TileClient';
 import DataframeCache from './DataframeCache';
 
@@ -26,7 +25,7 @@ const MVT_TO_CARTO_TYPES = {
     3: geometryTypes.POLYGON
 };
 
-export default class MvtClient extends Base {
+export default class MvtClient {
 
     /**
      * Create a carto.source.MVT.
@@ -47,7 +46,6 @@ export default class MvtClient extends Base {
      * @IGNOREapi
      */
     constructor(templateURL, metadata = new Metadata(), layerId, ) {
-        super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
             metadata = new Metadata(metadata);
@@ -98,7 +96,7 @@ export default class MvtClient extends Base {
     }
 
     async _responseToDataFrame(response, x, y, z) {
-        
+
         if (this._cache.get(`${x},${y},${z}`)) {
             return this._cache.get(`${x},${y},${z}`);
         }

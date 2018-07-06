@@ -1,4 +1,4 @@
-import SourceBase from '../../../src/sources/BaseWindshaft';
+import WindshaftSource from '../../../src/sources/WindshaftSource';
 
 describe('sources/base-windshaft', () => {
     const auth = {
@@ -12,15 +12,15 @@ describe('sources/base-windshaft', () => {
 
     describe('constructor', () => {
         it('should build a new Source', () => {
-            const source = new SourceBase();
+            const source = new WindshaftSource();
             expect(source._windshaftClient).toBeDefined();
         });
     });
 
     describe('._initialize', () => {
-        const source = new SourceBase();
+        const source = new WindshaftSource();
         it('should initialize the source with (auth, config)', () => {
-            const source = new SourceBase();
+            const source = new WindshaftSource();
             source._initialize(auth, config);
 
             expect(source._username).toEqual('test');
@@ -30,7 +30,7 @@ describe('sources/base-windshaft', () => {
         });
 
         it('should build a new Source with (auth) and default config', () => {
-            const source = new SourceBase();
+            const source = new WindshaftSource();
             source._initialize(auth);
 
             expect(source._username).toEqual('test');
