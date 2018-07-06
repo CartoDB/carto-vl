@@ -29,7 +29,7 @@ export default class Windshaft {
         const conf = this._getConfig(this._source);
         const agg = await this._generateAggregation(MNS, resolution);
         let select = sqlHelper.buildSelectClause(MNS);
-        let aggSQL = sqlHelper.buildQuery(select,undefined, this._source);
+        let aggSQL = sqlHelper.buildQuery(select, undefined, this._source);
 
         const query = `(${aggSQL}) AS tmp`;
 
@@ -54,7 +54,22 @@ export default class Windshaft {
         let { url, metadata, subdomains } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
+        this._checkLayerMeta(MNS);
         return { MNS, resolution, filters, metadata, url, subdomains };
+    }
+
+    _checkLayerMeta(MNS) {
+        if (!this._isAggregated() && this._requiresAggregation(MNS)) {
+            throw new Error('Aggregation not supported for this dataset');
+        }
+    }
+
+    _isAggregated() {
+        return this.metadata && this.metadata.isAggregated;
+    }
+
+    _requiresAggregation(MNS) {
+        return MNS.columns.some(column => schema.column.isAggregated(column));
     }
 
     _getConfig(source) {

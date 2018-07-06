@@ -50,7 +50,7 @@ export default class BaseWindshaft extends Base {
     }
 
     free() {
-        this._windshaftClient.free();
+        this._mvtClient && this._mvtClient.free();
     }
 
     _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, url, subdomains }) {
@@ -61,12 +61,21 @@ export default class BaseWindshaft extends Base {
         if (subdomains.length === 0) {
             templateURL = url.replace('{s}', this._getSubdomain(subdomains, 0, 0));
         }
-        this._mvtClient = new MvtClient(templateURL, metadata);
-        this._mvtClient.setCallbacks({
+
+        this._mvtClient = this._initMvtClient(templateURL, metadata);
+        this.metadata = metadata;
+        this._MNS = MNS;
+        this.filtering = filters;
+        this.resolution = resolution;
+    }
+
+    _initMvtClient(templateURL, metadata) {
+        const mvtClient = new MvtClient(templateURL, metadata);
+        mvtClient.setCallbacks({
             onDataFrameLoaded: this._onDataFrameLoaded,
             onDataLoaded: this._onDataLoaded
         });
-        this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
+        mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
             if (!column) {
@@ -74,14 +83,14 @@ export default class BaseWindshaft extends Base {
             }
             switch (column.type) {
                 case 'date':
-                    {
-                        const d = new Date();
-                        d.setTime(1000 * propertyValue);
-                        const min = column.min;
-                        const max = column.max;
-                        const n = (d - min) / (max.getTime() - min.getTime());
-                        return n;
-                    }
+                {
+                    const d = new Date();
+                    d.setTime(1000 * propertyValue);
+                    const min = column.min;
+                    const max = column.max;
+                    const n = (d - min) / (max.getTime() - min.getTime());
+                    return n;
+                }
                 case 'category':
                     return this.metadata.categorizeString(propertyValue);
                 case 'number':
@@ -90,23 +99,7 @@ export default class BaseWindshaft extends Base {
                     throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
             }
         };
-        this.metadata = metadata;
-        this._MNS = MNS;
-        this.filtering = filters;
-        this.resolution = resolution;
-        this._checkLayerMeta(MNS);
-    }
-
-    _checkLayerMeta(MNS) {
-        if (!this._isAggregated()) {
-            if (this._requiresAggregation(MNS)) {
-                throw new Error('Aggregation not supported for this dataset');
-            }
-        }
-    }
-
-    _isAggregated() {
-        return this.metadata && this.metadata.isAggregated;
+        return mvtClient;
     }
 
     _getSubdomain(subdomains, x, y) {
