@@ -51,7 +51,7 @@ export default class SQL extends BaseWindshaft {
         super();
         this._checkQuery(query);
         this._query = query;
-        this.initialize(auth, config);
+        this._initialize(auth, config);
     }
 
     clone() {

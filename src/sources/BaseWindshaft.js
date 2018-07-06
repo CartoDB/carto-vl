@@ -13,16 +13,6 @@ export default class BaseWindshaft extends Base {
         this._client = new Windshaft(this);
     }
 
-    initialize(auth, config) {
-        this._auth = auth || getDefaultAuth();
-        this._config = config || getDefaultConfig();
-        checkAuth(this._auth);
-        checkConfig(this._config);
-        this._apiKey = this._auth.apiKey;
-        this._username = this._auth.username;
-        this._serverURL = this._generateURL(this._auth, this._config);
-    }
-
     bindLayer(...args) {
         this._client.bindLayer(...args);
     }
@@ -41,6 +31,16 @@ export default class BaseWindshaft extends Base {
 
     free() {
         this._client.free();
+    }
+
+    _initialize(auth, config) {
+        this._auth = auth || getDefaultAuth();
+        this._config = config || getDefaultConfig();
+        checkAuth(this._auth);
+        checkConfig(this._config);
+        this._apiKey = this._auth.apiKey;
+        this._username = this._auth.username;
+        this._serverURL = this._generateURL(this._auth, this._config);
     }
 
     _generateURL(auth, config) {
