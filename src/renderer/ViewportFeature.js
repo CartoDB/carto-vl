@@ -11,8 +11,8 @@ export default class ViewportFeature {
         this._properties.forEach((name) => {
             Object.defineProperty(this, name, {
                 get: this._metadata.properties[name].type === 'category'
-                    ? () => this._feature[name]
-                    : () => this._metadata.IDToCategory.get(this._feature[name])
+                    ? () => this._metadata.IDToCategory.get(this._feature[name])
+                    : () => this._feature[name]
             });
         });
     }
