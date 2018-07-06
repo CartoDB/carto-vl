@@ -17,7 +17,7 @@ describe('sources/dataset', () => {
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
             expect(source._serverURL).toEqual('https://test.test.com');
-            expect(source._client).toBeDefined();
+            expect(source._windshaftClient).toBeDefined();
         });
 
         it('should build a new Source with (tableName, auth) and default options', () => {
@@ -26,7 +26,7 @@ describe('sources/dataset', () => {
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
             expect(source._serverURL).toEqual('https://test.carto.com');
-            expect(source._client).toBeDefined();
+            expect(source._windshaftClient).toBeDefined();
         });
 
         it('should throw an error if tableName is not valid', function () {
