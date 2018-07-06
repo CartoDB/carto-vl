@@ -34,7 +34,7 @@ lowerCaseFunctions.house = functions.HOUSE;
 lowerCaseFunctions.marker = functions.MARKER;
 lowerCaseFunctions.markeroutline = functions.MARKER_OUTLINE;
 lowerCaseFunctions.star = functions.STAR;
-lowerCaseFunctions.starOutline = functions.STAR_OUTLINE;
+lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
 lowerCaseFunctions.triangle = functions.TRIANGLE;
 lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
 
