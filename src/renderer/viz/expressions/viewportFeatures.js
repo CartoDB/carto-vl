@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import Property from './basic/property';
 import { implicitCast } from './utils';
 import ViewportFeature from '../../ViewportFeature';
+import mem from 'mem';
 
 /**
  * Generates a list of features in the viewport
@@ -77,7 +78,11 @@ export default class ViewportFeatures extends BaseExpression {
         this.expr = [];
     }
 
-    accumViewportAgg(feature) {
+    accumViewportAgg() {
+        return mem(this._accum);
+    }
+
+    _accum(feature) {
         this.expr.push(
             new ViewportFeature(
                 feature, 
