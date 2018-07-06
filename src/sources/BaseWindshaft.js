@@ -14,6 +14,7 @@ export default class BaseWindshaft extends Base {
     constructor() {
         super();
         this._windshaftClient = new WindshaftClient(this);
+        this._mvtClient; // Will be initialized later
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {

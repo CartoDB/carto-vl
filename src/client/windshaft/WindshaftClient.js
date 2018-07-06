@@ -8,16 +8,15 @@ import sqlHelper from './sqlHelper';
 
 const SAMPLE_ROWS = 1000;
 
-// Get dataframes <- MVT <- Windshaft
-// Get metadata
-// Instantiate map Windshaft
-// Requrest SQL API (temp)
-// Cache dataframe
 
-export default class Windshaft {
+export default class WindshaftClient {
 
-    constructor(source) {
-        this._source = source;
+    /**
+     * Manage comunication with CARTO servers.
+     * @param {BaseWindshaft} source
+     */
+    constructor(windshaftSource) {
+        this._source = windshaftSource;
         this._exclusive = true;
 
         this._MNS = null;
@@ -196,10 +195,6 @@ export default class Windshaft {
 
         const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
         return metadata;
-    }
-
-    _requiresAggregation(MNS) {
-        return MNS.columns.some(column => schema.column.isAggregated(column));
     }
 }
 
