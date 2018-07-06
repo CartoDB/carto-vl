@@ -1,0 +1,68 @@
+## Introduction to Image Markers
+
+CARTO VL supports the use of sprites to render point data with image markers. Image markers can be accessed directly from CARTO VL's built-in symbol library, or from external sources via an HTTP request. Any image (built-in or external) can be colored, sized and placed using CARTO VL expressions.
+
+### Built-in image markers
+
+To access image markers from the built-in symbol library, use the `symbol` property with the name of the image:
+
+```js
+symbol: cross
+```
+
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5jb2xvcjogcmdiKDIwNCwwLDApXG5zeW1ib2w6IGNyb3NzIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
+
+### External image markers
+
+External image markers can be loaded with a URL link. 
+
+Note: Keep in mind that the server must respond with the appropriate CORS headers for the image file to be properly loaded.
+
+To access external images, use the `symbol` property with the image URL inside of the `sprite` expression:
+```js
+symbol: sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
+```
+
+http://127.0.0.1:8080/examples/styling/sprite.html
+
+### Assign image markers to categories
+
+You can match specific images to specific categories in your data with a categorical expression.
+
+The example below matches the first category (features with less than 10 million people) with the first image (`marker.svg`), and the second category (features with more than 10 million people) with the second image (`star.svg`).
+
+```js
+symbol: ramp(buckets($pop_max, [1000000]), sprites([sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg'), sprite('https://libs.cartocdn.com/carto-vl/assets/star.svg')]))
+```
+http://127.0.0.1:8080/examples/styling/multiple-sprites.html
+
+
+### Image marker placement
+
+The placement and alignment of image markers is controlled using the `symbolPlacement` property. By default, image markers are bottom-aligned meaning the marker arrow points to the original feature's location. If that is not the desired behavior, you can modify the placement with the `symbolPlacement` property.
+
+The `symbolPlacement` property accepts one of two default constants (`ALIGN_BOTTOM` or `ALIGN_CENTER`) or a placement expression (TODO link to reference).
+
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlciIsImYiOnsibG5nIjoyLjE2NzYwNjQ1ODgxMTE3ODUsImxhdCI6NDEuNDA4MDEzMzc2NzQyMjV9LCJnIjoxNy4wNDI5MjMzNjE0MTkyMSwiaCI6IlZveWFnZXIifQ==
+
+### Coloring image markers
+
+The color of image markers can be customized with the `color` property.
+
+#### Global color
+
+The example below uses the `color` property to override the default color, to `yellow`:
+
+```js
+symbol: cross
+color: yellow
+```
+http://127.0.0.1:8080/examples/editor/index.html#eyJhIjoic3BlbmRfZGF0YSIsImIiOiIiLCJjIjoiY2FydG92bCIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6IDcwXG5zeW1ib2w6IGNyb3NzXG5zeW1ib2xQbGFjZW1lbnQ6IGFsaWduX2NlbnRlclxuY29sb3I6IHdoaXRlIiwiZiI6eyJsbmciOjIuMTY3NjA2NDU4ODExMTc4NSwibGF0Ijo0MS40MDgwMTMzNzY3NDIyNX0sImciOjE3LjA0MjkyMzM2MTQxOTIxLCJoIjoiRGFya01hdHRlciJ9
+
+#### Color by value
+
+#### Modifying sprite color
+
+The color of the sprites can also be modified with other color expressions.
+
+(Mamata, do you think we should remove this part from the guide?)
