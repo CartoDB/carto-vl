@@ -8,20 +8,20 @@ export default class ViewportFeature {
     }
 
     setProperties() {
-        for (let name in this._properties) {
+        this._properties.forEach((name) => {
             Object.defineProperty(this.prototype, name, {
-                get: (this._metadata.properties[name].type === 'category')
-                    ? getFeatureProperty(name).bind(this)
-                    : getMetadataProperty(name).bind(this)
+                get: this._metadata.properties[name].type === 'category'
+                    ? _getFeatureProperty(name).call(this)
+                    : _getMetadataProperty(name).call(this)
             });
-        }
+        });
     }
 }
 
-function getFeatureProperty(name) {
+function _getFeatureProperty(name) {
     return () => this._feature[name];
 }
 
-function getMetadataProperty(name) {
+function _getMetadataProperty(name) {
     return () => this.metadata.IDToCategory.get(this._feature[name]);
 }
