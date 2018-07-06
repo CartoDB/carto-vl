@@ -185,10 +185,12 @@ export default class MVT extends Base {
     }
 
     _decodeProperties(propertyNames, properties, feature, i) {
-        propertyNames.forEach(propertyName => {
+        const length = propertyNames.length;
+        for (let j = 0; j < length; j++) {
+            const propertyName = propertyNames[j];
             const propertyValue = feature.properties[propertyName];
             properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
-        });
+        }
     }
 
     decodeProperty(propertyName, propertyValue) {
