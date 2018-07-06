@@ -17,9 +17,12 @@ export default class BaseWindshaft extends Base {
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
+        this._onDataFrameLoaded = addDataframe;
+        this._onDataLoaded = dataLoadedCallback;
+
         this._mvtClient.setCallbacks({
-            onDataFrameLoaded: addDataframe,
-            onDataLoaded: dataLoadedCallback
+            onDataFrameLoaded: this._onDataFrameLoaded,
+            onDataLoaded: this._onDataLoaded
         });
     }
 
@@ -59,7 +62,10 @@ export default class BaseWindshaft extends Base {
             templateURL = url.replace('{s}', this._getSubdomain(subdomains, 0, 0));
         }
         this._mvtClient = new MvtClient(templateURL, metadata);
-        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
+        this._mvtClient.setCallbacks({
+            onDataFrameLoaded: this._onDataFrameLoaded,
+            onDataLoaded: this._onDataLoaded
+        });
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
@@ -68,14 +74,14 @@ export default class BaseWindshaft extends Base {
             }
             switch (column.type) {
                 case 'date':
-                {
-                    const d = new Date();
-                    d.setTime(1000 * propertyValue);
-                    const min = column.min;
-                    const max = column.max;
-                    const n = (d - min) / (max.getTime() - min.getTime());
-                    return n;
-                }
+                    {
+                        const d = new Date();
+                        d.setTime(1000 * propertyValue);
+                        const min = column.min;
+                        const max = column.max;
+                        const n = (d - min) / (max.getTime() - min.getTime());
+                        return n;
+                    }
                 case 'category':
                     return this.metadata.categorizeString(propertyValue);
                 case 'number':
@@ -102,7 +108,7 @@ export default class BaseWindshaft extends Base {
     _isAggregated() {
         return this.metadata && this.metadata.isAggregated;
     }
-    
+
     _getSubdomain(subdomains, x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
         return subdomains[Math.abs(x + y) % subdomains.length];
