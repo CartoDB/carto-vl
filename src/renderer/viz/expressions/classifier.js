@@ -22,9 +22,11 @@ export class Classifier extends BaseExpression {
 
     eval(feature) {
         const input = this.input.eval(feature);
-        return this.breakpoints.findIndex((br) => {
+        const index = this.breakpoints.findIndex((br) => {
             return input <= br.expr;
         });
+
+        return index !== -1 ? index : this.breakpoints.length;
     }
 
     _genBreakpoints() {

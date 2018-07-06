@@ -667,33 +667,82 @@ describe('src/renderer/viz/expressions/ramp', () => {
         });
 
         describe('when palettes are defined palettes', () => {
-            const METADATA = new Metadata({
-                properties: {
-                    price: { type: 'number', min: 0, max: 10 },
-                },
-                sample: [
-                    { price: 0 },
-                    { price: 1 },
-                    { price: 2 },
-                    { price: 3 },
-                    { price: 4 },
-                    { price: 5 },
-                    { price: 6 },
-                    { price: 7 },
-                    { price: 8 },
-                    { price: 9 },
-                    { price: 10 }
-                ]
-            });
-
-            const $price = s.property('price');
-            let actual;
-            let expected;
-
             describe('classification', () => {
-                describe('and there are less categories than colors', () => {
-                    xit('should not show interpolation', () => {
+                describe('and there are between 2 and 7 colors', () => {
+                    const METADATA = new Metadata({
+                        properties: {
+                            price: { type: 'number', min: 1, max: 13 },
+                        },
+                        sample: [
+                            { price: 1 },
+                            { price: 2 },
+                            { price: 3 },
+                            { price: 4 },
+                            { price: 5 },
+                            { price: 6 },
+                            { price: 7 },
+                            { price: 8 },
+                            { price: 9 },
+                            { price: 10 },
+                            { price: 11 },
+                            { price: 12 },
+                            { price: 13 }
+                        ]
+                    });
+        
+                    const $price = s.property('price');
+                    let actual;
+                    let expected;
+
+                    it('should not show interpolation', () => {
                         const RAMP_COLORS = cartocolor.Sunset[3];
+                        const q = globalQuantiles($price, 3); 
+                        const r = ramp(q, palettes.SUNSET);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1});
+                        expected = hexToRgb(RAMP_COLORS[0]);
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 6});
+                        expected = hexToRgb(RAMP_COLORS[1]);
+                        
+                        expect(actual).toEqual(expected);
+                        
+                        actual = r.eval({price: 10});
+                        expected = hexToRgb(RAMP_COLORS[2]);
+                        
+                        expect(actual).toEqual(expected);
+                    });
+                });
+
+                describe('and there more than 7 colors', () => {
+                    const METADATA = new Metadata({
+                        properties: {
+                            price: { type: 'number', min: 0, max: 10 },
+                        },
+                        sample: [
+                            { price: 0 },
+                            { price: 1 },
+                            { price: 2 },
+                            { price: 3 },
+                            { price: 4 },
+                            { price: 5 },
+                            { price: 6 },
+                            { price: 7 },
+                            { price: 8 },
+                            { price: 9 },
+                            { price: 10 }
+                        ]
+                    });
+        
+                    const $price = s.property('price');
+                    let actual;
+                    let expected;
+
+                    xit('should show interpolation', () => {
+                        const RAMP_COLORS = cartocolor.Sunset[7];
                         const q = globalQuantiles($price, 4);
                         const r = ramp(q, palettes.SUNSET);
                         r._compile(METADATA);
@@ -706,28 +755,32 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[1]);
                         
-                        expect(actual).toEqual(expected);
+                        expect(actual).not.toEqual(expected);
                         
                         actual = r.eval({price: 3.1});
                         expected = hexToRgb(RAMP_COLORS[2]);
                         
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({price: 4.1});
+                        expected = hexToRgb(RAMP_COLORS[3]);
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 5.1});
+                        expected = hexToRgb(RAMP_COLORS[4]);
+                        
+                        expect(actual).not.toEqual(expected); 
+
+                        actual = r.eval({price: 6.1});
+                        expected = hexToRgb(RAMP_COLORS[5]);
+                        
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({price: 8});
+                        expected = hexToRgb(RAMP_COLORS[6]);
+                        
                         expect(actual).toEqual(expected);
-                    });
-                });
-
-                describe('and there are the same number of categories than colors', () => {
-                    it('should not show interpolation', () => {
-                        const q = globalQuantiles($price, 4);
-                        const r = ramp(q, palettes.PRISM);
-                        r._compile(METADATA);
-                    });
-                });
-
-                describe('and there are more categories than colors', () => {
-                    it('should show interpolation', () => {
-                        const q = globalQuantiles($price, 3);
-                        const r = ramp(q, palettes.PRISM);
-                        r._compile(METADATA);
                     });
                 });
             });

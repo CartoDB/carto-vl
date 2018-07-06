@@ -5,7 +5,6 @@ import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import { Classifier } from './classifier';
-import Linear from './linear';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -348,9 +347,15 @@ function _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersC
 function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
     let colors;
 
-    colors = _getSubPalettes(palette, input.numCategories);
-    colors.pop();
-    othersColor = colors[input.numCategories];
+    if (palette.isQuantitative()) {
+        colors = _getSubPalettes(palette, input.numCategories);
+    }
+
+    if (palette.isQualitative()) {
+        colors = _getSubPalettes(palette, input.numCategories);
+        colors.pop();
+        othersColor = colors[input.numCategories];
+    }
 
     return _avoidShowingInterpolation(input.numCategories, colors, othersColor);
 }
