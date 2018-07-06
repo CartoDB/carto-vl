@@ -12,7 +12,7 @@ export default class ViewportFeature {
             Object.defineProperty(this, name, {
                 get: this._metadata.properties[name].type === 'category'
                     ? () => this._feature[name]
-                    : () => this.metadata.IDToCategory.get(this._feature[name])
+                    : () => this._metadata.IDToCategory.get(this._feature[name])
             });
         });
     }
