@@ -69,13 +69,13 @@ export default class ViewportFeatures extends BaseExpression {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
             const columns = this._getMinimumNeededSchema().columns;
-            this.viewportFeature = this.genViewportFeatureClass(columns, metadata);
+            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
         }
         this.expr = [];
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(new this.viewportFeature(feature));
+        this.expr.push(new this._FeatureProxy(feature));
     }
 
     genViewportFeatureClass(properties, metadata) {
