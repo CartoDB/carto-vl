@@ -72,7 +72,6 @@ export default class MvtClient extends Base {
     }
 
     _getTiles(tiles) {
-        console.warn('_getTiles');
         this._requestGroupID++;
         let completedTiles = [];
         let needToComplete = tiles.length;
@@ -94,7 +93,6 @@ export default class MvtClient extends Base {
                 completedTiles.map(d => d.active = true);
                 this._oldDataframes = completedTiles;
                 this._onDataLoaded && this._onDataLoaded();
-                console.warn('completed!', this._onDataLoaded);
             }
         });
     }
