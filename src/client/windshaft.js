@@ -387,22 +387,41 @@ export default class Windshaft {
     }
 }
 
-function generateUrl(url, parameters = []) {
-    return `${url}?${parameters.join('&')}`;
-}
-
-function encodeParameter(name, value) {
-    return `${name}=${encodeURIComponent(value)}`;
-}
-
-function generateMapsApiUrl(conf, path){
-    let url = `${conf.serverURL}/api/v1/map`;
-    if (path) {
-        url += path;
+function adaptGeometryType(type) {
+    switch (type) {
+        case 'ST_MultiPolygon':
+        case 'ST_Polygon':
+            return 'polygon';
+        case 'ST_Point':
+            return 'point';
+        case 'ST_MultiLineString':
+        case 'ST_LineString':
+            return 'line';
+        default:
+            throw new Error(`Unimplemented geometry type ''${type}'`);
     }
-    return url;
 }
 
+function adaptColumnType(type) {
+    if (type === 'string') {
+        return 'category';
+    }
+    return type;
+}
+
+// generate a promise under certain assumptions/choices; then if the result changes the assumptions,
+// repeat the generation with the new information
+async function repeatablePromise(initialAssumptions, assumptionsFromResult, promiseGenerator) {
+    let promise = promiseGenerator(initialAssumptions);
+    let result = await promise;
+    let finalAssumptions = assumptionsFromResult(result);
+    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+        return promise;
+    }
+    else {
+        return promiseGenerator(finalAssumptions);
+    }
+}
 
 function getMapRequest(conf, mapConfig) {
     const mapConfigPayload = JSON.stringify(mapConfig);
@@ -439,38 +458,18 @@ function getLayerUrl(layergroup, layerIndex, conf) {
     return generateUrl(generateMapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
 }
 
-function adaptGeometryType(type) {
-    switch (type) {
-        case 'ST_MultiPolygon':
-        case 'ST_Polygon':
-            return 'polygon';
-        case 'ST_Point':
-            return 'point';
-        case 'ST_MultiLineString':
-        case 'ST_LineString':
-            return 'line';
-        default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
-    }
+function encodeParameter(name, value) {
+    return `${name}=${encodeURIComponent(value)}`;
 }
 
-function adaptColumnType(type) {
-    if (type === 'string') {
-        return 'category';
-    }
-    return type;
+function generateUrl(url, parameters = []) {
+    return `${url}?${parameters.join('&')}`;
 }
 
-// generate a promise under certain assumptions/choices; then if the result changes the assumptions,
-// repeat the generation with the new information
-async function repeatablePromise(initialAssumptions, assumptionsFromResult, promiseGenerator) {
-    let promise = promiseGenerator(initialAssumptions);
-    let result = await promise;
-    let finalAssumptions = assumptionsFromResult(result);
-    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
-        return promise;
+function generateMapsApiUrl(conf, path) {
+    let url = `${conf.serverURL}/api/v1/map`;
+    if (path) {
+        url += path;
     }
-    else {
-        return promiseGenerator(finalAssumptions);
-    }
+    return url;
 }
