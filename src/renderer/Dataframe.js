@@ -280,7 +280,7 @@ export default class Dataframe {
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
             let prop = this.properties[propertyName][featureIndex];
-            if (propertyName === 'cartodb_id') {
+            if (propertyName === this.metadata.idProperty) {
                 id = prop;
             } else {
                 const column = this.metadata.properties[propertyName];

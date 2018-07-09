@@ -174,10 +174,10 @@ export default class Renderer {
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
-                const featureId = dataframe.properties.cartodb_id[i];
+                const featureId = dataframe.properties[metadata.idProperty][i];
 
                 // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(featureId) {
+                if (processedFeaturesIDs.has(featureId)) {
                     continue;
                 }
                 // Ignore features outside viewport
