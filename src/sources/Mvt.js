@@ -74,7 +74,7 @@ export default class MVT extends Base {
     async responseToDataframeTransformer(response, x, y, z) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength == 0 || response == 'null') {
+        if (arrayBuffer.byteLength == 0 || response == 'null' || response.status === 404) {
             return { empty: true };
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
