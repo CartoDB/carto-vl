@@ -25,7 +25,7 @@ import Palette from './Palette';
 
 export default class PaletteReverse extends Palette {
     constructor(palette) {
-        super({});
+        super(palette.name, palette.subPalettes);
         this.type = 'palette';
         this._originalPalette = palette;
         this.tags = palette.tags;
