@@ -18,9 +18,8 @@ export default class Metadata {
         this.numCategories = 0;
 
         Object.values(properties).map(property => {
-            if (property.categories) {
-                property.categories.map(category => this.categorizeString(category.name));
-            }
+            property.categories = property.categories || [];
+            property.categories.map(category => this.categorizeString(category.name));
         });
     }
     categorizeString(category) {
