@@ -7,6 +7,7 @@ import Buckets from './buckets';
 import Property from './basic/property';
 import { Classifier } from './classifier';
 import Linear from './linear';
+import Top from './top';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -362,12 +363,12 @@ function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersC
     }
 
     if (palette.isQualitative()) {
-        if (input.isA(Classifier)) {
+        if (input.isA(Top)) {
+            colors = _getSubPalettes(palette, numCategories);
+        } else {
             colors = _getSubPalettes(palette, input.numCategories);
             colors.pop();
             othersColor = colors[input.numCategories];
-        } else {
-            colors = _getSubPalettes(palette, numCategories);
         }
     }
 
