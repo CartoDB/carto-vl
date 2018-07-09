@@ -280,12 +280,12 @@ export default class Dataframe {
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
             let prop = this.properties[propertyName][featureIndex];
-            if (propertyName === this.metadata.idProperty) {
-                id = prop;
-            }
             const column = this.metadata.properties[propertyName];
             if (column && column.type == 'category') {
                 prop = this.metadata.IDToCategory.get(prop);
+            }
+            if (propertyName === this.metadata.idProperty) {
+                id = prop;
             }
             properties[propertyName] = prop;
         });
