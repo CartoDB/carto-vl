@@ -428,10 +428,10 @@ function getMapRequest(conf, mapConfig) {
     const auth = encodeParameter('api_key', conf.apiKey);
     const client = encodeParameter('client', `vl-${version}`);
 
-    const getParams = [auth, client, encodeParameter('config', mapConfigPayload)];
-    const getUrl = generateUrl(generateMapsApiUrl(conf), getParams);
-    if (getUrl.length < REQUEST_GET_MAX_URL_LENGTH) {
-        return new Request(getUrl, {
+    const parameters = [auth, client, encodeParameter('config', mapConfigPayload)];
+    const url = generateUrl(generateMapsApiUrl(conf), parameters);
+    if (url.length < REQUEST_GET_MAX_URL_LENGTH) {
+        return new Request(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json'
