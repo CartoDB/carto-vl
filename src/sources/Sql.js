@@ -1,8 +1,8 @@
 import CartoValidationError from '../errors/carto-validation-error';
 import util from '../utils/util';
-import BaseWindshaft from './BaseWindshaft';
+import WindshaftSource from './WindshaftSource';
 
-export default class SQL extends BaseWindshaft {
+export default class SQL extends WindshaftSource {
 
     /**
      * A SQL defines the data that will be displayed in a layer.
@@ -51,10 +51,10 @@ export default class SQL extends BaseWindshaft {
         super();
         this._checkQuery(query);
         this._query = query;
-        this.initialize(auth, config);
+        this._initialize(auth, config);
     }
 
-    _clone() {
+    clone() {
         return new SQL(this._query, this._auth, this._config);
     }
 

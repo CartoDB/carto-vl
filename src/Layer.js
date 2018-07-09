@@ -154,7 +154,7 @@ export default class Layer {
     async update(source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
-        source = source._clone();
+        source = source.clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
         const loadSpritesPromise = viz.loadSprites();
@@ -336,10 +336,7 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded(dataframe) {
-        dataframe.setFreeObserver(() => {
-            this._integrator.invalidateWebGLState();
-            this._integrator.needRefresh();
-        });
+        dataframe.setFreeObserver(this._dataFrameFreeObserver.bind(this));
         this._renderLayer.addDataframe(dataframe);
         this._integrator.invalidateWebGLState();
         if (this._viz) {
@@ -347,6 +344,14 @@ export default class Layer {
         }
         this._integrator.needRefresh();
         this._fireUpdateOnNextRender = true;
+    }
+
+    /**
+     * Callback executed when a dataframe is freed
+     */
+    _dataFrameFreeObserver() {
+        this._integrator.invalidateWebGLState();
+        this._integrator.needRefresh();
     }
 
     /**

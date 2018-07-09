@@ -1,4 +1,4 @@
-import * as f from '../../../src/client/windshaft-filtering';
+import * as f from '../../../src/client/windshaft/windshaft-filtering';
 import { Viz, expressions as s } from '../../../src/index';
 
 function preFilters(f, vizFilter) {

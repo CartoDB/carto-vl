@@ -97,7 +97,7 @@ export default class GeoJSON extends Base {
         return false;
     }
 
-    _clone() {
+    clone() {
         return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
