@@ -335,7 +335,7 @@ export default class Ramp extends BaseExpression {
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
     return input.isA(Buckets)
         ? _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor)
-        : _getColorsFromPaletteTypeDefault(input, palette, othersColor);
+        : _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor);
 }
 
 function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
@@ -354,7 +354,7 @@ function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
     return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
 
-function _getColorsFromPaletteTypeDefault(input, palette, othersColor) {
+function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
     let colors;
 
     if (palette.isQuantitative()) {
@@ -362,9 +362,12 @@ function _getColorsFromPaletteTypeDefault(input, palette, othersColor) {
     }
 
     if (palette.isQualitative()) {
-        colors = _getSubPalettes(palette, input.numCategories);
-        colors.pop();
-        othersColor = colors[input.numCategories];
+        colors = _getSubPalettes(palette, numCategories);
+        
+        if (input.numCategories === numCategories) {
+            colors.pop();
+            othersColor = colors[numCategories];
+        }
     }
 
     if (input.numCategories === undefined) {
@@ -385,13 +388,17 @@ function _getSubPalettes(palette, numCategories) {
 function _getColorsFromColorArrayType(input, palette, numCategories, othersColor) {
     return input.type === inputTypes.CATEGORY
         ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, othersColor)
-        : _getColorsFromColorArrayTypeNumeric(numCategories, palette.colors);
+        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
 }
 
 function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, othersColor) {
     let otherColor;
 
     if (input.isA(Classifier) && numCategories < colors.length) {
+        return colors;
+    }
+
+    if (input.isA(Property)) {
         return colors;
     }
 
