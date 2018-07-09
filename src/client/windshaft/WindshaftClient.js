@@ -7,6 +7,7 @@ import sqlHelper from './sqlHelper';
 
 
 const SAMPLE_ROWS = 1000;
+const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
 
 export default class WindshaftClient {
@@ -134,15 +135,16 @@ export default class WindshaftClient {
                 }
             };
         }
-        const response = await fetch(getEndPoint(conf), this._getRequestConfig(mapConfigAgg));
+        const response = await fetch(getMapRequest(conf, mapConfigAgg));
         const layergroup = await response.json();
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
         }
+        const subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
         return {
-            subdomains: layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [],
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg),
+            subdomains
         };
     }
 
@@ -199,33 +201,6 @@ export default class WindshaftClient {
 }
 
 
-
-function getLayerUrl(layergroup, layerIndex, conf) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
-    }
-    return getEndPoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
-}
-
-function getEndPoint(conf, path = '') {
-    let url = `${conf.serverURL}/api/v1/map`;
-    if (path) {
-        url += '/' + path;
-    }
-    url = authURL(url, conf);
-    return url;
-}
-
-function authURL(url, conf) {
-    if (conf.apiKey) {
-        const sep = url.includes('?') ? '&' : '?';
-        url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
-        url += '&client=' + encodeURIComponent('vl-' + version);
-    }
-    return url;
-}
-
 function adaptGeometryType(type) {
     switch (type) {
         case 'ST_MultiPolygon':
@@ -246,4 +221,55 @@ function adaptColumnType(type) {
         return 'category';
     }
     return type;
+}
+
+function getMapRequest(conf, mapConfig) {
+    const mapConfigPayload = JSON.stringify(mapConfig);
+    const auth = encodeParameter('api_key', conf.apiKey);
+    const client = encodeParameter('client', `vl-${version}`);
+
+    const parameters = [auth, client, encodeParameter('config', mapConfigPayload)];
+    const url = generateUrl(generateMapsApiUrl(conf), parameters);
+    if (url.length < REQUEST_GET_MAX_URL_LENGTH) {
+        return new Request(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+    }
+
+    return new Request(generateUrl(generateMapsApiUrl(conf), [auth, client]), {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: mapConfigPayload
+    });
+}
+
+function getLayerUrl(layergroup, layerIndex, conf) {
+    const params = [encodeParameter('api_key', conf.apiKey)];
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return generateUrl(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, params);
+    }
+    return generateUrl(generateMapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
+}
+
+function encodeParameter(name, value) {
+    return `${name}=${encodeURIComponent(value)}`;
+}
+
+function generateUrl(url, parameters = []) {
+    return `${url}?${parameters.join('&')}`;
+}
+
+function generateMapsApiUrl(conf, path) {
+    let url = `${conf.serverURL}/api/v1/map`;
+    if (path) {
+        url += path;
+    }
+    return url;
 }

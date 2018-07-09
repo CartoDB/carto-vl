@@ -32,6 +32,17 @@ const features = {
     features: [ feature1, feature2 ]
 };
 
+function checkFeatures(list, expectedList) {
+    // FIXME: this shouldn't require list to have the same order as expected
+    expect(list.length).toEqual(expectedList.length);
+    for (let i=0; i<list.length; ++i) {
+        const actual = {};
+        const expected = expectedList[i];
+        Object.keys(expected).forEach(prop => actual[prop] = list[i][prop]);
+        expect(actual).toEqual(expected);
+    }
+}
+
 describe('viewportFeatures', () => {
     let map, source1, viz1, layer1, source2, viz2, layer2;
 
@@ -63,7 +74,7 @@ describe('viewportFeatures', () => {
                 { value: 10, category: 'a'},
                 { value: 1000, category: 'b'}
             ];
-            expect(viz1.variables.list.eval()).toEqual(expected);
+            checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
@@ -78,8 +89,8 @@ describe('viewportFeatures', () => {
                 { value: 10 },
                 { value: 1000 }
             ];
-            expect(viz2.variables.list2all.eval()).toEqual(expectedAll);
-            expect(viz2.variables.list2value.eval()).toEqual(expectedValue);
+            checkFeatures(viz2.variables.list2all.eval(), expectedAll);
+            checkFeatures(viz2.variables.list2value.eval(), expectedValue);
             done();
         });
     });
@@ -116,7 +127,7 @@ describe('viewportFeatures on a map with filters', () => {
             const expected = [
                 { value: 10, category: 'a'}
             ];
-            expect(viz1.variables.list.eval()).toEqual(expected);
+            checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
@@ -129,8 +140,8 @@ describe('viewportFeatures on a map with filters', () => {
             const expectedValue = [
                 { value: 1000 }
             ];
-            expect(viz2.variables.list2all.eval()).toEqual(expectedAll);
-            expect(viz2.variables.list2value.eval()).toEqual(expectedValue);
+            checkFeatures(viz2.variables.list2all.eval(), expectedAll);
+            checkFeatures(viz2.variables.list2value.eval(), expectedValue);
             done();
         });
     });
@@ -167,7 +178,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
             const expected = [
                 { value: 10, category: 'a'}
             ];
-            expect(viz1.variables.list.eval()).toEqual(expected);
+            checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
@@ -180,8 +191,8 @@ describe('viewportFeatures on a zoomed-in map', () => {
             const expectedValue = [
                 { value: 10 }
             ];
-            expect(viz2.variables.list2all.eval()).toEqual(expectedAll);
-            expect(viz2.variables.list2value.eval()).toEqual(expectedValue);
+            checkFeatures(viz2.variables.list2all.eval(), expectedAll);
+            checkFeatures(viz2.variables.list2value.eval(), expectedValue);
             done();
         });
     });

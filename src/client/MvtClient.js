@@ -214,13 +214,15 @@ export default class MvtClient {
     }
 
     _decodeProperties(propertyNames, properties, feature, i) {
-        propertyNames.forEach(propertyName => {
+        const length = propertyNames.length;
+        for (let j = 0; j < length; j++) {
+            const propertyName = propertyNames[j];
             const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = this._decodeProperty(propertyName, propertyValue);
-        });
+            properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
+        }
     }
 
-    _decodeProperty(propertyName, propertyValue) {
+    decodeProperty(propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {

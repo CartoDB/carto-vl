@@ -243,7 +243,7 @@ export default class Renderer {
             const name = propertyNames[i];
             feature[name] = dataframe.properties[name][index];
         }
-        dataframe.cachedFeatures.push(feature);
+        dataframe.cachedFeatures[index] = feature;
         return feature;
     }
 
