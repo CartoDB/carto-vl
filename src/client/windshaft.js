@@ -8,6 +8,8 @@ import * as windshaftFiltering from './windshaft-filtering';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
+const REQUEST_GET_MAX_URL_LENGTH = 2048;
+
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -187,7 +189,7 @@ export default class Windshaft {
                 case 'date':
                 {
                     const d = new Date();
-                    d.setTime(1000*propertyValue);
+                    d.setTime(1000 * propertyValue);
                     const min = column.min;
                     const max = column.max;
                     const n = (d - min) / (max.getTime() - min.getTime());
@@ -333,7 +335,7 @@ export default class Windshaft {
                 }
             };
         }
-        const response = await fetch(endpoint(conf), this._getRequestConfig(mapConfigAgg));
+        const response = await fetch(getMapRequest(conf, mapConfigAgg));
         const layergroup = await response.json();
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
@@ -342,18 +344,6 @@ export default class Windshaft {
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
             metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
-        };
-    }
-
-    _getRequestConfig(mapConfigAgg) {
-        return {
-            method: 'POST',
-            headers: {
-
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(mapConfigAgg),
         };
     }
 
@@ -397,32 +387,6 @@ export default class Windshaft {
     }
 }
 
-const endpoint = (conf, path = '') => {
-    let url = `${conf.serverURL}/api/v1/map`;
-    if (path) {
-        url += '/' + path;
-    }
-    url = authURL(url, conf);
-    return url;
-};
-
-function getLayerUrl(layergroup, layerIndex, conf) {
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return authURL(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, conf);
-    }
-    return endpoint(conf, `${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`);
-}
-
-function authURL(url, conf) {
-    if (conf.apiKey) {
-        const sep = url.includes('?') ? '&' : '?';
-        url += sep + 'api_key=' + encodeURIComponent(conf.apiKey);
-        url += '&client=' + encodeURIComponent('vl-' + version);
-    }
-    return url;
-}
-
 function adaptGeometryType(type) {
     switch (type) {
         case 'ST_MultiPolygon':
@@ -457,4 +421,55 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
     else {
         return promiseGenerator(finalAssumptions);
     }
+}
+
+function getMapRequest(conf, mapConfig) {
+    const mapConfigPayload = JSON.stringify(mapConfig);
+    const auth = encodeParameter('api_key', conf.apiKey);
+    const client = encodeParameter('client', `vl-${version}`);
+
+    const parameters = [auth, client, encodeParameter('config', mapConfigPayload)];
+    const url = generateUrl(generateMapsApiUrl(conf), parameters);
+    if (url.length < REQUEST_GET_MAX_URL_LENGTH) {
+        return new Request(url, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+    }
+
+    return new Request(generateUrl(generateMapsApiUrl(conf), [auth, client]), {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: mapConfigPayload
+    });
+}
+
+function getLayerUrl(layergroup, layerIndex, conf) {
+    const params = [encodeParameter('api_key', conf.apiKey)];
+    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
+        const urlTemplates = layergroup.cdn_url.templates.https;
+        return generateUrl(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, params);
+    }
+    return generateUrl(generateMapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
+}
+
+function encodeParameter(name, value) {
+    return `${name}=${encodeURIComponent(value)}`;
+}
+
+function generateUrl(url, parameters = []) {
+    return `${url}?${parameters.join('&')}`;
+}
+
+function generateMapsApiUrl(conf, path) {
+    let url = `${conf.serverURL}/api/v1/map`;
+    if (path) {
+        url += path;
+    }
+    return url;
 }
