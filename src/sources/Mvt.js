@@ -140,10 +140,7 @@ export default class MVT extends Base {
             if (decodeFn) {
                 const decodedPolygons = decodeFn(geom, mvt_extent);
                 geometries.push(decodedPolygons);
-                this._decodeProperties(propertyNames, properties, f, i);
-                numFeatures++;
-            }
-            else {
+            } else {
                 const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
                 const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
                 // Tiles may contain points in the border;
@@ -153,9 +150,12 @@ export default class MVT extends Base {
                 }
                 geometries[2 * numFeatures + 0] = x;
                 geometries[2 * numFeatures + 1] = y;
-                this._decodeProperties(propertyNames, properties, f, numFeatures);
-                numFeatures++;
             }
+            if (f.properties[this._metadata.idProperty] === undefined) {
+                throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);
+            }
+            this._decodeProperties(propertyNames, properties, f, numFeatures);
+            numFeatures++;
         }
 
         return { properties, geometries, numFeatures };
