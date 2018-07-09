@@ -4,7 +4,6 @@ import { ramp, buckets, palettes, globalQuantiles } from '../../../../../src/ren
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
-import { ReadStream } from 'tty';
 
 const DEFAULT_COLOR = s.namedColor('gray');
 
@@ -741,43 +740,43 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     let actual;
                     let expected;
 
-                    xit('should show interpolation', () => {
+                    it('should show interpolation', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
-                        const q = globalQuantiles($price, 4);
+                        const q = globalQuantiles($price, 10);
                         const r = ramp(q, palettes.SUNSET);
                         r._compile(METADATA);
 
-                        actual = r.eval({ price: 1 });
+                        actual = r.eval({ price: 0 });
                         expected = hexToRgb(RAMP_COLORS[0]);
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({ price: 2.1 });
+                        actual = r.eval({ price: 1.1 });
                         expected = hexToRgb(RAMP_COLORS[1]);
                         
                         expect(actual).not.toEqual(expected);
                         
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({price: 2.1});
                         expected = hexToRgb(RAMP_COLORS[2]);
                         
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
+                        actual = r.eval({price: 3.1});
                         expected = hexToRgb(RAMP_COLORS[3]);
                         
                         expect(actual).not.toEqual(expected);
                         
-                        actual = r.eval({price: 5.1});
+                        actual = r.eval({price: 4.1});
                         expected = hexToRgb(RAMP_COLORS[4]);
                         
                         expect(actual).not.toEqual(expected); 
 
-                        actual = r.eval({price: 6.1});
+                        actual = r.eval({price: 5.1});
                         expected = hexToRgb(RAMP_COLORS[5]);
                         
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 8});
+                        actual = r.eval({price: 10});
                         expected = hexToRgb(RAMP_COLORS[6]);
                         
                         expect(actual).toEqual(expected);
