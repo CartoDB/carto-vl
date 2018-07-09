@@ -362,11 +362,12 @@ function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersC
     }
 
     if (palette.isQualitative()) {
-        colors = _getSubPalettes(palette, numCategories);
-        
-        if (input.numCategories === numCategories) {
+        if (input.isA(Classifier)) {
+            colors = _getSubPalettes(palette, input.numCategories);
             colors.pop();
-            othersColor = colors[numCategories];
+            othersColor = colors[input.numCategories];
+        } else {
+            colors = _getSubPalettes(palette, numCategories);
         }
     }
 
