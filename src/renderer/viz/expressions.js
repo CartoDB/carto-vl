@@ -129,8 +129,8 @@ import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
-import { In } from './expressions/belongs.js';
-import { Nin } from './expressions/belongs.js';
+import { In } from './expressions/belongs';
+import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
@@ -223,14 +223,14 @@ import { Ceil } from './expressions/unary';
 
 import variableFn from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 import ViewportFeatures from './expressions/viewportFeatures';
 
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import {Sprite, SVG} from './expressions/sprite';
+import { Image, SVG } from './expressions/Image';
 import Placement from './expressions/placement';
 import Sprites from './expressions/sprites';
 
@@ -280,7 +280,11 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
-export const sprite = (...args) => new Sprite(...args);
+export const sprite = (...args) => {
+    console.warn('DeprecationWarning: "sprite" expression is deprecated. Please use "image" instead.');
+    return new Image(...args);
+};
+export const image = (...args) => new Image(...args);
 export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);

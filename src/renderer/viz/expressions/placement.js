@@ -24,7 +24,7 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * @return {Placement} Numeric expression
  *
  * @example <caption>Setting the aligment to the top corner of the sprite.</caption>
- *   symbol: sprite('./marker.svg')
+ *   symbol: image('./marker.svg')
  *   symbolPlacement: placement(1, 0)
  *
  * @memberof carto.expressions

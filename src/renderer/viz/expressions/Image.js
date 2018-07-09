@@ -13,12 +13,12 @@ import { checkString } from './utils';
  * @example <caption>Load a svg image.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   symbol: s.sprite('./marker.svg')
+ *   symbol: s.image('./marker.svg')
  * });
  *
  * @example <caption>Load a svg image. (String)</caption>
  * const viz = new carto.Viz(`
- *    symbol: sprite('./marker.svg')
+ *    symbol: image('./marker.svg')
  * `);
  * @memberof carto.expressions
  * @name sprite
@@ -26,7 +26,7 @@ import { checkString } from './utils';
  * @api
 */
 
-export class Sprite extends Base {
+export class Image extends Base {
     constructor(url) {
         checkString('sprite', 'url', 0, url);
         super({});
@@ -34,7 +34,7 @@ export class Sprite extends Base {
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {
-            this.image = new Image();
+            this.image = new window.Image();
             this.image.onload = () => {
                 this.canvas = getCanvasFromImage(this.image);
                 this.image = null;
@@ -114,7 +114,7 @@ function getCanvasFromImage(img) {
     return canvas;
 }
 
-export class SVG extends Sprite{
+export class SVG extends Image{
     constructor(svg){
         super('data:image/svg+xml,' + encodeURIComponent(svg));
     }
