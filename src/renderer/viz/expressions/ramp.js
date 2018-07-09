@@ -4,7 +4,9 @@ import { interpolate } from '../colorspaces';
 import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
+import Property from './basic/property';
 import { Classifier } from './classifier';
+import Linear from './linear';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -96,6 +98,8 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
+        this.inlineMaker = () => undefined;
+
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
 
         try {
@@ -162,13 +166,19 @@ export default class Ramp extends BaseExpression {
     
     _compile(metadata) {
         super._compile(metadata);
+
+        if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
+            this.input = new Linear(this.input); 
+            this.input._compile(metadata);
+        }
+
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
         
         if (this.palette.type === paletteTypes.SPRITE) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
             checkInstance('ramp', 'palette', 1, Sprites, this.palette);
         }
-
+        
         this._texCategories = null;
         this._GLtexCategories = null;
     }
@@ -324,11 +334,11 @@ export default class Ramp extends BaseExpression {
 
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
     return input.isA(Buckets)
-        ? _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersColor)
-        : _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor);
+        ? _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor)
+        : _getColorsFromPaletteTypeDefault(input, palette, othersColor);
 }
 
-function _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersColor) {
+function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
     let colors;
     
     if (palette.isQuantitative()) {
@@ -344,7 +354,7 @@ function _getColorsFromPaletteTypeBuckets(input, palette, numCategories, othersC
     return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
 
-function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
+function _getColorsFromPaletteTypeDefault(input, palette, othersColor) {
     let colors;
 
     if (palette.isQuantitative()) {
@@ -355,6 +365,10 @@ function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersC
         colors = _getSubPalettes(palette, input.numCategories);
         colors.pop();
         othersColor = colors[input.numCategories];
+    }
+
+    if (input.numCategories === undefined) {
+        return colors;
     }
 
     return _avoidShowingInterpolation(input.numCategories, colors, othersColor);

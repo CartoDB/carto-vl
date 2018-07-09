@@ -1,6 +1,6 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, checkRGBAThreshold } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear } from '../../../../../src/renderer/viz/expressions';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
@@ -661,7 +661,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
 
             describe('interpolation', () => {
+                describe('and it uses linear expression', () => {
+                    it('should show interpolation', () => {
 
+                    });
+                });
+
+                describe('and it does not use linear expression', () => {
+                    it('should show interpolation', () => {
+
+                    });
+                });
             });
         });
 
@@ -780,6 +790,110 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         expected = hexToRgb(RAMP_COLORS[6]);
                         
                         expect(actual).toEqual(expected);
+                    });
+                });
+            });
+
+            describe('interpolation', () => {
+                const METADATA = new Metadata({
+                    properties: {
+                        price: { type: 'number', min: 1, max: 13 },
+                    },
+                    sample: [
+                        { price: 1 },
+                        { price: 2 },
+                        { price: 3 },
+                        { price: 4 },
+                        { price: 5 },
+                        { price: 6 },
+                        { price: 7 },
+                        { price: 8 },
+                        { price: 9 },
+                        { price: 10 },
+                        { price: 11 },
+                        { price: 12 },
+                        { price: 13 }
+                    ]
+                });
+    
+                const $price = s.property('price');
+                let actual;
+                let expected;
+
+                describe('and it uses linear expression', () => {
+                    it('should show interpolation', () => {
+                        const RAMP_COLORS = cartocolor.Sunset[7];
+                        const q = linear($price);
+                        const r = ramp(q, palettes.SUNSET);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1 });
+                        expected = hexToRgb(RAMP_COLORS[0]);
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 1.1 });
+                        expected = hexToRgb(RAMP_COLORS[1]);
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 2.1});
+                        expected = hexToRgb(RAMP_COLORS[2]);
+                        
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({price: 3.1});
+                        expected = hexToRgb(RAMP_COLORS[3]);
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 4.1});
+                        expected = hexToRgb(RAMP_COLORS[4]);
+                        
+                        expect(actual).not.toEqual(expected); 
+
+                        actual = r.eval({price: 5.1});
+                        expected = hexToRgb(RAMP_COLORS[5]);
+                        
+                        expect(actual).not.toEqual(expected);
+                    });
+                });
+
+                describe('and it does not use linear expression', () => {
+                    it('should show interpolation', () => {
+                        const RAMP_COLORS = cartocolor.Sunset[7];
+                        const r = ramp($price, palettes.SUNSET);
+                        r._compile(METADATA);
+
+                        actual = r.eval({ price: 1 });
+                        expected = hexToRgb(RAMP_COLORS[0]);
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 1.1 });
+                        expected = hexToRgb(RAMP_COLORS[1]);
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 2.1});
+                        expected = hexToRgb(RAMP_COLORS[2]);
+                        
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({price: 3.1});
+                        expected = hexToRgb(RAMP_COLORS[3]);
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 4.1});
+                        expected = hexToRgb(RAMP_COLORS[4]);
+                        
+                        expect(actual).not.toEqual(expected); 
+
+                        actual = r.eval({price: 5.1});
+                        expected = hexToRgb(RAMP_COLORS[5]);
+                        
+                        expect(actual).not.toEqual(expected);
                     });
                 });
             });

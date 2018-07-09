@@ -39,12 +39,15 @@ export default class Property extends BaseExpression {
         super({});
         this.name = name;
     }
+
     isFeatureDependent(){
         return true;
     }
+
     get value() {
         return this.eval();
     }
+    
     eval(feature) {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
@@ -58,17 +61,21 @@ export default class Property extends BaseExpression {
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
+        
         if (this.type == 'category') {
             this.numCategories = metaColumn.categories.length;
         }
+
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
+
     _applyToShaderSource(getGLSLforProperty) {
         return {
             preface: '',
             inline: getGLSLforProperty(this.name)
         };
     }
+
     _getMinimumNeededSchema() {
         return {
             columns: [
