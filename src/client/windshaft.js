@@ -8,6 +8,8 @@ import * as windshaftFiltering from './windshaft-filtering';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
+const REQUEST_GET_MAX_URL_LENGTH = 2048;
+
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -401,7 +403,6 @@ function generateMapsApiUrl(conf, path){
     return url;
 }
 
-const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
 function getMapRequest(conf, mapConfig) {
     const mapConfigPayload = JSON.stringify(mapConfig);
