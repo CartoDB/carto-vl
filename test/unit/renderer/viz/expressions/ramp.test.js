@@ -661,15 +661,67 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
 
             describe('interpolation', () => {
+                const METADATA = new Metadata({
+                    properties: {
+                        price: { type: 'number', min: 1, max: 5 },
+                    },
+                    sample: [
+                        { price: 1 },
+                        { price: 2 },
+                        { price: 3 },
+                        { price: 4 },
+                        { price: 5 },
+                    ]
+                });
+
                 describe('and it uses linear expression', () => {
                     it('should show interpolation', () => {
+                        const q = linear($price);
+                        const r = ramp(q,[red, blue, yellow, purple, green]);
+                        r._compile(METADATA);
 
+                        actual = r.eval({ price: 1 });
+                        expected = red._nameToRGBA();
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 2.1 });
+                        expected = blue._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 3.1});
+                        expected = yellow._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({price: 4.1});
+                        expected = purple._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
                     });
                 });
 
                 describe('and it does not use linear expression', () => {
                     it('should show interpolation', () => {
+                        const q = $price;
+                        const r = ramp(q,[red, blue, yellow, purple, green]);
+                        r._compile(METADATA);
 
+                        actual = r.eval({ price: 1 });
+                        expected = red._nameToRGBA();
+
+                        expect(actual).toEqual(expected);
+
+                        actual = r.eval({ price: 2.1 });
+                        expected = blue._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
+                        
+                        actual = r.eval({price: 3.1});
+                        expected = yellow._nameToRGBA();
+                        
+                        expect(actual).not.toEqual(expected);
                     });
                 });
             });
