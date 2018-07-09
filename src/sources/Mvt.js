@@ -133,9 +133,6 @@ export default class MVT extends Base {
     _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
-        if (!properties.has(this.metadata.idProperty)) {
-            // TODO: generate source ids
-        }
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
