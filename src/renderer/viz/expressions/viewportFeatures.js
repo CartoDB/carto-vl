@@ -44,6 +44,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
+        this.viewportFeature = null;
     }
 
     _compile() {
@@ -63,30 +64,44 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg(metadata) {
-        if (!this._requiredProperties.every(p => (p.isA(Property)))) {
-            throw new Error('viewportFeatures arguments can only be properties');
+        if (!this.viewportFeature) {
+            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+                throw new Error('viewportFeatures arguments can only be properties');
+            }
+            const columns = this._getMinimumNeededSchema().columns;
+            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
         }
-        this._metadata = metadata;
-        this._columns = this._getMinimumNeededSchema().columns;
         this.expr = [];
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(_adaptFeature(feature, this._columns, this._metadata));
+        this.expr.push(new this._FeatureProxy(feature));
     }
-}
 
-function _adaptFeature(feature, propertyNames, metadata) {
-    const adaptedFeature = {};
-    for (let i = 0; i < propertyNames.length; i++) {
-        const name = propertyNames[i];
-        let value = feature[name];
-        if (metadata.properties[name].type === 'category') {
-            value = metadata.IDToCategory.get(value);
-        }
-        adaptedFeature[name] = value;
+    genViewportFeatureClass(properties, metadata) {
+        const categoryProperties = properties.filter(name => metadata.properties[name].type === 'category');
+        const nonCategoryProperties = properties.filter(name => metadata.properties[name].type !== 'category');
+        const cls = class ViewportFeature {
+            constructor(feature) {
+                this._feature = feature;
+            }
+        };
+        nonCategoryProperties.forEach(prop => {
+            Object.defineProperty(cls.prototype, prop, {
+                get: function() {
+                    return this._feature[prop];
+                }
+            });
+        });
+        categoryProperties.forEach(prop => {
+            Object.defineProperty(cls.prototype, prop, {
+                get: function() {
+                    return metadata.IDToCategory.get(this._feature[prop]);
+                }
+            });
+        });
+        return cls;
     }
-    return adaptedFeature;
 }
 
 function _childrenFromProperties(properties) {
