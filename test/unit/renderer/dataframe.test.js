@@ -12,7 +12,6 @@ describe('src/renderer/Dataframe', () => {
                 ],
                 properties: {
                     id: [1, 2],
-                    cartodb_id: [0, 1]
                 },
                 type: 'point',
                 size: 2,
@@ -22,14 +21,12 @@ describe('src/renderer/Dataframe', () => {
                         id: {
                             type: 'number',
                         },
-                        cartodb_id: {
-                            type: 'number',
-                        }
-                    }
+                    },
+                    idProperty: 'id',
                 }
             });
-            const feature1 = { id: 0, properties: { id: 1 } };
-            const feature2 = { id: 1, properties: { id: 2 } };
+            const feature1 = { id: 1, properties: { id: 1 } };
+            const feature2 = { id: 2, properties: { id: 2 } };
             const viz = {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
@@ -86,13 +83,15 @@ describe('src/renderer/Dataframe', () => {
                         cartodb_id: {
                             type: 'number',
                         }
-                    }
+                    },
+                    idProperty: 'cartodb_id',
                 }
             });
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_prop: 1
+                    numeric_prop: 1,
+                    cartodb_id: 0,
                 }
             };
             const viz = {
@@ -148,7 +147,8 @@ describe('src/renderer/Dataframe', () => {
                         numeric_property: {
                             type: 'number',
                         }
-                    }
+                    },
+                    idProperty: 'cartodb_id',
                 }
             });
             const viz = {
@@ -159,7 +159,8 @@ describe('src/renderer/Dataframe', () => {
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_property: 0
+                    numeric_property: 0,
+                    cartodb_id: 0,
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {
