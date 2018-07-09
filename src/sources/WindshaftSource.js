@@ -58,10 +58,7 @@ export default class WindshaftSource extends Base {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        let templateURL = subdomains.map(s => url.replace('{s}', s));
-        if (subdomains.length === 0) {
-            templateURL = url.replace('{s}', this._getSubdomain(subdomains, 0, 0));
-        }
+        const templateURL = this._buildTemplateUrl(url, subdomains);
 
         this._mvtClient = this._initMvtClient(templateURL, metadata);
         this.metadata = metadata;
@@ -101,6 +98,15 @@ export default class WindshaftSource extends Base {
             }
         };
         return mvtClient;
+    }
+
+    _buildTemplateUrl(url, subdomains){
+        let templateURL = subdomains.map(s => url.replace('{s}', s));
+        if (subdomains.length === 0) {
+            templateURL = url.replace('{s}', this._getSubdomain(subdomains, 0, 0));
+        }
+
+        return templateURL;
     }
 
     _getSubdomain(subdomains, x, y) {
