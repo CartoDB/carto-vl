@@ -76,11 +76,6 @@ function tileRsys(x, y, z) {
     return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
 }
 
-/**
- * Minimum zoom level for which tiles are no larger than the RSys rectangle
- * @param {RSys} rsys
- * @return {number}
- */
 function rZoom(zoom, viewportZoomToSourceZoom) {
     return viewportZoomToSourceZoom(Math.log2(1. / zoom));
 }
