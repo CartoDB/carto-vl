@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
-import { interpolate } from '../colorspaces';
+import { interpolateRGBAinCieLAB } from '../colorspaces';
 import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
@@ -265,7 +265,7 @@ export default class Ramp extends BaseExpression {
             const vlow = [vlowRaw.r / MAX_BYTE_VALUE, vlowRaw.g / MAX_BYTE_VALUE, vlowRaw.b / MAX_BYTE_VALUE, vlowRaw.a];
             const vhigh = [vhighRaw.r / MAX_BYTE_VALUE, vhighRaw.g / MAX_BYTE_VALUE, vhighRaw.b / MAX_BYTE_VALUE, vhighRaw.a];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
-            const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+            const v = interpolateRGBAinCieLAB({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
             pixelValues[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
             pixelValues[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);

@@ -7,7 +7,7 @@ export function cielabToSRGB(cielab) {
     return XYZToSRGB(cielabToXYZ(cielab));
 }
 
-export function interpolate(low, high, m) {
+export function interpolateRGBAinCieLAB(low, high, m) {
     const cielabLow = sRGBToCielab({
         r: low.r,
         g: low.g,
