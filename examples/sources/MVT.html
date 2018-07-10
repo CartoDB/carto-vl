@@ -70,8 +70,10 @@
       const tilejson = layergroup.metadata.tilejson.vector;
       const source = new carto.source.MVT(tilejson.tiles[0], {
         properties: {
-          numfloors: { type: 'number' }
-        }
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
       }, 'europeLayer');
 
       const viz = new carto.Viz(`

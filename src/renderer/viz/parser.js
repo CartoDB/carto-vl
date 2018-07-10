@@ -18,9 +18,27 @@ lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
 lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
 lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
+
 lowerCaseFunctions.pi = functions.PI;
 lowerCaseFunctions.e = functions.E;
 lowerCaseFunctions.hold = functions.HOLD;
+
+lowerCaseFunctions.bicycle = functions.BICYCLE;
+lowerCaseFunctions.building = functions.BUILDING;
+lowerCaseFunctions.bus = functions.BUS;
+lowerCaseFunctions.car = functions.CAR;
+lowerCaseFunctions.circle = functions.CIRCLE;
+lowerCaseFunctions.circleoutline = functions.CIRCLE_OUTLINE;
+lowerCaseFunctions.cross = functions.CROSS;
+lowerCaseFunctions.flag = functions.FLAG;
+lowerCaseFunctions.house = functions.HOUSE;
+lowerCaseFunctions.marker = functions.MARKER;
+lowerCaseFunctions.markeroutline = functions.MARKER_OUTLINE;
+lowerCaseFunctions.star = functions.STAR;
+lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
+lowerCaseFunctions.triangle = functions.TRIANGLE;
+lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
+
 
 export function parseVizExpression(str) {
     prepareJsep();

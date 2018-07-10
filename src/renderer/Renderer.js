@@ -171,18 +171,20 @@ export default class Renderer {
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
-
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
+                const featureId = dataframe.properties[metadata.idProperty][i];
+
                 // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                if (processedFeaturesIDs.has(featureId)) {
                     continue;
                 }
                 // Ignore features outside viewport
                 if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
+                processedFeaturesIDs.add(featureId);
 
                 const feature = this._featureFromDataFrame(dataframe, i);
 
@@ -243,7 +245,7 @@ export default class Renderer {
             const name = propertyNames[i];
             feature[name] = dataframe.properties[name][index];
         }
-        dataframe.cachedFeatures.push(feature);
+        dataframe.cachedFeatures[index] = feature;
         return feature;
     }
 
