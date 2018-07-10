@@ -123,7 +123,7 @@
  * @api
  */
 
-import * as svgs from './builtinSVGs';
+import svgs from './defaultSVGs';
 
 import Transition from './expressions/transition';
 
@@ -230,7 +230,8 @@ import ViewportFeatures from './expressions/viewportFeatures';
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import {Sprite, SVG} from './expressions/sprite';
+import Sprite from './expressions/sprite';
+import SVG from './expressions/svg';
 import Placement from './expressions/placement';
 import Sprites from './expressions/sprites';
 

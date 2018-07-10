@@ -26,7 +26,7 @@ import { checkString } from './utils';
  * @api
 */
 
-export class Sprite extends Base {
+export default class Sprite extends Base {
     constructor(url) {
         checkString('sprite', 'url', 0, url);
         super({});
@@ -112,11 +112,5 @@ function getCanvasFromImage(img) {
     ctx.drawImage(img, (canvasSize - width) / 2, (canvasSize - height) / 2, width, height);
 
     return canvas;
-}
-
-export class SVG extends Sprite{
-    constructor(svg){
-        super('data:image/svg+xml,' + encodeURIComponent(svg));
-    }
 }
 
