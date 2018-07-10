@@ -41,7 +41,8 @@ async function loadMVT() {
         }
     },
     {
-        viewportZoomToSourceZoom: () => 9
+        viewportZoomToSourceZoom: () => 10,
+        maxZoom: 9,
     }
     );
 

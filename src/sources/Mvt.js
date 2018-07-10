@@ -28,7 +28,14 @@ const MVT_TO_CARTO_TYPES = {
  * A MVTOptions object declares a MVT configuration
  * @typedef {object} MVTOptions
  * @property {string} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
- * @property {function} viewportZoomToSourceZoom - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, defaults to `Math.ceil`
+ * @property {function} viewportZoomToSourceZoom - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, undefined defaults to `Math.ceil`
+ * @property {number} maxZoom - limit MVT tile requests to this zoom level, undefined defaults to no limit
+ * 
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles up to zoom level 12.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     maxZoom: 12
+ * };
  * 
  * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</caption>
  * const options = {
@@ -63,7 +70,7 @@ export default class MVT extends Base {
      * @extends carto.source.Base
      * @memberof carto.source
      */
-    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil }) {
+    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -87,7 +94,11 @@ export default class MVT extends Base {
     }
 
     requestData(viewport) {
-        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this), this._options.viewportZoomToSourceZoom);
+        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this),
+            zoom => this._options.maxZoom == undefined ?
+                this._options.viewportZoomToSourceZoom(zoom) :
+                Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
+        );
     }
 
     async responseToDataframeTransformer(response, x, y, z) {
