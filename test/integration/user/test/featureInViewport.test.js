@@ -5,9 +5,9 @@ import mapboxgl from '@carto/mapbox-gl';
 describe('viewport features', () => {
     describe('given a list of features', () => {
         describe('when the viewport is in a predefined place (center/zoom)', () => {
-            let map, source, viz, layer;
+            let map, source, viz, layer, div;
             beforeEach(() => {
-                const div = document.createElement('div');
+                div = document.createElement('div');
                 div.id = 'map';
                 div.style.width = '500px';
                 div.style.height = '500px';
@@ -30,12 +30,17 @@ describe('viewport features', () => {
                 `);
                 layer = new carto.Layer('layer', source, viz);
             });
+           
             it('should correctly detect features inside viewport', done => {
                 layer.addTo(map, 'watername_ocean');
                 layer.on('loaded', () => {
                     expect(viz.variables.list.value.length).toEqual(5);
                     done();
                 });
+            });
+
+            afterEach(() => {
+                document.body.removeChild(div);
             });
         });
     });
