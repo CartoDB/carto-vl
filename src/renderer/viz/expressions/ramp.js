@@ -135,7 +135,7 @@ export default class Ramp extends BaseExpression {
             const images = this.palette._applyToShaderSource(getGLSLforProperty);
             return {
                 preface: input.preface + images.preface,
-                inline: `${images.inline}(spriteUV, ${input.inline})`
+                inline: `${images.inline}(imageUV, ${input.inline})`
             };
         }
         return {
