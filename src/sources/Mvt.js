@@ -29,6 +29,19 @@ const MVT_TO_CARTO_TYPES = {
  * @typedef {object} MVTOptions
  * @property {string} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
  * @property {function} viewportZoomToSourceZoom - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, defaults to `Math.ceil`
+ * 
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 4), 6)
+ * };
+ * 
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 0,3,6,9...</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
+ * };
+ *
  */
 
 export default class MVT extends Base {

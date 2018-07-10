@@ -75,7 +75,7 @@
         idProperty: 'cartodb_id',
       }, {
           layerID: 'europeLayer',
-          viewportZoomToSourceZoom: z => Math.round(z/3)*3
+          viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 1), 11)
       });
 
       const viz = new carto.Viz(`
