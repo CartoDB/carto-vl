@@ -44,7 +44,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
-        this.viewportFeature = null;
+        this._FeatureProxy = null;
     }
 
     _compile() {
@@ -64,7 +64,7 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg(metadata) {
-        if (!this.viewportFeature) {
+        if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
