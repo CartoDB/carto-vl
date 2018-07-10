@@ -18,13 +18,13 @@ External image markers can be loaded with a URL link.
 
 Note: Keep in mind that the server must respond with the appropriate CORS headers for the image file to be properly loaded.
 
-To access external images, use the `symbol` property with the image URL inside of the `sprite` expression:
+To access external images, use the `symbol` property with the image URL inside of the `image` expression:
 
 ```js
 symbol: image('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
 ```
 
-http://127.0.0.1:8080/examples/styling/sprite.html
+http://127.0.0.1:8080/examples/styling/image.html
 
 ### Assign images to categories
 

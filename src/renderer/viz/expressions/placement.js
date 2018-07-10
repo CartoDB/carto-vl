@@ -2,10 +2,10 @@ import BaseExpression from './base';
 import { checkLooseType, checkType, implicitCast } from './utils';
 
 /**
- * Placement. Define a sprite offset relative to its size. Where:
- * - `symbolPlacement: placement(1,1)` means to align the bottom left corner of the sprite with the point center.
- * - `symbolPlacement: placement(0,0)` means to align the center of the sprite with the point center.
- * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the sprite with the point center.
+ * Placement. Define an image offset relative to its size. Where:
+ * - `symbolPlacement: placement(1,1)` means to align the bottom left corner of the image with the point center.
+ * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
+ * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
  *
  *           |1
  *           |
@@ -19,11 +19,11 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
  * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
  *
- * @param {number} x - first numeric expression that indicates the sprite offset in the X direction.
- * @param {number} y - second numeric expression that indicates the sprite offset in the Y direction.
+ * @param {number} x - first numeric expression that indicates the image offset in the X direction.
+ * @param {number} y - second numeric expression that indicates the image offset in the Y direction.
  * @return {Placement} Numeric expression
  *
- * @example <caption>Setting the aligment to the top corner of the sprite.</caption>
+ * @example <caption>Setting the aligment to the top corner of the image.</caption>
  *   symbol: image('./marker.svg')
  *   symbolPlacement: placement(1, 0)
  *

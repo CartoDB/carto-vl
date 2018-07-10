@@ -7,8 +7,8 @@
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
- *  - **symbol** - show a sprite instead in the place of points
- *  - **symbolPlacement** - when using `symbol`, offset to apply to the sprite
+ *  - **symbol** - show an image instead in the place of points
+ *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
  * For example the point diameter could be using the `add` expression:
@@ -123,6 +123,8 @@
  * @api
  */
 
+import { showDeprecationWarning } from './utils/warning';
+
 import * as svgs from './builtinSVGs';
 
 import Transition from './expressions/transition';
@@ -232,7 +234,7 @@ import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 import { Image, SVG } from './expressions/Image';
 import Placement from './expressions/placement';
-import Sprites from './expressions/sprites';
+import Images from './expressions/images';
 
 /* Expose classes as constructor functions */
 
@@ -280,10 +282,8 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
-export const sprite = (...args) => {
-    console.warn('DeprecationWarning: "sprite" expression is deprecated. Please use "image" instead.');
-    return new Image(...args);
-};
+export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
+
 export const image = (...args) => new Image(...args);
 export const svg = (...args) => new SVG(...args);
 
@@ -337,10 +337,7 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => {
-    console.warn('DeprecationWarning: "torque" expression is deprecated. Please use "animation" instead.');
-    return new Animation(...args);
-};
+export const torque = (...args) => showDeprecationWarning(args, Animation, 'torque', 'animation');
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
@@ -353,7 +350,9 @@ export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
-export const sprites = (...args) => new Sprites(...args);
+export const images = (...args) => new Images(...args);
+
+export const sprites = (...args) => showDeprecationWarning(args, Images, 'sprites', 'images');
 
 export const variable = (...args) => variableFn(...args);
 export { variable as var };

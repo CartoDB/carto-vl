@@ -1,17 +1,17 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/renderer/viz/expressions/sprites', () => {
+describe('src/renderer/viz/expressions/images', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('sprite', [undefined]);
-        validateStaticTypeErrors('sprite', [-4]);
-        validateStaticTypeErrors('sprite', ['number']);
-        validateStaticTypeErrors('sprite', ['color']);
-        validateStaticTypeErrors('sprite', ['category-property']);
-        validateStaticTypeErrors('sprite', ['color-array']);
+        validateStaticTypeErrors('image', [undefined]);
+        validateStaticTypeErrors('image', [-4]);
+        validateStaticTypeErrors('image', ['number']);
+        validateStaticTypeErrors('image', ['color']);
+        validateStaticTypeErrors('image', ['category-property']);
+        validateStaticTypeErrors('image', ['color-array']);
     });
 
     describe('type', () => {
-        validateStaticType('sprite', ['wadus.svg'], 'sprite');
+        validateStaticType('image', ['wadus.svg'], 'image');
     });
 
     describe('eval', () => {

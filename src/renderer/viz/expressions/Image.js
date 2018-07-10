@@ -2,9 +2,9 @@ import Base from './base';
 import { checkString } from './utils';
 
 /**
- * Sprite. Load an image and use it as a symbol.
+ * Image. Load an image and use it as a symbol.
  *
- * Note: sprite RGB color will be overridden if the viz `color` property is set.
+ * Note: image RGB color will be overridden if the viz `color` property is set.
  *
  * Limitation: images have to be square.
  *
@@ -21,16 +21,16 @@ import { checkString } from './utils';
  *    symbol: image('./marker.svg')
  * `);
  * @memberof carto.expressions
- * @name sprite
+ * @name image
  * @function
  * @api
 */
 
 export class Image extends Base {
     constructor(url) {
-        checkString('sprite', 'url', 0, url);
+        checkString('image', 'url', 0, url);
         super({});
-        this.type = 'sprite';
+        this.type = 'image';
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {
@@ -46,7 +46,7 @@ export class Image extends Base {
         });
     }
 
-    loadSprites() {
+    loadImages() {
         this.count = this.count + 1 || 1;
         return this._promise;
     }

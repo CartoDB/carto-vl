@@ -31,8 +31,8 @@ export default class Base {
         this._shaderBindings = new Map();
     }
 
-    loadSprites() {
-        return Promise.all(this._getChildren().map(child => child.loadSprites()));
+    loadImages() {
+        return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
     _bind(metadata) {
