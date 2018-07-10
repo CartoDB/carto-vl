@@ -57,7 +57,7 @@
       @list: viewportFeatures(@number, $sttext)
       @anotheList: viewportFeatures($zip)
       width: 20 // + 0*@number
-      // filter: $zip > 50000
+      @c: $zip > 50000
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
