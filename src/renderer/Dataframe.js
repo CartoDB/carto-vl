@@ -187,7 +187,7 @@ export default class Dataframe {
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
             case 'polygon':
-                return this._isPolygonInViewport(triangles, viewport);
+                return this._isPolygonInViewport(featureIndex, scale, center, aspect, triangles, viewport);
             default:
                 return false;
         }
@@ -200,7 +200,15 @@ export default class Dataframe {
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport(triangles, viewport) {
+    _isPolygonInViewport(featureIndex, scale, center, aspect, triangles, viewport) {
+        const viewportAABB = this._getBounds(scale, center, aspect);
+        const featureAABB = this._aabb[featureIndex];
+        const result = this._compareAABBs(featureAABB, viewportAABB);
+        if (result !== 0) {
+            return result > 0; // true when feature in viewport false otherwise
+        }
+
+        // When the aabb is not enough we perform a better check 
         for (let i = 0; i < triangles.length; i++) {
             if (triangles[i].collides(viewport)) {
                 return true;
@@ -209,10 +217,24 @@ export default class Dataframe {
         return false;
     }
 
+    _compareAABBs(featureAABB, viewportAABB) {
+        // feature totally inside viewport return positive number
+        if (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
+            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy) {
+            return 1;
+        }
+        // feature totally outside viewport return negative number
+        if (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
+            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny) {
+            return -1;
+        }
+        // Partial intersection return 0
+        return 0;
+    }
+
     _getBounds(scale, center, aspect) {
         this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
         this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
-
         const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
         const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
         const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
