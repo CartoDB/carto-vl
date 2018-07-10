@@ -29,7 +29,7 @@ export default class Polygon extends Geometry {
         this._dirty_coords = true;
         this._dirty_normals = true;
 
-        Polygon.prototype.setPoints.call(this, points);
+        this.setPoints(points);
     }
 
     /**

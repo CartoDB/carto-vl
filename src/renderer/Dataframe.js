@@ -7,7 +7,7 @@ import Polygon from '../core/geometries/Polygon';
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
 export default class Dataframe {
-    constructor({ center, scale, geom, properties, type, active, size, metadata}) {
+    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -28,10 +28,12 @@ export default class Dataframe {
         const vertices = this.decodedGeom.vertices;
         const featureGeometries = [];
 
-        for (let i = 0; i < vertices.length; i+=3) {
-            const triangle = [vertices[i], vertices[i+1], vertices[i+2]];
+        for (let i = 0; i < vertices.length - 3; i += 3) {
+            const triangle = [vertices[i], vertices[i + 1], vertices[i + 2]];
             featureGeometries.push(new Polygon(0, 0, triangle));
         }
+
+        return featureGeometries;
     }
 
     setFreeObserver(freeObserver) {
@@ -138,7 +140,6 @@ export default class Dataframe {
                 return true;
             }
         }
-
         return false;
     }
 
