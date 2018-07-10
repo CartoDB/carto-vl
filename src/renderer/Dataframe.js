@@ -22,6 +22,72 @@ export default class Dataframe {
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
         this._featureGeometries = this._getFeatureGeometries();
+        this._aabb = this._computeAABB(geom);
+    }
+
+    _computeAABB(geometry) {
+        if (this.type === 'line') {
+            return this._computeLineAABB(geometry);
+        }
+        if (this.type === 'polygon') {
+            return this._computePolygonAABB(geometry);
+        }
+        return [];
+    }
+
+    _computePolygonAABB(geometry) {
+        const aabbList = [];
+
+        for (let i = 0; i < geometry.length; i++) {
+            const feature = geometry[i];
+            const aabb = {
+                minx: Number.POSITIVE_INFINITY,
+                miny: Number.POSITIVE_INFINITY,
+                maxx: Number.NEGATIVE_INFINITY,
+                maxy: Number.NEGATIVE_INFINITY,
+            };
+            for (let j = 0; j < feature.length; j++) {
+                const polygon = feature[j];
+                const vertices = polygon.flat;
+                const numVertices = polygon.holes[0] || polygon.flat.length / 2;
+                for (let k = 0; k < numVertices; k++) {
+                    aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
+                    aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
+                    aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
+                    aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
+                }
+            }
+
+            aabbList.push(aabb);
+        }
+
+        return aabbList;
+    }
+
+    _computeLineAABB(geometry) {
+        const aabbList = [];
+        for (let i = 0; i < geometry.length; i++) {
+            const feature = geometry[i];
+            const aabb = {
+                minx: Number.POSITIVE_INFINITY,
+                miny: Number.POSITIVE_INFINITY,
+                maxx: Number.NEGATIVE_INFINITY,
+                maxy: Number.NEGATIVE_INFINITY,
+            };
+            for (let j = 0; j < feature.length; j++) {
+                const vertices = feature[j];
+                const numVertices = vertices.length;
+                for (let k = 0; k < numVertices; k++) {
+                    aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
+                    aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
+                    aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
+                    aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
+                }
+            }
+            aabbList.push(aabb);
+        }
+
+        return aabbList;
     }
 
     _getFeatureGeometries() {
