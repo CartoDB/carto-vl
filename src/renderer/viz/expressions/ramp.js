@@ -334,9 +334,9 @@ export default class Ramp extends BaseExpression {
 }
 
 function _getColorsFromPaletteType(input, palette, numCategories, othersColor) {
-    return input.isA(Buckets)
+    return input.isA(Buckets) || input.isA(Top)
         ? _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor)
-        : _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor);
+        : _getColorsFromPaletteTypeDefault(input, palette, othersColor);
 }
 
 function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
@@ -355,7 +355,7 @@ function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
     return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
 
-function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersColor) {
+function _getColorsFromPaletteTypeDefault(input, palette, othersColor) {
     let colors;
 
     if (palette.isQuantitative()) {
@@ -363,13 +363,9 @@ function _getColorsFromPaletteTypeDefault(input, palette, numCategories, othersC
     }
 
     if (palette.isQualitative()) {
-        if (input.isA(Top)) {
-            colors = _getSubPalettes(palette, numCategories);
-        } else {
-            colors = _getSubPalettes(palette, input.numCategories);
-            colors.pop();
-            othersColor = colors[input.numCategories];
-        }
+        colors = _getSubPalettes(palette, input.numCategories);
+        colors.pop();
+        othersColor = colors[input.numCategories];
     }
 
     if (input.numCategories === undefined) {
