@@ -35,7 +35,6 @@ export default class Polygon extends Geometry {
     /**
      * Sets the points making up the polygon. It's important to use this function when changing the polygon's shape to ensure internal data is also updated.
      */
-
     setPoints(new_points) {
         const count = new_points.length;
 

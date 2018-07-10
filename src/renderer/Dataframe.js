@@ -1,6 +1,6 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
-import Polygon from './geometries/Polygon';
+import Polygon from '../core/geometries/Polygon';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
