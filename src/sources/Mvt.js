@@ -24,6 +24,12 @@ const MVT_TO_CARTO_TYPES = {
     3: geometryTypes.POLYGON
 };
 
+/**
+ * A MVTOptions object declares a MVT configuration
+ * @typedef {object} MVTOptions
+ * @property {string} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
+ * @property {function} viewportZoomToSourceZoom - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, defaults to `Math.ceil`
+ */
 
 export default class MVT extends Base {
 
@@ -32,7 +38,7 @@ export default class MVT extends Base {
      *
      * @param {object} data - A MVT data object
      * @param {object} [metadata] - A carto.source.mvt.Metadata object
-     * @param {string} [layerId] - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
+     * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
@@ -43,9 +49,8 @@ export default class MVT extends Base {
      * @constructor MVT
      * @extends carto.source.Base
      * @memberof carto.source
-     * @IGNOREapi
      */
-    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined }) {
+    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
