@@ -180,7 +180,7 @@ export default class Dataframe {
         const height = scale * (center.y - this.center.y);
         const width = (scale / aspect) * (center.x - this.center.x);
         const viewport = this._getViewportGeometry(center, width, height);
-        const triangles = this._featureGeometries[featureIndex];
+        const triangles = this._featureGeometries;
 
         switch (this.type) {
             case 'point':
