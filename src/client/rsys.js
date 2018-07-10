@@ -81,8 +81,8 @@ function tileRsys(x, y, z) {
  * @param {RSys} rsys
  * @return {number}
  */
-function rZoom(zoom) {
-    return Math.ceil(Math.log2(1. / zoom));
+function rZoom(zoom, viewportZoomToSourceZoom) {
+    return viewportZoomToSourceZoom(Math.log2(1. / zoom));
 }
 
 /**
@@ -91,8 +91,8 @@ function rZoom(zoom) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-export function rTiles(bounds) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
+export function rTiles(bounds, viewportZoomToSourceZoom = Math.ceil) {
+    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2., viewportZoomToSourceZoom), bounds);
 }
 
 /**

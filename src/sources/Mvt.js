@@ -24,6 +24,7 @@ const MVT_TO_CARTO_TYPES = {
     3: geometryTypes.POLYGON
 };
 
+
 export default class MVT extends Base {
 
     /**
@@ -44,7 +45,7 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @IGNOREapi
      */
-    constructor(templateURL, metadata = new Metadata(), layerId = undefined) {
+    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -52,11 +53,11 @@ export default class MVT extends Base {
         }
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
-        this._layerID = layerId;
+        this._options = options;
     }
 
     _clone() {
-        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._layerID);
+        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
@@ -68,7 +69,7 @@ export default class MVT extends Base {
     }
 
     requestData(viewport) {
-        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this));
+        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this), this._options.viewportZoomToSourceZoom);
     }
 
     async responseToDataframeTransformer(response, x, y, z) {
@@ -79,14 +80,14 @@ export default class MVT extends Base {
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
 
-        if (Object.keys(tile.layers).length > 1 && !this._layerID) {
+        if (Object.keys(tile.layers).length > 1 && !this._options.layerID) {
             throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
         }
 
-        const mvtLayer = tile.layers[this._layerID || Object.keys(tile.layers)[0]];
+        const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
 
         if (!mvtLayer) {
-            throw new Error(`LayerID '${this._layerID}' doesn't exist on the MVT tile`);
+            throw new Error(`LayerID '${this._options.layerID}' doesn't exist on the MVT tile`);
         }
 
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
