@@ -239,7 +239,8 @@ const superRefresh = (opts) => {
         }
     );
     const vizStr = document.getElementById('styleEntry').value;
-    const viz = new carto.Viz(vizStr);
+    // Expose viz as window variable for debugging
+    let viz = window.viz = new carto.Viz(vizStr); 
     if (!layer) {
         setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
