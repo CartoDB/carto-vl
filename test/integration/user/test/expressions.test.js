@@ -36,7 +36,7 @@ describe('BaseExpression', () => {
             it('should work well with variables', done => {
                 layer.on('loaded', () => {
                     viz.filter.blendTo(carto.expressions.var('var1'), 0);
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         viz.filter.blendTo(carto.expressions.var('var1'));
                         done();
                     }, 0);
@@ -46,6 +46,7 @@ describe('BaseExpression', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(div);
     });
 });
