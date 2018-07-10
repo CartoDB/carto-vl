@@ -14,9 +14,11 @@ const programCache = new Cache();
  */
 export function compileProgram(gl, glslvertexShader, glslfragmentShader) {
     const code = glslvertexShader + glslfragmentShader;
+    
     if (programCache.has(gl, code)) {
         return programCache.get(gl, code);
     }
+
     const shader = {};
     const vertexShader = _compileShader(gl, glslvertexShader, gl.VERTEX_SHADER);
     const fragmentShader = _compileShader(gl, glslfragmentShader, gl.FRAGMENT_SHADER);

@@ -123,6 +123,8 @@
  * @api
  */
 
+import * as svgs from './builtinSVGs';
+
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
@@ -219,15 +221,16 @@ import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
 
-import Variable from './expressions/basic/variable';
+import variableFn from './expressions/basic/variable';
 
 import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
+import ViewportFeatures from './expressions/viewportFeatures';
 
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import Sprite from './expressions/sprite';
+import {Sprite, SVG} from './expressions/sprite';
 import Placement from './expressions/placement';
 import Sprites from './expressions/sprites';
 
@@ -278,6 +281,7 @@ export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
 export const sprite = (...args) => new Sprite(...args);
+export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);
 
@@ -347,7 +351,7 @@ export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
 export const sprites = (...args) => new Sprites(...args);
 
-export const variable = (...args) => new Variable(...args);
+export const variable = (...args) => variableFn(...args);
 export { variable as var };
 
 export const viewportAvg = (...args) => new ViewportAvg(...args);
@@ -357,6 +361,7 @@ export const viewportSum = (...args) => new ViewportSum(...args);
 export const viewportCount = (...args) => new ViewportCount(...args);
 export const viewportPercentile = (...args) => new ViewportPercentile(...args);
 export const viewportHistogram = (...args) => new ViewportHistogram(...args);
+export const viewportFeatures = (...args) => new ViewportFeatures(...args);
 export const globalAvg = (...args) => new GlobalAvg(...args);
 export const globalMax = (...args) => new GlobalMax(...args);
 export const globalMin = (...args) => new GlobalMin(...args);
@@ -374,6 +379,26 @@ export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 export const PI = new Constant(Math.PI);
 export const E = new Constant(Math.E);
+
+export const BICYCLE = new SVG(svgs.bicycle);
+export const BUILDING = new SVG(svgs.building);
+export const BUS = new SVG(svgs.bus);
+export const CAR = new SVG(svgs.car);
+export const CIRCLE = new SVG(svgs.circle);
+export const CIRCLE_OUTLINE = new SVG(svgs.circleOutline);
+export const CROSS = new SVG(svgs.cross);
+export const FLAG = new SVG(svgs.flag);
+export const HOUSE = new SVG(svgs.house);
+export const MARKER = new SVG(svgs.marker);
+export const MARKER_OUTLINE = new SVG(svgs.markerOutline);
+export const PLUS = new SVG(svgs.plus);
+export const SQUARE = new SVG(svgs.square);
+export const SQUARE_OUTLINE = new SVG(svgs.squareOutline);
+export const STAR = new SVG(svgs.star);
+export const STAR_OUTLINE = new SVG(svgs.starOutline);
+export const TRIANGLE = new SVG(svgs.triangle);
+export const TRIANGLE_OUTLINE = new SVG(svgs.triangleOutline);
+
 
 export const ALIGN_CENTER = new Placement(constant(0), constant(0));
 export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));

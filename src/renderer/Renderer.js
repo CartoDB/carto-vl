@@ -161,21 +161,30 @@ export default class Renderer {
             return;
         }
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg());
+        // Assume that all dataframes of a renderLayer share the same metadata
+        const metadata = dataframes.length ? dataframes[0].metadata : {};
+
+        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
+
+        const viewportExpressionsLength = viewportExpressions.length;
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
+        const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
+                const featureId = dataframe.properties[metadata.idProperty][i];
+
                 // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                if (processedFeaturesIDs.has(featureId)) {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i)) {
+                if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
+                processedFeaturesIDs.add(featureId);
 
                 const feature = this._featureFromDataFrame(dataframe, i);
 
@@ -184,17 +193,20 @@ export default class Renderer {
                     continue;
                 }
 
-                viewportExpressions.forEach(viewportExpression => viewportExpression.accumViewportAgg(feature));
+                for (let j = 0; j < viewportExpressionsLength; j++) {
+                    viewportExpressions[j].accumViewportAgg(feature);
+                }
             }
         });
     }
 
     /**
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
+     * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport(dataframe, index) {
+    _isFeatureInViewport(dataframe, index, aspect) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, this.getAspect());
+        return dataframe.inViewport(index, scale, this._center, aspect);
     }
 
     /**
@@ -219,12 +231,21 @@ export default class Renderer {
      * Build a feature object from a dataframe and an index copying all the properties.
      */
     _featureFromDataFrame(dataframe, index) {
-        const propertyNames = Object.keys(dataframe.properties);
+        if (!dataframe.cachedFeatures) {
+            dataframe.cachedFeatures = [];
+        }
+
+        if (dataframe.cachedFeatures[index] !== undefined) {
+            return dataframe.cachedFeatures[index];
+        }
+
         const feature = {};
+        const propertyNames = Object.keys(dataframe.properties);
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
             feature[name] = dataframe.properties[name][index];
         }
+        dataframe.cachedFeatures[index] = feature;
         return feature;
     }
 
@@ -234,41 +255,40 @@ export default class Renderer {
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: 1 / this._zoom, // Used by zoom expression
+            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)), // Used by zoom expression
         };
 
         if (!tiles.length) {
             return;
         }
+        viz._getRootExpressions().map(expr => expr._dataReady());
 
         gl.enable(gl.CULL_FACE);
-
         gl.disable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.STENCIL_TEST);
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-
         this._runViewportAggregations(renderLayer);
 
-
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
-            const TID = shader.tid;
+            const textureId = shader.textureIds.get(viz);
+
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, tile.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
-            drawMetadata.freeTexUnit = Object.keys(TID).length;
+            drawMetadata.freeTexUnit = Object.keys(textureId).length;
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            Object.keys(TID).forEach((name, i) => {
+            Object.keys(textureId).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
                 gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
-                gl.uniform1i(TID[name], i);
+                gl.uniform1i(textureId[name], i);
             });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
@@ -278,6 +298,7 @@ export default class Renderer {
             gl.drawArrays(gl.TRIANGLES, 0, 3);
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
+
         tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
         tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
         tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
@@ -378,15 +399,15 @@ export default class Renderer {
             gl.uniform1i(renderer.widthTexture, freeTexUnit);
             freeTexUnit++;
 
-
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
             if (!viz.symbol._default) {
+                const textureId = viz.symbolShader.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
-                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(viz.symbolShader.tid).length;
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
                 viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
@@ -394,10 +415,11 @@ export default class Renderer {
                 viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
-                Object.keys(viz.symbolShader.tid).forEach(name => {
+
+                Object.keys(textureId).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                     gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
-                    gl.uniform1i(viz.symbolShader.tid[name], freeTexUnit);
+                    gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
 
@@ -467,10 +489,10 @@ function getOrderingRenderBuckets(renderLayer) {
     let orderingMaxs = [1000];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
-    if (orderer instanceof Asc) {
+    if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
-    } else if (orderer instanceof Desc) {
+    } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
         orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
     }

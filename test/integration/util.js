@@ -1,5 +1,5 @@
 import mapboxgl from '@carto/mapbox-gl';
-import { projectToWebMercator, WM_2R } from '../../src/api/util';
+import { projectToWebMercator, WM_2R } from '../../src/utils/util';
 
 const mapSize = 600;
 
@@ -55,6 +55,6 @@ function project(coordinates) {
     const wm = projectToWebMercator(coordinates);
     return {
         x: mapSize * (0.5 + wm.x / WM_2R),
-        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /*offset*/ )
+        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /*offset*/)
     };
 }

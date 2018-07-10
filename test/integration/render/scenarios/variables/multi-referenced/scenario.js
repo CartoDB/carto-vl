@@ -6,9 +6,9 @@ const map = new carto.Map({
 const source = new carto.source.GeoJSON(sources['points']);
 // Check that precision is good
 const viz = new carto.Viz(`
-    @tenten: 10
-    @tenoneHundred: @tenten * @tenten
-    width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * @tenoneHundred / @tenten * 10
+    @ten: 10
+    @oneHundred: @ten * @ten
+    width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]) * @oneHundred / @ten * 10
 `);
 const layer = new carto.Layer('layer', source, viz);
 

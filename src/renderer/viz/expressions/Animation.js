@@ -3,8 +3,10 @@ import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
-import Variable from './basic/variable';
-import { castDate } from '../../../api/util';
+import { castDate } from '../../../utils/util';
+
+let waitingForLayer = new Set();
+let waitingForOthers = new Set();
 
 /**
  * Create an animated temporal filter (animation).
@@ -66,13 +68,11 @@ import { castDate } from '../../../api/util';
 export class Animation extends BaseExpression {
     constructor(input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
-        let originalInput = input;
+        input = implicitCast(input);
+        const originalInput = input;
 
-        if (input instanceof Property) {
+        if (input.isA(Property)) {
             input = linear(input, globalMin(input), globalMax(input));
-        } else {
-            input = implicitCast(input);
-            originalInput = input;
         }
 
         checkLooseType('animation', 'input', 0, 'number', input);
@@ -93,7 +93,46 @@ export class Animation extends BaseExpression {
         return !this.paused;
     }
 
+    _dataReady() {
+        if (waitingForLayer.has(this)) {
+            waitingForLayer.delete(this);
+            waitingForOthers.add(this);
+        }
+        if (waitingForOthers.has(this)) {
+            waitingForLayer = new Set([...waitingForLayer].filter(expr => {
+                while (expr.parent) {
+                    expr = expr.parent;
+                }
+                if (expr._getRootExpressions) {
+                    // The animation hasn't been removed from the viz
+                    return true;
+                }
+                return false;
+            }));
+            if (waitingForLayer.size > 0) {
+                return;
+            }
+            [...waitingForOthers.values()].map(anim => {
+                if (anim._paused === 'default') {
+                    anim.play();
+                }
+            });
+            waitingForOthers.clear();
+        }
+    }
+
+    _postShaderCompile(program, gl) {
+        waitingForLayer.add(this);
+        this._paused = 'default';
+        super._postShaderCompile(program, gl);
+    }
+
     _setTimestamp(timestamp) {
+        super._setTimestamp(timestamp);
+
+        if (this._paused && this._lastTime === undefined) {
+            return;
+        }
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -108,12 +147,10 @@ export class Animation extends BaseExpression {
         }
 
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
-
-        super._setTimestamp(timestamp);
     }
 
     eval(feature) {
-        const input = this.input.eval(feature);
+        const input = this._input.eval(feature);
 
         if (Number.isNaN(input)) {
             return 0;
@@ -139,8 +176,8 @@ export class Animation extends BaseExpression {
      */
     getProgressValue() {
         const progress = this.progress.eval(); //from 0 to 1
-        const min = this.input.min.eval();
-        const max = this.input.max.eval();
+        const min = this._input.min.eval();
+        const max = this._input.max.eval();
 
         if (!(min instanceof Date)) {
             return progress * (max - min) + min;
@@ -178,7 +215,7 @@ export class Animation extends BaseExpression {
 
     /**
      * Get the animation progress.
-     * 
+     *
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
@@ -199,7 +236,7 @@ export class Animation extends BaseExpression {
      */
     setProgressPct(progress) {
         progress = Number.parseFloat(progress);
-        
+
         if (progress < 0 || progress > 1) {
             throw new TypeError(`animation.setProgressPct requires a number between 0 and 1 as parameter but got: ${progress}`);
         }
@@ -244,10 +281,6 @@ export class Animation extends BaseExpression {
         this._paused = true;
     }
 
-    get input() {
-        return this._input instanceof Variable ? this._input.alias : this._input;
-    }
-
     _compile(meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
@@ -256,17 +289,17 @@ export class Animation extends BaseExpression {
         checkType('animation', 'duration', 1, 'number', this.duration);
         super._compile(meta);
 
-        checkType('animation', 'input', 0, 'number', this.input);
+        checkType('animation', 'input', 0, 'number', this._input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
 
         this.preface = `
             #ifndef ANIMATION
             #define ANIMATION
-            
+
             float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
                 float x = 0.;
-                
+
                 // Check for NaN
                 if (_input <= 0.0 || 0.0 <= _input){
                     x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
