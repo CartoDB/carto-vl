@@ -99,8 +99,6 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        this.inlineMaker = () => undefined;
-
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
 
         try {
