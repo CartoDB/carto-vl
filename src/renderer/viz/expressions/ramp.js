@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
 import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
-import Images from './images';
+import Images from './ImageList';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)

@@ -234,7 +234,7 @@ import XYZ from './expressions/xyz';
 import Zoom from './expressions/zoom';
 import { Image, SVG } from './expressions/Image';
 import Placement from './expressions/placement';
-import Images from './expressions/images';
+import ImageList from './expressions/ImageList';
 
 /* Expose classes as constructor functions */
 
@@ -282,9 +282,12 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
-export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
 
 export const image = (...args) => new Image(...args);
+export const imageList = (...args) => new ImageList(...args);
+export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
+export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
+
 export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);
@@ -350,9 +353,6 @@ export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
-export const images = (...args) => new Images(...args);
-
-export const sprites = (...args) => showDeprecationWarning(args, Images, 'sprites', 'images');
 
 export const variable = (...args) => variableFn(...args);
 export { variable as var };

@@ -1,6 +1,6 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/renderer/viz/expressions/images', () => {
+describe('src/renderer/viz/expressions/image', () => {
     describe('error control', () => {
         validateStaticTypeErrors('image', [undefined]);
         validateStaticTypeErrors('image', [-4]);

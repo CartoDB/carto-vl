@@ -32,7 +32,7 @@ You can match specific images to specific categories in your data with a categor
 The example below, assigns a unique image file to each unique `complaint` type:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),images([car,bus,house]))
+symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
 ```
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/image-files/category-to-image.html)
@@ -46,7 +46,7 @@ The color of image markers can be customized with the `color` property.
 The example below uses the `color` property to override the image fill color from the default black, to `blue`:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),images([car,bus,house]))
+symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
 color: blue
 ```
 
@@ -57,7 +57,7 @@ color: blue
 The example below colors each category's image with a unique color:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),images([car,bus,house]))
+symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
 color: ramp(buckets($complaint,['Car','Bus','Building']),[purple,orange,blue])
 ```
 

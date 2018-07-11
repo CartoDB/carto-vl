@@ -1,18 +1,18 @@
 import { validateStaticType, validateStaticTypeErrors } from './utils';
 
-describe('src/renderer/viz/expressions/images', () => {
+describe('src/renderer/viz/expressions/imageList', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('images', [undefined]);
-        validateStaticTypeErrors('images', ['123']);
-        validateStaticTypeErrors('images', [-4]);
-        validateStaticTypeErrors('images', ['number']);
-        validateStaticTypeErrors('images', ['color']);
-        validateStaticTypeErrors('images', ['category']);
-        validateStaticTypeErrors('images', ['color-array']);
+        validateStaticTypeErrors('imageList', [undefined]);
+        validateStaticTypeErrors('imageList', ['123']);
+        validateStaticTypeErrors('imageList', [-4]);
+        validateStaticTypeErrors('imageList', ['number']);
+        validateStaticTypeErrors('imageList', ['color']);
+        validateStaticTypeErrors('imageList', ['category']);
+        validateStaticTypeErrors('imageList', ['color-array']);
     });
 
     describe('type', () => {
-        validateStaticType('images', ['image-array'], 'image');
+        validateStaticType('imageList', ['image-array'], 'image');
     });
 
     describe('eval', () => {
