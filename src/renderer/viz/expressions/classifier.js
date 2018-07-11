@@ -180,14 +180,14 @@ export class GlobalQuantiles extends Classifier {
 
     _compile(metadata) {
         super._compile(metadata);
-        const sample = metadata.sample.map(s => s[this.input.name]);
+        const copy = metadata.sample.map(s => s[this.input.name]);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
         
-        sample.sort((x, y) => x - y);
+        copy.sort((x, y) => x - y);
         
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
-            breakpoint.expr = sample[Math.floor(p * sample.length)];
+            breakpoint.expr = copy[Math.floor(p * copy.length)];
         });
     }
 }
