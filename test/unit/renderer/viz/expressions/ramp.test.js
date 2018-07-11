@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, checkRGBAThreshold } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes, globalQuantiles, linear } from '../../../../../src/renderer/viz/expressions';
 import * as s from '../../../../../src/renderer/viz/expressions';
@@ -244,7 +244,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             actual = r.eval();
                             expected = DEFAULT_COLOR._nameToRGBA();
-                            checkRGBAThreshold.call(this, actual, expected);
+
+                            expect(actual).toEqual(expected);
                         });
 
                         it('should use last color for the remaining categories', () => {
@@ -272,7 +273,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                                 actual = r.eval();
                                 expected = colors[index]._nameToRGBA();
                                 
-                                checkRGBAThreshold.call(this, actual, expected);
+                                expect(actual).toEqual(expected);
                             });
                         });
                     });

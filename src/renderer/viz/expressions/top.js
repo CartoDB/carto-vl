@@ -55,7 +55,6 @@ export default class Top extends BaseExpression {
         super._compile(metadata);
         checkType('top', 'property', 0, 'category', this.property);
         checkType('top', 'buckets', 1, 'number', this.buckets);
-        this.isBucketComplete = true;
         this._meta = metadata;
         this._textureBuckets = null;
     }
