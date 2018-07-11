@@ -361,7 +361,7 @@ function _getColorsFromPaletteTypeBuckets(palette, numCategories, othersColor) {
 }
 
 function _getColorsFromPaletteTypeTop(palette, numCategories, othersColor) {
-    colors = _getSubPalettes(palette, numCategories);
+    let colors = _getSubPalettes(palette, numCategories);
     return _avoidShowingInterpolation(numCategories, colors, othersColor);
 }
 
