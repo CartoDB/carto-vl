@@ -238,11 +238,11 @@ export default class Ramp extends BaseExpression {
         }
 
         return this.type === rampTypes.COLOR
-            ? this._computeTextureColor()
-            : this._computeTexture();
+            ? this._computeColorRampTexture()
+            : this._computeNumericRampTexture();
     }
 
-    _computeTextureColor() {
+    _computeColorRampTexture() {
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
@@ -263,7 +263,7 @@ export default class Ramp extends BaseExpression {
         return texturePixels;
     }
 
-    _computeTexture() {
+    _computeNumericRampTexture() {
         const texturePixels = new Float32Array(COLOR_ARRAY_LENGTH);
         const floats = this.palette.floats;
 
