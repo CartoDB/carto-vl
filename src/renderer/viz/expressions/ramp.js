@@ -249,8 +249,8 @@ export default class Ramp extends BaseExpression {
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
             const vlowRaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
             const vhighRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vlow = [vlowRaw.r / MAX_BYTE_VALUE, vlowRaw.g / MAX_BYTE_VALUE, vlowRaw.b / MAX_BYTE_VALUE, vlowRaw.a];
-            const vhigh = [vhighRaw.r / MAX_BYTE_VALUE, vhighRaw.g / MAX_BYTE_VALUE, vhighRaw.b / MAX_BYTE_VALUE, vhighRaw.a];
+            const vlow = [vlowRaw.r / (COLOR_ARRAY_LENGTH - 1), vlowRaw.g / (COLOR_ARRAY_LENGTH - 1), vlowRaw.b / (COLOR_ARRAY_LENGTH - 1), vlowRaw.a];
+            const vhigh = [vhighRaw.r / (COLOR_ARRAY_LENGTH - 1), vhighRaw.g / (COLOR_ARRAY_LENGTH - 1), vhighRaw.b / (COLOR_ARRAY_LENGTH - 1), vhighRaw.a];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
             const v = interpolateRGBAinCieLAB({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
 
@@ -268,9 +268,9 @@ export default class Ramp extends BaseExpression {
         const floats = this.palette.floats;
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vlowRaw = floats[Math.floor(i / MAX_BYTE_VALUE * (floats.length - 1))];
-            const vhighRaw = floats[Math.ceil(i / MAX_BYTE_VALUE * (floats.length - 1))];
-            const m = i / MAX_BYTE_VALUE * (floats.length - 1) - Math.floor(i / MAX_BYTE_VALUE * (floats.length - 1));
+            const vlowRaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const vhighRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
             texturePixels[i] = ((1. - m) * vlowRaw + m * vhighRaw);
         }
 
