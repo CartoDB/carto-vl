@@ -212,6 +212,7 @@ export default class Ramp extends BaseExpression {
         }
 
         const defaultOthersColor = new NamedColor('gray');
+        
         return palette.type === paletteTypes.PALETTE
             ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
             : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
@@ -349,7 +350,7 @@ function _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor
     let colors = _getSubPalettes(palette, numCategories);
 
     if (palette.isQualitative()) {
-        defaultOthersColor = colors[numCategories];
+        defaultOthersColor = colors[colors.length - 1];
     }
 
     return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
