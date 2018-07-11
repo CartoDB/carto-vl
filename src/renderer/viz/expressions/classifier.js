@@ -21,12 +21,13 @@ export class Classifier extends BaseExpression {
     }
 
     eval(feature) {
+        const NOT_FOUND_INDEX = -1;
         const input = this.input.eval(feature);
         const index = this.breakpoints.findIndex((br) => {
             return input <= br.expr;
         });
 
-        return index !== -1 ? index : this.breakpoints.length;
+        return index === NOT_FOUND_INDEX ? this.breakpoints.length : index;
     }
 
     _genBreakpoints() {

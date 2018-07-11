@@ -125,21 +125,17 @@ export default class Ramp extends BaseExpression {
         const pixelValues = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
-        if (input !== -1) {
-            const numValues = pixelValues.length - 1;
-            const m = (input - this.minKey) / (this.maxKey - this.minKey);
-            
-            const color = this.type === rampTypes.NUMBER
-                ? this._getValue(pixelValues, numValues, m)
-                : this._getColorValue(pixelValues, m);
-            
-            this._texCategories = null;
-            this._GLtexCategories = null;
+        const numValues = pixelValues.length - 1;
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+        
+        const color = this.type === rampTypes.NUMBER
+            ? this._getValue(pixelValues, numValues, m)
+            : this._getColorValue(pixelValues, m);
+        
+        this._texCategories = null;
+        this._GLtexCategories = null;
 
-            return color;
-        }
-
-        return null;
+        return color;
     }
 
     _getValue(pixelValues, numValues, m) {
