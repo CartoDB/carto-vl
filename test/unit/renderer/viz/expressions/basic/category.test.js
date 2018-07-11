@@ -1,5 +1,6 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
@@ -23,18 +24,18 @@ describe('src/renderer/viz/expressions/basic/category', () => {
     });
 
     describe('.eval', () => {
-        const fakeMetadata = {
-            columns: [{
-                type: 'category',
-                name: 'category',
-                categoryNames: ['cat0', 'cat1', 'cat2']
-            }],
-            categoryIDs: {
-                'cat0': 0,
-                'cat1': 1,
-                'cat2': 2,
+        const fakeMetadata = new Metadata({
+            properties: {
+                category: {
+                    type: 'category',
+                    categories: [
+                        { category: 'cat0' }, 
+                        { category: 'cat1' },
+                        { category: 'cat2' }
+                    ]
+                }
             }
-        };
+        });
         
         it('should return the value from the metadata', () => {
             const categoryExpresion = s.category('cat0');
