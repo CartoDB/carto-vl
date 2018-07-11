@@ -6,8 +6,6 @@ import { checkString } from './utils';
  *
  * Note: sprite RGB color will be overridden if the viz `color` property is set.
  *
- * Limitation: images have to be square.
- *
  * @param {string} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
@@ -106,16 +104,17 @@ function getCanvasFromImage(img) {
 
     const ctx = canvas.getContext('2d');
 
-    const max = Math.min(Math.max(img.width, img.height), canvasSize);
+    const max = Math.max(img.width, img.height);
     const width = img.width / max * canvasSize;
     const height = img.height / max * canvasSize;
-    ctx.drawImage(img, (canvasSize - width) / 2, (canvasSize - height) / 2, width, height);
+
+    ctx.drawImage(img, 1 + (canvasSize - width) / 2, 1 + (canvasSize - height) / 2, width - 2, height - 2);
 
     return canvas;
 }
 
-export class SVG extends Sprite{
-    constructor(svg){
+export class SVG extends Sprite {
+    constructor(svg) {
         super('data:image/svg+xml,' + encodeURIComponent(svg));
     }
 }
