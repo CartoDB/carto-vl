@@ -192,7 +192,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import PaletteReverse from './expressions/color/palettes/PaletteReverse';
+import Reverse from './expressions/color/palettes/Reverse';
 
 import Property from './expressions/basic/property';
 
@@ -309,7 +309,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = (...args) => new PaletteReverse(...args);
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };

@@ -23,7 +23,7 @@ import Palette from './Palette';
  * @api
  */
 
-export default class PaletteReverse extends Palette {
+export default class Reverse extends Palette {
     constructor(palette) {
         super(palette.name, palette.subPalettes);
         this.type = 'palette';
