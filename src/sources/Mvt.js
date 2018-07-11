@@ -79,6 +79,7 @@ export default class MVT extends Base {
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
         this._options = options;
+        this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
     }
 
     _clone() {
