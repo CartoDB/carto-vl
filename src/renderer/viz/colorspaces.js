@@ -7,26 +7,26 @@ export function cielabToSRGB(cielab) {
     return XYZToSRGB(cielabToXYZ(cielab));
 }
 
-export function interpolateRGBAinCieLAB(low, high, m) {
-    const cielabLow = sRGBToCielab({
-        r: low.r,
-        g: low.g,
-        b: low.b,
-        a: low.a,
+export function interpolateRGBAinCieLAB(rgbColorA, rgbColorB, m) {
+    const cielabColorA = sRGBToCielab({
+        r: rgbColorA.r,
+        g: rgbColorA.g,
+        b: rgbColorA.b,
+        a: rgbColorA.a,
     });
     
-    const cielabHigh = sRGBToCielab({
-        r: high.r,
-        g: high.g,
-        b: high.b,
-        a: high.a,
+    const cielabColorB = sRGBToCielab({
+        r: rgbColorB.r,
+        g: rgbColorB.g,
+        b: rgbColorB.b,
+        a: rgbColorB.a,
     });
 
     const cielabInterpolated = {
-        l: (1 - m) * cielabLow.l + m * cielabHigh.l,
-        a: (1 - m) * cielabLow.a + m * cielabHigh.a,
-        b: (1 - m) * cielabLow.b + m * cielabHigh.b,
-        alpha: (1 - m) * cielabLow.alpha + m * cielabHigh.alpha,
+        l: (1 - m) * cielabColorA.l + m * cielabColorB.l,
+        a: (1 - m) * cielabColorA.a + m * cielabColorB.a,
+        b: (1 - m) * cielabColorA.b + m * cielabColorB.b,
+        alpha: (1 - m) * cielabColorA.alpha + m * cielabColorB.alpha,
     };
 
     return cielabToSRGB(cielabInterpolated);

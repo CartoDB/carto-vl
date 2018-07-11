@@ -247,12 +247,12 @@ export default class Ramp extends BaseExpression {
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vlowRaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vhighRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vlow = [vlowRaw.r / (COLOR_ARRAY_LENGTH - 1), vlowRaw.g / (COLOR_ARRAY_LENGTH - 1), vlowRaw.b / (COLOR_ARRAY_LENGTH - 1), vlowRaw.a];
-            const vhigh = [vhighRaw.r / (COLOR_ARRAY_LENGTH - 1), vhighRaw.g / (COLOR_ARRAY_LENGTH - 1), vhighRaw.b / (COLOR_ARRAY_LENGTH - 1), vhighRaw.a];
+            const vColorARaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vColorBRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vColorA = [vColorARaw.r / (COLOR_ARRAY_LENGTH - 1), vColorARaw.g / (COLOR_ARRAY_LENGTH - 1), vColorARaw.b / (COLOR_ARRAY_LENGTH - 1), vColorARaw.a];
+            const vColorB = [vColorBRaw.r / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.g / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.b / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.a];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
-            const v = interpolateRGBAinCieLAB({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
+            const v = interpolateRGBAinCieLAB({ r: vColorA[0], g: vColorA[1], b: vColorA[2], a: vColorA[3] }, { r: vColorB[0], g: vColorB[1], b: vColorB[2], a: vColorB[3] }, m);
 
             texturePixels[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
             texturePixels[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);
@@ -268,10 +268,10 @@ export default class Ramp extends BaseExpression {
         const floats = this.palette.floats;
 
         for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vlowRaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
-            const vhighRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const vColorARaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const vColorBRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
-            texturePixels[i] = ((1. - m) * vlowRaw + m * vhighRaw);
+            texturePixels[i] = ((1. - m) * vColorARaw + m * vColorBRaw);
         }
 
         return texturePixels;
