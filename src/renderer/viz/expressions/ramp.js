@@ -392,14 +392,20 @@ function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, d
 
     if (numCategories < colors.length) {
         othersColor = colors[numCategories];
-    } 
+        return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    }
 
-    if (numCategories >= colors.length) {
+    if (numCategories > colors.length) {
         othersColor = defaultOthersColor;
         colors = _addothersColorToColors(colors, othersColor);
+        return colors;
     }
-    
-    return _avoidShowingInterpolation(numCategories, colors, othersColor);
+
+    if (numCategories === colors.length) {
+        othersColor = defaultOthersColor;
+        colors = _addothersColorToColors(colors, othersColor);
+        return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    }
 }
 
 function _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
