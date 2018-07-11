@@ -101,6 +101,7 @@ describe('Layer', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(div);
     });
 });

@@ -140,8 +140,9 @@ export default class GeoJSON extends Base {
             // Set the geomType of the first feature to the metadata
             geomType = this._getDataframeType(this._features[0].geometry.type);
         }
+        const idProperty = 'cartodb_id';
 
-        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType });
+        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
 
         return this._metadata;
     }

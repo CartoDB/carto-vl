@@ -50,9 +50,11 @@ export default class ImageList extends Base {
             inline: `atlas${this._uid}Fn`
         };
     }
+
     _postShaderCompile(program, gl) {
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `atlas${this._uid}`);
     }
+    
     _preDraw(program, drawMetadata, gl) {
         this.init = true;
         for (let i = 0; i < this.numImages; i++) {
