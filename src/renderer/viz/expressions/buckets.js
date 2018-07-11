@@ -98,7 +98,6 @@ export default class Buckets extends BaseExpression {
         this.numCategories = list.elems.length + 1;
         this.list = list;
         this.type = 'category';
-        this.isBuckets = true;
     }
 
     eval(feature) {
