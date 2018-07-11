@@ -12,8 +12,8 @@ export default class Polygon extends Geometry {
         this.angle = angle;
         this.scale_x = scale_x;
         this.scale_y = scale_y;
-
-        this._polygon = true;
+        this.isPolygon = true;
+        
         this._x = x;
         this._y = y;
         this._angle = angle;

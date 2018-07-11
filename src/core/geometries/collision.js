@@ -3,10 +3,7 @@
  * https://github.com/Prozi/detect-collisions/
  */
 export default function SAT(a, b, aabb = true) {
-    const a_polygon = a._polygon;
-    const b_polygon = b._polygon;
-
-    if (a_polygon) {
+    if (a.isPolygon) {
         if (
             a._dirty_coords ||
             a.x !== a._x ||
@@ -19,7 +16,7 @@ export default function SAT(a, b, aabb = true) {
         }
     }
 
-    if (b_polygon) {
+    if (b.isPolygon) {
         if (
             b._dirty_coords ||
             b.x !== b._x ||
@@ -33,11 +30,11 @@ export default function SAT(a, b, aabb = true) {
     }
 
     if (!aabb || aabbAABB(a, b)) {
-        if (a_polygon && a._dirty_normals) {
+        if (a.isPolygon && a._dirty_normals) {
             a._calculateNormals();
         }
 
-        if (b_polygon && b._dirty_normals) {
+        if (b.isPolygon && b._dirty_normals) {
             b._calculateNormals();
         }
     }
@@ -50,7 +47,7 @@ export default function SAT(a, b, aabb = true) {
  */
 
 function aabbAABB(a, b) {
-    const a_polygon = a._polygon;
+    const a_polygon = a.isPolygon;
     const a_x = a_polygon ? 0 : a.x;
     const a_y = a_polygon ? 0 : a.y;
     const a_radius = a_polygon ? 0 : a.radius * a.scale;
@@ -59,7 +56,7 @@ function aabbAABB(a, b) {
     const a_max_x = a_polygon ? a._max_x : a_x + a_radius;
     const a_max_y = a_polygon ? a._max_y : a_y + a_radius;
 
-    const b_polygon = b._polygon;
+    const b_polygon = b.isPolygon;
     const b_x = b_polygon ? 0 : b.x;
     const b_y = b_polygon ? 0 : b.y;
     const b_radius = b_polygon ? 0 : b.radius * b.scale;
