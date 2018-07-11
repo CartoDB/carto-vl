@@ -77,7 +77,7 @@ function tileRsys(x, y, z) {
 }
 
 function rZoom(zoom, viewportZoomToSourceZoom) {
-    return viewportZoomToSourceZoom(Math.log2(1. / zoom));
+    return viewportZoomToSourceZoom(Math.log2(1 / zoom));
 }
 
 /**
