@@ -48,6 +48,50 @@ export function normalize(v) {
     return [v[0] / s, v[1] / s];
 }
 
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+export function pointInTriangle(p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    if (equalPoints(v1, v2) || equalPoints(v2, v3) || equalPoints(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneTest(p, v1, v2) < 0;
+    const b2 = halfPlaneTest(p, v2, v3) < 0;
+    const b3 = halfPlaneTest(p, v3, v1) < 0;
+
+    return (b1 == b2) && (b2 == b3);
+}
+
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+export function halfPlaneTest(p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+export function equalPoints(a, b) {
+    return (a.x == b.x) && (a.y == b.y);
+}
+
+export function pointInCircle(p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
+}
+
 export default {
     intersect,
     sub,
@@ -55,5 +99,9 @@ export default {
     perpendicular,
     normalize,
     getLineNormal,
-    getJointNormal
+    getJointNormal,
+    halfPlaneTest,
+    pointInTriangle,
+    equalPoints,
+    pointInCircle
 };

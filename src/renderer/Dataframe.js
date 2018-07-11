@@ -1,10 +1,17 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
 import Polygon from '../core/geometries/Polygon';
+import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
+
+const AABBResults = {
+    COLLISION: 1,
+    NO_COLLISION: -1,
+    UNKNOWN: 0
+};
 
 export default class Dataframe {
     constructor({ center, scale, geom, properties, type, active, size, metadata }) {
@@ -22,34 +29,35 @@ export default class Dataframe {
         this.propertyID = {}; //Name => PID
         this.propertyCount = 0;
         this._featureGeometries = this._getFeatureGeometries();
-        this._aabb = this._computeAABB(geom);
+        this._aabb = this._computeAABB(geom, type);
     }
 
-    _computeAABB(geometry) {
-        if (this.type === 'line') {
-            return this._computeLineAABB(geometry);
+    _computeAABB(geometry, type) {
+        switch (type) {
+            case 'point':
+                return [];
+            case 'line':
+            case 'polygon':
+                return this._computeFeatureAABB(geometry, type);
         }
-        if (this.type === 'polygon') {
-            return this._computePolygonAABB(geometry);
-        }
-        return [];
     }
 
-    _computePolygonAABB(geometry) {
+    _computeFeatureAABB(geometry, type) {
         const aabbList = [];
 
         for (let i = 0; i < geometry.length; i++) {
             const feature = geometry[i];
+            
             const aabb = {
                 minx: Number.POSITIVE_INFINITY,
                 miny: Number.POSITIVE_INFINITY,
                 maxx: Number.NEGATIVE_INFINITY,
                 maxy: Number.NEGATIVE_INFINITY,
             };
+
             for (let j = 0; j < feature.length; j++) {
-                const polygon = feature[j];
-                const vertices = polygon.flat;
-                const numVertices = polygon.holes[0] || polygon.flat.length / 2;
+                const { vertices, numVertices } = _getVerticesForGeometry(feature[j], type);
+
                 for (let k = 0; k < numVertices; k++) {
                     aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
                     aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
@@ -58,32 +66,6 @@ export default class Dataframe {
                 }
             }
 
-            aabbList.push(aabb);
-        }
-
-        return aabbList;
-    }
-
-    _computeLineAABB(geometry) {
-        const aabbList = [];
-        for (let i = 0; i < geometry.length; i++) {
-            const feature = geometry[i];
-            const aabb = {
-                minx: Number.POSITIVE_INFINITY,
-                miny: Number.POSITIVE_INFINITY,
-                maxx: Number.NEGATIVE_INFINITY,
-                maxy: Number.NEGATIVE_INFINITY,
-            };
-            for (let j = 0; j < feature.length; j++) {
-                const vertices = feature[j];
-                const numVertices = vertices.length;
-                for (let k = 0; k < numVertices; k++) {
-                    aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
-                    aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
-                    aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
-                    aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
-                }
-            }
             aabbList.push(aabb);
         }
 
@@ -93,9 +75,10 @@ export default class Dataframe {
     _getFeatureGeometries() {
         const vertices = this.decodedGeom.vertices;
         const featureGeometries = [];
+        const INDEX_INCREMENT = 3;
 
-        for (let i = 0; i < vertices.length - 3; i += 3) {
-            const triangle = [vertices[i], vertices[i + 1], vertices[i + 2]];
+        for (let i = 0; i < vertices.length - INDEX_INCREMENT; i++) {
+            const triangle = [vertices[i], vertices[i++], vertices[i++]];
             featureGeometries.push(new Polygon(0, 0, triangle));
         }
 
@@ -203,33 +186,22 @@ export default class Dataframe {
     _isPolygonInViewport(featureIndex, scale, center, aspect, triangles, viewport) {
         const viewportAABB = this._getBounds(scale, center, aspect);
         const featureAABB = this._aabb[featureIndex];
-        const result = this._compareAABBs(featureAABB, viewportAABB);
-        if (result !== 0) {
-            return result > 0; // true when feature in viewport false otherwise
-        }
-
-        // When the aabb is not enough we perform a better check 
-        for (let i = 0; i < triangles.length; i++) {
-            if (triangles[i].collides(viewport)) {
-                return true;
-            }
-        }
-        return false;
+        const AABBResult = this._compareAABBs(featureAABB, viewportAABB);
+        
+        return AABBResult === AABBResults.UNKNOWN
+            ? _isPolygonCollidingViewport(triangles, viewport)
+            : AABBResult === AABBResults.COLLISION;
     }
 
     _compareAABBs(featureAABB, viewportAABB) {
-        // feature totally inside viewport return positive number
-        if (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
-            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy) {
-            return 1;
+        switch (true) {
+            case _isFeatureInsideViewport(featureAABB, viewportAABB): 
+                return AABBResults.COLLISION;
+            case _isFeatureOutsideViewport(featureAABB, viewportAABB):
+                return AABBResults.NO_COLLISION;
+            default:
+                return AABBResults.UNKNOWN;
         }
-        // feature totally outside viewport return negative number
-        if (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
-            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny) {
-            return -1;
-        }
-        // Partial intersection return 0
-        return 0;
     }
 
     _getBounds(scale, center, aspect) {
@@ -292,7 +264,7 @@ export default class Dataframe {
                 center.y += offset[1] * scale;
             }
 
-            const inside = _pointInCircle(p, center, scale);
+            const inside = pointInCircle(p, center, scale);
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
             }
@@ -351,7 +323,7 @@ export default class Dataframe {
                 x: vertices[i + 4] + normals[i + 4] * scale,
                 y: vertices[i + 5] + normals[i + 5] * scale
             };
-            const inside = _pointInTriangle(p, v1, v2, v3);
+            const inside = pointInTriangle(p, v1, v2, v3);
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
@@ -473,46 +445,42 @@ export default class Dataframe {
     }
 }
 
-// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
-// Parameters in {x: 0, y:0} form
-export function _pointInTriangle(p, v1, v2, v3) {
-    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-    // contains an explanation of both this algorithm and one based on barycentric coordinates,
-    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+const geometryFeature = {
+    line: (feature) => {
+        return {
+            vertices: feature,
+            numVertices: feature.length
+        };
+    },
 
-    if (_equal(v1, v2) || _equal(v2, v3) || _equal(v3, v1)) {
-        // Avoid zero area triangle
-        return false;
+    polygon: (feature) => {
+        return {
+            vertices: feature.flat,
+            numVertices: feature.holes[0] || feature.flat.length / 2
+        };
+    }
+};
+
+function _getVerticesForGeometry(feature, geometryType) {
+    return geometryFeature[geometryType] ? geometryFeature[geometryType](feature) : null;
+}
+
+function _isFeatureInsideViewport(featureAABB, viewportAABB) {
+    return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
+            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
+}
+
+function _isFeatureOutsideViewport(featureAABB, viewportAABB) {
+    return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
+            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+}
+
+function _isPolygonCollidingViewport(triangles, viewport) {
+    for (let i = 0; i < triangles.length; i++) {
+        if (triangles[i].collides(viewport)) {
+            return true;
+        }
     }
 
-    // A point is inside a triangle or in one of the triangles edges
-    // if the point is in the three half-plane defined by the 3 edges
-    const b1 = _halfPlaneTest(p, v1, v2) < 0;
-    const b2 = _halfPlaneTest(p, v2, v3) < 0;
-    const b3 = _halfPlaneTest(p, v3, v1) < 0;
-
-    return (b1 == b2) && (b2 == b3);
-}
-
-// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
-// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
-// returns >0 if the point is OUTSIDE
-// Parameters in {x: 0, y:0} form
-function _halfPlaneTest(p, a, b) {
-    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
-    // The result's sign is the half plane test result
-    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
-}
-
-function _equal(a, b) {
-    return (a.x == b.x) && (a.y == b.y);
-}
-
-function _pointInCircle(p, center, scale) {
-    const diff = {
-        x: p.x - center.x,
-        y: p.y - center.y
-    };
-    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
-    return lengthSquared <= scale * scale;
+    return false;
 }

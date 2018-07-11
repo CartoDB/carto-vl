@@ -1,4 +1,5 @@
-import Dataframe, { _pointInTriangle as pointInTriangle } from '../../../src/renderer/Dataframe';
+import Dataframe from '../../../src/renderer/Dataframe';
+import { pointInTriangle } from '../../../src/utils/geometry.js';
 
 describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
