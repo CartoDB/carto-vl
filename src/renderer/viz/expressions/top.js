@@ -86,7 +86,7 @@ export default class Top extends BaseExpression {
             this._textureBuckets = buckets;
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             const width = 1024;
-            let colorValues = new Uint8Array(4 * width);
+            let texturePixels = new Uint8Array(4 * width);
             const metaColumn = this._meta.properties[this.property.name];
 
             const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
@@ -95,13 +95,13 @@ export default class Top extends BaseExpression {
 
             orderedCategoryNames.map((cat, i) => {
                 if (i < buckets) {
-                    colorValues[4 * this._meta.categoryToID.get(cat.name) + 3] = (i + 1);
+                    texturePixels[4 * this._meta.categoryToID.get(cat.name) + 3] = (i + 1);
                 }
             });
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                 width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                colorValues);
+                texturePixels);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
