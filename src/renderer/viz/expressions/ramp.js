@@ -380,31 +380,18 @@ function _getColorsFromColorArrayType(input, palette, numCategories, defaultOthe
 }
 
 function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, defaultOthersColor) {
-    let othersColor;
-
-    if (input.isA(Classifier) && numCategories < colors.length) {
-        return colors;
-    }
-
-    if (input.isA(Property)) {
-        return colors;
-    }
-
-    if (numCategories < colors.length) {
-        othersColor = colors[numCategories];
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    }
-
-    if (numCategories > colors.length) {
-        othersColor = defaultOthersColor;
-        colors = _addothersColorToColors(colors, othersColor);
-        return colors;
-    }
-
-    if (numCategories === colors.length) {
-        othersColor = defaultOthersColor;
-        colors = _addothersColorToColors(colors, othersColor);
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    switch(true) {
+        case input.isA(Classifier) && numCategories < colors.length:
+            return colors;
+        case input.isA(Property):
+            return colors;
+        case numCategories < colors.length:
+            return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
+        case numCategories > colors.length:
+            return _addothersColorToColors(colors, defaultOthersColor);
+        default:
+            colors = _addothersColorToColors(colors, defaultOthersColor);
+            return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
     }
 }
 
