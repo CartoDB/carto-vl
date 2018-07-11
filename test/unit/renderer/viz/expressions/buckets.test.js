@@ -24,10 +24,10 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     city: {
                         type: 'category',
                         categories: [
-                            { city: 'Murcia' }, 
-                            { city: 'Madrid' },
-                            { city: 'Pontevedra' },
-                            { city: 'Barcelona' }
+                            { name: 'Murcia' }, 
+                            { name: 'Madrid' },
+                            { name: 'Pontevedra' },
+                            { name: 'Barcelona' }
                         ]
                     }
                 }

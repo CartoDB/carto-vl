@@ -88,11 +88,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         grade: {
                             type: 'category',
                             categories: [
-                                { grade: 'A' }, 
-                                { grade: 'B' },
-                                { grade: 'C' },
-                                { grade: 'D' },
-                                { grade: 'E' }
+                                { name: 'A' }, 
+                                { name: 'B' },
+                                { name: 'C' },
+                                { name: 'D' },
+                                { name: 'E' }
                             ]
                         }
                     }
@@ -442,13 +442,13 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         city: {
                             type: 'category',
                             categories: [
-                                { city: 'Murcia' }, 
-                                { city: 'Madrid' },
-                                { city: 'Pontevedra' },
-                                { city: 'Barcelona' },
-                                { city: 'Alicante' },
-                                { city: 'Cordoba' },
-                                { city: 'Zaragoza' }
+                                { name: 'Murcia' }, 
+                                { name: 'Madrid' },
+                                { name: 'Pontevedra' },
+                                { name: 'Barcelona' },
+                                { name: 'Alicante' },
+                                { name: 'Cordoba' },
+                                { name: 'Zaragoza' }
                             ]
                         }
                     }

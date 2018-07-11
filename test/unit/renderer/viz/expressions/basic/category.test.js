@@ -29,9 +29,9 @@ describe('src/renderer/viz/expressions/basic/category', () => {
                 category: {
                     type: 'category',
                     categories: [
-                        { category: 'cat0' }, 
-                        { category: 'cat1' },
-                        { category: 'cat2' }
+                        { name: 'cat0' }, 
+                        { name: 'cat1' },
+                        { name: 'cat2' }
                     ]
                 }
             }
