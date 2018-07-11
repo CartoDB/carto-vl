@@ -7,6 +7,7 @@ export default class RenderLayer {
         this.viz = null;
         this.type = null;
         this.customizedFeatures = {};
+        this.idProperty = null;
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
@@ -19,6 +20,7 @@ export default class RenderLayer {
             dataframe.bind(this.renderer);
         }
         this.dataframes.push(dataframe);
+        this.idProperty = dataframe.metadata.idProperty;
     }
 
     getActiveDataframes() {
@@ -51,7 +53,7 @@ export default class RenderLayer {
      * Return a public `Feature` object from the internal feature object obtained from a dataframe.
      */
     _generateApiFeature(rawFeature) {
-        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz);
+        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
     }
 
     trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {

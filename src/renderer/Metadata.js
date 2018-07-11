@@ -5,21 +5,21 @@ export const IDENTITY = {
 };
 
 export default class Metadata {
-    constructor({ properties, featureCount, sample, geomType, isAggregated } = { properties: {} }) {
+    constructor({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
         this.properties = properties;
         this.featureCount = featureCount;
         this.sample = sample;
         this.geomType = geomType;
         this.isAggregated = isAggregated;
+        this.idProperty = idProperty || 'cartodb_id';
 
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
 
         Object.values(properties).map(property => {
-            if (property.categories) {
-                property.categories.map(category => this.categorizeString(category.name));
-            }
+            property.categories = property.categories || [];
+            property.categories.map(category => this.categorizeString(category.name));
         });
     }
     categorizeString(category) {

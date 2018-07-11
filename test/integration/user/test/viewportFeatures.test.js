@@ -44,10 +44,10 @@ function checkFeatures(list, expectedList) {
 }
 
 describe('viewportFeatures', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2;
+    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
 
     beforeEach(() => {
-        const setup = util.createMap('map');
+        setup = util.createMap('map');
         map = setup.map;
 
         source1 = new carto.source.GeoJSON(features);
@@ -94,13 +94,17 @@ describe('viewportFeatures', () => {
             done();
         });
     });
+
+    afterEach(() => {
+        document.body.removeChild(setup.div);
+    });
 });
 
 describe('viewportFeatures on a map with filters', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2;
+    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
 
     beforeEach(() => {
-        const setup = util.createMap('map');
+        setup = util.createMap('map');
         map = setup.map;
 
         source1 = new carto.source.GeoJSON(features);
@@ -132,7 +136,7 @@ describe('viewportFeatures on a map with filters', () => {
         });
     });
 
-    it ('should get the fileered feature properties of another layer', done => {
+    it ('should get the filtered feature properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
                 { id: 2, value: 1000, category: 'b'}
@@ -145,14 +149,18 @@ describe('viewportFeatures on a map with filters', () => {
             done();
         });
     });
+
+    afterEach(() => {
+        document.body.removeChild(setup.div);
+    });
 });
 
 
 describe('viewportFeatures on a zoomed-in map', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2;
+    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
 
     beforeEach(() => {
-        const setup = util.createMap('map');
+        setup = util.createMap('map');
         map = setup.map;
         map.setZoom(10);
 
@@ -196,13 +204,17 @@ describe('viewportFeatures on a zoomed-in map', () => {
             done();
         });
     });
+
+    afterEach(() => {
+        document.body.removeChild(setup.div);
+    });
 });
 
 describe('viewportFeatures with invalid parameters', () => {
-    let map, source, viz, layer;
+    let map, source, viz, layer, setup;
 
     beforeEach(() => {
-        const setup = util.createMap('map');
+        setup = util.createMap('map');
         map = setup.map;
 
         source = new carto.source.GeoJSON(features);
@@ -224,5 +236,10 @@ describe('viewportFeatures with invalid parameters', () => {
             }
         ).toThrowError(/arguments can only be properties/);
         done();
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(setup.div);
     });
 });
