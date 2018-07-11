@@ -64,6 +64,9 @@ export default class TileClient {
 
     async _requestDataframe(x, y, z, responseToDataframeTransformer) {
         const response = await fetch(this._getTileUrl(x, y, z));
+        if (response.status == 404) {
+            return { empty: true };
+        }
         const dataframe = await responseToDataframeTransformer(response, x, y, z);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
