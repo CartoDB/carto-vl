@@ -353,10 +353,6 @@ function _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor
 }
 
 function _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor) {
-    if (input.numCategories === undefined) {
-        return palette.getLongestSubPalette();
-    }
-
     let colors = _getSubPalettes(palette, input.numCategories);
 
     if (palette.isQualitative()) {
@@ -364,15 +360,17 @@ function _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor) {
         defaultOthersColor = colors[input.numCategories];
     }
 
+    if (input.numCategories === undefined) {
+        return colors;
+    }
+
     return _avoidShowingInterpolation(input.numCategories, colors, defaultOthersColor);
 }
 
 function _getSubPalettes(palette, numCategories) {
-    const colors = palette.subPalettes[numCategories]
+    return palette.subPalettes[numCategories]
         ? palette.subPalettes[numCategories]
         : palette.getLongestSubPalette();
-    
-    return colors;
 }
 
 function _getColorsFromColorArrayType(input, palette, numCategories, defaultOthersColor) {
