@@ -332,15 +332,13 @@ function _getColorsFromPaletteType(input, palette, numCategories, defaultOthersC
 }
 
 function _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor) {
-    let colors;
+    let colors = _getSubPalettes(palette, numCategories);
     
     if (palette.isQuantitative()) {
-        colors = _getSubPalettes(palette, numCategories);
         colors.push(defaultOthersColor);
     }
 
     if (palette.isQualitative()) {
-        colors = _getSubPalettes(palette, numCategories);
         defaultOthersColor = colors[numCategories];
     }
 
@@ -349,6 +347,11 @@ function _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersC
 
 function _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor) {
     let colors = _getSubPalettes(palette, numCategories);
+
+    if (palette.isQualitative()) {
+        defaultOthersColor = colors[numCategories];
+    }
+
     return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
 }
 
