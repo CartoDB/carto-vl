@@ -6,8 +6,6 @@ import { checkString } from './utils';
  *
  * Note: sprite RGB color will be overridden if the viz `color` property is set.
  *
- * Limitation: images have to be square.
- *
  * @param {string} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
