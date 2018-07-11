@@ -51,13 +51,14 @@ function takeReference(file, template, asyncLoad) {
     }
 }
 
-async function testSST(file, template, asyncLoad) {
+async function testSST(file, template, asyncLoad, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
+    options.browser = browser;
     const capturedErrors = [];
     options.pageEvents = {
         error: err => {
