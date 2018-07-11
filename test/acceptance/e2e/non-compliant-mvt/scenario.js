@@ -8,8 +8,8 @@ const map = new mapboxgl.Map({
 });
 
 const metadata = {
-    properties: {},
     idProperty: 'attr_0',
+    properties: {}
 };
 
 let wadus = [];
