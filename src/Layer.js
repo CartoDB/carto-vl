@@ -157,10 +157,10 @@ export default class Layer {
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
-        const loadImagesPromise = viz.loadImages();
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
         await this._integratorPromise;
-        await loadImagesPromise;
+        await loadSpritesPromise;
 
         await this._context;
         if (this._atomicChangeUID > uid) {
@@ -409,9 +409,9 @@ export default class Layer {
             throw new Error('A source is required before changing the viz');
         }
         const source = this._source;
-        const loadImagesPromise = viz.loadImages();
+        const loadSpritesPromise = viz.loadSprites();
         const metadata = await source.requestMetadata(viz);
-        await loadImagesPromise;
+        await loadSpritesPromise;
 
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');

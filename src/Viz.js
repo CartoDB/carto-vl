@@ -59,13 +59,13 @@ export default class Viz {
     * @memberof carto
     * @api
     *
-    * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+    * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original sprite RGB channels
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-    * @property {Image} symbol - show an image instead in the place of points
-    * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+    * @property {Sprite} symbol - show a sprite instead in the place of points
+    * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the sprite
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
@@ -91,8 +91,8 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
-    loadImages() {
-        return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
+    loadSprites() {
+        return Promise.all(this._getRootExpressions().map(expr => expr.loadSprites()));
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
@@ -403,13 +403,13 @@ export default class Viz {
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
          * @typedef {object} VizSpec
-         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original sprite RGB channels
          * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
          * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
          * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
          * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {Image} symbol - show an image instead in the place of points
-         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+         * @property {Sprite} symbol - show a sprite instead in the place of points
+         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the sprite
          * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
          * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.

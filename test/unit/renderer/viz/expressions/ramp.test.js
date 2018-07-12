@@ -12,7 +12,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         validateStaticTypeErrors('ramp', []);
         validateStaticTypeErrors('ramp', ['number']);
         validateStaticTypeErrors('ramp', ['category']);
-        validateDynamicTypeErrors('ramp', ['number', 'image-list']);
+        validateDynamicTypeErrors('ramp', ['number', 'sprites']);
     });
 
     describe('type', () => {
@@ -20,7 +20,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         validateStaticType('ramp', ['category', 'palette'], 'color');
         validateStaticType('ramp', ['category', 'color-array'], 'color');
         validateStaticType('ramp', ['category', 'number-array'], 'number');
-        validateStaticType('ramp', ['category', 'image-list'], 'color');
+        validateStaticType('ramp', ['category', 'sprites'], 'color');
     });
 
     describe('.eval', () => {

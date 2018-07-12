@@ -1,12 +1,11 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
-
 import { interpolateRGBAinCieLAB } from '../colorspaces';
+import Sprites from './sprites';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
 import { Classifier } from './classifier';
-import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
 
@@ -14,7 +13,7 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image'
+    SPRITE: 'sprite'
 };
 
 const rampTypes = {
@@ -91,8 +90,8 @@ export default class Ramp extends BaseExpression {
         checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
         checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
         
-        if (palette.type === paletteTypes.IMAGE) {
-            checkInstance('ramp', 'palette', 1, ImageList, palette);
+        if (palette.type === paletteTypes.SPRITE) {
+            checkInstance('ramp', 'palette', 1, Sprites, palette);
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
@@ -113,8 +112,8 @@ export default class Ramp extends BaseExpression {
         }
     }
 
-    loadImages() {
-        return Promise.all([this.input.loadImages(), this.palette.loadImages()]);
+    loadSprites() {
+        return Promise.all([this.input.loadSprites(), this.palette.loadSprites()]);
     }
 
     _setUID(idGenerator) {
@@ -167,9 +166,9 @@ export default class Ramp extends BaseExpression {
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
         
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
-            checkInstance('ramp', 'palette', 1, ImageList, this.palette);
+            checkInstance('ramp', 'palette', 1, Sprites, this.palette);
         }
         
         this._texCategories = null;
@@ -185,12 +184,12 @@ export default class Ramp extends BaseExpression {
     _applyToShaderSource(getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
-            const images = this.palette._applyToShaderSource(getGLSLforProperty);
+        if (this.palette.type === paletteTypes.SPRITE) {
+            const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
             
             return {
-                preface: input.preface + images.preface,
-                inline: `${images.inline}(imageUV, ${input.inline})`
+                preface: input.preface + sprites.preface,
+                inline: `${sprites.inline}(spriteUV, ${input.inline})`
             };
         }
 
@@ -208,7 +207,7 @@ export default class Ramp extends BaseExpression {
     }
     
     _getColorsFromPalette(input, palette) {
-        if (palette.type === paletteTypes.IMAGE) {
+        if (palette.type === paletteTypes.SPRITE) {
             return palette.colors;
         }
 
@@ -220,7 +219,7 @@ export default class Ramp extends BaseExpression {
     }
     
     _postShaderCompile(program, gl) {
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -307,7 +306,7 @@ export default class Ramp extends BaseExpression {
     _preDraw(program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.SPRITE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
