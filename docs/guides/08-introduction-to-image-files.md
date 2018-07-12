@@ -67,7 +67,7 @@ color: ramp(buckets($complaint,['Car','Bus','Building']),[purple,orange,blue])
 
 The placement and alignment of image markers is controlled using the `symbolPlacement` property. By default, image markers are bottom-aligned meaning the marker arrow points to the original feature's location. 
 
-If that is not the desired placement, you can modify with the `symbolPlacement` property which accepts one of two default constants (`align_bottom` or `align_center`) or a placement expression (TODO link to reference).
+If that is not the desired placement, you can modify with the `symbolPlacement` property which accepts one of two default constants (`align_bottom` or `align_center`) or a placement expression.
 
 ```js
 symbolPlacement: align_bottom
