@@ -77,10 +77,8 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg(feature) {
-        if (this._ViewportFeatureProxy) {
-            const properties = this._getMinimumNeededSchema().columns;
-            this.expr.push(new this._ViewportFeatureProxy(feature, properties));
-        }
+        const properties = this._getMinimumNeededSchema().columns;
+        this.expr.push(new this._ViewportFeatureProxy(feature, properties));
     }
 }
 
