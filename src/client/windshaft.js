@@ -173,48 +173,28 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
+        
         let templateURL = this._subdomains.map(s => urlTemplate.replace('{s}', s));
+        
         if (this._subdomains.length === 0) {
             templateURL = urlTemplate.replace('{s}', this._getSubdomain(0, 0));
         }
-        this._mvtClient = new MVT(templateURL);
+
+        this._mvtClient = new MVT(templateURL, metadata, { type: 'windshaft' } );
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
-        this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const basename = schema.column.getBase(propertyName);
-            const column = this.metadata.properties[basename];
-            if (!column) {
-                return;
-            }
-            switch (column.type) {
-                case 'date':
-                {
-                    const d = new Date();
-                    d.setTime(1000 * propertyValue);
-                    const min = column.min;
-                    const max = column.max;
-                    const n = (d - min) / (max.getTime() - min.getTime());
-                    return n;
-                }
-                case 'category':
-                    return this.metadata.categorizeString(propertyValue);
-                case 'number':
-                    return propertyValue;
-                default:
-                    throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
-            }
-        };
         this.urlTemplate = urlTemplate;
         this.metadata = metadata;
-        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
+
     _getSubdomain(x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
+
     async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];

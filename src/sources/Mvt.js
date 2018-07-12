@@ -7,7 +7,7 @@ import Metadata from '../renderer/Metadata';
 import { RTT_WIDTH } from '../renderer/Renderer';
 import Base from './Base';
 import TileClient from './TileClient';
-
+import schema from '../renderer/schema';
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
 
@@ -50,7 +50,6 @@ const MVT_TO_CARTO_TYPES = {
  * };
  *
  */
-
 export default class MVT extends Base {
 
     /**
@@ -70,15 +69,19 @@ export default class MVT extends Base {
      * @extends carto.source.Base
      * @memberof carto.source
      */
-    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor(templateURL, metadata = new Metadata(), options = {}) {
+        const defaultOptions = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined, type: 'mvt' };
+        
         super();
         this._templateURL = templateURL;
+        
         if (!(metadata instanceof Metadata)) {
             metadata = new Metadata(metadata);
         }
+
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
-        this._options = options;
+        this._options = Object.assign(defaultOptions, options);
     }
 
     _clone() {
@@ -126,6 +129,11 @@ export default class MVT extends Base {
         return dataframe;
     }
 
+    decodeProperty(propertyValue, column) {
+        return this._options.type === 'mvt'
+            ? this._decodeProperty(propertyValue)
+            : this._decodeWindshaftProperty(propertyValue, column);
+    }
 
     _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
         if (!mvtLayer.length) {
@@ -163,6 +171,7 @@ export default class MVT extends Base {
     _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -181,9 +190,11 @@ export default class MVT extends Base {
                 geometries[2 * numFeatures + 0] = x;
                 geometries[2 * numFeatures + 1] = y;
             }
+            
             if (f.properties[this._metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);
             }
+
             this._decodeProperties(propertyNames, properties, f, numFeatures);
             numFeatures++;
         }
@@ -219,11 +230,37 @@ export default class MVT extends Base {
         for (let j = 0; j < length; j++) {
             const propertyName = propertyNames[j];
             const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
+            properties[propertyName][i] = this.decodeProperty(propertyValue, propertyName);
         }
     }
 
-    decodeProperty(propertyName, propertyValue) {
+    _decodeWindshaftProperty(propertyValue, propertyName) {
+        const basename = schema.column.getBase(propertyName);
+        const column = this._metadata.properties[basename];
+
+        if (!column) {
+            return;
+        }
+
+        switch (column.type) {
+            case 'date': {
+                const d = new Date();
+                d.setTime(1000 * propertyValue);
+                const min = column.min;
+                const max = column.max;
+                const n = (d - min) / (max.getTime() - min.getTime());
+                return n;
+            }
+            case 'category':
+                return this._metadata.categorizeString(propertyValue);
+            case 'number':
+                return propertyValue;
+            default:
+                throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+        }
+    }
+
+    _decodeProperty(propertyValue) {
         if (typeof propertyValue === 'string') {
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
