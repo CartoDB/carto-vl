@@ -14,6 +14,6 @@ layer.on('loaded', () => {
     layer.update(polygon, viz).then(() => {
         layer.on('updated', () => {
             window.loaded = true;
-        })
+        });
     });
 });
