@@ -40,7 +40,7 @@
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "eslint": "^4.15.0",
-    "exquisite-sst": "IagoLast/Exquisite#master",
+    "exquisite-sst": "^1.4.0",
     "fastly": "^2.2.0",
     "glob": "^7.1.2",
     "http-server": "^0.11.1",

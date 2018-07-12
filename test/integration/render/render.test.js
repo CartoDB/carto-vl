@@ -11,14 +11,17 @@ const exquisite = require('exquisite-sst');
 const files = util.loadFiles(path.join(__dirname, 'scenarios'));
 const template = util.loadTemplate(path.join(__dirname, 'render.html.tpl'));
 
-describe('Render tests:', async () => {
+describe('Render tests:', () => {
     let server;
     let browser;
 
-    before(async () => {
+    before(done => {
         server = http.createServer(handler);
         server.listen(util.PORT);
-        browser = await exquisite.browser();
+        exquisite.browser(util.headless()).then(_browser => {
+            browser = _browser;
+            done();
+        });
     });
 
     after(done => {
