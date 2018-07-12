@@ -129,8 +129,8 @@ import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
-import { In } from './expressions/belongs.js';
-import { Nin } from './expressions/belongs.js';
+import { In } from './expressions/belongs';
+import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
@@ -223,9 +223,9 @@ import { Ceil } from './expressions/unary';
 
 import variableFn from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
-import ViewportFeatures from './expressions/viewportFeatures';
+import ViewportFeatures from './expressions/ViewportFeatures';
 
 import XYZ from './expressions/xyz';
 
