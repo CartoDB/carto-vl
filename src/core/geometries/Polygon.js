@@ -6,28 +6,28 @@ import Geometry from './Geometry';
  */
 
 export default class Polygon extends Geometry {
-    constructor(x = 0, y = 0, points = [], angle = 0, scale_x = 1, scale_y = 1) {
+    constructor(x = 0, y = 0, points = [], angle = 0, scaleX = 1, scaleY = 1) {
         super(x, y);
 
         this.angle = angle;
-        this.scale_x = scale_x;
-        this.scale_y = scale_y;
+        this.scaleX = scaleX;
+        this.scaleY = scaleY;
         this.isPolygon = true;
         
         this._x = x;
         this._y = y;
         this._angle = angle;
-        this._scale_x = scale_x;
-        this._scale_y = scale_y;
-        this._min_x = 0;
-        this._min_y = 0;
-        this._max_x = 0;
-        this._max_y = 0;
+        this._scaleX = scaleX;
+        this._scaleY = scaleY;
+        this._minX = 0;
+        this._minY = 0;
+        this._maxX = 0;
+        this._maxY = 0;
         this._points = null;
         this._coords = null;
         this._normals = null;
-        this._dirty_coords = true;
-        this._dirty_normals = true;
+        this._dirtyCoords = true;
+        this._dirtyNormals = true;
 
         this.setPoints(points);
     }
@@ -35,8 +35,8 @@ export default class Polygon extends Geometry {
     /**
      * Sets the points making up the polygon. It's important to use this function when changing the polygon's shape to ensure internal data is also updated.
      */
-    setPoints(new_points) {
-        const count = new_points.length;
+    setPoints(newPoints) {
+        const count = newPoints.length;
 
         this._points = new Float64Array(count * 2);
         this._coords = new Float64Array(count * 2);
@@ -46,13 +46,13 @@ export default class Polygon extends Geometry {
         const points = this._points;
 
         for (let i = 0, ix = 0, iy = 1; i < count; ++i, ix += 2, iy += 2) {
-            const new_point = new_points[i];
+            const newPoint = newPoints[i];
 
-            points[ix] = new_point[0];
-            points[iy] = new_point[1];
+            points[ix] = newPoint[0];
+            points[iy] = newPoint[1];
         }
 
-        this._dirty_coords = true;
+        this._dirtyCoords = true;
     }
 
     /**
@@ -62,72 +62,49 @@ export default class Polygon extends Geometry {
         const x = this.x;
         const y = this.y;
         const angle = this.angle;
-        const scale_x = this.scale_x;
-        const scale_y = this.scale_y;
+        const scaleX = this.scaleX;
+        const scaleY = this.scaleY;
         const points = this._points;
         const coords = this._coords;
         const count = points.length;
 
-        let min_x;
-        let max_x;
-        let min_y;
-        let max_y;
+        let minX;
+        let maxX;
+        let minY;
+        let maxY;
 
         for (let ix = 0, iy = 1; ix < count; ix += 2, iy += 2) {
-            let coord_x = points[ix] * scale_x;
-            let coord_y = points[iy] * scale_y;
+            let coordX = points[ix] * scaleX;
+            let coordY = points[iy] * scaleY;
 
-            if (angle) {
-                const cos = Math.cos(angle);
-                const sin = Math.sin(angle);
-                const tmp_x = coord_x;
-                const tmp_y = coord_y;
+            [ coordX, coordY ] = _updateCoordsAngle(angle, coordX, coordY);
 
-                coord_x = tmp_x * cos - tmp_y * sin;
-                coord_y = tmp_x * sin + tmp_y * cos;
-            }
+            coordX += x;
+            coordY += y;
 
-            coord_x += x;
-            coord_y += y;
+            coords[ix] = coordX;
+            coords[iy] = coordY;
 
-            coords[ix] = coord_x;
-            coords[iy] = coord_y;
-
-            if (ix === 0) {
-                min_x = max_x = coord_x;
-                min_y = max_y = coord_y;
-            } else {
-                if (coord_x < min_x) {
-                    min_x = coord_x;
-                } else if (coord_x > max_x) {
-                    max_x = coord_x;
-                }
-
-                if (coord_y < min_y) {
-                    min_y = coord_y;
-                } else if (coord_y > max_y) {
-                    max_y = coord_y;
-                }
-            }
+            [ minX, maxX, minY, maxY] = _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY);
         }
 
         this._x = x;
         this._y = y;
         this._angle = angle;
-        this._scale_x = scale_x;
-        this._scale_y = scale_y;
-        this._min_x = min_x;
-        this._min_y = min_y;
-        this._max_x = max_x;
-        this._max_y = max_y;
-        this._dirty_coords = false;
-        this._dirty_normals = true;
+        this._scaleX = scaleX;
+        this._scaleY = scaleY;
+        this._minX = minX;
+        this._minY = minY;
+        this._maxX = maxX;
+        this._maxY = maxY;
+        this._dirtyCoords = false;
+        this._dirtyNormals = true;
     }
 
     /**
      * Calculates the normals and edges of the polygon's sides
      */
-    _calculateNormals() {
+    _calculateNormalsAndEdges() {
         const coords = this._coords;
         const edges = this._edges;
         const normals = this._normals;
@@ -142,9 +119,50 @@ export default class Polygon extends Geometry {
             edges[ix] = x;
             edges[iy] = y;
             normals[ix] = length ? y / length : 0;
-            normals[iy] = length ? -x / length : 0;
+            normals[iy] = length ? - x / length : 0;
         }
 
-        this._dirty_normals = false;
+        this._dirtyNormals = false;
     }
+}
+
+function _updateCoordsAngle(angle, coordX, coordY) {
+    if (angle) {
+        const cos = Math.cos(angle);
+        const sin = Math.sin(angle);
+        const tmpX = coordX;
+        const tmpY = coordY;
+
+        coordX = tmpX * cos - tmpY * sin;
+        coordY = tmpX * sin + tmpY * cos;
+    }
+
+    return [ coordX, coordY];
+}
+
+function _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY) {
+    if (ix === 0) {
+        minX = maxX = coordX;
+        minY = maxY = coordY;
+
+        return [ minX, maxX, minY, maxY ];
+    }
+
+    if (coordX < minX) {
+        minX = coordX;
+    } 
+    
+    if (coordX > maxX) {
+        maxX = coordX;
+    }
+
+    if (coordY < minY) {
+        minY = coordY;
+    } 
+    
+    if (coordY > maxY) {
+        maxY = coordY;
+    }
+
+    return [ minX, maxX, minY, maxY ];
 }

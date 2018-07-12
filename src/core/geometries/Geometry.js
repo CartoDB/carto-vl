@@ -4,7 +4,6 @@ import SAT from './collision';
  * Base Geometry to detect collisions
  * https://github.com/Prozi/detect-collisions/
  */
-
 export default class Geometry {
     constructor(x = 0, y = 0) {
         this.x = x;
@@ -12,9 +11,9 @@ export default class Geometry {
     }
 
     /**
-     * Determines if the geometry is colliding with another geoometry
+     * Determines if the geometry is colliding with another geometry
      */
-    collides(target, aabb = true) {
-        return SAT(this, target, aabb);
+    collides(geometry) {
+        return SAT(this, geometry);
     }
 }

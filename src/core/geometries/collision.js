@@ -5,12 +5,12 @@
 export default function SAT(a, b, aabb = true) {
     if (a.isPolygon) {
         if (
-            a._dirty_coords ||
+            a._dirtyCoords ||
             a.x !== a._x ||
             a.y !== a._y ||
             a.angle !== a._angle ||
-            a.scale_x !== a._scale_x ||
-            a.scale_y !== a._scale_y
+            a.scaleX !== a._scaleX ||
+            a.scaleY !== a._scaleY
         ) {
             a._calculateCoords();
         }
@@ -18,88 +18,87 @@ export default function SAT(a, b, aabb = true) {
 
     if (b.isPolygon) {
         if (
-            b._dirty_coords ||
+            b._dirtyCoords ||
             b.x !== b._x ||
             b.y !== b._y ||
             b.angle !== b._angle ||
-            b.scale_x !== b._scale_x ||
-            b.scale_y !== b._scale_y
+            b.scaleX !== b._scaleX ||
+            b.scaleY !== b._scaleY
         ) {
             b._calculateCoords();
         }
     }
 
-    if (!aabb || aabbAABB(a, b)) {
-        if (a.isPolygon && a._dirty_normals) {
-            a._calculateNormals();
+    if (!aabb || _aabbAABB(a, b)) {
+        if (a.isPolygon && a._dirtyNormals) {
+            a._calculateNormalsAndEdges();
         }
 
-        if (b.isPolygon && b._dirty_normals) {
-            b._calculateNormals();
+        if (b.isPolygon && b._dirtyNormals) {
+            b._calculateNormalsAndEdges();
         }
     }
 
-    return polygonPolygon(a, b);
+    return _polygonCollision(a, b);
 }
 
 /**
  * Determines if two bodies' axis aligned bounding boxes are colliding
  */
+function _aabbAABB(a, b) {
+    const aPolygon = a.isPolygon;
+    const aX = aPolygon ? 0 : a.x;
+    const aY = aPolygon ? 0 : a.y;
+    const aRadius = aPolygon ? 0 : a.radius * a.scale;
+    const aMinX = aPolygon ? a._minX : aX - aRadius;
+    const aMinY = aPolygon ? a._minY : aY - aRadius;
+    const aMaxX = aPolygon ? a._maxX : aX + aRadius;
+    const aMaxY = aPolygon ? a._maxY : aY + aRadius;
 
-function aabbAABB(a, b) {
-    const a_polygon = a.isPolygon;
-    const a_x = a_polygon ? 0 : a.x;
-    const a_y = a_polygon ? 0 : a.y;
-    const a_radius = a_polygon ? 0 : a.radius * a.scale;
-    const a_min_x = a_polygon ? a._min_x : a_x - a_radius;
-    const a_min_y = a_polygon ? a._min_y : a_y - a_radius;
-    const a_max_x = a_polygon ? a._max_x : a_x + a_radius;
-    const a_max_y = a_polygon ? a._max_y : a_y + a_radius;
+    const bPolygon = b.isPolygon;
+    const bX = bPolygon ? 0 : b.x;
+    const bY = bPolygon ? 0 : b.y;
+    const bRadius = bPolygon ? 0 : b.radius * b.scale;
+    const bMinX = bPolygon ? b._minX : bX - bRadius;
+    const b_minY = bPolygon ? b._minY : bY - bRadius;
+    const bMaxX = bPolygon ? b._maxX : bX + bRadius;
+    const b_maxY = bPolygon ? b._maxY : bY + bRadius;
 
-    const b_polygon = b.isPolygon;
-    const b_x = b_polygon ? 0 : b.x;
-    const b_y = b_polygon ? 0 : b.y;
-    const b_radius = b_polygon ? 0 : b.radius * b.scale;
-    const b_min_x = b_polygon ? b._min_x : b_x - b_radius;
-    const b_min_y = b_polygon ? b._min_y : b_y - b_radius;
-    const b_max_x = b_polygon ? b._max_x : b_x + b_radius;
-    const b_max_y = b_polygon ? b._max_y : b_y + b_radius;
-
-    return a_min_x < b_max_x && a_min_y < b_max_y && a_max_x > b_min_x && a_max_y > b_min_y;
+    return aMinX < bMaxX && aMinY < b_maxY && aMaxX > bMinX && aMaxY > b_minY;
 }
 
 /**
  * Determines if two polygons are colliding
  */
 
-function polygonPolygon(a, b) {
-    const a_count = a._coords.length;
-    const b_count = b._coords.length;
+function _polygonCollision(a, b) {
+    const aCount = a._coords.length;
+    const bCount = b._coords.length;
 
     // Handle points specially
-    if (a_count === 2 && b_count === 2) {
-        const a_coords = a._coords;
-        const b_coords = b._coords;
+    if (aCount === 2 && bCount === 2) {
+        const aCoords = a._coords;
+        const bCoords = b._coords;
 
-        return a_coords[0] === b_coords[0] && a_coords[1] === b_coords[1];
+        return aCoords[0] === bCoords[0] && aCoords[1] === bCoords[1];
     }
 
-    const a_coords = a._coords;
-    const b_coords = b._coords;
-    const a_normals = a._normals;
-    const b_normals = b._normals;
+    const aCoords = a._coords;
+    const bCoords = b._coords;
+    const aNormals = a._normals;
+    const bNormals = b._normals;
 
-    if (a_count > 2) {
-        for (let ix = 0, iy = 1; ix < a_count; ix += 2, iy += 2) {
-            if (separatingAxis(a_coords, b_coords, a_normals[ix], a_normals[iy])) {
+    if (aCount > 2) {
+        for (let ix = 0, iy = 1; ix < aCount; ix += 2, iy += 2) {
+            if (separatingAxis(aCoords, bCoords, aNormals[ix], aNormals[iy])) {
                 return false;
             }
         }
     }
 
-    if (b_count > 2) {
-        for (let ix = 0, iy = 1; ix < b_count; ix += 2, iy += 2) {
-            if (separatingAxis(a_coords, b_coords, b_normals[ix], b_normals[iy])) {
+    if (bCount > 2) {
+        for (let ix = 0, iy = 1; ix < bCount; ix += 2, iy += 2) {
+            if (separatingAxis(aCoords, bCoords, bNormals[ix], bNormals[iy])) {
                 return false;
             }
         }
@@ -111,44 +110,44 @@ function polygonPolygon(a, b) {
 /**
  * Determines if two polygons are separated by an axis
  */
-function separatingAxis(a_coords, b_coords, x, y) {
-    const a_count = a_coords.length;
-    const b_count = b_coords.length;
+function separatingAxis(aCoords, bCoords, x, y) {
+    const aCount = aCoords.length;
+    const bCount = bCoords.length;
 
-    if (!a_count || !b_count) {
+    if (!aCount || !bCount) {
         return true;
     }
 
-    let a_start = null;
-    let a_end = null;
-    let b_start = null;
-    let b_end = null;
+    let aStart = null;
+    let aEnd = null;
+    let bStart = null;
+    let bEnd = null;
 
-    for (let ix = 0, iy = 1; ix < a_count; ix += 2, iy += 2) {
-        const dot = a_coords[ix] * x + a_coords[iy] * y;
+    for (let ix = 0, iy = 1; ix < aCount; ix += 2, iy += 2) {
+        const dot = aCoords[ix] * x + aCoords[iy] * y;
 
-        if (a_start === null || a_start > dot) {
-            a_start = dot;
+        if (aStart === null || aStart > dot) {
+            aStart = dot;
         }
 
-        if (a_end === null || a_end < dot) {
-            a_end = dot;
-        }
-    }
-
-    for (let ix = 0, iy = 1; ix < b_count; ix += 2, iy += 2) {
-        const dot = b_coords[ix] * x + b_coords[iy] * y;
-
-        if (b_start === null || b_start > dot) {
-            b_start = dot;
-        }
-
-        if (b_end === null || b_end < dot) {
-            b_end = dot;
+        if (aEnd === null || aEnd < dot) {
+            aEnd = dot;
         }
     }
 
-    if (a_start > b_end || a_end < b_start) {
+    for (let ix = 0, iy = 1; ix < bCount; ix += 2, iy += 2) {
+        const dot = bCoords[ix] * x + bCoords[iy] * y;
+
+        if (bStart === null || bStart > dot) {
+            bStart = dot;
+        }
+
+        if (bEnd === null || bEnd < dot) {
+            bEnd = dot;
+        }
+    }
+
+    if (aStart > bEnd || aEnd < bStart) {
         return true;
     }
 
