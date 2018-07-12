@@ -56,8 +56,8 @@ export default function variable(name) {
             if (prop == 'parent') {
                 obj[prop] = value;
             } else if (prop == 'notify') {
-                return obj[prop];
-            } else if(alias && alias[prop]) {
+                obj[prop] = value;
+            } else if (alias && alias[prop]) {
                 alias[prop] = value;
             } else {
                 return false;
@@ -66,11 +66,15 @@ export default function variable(name) {
             return true;
         },
         get: (obj, prop) => {
-            if (prop == '_resolveAliases') {
+            if (prop == 'parent') {
+                return obj[prop];
+            } else if (prop == '_resolveAliases') {
                 return resolve;
             } else if (prop == '_getDependencies') {
                 return _getDependencies;
             } else if (prop == 'notify') {
+                return obj[prop];
+            } else if (prop == 'blendTo') {
                 return obj[prop];
             }
             if (alias && alias[prop]) {

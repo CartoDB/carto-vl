@@ -16,7 +16,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 },
                 IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']]),
             });
-            expr._resetViewportAgg();
+            expr.resetViewportAgg();
             expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
             expr.accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
             expr.accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });

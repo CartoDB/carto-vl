@@ -19,28 +19,35 @@ export default class BaseCategory extends BaseExpression {
         this.expr = categoryName;
         this.type = 'category';
     }
+    
     get value() {
         // Return the plain string
         return this.expr;
     }
-    eval() {
+    
+    eval() {        
         return this.expr;
     }
+    
     isAnimated() {
         return false;
     }
+    
     _compile(metadata) {
         this._metadata = metadata;
     }
+    
     _applyToShaderSource() {
         return {
             preface: this._prefaceCode(`uniform float cat${this._uid};\n`),
             inline: `cat${this._uid}`
         };
     }
+    
     _postShaderCompile(program, gl) {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
     }
+    
     _preDraw(program, drawMetadata, gl) {
         const id = this._metadata.categoryToID.get(this.expr);
         gl.uniform1f(this._getBinding(program).uniformLocation, id);

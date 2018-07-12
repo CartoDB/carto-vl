@@ -382,7 +382,9 @@ export default class Windshaft {
             }
         });
 
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt });
+        const idProperty = 'cartodb_id';
+
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
         return metadata;
     }
 }

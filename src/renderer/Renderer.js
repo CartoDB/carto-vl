@@ -164,25 +164,27 @@ export default class Renderer {
         // Assume that all dataframes of a renderLayer share the same metadata
         const metadata = dataframes.length ? dataframes[0].metadata : {};
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
+        viewportExpressions.forEach(expr => expr.resetViewportAgg(metadata));
 
         const viewportExpressionsLength = viewportExpressions.length;
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
-        // const processedFeaturesIDs = new Set();
-
+        const processedFeaturesIDs = new Set();
 
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
+                const featureId = dataframe.properties[metadata.idProperty][i];
+
                 // If feature has been acumulated ignore it
-                // if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
-                //     continue;
-                // }
+                if (processedFeaturesIDs.has(featureId)) {
+                    continue;
+                }
                 // Ignore features outside viewport
                 if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
+                processedFeaturesIDs.add(featureId);
 
                 const feature = this._featureFromDataFrame(dataframe, i);
 

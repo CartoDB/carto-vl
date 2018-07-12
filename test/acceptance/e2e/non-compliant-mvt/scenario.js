@@ -8,6 +8,7 @@ const map = new mapboxgl.Map({
 });
 
 const metadata = {
+    idProperty: 'attr_0',
     properties: {}
 };
 
