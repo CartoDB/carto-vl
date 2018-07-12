@@ -66,7 +66,7 @@ export default class ViewportFeatures extends BaseExpression {
 
     resetViewportAgg() {
         if (!this._ViewportFeatureProxy) {
-            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+            if (!this._requiredProperties.every((p) => p.isA(Property))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
 
@@ -77,8 +77,10 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg(feature) {
-        const properties = this._getMinimumNeededSchema().columns;
-        this.expr.push(new this._ViewportFeatureProxy(feature, properties));
+        if (this._ViewportFeatureProxy) {
+            const properties = this._getMinimumNeededSchema().columns;
+            this.expr.push(new this._ViewportFeatureProxy(feature, properties));
+        }
     }
 }
 
