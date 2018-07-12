@@ -39,7 +39,12 @@ async function loadMVT() {
                 max: 130,
             }
         }
-    });
+    },
+    {
+        viewportZoomToSourceZoom: () => 10,
+        maxZoom: 9,
+    }
+    );
 
     const viz = new carto.Viz(`
         color: ramp(linear($numfloors), prism)

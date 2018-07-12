@@ -1,3 +1,4 @@
+*.html
 *.log
 *_out.png
 secrets.json
