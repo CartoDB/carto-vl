@@ -148,21 +148,10 @@ function _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY) {
         return [ minX, maxX, minY, maxY ];
     }
 
-    if (coordX < minX) {
-        minX = coordX;
-    } 
-    
-    if (coordX > maxX) {
-        maxX = coordX;
-    }
-
-    if (coordY < minY) {
-        minY = coordY;
-    } 
-    
-    if (coordY > maxY) {
-        maxY = coordY;
-    }
+    minX = coordX < minX ? coordX : minX;
+    maxX = coordX > maxX ? coordX : maxX;
+    minY = coordY < minY ? coordY : minY;
+    maxY = coordY > maxY ? coordY : maxY;
 
     return [ minX, maxX, minY, maxY ];
 }
