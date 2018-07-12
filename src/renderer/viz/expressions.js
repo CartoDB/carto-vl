@@ -178,7 +178,7 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import NamedColor from './expressions/color/NamedColor';
+import { NamedColor } from './expressions/color/named-color';
 
 import Now from './expressions/now';
 
@@ -191,8 +191,8 @@ import { Desc } from './expressions/ordering';
 import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
-import palettes from './expressions/color/palettes';
-import Reverse from './expressions/color/palettes/Reverse';
+import { palettes } from './expressions/color/palettes';
+import { Reverse } from './expressions/color/palettes';
 
 import Property from './expressions/basic/property';
 

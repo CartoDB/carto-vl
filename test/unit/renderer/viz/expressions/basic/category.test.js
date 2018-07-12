@@ -1,6 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateStaticTypeErrors } from '../utils';
-import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
@@ -23,26 +22,4 @@ describe('src/renderer/viz/expressions/basic/category', () => {
         });
     });
 
-    describe('.eval', () => {
-        const fakeMetadata = new Metadata({
-            properties: {
-                category: {
-                    type: 'category',
-                    categories: [
-                        { name: 'cat0' }, 
-                        { name: 'cat1' },
-                        { name: 'cat2' }
-                    ]
-                }
-            }
-        });
-        
-        it('should return the value from the metadata', () => {
-            const categoryExpresion = s.category('cat0');
-            categoryExpresion._compile(fakeMetadata);
-            const actual = categoryExpresion.eval();
-
-            expect(actual).toEqual('cat0');
-        });
-    });
 });

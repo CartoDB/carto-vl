@@ -52,7 +52,6 @@ export default class Linear extends BaseExpression {
         }
         this.type = 'number';
     }
-
     eval(feature) {
         if (this.input.type == 'date') {
             const input = this.input.eval(feature);
@@ -75,7 +74,6 @@ export default class Linear extends BaseExpression {
         const max = this.max.eval(feature);
         return (v - min) / (max - min);
     }
-    
     _compile(metadata) {
         super._compile(metadata);
 

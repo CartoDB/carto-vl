@@ -66,7 +66,6 @@ export function validateDynamicTypeErrors(expressionName, argTypes) {
         validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
     });
 }
-
 export function validateStaticTypeErrors(expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
@@ -77,14 +76,12 @@ export function validateStaticTypeErrors(expressionName, argTypes) {
         }
     });
 }
-
 function equalArgs(argsA, argsB) {
     if (argsA.length != argsB.length) {
         return false;
     }
     return argsA.every((arg, index) => argsB[index] == arg);
 }
-
 function validateConstructorTimeTypeError(expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
@@ -119,7 +116,6 @@ export function validateDynamicType(expressionName, argTypes, expectedType) {
         validateCompileTimeType(expressionName, argTypes.map(getPropertyArg), expectedType);
     });
 }
-
 function validateConstructorTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
@@ -127,7 +123,6 @@ function validateConstructorTimeType(expressionName, args, expectedType) {
         ).toEqual(expectedType);
     });
 }
-
 function validateCompileTimeType(expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
@@ -164,7 +159,6 @@ function getSimpleArg(type) {
             return [type, `${type}`];
     }
 }
-
 function getPropertyArg(type) {
     switch (type) {
         case 'number':
