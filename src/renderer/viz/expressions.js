@@ -232,9 +232,10 @@ import ViewportFeatures from './expressions/viewportFeatures';
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import { Image, SVG } from './expressions/Image';
-import Placement from './expressions/placement';
+import Image from './expressions/Image';
+import SVG from './expressions/SVG';
 import ImageList from './expressions/ImageList';
+import Placement from './expressions/placement';
 
 /* Expose classes as constructor functions */
 

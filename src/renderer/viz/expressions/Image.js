@@ -24,7 +24,7 @@ import { checkString } from './utils';
  * @api
 */
 
-export class Image extends Base {
+export default class Image extends Base {
     constructor(url) {
         checkString('image', 'url', 0, url);
         super({});
@@ -34,7 +34,7 @@ export class Image extends Base {
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
-                this.canvas = getCanvasFromImage(this.image);
+                this.canvas = _getCanvasFromImage(this.image);
                 this.image = null;
                 resolve();
             };
@@ -97,25 +97,19 @@ export class Image extends Base {
     }
 }
 
-function getCanvasFromImage(img) {
-    const canvasSize = 256;
+function _getCanvasFromImage(img) {
+    const CANVAS_SIZE = 256;
     const canvas = document.createElement('canvas');
-    canvas.width = canvasSize;
-    canvas.height = canvasSize;
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
 
     const ctx = canvas.getContext('2d');
 
     const max = Math.max(img.width, img.height);
-    const width = img.width / max * canvasSize;
-    const height = img.height / max * canvasSize;
+    const width = img.width / max * CANVAS_SIZE;
+    const height = img.height / max * CANVAS_SIZE;
 
-    ctx.drawImage(img, 1 + (canvasSize - width) / 2, 1 + (canvasSize - height) / 2, width - 2, height - 2);
+    ctx.drawImage(img, 1 + (CANVAS_SIZE - width) / 2, 1 + (CANVAS_SIZE - height) / 2, width - 2, height - 2);
 
     return canvas;
 }
-export class SVG extends Image {
-    constructor(svg) {
-        super(`data:image/svg+xml,${encodeURIComponent(svg)}`);
-    }
-}
-
