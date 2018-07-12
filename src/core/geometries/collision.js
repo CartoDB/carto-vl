@@ -2,7 +2,7 @@
  * Determines if two bodies are colliding using the Separating Axis Theorem
  * https://github.com/Prozi/detect-collisions/
  */
-export default function SAT(a, b, aabb = true) {
+export default function collidesSAT(a, b, aabb = true) {
     if (a.isPolygon) {
         if (
             a._dirtyCoords ||

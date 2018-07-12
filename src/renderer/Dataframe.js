@@ -162,9 +162,7 @@ export default class Dataframe {
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties(properties) {
-        Object.keys(properties).forEach(propertyName => {
-            this._addProperty(propertyName);
-        });
+        Object.keys(properties).forEach(this._addProperty.bind(this));
     }
 
     getPropertyTexture(propertyName) {

@@ -1,4 +1,4 @@
-import SAT from './collision';
+import collidesSAT from './collision';
 
 /**
  * Base Geometry to detect collisions
@@ -14,6 +14,6 @@ export default class Geometry {
      * Determines if the geometry is colliding with another geometry
      */
     collides(geometry) {
-        return SAT(this, geometry);
+        return collidesSAT(this, geometry);
     }
 }
