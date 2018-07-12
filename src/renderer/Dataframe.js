@@ -7,10 +7,10 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
-const AABBResults = {
-    COLLISION: 1,
-    NO_COLLISION: -1,
-    UNKNOWN: 0
+const aabbResults = {
+    INSIDE: 1,
+    OUTSIDE: -1,
+    INTERSECTS: 0
 };
 
 export default class Dataframe {
@@ -159,217 +159,12 @@ export default class Dataframe {
         return this._geometryInViewport(featureIndex, scale, center, aspect); // FIXME
     }
 
-    _geometryInViewport(featureIndex, scale, center, aspect) {
-        const height = scale * (center.y - this.center.y);
-        const width = (scale / aspect) * (center.x - this.center.x);
-        const viewport = this._getViewportGeometry(center, width, height);
-        const triangles = this._featureGeometries;
-
-        switch (this.type) {
-            case 'point':
-                return this._isPointInViewport(featureIndex, scale, center, aspect);
-            case 'line':
-            case 'polygon':
-                return this._isPolygonInViewport(featureIndex, scale, center, aspect, triangles, viewport);
-            default:
-                return false;
-        }
-    }
-
-    _isPointInViewport(featureIndex, scale, center, aspect) {
-        const { minx, maxx, miny, maxy } = this._getBounds(scale, center, aspect);
-        const x = this.geom[2 * featureIndex + 0];
-        const y = this.geom[2 * featureIndex + 1];
-        return x > minx && x < maxx && y > miny && y < maxy;
-    }
-
-    _isPolygonInViewport(featureIndex, scale, center, aspect, triangles, viewport) {
-        const viewportAABB = this._getBounds(scale, center, aspect);
-        const featureAABB = this._aabb[featureIndex];
-        const AABBResult = this._compareAABBs(featureAABB, viewportAABB);
-        
-        return AABBResult === AABBResults.UNKNOWN
-            ? _isPolygonCollidingViewport(triangles, viewport)
-            : AABBResult === AABBResults.COLLISION;
-    }
-
-    _compareAABBs(featureAABB, viewportAABB) {
-        switch (true) {
-            case _isFeatureInsideViewport(featureAABB, viewportAABB): 
-                return AABBResults.COLLISION;
-            case _isFeatureOutsideViewport(featureAABB, viewportAABB):
-                return AABBResults.NO_COLLISION;
-            default:
-                return AABBResults.UNKNOWN;
-        }
-    }
-
-    _getBounds(scale, center, aspect) {
-        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
-        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
-        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
-        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
-
-        return { minx, maxx, miny, maxy };
-    }
-
-    _getViewportGeometry(center, width, height) {
-        const w = width / 2;
-        const h = height / 2;
-
-        const vertices = [
-            [center.x - w, center.y - h],
-            [center.x + w, center.y - h],
-            [center.x - w, center.y + h],
-            [center.x + w, center.y + h]
-        ];
-
-        return new Polygon(0, 0, vertices);
-    }
-
-    _getPointsAtPosition(p, viz) {
-        p = wToR(p.x, p.y, {
-            center: this.center,
-            scale: this.scale
+    // Add new properties to the dataframe or overwrite previously stored ones.
+    // `properties` is of the form: {propertyName: Float32Array}
+    addProperties(properties) {
+        Object.keys(properties).forEach(propertyName => {
+            this._addProperty(propertyName);
         });
-        const points = this.decodedGeom.vertices;
-        const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
-        const vizWidth = viz.width;
-        const vizStrokeWidth = viz.strokeWidth;
-
-        for (let i = 0; i < points.length; i += 2) {
-            const featureIndex = i / 2;
-            const center = {
-                x: points[i],
-                y: points[i + 1],
-            };
-            const f = this._getFeature(columnNames, featureIndex);
-            if (this._isFeatureFiltered(f, viz.filter)) {
-                continue;
-            }
-            const pointWidth = vizWidth.eval(f);
-            const pointStrokeWidth = vizStrokeWidth.eval(f);
-            const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
-
-            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
-            const scale = diameter / 2 * widthScale;
-            if (!viz.symbol.default) {
-                const offset = viz.symbolPlacement.eval();
-                center.x += offset[0] * scale;
-                center.y += offset[1] * scale;
-            }
-
-            const inside = pointInCircle(p, center, scale);
-            if (inside) {
-                features.push(this._getUserFeature(featureIndex));
-            }
-        }
-        return features;
-    }
-
-    _getLinesAtPosition(pos, viz) {
-        return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
-    }
-    _getPolygonAtPosition(pos, viz) {
-        return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
-    }
-    _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
-        const p = wToR(pos.x, pos.y, {
-            center: this.center,
-            scale: this.scale
-        });
-        const vertices = this.decodedGeom.vertices;
-        const normals = this.decodedGeom.normals;
-        const breakpoints = this.decodedGeom.breakpoints;
-        const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
-        // Linear search for all features
-        // Tests triangles since we already have the triangulated form
-        // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
-        let featureIndex = -1;
-        let scale;
-        let computeScale = feature => {
-            // Width is saturated at 336px
-            const width = Math.min(widthExpression.eval(feature), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            scale = width / 2 * widthScale;
-        };
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i == 0 || i >= breakpoints[featureIndex]) {
-                featureIndex++;
-                const feature = this._getFeature(columnNames, featureIndex);
-                if (this._isFeatureFiltered(feature, filterExpression)) {
-                    i = breakpoints[featureIndex] - 6;
-                    continue;
-                }
-                computeScale(feature);
-            }
-            const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * scale,
-                y: vertices[i + 1] + normals[i + 1] * scale
-            };
-            const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * scale,
-                y: vertices[i + 3] + normals[i + 3] * scale
-            };
-            const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * scale,
-                y: vertices[i + 5] + normals[i + 5] * scale
-            };
-            const inside = pointInTriangle(p, v1, v2, v3);
-            if (inside) {
-                features.push(this._getUserFeature(featureIndex));
-                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
-                // Also, don't waste CPU cycles
-                i = breakpoints[featureIndex] - 6;
-            }
-        }
-        return features;
-    }
-
-    _getFeature(columnNames, featureIndex) {
-        const f = {};
-        columnNames.forEach(name => {
-            f[name] = this.properties[name][featureIndex];
-        });
-        return f;
-    }
-    _isFeatureFiltered(feature, filterExpression) {
-        const isFiltered = filterExpression.eval(feature) < 0.5;
-        return isFiltered;
-    }
-
-    _getUserFeature(featureIndex) {
-        let id;
-        const properties = {};
-        Object.keys(this.properties).map(propertyName => {
-            let prop = this.properties[propertyName][featureIndex];
-            const column = this.metadata.properties[propertyName];
-            if (column && column.type == 'category') {
-                prop = this.metadata.IDToCategory.get(prop);
-            }
-            if (propertyName === this.metadata.idProperty) {
-                id = prop;
-            }
-            properties[propertyName] = prop;
-        });
-        return {
-            id,
-            properties
-        };
-    }
-
-    _addProperty(propertyName) {
-        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
-            this.getPropertyTexture(propertyName);
-        }
     }
 
     getPropertyTexture(propertyName) {
@@ -396,12 +191,246 @@ export default class Dataframe {
         return this.propertyTex[propertyName];
     }
 
-    // Add new properties to the dataframe or overwrite previously stored ones.
-    // `properties` is of the form: {propertyName: Float32Array}
-    addProperties(properties) {
-        Object.keys(properties).forEach(propertyName => {
-            this._addProperty(propertyName);
+    free() {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteTexture(this.texFilter);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+        }
+        const freeObserver = this.freeObserver;
+        
+        Object.keys(this).map(key => {
+            this[key] = null;
         });
+
+        this.freed = true;
+        
+        if (freeObserver) {
+            freeObserver(this);
+        }
+    }
+
+    _geometryInViewport(featureIndex, scale, center, aspect) {
+        const height = scale * (center.y - this.center.y);
+        const width = (scale / aspect) * (center.x - this.center.x);
+
+        switch (this.type) {
+            case 'point':
+                return this._isPointInViewport(featureIndex, scale, center, aspect);
+            case 'line':
+            case 'polygon':
+                return this._isPolygonInViewport(featureIndex, scale, center, aspect, height, width);
+            default:
+                return false;
+        }
+    }
+
+    _isPointInViewport(featureIndex, scale, center, aspect) {
+        const { minx, maxx, miny, maxy } = this._getBounds(scale, center, aspect);
+        const x = this.geom[2 * featureIndex + 0];
+        const y = this.geom[2 * featureIndex + 1];
+        return x > minx && x < maxx && y > miny && y < maxy;
+    }
+
+    _isPolygonInViewport(featureIndex, scale, center, aspect, width, height) {
+        const featureAABB = this._aabb[featureIndex];
+        const viewportAABB = this._getBounds(scale, center, aspect);
+        const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
+        const triangles = this._featureGeometries;
+
+        return aabbResult === aabbResults.INTERSECTS
+            ? _isPolygonCollidingViewport(triangles, center, width, height)
+            : aabbResult === aabbResults.INSIDE;
+    }
+
+    _compareAABBs(featureAABB, viewportAABB) {
+        switch (true) {
+            case _isFeatureInsideViewport(featureAABB, viewportAABB): 
+                return aabbResults.INSIDE;
+            case _isFeatureOutsideViewport(featureAABB, viewportAABB):
+                return aabbResults.OUTSIDE;
+            default:
+                return aabbResults.INTERSECTS;
+        }
+    }
+
+    _getBounds(scale, center, aspect) {
+        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
+        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
+        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+
+        return { minx, maxx, miny, maxy };
+    }
+
+    _getPointsAtPosition(pos, viz) {
+        const p = wToR(pos.x, pos.y, {
+            center: this.center,
+            scale: this.scale
+        });
+
+        const points = this.decodedGeom.vertices;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        const vizWidth = viz.width;
+        const vizStrokeWidth = viz.strokeWidth;
+
+        for (let i = 0; i < points.length; i += 2) {
+            const featureIndex = i / 2;
+            const center = {
+                x: points[i],
+                y: points[i + 1],
+            };
+
+            const feature = this._getFeature(columnNames, featureIndex);
+            
+            if (this._isFeatureFiltered(feature, viz.filter)) {
+                continue;
+            }
+
+            const pointWidth = vizWidth.eval(feature);
+            const pointStrokeWidth = vizStrokeWidth.eval(feature);
+            const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
+
+            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
+            const scale = diameter / 2 * widthScale;
+
+            if (!viz.symbol.default) {
+                const offset = viz.symbolPlacement.eval();
+                center.x += offset[0] * scale;
+                center.y += offset[1] * scale;
+            }
+
+            const inside = pointInCircle(p, center, scale);
+            
+            if (inside) {
+                features.push(this._getUserFeature(featureIndex));
+            }
+        }
+
+        return features;
+    }
+
+    _getLinesAtPosition(pos, viz) {
+        return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
+    }
+
+    _getPolygonAtPosition(pos, viz) {
+        return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
+    }
+
+    _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
+        const p = wToR(pos.x, pos.y, {
+            center: this.center,
+            scale: this.scale
+        });
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
+        const features = [];
+        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
+        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const columnNames = Object.keys(this.properties);
+        // Linear search for all features
+        // Tests triangles since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
+        let featureIndex = -1;
+        let scale;
+        let computeScale = feature => {
+            // Width is saturated at 336px
+            const width = Math.min(widthExpression.eval(feature), 336);
+            // width is a diameter and scale is radius-like, we need to divide by 2
+            scale = width / 2 * widthScale;
+        };
+
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i == 0 || i >= breakpoints[featureIndex]) {
+                featureIndex++;
+                const feature = this._getFeature(columnNames, featureIndex);
+                if (this._isFeatureFiltered(feature, filterExpression)) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
+                computeScale(feature);
+            }
+
+            const v1 = {
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
+            };
+
+            const v2 = {
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
+            };
+
+            const v3 = {
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
+            };
+
+            const inside = pointInTriangle(p, v1, v2, v3);
+
+            if (inside) {
+                features.push(this._getUserFeature(featureIndex));
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+        return features;
+    }
+
+    _getFeature(columnNames, featureIndex) {
+        const feature = {};
+        
+        columnNames.forEach(name => {
+            feature[name] = this.properties[name][featureIndex];
+        });
+
+        return feature;
+    }
+
+    _isFeatureFiltered(feature, filterExpression) {
+        return filterExpression.eval(feature) < 0.5;
+    }
+
+    _getUserFeature(featureIndex) {
+        let id;
+        const properties = {};
+        
+        Object.keys(this.properties).map(propertyName => {
+            let prop = this.properties[propertyName][featureIndex];
+            const column = this.metadata.properties[propertyName];
+            
+            if (column && column.type == 'category') {
+                prop = this.metadata.IDToCategory.get(prop);
+            }
+
+            if (propertyName === this.metadata.idProperty) {
+                id = prop;
+            }
+
+            properties[propertyName] = prop;
+        });
+
+        return { id, properties };
+    }
+
+    _addProperty(propertyName) {
+        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
+            this.getPropertyTexture(propertyName);
+        }
     }
 
     _createStyleTileTexture(numFeatures) {
@@ -421,31 +450,9 @@ export default class Dataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
     }
-
-    free() {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteTexture(this.texFilter);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-        }
-        const freeObserver = this.freeObserver;
-        Object.keys(this).map(key => {
-            this[key] = null;
-        });
-        this.freed = true;
-        if (freeObserver) {
-            freeObserver(this);
-        }
-    }
 }
 
-const geometryFeature = {
+const _geometryFeature = {
     line: (feature) => {
         return {
             vertices: feature,
@@ -462,7 +469,7 @@ const geometryFeature = {
 };
 
 function _getVerticesForGeometry(feature, geometryType) {
-    return geometryFeature[geometryType] ? geometryFeature[geometryType](feature) : null;
+    return _geometryFeature[geometryType] ? _geometryFeature[geometryType](feature) : null;
 }
 
 function _isFeatureInsideViewport(featureAABB, viewportAABB) {
@@ -475,7 +482,9 @@ function _isFeatureOutsideViewport(featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport(triangles, viewport) {
+function _isPolygonCollidingViewport(triangles, center, width, height) {
+    const viewport = _getViewportGeometry(center, width, height);
+
     for (let i = 0; i < triangles.length; i++) {
         if (triangles[i].collides(viewport)) {
             return true;
@@ -483,4 +492,19 @@ function _isPolygonCollidingViewport(triangles, viewport) {
     }
 
     return false;
+}
+
+
+function _getViewportGeometry(center, width, height) {
+    const w = width / 2;
+    const h = height / 2;
+
+    const vertices = [
+        [center.x - w, center.y - h],
+        [center.x + w, center.y - h],
+        [center.x - w, center.y + h],
+        [center.x + w, center.y + h]
+    ];
+
+    return new Polygon(0, 0, vertices);
 }
