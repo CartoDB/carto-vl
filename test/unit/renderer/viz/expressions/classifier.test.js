@@ -31,7 +31,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     { price: 5 },
                 ]
             });
-            expr._resetViewportAgg();
+            expr.resetViewportAgg();
             expr.accumViewportAgg({ price: 0 });
             expr.accumViewportAgg({ price: 1 });
 

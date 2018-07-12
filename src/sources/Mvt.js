@@ -24,6 +24,33 @@ const MVT_TO_CARTO_TYPES = {
     3: geometryTypes.POLYGON
 };
 
+/**
+ * A MVTOptions object declares a MVT configuration
+ * @typedef {object} MVTOptions
+ * @property {string} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer
+ * @property {function} [viewportZoomToSourceZoom=Math.ceil] - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, undefined defaults to `Math.ceil`
+ * @property {number} maxZoom - limit MVT tile requests to this zoom level, undefined defaults to no limit
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles up to zoom level 12.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     maxZoom: 12
+ * };
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 4), 6)
+ * };
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 0,3,6,9...</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
+ * };
+ *
+ */
+
 export default class MVT extends Base {
 
     /**
@@ -31,7 +58,7 @@ export default class MVT extends Base {
      *
      * @param {object} data - A MVT data object
      * @param {object} [metadata] - A carto.source.mvt.Metadata object
-     * @param {string} [layerId] - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contains one layer
+     * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
@@ -42,9 +69,8 @@ export default class MVT extends Base {
      * @constructor MVT
      * @extends carto.source.Base
      * @memberof carto.source
-     * @IGNOREapi
      */
-    constructor(templateURL, metadata = new Metadata(), layerId = undefined) {
+    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -52,11 +78,12 @@ export default class MVT extends Base {
         }
         this._metadata = metadata;
         this._tileClient = new TileClient(templateURL);
-        this._layerID = layerId;
+        this._options = options;
+        this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
     }
 
     _clone() {
-        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._layerID);
+        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
@@ -68,7 +95,11 @@ export default class MVT extends Base {
     }
 
     requestData(viewport) {
-        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this));
+        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this),
+            zoom => this._options.maxZoom == undefined ?
+                this._options.viewportZoomToSourceZoom(zoom) :
+                Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
+        );
     }
 
     async responseToDataframeTransformer(response, x, y, z) {
@@ -79,14 +110,14 @@ export default class MVT extends Base {
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
 
-        if (Object.keys(tile.layers).length > 1 && !this._layerID) {
+        if (Object.keys(tile.layers).length > 1 && !this._options.layerID) {
             throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
         }
 
-        const mvtLayer = tile.layers[this._layerID || Object.keys(tile.layers)[0]];
+        const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
 
         if (!mvtLayer) {
-            throw new Error(`LayerID '${this._layerID}' doesn't exist on the MVT tile`);
+            throw new Error(`LayerID '${this._options.layerID}' doesn't exist on the MVT tile`);
         }
 
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);

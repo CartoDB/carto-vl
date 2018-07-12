@@ -1,74 +1,130 @@
-DEVELOPERS
----
+# Developers
 
-## Contents
+CARTO VL is an open-source library. We are more than happy to receive your contributions to the code and its documentation.
 
-* [Getting Started](#setup)
-* [Versioning and Releasing](#release)
-* [Testing](#testing)
-* [Documentation](#documentation) 
+## <a name="prerequisites">Prerequisites</a>
 
+To clone and run this library, you'll need [Node.js](https://nodejs.org/en/download/) >=6.11.5 (which comes with [npm](http://npmjs.com)) installed on your computer.
 
+## <a name="install">Install</a>
 
-## <a name="setup"> Getting started </a>
+Run this commands from your command line:
 
-To build the library node `node >=6.11.5` is required, once you have a compatible node version you can start developing.
+```bash
+# Clone this repository
+$ git clone https://github.com/CartoDB/carto-vl
 
-### Install dependencies
+# Go into the repository
+$ cd carto-vl
 
-    yarn 
+# Install dependencies
+$ yarn
 
-### Build the library
+# Bundle the library
+$ yarn build
+```
 
-    yarn build
+## <a name="tests">Tests</a>
 
-## <a name="release"> Versioning and Releasing </a>
+### Unit tests
 
-### Update the library version
-We use `yarn bump` commmand to update the library version following [semver](http://semver.org/) rules.
+<!-- Add description -->
 
-    yarn bump:patch|minor|major
+```bash
+# Running the tests
+$ yarn test
 
-### Publishing the library
-In order to publish the library configure your `secrets.json` file and use the following command:
+# To watch the unit tests
+$ yarn test:watch
 
-    yarn release
+# To launch the unit tests in the browser
+$ yarn test:browser
+```
 
-## <a name="testing"> Testing </a>
+### Integration tests
 
-- [Unit tests](https://github.com/CartoDB/carto-vl/blob/master/test/unit/README.md)
-- [Integration tests](https://github.com/CartoDB/carto-vl/blob/master/test/integration/README.md)
-- [Acceptance tests](https://github.com/CartoDB/carto-vl/blob/master/test/acceptance/README.md)
+Automatically test the **user activity** using local data sources (GeoJSON).
 
+```bash
+# Running the tests
+$ yarn test:user
 
-## <a name="documentation"> Documentation </a>
+# To watch the user tests
+$ yarn test:user:watch
+```
 
+With these you can also test the **renderer** using local data sources (GeoJSON) and a static map. The local GeoJSON files are located in the `common/sources` directory.
 
-You **can generate generate the documentation to have an up to date version**.
+```bash
+# Running the tests
+$ yarn test:render
+```
 
-### Public documentation
+#### Generating new references
 
-This is intended for the end-user of the library. It's available in the directory `docs/public` and it contains:
- - Getting started introduction with a basic example.
- - Detailed information about how styling expressions.
- - Full reference for the public API.
+To create new tests, crate a new folder with a new `scenario.js` file and run the following command:
 
-For generating the public documentation, you should run:
+```
+yarn test:render:prepare
+```
 
+#### Modify old references
 
-    yarn docs
+Manually remove your old reference images and run this command to create new ones:
 
+```
+yarn test:render:prepare
+```
 
-### Serve docs and examples
+#### Filtering tests
 
-The recommended way to navigate the documentation and check the examples is running the following command:
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
 
-    yarn serve
+#### Ignoring tests
 
-### Internal documentation
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
-It's also possible to generate a full reference for all the private classes and methods. This will be useful for anyone working on the project internals.
+### Acceptance tests (E2E tests)
 
-To generate the docs for the private API, you need to execute:
+This end to end tests cover the entire library by perfoming tests againts real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images.
 
-    yarn docs:all
+```bash
+# Running the tests
+$ yarn test:e2e
+```
+
+#### Generating new references
+
+To create new tests, crate a new folder with a new `scenario.js` file and run the following command:
+
+```
+yarn test:e2e:prepare
+```
+
+#### Modify old references
+
+Manually remove your old reference images and run this command to create new ones:
+
+```
+yarn test:e2e:prepare
+```
+
+#### Filtering tests
+
+Adding `f-` at the beginning of any test folder marks this test to be executed without the rest of the tests.
+
+#### Ignoring tests
+
+Adding `x-` at the beginning of any test folder marks this test to be ignored.
+
+## <a name="documentation">Document your changes</a>
+
+This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+
+```bash
+# Generate the public documentation
+$ yarn docs
+
+# Serve docs and examples
+$ yarn serve
+```

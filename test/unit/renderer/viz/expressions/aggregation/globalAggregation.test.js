@@ -15,6 +15,7 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
                 }
             },
         };
+        
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);
             globalMin._compile(fakeMetadata);
