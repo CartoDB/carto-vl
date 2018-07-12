@@ -6,8 +6,9 @@ const map = new carto.Map({
 const source = new carto.source.GeoJSON(sources['points']);
 const viz = new carto.Viz(`
 width: 50
-symbol: sprite('/test/common/flower.svg')
-symbolPlacement: align_bottom
+color: ramp(linear($numeric), prism)
+symbol: ramp(buckets($numeric, [4]), imageList([image('/test/common/marker.svg'), image('/test/common/marker2.svg')]))
+symbolPlacement: align_center
 `);
 const layer = new carto.Layer('layer', source, viz);
 

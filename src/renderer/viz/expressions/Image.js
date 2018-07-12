@@ -2,39 +2,39 @@ import Base from './base';
 import { checkString } from './utils';
 
 /**
- * Sprite. Load an image and use it as a symbol.
+ * Image. Load an image and use it as a symbol.
  *
- * Note: sprite RGB color will be overridden if the viz `color` property is set.
+ * Note: image RGB color will be overridden if the viz `color` property is set.
  *
  * @param {string} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   symbol: s.sprite('./marker.svg')
+ *   symbol: s.image('./marker.svg')
  * });
  *
  * @example <caption>Load a svg image. (String)</caption>
  * const viz = new carto.Viz(`
- *    symbol: sprite('./marker.svg')
+ *    symbol: image('./marker.svg')
  * `);
  * @memberof carto.expressions
- * @name sprite
+ * @name image
  * @function
  * @api
 */
 
-export class Sprite extends Base {
+export default class Image extends Base {
     constructor(url) {
-        checkString('sprite', 'url', 0, url);
+        checkString('image', 'url', 0, url);
         super({});
-        this.type = 'sprite';
+        this.type = 'image';
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {
-            this.image = new Image();
+            this.image = new window.Image();
             this.image.onload = () => {
-                this.canvas = getCanvasFromImage(this.image);
+                this.canvas = _getCanvasFromImage(this.image);
                 this.image = null;
                 resolve();
             };
@@ -44,10 +44,12 @@ export class Sprite extends Base {
         });
     }
 
-    loadSprites() {
+    loadImages() {
         this.count = this.count + 1 || 1;
         return this._promise;
     }
+
+    eval() {}
 
     _compile(meta) {
         super._compile(meta);
@@ -62,7 +64,7 @@ export class Sprite extends Base {
     _applyToShaderSource() {
         return {
             preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
-            inline: `texture2D(texSprite${this._uid}, spriteUV).rgba`
+            inline: `texture2D(texSprite${this._uid}, imageUV).rgba`
         };
     }
 
@@ -93,29 +95,21 @@ export class Sprite extends Base {
             drawMetadata.freeTexUnit++;
         }
     }
-    // TODO eval
 }
 
-function getCanvasFromImage(img) {
-    const canvasSize = 256;
+function _getCanvasFromImage(img) {
+    const CANVAS_SIZE = 256;
     const canvas = document.createElement('canvas');
-    canvas.width = canvasSize;
-    canvas.height = canvasSize;
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
 
     const ctx = canvas.getContext('2d');
 
     const max = Math.max(img.width, img.height);
-    const width = img.width / max * canvasSize;
-    const height = img.height / max * canvasSize;
+    const width = img.width / max * CANVAS_SIZE;
+    const height = img.height / max * CANVAS_SIZE;
 
-    ctx.drawImage(img, 1 + (canvasSize - width) / 2, 1 + (canvasSize - height) / 2, width - 2, height - 2);
+    ctx.drawImage(img, 1 + (CANVAS_SIZE - width) / 2, 1 + (CANVAS_SIZE - height) / 2, width - 2, height - 2);
 
     return canvas;
 }
-
-export class SVG extends Sprite {
-    constructor(svg) {
-        super('data:image/svg+xml,' + encodeURIComponent(svg));
-    }
-}
-
