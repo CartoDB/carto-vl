@@ -128,8 +128,12 @@ function loadOptions() {
         delay: 100,
         viewportWidth: 400,
         viewportHeight: 300,
-        headless: process.platform === 'linux'
+        headless: headless()
     };
+}
+
+function headless() {
+    return process.platform === 'linux';
 }
 
 /**
@@ -153,5 +157,6 @@ module.exports = {
     loadTemplate,
     takeReference,
     testSST,
+    headless,
     PORT,
 };

@@ -18,7 +18,7 @@ describe('Render tests:', () => {
     before(done => {
         server = http.createServer(handler);
         server.listen(util.PORT);
-        exquisite.browser().then(_browser => {
+        exquisite.browser(util.headless()).then(_browser => {
             browser = _browser;
             done();
         });
