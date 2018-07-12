@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import Property from './basic/property';
 import { implicitCast } from './utils';
+import ViewportFeature from '../../ViewportFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -44,7 +45,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
-        this._FeatureProxy = null;
+        this._ViewportFeatureProxy = null;
     }
 
     _compile() {
@@ -63,41 +64,26 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg(metadata) {
-        if (!this._FeatureProxy) {
+    resetViewportAgg() {
+        if (!this._ViewportFeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
-            const columns = this._getMinimumNeededSchema().columns;
-            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
+
+            this._ViewportFeatureProxy = ViewportFeature;
         }
+        
         this.expr = [];
     }
 
     accumViewportAgg(feature) {
-        this.expr.push(new this._FeatureProxy(feature));
-    }
-
-    genViewportFeatureClass(properties) {
-        const cls = class ViewportFeature {
-            constructor(feature) {
-                this._feature = feature;
-            }
-        };
-        properties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function () {
-                    return this._feature[prop];
-                }
-            });
-        });
-        return cls;
+        const properties = this._getMinimumNeededSchema().columns;
+        this.expr.push(new this._ViewportFeatureProxy(feature, properties));
     }
 }
 
 function _childrenFromProperties(properties) {
-    let i = 0;
     const childContainer = {};
-    properties.forEach(property => childContainer['p' + ++i] = property);
+    properties.forEach((property, index) => childContainer[`p${index+1}`] = property);
     return childContainer;
 }
