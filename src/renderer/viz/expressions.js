@@ -7,8 +7,8 @@
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
- *  - **symbol** - show a sprite instead in the place of points
- *  - **symbolPlacement** - when using `symbol`, offset to apply to the sprite
+ *  - **symbol** - show an image instead in the place of points
+ *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
  * For example the point diameter could be using the `add` expression:
@@ -123,14 +123,16 @@
  * @api
  */
 
+import { showDeprecationWarning } from './utils/warning';
+
 import * as svgs from './builtinSVGs';
 
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
-import { In } from './expressions/belongs.js';
-import { Nin } from './expressions/belongs.js';
+import { In } from './expressions/belongs';
+import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
@@ -223,16 +225,17 @@ import { Ceil } from './expressions/unary';
 
 import variableFn from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 import ViewportFeatures from './expressions/viewportFeatures';
 
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import {Sprite, SVG} from './expressions/sprite';
+import Image from './expressions/Image';
+import SVG from './expressions/SVG';
+import ImageList from './expressions/ImageList';
 import Placement from './expressions/placement';
-import Sprites from './expressions/sprites';
 
 /* Expose classes as constructor functions */
 
@@ -280,7 +283,12 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
-export const sprite = (...args) => new Sprite(...args);
+
+export const image = (...args) => new Image(...args);
+export const imageList = (...args) => new ImageList(...args);
+export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
+export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
+
 export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);
@@ -333,10 +341,7 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => {
-    console.warn('DeprecationWarning: "torque" expression is deprecated. Please use "animation" instead.');
-    return new Animation(...args);
-};
+export const torque = (...args) => showDeprecationWarning(args, Animation, 'torque', 'animation');
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
@@ -349,7 +354,6 @@ export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
-export const sprites = (...args) => new Sprites(...args);
 
 export const variable = (...args) => variableFn(...args);
 export { variable as var };

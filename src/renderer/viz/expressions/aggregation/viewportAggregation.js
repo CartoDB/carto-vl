@@ -207,7 +207,7 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             return this.property._getMinimumNeededSchema();
         }
 
-        resetViewportAgg() {
+        _resetViewportAgg() {
             zeroFn(this);
         }
 
@@ -291,7 +291,7 @@ export class ViewportPercentile extends BaseExpression {
         return this.property._getMinimumNeededSchema();
     }
 
-    resetViewportAgg() {
+    _resetViewportAgg() {
         this._value = null;
         this._array = [];
     }
@@ -352,7 +352,7 @@ export class ViewportHistogram extends BaseExpression {
         this.inlineMaker = () => null;
     }
 
-    resetViewportAgg() {
+    _resetViewportAgg() {
         this._cached = null;
         this._histogram = new Map();
     }

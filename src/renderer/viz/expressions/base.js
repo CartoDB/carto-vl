@@ -31,8 +31,8 @@ export default class Base {
         this._shaderBindings = new Map();
     }
 
-    loadSprites() {
-        return Promise.all(this._getChildren().map(child => child.loadSprites()));
+    loadImages() {
+        return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
     _bind(metadata) {
@@ -113,8 +113,8 @@ export default class Base {
         return this._shaderBindings.get(shader);
     }
 
-    resetViewportAgg() {
-        this._getChildren().forEach(child => child.resetViewportAgg());
+    _resetViewportAgg() {
+        this._getChildren().forEach(child => child._resetViewportAgg());
     }
 
     accumViewportAgg(feature) {
