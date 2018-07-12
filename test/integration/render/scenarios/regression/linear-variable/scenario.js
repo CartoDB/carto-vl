@@ -8,3 +8,6 @@ const viz = new carto.Viz('color: ramp(linear(@num), PRISM), width: 50, @num: $n
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
+layer.on('loaded', () => {
+    window.loaded = true;
+});

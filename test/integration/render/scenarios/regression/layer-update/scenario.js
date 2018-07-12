@@ -1,6 +1,8 @@
-const map = new carto.Map({
+const map = new mapboxgl.Map({
     container: 'map',
-    background: 'black'
+    style: { version: 8, sources: {}, layers: [] },
+    center: [0, 0],
+    zoom: 0
 });
 
 const points = new carto.source.GeoJSON(sources['collection-point']);
@@ -8,4 +10,10 @@ const polygon = new carto.source.GeoJSON(sources['polygon']);
 const viz = new carto.Viz('color: rgb(255, 0, 0)');
 const layer = new carto.Layer('layer', points, viz);
 layer.addTo(map);
-layer.update(polygon, viz);
+layer.on('loaded', () => {
+    layer.update(polygon, viz).then(() => {
+        layer.on('updated', () => {
+            window.loaded = true;
+        })
+    });
+});
