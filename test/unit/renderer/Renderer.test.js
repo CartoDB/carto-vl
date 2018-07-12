@@ -30,7 +30,7 @@ describe('src/renderer/Renderer', () => {
             const dataframe = {
                 properties: {
                     city: [0],
-                    status: [0]
+                    status: [3]
                 }
             };
 

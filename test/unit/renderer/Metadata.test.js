@@ -1,0 +1,3 @@
+describe('src/renderer/Metadata', () => {
+    
+});
