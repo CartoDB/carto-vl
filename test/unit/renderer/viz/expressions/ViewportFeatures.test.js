@@ -1,31 +1,8 @@
-import Metadata from '../../../../../src/renderer/Metadata';
 import ViewportFeatures from '../../../../../src/renderer/viz/expressions/ViewportFeatures';
-import Property from '../../../../../src/renderer/viz/expressions/basic/Property';
 import ViewportFeature from '../../../../../src/renderer/ViewportFeature';
 import { property } from '../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/viewportFeatures', () => {
-    const METADATA = new Metadata({
-        properties: {
-            city: {
-                type: 'category',
-                categories: [
-                    { name: 'Murcia' }, 
-                    { name: 'Pontevedra' },
-                    { name: 'Madrid' }
-                ]
-            },
-
-            status: {
-                type: 'category',
-                categories: [
-                    { name: 'Fluid' },
-                    { name: 'Slow' }
-                ]
-            }
-        }
-    });
-
     describe('._compile', () => {
         it('should throw an error if it is called', (done) => {
             const viewportFeatures = new ViewportFeatures();
