@@ -49,6 +49,7 @@ const MVT_TO_CARTO_TYPES = {
  *     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
  * };
  *
+ * @api
  */
 
 export default class MVT extends Base {
@@ -69,6 +70,7 @@ export default class MVT extends Base {
      * @constructor MVT
      * @extends carto.source.Base
      * @memberof carto.source
+     * @api
      */
     constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
