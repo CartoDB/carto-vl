@@ -267,7 +267,7 @@ function clipLine(line) {
         type0 = nextType;
     }
 
-    clippedLine = removeDuplicatedVerticesOnLine(clippedLine);
+    clippedLine = _removeDuplicatedVerticesOnLine(clippedLine);
     if (clippedLine.length > 0) {
         clippedLines.push(clippedLine);
     }
@@ -275,7 +275,7 @@ function clipLine(line) {
     return clippedLines;
 }
 
-function removeDuplicatedVerticesOnLine(line) {
+function _removeDuplicatedVerticesOnLine(line) {
     const result = [];
     let prevX = undefined;
     let prevY = undefined;
