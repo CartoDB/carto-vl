@@ -228,8 +228,14 @@ export default class MVT extends Base {
 
     decodeProperty(propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
+            if (this._metadata.properties[propertyName].type != 'category') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type }' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
+            }
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
+            if (this._metadata.properties[propertyName].type != 'number') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type }' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
+            }
             return propertyValue;
         } else if (propertyValue == null || propertyValue == undefined) {
             return Number.NaN;

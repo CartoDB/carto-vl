@@ -31,4 +31,20 @@ describe('sources/mvt', () => {
             expect(source._options.viewportZoomToSourceZoom).toEqual(viewportZoomToSourceZoom);
         });
     });
+    describe('decodeProperty', () => {
+        it('should throw an error when the property type is string and the metadata declared type is number', () => {
+            const metadata = {
+                idProperty: 'id',
+                properties: {
+                    wadus: {
+                        type: 'number'
+                    }
+                }
+            };
+            const source = new Mvt('URL', metadata);
+            expect(() => {
+                source.decodeProperty('wadus', 'this is not a number');
+            }).toThrow('MVT decoding error. Metadata property \'wadus\' is of type \'number\' but the MVT tile contained a feature property of type string: \'this is not a number\'');
+        });
+    });
 });
