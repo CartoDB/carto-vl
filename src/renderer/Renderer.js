@@ -186,7 +186,7 @@ export default class Renderer {
                 }
                 processedFeaturesIDs.add(featureId);
 
-                const feature = this._featureFromDataFrame(dataframe, i);
+                const feature = this._featureFromDataFrame(dataframe, i, metadata);
 
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
@@ -230,7 +230,7 @@ export default class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame(dataframe, index) {
+    _featureFromDataFrame(dataframe, index, metadata) {
         if (!dataframe.cachedFeatures) {
             dataframe.cachedFeatures = [];
         }
@@ -239,13 +239,23 @@ export default class Renderer {
             return dataframe.cachedFeatures[index];
         }
 
+        const feature = this._createFeature(index, dataframe.properties, metadata);
+        dataframe.cachedFeatures[index] = feature;
+
+        return feature;
+    }
+
+    _createFeature(index, properties, metadata) {
         const feature = {};
-        const propertyNames = Object.keys(dataframe.properties);
+        const propertyNames = Object.keys(properties);
+        
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
-            feature[name] = dataframe.properties[name][index];
+            feature[name] = (metadata.properties[name].type === 'category')
+                ? metadata.IDToCategory.get(properties[name][index])
+                : properties[name][index];
         }
-        dataframe.cachedFeatures[index] = feature;
+
         return feature;
     }
 

@@ -22,6 +22,7 @@ export default class Metadata {
             property.categories.map(category => this.categorizeString(category.name));
         });
     }
+
     categorizeString(category) {
         if (category === undefined) {
             category = null;
@@ -32,8 +33,10 @@ export default class Metadata {
         this.categoryToID.set(category, this.numCategories);
         this.IDToCategory.set(this.numCategories, category);
         this.numCategories++;
+
         return this.numCategories - 1;
     }
+    
     propertyNames(propertyName) {
         const prop = this.properties[propertyName];
         if (prop.aggregations) {
