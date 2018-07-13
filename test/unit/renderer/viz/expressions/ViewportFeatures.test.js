@@ -11,7 +11,7 @@ describe('src/renderer/viz/expressions/viewportFeatures', () => {
         });
     });
 
-    describe('resetViewportAgg', () => {
+    describe('_resetViewportAgg', () => {
         it('should throw an error if properties are not valid Property', () => {
             const properties = [];
             properties.push('city');
@@ -19,7 +19,7 @@ describe('src/renderer/viz/expressions/viewportFeatures', () => {
             const viewportFeatures = new ViewportFeatures(...properties);
 
             expect(() => {
-                viewportFeatures.resetViewportAgg();
+                viewportFeatures._resetViewportAgg();
             }).toThrowError('viewportFeatures arguments can only be properties');
 
         });
@@ -28,7 +28,7 @@ describe('src/renderer/viz/expressions/viewportFeatures', () => {
             const viewportFeatures = new ViewportFeatures();
             viewportFeatures.accumViewportAgg({ city: 'Murcia' });
 
-            viewportFeatures.resetViewportAgg();
+            viewportFeatures._resetViewportAgg();
 
             expect(viewportFeatures.value).toEqual([]);
         });

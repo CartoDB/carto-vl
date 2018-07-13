@@ -62,7 +62,7 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    resetViewportAgg() {
+    _resetViewportAgg() {
         if (!this._requiredProperties.every((p) => p.isA(Property))) {
             throw new Error('viewportFeatures arguments can only be properties');
         }

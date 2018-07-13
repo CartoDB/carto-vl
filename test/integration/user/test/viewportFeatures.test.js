@@ -145,7 +145,14 @@ describe('viewportFeatures', () => {
         });
 
         it ('should fail with proper error', done => {
-            expect(viz1.variables.list._resetViewportAgg).toThrowError(/arguments can only be properties/);
+            const viz3 = new carto.Viz(`
+                @wrongList: viewportFeatures('bad')
+            `);
+
+            const expectedError = /arguments can only be properties/;
+            expect(() => {
+                viz3.variables.wrongList._resetViewportAgg();
+            }).toThrowError(expectedError);
             done();
         });
     });
