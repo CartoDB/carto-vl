@@ -172,7 +172,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     const MIN_VALID_NUM_VERTICES = 3;
 
     // preClippedVertices is closed by repeating the first vertex
-    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES+1) {
+    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES + 1) {
         if (isHole) {
             polygon.holes.push(polygon.flat.length / 2);
         }
@@ -180,7 +180,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
             polygon.flat.push(v[0], v[1]);
         });
         Object.keys(clippedTypes).forEach(i => {
-            polygon.clipped.push(Number(i)*2);
+            polygon.clipped.push(Number(i) * 2);
             polygon.clippedType.push(clippedTypes[i]);
         });
     }
@@ -226,13 +226,13 @@ function clipLine(line) {
     }
     let point0 = line[0];
     let type0 = clipType(point0);
-    for (let i=1; i<line.length; ++i) {
+    for (let i = 1; i < line.length; ++i) {
         let point1 = line[i];
         let type1 = clipType(point1);
         const nextType = type1;
         const nextPoint = point1;
 
-        for(;;) {
+        for (; ;) {
             if (!(type0 | type1)) {
                 // both points inside
                 clippedLine.push(...point0);
@@ -266,9 +266,27 @@ function clipLine(line) {
         point0 = nextPoint;
         type0 = nextType;
     }
+
+    clippedLine = removeDuplicatedVerticesOnLine(clippedLine);
     if (clippedLine.length > 0) {
         clippedLines.push(clippedLine);
     }
 
     return clippedLines;
+}
+
+function removeDuplicatedVerticesOnLine(line) {
+    const result = [];
+    let prevX = undefined;
+    let prevY = undefined;
+    for (let i = 0; i < line.length; i += 2) {
+        const x = line[i];
+        const y = line[i + 1];
+        if (x != prevX || y != prevY) {
+            result.push(x, y);
+            prevX = x;
+            prevY = y;
+        }
+    }
+    return result;
 }
