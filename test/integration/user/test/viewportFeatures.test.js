@@ -143,6 +143,11 @@ describe('viewportFeatures', () => {
                 _checkFeatures(viz2.variables.list2value.eval(), expectedValue, done);
             });
         });
+
+        it ('should fail with proper error', done => {
+            expect(viz1.variables.list._resetViewportAgg).toThrowError(/arguments can only be properties/);
+            done();
+        });
     });
 
     afterEach(() => {

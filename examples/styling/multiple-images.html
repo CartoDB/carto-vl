@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Single Sprite | CARTO</title>
+  <title>Multiple Images | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -19,10 +19,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Single Sprite</h1>
+        <h1>Multiple Sprites</h1>
       </header>
       <section>
-        <p class="description open-sans">Show a sprite instead of points</p>
+        <p class="description open-sans">Show different sprites based on a category property</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -53,9 +53,9 @@
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
     width: (sqrt($pop_max) * 0.003)*zoom()
-    color: white
-    strokeColor: black
-    symbol: sprite('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
+    color: ramp(linear($pop_max, 0, 10000000), prism)
+    symbol: ramp(buckets($pop_max, [1000000]), sprites([image('https://libs.cartocdn.com/carto-vl/assets/marker.svg'), image('https://libs.cartocdn.com/carto-vl/assets/star.svg')]))
+    symbolPlacement: align_bottom
     `);
 
 
