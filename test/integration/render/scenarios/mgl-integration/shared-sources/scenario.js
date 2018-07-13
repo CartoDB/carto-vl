@@ -12,3 +12,12 @@ const layer1 = new carto.Layer('layer1', points, viz1);
 const layer2 = new carto.Layer('layer2', points, viz2);
 layer1.addTo(map);
 layer2.addTo(map);
+let loadedLayers = 0;
+layer1.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});
+layer2.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});

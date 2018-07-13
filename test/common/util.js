@@ -51,20 +51,40 @@ function takeReference(file, template, asyncLoad) {
     }
 }
 
-function testSST(file, template, asyncLoad) {
+async function testSST(file, template, asyncLoad, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
+    options.browser = browser;
+    const capturedErrors = [];
     options.pageEvents = {
-        error: err => console.error(err.message),
-        pageerror: err => console.error(err.message),
-        requestfailed: _onRequestFailed,
+        error: err => {
+            console.error(err);
+            capturedErrors.push(err);
+        },
+        pageerror: err => {
+            console.error(err);
+            capturedErrors.push(err);
+        },
+        requestfailed: request => {
+            const failure = request.failure();
+            if (failure) {
+                const err = new Error(`Request failed: URL="${request.url()}"; Reason="${failure.errorText}"`);
+                console.error(err);
+                capturedErrors.push(err);
+            }
+        },
     };
     if (asyncLoad) options.waitForFn = () => window.loaded;
-    return exquisite.test(options);
+
+    const result = await exquisite.test(options);
+    if (capturedErrors.length > 0) {
+        throw new Error(capturedErrors.map(err => err.message).join(', '));
+    }
+    return result;
 }
 
 function writeTemplate(file, template) {
@@ -108,8 +128,12 @@ function loadOptions() {
         delay: 100,
         viewportWidth: 400,
         viewportHeight: 300,
-        headless: process.platform === 'linux'
+        headless: headless()
     };
+}
+
+function headless() {
+    return process.platform === 'linux';
 }
 
 /**
@@ -127,17 +151,12 @@ function handleBrowserConsole(consoleMessage) {
     }
 }
 
-function _onRequestFailed(request) {
-    if (request.failure()) {
-        console.error(`${request.url()} --> ${request.failure().errorText}`);
-    }
-}
-
 module.exports = {
     getName,
     loadFiles,
     loadTemplate,
     takeReference,
     testSST,
+    headless,
     PORT,
 };
