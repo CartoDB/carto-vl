@@ -14,7 +14,8 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image'
+    IMAGE: 'image',
+    LABEL: 'label'
 };
 
 const rampTypes = {
@@ -191,6 +192,15 @@ export default class Ramp extends BaseExpression {
             return {
                 preface: input.preface + images.preface,
                 inline: `${images.inline}(imageUV, ${input.inline})`
+            };
+        }
+
+        if (this.palette.type === paletteTypes.LABEL) {
+            const labels = this.palette._applyToShaderSource(getGLSLforProperty);
+            
+            return {
+                preface: input.preface + labels.preface,
+                inline: `${labels.inline}(labelUV, ${input.inline})`
             };
         }
 

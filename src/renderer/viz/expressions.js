@@ -236,6 +236,7 @@ import Image from './expressions/Image';
 import SVG from './expressions/SVG';
 import ImageList from './expressions/ImageList';
 import Placement from './expressions/placement';
+import Label from './expressions/Label';
 
 /* Expose classes as constructor functions */
 
@@ -288,7 +289,7 @@ export const image = (...args) => new Image(...args);
 export const imageList = (...args) => new ImageList(...args);
 export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
 export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
-
+export const label = (...args) => new Label(...args);
 export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);

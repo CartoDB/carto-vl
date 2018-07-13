@@ -11,6 +11,7 @@ $propertyPreface
 void main(void) {
     vec2 featureID = featureIDVar;
     vec2 imageUV = gl_PointCoord.xy;
+    vec2 labelUV = gl_PointCoord.xy;
     vec4 symbolColor = $symbol_inline;
 
     vec4 c;
