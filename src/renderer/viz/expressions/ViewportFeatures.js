@@ -66,6 +66,7 @@ export default class ViewportFeatures extends BaseExpression {
         if (!this._requiredProperties.every((p) => p.isA(Property))) {
             throw new Error('viewportFeatures arguments can only be properties');
         }
+
         this.expr = [];
     }
 
