@@ -21,4 +21,8 @@ class CartoMapIntegrator {
     }
     needRefresh() {
     }
+
+    getZoomLevel(){
+        return 0;
+    }
 }
