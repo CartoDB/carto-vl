@@ -416,7 +416,8 @@ export default class GeoJSON extends Base {
 
     _isClockWise (vertices) {
         let total = 0;
-        let pt1 = vertices[0], pt2;
+        let pt1 = vertices[0];
+        let pt2;
         for (let i = 0; i < vertices.length - 1; i++) {
             pt2 = vertices[i + 1];
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);

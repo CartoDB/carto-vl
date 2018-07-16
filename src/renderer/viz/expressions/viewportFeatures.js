@@ -98,6 +98,8 @@ export default class ViewportFeatures extends BaseExpression {
 function _childrenFromProperties (properties) {
     let i = 0;
     const childContainer = {};
-    properties.forEach(property => childContainer['p' + ++i] = property);
+    properties.forEach(property => {
+        childContainer['p' + ++i] = property;
+    });
     return childContainer;
 }

@@ -14,6 +14,4 @@ export default class Base {
      * @abstract
      * @api
      */
-    constructor () {
-    }
 }

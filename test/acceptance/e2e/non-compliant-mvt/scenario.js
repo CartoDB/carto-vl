@@ -26,4 +26,6 @@ const viz = new carto.Viz(vizSpec);
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map, 'watername_ocean');
-layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
+layer.on('loaded', () => {
+    window.loaded = true;
+});

@@ -38,7 +38,9 @@ function checkFeatures (list, expectedList) {
     for (let i = 0; i < list.length; ++i) {
         const actual = {};
         const expected = expectedList[i];
-        Object.keys(expected).forEach(prop => actual[prop] = list[i][prop]);
+        Object.keys(expected).forEach(prop => {
+            actual[prop] = list[i][prop];
+        });
         expect(actual).toEqual(expected);
     }
 }
@@ -71,8 +73,8 @@ describe('viewportFeatures', () => {
     it('should get the features properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'},
-                { value: 1000, category: 'b'}
+                { value: 10, category: 'a' },
+                { value: 1000, category: 'b' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
@@ -82,8 +84,8 @@ describe('viewportFeatures', () => {
     it('should get the features properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a'},
-                { id: 2, value: 1000, category: 'b'}
+                { id: 1, value: 10, category: 'a' },
+                { id: 2, value: 1000, category: 'b' }
             ];
             const expectedValue = [
                 { value: 10 },
@@ -129,7 +131,7 @@ describe('viewportFeatures on a map with filters', () => {
     it('should get the filtered feature properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'}
+                { value: 10, category: 'a' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
@@ -139,7 +141,7 @@ describe('viewportFeatures on a map with filters', () => {
     it('should get the filtered feature properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 2, value: 1000, category: 'b'}
+                { id: 2, value: 1000, category: 'b' }
             ];
             const expectedValue = [
                 { value: 1000 }
@@ -183,7 +185,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     it('should get only in-viewport feature properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'}
+                { value: 10, category: 'a' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
@@ -193,7 +195,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     it('should get only in-viewport features properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a'}
+                { id: 1, value: 10, category: 'a' }
             ];
             const expectedValue = [
                 { value: 10 }

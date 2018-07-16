@@ -31,6 +31,8 @@
         "no-console": "off",
         "no-useless-escape": "off",
         "no-var": "error",
-        "no-new": "off"
+        "no-new": "off",
+        "no-tabs": "off",
+        "import/no-duplicates": "off"
     }
 }

@@ -1,11 +1,10 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear } from '../../../../../src/renderer/viz/expressions';
-import * as s from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
-const DEFAULT_COLOR = s.namedColor('gray');
+const DEFAULT_COLOR = namedColor('gray');
 
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
@@ -52,8 +51,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
 
             describe('and values are colors', () => {
-                const firstColor = s.namedColor('red');
-                const secondColor = s.namedColor('blue');
+                const firstColor = namedColor('red');
+                const secondColor = namedColor('blue');
                 let actual;
                 let expected;
 
@@ -98,12 +97,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     }
                 });
 
-                const red = s.namedColor('red');
-                const blue = s.namedColor('blue');
-                const yellow = s.namedColor('yellow');
-                const purple = s.namedColor('purple');
-                const green = s.namedColor('green');
-                const orange = s.namedColor('orange');
+                const red = namedColor('red');
+                const blue = namedColor('blue');
+                const yellow = namedColor('yellow');
+                const purple = namedColor('purple');
+                const green = namedColor('green');
+                const orange = namedColor('orange');
 
                 let actual;
                 let expected;
@@ -295,12 +294,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
 
             describe('when categories are quantitative', () => {
-                const red = s.namedColor('red');
-                const blue = s.namedColor('blue');
-                const yellow = s.namedColor('yellow');
-                const purple = s.namedColor('purple');
-                const green = s.namedColor('green');
-                const orange = s.namedColor('orange');
+                const red = namedColor('red');
+                const blue = namedColor('blue');
+                const yellow = namedColor('yellow');
+                const purple = namedColor('purple');
+                const green = namedColor('green');
+                const orange = namedColor('orange');
 
                 describe('and there are less buckets than colors', () => {
                     const RANGES = [10, 20, 30];
@@ -584,12 +583,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 ]
             });
 
-            const $price = s.property('price');
-            const red = s.namedColor('red');
-            const blue = s.namedColor('blue');
-            const yellow = s.namedColor('yellow');
-            const purple = s.namedColor('purple');
-            const green = s.namedColor('green');
+            const $price = property('price');
+            const red = namedColor('red');
+            const blue = namedColor('blue');
+            const yellow = namedColor('yellow');
+            const purple = namedColor('purple');
+            const green = namedColor('green');
 
             let actual;
             let expected;
@@ -611,7 +610,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = yellow._nameToRGBA();
 
                         expect(actual).not.toEqual(expected);
@@ -634,7 +633,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = yellow._nameToRGBA();
 
                         expect(actual).toEqual(expected);
@@ -647,12 +646,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(q, [red, blue]);
                         r._compile(METADATA);
 
-                        actual = r.eval({price: 1});
+                        actual = r.eval({ price: 1 });
                         expected = red._nameToRGBA();
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({price: 3});
+                        actual = r.eval({ price: 3 });
                         expected = blue._nameToRGBA();
 
                         expect(actual).not.toEqual(expected);
@@ -690,12 +689,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = yellow._nameToRGBA();
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
+                        actual = r.eval({ price: 4.1 });
                         expected = purple._nameToRGBA();
 
                         expect(actual).not.toEqual(expected);
@@ -718,7 +717,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = yellow._nameToRGBA();
 
                         expect(actual).not.toEqual(expected);
@@ -751,7 +750,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         ]
                     });
 
-                    const $price = s.property('price');
+                    const $price = property('price');
                     let actual;
                     let expected;
 
@@ -761,17 +760,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const r = ramp(q, palettes.SUNSET);
                         r._compile(METADATA);
 
-                        actual = r.eval({ price: 1});
+                        actual = r.eval({ price: 1 });
                         expected = hexToRgb(RAMP_COLORS[0]);
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({ price: 6});
+                        actual = r.eval({ price: 6 });
                         expected = hexToRgb(RAMP_COLORS[1]);
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({price: 10});
+                        actual = r.eval({ price: 10 });
                         expected = hexToRgb(RAMP_COLORS[2]);
 
                         expect(actual).toEqual(expected);
@@ -798,7 +797,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         ]
                     });
 
-                    const $price = s.property('price');
+                    const $price = property('price');
                     let actual;
                     let expected;
 
@@ -818,27 +817,27 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 2.1});
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
+                        actual = r.eval({ price: 4.1 });
                         expected = hexToRgb(RAMP_COLORS[4]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 5.1});
+                        actual = r.eval({ price: 5.1 });
                         expected = hexToRgb(RAMP_COLORS[5]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 10});
+                        actual = r.eval({ price: 10 });
                         expected = hexToRgb(RAMP_COLORS[6]);
 
                         expect(actual).toEqual(expected);
@@ -868,7 +867,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     ]
                 });
 
-                const $price = s.property('price');
+                const $price = property('price');
                 let actual;
                 let expected;
 
@@ -889,22 +888,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 2.1});
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
+                        actual = r.eval({ price: 4.1 });
                         expected = hexToRgb(RAMP_COLORS[4]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 5.1});
+                        actual = r.eval({ price: 5.1 });
                         expected = hexToRgb(RAMP_COLORS[5]);
 
                         expect(actual).not.toEqual(expected);
@@ -927,22 +926,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 2.1});
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
+                        actual = r.eval({ price: 4.1 });
                         expected = hexToRgb(RAMP_COLORS[4]);
 
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 5.1});
+                        actual = r.eval({ price: 5.1 });
                         expected = hexToRgb(RAMP_COLORS[5]);
 
                         expect(actual).not.toEqual(expected);
