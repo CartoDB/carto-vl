@@ -64,10 +64,14 @@
     "webpack-glsl-loader": "^1.0.1"
   },
   "main": "src/index.js",
-  "module": "src/index.js",
-  "jsnext:main": "src/index.js",
+  "module": "carto-vl.js",
+  "jsnext:main": "carto-vl.js",
   "scripts": {
+    "prepublish": "yarn build:npm",
     "build": "yarn build:dev && yarn build:min",
+    "build:npm":"yarn build:npm:dev && yarn build:npm:min",
+    "build:npm:dev": "webpack --config webpack/webpack.config.js --output-path='./'",
+    "build:npm:min": "webpack --config webpack/webpack.min.config.js --output-path='./'",
     "build:dev": "webpack --config webpack/webpack.config.js",
     "build:min": "webpack --config webpack/webpack.min.config.js",
     "build:watch": "webpack -w --config webpack/webpack.config.js",
