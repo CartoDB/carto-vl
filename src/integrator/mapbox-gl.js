@@ -73,9 +73,9 @@ class MGLIntegrator {
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-                this._layers.map(layer => layer.initCallback());
             }
 
+            layer.initialize();
             layer.$paintCallback();
             this._paintedLayers++;
 

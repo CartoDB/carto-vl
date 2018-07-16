@@ -36,7 +36,7 @@ export default class Map {
     }
 
     addLayer (layer, beforeLayerID) {
-        layer.initCallback();
+        layer.initialize();
 
         let index;
         for (index = 0; index < this._layers.length; index++) {
