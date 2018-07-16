@@ -77,7 +77,7 @@ class MGLIntegrator {
                 this.renderer._initGL(gl);
             }
 
-            layer.initCallback();
+            layer.initialize();
             layer.$paintCallback();
             this._paintedLayers++;
 

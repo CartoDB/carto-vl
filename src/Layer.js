@@ -78,7 +78,7 @@ export default class Layer {
         this._integrator = null;
         
         this._context = new Promise((resolve) => {
-            this._contextInitCallback = resolve;
+            this._contextInitialize = resolve;
         });
         
         this._integratorPromise = new Promise((resolve) => {
@@ -256,11 +256,11 @@ export default class Layer {
     }
 
     // The integrator will call this method once the webgl context is ready.
-    initCallback() {
+    initialize() {
         if (!this._isInitialized) {
             this._isInitialized = true;
             this._renderLayer.renderer = this._integrator.renderer;
-            this._contextInitCallback();
+            this._contextInitialize();
             this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
             this.requestMetadata();
         }
