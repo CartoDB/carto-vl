@@ -115,7 +115,7 @@
             "samples": [
                 {
                     "title": "External GeoJSON layer",
-                    "file": "advances/external-geojson.html"
+                    "file": "advanced/external-geojson.html"
                 },
                 {
                     "title": "US population by county",
