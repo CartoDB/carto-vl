@@ -1,6 +1,6 @@
-import GeoJSON from '../../../src/sources/Geojson';
+import GeoJSON from '../../../src/sources/GeoJSON';
 
-describe('sources/geojson', () => {
+describe('sources/GeoJSON', () => {
     const createVizMock = (columns = []) => {
         return {
             getMinimumNeededSchema: () => { return { columns }; }

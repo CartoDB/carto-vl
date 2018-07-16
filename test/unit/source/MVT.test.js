@@ -1,6 +1,6 @@
-import Mvt from '../../../src/sources/Mvt';
+import MVT from '../../../src/sources/MVT';
 
-describe('sources/mvt', () => {
+describe('sources/MVT', () => {
     describe('constructor', () => {
         const metadata = {
             idProperty: 'id',
@@ -10,23 +10,23 @@ describe('sources/mvt', () => {
         const maxZoom = 14;
 
         it('should have viewportZoomToSourceZoom when no options are provided', () => {
-            const source = new Mvt('URL', metadata);
+            const source = new MVT('URL', metadata);
             expect(source._options.viewportZoomToSourceZoom).not.toBeUndefined();
         });
 
         it('should have viewportZoomToSourceZoom when layerId option is present but viewportZoomToSourceZoom is not', () => {
-            const source = new Mvt('URL', metadata, { layerId });
+            const source = new MVT('URL', metadata, { layerId });
             expect(source._options.viewportZoomToSourceZoom).not.toBeUndefined();
         });
 
         it('should have viewportZoomToSourceZoom when layerId and maxZoom option is present but viewportZoomToSourceZoom is not', () => {
-            const source = new Mvt('URL', metadata, { layerId, maxZoom });
+            const source = new MVT('URL', metadata, { layerId, maxZoom });
             expect(source._options.viewportZoomToSourceZoom).not.toBeUndefined();
         });
 
         it('should have viewportZoomToSourceZoom as provided', () => {
             const viewportZoomToSourceZoom = z => z;
-            const source = new Mvt('URL', metadata, { viewportZoomToSourceZoom });
+            const source = new MVT('URL', metadata, { viewportZoomToSourceZoom });
             expect(source._options.viewportZoomToSourceZoom).not.toBeUndefined();
             expect(source._options.viewportZoomToSourceZoom).toEqual(viewportZoomToSourceZoom);
         });
