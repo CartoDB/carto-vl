@@ -12,11 +12,11 @@ import { parseVizExpression } from '../renderer/viz/parser';
  * @api
  */
 export default class FeatureVizProperty {
-    get value() {
+    get value () {
         return this._viz[this._propertyName].eval(this._properties);
     }
 
-    constructor(propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
+    constructor (propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
         this._propertyName = propertyName;
         this._feature = feature;
         this._viz = viz;
@@ -27,8 +27,8 @@ export default class FeatureVizProperty {
     }
 }
 
-function _generateResetFunction(propertyName, feature, customizedFeatures, viz, idProperty) {
-    return function reset(duration = 500) {
+function _generateResetFunction (propertyName, feature, customizedFeatures, viz, idProperty) {
+    return function reset (duration = 500) {
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
             customizedFeatures[feature.id][propertyName].replaceChild(
                 customizedFeatures[feature.id][propertyName].mix,
@@ -41,10 +41,9 @@ function _generateResetFunction(propertyName, feature, customizedFeatures, viz, 
     };
 }
 
-
-function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty) {
-    return function generatedBlendTo(newExpression, duration = 500) {
-        if (typeof newExpression == 'string') {
+function _generateBlenderFunction (propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty) {
+    return function generatedBlendTo (newExpression, duration = 500) {
+        if (typeof newExpression === 'string') {
             newExpression = parseVizExpression(newExpression);
         }
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
@@ -59,7 +58,7 @@ function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz
         trackFeatureViz(feature.id, propertyName, blendExpr, customizedFeatures);
         viz.replaceChild(
             viz[propertyName],
-            blendExpr,
+            blendExpr
         );
         viz[propertyName].notify();
     };

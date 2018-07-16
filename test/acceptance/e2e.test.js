@@ -12,7 +12,7 @@ const template = util.loadTemplate(path.join(__dirname, 'e2e.html.tpl'));
 
 describe('E2E tests:', () => {
     let server;
-    
+
     before(() => {
         server = http.createServer(handler);
         server.listen(util.PORT);
@@ -25,7 +25,7 @@ describe('E2E tests:', () => {
     });
 });
 
-function test(file) {
+function test (file) {
     it(util.getName(file), () => {
         const actual = util.testSST(file, template, true);
         return chai.expect(actual).to.eventually.eq(0);

@@ -24,7 +24,7 @@ import { checkInstance } from './utils';
  * @IGNOREapi
  */
 export class Asc extends BaseExpression {
-    constructor(by) {
+    constructor (by) {
         super({});
         checkInstance('asc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -54,7 +54,7 @@ export class Asc extends BaseExpression {
  * @IGNOREapi
  */
 export class Desc extends BaseExpression {
-    constructor(by) {
+    constructor (by) {
         super({});
         checkInstance('desc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -83,7 +83,7 @@ export class Desc extends BaseExpression {
  * @IGNOREapi
  */
 export class NoOrder extends BaseExpression {
-    constructor() {
+    constructor () {
         super({});
         this.type = 'orderer';
     }
@@ -111,7 +111,7 @@ export class NoOrder extends BaseExpression {
  * @IGNOREapi
  */
 export class Width extends BaseExpression {
-    constructor() {
+    constructor () {
         super({});
         this.type = 'propertyReference';
     }

@@ -270,21 +270,21 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  */
 export const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 
-function genUnaryOp(name, jsFn, glsl) {
+function genUnaryOp (name, jsFn, glsl) {
     return class UnaryOperation extends BaseExpression {
-        constructor(a) {
+        constructor (a) {
             a = implicitCast(a);
             checkLooseType(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(feature) {
+        eval (feature) {
             return jsFn(this.a.eval(feature));
         }
-        _compile(meta) {
+        _compile (meta) {
             super._compile(meta);
             checkType(name, 'x', 0, 'number', this.a);
             if (this.a.type != 'number') {

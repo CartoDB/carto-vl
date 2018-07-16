@@ -1,37 +1,36 @@
 import { clamp } from './expressions/utils';
 
-export function sRGBToCielab(srgb) {
+export function sRGBToCielab (srgb) {
     return XYZToCieLab(sRGBToXYZ(srgb));
 }
-export function cielabToSRGB(cielab) {
+export function cielabToSRGB (cielab) {
     return XYZToSRGB(cielabToXYZ(cielab));
 }
 
-export function interpolateRGBAinCieLAB(rgbColorA, rgbColorB, m) {
+export function interpolateRGBAinCieLAB (rgbColorA, rgbColorB, m) {
     const cielabColorA = sRGBToCielab({
         r: rgbColorA.r,
         g: rgbColorA.g,
         b: rgbColorA.b,
-        a: rgbColorA.a,
+        a: rgbColorA.a
     });
-    
+
     const cielabColorB = sRGBToCielab({
         r: rgbColorB.r,
         g: rgbColorB.g,
         b: rgbColorB.b,
-        a: rgbColorB.a,
+        a: rgbColorB.a
     });
 
     const cielabInterpolated = {
         l: (1 - m) * cielabColorA.l + m * cielabColorB.l,
         a: (1 - m) * cielabColorA.a + m * cielabColorB.a,
         b: (1 - m) * cielabColorA.b + m * cielabColorB.b,
-        alpha: (1 - m) * cielabColorA.alpha + m * cielabColorB.alpha,
+        alpha: (1 - m) * cielabColorA.alpha + m * cielabColorB.alpha
     };
 
     return cielabToSRGB(cielabInterpolated);
 }
-
 
 // Following functionality has been inspired by http://www.getreuer.info/home/colorspace
 // License:
@@ -48,7 +47,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” 
 */
 
 // Convert sRGB to CIE XYZ with the D65 white point
-function sRGBToXYZ(srgb) {
+function sRGBToXYZ (srgb) {
     // Poynton, "Frequently Asked Questions About Color," page 10
     // Wikipedia: http://en.wikipedia.org/wiki/SRGB
     // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space
@@ -61,7 +60,7 @@ function sRGBToXYZ(srgb) {
     };
 }
 
-function sRGBToLinearRGB({ r, g, b, a }) {
+function sRGBToLinearRGB ({ r, g, b, a }) {
     // http://en.wikipedia.org/wiki/SRGB
     const inverseGammaCorrection = t =>
         t <= 0.0404482362771076 ? t / 12.92 : Math.pow((t + 0.055) / 1.055, 2.4);
@@ -69,10 +68,10 @@ function sRGBToLinearRGB({ r, g, b, a }) {
         r: inverseGammaCorrection(r),
         g: inverseGammaCorrection(g),
         b: inverseGammaCorrection(b),
-        a,
+        a
     };
 }
-function linearRGBToSRGB({ r, g, b, a }) {
+function linearRGBToSRGB ({ r, g, b, a }) {
     // http://en.wikipedia.org/wiki/SRGB
     const gammaCorrection = t =>
         t <= 0.0031306684425005883 ? 12.92 * t : 1.055 * Math.pow(t, 0.416666666666666667) - 0.055;
@@ -80,7 +79,7 @@ function linearRGBToSRGB({ r, g, b, a }) {
         r: gammaCorrection(r),
         g: gammaCorrection(g),
         b: gammaCorrection(b),
-        a,
+        a
     };
 }
 
@@ -89,7 +88,7 @@ const WHITEPOINT_D65_Y = 1.0;
 const WHITEPOINT_D65_Z = 1.088754;
 
 // Convert CIE XYZ to CIE L*a*b* (CIELAB) with the D65 white point
-function XYZToCieLab({ x, y, z, a }) {
+function XYZToCieLab ({ x, y, z, a }) {
     // Wikipedia: http://en.wikipedia.org/wiki/Lab_color_space
 
     const xn = WHITEPOINT_D65_X;
@@ -97,8 +96,8 @@ function XYZToCieLab({ x, y, z, a }) {
     const zn = WHITEPOINT_D65_Z;
 
     const f = t =>
-        t >= 8.85645167903563082e-3 ?
-            Math.pow(t, 0.333333333333333) : (841.0 / 108.0) * t + 4.0 / 29.0;
+        t >= 8.85645167903563082e-3
+            ? Math.pow(t, 0.333333333333333) : (841.0 / 108.0) * t + 4.0 / 29.0;
 
     return {
         l: 116 * f(y / yn) - 16,
@@ -109,7 +108,7 @@ function XYZToCieLab({ x, y, z, a }) {
 }
 
 // Convert CIE XYZ to sRGB with the D65 white point
-function XYZToSRGB({ x, y, z, a }) {
+function XYZToSRGB ({ x, y, z, a }) {
     // Poynton, "Frequently Asked Questions About Color," page 10
     // Wikipedia: http://en.wikipedia.org/wiki/SRGB
     // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space
@@ -123,12 +122,12 @@ function XYZToSRGB({ x, y, z, a }) {
 }
 
 // Convert CIE L*a*b* (CIELAB) to CIE XYZ with the D65 white point
-function cielabToXYZ({ l, a, b, alpha }) {
+function cielabToXYZ ({ l, a, b, alpha }) {
     // Wikipedia: http://en.wikipedia.org/wiki/Lab_color_space
 
     const f = t =>
-        ((t >= 0.206896551724137931) ?
-            ((t) * (t) * (t)) : (108.0 / 841.0) * ((t) - (4.0 / 29.0)));
+        ((t >= 0.206896551724137931)
+            ? ((t) * (t) * (t)) : (108.0 / 841.0) * ((t) - (4.0 / 29.0)));
 
     return {
         x: WHITEPOINT_D65_X * f((l + 16) / 116 + a / 500),

@@ -35,4 +35,3 @@ import SQL from './sources/Sql';
 const source = { Dataset, SQL, GeoJSON, MVT };
 
 export { setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
-

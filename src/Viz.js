@@ -35,7 +35,6 @@ const SUPPORTED_PROPERTIES = [
 ];
 
 export default class Viz {
-
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
     * displayed and processed.
@@ -71,7 +70,7 @@ export default class Viz {
     * @property {object} variables - An object describing the variables used.
     *
     */
-    constructor(definition) {
+    constructor (definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
@@ -91,13 +90,13 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
-    loadImages() {
+    loadImages () {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
-    _defineProperty(propertyName, propertyValue) {
+    _defineProperty (propertyName, propertyValue) {
         if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
             return;
         }
@@ -109,7 +108,7 @@ export default class Viz {
                 }
                 this['_' + propertyName] = expr;
                 this._changed();
-            },
+            }
         });
 
         let property = propertyValue;
@@ -138,7 +137,7 @@ export default class Viz {
         this['_' + propertyName] = property;
     }
 
-    _getRootExpressions() {
+    _getRootExpressions () {
         return [
             this.color,
             this.width,
@@ -152,14 +151,14 @@ export default class Viz {
         ];
     }
 
-    _updateRootExpressions() {
+    _updateRootExpressions () {
         this._getRootExpressions().forEach(expr => {
             expr.parent = this;
             expr.notify = this._changed.bind(this);
         });
     }
 
-    isAnimated() {
+    isAnimated () {
         return this.color.isAnimated() ||
             this.width.isAnimated() ||
             this.strokeColor.isAnimated() ||
@@ -169,11 +168,11 @@ export default class Viz {
             this.symbolPlacement.isAnimated();
     }
 
-    onChange(callback) {
+    onChange (callback) {
         this._changeCallback = callback;
     }
 
-    _changed() {
+    _changed () {
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
@@ -181,12 +180,12 @@ export default class Viz {
         }
     }
 
-    getMinimumNeededSchema() {
+    getMinimumNeededSchema () {
         const exprs = this._getRootExpressions().filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
-    setDefaultsIfRequired(geomType) {
+    setDefaultsIfRequired (geomType) {
         if (this._appliedDefaults) {
             return;
         }
@@ -209,7 +208,7 @@ export default class Viz {
         }
     }
 
-    _getDefaultGeomStyle(geomType) {
+    _getDefaultGeomStyle (geomType) {
         if (geomType === 'point') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
@@ -222,7 +221,7 @@ export default class Viz {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
-                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1)) // Not used in lines
             };
         } else if (geomType === 'polygon') {
             return {
@@ -234,7 +233,7 @@ export default class Viz {
         }
     }
 
-    _resolveAliases() {
+    _resolveAliases () {
         [
             this.color,
             this.width,
@@ -248,7 +247,7 @@ export default class Viz {
         );
     }
 
-    _validateAliasDAG() {
+    _validateAliasDAG () {
         const permanentMarkedSet = new Set();
         const temporarilyMarkedSet = new Set();
         const visit = node => {
@@ -276,7 +275,7 @@ export default class Viz {
         }
     }
 
-    compileShaders(gl, metadata) {
+    compileShaders (gl, metadata) {
         this.color._bind(metadata);
         this.width._bind(metadata);
         this.strokeColor._bind(metadata);
@@ -288,7 +287,7 @@ export default class Viz {
         this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
         this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
         this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
-        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
+        this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
 
         this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
@@ -299,7 +298,7 @@ export default class Viz {
         }
     }
 
-    replaceChild(toReplace, replacer) {
+    replaceChild (toReplace, replacer) {
         if (Object.values(this.variables).includes(toReplace)) {
             const varName = Object.keys(this.variables).find(varName => this.variables[varName] == toReplace);
             this.variables[varName] = replacer;
@@ -347,7 +346,7 @@ export default class Viz {
      * @param  {string|object} definition
      * @return {VizSpec}
      */
-    _getVizDefinition(definition) {
+    _getVizDefinition (definition) {
         if (util.isUndefined(definition)) {
             return this._setDefaults({});
         }
@@ -366,7 +365,7 @@ export default class Viz {
      * @param {VizSpec} vizSpec
      * @return {VizSpec}
      */
-    _setDefaults(vizSpec) {
+    _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
             vizSpec.color = DEFAULT_COLOR_EXPRESSION();
         }
@@ -398,7 +397,7 @@ export default class Viz {
         return vizSpec;
     }
 
-    _checkVizSpec(vizSpec) {
+    _checkVizSpec (vizSpec) {
         /**
          * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
          * For a better understanding we recommend reading the {@link TODO|VIZ guide}
@@ -470,7 +469,7 @@ export default class Viz {
  * Mark default expressions to apply the style defaults for each
  * geometry (point, line, polygon) when available.
  */
-function _markDefault(expression) {
+function _markDefault (expression) {
     expression.default = true;
     return expression;
 }

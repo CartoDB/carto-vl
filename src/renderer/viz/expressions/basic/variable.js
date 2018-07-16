@@ -28,14 +28,14 @@ import { checkString } from '../utils';
  * @api
  */
 export class Variable extends BaseExpression {
-    constructor() {
+    constructor () {
         super({});
     }
 }
-function isFunction(functionToCheck) {
+function isFunction (functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
-export default function variable(name) {
+export default function variable (name) {
     checkString('variable', 'name', 0, name);
     if (name == '') {
         throw new Error('variable(): invalid parameter, zero-length string');

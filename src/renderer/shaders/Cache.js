@@ -4,11 +4,11 @@
  * the webgl context is the key and at the second level the shader code is the cache key.
  */
 export default class Cache {
-    constructor() {
+    constructor () {
         this.caches = new WeakMap();
     }
 
-    get(gl, shadercode) {
+    get (gl, shadercode) {
         if (this.caches.has(gl)) {
             let cache = this.caches.get(gl);
 
@@ -16,7 +16,7 @@ export default class Cache {
         }
     }
 
-    set(gl, shadercode, shader) {
+    set (gl, shadercode, shader) {
         if (this.caches.has(gl)) {
             let cache = this.caches.get(gl);
             cache[shadercode] = shader;
@@ -27,7 +27,7 @@ export default class Cache {
         }
     }
 
-    has(gl, shadercode) {
+    has (gl, shadercode) {
         return this.get(gl, shadercode) !== undefined;
     }
 }

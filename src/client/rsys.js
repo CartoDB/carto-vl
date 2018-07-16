@@ -40,7 +40,7 @@
  * of an RSys (usually NWMC).
  */
 
-/*eslint no-unused-vars: ["off"] */
+/* eslint no-unused-vars: ["off"] */
 
 /**
  * R coordinates to World
@@ -49,7 +49,7 @@
  * @param {number} y - y coordinate in r
  * @return {RPoint} World coordinates
  */
-function rToW(r, x, y) {
+function rToW (r, x, y) {
     return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
 }
 
@@ -60,7 +60,7 @@ function rToW(r, x, y) {
  * @param {RSys} r - target ref. system
  * @return {RPoint} R coordinates
  */
-export function wToR(x, y, r) {
+export function wToR (x, y, r) {
     return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
 }
 
@@ -71,7 +71,7 @@ export function wToR(x, y, r) {
  * @param {number} z - Tile zoom level
  * @return {RSys}
  */
-function tileRsys(x, y, z) {
+function tileRsys (x, y, z) {
     let max = Math.pow(2, z);
     return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
 }
@@ -82,7 +82,7 @@ function tileRsys(x, y, z) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-export function rTiles(zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
+export function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
     return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);
 }
 
@@ -92,7 +92,7 @@ export function rTiles(zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
  * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function wRectangleTiles(z, wr) {
+function wRectangleTiles (z, wr) {
     const [w_minx, w_miny, w_maxx, w_maxy] = wr;
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
 
@@ -118,11 +118,11 @@ function wRectangleTiles(z, wr) {
  * @param {*} z
  * @returns {RSys}
  */
-export function getRsysFromTile(x, y, z) {
+export function getRsysFromTile (x, y, z) {
     return {
         center: {
-            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
-            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+            x: ((x + 0.5) / Math.pow(2, z)) * 2.0 - 1,
+            y: (1.0 - (y + 0.5) / Math.pow(2, z)) * 2.0 - 1.0
         },
         scale: 1 / Math.pow(2, z)
     };

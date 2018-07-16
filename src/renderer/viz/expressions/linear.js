@@ -28,7 +28,7 @@ import { globalMin, globalMax } from '../expressions';
 * @api
 */
 export default class Linear extends BaseExpression {
-    constructor(input, min, max) {
+    constructor (input, min, max) {
         input = implicitCast(input);
 
         if (min == undefined && max == undefined) {
@@ -53,7 +53,7 @@ export default class Linear extends BaseExpression {
         this.type = 'number';
     }
 
-    eval(feature) {
+    eval (feature) {
         if (this.input.type == 'date') {
             const input = this.input.eval(feature);
 
@@ -67,16 +67,15 @@ export default class Linear extends BaseExpression {
 
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
-            return (input-smin)/(smax-smin);
-
+            return (input - smin) / (smax - smin);
         }
         const v = this.input.eval(feature);
         const min = this.min.eval(feature);
         const max = this.max.eval(feature);
         return (v - min) / (max - min);
     }
-    
-    _compile(metadata) {
+
+    _compile (metadata) {
         super._compile(metadata);
 
         if (this.input.type == 'date') {
@@ -91,7 +90,6 @@ export default class Linear extends BaseExpression {
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);

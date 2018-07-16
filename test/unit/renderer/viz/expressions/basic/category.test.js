@@ -29,14 +29,14 @@ describe('src/renderer/viz/expressions/basic/category', () => {
                 category: {
                     type: 'category',
                     categories: [
-                        { name: 'cat0' }, 
+                        { name: 'cat0' },
                         { name: 'cat1' },
                         { name: 'cat2' }
                     ]
                 }
             }
         });
-        
+
         it('should return the value from the metadata', () => {
             const categoryExpresion = s.category('cat0');
             categoryExpresion._compile(fakeMetadata);

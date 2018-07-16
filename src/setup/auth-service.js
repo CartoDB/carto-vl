@@ -1,7 +1,7 @@
 import * as util from '../utils/util';
 import CartoValidationError from '../errors/carto-validation-error';
 
-let defaultAuth = undefined;
+let defaultAuth;
 
 /**
  * Set default authentication parameters: user and apiKey.
@@ -13,7 +13,7 @@ let defaultAuth = undefined;
  * @memberof carto
  * @api
  */
-function setDefaultAuth(auth) {
+function setDefaultAuth (auth) {
     checkAuth(auth);
     defaultAuth = auth;
 }
@@ -22,14 +22,14 @@ function setDefaultAuth(auth) {
  * Get default authentication
  * @return {object}
  */
-function getDefaultAuth() {
+function getDefaultAuth () {
     return defaultAuth;
 }
 
 /**
  * Reset the default auth object
  */
-function cleanDefaultAuth() {
+function cleanDefaultAuth () {
     defaultAuth = undefined;
 }
 
@@ -38,7 +38,7 @@ function cleanDefaultAuth() {
  *
  * @param  {object} auth
  */
-function checkAuth(auth) {
+function checkAuth (auth) {
     if (util.isUndefined(auth)) {
         throw new CartoValidationError('setup', 'authRequired');
     }
@@ -50,7 +50,7 @@ function checkAuth(auth) {
     checkUsername(auth.username);
 }
 
-function checkApiKey(apiKey) {
+function checkApiKey (apiKey) {
     if (util.isUndefined(apiKey)) {
         throw new CartoValidationError('setup', 'apiKeyRequired');
     }
@@ -62,7 +62,7 @@ function checkApiKey(apiKey) {
     }
 }
 
-function checkUsername(username) {
+function checkUsername (username) {
     if (util.isUndefined(username)) {
         throw new CartoValidationError('setup', 'usernameRequired');
     }

@@ -3,14 +3,14 @@ import { implicitCast } from './utils';
 
 // TODO should this expression be removed?
 export default class XYZ extends BaseExpression {
-    constructor(x, y, z) {
+    constructor (x, y, z) {
         x = implicitCast(x);
         y = implicitCast(y);
         z = implicitCast(z);
         super({ x: x, y: y, z: z });
         // TODO improve type check
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
         if (this.x.type != 'number' || this.y.type != 'number' || this.z.type != 'number') {
             throw new Error('XYZ() invalid parameters');

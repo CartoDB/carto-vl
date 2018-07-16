@@ -443,9 +443,9 @@ export const And = genBinaryOp('and',
     (x, y) => `min(${x} * ${y}, 1.)`
 );
 
-function genBinaryOp(name, allowedSignature, jsFn, glsl) {
+function genBinaryOp (name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends BaseExpression {
-        constructor(a, b) {
+        constructor (a, b) {
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return number(jsFn(a, b));
             }
@@ -462,13 +462,13 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(feature) {
+        eval (feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
-        _compile(meta) {
+        _compile (meta) {
             super._compile(meta);
             const [a, b] = [this.a, this.b];
 
@@ -483,7 +483,7 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
     };
 }
 
-function getSignatureLoose(a, b) {
+function getSignatureLoose (a, b) {
     if (!a.type || !b.type) {
         if (!a.type && !b.type) {
             return undefined;
@@ -512,7 +512,7 @@ function getSignatureLoose(a, b) {
     }
 }
 
-function getSignature(a, b) {
+function getSignature (a, b) {
     if (!a.type || !b.type) {
         return undefined;
     } else if (a.type == 'number' && b.type == 'number') {
@@ -535,7 +535,7 @@ function getSignature(a, b) {
     }
 }
 
-function getReturnTypeFromSignature(signature) {
+function getReturnTypeFromSignature (signature) {
     switch (signature) {
         case NUMBERS_TO_NUMBER:
             return 'number';

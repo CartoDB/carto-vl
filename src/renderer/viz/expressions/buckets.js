@@ -65,26 +65,26 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor(input, list) {
+    constructor (input, list) {
         input = implicitCast(input);
         list = implicitCast(list);
 
-        let looseType = undefined;
-        
+        let looseType;
+
         if (input.type) {
             if (input.type !== 'number' && input.type !== 'category') {
                 throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
         }
-        
+
         list.elems.map((item, index) => {
             if (item.type) {
                 if (looseType && looseType != item.type) {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
                         `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
                 } else if (item.type != 'number' && item.type != 'category') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
+                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
                 }
             }
         });
@@ -100,7 +100,7 @@ export default class Buckets extends BaseExpression {
         this.type = 'category';
     }
 
-    eval(feature) {
+    eval (feature) {
         const v = this.input.eval(feature);
         let i = 0;
 
@@ -123,24 +123,24 @@ export default class Buckets extends BaseExpression {
         return i;
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
 
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
-        
+
         this.list.elems.map((item, index) => {
             if (this.input.type != item.type) {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type` +
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
                     `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`);
             } else if (item.type != 'number' && item.type != 'category') {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index+1)} parameter type\n\ttype was ${item.type}`);
+                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
             }
         });
     }
 
-    _applyToShaderSource(getGLSLforProperty) {
+    _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);

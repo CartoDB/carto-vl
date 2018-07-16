@@ -4,7 +4,7 @@ const map = new mapboxgl.Map({
     center: [-73.97720677029952, 40.77784846220871],
     zoom: 13,
     dragRotate: false,
-    touchZoomRotate: false,
+    touchZoomRotate: false
 });
 
 const metadata = {

@@ -53,7 +53,6 @@ const MVT_TO_CARTO_TYPES = {
  */
 
 export default class MVT extends Base {
-
     /**
      * Create a carto.source.MVT.
      *
@@ -72,7 +71,7 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -84,27 +83,27 @@ export default class MVT extends Base {
         this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
     }
 
-    _clone() {
+    _clone () {
         return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
-    bindLayer(addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe, dataLoadedCallback) {
         this._tileClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
-    async requestMetadata() {
+    async requestMetadata () {
         return this._metadata;
     }
 
-    requestData(zoom, viewport) {
+    requestData (zoom, viewport) {
         return this._tileClient.requestData(zoom, viewport, this.responseToDataframeTransformer.bind(this),
-            zoom => this._options.maxZoom == undefined ?
-                this._options.viewportZoomToSourceZoom(zoom) :
-                Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
+            zoom => this._options.maxZoom == undefined
+                ? this._options.viewportZoomToSourceZoom(zoom)
+                : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
         );
     }
 
-    async responseToDataframeTransformer(response, x, y, z) {
+    async responseToDataframeTransformer (response, x, y, z) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength == 0 || response == 'null') {
@@ -129,8 +128,7 @@ export default class MVT extends Base {
         return dataframe;
     }
 
-
-    _decodeMVTLayer(mvtLayer, metadata, mvt_extent) {
+    _decodeMVTLayer (mvtLayer, metadata, mvt_extent) {
         if (!mvtLayer.length) {
             return { properties: [], geometries: {}, numFeatures: 0 };
         }
@@ -149,7 +147,7 @@ export default class MVT extends Base {
         }
     }
 
-    _autoDiscoverType(mvtLayer) {
+    _autoDiscoverType (mvtLayer) {
         const type = mvtLayer.feature(0).type;
         switch (type) {
             case mvtDecoderGeomTypes.point:
@@ -163,7 +161,7 @@ export default class MVT extends Base {
         }
     }
 
-    _decode(mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
+    _decode (mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
@@ -174,8 +172,8 @@ export default class MVT extends Base {
                 const decodedPolygons = decodeFn(geom, mvt_extent);
                 geometries.push(decodedPolygons);
             } else {
-                const x = 2 * (geom[0][0].x) / mvt_extent - 1.;
-                const y = 2 * (1. - (geom[0][0].y) / mvt_extent) - 1.;
+                const x = 2 * (geom[0][0].x) / mvt_extent - 1.0;
+                const y = 2 * (1.0 - (geom[0][0].y) / mvt_extent) - 1.0;
                 // Tiles may contain points in the border;
                 // we'll avoid here duplicatend points between tiles by excluding the 1-edge
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
@@ -195,7 +193,7 @@ export default class MVT extends Base {
     }
 
     // Currently only mvtLayers with the same type in every feature are supported
-    _checkType(feature, expected) {
+    _checkType (feature, expected) {
         const type = feature.type;
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
@@ -203,12 +201,12 @@ export default class MVT extends Base {
         }
     }
 
-    _initializePropertyArrays(metadata, length) {
+    _initializePropertyArrays (metadata, length) {
         const properties = {};
         const propertyNames = [];
-        Object.keys(metadata.properties).
-            filter(propertyName => metadata.properties[propertyName].type != 'geometry').
-            forEach(propertyName => {
+        Object.keys(metadata.properties)
+            .filter(propertyName => metadata.properties[propertyName].type != 'geometry')
+            .forEach(propertyName => {
                 propertyNames.push(...metadata.propertyNames(propertyName));
             });
 
@@ -217,7 +215,7 @@ export default class MVT extends Base {
         return { properties, propertyNames };
     }
 
-    _decodeProperties(propertyNames, properties, feature, i) {
+    _decodeProperties (propertyNames, properties, feature, i) {
         const length = propertyNames.length;
         for (let j = 0; j < length; j++) {
             const propertyName = propertyNames[j];
@@ -226,7 +224,7 @@ export default class MVT extends Base {
         }
     }
 
-    decodeProperty(propertyName, propertyValue) {
+    decodeProperty (propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
@@ -238,7 +236,7 @@ export default class MVT extends Base {
         }
     }
 
-    _generateDataFrame(rs, geometry, properties, size, type) {
+    _generateDataFrame (rs, geometry, properties, size, type) {
         return new Dataframe({
             active: false,
             center: rs.center,
@@ -247,11 +245,11 @@ export default class MVT extends Base {
             scale: rs.scale,
             size: size,
             type: type,
-            metadata: this._metadata,
+            metadata: this._metadata
         });
     }
 
-    free() {
+    free () {
         this._tileClient.free();
     }
 }

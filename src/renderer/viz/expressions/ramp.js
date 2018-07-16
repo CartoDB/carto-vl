@@ -83,14 +83,14 @@ const MAX_BYTE_VALUE = 255;
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor(input, palette) {
+    constructor (input, palette) {
         input = implicitCast(input);
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
         checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
-        
+
         if (palette.type === paletteTypes.IMAGE) {
             checkInstance('ramp', 'palette', 1, ImageList, palette);
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
@@ -113,22 +113,22 @@ export default class Ramp extends BaseExpression {
         }
     }
 
-    loadImages() {
+    loadImages () {
         return Promise.all([this.input.loadImages(), this.palette.loadImages()]);
     }
 
-    _setUID(idGenerator) {
+    _setUID (idGenerator) {
         super._setUID(idGenerator);
         this.palette._setUID(idGenerator);
     }
 
-    eval(feature) {
+    eval (feature) {
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
-        
+
         const color = this.type === rampTypes.NUMBER
             ? this._getValue(texturePixels, numValues, m)
             : this._getColorValue(texturePixels, m);
@@ -136,7 +136,7 @@ export default class Ramp extends BaseExpression {
         return color;
     }
 
-    _getValue(texturePixels, numValues, m) {
+    _getValue (texturePixels, numValues, m) {
         const lowIndex = clamp(Math.floor(numValues * m), 0, numValues);
         const highIndex = clamp(Math.ceil(numValues * m), 0, numValues);
         const fract = numValues * m - Math.floor(numValues * m);
@@ -145,8 +145,8 @@ export default class Ramp extends BaseExpression {
 
         return Math.round(fract * high + (1 - fract) * low);
     }
-    
-    _getColorValue(texturePixels, m) {
+
+    _getColorValue (texturePixels, m) {
         const index = Math.round(m * MAX_BYTE_VALUE);
 
         return {
@@ -156,38 +156,38 @@ export default class Ramp extends BaseExpression {
             a: Math.round(texturePixels[index * 4 + 3]) / MAX_BYTE_VALUE
         };
     }
-    
-    _compile(metadata) {
+
+    _compile (metadata) {
         super._compile(metadata);
 
         if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
-            this.input = new Linear(this.input); 
+            this.input = new Linear(this.input);
             this.input._compile(metadata);
         }
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
-        
+
         if (this.palette.type === paletteTypes.IMAGE) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
-        
+
         this._texCategories = null;
         this._GLtexCategories = null;
     }
 
-    _free(gl) {
+    _free (gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);
         }
     }
 
-    _applyToShaderSource(getGLSLforProperty) {
+    _applyToShaderSource (getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
 
         if (this.palette.type === paletteTypes.IMAGE) {
             const images = this.palette._applyToShaderSource(getGLSLforProperty);
-            
+
             return {
                 preface: input.preface + images.preface,
                 inline: `${images.inline}(imageUV, ${input.inline})`
@@ -206,20 +206,20 @@ export default class Ramp extends BaseExpression {
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }
-    
-    _getColorsFromPalette(input, palette) {
+
+    _getColorsFromPalette (input, palette) {
         if (palette.type === paletteTypes.IMAGE) {
             return palette.colors;
         }
 
         const defaultOthersColor = new NamedColor('gray');
-        
+
         return palette.type === paletteTypes.PALETTE
             ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
             : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
     }
-    
-    _postShaderCompile(program, gl) {
+
+    _postShaderCompile (program, gl) {
         if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
@@ -232,7 +232,7 @@ export default class Ramp extends BaseExpression {
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
 
-    _computeTextureIfNeeded() {
+    _computeTextureIfNeeded () {
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
@@ -244,7 +244,7 @@ export default class Ramp extends BaseExpression {
             : this._computeNumericRampTexture();
     }
 
-    _computeColorRampTexture() {
+    _computeColorRampTexture () {
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
@@ -265,7 +265,7 @@ export default class Ramp extends BaseExpression {
         return texturePixels;
     }
 
-    _computeNumericRampTexture() {
+    _computeNumericRampTexture () {
         const texturePixels = new Float32Array(COLOR_ARRAY_LENGTH);
         const floats = this.palette.floats;
 
@@ -273,13 +273,13 @@ export default class Ramp extends BaseExpression {
             const vColorARaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
             const vColorBRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
             const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
-            texturePixels[i] = ((1. - m) * vColorARaw + m * vColorBRaw);
+            texturePixels[i] = ((1.0 - m) * vColorARaw + m * vColorBRaw);
         }
 
         return texturePixels;
     }
 
-    _computeGLTextureIfNeeded(gl) {
+    _computeGLTextureIfNeeded (gl) {
         const texturePixels = this._computeTextureIfNeeded();
 
         if (this._GLtexCategories !== this.input.numCategories) {
@@ -287,7 +287,7 @@ export default class Ramp extends BaseExpression {
 
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            
+
             if (this.type === rampTypes.COLOR) {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
@@ -304,7 +304,7 @@ export default class Ramp extends BaseExpression {
         }
     }
 
-    _preDraw(program, drawMetadata, gl) {
+    _preDraw (program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
 
         if (this.palette.type === paletteTypes.IMAGE) {
@@ -322,7 +322,7 @@ export default class Ramp extends BaseExpression {
     }
 }
 
-function _getColorsFromPaletteType(input, palette, numCategories, defaultOthersColor) {
+function _getColorsFromPaletteType (input, palette, numCategories, defaultOthersColor) {
     switch (true) {
         case input.isA(Buckets):
             return _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor);
@@ -333,9 +333,9 @@ function _getColorsFromPaletteType(input, palette, numCategories, defaultOthersC
     }
 }
 
-function _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor) {
+function _getColorsFromPaletteTypeBuckets (palette, numCategories, defaultOthersColor) {
     let colors = _getSubPalettes(palette, numCategories);
-    
+
     if (palette.isQuantitative()) {
         colors.push(defaultOthersColor);
     }
@@ -347,7 +347,7 @@ function _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersC
     return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
 }
 
-function _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor) {
+function _getColorsFromPaletteTypeTop (palette, numCategories, defaultOthersColor) {
     let colors = _getSubPalettes(palette, numCategories);
 
     if (palette.isQualitative()) {
@@ -357,7 +357,7 @@ function _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor
     return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
 }
 
-function _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor) {
+function _getColorsFromPaletteTypeDefault (input, palette, defaultOthersColor) {
     let colors = _getSubPalettes(palette, input.numCategories);
 
     if (palette.isQualitative()) {
@@ -372,20 +372,20 @@ function _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor) {
     return _avoidShowingInterpolation(input.numCategories, colors, defaultOthersColor);
 }
 
-function _getSubPalettes(palette, numCategories) {
+function _getSubPalettes (palette, numCategories) {
     return palette.subPalettes[numCategories]
         ? palette.subPalettes[numCategories]
         : palette.getLongestSubPalette();
 }
 
-function _getColorsFromColorArrayType(input, palette, numCategories, defaultOthersColor) {
+function _getColorsFromColorArrayType (input, palette, numCategories, defaultOthersColor) {
     return input.type === inputTypes.CATEGORY
         ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, defaultOthersColor)
         : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
 }
 
-function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, defaultOthersColor) {
-    switch(true) {
+function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
+    switch (true) {
         case input.isA(Classifier) && numCategories < colors.length:
             return colors;
         case input.isA(Property):
@@ -400,19 +400,19 @@ function _getColorsFromColorArrayTypeCategorical(input, numCategories, colors, d
     }
 }
 
-function _getColorsFromColorArrayTypeNumeric(numCategories, colors) {
+function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
     let othersColor;
-    
+
     if (numCategories < colors.length) {
         othersColor = colors[numCategories];
         return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    } 
+    }
 
     if (numCategories === colors.length) {
         othersColor = colors[colors.length - 1];
         return _avoidShowingInterpolation(numCategories, colors, othersColor);
     }
-    
+
     return colors;
 }
 
@@ -420,7 +420,7 @@ function _addothersColorToColors (colors, othersColor) {
     return [...colors, othersColor];
 }
 
-function _avoidShowingInterpolation(numCategories, colors, defaultOthersColor) {
+function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) {
     const colorArray = [];
 
     for (let i = 0; i < colors.length; i++) {

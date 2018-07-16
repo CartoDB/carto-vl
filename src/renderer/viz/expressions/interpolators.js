@@ -58,16 +58,16 @@ export class BounceEaseIn extends genInterpolator(
 ) { }
 
 // Interpolators
-function genInterpolator(inlineMaker, preface, jsEval) {
+function genInterpolator (inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends BaseExpression {
-        constructor(m) {
+        constructor (m) {
             m = implicitCast(m);
             super({ m });
         }
-        eval(feature) {
+        eval (feature) {
             return jsEval(this.m.eval(feature));
         }
-        _compile(meta) {
+        _compile (meta) {
             super._compile(meta);
             if (this.m.type != 'number') {
                 throw new Error(`Blending cannot be performed by '${this.m.type}'`);

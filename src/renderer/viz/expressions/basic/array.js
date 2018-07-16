@@ -13,7 +13,7 @@ import { checkExpression, implicitCast, getOrdinalFromIndex } from '../utils';
  * @IGNOREapi
  */
 export default class BaseArray extends BaseExpression {
-    constructor(elems) {
+    constructor (elems) {
         elems = elems || [];
         if (!Array.isArray(elems)) {
             elems = [elems];
@@ -35,7 +35,7 @@ export default class BaseArray extends BaseExpression {
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type != type && item.type != undefined) {
-                throw new Error(`array(): invalid ${getOrdinalFromIndex(index+1)} parameter type, invalid argument type combination`);
+                throw new Error(`array(): invalid ${getOrdinalFromIndex(index + 1)} parameter type, invalid argument type combination`);
             }
         });
         super({});
@@ -47,18 +47,18 @@ export default class BaseArray extends BaseExpression {
             throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
-    get value() {
+    get value () {
         return this.elems.map(c => c.value);
     }
-    eval() {
+    eval () {
         return this.elems.map(c => c.eval());
     }
-    _resolveAliases(aliases) {
+    _resolveAliases (aliases) {
         this.elems.map(c => c._resolveAliases(aliases));
     }
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
-  
+
         const type = this.elems[0].type;
         if (['number', 'category', 'color', 'time'].indexOf(type) == -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);

@@ -5,9 +5,7 @@ const map = new mapboxgl.Map({
     zoom: 12
 });
 
-
-
-async function loadMVT() {
+async function loadMVT () {
     const mapConfig = {
         buffersize: { mvt: 0 },
         layers: [
@@ -36,13 +34,13 @@ async function loadMVT() {
             numfloors: {
                 type: 'number',
                 min: 1,
-                max: 130,
+                max: 130
             }
         }
     },
     {
         viewportZoomToSourceZoom: () => 10,
-        maxZoom: 9,
+        maxZoom: 9
     }
     );
 

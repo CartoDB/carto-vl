@@ -332,9 +332,9 @@ describe('Interactivity', () => {
         });
     });
 
-    function onLoaded(callback) {
+    function onLoaded (callback) {
         let allLoaded = 0;
-        function loaded() {
+        function loaded () {
             allLoaded++;
             if (allLoaded == 2) {
                 callback();
@@ -396,7 +396,7 @@ describe('Cursor', () => {
         });
     });
 
-    afterEach(()=>{
+    afterEach(() => {
         map.remove();
         document.body.removeChild(setup.div);
     });

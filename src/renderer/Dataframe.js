@@ -7,7 +7,7 @@ const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
-    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
+    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -19,7 +19,7 @@ export default class Dataframe {
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
-        this.propertyID = {}; //Name => PID
+        this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
         if (this.type == 'polygon') {
             this._aabb = [];
@@ -28,7 +28,7 @@ export default class Dataframe {
                     minx: Number.POSITIVE_INFINITY,
                     miny: Number.POSITIVE_INFINITY,
                     maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY
                 };
                 feature.forEach(polygon => {
                     const vertices = polygon.flat;
@@ -49,7 +49,7 @@ export default class Dataframe {
                     minx: Number.POSITIVE_INFINITY,
                     miny: Number.POSITIVE_INFINITY,
                     maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY
                 };
                 feature.forEach(line => {
                     const vertices = line;
@@ -66,11 +66,11 @@ export default class Dataframe {
         }
     }
 
-    setFreeObserver(freeObserver) {
+    setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
     }
 
-    bind(renderer) {
+    bind (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
 
@@ -121,7 +121,7 @@ export default class Dataframe {
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    getFeaturesAtPosition(pos, viz) {
+    getFeaturesAtPosition (pos, viz) {
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
@@ -134,7 +134,7 @@ export default class Dataframe {
         }
     }
 
-    inViewport(featureIndex, scale, center, aspect) {
+    inViewport (featureIndex, scale, center, aspect) {
         const { minx, miny, maxx, maxy } = this._getBounds(scale, center, aspect);
 
         switch (this.type) {
@@ -153,7 +153,7 @@ export default class Dataframe {
         }
     }
 
-    _getBounds(scale, center, aspect) {
+    _getBounds (scale, center, aspect) {
         this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
         this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
         const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
@@ -164,7 +164,7 @@ export default class Dataframe {
         return { minx, maxx, miny, maxy };
     }
 
-    _getPointsAtPosition(p, viz) {
+    _getPointsAtPosition (p, viz) {
         p = wToR(p.x, p.y, { center: this.center, scale: this.scale });
         const points = this.decodedGeom.vertices;
         const features = [];
@@ -178,7 +178,7 @@ export default class Dataframe {
             const featureIndex = i / 2;
             const center = {
                 x: points[i],
-                y: points[i + 1],
+                y: points[i + 1]
             };
             const f = this._getFeature(columnNames, featureIndex);
             if (this._isFeatureFiltered(f, viz.filter)) {
@@ -204,13 +204,13 @@ export default class Dataframe {
         return features;
     }
 
-    _getLinesAtPosition(pos, viz) {
+    _getLinesAtPosition (pos, viz) {
         return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
     }
-    _getPolygonAtPosition(pos, viz) {
+    _getPolygonAtPosition (pos, viz) {
         return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
     }
-    _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
+    _getFeaturesFromTriangles (pos, widthExpression, filterExpression) {
         const p = wToR(pos.x, pos.y, { center: this.center, scale: this.scale });
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
@@ -263,19 +263,19 @@ export default class Dataframe {
         return features;
     }
 
-    _getFeature(columnNames, featureIndex) {
+    _getFeature (columnNames, featureIndex) {
         const f = {};
         columnNames.forEach(name => {
             f[name] = this.properties[name][featureIndex];
         });
         return f;
     }
-    _isFeatureFiltered(feature, filterExpression) {
+    _isFeatureFiltered (feature, filterExpression) {
         const isFiltered = filterExpression.eval(feature) < 0.5;
         return isFiltered;
     }
 
-    _getUserFeature(featureIndex) {
+    _getUserFeature (featureIndex) {
         let id;
         const properties = {};
         Object.keys(this.properties).map(propertyName => {
@@ -292,13 +292,13 @@ export default class Dataframe {
         return { id, properties };
     }
 
-    _addProperty(propertyName) {
+    _addProperty (propertyName) {
         if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
             this.getPropertyTexture(propertyName);
         }
     }
 
-    getPropertyTexture(propertyName) {
+    getPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
             return this.propertyTex[propertyName];
         }
@@ -324,13 +324,13 @@ export default class Dataframe {
 
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
-    addProperties(properties) {
+    addProperties (properties) {
         Object.keys(properties).forEach(propertyName => {
             this._addProperty(propertyName);
         });
     }
 
-    _createStyleTileTexture(numFeatures) {
+    _createStyleTileTexture (numFeatures) {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this.renderer.gl;
@@ -348,7 +348,7 @@ export default class Dataframe {
         return texture;
     }
 
-    free() {
+    free () {
         if (this.propertyTex) {
             const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
@@ -373,7 +373,7 @@ export default class Dataframe {
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
 // Parameters in {x: 0, y:0} form
-export function _pointInTriangle(p, v1, v2, v3) {
+export function _pointInTriangle (p, v1, v2, v3) {
     // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
     // contains an explanation of both this algorithm and one based on barycentric coordinates,
     // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
@@ -396,17 +396,17 @@ export function _pointInTriangle(p, v1, v2, v3) {
 // Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
 // returns >0 if the point is OUTSIDE
 // Parameters in {x: 0, y:0} form
-function _halfPlaneTest(p, a, b) {
+function _halfPlaneTest (p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
-function _equal(a, b) {
+function _equal (a, b) {
     return (a.x == b.x) && (a.y == b.y);
 }
 
-function _pointInCircle(p, center, scale) {
+function _pointInCircle (p, center, scale) {
     const diff = {
         x: p.x - center.x,
         y: p.y - center.y

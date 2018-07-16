@@ -168,14 +168,12 @@ export const ViewportCount = genViewportAgg('count',
     self => { self._value++; },
     self => self._value);
 
-
-
-function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
+function genViewportAgg (metadataPropertyName, zeroFn, accumFn, resolveFn) {
     return class ViewportAggregation extends BaseExpression {
         /**
          * @param {*} property
          */
-        constructor(property) {
+        constructor (property) {
             super({
                 property: implicitCast(metadataPropertyName == 'count' ? number(0) : property),
                 _impostor: number(0)
@@ -183,19 +181,19 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             this._isViewport = true;
         }
 
-        isFeatureDependent() {
+        isFeatureDependent () {
             return false;
         }
 
-        get value() {
+        get value () {
             return resolveFn(this);
         }
 
-        eval() {
+        eval () {
             return resolveFn(this);
         }
 
-        _compile(metadata) {
+        _compile (metadata) {
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
@@ -203,19 +201,19 @@ function genViewportAgg(metadataPropertyName, zeroFn, accumFn, resolveFn) {
             super.inlineMaker = inline => inline._impostor;
         }
 
-        _getMinimumNeededSchema() {
+        _getMinimumNeededSchema () {
             return this.property._getMinimumNeededSchema();
         }
 
-        _resetViewportAgg() {
+        _resetViewportAgg () {
             zeroFn(this);
         }
 
-        accumViewportAgg(feature) {
+        accumViewportAgg (feature) {
             accumFn(this, this.property.eval(feature));
         }
 
-        _preDraw(...args) {
+        _preDraw (...args) {
             this._impostor.expr = this.eval();
             super._preDraw(...args);
         }
@@ -251,7 +249,7 @@ export class ViewportPercentile extends BaseExpression {
     /**
      * @param {*} property
      */
-    constructor(property, percentile) {
+    constructor (property, percentile) {
         super({
             property: implicitCast(property),
             percentile: implicitCast(percentile),
@@ -260,15 +258,15 @@ export class ViewportPercentile extends BaseExpression {
         this._isViewport = true;
     }
 
-    isFeatureDependent() {
+    isFeatureDependent () {
         return false;
     }
 
-    get value() {
+    get value () {
         return this.eval();
     }
 
-    eval(f) {
+    eval (f) {
         if (this._value == null) {
             this._array.sort((a, b) => a - b);
             const index = clamp(
@@ -279,7 +277,7 @@ export class ViewportPercentile extends BaseExpression {
         return this._value;
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         // TODO improve type check
         this.property._compile(metadata);
@@ -287,21 +285,21 @@ export class ViewportPercentile extends BaseExpression {
         super.inlineMaker = inline => inline.impostor;
     }
 
-    _getMinimumNeededSchema() {
+    _getMinimumNeededSchema () {
         return this.property._getMinimumNeededSchema();
     }
 
-    _resetViewportAgg() {
+    _resetViewportAgg () {
         this._value = null;
         this._array = [];
     }
 
-    accumViewportAgg(feature) {
+    accumViewportAgg (feature) {
         const v = this.property.eval(feature);
         this._array.push(v);
     }
 
-    _preDraw(...args) {
+    _preDraw (...args) {
         this.impostor.expr = this.eval();
         super._preDraw(...args);
     }
@@ -342,29 +340,29 @@ export class ViewportPercentile extends BaseExpression {
  * @api
  */
 export class ViewportHistogram extends BaseExpression {
-    constructor(x, weight = 1, size = 1000) {
+    constructor (x, weight = 1, size = 1000) {
         super({
             x: implicitCast(x),
-            weight: implicitCast(weight),
+            weight: implicitCast(weight)
         });
         this._size = size;
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
 
-    _resetViewportAgg() {
+    _resetViewportAgg () {
         this._cached = null;
         this._histogram = new Map();
     }
 
-    accumViewportAgg(feature) {
+    accumViewportAgg (feature) {
         const x = this.x.eval(feature);
         const weight = this.weight.eval(feature);
         const count = this._histogram.get(x) || 0;
         this._histogram.set(x, count + weight);
     }
 
-    get value() {
+    get value () {
         if (this._cached == null) {
             if (!this._histogram) {
                 return null;
@@ -390,7 +388,7 @@ export class ViewportHistogram extends BaseExpression {
                 this._cached = hist.map((count, index) => {
                     return {
                         x: [min + index / this._size * range, min + (index + 1) / this._size * range],
-                        y: count,
+                        y: count
                     };
                 });
             } else {
@@ -402,7 +400,7 @@ export class ViewportHistogram extends BaseExpression {
         return this._cached;
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         this._metatada = metadata;
         super._compile(metadata);
     }

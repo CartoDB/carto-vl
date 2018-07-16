@@ -53,7 +53,7 @@ strokeWidth:      2*zoom()/50000`,
     `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp(clusterMode($category), PRISM)
 strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
+strokeWidth:      2*zoom()/50000`
 ];
 
 const examples = [
@@ -78,7 +78,7 @@ const examples = [
 const BASEMAPS = {
     DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
     Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 };
 
 const DEFAULT_BASEMAP = 'DarkMatter';
@@ -92,7 +92,7 @@ let map = new mapboxgl.Map({
     style: { version: 8, sources: {}, layers: [] },
     center: [0, 0],
     zoom: 0,
-    dragRotate: false,
+    dragRotate: false
 });
 
 map.touchZoomRotate.disableRotation();
@@ -109,7 +109,7 @@ setInterval(() => {
 map.on('zoom', updateMapInfo);
 map.on('move', updateMapInfo);
 
-function updateMapInfo() {
+function updateMapInfo () {
     let center = map.getCenter();
     document.querySelector('.map-info').innerText = `Center: [${center.lng.toFixed(6)}, ${center.lat.toFixed(6)}]  Zoom: ${map.getZoom().toFixed(6)}`;
 }
@@ -117,7 +117,7 @@ function updateMapInfo() {
 map.on('load', () => {
     updateMapInfo();
 
-    function updateViz(v) {
+    function updateViz (v) {
         if (v.target) {
             v = event.target.value;
         }
@@ -141,7 +141,7 @@ map.on('load', () => {
         }
     }
 
-    function barcelona() {
+    function barcelona () {
         document.getElementById('dataset').value = 'spend_data';
         document.getElementById('user').value = 'cartovl';
         document.getElementById('serverURL').value = 'https://{user}.carto.com';
@@ -181,15 +181,15 @@ map.on('load', () => {
     map.on('moveend', saveConfig);
 });
 
-function saveConfig() {
+function saveConfig () {
     location.hash = getConfig();
 }
 
-function getConfig() {
+function getConfig () {
     return '#' + btoa(JSON.stringify(getJSONConfig()));
 }
 
-function getJSONConfig() {
+function getJSONConfig () {
     return {
         a: document.getElementById('dataset').value,
         b: '',
@@ -202,7 +202,7 @@ function getJSONConfig() {
     };
 }
 
-function setConfig(input) {
+function setConfig (input) {
     let c = JSON.parse(atob(input));
     if (c.c == 'dmanzanares-ded13') {
         c.c = 'cartovl';
@@ -258,7 +258,7 @@ const superRefresh = (opts) => {
     }
 };
 
-function setupMap(opts) {
+function setupMap (opts) {
     opts = opts || {};
     if (opts.zoom !== undefined) {
         map.setZoom(opts.zoom);
@@ -270,14 +270,14 @@ function setupMap(opts) {
     createBasemapElements();
 }
 
-function handleError(error) {
+function handleError (error) {
     const err = `Invalid viz: ${error}:${error.stack}`;
     console.warn(err);
     document.getElementById('feedback').innerText = err;
     document.getElementById('feedback').style.display = 'block';
 }
 
-function createBasemapElements() {
+function createBasemapElements () {
     const basemapSelector = document.querySelector('#basemap');
     basemapSelector.innerHTML = '';
     Object.keys(BASEMAPS).forEach(id => {
@@ -303,7 +303,7 @@ function createBasemapElements() {
     });
 }
 
-function setBasemap(id) {
+function setBasemap (id) {
     basemap = id;
     map.setStyle(BASEMAPS[basemap]);
     let added = false;
@@ -326,7 +326,7 @@ $fullscreenButton.onclick = () => {
     }
 };
 
-function enterFullScreen() {
+function enterFullScreen () {
     $fullscreenButton.style.position = 'fixed';
     $fullscreenButton.style.top = '10px';
     $fullscreenButton.style.right = '10px';
@@ -342,7 +342,7 @@ function enterFullScreen() {
     map.resize();
 }
 
-function exitFullScreen() {
+function exitFullScreen () {
     $fullscreenButton.style.position = '';
     $fullscreenButton.style.top = '';
     $fullscreenButton.style.right = '';
@@ -369,7 +369,6 @@ if ($exportMapButton) {
     });
 }
 
-
 if ($copyHTMLButton) {
     $copyHTMLButton.addEventListener('click', () => {
         $mapTextarea.select();
@@ -377,11 +376,10 @@ if ($copyHTMLButton) {
     });
 }
 
-
 /**
  * Generates an HTML template for the given map configuration
  */
-function generateSnippet(config) {
+function generateSnippet (config) {
     const dataset = config.a;
     const apiKey = config.b || 'default_public';
     const username = config.c;
@@ -390,7 +388,6 @@ function generateSnippet(config) {
     const center = config.f || { lat: 0, lng: 0 };
     const zoom = config.g || 10;
     const basemap = BASEMAPS[config.h] || 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
-
 
     return `<!DOCTYPE html>
         <html>
@@ -449,16 +446,15 @@ function generateSnippet(config) {
     `;
 }
 
-
-function showLoader() {
+function showLoader () {
     document.querySelector('.loader').style.display = 'block';
 }
 
-function hideLoader() {
+function hideLoader () {
     document.querySelector('.loader').style.display = 'none';
 }
 
-function addExample(example) {
+function addExample (example) {
     const [name, code] = example;
     let button = document.createElement('button');
     button.innerText = name;
@@ -468,7 +464,6 @@ function addExample(example) {
     document.getElementById('buttonlist').appendChild(button);
 }
 
-
-function mod(a, b) {
+function mod (a, b) {
     return ((a % b) + b) % b;
 }

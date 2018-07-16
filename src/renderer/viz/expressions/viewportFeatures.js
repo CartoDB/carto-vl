@@ -32,7 +32,7 @@ import { implicitCast } from './utils';
  * @api
  */
 export default class ViewportFeatures extends BaseExpression {
-    constructor(...properties) {
+    constructor (...properties) {
         properties = properties.map(p => implicitCast(p));
 
         // We need to set all the properties as children of the expression
@@ -47,23 +47,23 @@ export default class ViewportFeatures extends BaseExpression {
         this._FeatureProxy = null;
     }
 
-    _compile() {
+    _compile () {
         throw new Error('viewportFeatures cannot be used in visualizations');
     }
 
-    isFeatureDependent() {
+    isFeatureDependent () {
         return false;
     }
 
-    get value() {
+    get value () {
         return this.expr;
     }
 
-    eval() {
+    eval () {
         return this.expr;
     }
 
-    _resetViewportAgg(metadata) {
+    _resetViewportAgg (metadata) {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
@@ -74,13 +74,13 @@ export default class ViewportFeatures extends BaseExpression {
         this.expr = [];
     }
 
-    accumViewportAgg(feature) {
+    accumViewportAgg (feature) {
         this.expr.push(new this._FeatureProxy(feature));
     }
 
-    genViewportFeatureClass(properties) {
+    genViewportFeatureClass (properties) {
         const cls = class ViewportFeature {
-            constructor(feature) {
+            constructor (feature) {
                 this._feature = feature;
             }
         };
@@ -95,7 +95,7 @@ export default class ViewportFeatures extends BaseExpression {
     }
 }
 
-function _childrenFromProperties(properties) {
+function _childrenFromProperties (properties) {
     let i = 0;
     const childContainer = {};
     properties.forEach(property => childContainer['p' + ++i] = property);

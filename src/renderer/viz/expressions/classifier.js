@@ -6,7 +6,7 @@ import * as schema from '../../schema';
 
 let classifierUID = 0;
 export class Classifier extends BaseExpression {
-    constructor(children, buckets) {
+    constructor (children, buckets) {
         let breakpoints = [];
         for (let i = 0; i < buckets - 1; i++) {
             children[`arg${i}`] = number(0);
@@ -20,7 +20,7 @@ export class Classifier extends BaseExpression {
         this.type = 'category';
     }
 
-    eval(feature) {
+    eval (feature) {
         const NOT_FOUND_INDEX = -1;
         const input = this.input.eval(feature);
         const index = this.breakpoints.findIndex((br) => {
@@ -30,15 +30,15 @@ export class Classifier extends BaseExpression {
         return index === NOT_FOUND_INDEX ? this.breakpoints.length : index;
     }
 
-    _genBreakpoints() {
+    _genBreakpoints () {
     }
 
-    getBreakpointList() {
+    getBreakpointList () {
         this._genBreakpoints();
         return this.breakpoints.map(br => br.expr);
     }
 
-    _applyToShaderSource(getGLSLforProperty) {
+    _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
         childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
@@ -58,13 +58,13 @@ export class Classifier extends BaseExpression {
         };
     }
 
-    _preDraw(program, drawMetadata, gl) {
+    _preDraw (program, drawMetadata, gl) {
         this._genBreakpoints();
         // TODO
         super._preDraw(program, drawMetadata, gl);
     }
 
-    _getColumnName() {
+    _getColumnName () {
         if (this.input.aggName) {
             // Property has aggregation
             return schema.column.aggColumn(this.input.name, this.input.aggName);
@@ -72,7 +72,6 @@ export class Classifier extends BaseExpression {
         return this.input.name;
     }
 }
-
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -100,7 +99,7 @@ export class Classifier extends BaseExpression {
  * @api
  */
 export class ViewportQuantiles extends Classifier {
-    constructor(input, buckets) {
+    constructor (input, buckets) {
         checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
@@ -112,12 +111,12 @@ export class ViewportQuantiles extends Classifier {
         super(children, buckets);
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         checkType('viewportQuantiles', 'input', 0, 'number', this.input);
     }
 
-    _genBreakpoints() {
+    _genBreakpoints () {
         const hist = this._histogram.value;
 
         const histogramBuckets = hist.length;
@@ -173,19 +172,19 @@ export class ViewportQuantiles extends Classifier {
  * @api
  */
 export class GlobalQuantiles extends Classifier {
-    constructor(input, buckets) {
+    constructor (input, buckets) {
         checkInstance('globalQuantiles', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalQuantiles', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         const copy = metadata.sample.map(s => s[this.input.name]);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
-        
+
         copy.sort((x, y) => x - y);
-        
+
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.buckets;
             breakpoint.expr = copy[Math.floor(p * copy.length)];
@@ -219,13 +218,13 @@ export class GlobalQuantiles extends Classifier {
  * @api
  */
 export class GlobalEqIntervals extends Classifier {
-    constructor(input, buckets) {
+    constructor (input, buckets) {
         checkInstance('globalEqIntervals', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalEqIntervals', 'buckets', 1, buckets);
         super({ input }, buckets);
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
         const { min, max } = metadata.properties[this.input.name];
@@ -264,7 +263,7 @@ export class GlobalEqIntervals extends Classifier {
  * @api
  */
 export class ViewportEqIntervals extends Classifier {
-    constructor(input, buckets) {
+    constructor (input, buckets) {
         checkInstance('viewportEqIntervals', 'input', 0, Property, input && (input.property || input));
         checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
         let children = {
@@ -274,11 +273,11 @@ export class ViewportEqIntervals extends Classifier {
         children._max = viewportMax(input);
         super(children, buckets);
     }
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
-    _genBreakpoints() {
+    _genBreakpoints () {
         const min = this._min.eval();
         const max = this._max.eval();
 
