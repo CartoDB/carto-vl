@@ -96,8 +96,8 @@ export default class MVT extends Base {
         return this._metadata;
     }
 
-    requestData(viewport) {
-        return this._tileClient.requestData(viewport, this.responseToDataframeTransformer.bind(this),
+    requestData(zoom, viewport) {
+        return this._tileClient.requestData(zoom, viewport, this.responseToDataframeTransformer.bind(this),
             zoom => this._options.maxZoom == undefined ?
                 this._options.viewportZoomToSourceZoom(zoom) :
                 Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)

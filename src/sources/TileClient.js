@@ -18,8 +18,8 @@ export default class TileClient {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestData(viewport, responseToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
-        const tiles = rTiles(viewport, viewportZoomToSourceZoom);
+    requestData(zoom, viewport, responseToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
+        const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom);
         this._getTiles(tiles, responseToDataframeTransformer);
     }
 

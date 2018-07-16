@@ -96,11 +96,10 @@ export default class Windshaft {
      * So long as the viz doesn't change, getData() can be called repeatedly for different
      * viewports. If viz changes getMetadata() should be called before requesting data
      * for the new viz.
-     * @param {*} viewport
      */
-    getData(viewport) {
+    getData(zoom, viewport) {
         if (this._mvtClient) {
-            return this._mvtClient.requestData(viewport);// FIXME extend
+            return this._mvtClient.requestData(zoom, viewport);// FIXME extend
         }
     }
 

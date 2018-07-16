@@ -274,7 +274,7 @@ export default class Layer {
         if (!this.metadata) {
             return;
         }
-        this._source.requestData(this._getViewport());
+        this._source.requestData(this._getZoom(), this._getViewport());
         this._fireUpdateOnNextRender = true;
     }
 
@@ -458,6 +458,11 @@ export default class Layer {
     _getViewport() {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
+        }
+    }
+    _getZoom(){
+        if (this._integrator){
+            return this._integrator.getZoomLevel();
         }
     }
 

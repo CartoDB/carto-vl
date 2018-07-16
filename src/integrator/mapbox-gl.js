@@ -127,4 +127,8 @@ class MGLIntegrator {
         this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
         return z;
     }
+
+    getZoomLevel() {
+        return this.map.getZoom();
+    }
 }
