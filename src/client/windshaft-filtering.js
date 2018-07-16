@@ -381,7 +381,7 @@ class PreaggregationFiltering {
             let p = this._property(f.value);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);
-            if (p && lo !== null && hi !== null) {
+            if (p && lo && hi) {
                 return {
                     type: 'between',
                     property: p.property,

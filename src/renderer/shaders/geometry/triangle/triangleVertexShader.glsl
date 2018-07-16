@@ -30,7 +30,7 @@ float decodeWidth(float x){
 
 void main(void) {
     vec4 c;
-    if (normal === vec2(0.)){
+    if (normal == vec2(0.)){
         c = texture2D(colorTex, featureID);
     }else{
         c = texture2D(strokeColorTex, featureID);
