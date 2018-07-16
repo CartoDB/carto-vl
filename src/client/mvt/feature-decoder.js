@@ -8,12 +8,12 @@ export class Polygon {
     }
 }
 
-export function decodeLines (geometries, mvt_extent) {
+export function decodeLines (geometries, mvtExtent) {
     let decodedGeometries = [];
     geometries.map(l => {
         let line = [];
         l.map(point => {
-            line.push([2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1]);
+            line.push([2 * point.x / mvtExtent - 1, 2 * (1 - point.y / mvtExtent) - 1]);
         });
         decodedGeometries.push(...clipLine(line));
     });

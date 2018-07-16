@@ -343,7 +343,7 @@ export default class Windshaft {
     }
 
     _adaptMetadata (meta, agg) {
-        const { stats, aggregation, dates_as_numbers } = meta;
+        const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
 
@@ -367,7 +367,7 @@ export default class Windshaft {
                     category.name = category.category;
                     delete category.category;
                 });
-            } else if (dates_as_numbers && dates_as_numbers.includes(propertyName)) {
+            } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
                     if (property[fn]) {

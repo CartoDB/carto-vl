@@ -217,10 +217,10 @@ class AggregationFiltering {
             if (Object.keys(af).length === 1 && Object.keys(bf).length === 1) {
                 const ka = Object.keys(af)[0];
                 const kb = Object.keys(bf)[0];
-                const less_ops = ['less_than', 'less_than_or_equal_to'];
-                const greater_ops = ['greater_than', 'greater_than_or_equal_to'];
-                return (less_ops.includes(ka) && greater_ops.includes(kb)) ||
-                    (less_ops.includes(kb) && greater_ops.includes(ka));
+                const lessOps = ['less_than', 'less_than_or_equal_to'];
+                const greaterOps = ['greater_than', 'greater_than_or_equal_to'];
+                return (lessOps.includes(ka) && greaterOps.includes(kb)) ||
+                    (lessOps.includes(kb) && greaterOps.includes(ka));
             }
         }
         return false;
@@ -237,8 +237,6 @@ class PreaggregationFiltering {
      * each node has a `type` property and various other parameters
      * that depend on the type.
      */
-    constructor () {
-    }
 
     // return (partial) filters as an object (JSON) representing the SQL syntax tree
     getFilter (vizFilter) {

@@ -128,7 +128,7 @@ export default class MVT extends Base {
         return dataframe;
     }
 
-    _decodeMVTLayer (mvtLayer, metadata, mvt_extent) {
+    _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {
         if (!mvtLayer.length) {
             return { properties: [], geometries: {}, numFeatures: 0 };
         }
@@ -137,11 +137,11 @@ export default class MVT extends Base {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvt_extent, new Float32Array(mvtLayer.length * 2));
+                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2));
             case geometryTypes.LINE:
-                return this._decode(mvtLayer, metadata, mvt_extent, [], decodeLines);
+                return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
             case geometryTypes.POLYGON:
-                return this._decode(mvtLayer, metadata, mvt_extent, [], decodePolygons);
+                return this._decode(mvtLayer, metadata, mvtExtent, [], decodePolygons);
             default:
                 throw new Error('MVT: invalid geometry type');
         }
@@ -161,7 +161,7 @@ export default class MVT extends Base {
         }
     }
 
-    _decode (mvtLayer, metadata, mvt_extent, geometries, decodeFn) {
+    _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
@@ -169,11 +169,11 @@ export default class MVT extends Base {
             this._checkType(f, metadata.geomType);
             const geom = f.loadGeometry();
             if (decodeFn) {
-                const decodedPolygons = decodeFn(geom, mvt_extent);
+                const decodedPolygons = decodeFn(geom, mvtExtent);
                 geometries.push(decodedPolygons);
             } else {
-                const x = 2 * (geom[0][0].x) / mvt_extent - 1.0;
-                const y = 2 * (1.0 - (geom[0][0].y) / mvt_extent) - 1.0;
+                const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;
+                const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;
                 // Tiles may contain points in the border;
                 // we'll avoid here duplicatend points between tiles by excluding the 1-edge
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
@@ -210,7 +210,9 @@ export default class MVT extends Base {
                 propertyNames.push(...metadata.propertyNames(propertyName));
             });
 
-        propertyNames.forEach(propertyName => properties[propertyName] = new Float32Array(length + RTT_WIDTH));
+        propertyNames.forEach(propertyName => {
+            properties[propertyName] = new Float32Array(length + RTT_WIDTH);
+        });
 
         return { properties, propertyNames };
     }

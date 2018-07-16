@@ -53,8 +53,8 @@ export default class Renderer {
 
     _initGL (gl) {
         this.gl = gl;
-        const OES_texture_float = gl.getExtension('OES_texture_float');
-        if (!OES_texture_float) {
+        const OESTextureFloat = gl.getExtension('OES_texture_float');
+        if (!OESTextureFloat) {
             throw new Error('WebGL extension OES_texture_float is unsupported');
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
