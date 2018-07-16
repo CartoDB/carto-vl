@@ -63,9 +63,8 @@ export default class Layer {
         this._checkSource(source);
         this._checkViz(viz);
         this._oldDataframes = new Set();
-
+        this._isInitialized = false;
         this._init(id, source, viz);
-
     }
 
     _init(id, source, viz) {
@@ -77,9 +76,11 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
+        
         this._context = new Promise((resolve) => {
             this._contextInitCallback = resolve;
         });
+        
         this._integratorPromise = new Promise((resolve) => {
             this._integratorCallback = resolve;
         });
@@ -256,10 +257,13 @@ export default class Layer {
 
     // The integrator will call this method once the webgl context is ready.
     initCallback() {
-        this._renderLayer.renderer = this._integrator.renderer;
-        this._contextInitCallback();
-        this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
-        this.requestMetadata();
+        if (!this._isInitialized) {
+            this._isInitialized = true;
+            this._renderLayer.renderer = this._integrator.renderer;
+            this._contextInitCallback();
+            this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
+            this.requestMetadata();
+        }
     }
 
     async requestMetadata(viz) {
