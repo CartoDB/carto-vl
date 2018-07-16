@@ -11,10 +11,6 @@
                     "file": "basics/add-layer.html"
                 },
                 {
-                    "title": "Add GeoJSON layer",
-                    "file": "basics/add-layer-geojson.html"
-                },
-                {
                     "title": "Style layer",
                     "file": "basics/basic-style.html"
                 },
@@ -118,8 +114,8 @@
             "title": "Advanced",
             "samples": [
                 {
-                    "title": "Denver trees",
-                    "file": "advanced/denver-trees.html"
+                    "title": "External GeoJSON layer",
+                    "file": "advances/external-geojson.html"
                 },
                 {
                     "title": "US population by county",
