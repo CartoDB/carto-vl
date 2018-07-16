@@ -28,7 +28,7 @@ describe('E2E tests:', () => {
         it(util.getName(file), () => {
             const actual = util.testSST(file, template, browser);
             return chai.expect(actual).to.eventually.eq(0);
-        }).timeout(20000);
+        });
     });
 
     after(done => {

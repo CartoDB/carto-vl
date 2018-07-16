@@ -29,7 +29,7 @@ describe('Render tests:', () => {
             const actual = util.testSST(file, template, browser);
             // Temporary threshold (1px) to cover small renderer differences between Mac & Linux
             return chai.expect(actual).to.eventually.be.at.most(1);
-        }).timeout(10000);
+        });
     });
 
     after(done => {
