@@ -24,16 +24,16 @@ describe('Render tests:', () => {
         });
     });
 
-    after(done => {
-        server.close();
-        exquisite.release(browser).then(done);
-    });
-
     files.forEach(file => {
         it(util.getName(file), () => {
-            const actual = util.testSST(file, template, true, browser);
+            const actual = util.testSST(file, template, browser);
             // Temporary threshold (1px) to cover small renderer differences between Mac & Linux
             return chai.expect(actual).to.eventually.be.at.most(1);
         }).timeout(10000);
+    });
+
+    after(done => {
+        server.close();
+        exquisite.release(browser).then(done);
     });
 });

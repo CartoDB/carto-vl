@@ -6,28 +6,33 @@ chai.use(require('chai-as-promised'));
 
 const handler = require('serve-handler');
 const http = require('http');
+const exquisite = require('exquisite-sst');
 
 const files = util.loadFiles(path.join(__dirname, 'e2e'));
 const template = util.loadTemplate(path.join(__dirname, 'e2e.html.tpl'));
 
 describe('E2E tests:', () => {
     let server;
-    
-    before(() => {
+    let browser;
+
+    before(done => {
         server = http.createServer(handler);
         server.listen(util.PORT);
+        exquisite.browser(util.headless()).then(_browser => {
+            browser = _browser;
+            done();
+        });
     });
 
-    files.forEach(test);
+    files.forEach(file => {
+        it(util.getName(file), () => {
+            const actual = util.testSST(file, template, browser);
+            return chai.expect(actual).to.eventually.eq(0);
+        }).timeout(20000);
+    });
 
-    after(() => {
+    after(done => {
         server.close();
+        exquisite.release(browser).then(done);
     });
 });
-
-function test(file) {
-    it(util.getName(file), () => {
-        const actual = util.testSST(file, template, true);
-        return chai.expect(actual).to.eventually.eq(0);
-    }).timeout(20000);
-}
