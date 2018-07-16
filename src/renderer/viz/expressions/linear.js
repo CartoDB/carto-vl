@@ -31,7 +31,7 @@ export default class Linear extends BaseExpression {
     constructor (input, min, max) {
         input = implicitCast(input);
 
-        if (min == undefined && max == undefined) {
+        if (min === undefined && max === undefined) {
             min = globalMin(input);
             max = globalMax(input);
         }
@@ -45,7 +45,7 @@ export default class Linear extends BaseExpression {
 
         super({ input, min, max });
 
-        if (this.min.type != 'time') {
+        if (this.min.type !== 'time') {
             checkLooseType('linear', 'input', 0, 'number', this.input);
             checkLooseType('linear', 'min', 1, 'number', this.min);
             checkLooseType('linear', 'max', 2, 'number', this.max);
@@ -54,7 +54,7 @@ export default class Linear extends BaseExpression {
     }
 
     eval (feature) {
-        if (this.input.type == 'date') {
+        if (this.input.type === 'date') {
             const input = this.input.eval(feature);
 
             const min = this.min.eval().getTime();
@@ -78,7 +78,7 @@ export default class Linear extends BaseExpression {
     _compile (metadata) {
         super._compile(metadata);
 
-        if (this.input.type == 'date') {
+        if (this.input.type === 'date') {
             const min = this.min.eval().getTime();
             const max = this.max.eval().getTime();
 

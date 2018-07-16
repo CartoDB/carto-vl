@@ -18,13 +18,13 @@ import * as earcut from 'earcut';
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
 // The geom will be an array of coordinates in this case
 export function decodeGeom (geomType, geom) {
-    if (geomType == 'point') {
+    if (geomType === 'point') {
         return decodePoint(geom);
     }
-    if (geomType == 'polygon') {
+    if (geomType === 'polygon') {
         return decodePolygon(geom);
     }
-    if (geomType == 'line') {
+    if (geomType === 'line') {
         return decodeLine(geom);
     }
     throw new Error(`Unimplemented geometry type: '${geomType}'`);

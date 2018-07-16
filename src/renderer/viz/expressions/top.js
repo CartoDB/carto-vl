@@ -44,7 +44,7 @@ export default class Top extends BaseExpression {
 
         let ret;
         orderedCategoryNames.map((name, i) => {
-            if (i == p) {
+            if (i === p) {
                 ret = i < buckets ? i + 1 : 0;
             }
         });

@@ -62,7 +62,7 @@ class AggregationFiltering {
             let a = this._basicCondition(f.a);
             let b = this._basicCondition(f.b);
             if (a && b) {
-                if (a.property == b.property) {
+                if (a.property === b.property) {
                     a.filters = a.filters.concat(b.filters);
                     return a;
                 }
@@ -112,8 +112,8 @@ class AggregationFiltering {
     _in (f) {
         if (f.isA(In)) {
             let p = this._aggregation(f.value);
-            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
                     in: values
                 });
@@ -125,8 +125,8 @@ class AggregationFiltering {
     _notIn (f) {
         if (f.isA(Nin)) {
             let p = this._aggregation(f.value);
-            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
                     not_in: values
                 });
@@ -261,7 +261,7 @@ class PreaggregationFiltering {
             // and keep the supported ones as a partial filter
             const l = [this._filter(f.a), this._filter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
             if (l.length) {
-                if (l.length == 1) {
+                if (l.length === 1) {
                     return l[0];
                 }
                 return {
@@ -354,7 +354,7 @@ class PreaggregationFiltering {
         if (f.isA(In)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
                     type: 'in',
                     property: p.property,
@@ -368,7 +368,7 @@ class PreaggregationFiltering {
         if (f.isA(Nin)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
                     type: 'notIn',
                     property: p.property,
@@ -383,7 +383,7 @@ class PreaggregationFiltering {
             let p = this._property(f.value);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);
-            if (p && lo != null && hi != null) {
+            if (p && lo !== null && hi !== null) {
                 return {
                     type: 'between',
                     property: p.property,

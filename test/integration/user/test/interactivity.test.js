@@ -336,7 +336,7 @@ describe('Interactivity', () => {
         let allLoaded = 0;
         function loaded () {
             allLoaded++;
-            if (allLoaded == 2) {
+            if (allLoaded === 2) {
                 callback();
             }
         }

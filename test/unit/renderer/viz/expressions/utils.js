@@ -19,7 +19,7 @@ const metadata = new Metadata({
 // Validate feature independence checks at constructor and compile times, mark the dependent argument with 'dependent' in argTypes
 export function validateFeatureDependentErrors (expressionName, argTypes) {
     {
-        const args = argTypes.map(type => type == 'dependent' ? 'number-property' : type).map(getPropertyArg);
+        const args = argTypes.map(type => type === 'dependent' ? 'number-property' : type).map(getPropertyArg);
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time a feature dependent error`, () => {
             expect(() =>
                 s[expressionName](...args.map(arg => arg[0]))
@@ -28,7 +28,7 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
     }
     {
         const v = s.variable('var1');
-        const args = argTypes.map(type => type == 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
+        const args = argTypes.map(type => type === 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
             v._resolveAliases({var1: s.property('wadus')});
@@ -79,10 +79,10 @@ export function validateStaticTypeErrors (expressionName, argTypes) {
 }
 
 function equalArgs (argsA, argsB) {
-    if (argsA.length != argsB.length) {
+    if (argsA.length !== argsB.length) {
         return false;
     }
-    return argsA.every((arg, index) => argsB[index] == arg);
+    return argsA.every((arg, index) => argsB[index] === arg);
 }
 
 function validateConstructorTimeTypeError (expressionName, args) {

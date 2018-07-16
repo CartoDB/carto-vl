@@ -29,7 +29,7 @@ export function isNumber (value) {
 
 export function isObject (value) {
     const type = typeof value;
-    return value != null && (type == 'object' || type == 'function');
+    return value !== null && (type === 'object' || type === 'function');
 }
 
 /**

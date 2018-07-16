@@ -33,7 +33,7 @@ export function decodePolygons (geometries, mvtExtent) {
     let invertedOrientation;
     geometries.forEach(geom => {
         let area = signedPolygonArea(geom);
-        if (area == 0) {
+        if (area === 0) {
             return;
         }
         if (invertedOrientation === undefined) {
@@ -276,7 +276,7 @@ function _removeDuplicatedVerticesOnLine (line) {
     for (let i = 0; i < line.length; i += 2) {
         const x = line[i];
         const y = line[i + 1];
-        if (x != prevX || y != prevY) {
+        if (x !== prevX || y !== prevY) {
             result.push(x, y);
             prevX = x;
             prevY = y;

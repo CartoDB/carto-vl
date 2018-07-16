@@ -230,7 +230,7 @@ export default class GeoJSON extends Base {
             };
         }
         const property = this._properties[propertyName];
-        const cat = property.categories.find(cat => cat.name == value);
+        const cat = property.categories.find(cat => cat.name === value);
         if (cat) {
             cat.frequency++;
         } else {

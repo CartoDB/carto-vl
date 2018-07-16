@@ -103,7 +103,7 @@ export default class Viz {
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (propertyName != 'resolution') {
+                if (propertyName !== 'resolution') {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
@@ -112,7 +112,7 @@ export default class Viz {
         });
 
         let property = propertyValue;
-        if (propertyName == 'variables') {
+        if (propertyName === 'variables') {
             let init = false;
             const handler = {
                 get: (obj, prop) => {
@@ -300,35 +300,35 @@ export default class Viz {
 
     replaceChild (toReplace, replacer) {
         if (Object.values(this.variables).includes(toReplace)) {
-            const varName = Object.keys(this.variables).find(varName => this.variables[varName] == toReplace);
+            const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.color) {
+        } else if (toReplace === this.color) {
             this.color = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.width) {
+        } else if (toReplace === this.width) {
             this.width = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.strokeColor) {
+        } else if (toReplace === this.strokeColor) {
             this.strokeColor = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.strokeWidth) {
+        } else if (toReplace === this.strokeWidth) {
             this.strokeWidth = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.filter) {
+        } else if (toReplace === this.filter) {
             this.filter = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.symbol) {
+        } else if (toReplace === this.symbol) {
             this.symbol = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.symbolPlacement) {
+        } else if (toReplace === this.symbolPlacement) {
             this.symbolPlacement = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;

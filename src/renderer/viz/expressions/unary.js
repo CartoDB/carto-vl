@@ -287,7 +287,7 @@ function genUnaryOp (name, jsFn, glsl) {
         _compile (meta) {
             super._compile(meta);
             checkType(name, 'x', 0, 'number', this.a);
-            if (this.a.type != 'number') {
+            if (this.a.type !== 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
             this.inlineMaker = inlines => glsl(inlines.a);

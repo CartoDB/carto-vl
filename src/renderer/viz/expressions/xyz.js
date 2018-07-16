@@ -12,7 +12,7 @@ export default class XYZ extends BaseExpression {
     }
     _compile (meta) {
         super._compile(meta);
-        if (this.x.type != 'number' || this.y.type != 'number' || this.z.type != 'number') {
+        if (this.x.type !== 'number' || this.y.type !== 'number' || this.z.type !== 'number') {
             throw new Error('XYZ() invalid parameters');
         }
         this.type = 'color';

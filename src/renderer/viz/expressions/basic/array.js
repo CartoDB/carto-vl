@@ -25,16 +25,16 @@ export default class BaseArray extends BaseExpression {
         let type = '';
         for (let elem of elems) {
             type = elem.type;
-            if (elem.type != undefined) {
+            if (elem.type !== undefined) {
                 break;
             }
         }
-        if (['number', 'category', 'color', 'time', undefined].indexOf(type) == -1) {
+        if (['number', 'category', 'color', 'time', undefined].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
-            if (item.type != type && item.type != undefined) {
+            if (item.type !== type && item.type !== undefined) {
                 throw new Error(`array(): invalid ${getOrdinalFromIndex(index + 1)} parameter type, invalid argument type combination`);
             }
         });
@@ -60,12 +60,12 @@ export default class BaseArray extends BaseExpression {
         super._compile(metadata);
 
         const type = this.elems[0].type;
-        if (['number', 'category', 'color', 'time'].indexOf(type) == -1) {
+        if (['number', 'category', 'color', 'time'].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         this.elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
-            if (item.type != type) {
+            if (item.type !== type) {
                 throw new Error(`array(): invalid ${getOrdinalFromIndex(index)} parameter, invalid argument type combination`);
             }
         });

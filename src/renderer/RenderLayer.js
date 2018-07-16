@@ -37,7 +37,7 @@ export default class RenderLayer {
     }
 
     _checkDataframeType (dataframe) {
-        if (this.type != dataframe.type) {
+        if (this.type !== dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
         }
     }

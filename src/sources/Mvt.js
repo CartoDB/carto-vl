@@ -97,7 +97,7 @@ export default class MVT extends Base {
 
     requestData (zoom, viewport) {
         return this._tileClient.requestData(zoom, viewport, this.responseToDataframeTransformer.bind(this),
-            zoom => this._options.maxZoom == undefined
+            zoom => this._options.maxZoom === undefined
                 ? this._options.viewportZoomToSourceZoom(zoom)
                 : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
         );
@@ -106,7 +106,7 @@ export default class MVT extends Base {
     async responseToDataframeTransformer (response, x, y, z) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength == 0 || response == 'null') {
+        if (arrayBuffer.byteLength === 0 || response === 'null') {
             return { empty: true };
         }
         const tile = new VectorTile(new Protobuf(arrayBuffer));
@@ -205,7 +205,7 @@ export default class MVT extends Base {
         const properties = {};
         const propertyNames = [];
         Object.keys(metadata.properties)
-            .filter(propertyName => metadata.properties[propertyName].type != 'geometry')
+            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
             .forEach(propertyName => {
                 propertyNames.push(...metadata.propertyNames(propertyName));
             });
@@ -229,7 +229,7 @@ export default class MVT extends Base {
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
             return propertyValue;
-        } else if (propertyValue == null || propertyValue == undefined) {
+        } else if (propertyValue === null || propertyValue === undefined) {
             return Number.NaN;
         } else {
             throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);

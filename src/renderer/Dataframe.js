@@ -21,7 +21,7 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
-        if (this.type == 'polygon') {
+        if (this.type === 'polygon') {
             this._aabb = [];
             geom.forEach(feature => {
                 const aabb = {
@@ -42,7 +42,7 @@ export default class Dataframe {
                 });
                 this._aabb.push(aabb);
             });
-        } else if (this.type == 'line') {
+        } else if (this.type === 'line') {
             this._aabb = [];
             geom.forEach(feature => {
                 const aabb = {
@@ -100,7 +100,7 @@ export default class Dataframe {
                     index++;
                 }
             } else {
-                while (i == breakpoints[index]) {
+                while (i === breakpoints[index]) {
                     index++;
                 }
             }
@@ -231,7 +231,7 @@ export default class Dataframe {
             scale = width / 2 * widthScale;
         };
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i == 0 || i >= breakpoints[featureIndex]) {
+            if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this._getFeature(columnNames, featureIndex);
                 if (this._isFeatureFiltered(feature, filterExpression)) {
@@ -281,7 +281,7 @@ export default class Dataframe {
         Object.keys(this.properties).map(propertyName => {
             let prop = this.properties[propertyName][featureIndex];
             const column = this.metadata.properties[propertyName];
-            if (column && column.type == 'category') {
+            if (column && column.type === 'category') {
                 prop = this.metadata.IDToCategory.get(prop);
             }
             if (propertyName === this.metadata.idProperty) {
@@ -389,7 +389,7 @@ export function _pointInTriangle (p, v1, v2, v3) {
     const b2 = _halfPlaneTest(p, v2, v3) < 0;
     const b3 = _halfPlaneTest(p, v3, v1) < 0;
 
-    return (b1 == b2) && (b2 == b3);
+    return (b1 === b2) && (b2 === b3);
 }
 
 // Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
@@ -403,7 +403,7 @@ function _halfPlaneTest (p, a, b) {
 }
 
 function _equal (a, b) {
-    return (a.x == b.x) && (a.y == b.y);
+    return (a.x === b.x) && (a.y === b.y);
 }
 
 function _pointInCircle (p, center, scale) {

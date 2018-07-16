@@ -175,7 +175,7 @@ function genViewportAgg (metadataPropertyName, zeroFn, accumFn, resolveFn) {
          */
         constructor (property) {
             super({
-                property: implicitCast(metadataPropertyName == 'count' ? number(0) : property),
+                property: implicitCast(metadataPropertyName === 'count' ? number(0) : property),
                 _impostor: number(0)
             });
             this._isViewport = true;
@@ -267,7 +267,7 @@ export class ViewportPercentile extends BaseExpression {
     }
 
     eval (f) {
-        if (this._value == null) {
+        if (this._value === null) {
             this._array.sort((a, b) => a - b);
             const index = clamp(
                 Math.floor(this.percentile.eval(f) / 100 * this._array.length),
@@ -363,11 +363,11 @@ export class ViewportHistogram extends BaseExpression {
     }
 
     get value () {
-        if (this._cached == null) {
+        if (this._cached === null) {
             if (!this._histogram) {
                 return null;
             }
-            if (this.x.type == 'number') {
+            if (this.x.type === 'number') {
                 const array = [...this._histogram];
                 let min = Number.POSITIVE_INFINITY;
                 let max = Number.NEGATIVE_INFINITY;

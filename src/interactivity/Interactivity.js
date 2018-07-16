@@ -276,7 +276,7 @@ function preCheckLayerList (layerList) {
     }
 }
 function postCheckLayerList (layerList) {
-    if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
+    if (!layerList.every(layer => layer.getIntegrator() === layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }

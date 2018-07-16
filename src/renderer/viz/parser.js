@@ -12,7 +12,7 @@ const aggFns = [];
 
 const lowerCaseFunctions = {};
 Object.keys(functions)
-    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
+    .filter(name => name[0] === name[0].toLowerCase()) // Only get functions starting with lowercase
     .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
 lowerCaseFunctions.true = functions.TRUE;
 lowerCaseFunctions.false = functions.FALSE;
@@ -50,7 +50,7 @@ export function parseVizDefinition (str) {
     prepareJsep();
     const ast = jsep(cleanComments(str));
     let vizSpec = { variables: {} };
-    if (ast.type == 'Compound') {
+    if (ast.type === 'Compound') {
         ast.body.map(node => parseVizNamedExpr(vizSpec, node));
     } else {
         parseVizNamedExpr(vizSpec, ast);
@@ -60,10 +60,10 @@ export function parseVizDefinition (str) {
 }
 
 function parseVizNamedExpr (vizSpec, node) {
-    if (node.operator != ':') {
+    if (node.operator !== ':') {
         throw new Error('Invalid syntax');
     }
-    if (node.left.name.length && node.left.name[0] == '@') {
+    if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
     const name = node.left.name;
@@ -72,7 +72,7 @@ function parseVizNamedExpr (vizSpec, node) {
     }
     if (name.startsWith('__cartovl_variable_')) {
         vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (name == 'resolution') {
+    } else if (name === 'resolution') {
         const value = parseNode(node.right);
         vizSpec[name] = value;
     } else {
@@ -144,14 +144,14 @@ function parseUnaryOperation (node) {
 }
 
 function parseIdentifier (node) {
-    if (node.name.length && node.name[0] == '@') {
+    if (node.name.length && node.name[0] === '@') {
         node.name = '__cartovl_variable_' + node.name.substr(1);
     }
     if (node.name.startsWith('__cartovl_variable_')) {
         return functions.variable(node.name.substr('__cartovl_variable_'.length));
-    } else if (node.name[0] == '#') {
+    } else if (node.name[0] === '#') {
         return new Hex(node.name);
-    } else if (node.name[0] == '$') {
+    } else if (node.name[0] === '$') {
         return functions.property(node.name.substring(1));
     } else if (functions.palettes[node.name.toUpperCase()]) {
         return functions.palettes[node.name.toUpperCase()];
@@ -165,17 +165,17 @@ function parseIdentifier (node) {
 }
 
 function parseNode (node) {
-    if (node.type == 'CallExpression') {
+    if (node.type === 'CallExpression') {
         return parseFunctionCall(node);
-    } else if (node.type == 'Literal') {
+    } else if (node.type === 'Literal') {
         return node.value;
-    } else if (node.type == 'ArrayExpression') {
+    } else if (node.type === 'ArrayExpression') {
         return node.elements.map(e => parseNode(e));
-    } else if (node.type == 'BinaryExpression') {
+    } else if (node.type === 'BinaryExpression') {
         return parseBinaryOperation(node);
-    } else if (node.type == 'UnaryExpression') {
+    } else if (node.type === 'UnaryExpression') {
         return parseUnaryOperation(node);
-    } else if (node.type == 'Identifier') {
+    } else if (node.type === 'Identifier') {
         return parseIdentifier(node);
     }
     throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
@@ -225,9 +225,9 @@ export function cleanComments (str) {
 
     for (let i = 0, l = str.length; i < l; i++) {
         if (mode.singleQuote) {
-            if (str[i] == '\\') {
+            if (str[i] === '\\') {
                 mode.escape++;
-            } else if (str[i] === '\'' && mode.escape % 2 == 0) {
+            } else if (str[i] === '\'' && mode.escape % 2 === 0) {
                 mode.singleQuote = false;
                 mode.escape = 0;
             }
@@ -235,9 +235,9 @@ export function cleanComments (str) {
         }
 
         if (mode.doubleQuote) {
-            if (str[i] == '\\') {
+            if (str[i] === '\\') {
                 mode.escape++;
-            } else if (str[i] === '"' && mode.escape % 2 == 0) {
+            } else if (str[i] === '"' && mode.escape % 2 === 0) {
                 mode.doubleQuote = false;
                 mode.escape = 0;
             }

@@ -151,7 +151,7 @@ export default class Base {
      * @param {*} replacer
      */
     replaceChild (toReplace, replacer) {
-        const name = this.childrenNames.find(name => this[name] == toReplace);
+        const name = this.childrenNames.find(name => this[name] === toReplace);
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;

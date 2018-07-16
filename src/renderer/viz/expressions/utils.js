@@ -143,13 +143,13 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (Array.isArray(expectedType)) {
         const ok = expectedType.some(type =>
-            parameter.type == type
+            parameter.type === type
         );
         if (!ok) {
             throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
             expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
         }
-    } else if (parameter.type != expectedType) {
+    } else if (parameter.type !== expectedType) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
     }
 }
@@ -195,5 +195,5 @@ export function mix (x, y, a) {
 }
 
 function _isNumber (value) {
-    return Number.isFinite(value) || value == Infinity || value == -Infinity || Number.isNaN(value);
+    return Number.isFinite(value) || value === Infinity || value === -Infinity || Number.isNaN(value);
 }

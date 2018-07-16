@@ -313,7 +313,7 @@ export default class Layer {
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-            if (!this._isLoaded && this.state == 'dataLoaded') {
+            if (!this._isLoaded && this.state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
             }

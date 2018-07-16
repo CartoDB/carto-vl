@@ -326,7 +326,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price == 30  // Equivalent to eq($price, 30)
+ *   filter: $price === 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -336,7 +336,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  */
 export const Equals = genBinaryOp('equals',
     NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
-    (x, y) => x == y ? 1 : 0,
+    (x, y) => x === y ? 1 : 0,
     (x, y) => `(${x}==${y}? 1.:0.)`
 );
 
@@ -357,7 +357,7 @@ export const Equals = genBinaryOp('equals',
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price != 30  // Equivalent to neq($price, 30)
+ *   filter: $price !== 30  // Equivalent to neq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -367,7 +367,7 @@ export const Equals = genBinaryOp('equals',
  */
 export const NotEquals = genBinaryOp('notEquals',
     NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
-    (x, y) => x != y ? 1 : 0,
+    (x, y) => x !== y ? 1 : 0,
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
 
@@ -418,7 +418,7 @@ export const Or = genBinaryOp('or',
  * @param {Number} y - Second value of the expression
  * @return {Number} Result of the expression
  *
- * @example <caption>Show only elements with price < 30 AND category == 'fruit'.</caption>
+ * @example <caption>Show only elements with price < 30 AND category === 'fruit'.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.and(
@@ -427,9 +427,9 @@ export const Or = genBinaryOp('or',
  *   )
  * });
  *
- * @example <caption>Show only elements with price < 30 AND category == 'fruit'. (String)</caption>
+ * @example <caption>Show only elements with price < 30 AND category === 'fruit'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price < 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+ *   filter: $price < 30 and $category === 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
  * `);
  *
  * @memberof carto.expressions
@@ -454,7 +454,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
 
             const signature = getSignatureLoose(a, b);
             if (signature !== undefined) {
-                if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+                if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
                     throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
                 }
             }
@@ -473,7 +473,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             const [a, b] = [this.a, this.b];
 
             const signature = getSignature(a, b);
-            if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+            if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
                 throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
             this.type = getReturnTypeFromSignature(signature);
@@ -489,23 +489,23 @@ function getSignatureLoose (a, b) {
             return undefined;
         }
         const knownType = a.type || b.type;
-        if (knownType == 'color') {
+        if (knownType === 'color') {
             return NUMBER_AND_COLOR_TO_COLOR;
         }
-    } else if (a.type == 'number' && b.type == 'number') {
+    } else if (a.type === 'number' && b.type === 'number') {
         return NUMBERS_TO_NUMBER;
-    } else if (a.type == 'number' && b.type == 'color') {
+    } else if (a.type === 'number' && b.type === 'color') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'number') {
+    } else if (a.type === 'color' && b.type === 'number') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'color') {
+    } else if (a.type === 'color' && b.type === 'color') {
         return COLORS_TO_COLOR;
-    } else if (a.type == 'category' && b.type == 'category') {
+    } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
-    } else if ((a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'image') ||
-        (a.type == 'color' && b.type == 'image')) {
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;
@@ -515,20 +515,20 @@ function getSignatureLoose (a, b) {
 function getSignature (a, b) {
     if (!a.type || !b.type) {
         return undefined;
-    } else if (a.type == 'number' && b.type == 'number') {
+    } else if (a.type === 'number' && b.type === 'number') {
         return NUMBERS_TO_NUMBER;
-    } else if (a.type == 'number' && b.type == 'color') {
+    } else if (a.type === 'number' && b.type === 'color') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'number') {
+    } else if (a.type === 'color' && b.type === 'number') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'color') {
+    } else if (a.type === 'color' && b.type === 'color') {
         return COLORS_TO_COLOR;
-    } else if (a.type == 'category' && b.type == 'category') {
+    } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
-    } else if ((a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'image') ||
-        (a.type == 'color' && b.type == 'image')) {
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;

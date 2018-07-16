@@ -243,7 +243,7 @@ export default class Renderer {
         const propertyNames = Object.keys(dataframe.properties);
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
-            if (metadata.properties[name].type == 'category') {
+            if (metadata.properties[name].type === 'category') {
                 feature[name] = metadata.IDToCategory.get(dataframe.properties[name][index]);
             } else {
                 feature[name] = dataframe.properties[name][index];
@@ -315,12 +315,12 @@ export default class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (renderLayer.type != 'point') {
+        if (renderLayer.type !== 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
-            if (w != this._width || h != this._height) {
+            if (w !== this._width || h !== this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -345,9 +345,9 @@ export default class Renderer {
             let renderer = null;
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
-            } else if (tile.type == 'point') {
+            } else if (tile.type === 'point') {
                 renderer = this.finalRendererProgram;
-            } else if (tile.type == 'line') {
+            } else if (tile.type === 'line') {
                 renderer = this.lineRendererProgram;
             } else {
                 renderer = this.triRendererProgram;
@@ -368,9 +368,9 @@ export default class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (scale / aspect) * (this._center.x - tile.center.x),
                 scale * (this._center.y - tile.center.y));
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-            } else if (tile.type == 'point') {
+            } else if (tile.type === 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
@@ -386,7 +386,7 @@ export default class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -427,7 +427,7 @@ export default class Renderer {
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
-            } else if (tile.type != 'line') {
+            } else if (tile.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
@@ -440,11 +440,11 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
             }
         });
@@ -452,7 +452,7 @@ export default class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type != 'point') {
+        if (renderLayer.type !== 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -492,10 +492,10 @@ function getOrderingRenderBuckets (renderLayer) {
     const NUM_BUCKETS = 64;
     if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
     } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
     }
     return {
         orderingMins,

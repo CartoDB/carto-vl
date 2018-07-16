@@ -108,9 +108,9 @@ export default class Windshaft {
      */
     _needToInstantiate (MNS, resolution, filtering) {
         return !schema.equals(this._MNS, MNS) ||
-            resolution != this.resolution ||
+            resolution !== this.resolution ||
             (
-                JSON.stringify(filtering) != JSON.stringify(this.filtering) &&
+                JSON.stringify(filtering) !== JSON.stringify(this.filtering) &&
                 this.metadata.featureCount > MIN_FILTERING
             );
     }
@@ -154,7 +154,7 @@ export default class Windshaft {
         }
         if (backendFilters) {
             const filteredSQL = this._buildQuery(select, backendFilters);
-            backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
+            backendFiltersApplied = backendFiltersApplied || filteredSQL !== aggSQL;
             aggSQL = filteredSQL;
         }
 
@@ -277,7 +277,7 @@ export default class Windshaft {
     _buildSelectClause (MNS) {
         const columns = MNS.columns.map(name => schema.column.getBase(name))
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
-        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
+        return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
     _buildQuery (select, filters) {
@@ -412,7 +412,7 @@ async function repeatablePromise (initialAssumptions, assumptionsFromResult, pro
     let promise = promiseGenerator(initialAssumptions);
     let result = await promise;
     let finalAssumptions = assumptionsFromResult(result);
-    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+    if (JSON.stringify(initialAssumptions) === JSON.stringify(finalAssumptions)) {
         return promise;
     } else {
         return promiseGenerator(finalAssumptions);

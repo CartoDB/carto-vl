@@ -204,11 +204,11 @@ function getJSONConfig () {
 
 function setConfig (input) {
     let c = JSON.parse(atob(input));
-    if (c.c == 'dmanzanares-ded13') {
+    if (c.c === 'dmanzanares-ded13') {
         c.c = 'cartovl';
         c.d = 'https://{user}.carto.com';
     }
-    if (c.d == 'carto.com') {
+    if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
     }
     document.getElementById('dataset').value = c.a;

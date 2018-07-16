@@ -26,7 +26,7 @@ const schema = {
 export function union (a, b) {
     const t = a.columns.concat(b.columns);
     return {
-        columns: t.filter((item, pos) => t.indexOf(item) == pos)
+        columns: t.filter((item, pos) => t.indexOf(item) === pos)
     };
 }
 
@@ -34,7 +34,7 @@ export function equals (a, b) {
     if (!a || !b) {
         return false;
     }
-    return a.columns.length == b.columns.length && a.columns.every(v => b.columns.includes(v));
+    return a.columns.length === b.columns.length && a.columns.every(v => b.columns.includes(v));
 }
 
 const AGG_PREFIX = '_cdb_agg_';
