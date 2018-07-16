@@ -76,18 +76,14 @@ function tileRsys(x, y, z) {
     return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
 }
 
-function rZoom(zoom, viewportZoomToSourceZoom) {
-    return viewportZoomToSourceZoom(Math.log2(1 / zoom));
-}
-
 /**
  * TC tiles that intersect the local rectangle of an RSys
  * (with the largest tile size no larger than the rectangle)
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-export function rTiles(bounds, viewportZoomToSourceZoom = Math.ceil) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2., viewportZoomToSourceZoom), bounds);
+export function rTiles(zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
+    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);
 }
 
 /**
