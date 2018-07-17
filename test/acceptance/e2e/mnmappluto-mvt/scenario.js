@@ -5,7 +5,7 @@ const map = new mapboxgl.Map({
     zoom: 12
 });
 
-async function loadMVT() {
+async function loadMVT () {
     const mapConfig = {
         buffersize: { mvt: 0 },
         layers: [
