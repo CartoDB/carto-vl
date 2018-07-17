@@ -48,29 +48,35 @@ if (prerelease) {
     */
     let base = 'v' + major + '.' + minor + '.' + patch + '-';
     if (prerelease[0]) { // alpha, beta, rc
-        uploadFiles(base + prerelease[0]);
+        upload(base + prerelease[0]);
     }
     if (prerelease[1]) { // number
-        uploadFiles(base + prerelease[0] + '.' + prerelease[1]);
+        upload(base + prerelease[0] + '.' + prerelease[1]);
     }
 } else {
     /**
     * Publish release URLs
     */
-    uploadFiles('v' + major);
-    uploadFiles('v' + major + '.' + minor);
-    uploadFiles('v' + major + '.' + minor + '.' + patch);
+    upload('v' + major);
+    upload('v' + major + '.' + minor);
+    upload('v' + major + '.' + minor + '.' + patch);
 }
 
-function uploadFiles (version) {
+function upload (version) {
     console.log('Publish', version);
+    uploadFiles('dist', 'carto-vl/' + version + '/');
+    console.log('Publish assets');
+    uploadFiles('assets', 'carto-vl/assets/');
+}
+
+function uploadFiles (orig, dest) {
     let uploader = client.uploadDir({
-        localDir: 'dist',
+        localDir: orig,
         deleteRemoved: true,
         s3Params: {
             ACL: 'public-read',
             Bucket: secrets.AWS_S3_BUCKET,
-            Prefix: 'carto-vl/' + version + '/'
+            Prefix: dest
         }
     });
     uploader.on('error', function (err) {
@@ -79,6 +85,6 @@ function uploadFiles (version) {
     uploader.on('progress', function () {
     });
     uploader.on('end', function () {
-        console.log('Done', version);
+        console.log('Done');
     });
 }
