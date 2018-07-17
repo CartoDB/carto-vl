@@ -64,7 +64,6 @@
  * @api
  */
 
-
 /**
  * Type of Numeric Expressions.
  *
@@ -402,7 +401,6 @@ export const STAR = new SVG(svgs.star);
 export const STAR_OUTLINE = new SVG(svgs.starOutline);
 export const TRIANGLE = new SVG(svgs.triangle);
 export const TRIANGLE_OUTLINE = new SVG(svgs.triangleOutline);
-
 
 export const ALIGN_CENTER = new Placement(constant(0), constant(0));
 export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));

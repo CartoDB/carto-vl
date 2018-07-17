@@ -9,7 +9,6 @@ describe('sources/base-windshaft', () => {
         serverURL: 'https://{user}.test.com'
     };
 
-
     describe('constructor', () => {
         it('should build a new Source', () => {
             const source = new SourceBase();

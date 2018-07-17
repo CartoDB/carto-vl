@@ -11,7 +11,6 @@ const DEFAULT_ORDER_EXPRESSION = s.noOrder();
 const DEFAULT_RESOLUTION = 1;
 
 describe('api/viz', () => {
-
     describe('constructor', () => {
         describe('when parameter is a vizSpec object', () => {
             it('should set default viz values when no parameters are given', () => {
@@ -200,7 +199,7 @@ describe('api/viz', () => {
             const numberB = s.number(2);
             const expected = s.gt(s.property('fake_property'), numberA);
             new Viz({
-                filter: expected,
+                filter: expected
             });
 
             const final = numberA.blendTo(numberB, 10);
@@ -211,7 +210,7 @@ describe('api/viz', () => {
             const numberB = s.number(2);
             const expected = s.gt(s.property('fake_property'), numberA);
             const viz = new Viz({
-                filter: expected,
+                filter: expected
             });
             viz.onChange(done);
             numberA.blendTo(numberB, 10);
@@ -221,7 +220,7 @@ describe('api/viz', () => {
             const numberB = s.number(2);
             const expected = s.gt(7, numberA);
             const viz = new Viz({
-                filter: expected,
+                filter: expected
             });
             numberA.blendTo(numberB, 999);
             viz.onChange(done);

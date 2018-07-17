@@ -24,7 +24,7 @@ import Palette from './Palette';
  */
 
 export default class Reverse extends Palette {
-    constructor(palette) {
+    constructor (palette) {
         super(palette.name, palette.subPalettes);
         this.type = 'palette';
         this._originalPalette = palette;
@@ -39,17 +39,16 @@ export default class Reverse extends Palette {
         });
     }
 
-    getLongestSubPalette() {
+    getLongestSubPalette () {
         return this._reversePalette(this._originalPalette.getLongestSubPalette());
     }
-    
-    _reversePalette(palette) {
+
+    _reversePalette (palette) {
         if (this.isQualitative()) {
             // Last color is 'others', therefore, we shouldn't change the order of that one
             const copy = [...palette];
             const others = copy.pop();
             return [...copy.reverse(), others];
-
         }
         return [...palette].reverse();
     }

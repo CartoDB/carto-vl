@@ -24,17 +24,17 @@ import { checkNumber } from '../utils';
  * @api
  */
 export default class Constant extends BaseExpression {
-    constructor(x) {
+    constructor (x) {
         checkNumber('constant', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
-    get value() {
+    get value () {
         return this.eval();
     }
-    eval() {
+    eval () {
         return this.expr;
     }
 }

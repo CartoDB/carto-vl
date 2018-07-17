@@ -47,7 +47,7 @@ describe('src/renderer/viz/expressions/linear', () => {
                     wadus: {
                         type: 'date',
                         min: new Date('1880-01-01T00:00:07Z'),
-                        max: new Date('1880-01-01T00:00:09Z'),
+                        max: new Date('1880-01-01T00:00:09Z')
                     }
                 }
             });

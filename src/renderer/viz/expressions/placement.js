@@ -33,9 +33,8 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * @api
  */
 
-
 export default class Placement extends BaseExpression {
-    constructor(x, y) {
+    constructor (x, y) {
         x = implicitCast(x);
         y = implicitCast(y);
         checkLooseType('placement', 'x', 0, 'number', x);
@@ -44,10 +43,10 @@ export default class Placement extends BaseExpression {
         this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
         this.type = 'placement';
     }
-    eval(v) {
+    eval (v) {
         return [this.x.eval(v), this.y.eval(v)];
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
         checkType('placement', 'x', 0, 'number', this.x);
         checkType('placement', 'y', 1, 'number', this.y);

@@ -143,42 +143,41 @@ export const GlobalSum = generateGlobalAggregattion('sum');
  */
 export const GlobalCount = generateGlobalAggregattion('count');
 
-
-function generateGlobalAggregattion(metadataPropertyName) {
+function generateGlobalAggregattion (metadataPropertyName) {
     return class GlobalAggregattion extends BaseExpression {
         /**
          * @param {*} property
          */
-        constructor(property) {
+        constructor (property) {
             super({ _value: number(0) });
             this.property = implicitCast(property);
         }
-        isFeatureDependent(){
+        isFeatureDependent () {
             return false;
         }
-        get value() {
+        get value () {
             return this._value.expr;
         }
 
-        eval() {
+        eval () {
             return this._value.expr;
         }
 
-        _compile(metadata) {
+        _compile (metadata) {
             super._compile(metadata);
             // TODO improve type check
             this.property._compile(metadata);
             this.type = 'number';
             super.inlineMaker = inline => inline._value;
-            if (metadata.properties[this.property.name][metadataPropertyName] === undefined){
+            if (metadata.properties[this.property.name][metadataPropertyName] === undefined) {
                 throw new Error(`Metadata ${metadataPropertyName} for property ${this.property.name} is not defined`);
             }
             this._value.expr = metadata.properties[this.property.name][metadataPropertyName];
         }
-        _getMinimumNeededSchema() {
+        _getMinimumNeededSchema () {
             return this.property._getMinimumNeededSchema();
         }
-        _getColumnName() {
+        _getColumnName () {
             if (this.property.aggName) {
                 // Property has aggregation
                 return schema.column.aggColumn(this.property.name, this.property.aggName);
@@ -187,7 +186,6 @@ function generateGlobalAggregattion(metadataPropertyName) {
         }
     };
 }
-
 
 /**
  * Return the Nth percentile of the feature property for the entire source data.
@@ -220,7 +218,7 @@ export class GlobalPercentile extends BaseExpression {
     /**
      * @param {*} property
      */
-    constructor(property, percentile) {
+    constructor (property, percentile) {
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');
         }
@@ -229,14 +227,14 @@ export class GlobalPercentile extends BaseExpression {
         this.property = property;
         this.percentile = percentile;
     }
-    isFeatureDependent(){
+    isFeatureDependent () {
         return false;
     }
-    get value() {
+    get value () {
         return this._value.expr;
     }
 
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         this.property._compile(metadata);
         this.type = 'number';
@@ -246,10 +244,10 @@ export class GlobalPercentile extends BaseExpression {
         const p = this.percentile / 100;
         this._value.expr = copy[Math.floor(p * copy.length)];
     }
-    _getMinimumNeededSchema() {
+    _getMinimumNeededSchema () {
         return this.property._getMinimumNeededSchema();
     }
-    _getColumnName() {
+    _getColumnName () {
         if (this.property.aggName) {
             // Property has aggregation
             return schema.column.aggColumn(this.property.name, this.property.aggName);

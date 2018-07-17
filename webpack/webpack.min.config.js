@@ -47,7 +47,7 @@ module.exports = {
                         drop_console: true
                     }
                 }
-            }),
+            })
         ]
     },
     plugins: [

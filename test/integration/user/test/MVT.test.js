@@ -19,7 +19,7 @@ describe('Layer', () => {
                         type: 'number'
                     }
                 },
-                idProperty: 'cartodb_id',
+                idProperty: 'cartodb_id'
             }, {
                 viewportZoomToSourceZoom: zoom => {
                     expect(zoom).toEqual(12.345);

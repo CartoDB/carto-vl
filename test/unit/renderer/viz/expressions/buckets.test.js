@@ -24,7 +24,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     city: {
                         type: 'category',
                         categories: [
-                            { name: 'Murcia' }, 
+                            { name: 'Murcia' },
                             { name: 'Madrid' },
                             { name: 'Pontevedra' },
                             { name: 'Barcelona' }
@@ -195,14 +195,13 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     bucketExpression = s.buckets($price, [10, 20]);
                     bucketExpression._compile(METADATA);
                 });
-                
+
                 it('should classify the input in the first category when is lower than the first breakpoint', () => {
                     const expected = 0;
                     const feature = { price: 9 };
                     const actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
-
                 });
 
                 it('should classify the input in the second category when is equal than the first breakpoint', () => {
@@ -212,7 +211,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
 
                     expect(actual).toEqual(expected);
                 });
-                
+
                 it('should classify the input in the second category when is lower than the second breakpoint', () => {
                     const expected = 1;
                     const feature = { price: 15 };
@@ -220,7 +219,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
 
                     expect(actual).toEqual(expected);
                 });
-                
+
                 it('should classify the input in the third category when is equal than the third breakpoint', () => {
                     const expected = 2;
                     const feature = { price: 20 };

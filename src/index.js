@@ -26,13 +26,12 @@ import Interactivity from './interactivity/Interactivity';
 import Layer from './Layer';
 import * as expressions from './renderer/viz/expressions';
 import Dataset from './sources/Dataset';
-import GeoJSON from './sources/Geojson';
-import MVT from './sources/Mvt';
-import SQL from './sources/Sql';
+import GeoJSON from './sources/GeoJSON';
+import MVT from './sources/MVT';
+import SQL from './sources/SQL';
 
 // Namespaces
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
 export { setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
-

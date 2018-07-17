@@ -23,18 +23,18 @@ import { number } from '../expressions';
  * @api
  */
 export default class Zoom extends BaseExpression {
-    constructor() {
+    constructor () {
         super({ zoom: number(0) });
         this.type = 'number';
     }
-    eval() {
+    eval () {
         return this.zoom.expr;
     }
-    _compile(metadata) {
+    _compile (metadata) {
         super._compile(metadata);
         super.inlineMaker = inline => inline.zoom;
     }
-    _preDraw(program, drawMetadata, gl) {
+    _preDraw (program, drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;
         this.zoom._preDraw(program, drawMetadata, gl);
     }

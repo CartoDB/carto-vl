@@ -19,7 +19,4 @@ describe('src/renderer/viz/expressions/ordering', () => {
         validateStaticType('desc', [s.width()], 'orderer');
         validateStaticType('noOrder', [], 'orderer');
     });
-
 });
-
-
