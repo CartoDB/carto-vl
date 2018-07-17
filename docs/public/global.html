@@ -988,6 +988,233 @@
 
             
                 
+<h4 class="name" id="MVTOptions">MVTOptions</h4>
+
+
+
+
+<div class="description">
+    <p>A MVTOptions object declares a MVT configuration</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>layerID</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>viewportZoomToSourceZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    Math.ceil
+                
+                </td>
+            
+
+            <td class="description last"><p>function to transform the viewport zoom into a zoom value to replace <code>{z}</code> in the MVT URL template, undefined defaults to <code>Math.ceil</code></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>maxZoom</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>limit MVT tile requests to this zoom level, undefined defaults to no limit</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use layer `myAwesomeLayer` and request tiles up to zoom level 12.</p>
+    
+    <pre class="prettyprint"><code>const options = {
+    layerID: 'myAwesomeLayer',
+    maxZoom: 12
+};</code></pre>
+
+        <p class="code-caption">Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</p>
+    
+    <pre class="prettyprint"><code>const options = {
+    layerID: 'myAwesomeLayer',
+    viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 4), 6)
+};</code></pre>
+
+        <p class="code-caption">Use layer `myAwesomeLayer` and request tiles only at zoom levels 0,3,6,9...</p>
+    
+    <pre class="prettyprint"><code>const options = {
+    layerID: 'myAwesomeLayer',
+    viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
+};</code></pre>
+
+
+
+            
+                
 <h4 class="name" id="Number">Number</h4>
 
 
@@ -1173,7 +1400,7 @@ For a better understanding we recommend reading the VIZ guide</p>
 
             
 
-            <td class="description last"><p>fill color of points and polygons and color of lines, if used with <code>symbol</code> the color will override the original sprite RGB channels</p></td>
+            <td class="description last"><p>fill color of points and polygons and color of lines, if used with <code>symbol</code> the color will override the original image RGB channels</p></td>
         </tr>
 
     
@@ -1278,7 +1505,7 @@ For a better understanding we recommend reading the VIZ guide</p>
             <td class="type">
             
                 
-<span class="param-type">Sprite</span>
+<span class="param-type">Image</span>
 
 
             
@@ -1288,7 +1515,7 @@ For a better understanding we recommend reading the VIZ guide</p>
 
             
 
-            <td class="description last"><p>show a sprite instead in the place of points</p></td>
+            <td class="description last"><p>show an image instead in the place of points</p></td>
         </tr>
 
     
@@ -1311,7 +1538,7 @@ For a better understanding we recommend reading the VIZ guide</p>
 
             
 
-            <td class="description last"><p>when using <code>symbol</code>, offset to apply to the sprite</p></td>
+            <td class="description last"><p>when using <code>symbol</code>, offset to apply to the image</p></td>
         </tr>
 
     
@@ -2325,13 +2552,13 @@ This is useful to create external widgets that are refreshed reactively to chang
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 22 2018 17:25:13 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jul 17 2018 16:12:35 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

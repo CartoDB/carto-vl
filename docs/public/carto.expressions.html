@@ -46,8 +46,8 @@
 <li><strong>width</strong>: fill diameter of points, thickness of lines, not applicable to polygons</li>
 <li><strong>strokeWidth</strong>: stroke width of points and polygons, not applicable to lines</li>
 <li><strong>filter</strong>: filter features by removing from rendering and interactivity all the features that don't pass the test</li>
-<li><strong>symbol</strong> - show a sprite instead in the place of points</li>
-<li><strong>symbolPlacement</strong> - when using <code>symbol</code>, offset to apply to the sprite</li>
+<li><strong>symbol</strong> - show an image instead in the place of points</li>
+<li><strong>symbolPlacement</strong> - when using <code>symbol</code>, offset to apply to the image</li>
 <li><strong>resolution</strong>: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points</li>
 </ul>
 <p>For example the point diameter could be using the <code>add</code> expression:</p>
@@ -132,7 +132,7 @@ type of their parameters.</p>
         <h3 class="subsection-title">Classes</h3>
 
         <dl>
-            <dt><a href="carto.expressions.Torque.html">Torque</a></dt>
+            <dt><a href="carto.expressions.Animation.html">Animation</a></dt>
             <dd></dd>
         </dl>
     
@@ -777,7 +777,7 @@ This fuzzy behavior will allow transitions to work in a continuos, non-discrete,
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Show only elements with price < 30 AND category == 'fruit'.</p>
+        <p class="code-caption">Show only elements with price < 30 AND category === 'fruit'.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
@@ -787,10 +787,10 @@ const viz = new carto.Viz({
   )
 });</code></pre>
 
-        <p class="code-caption">Show only elements with price < 30 AND category == 'fruit'. (String)</p>
+        <p class="code-caption">Show only elements with price < 30 AND category === 'fruit'. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: $price &lt; 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+  filter: $price &lt; 30 and $category === 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
 `);</code></pre>
 
 
@@ -801,7 +801,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".animate"><span class="type-signature">(static) </span>animate<span class="signature">(duration)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    <h4 class="name" id=".animation"><span class="type-signature">(static) </span>animation<span class="signature">(input, duration, fade)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -809,8 +809,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Animate returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
-The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.</p>
+    <p>Create an animated temporal filter (animation).</p>
 </div>
 
 
@@ -846,13 +845,13 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
 
         <tr>
             
-                <td class="name"><code>duration</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type"><a href="global.html#Number">Number</a></span>
 
 
             
@@ -862,7 +861,57 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
 
             
 
-            <td class="description last"><p>Animation duration in milliseconds</p></td>
+            <td class="description last"><p>input to base the temporal filter,
+if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
+this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
+If <code>input</code> is NULL or NaN the filter won't be passed at any moment of the animation.</p>
+<p>It can be combined with linear and time expressions.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>duration</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>duration of the animation in seconds, optional, defaults to 10 seconds</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>fade</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Fade">Fade</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut</p></td>
         </tr>
 
     
@@ -941,6 +990,39 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     
 
 
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 2
+  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
+  filter: animation($day, 40, fade(0.1, 0.3))
+`);</code></pre>
+
+        <p class="code-caption">Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: 2
+  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
+  filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
+`);</code></pre>
+
+        <p class="code-caption">Using the `getProgressValue` method to get the animation current value</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+const animationStyle = {
+  color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
+  width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
+  filter: animationExpr
+};
+layer.on('updated', () => {
+  let currTime = Math.floor(animationExpr.getProgressValue());
+  document.getElementById('timestamp').innerHTML = currTime;
+});</code></pre>
 
 
 
@@ -3557,7 +3639,7 @@ const viz = new carto.Viz({
         <p class="code-caption">Compare two numbers to show only elements with price equal to 30. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: $price == 30  // Equivalent to eq($price, 30)
+  filter: $price === 30  // Equivalent to eq($price, 30)
 `);</code></pre>
 
 
@@ -3576,7 +3658,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Create a FadeIn/FadeOut configuration. See <code>torque</code> for more details.</p>
+    <p>Create a FadeIn/FadeOut configuration. See <code>animation</code> for more details.</p>
 </div>
 
 
@@ -3738,13 +3820,13 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.torque(s.prop('day'), 40, s.fade(0.1, 0.3))
+  filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
 });</code></pre>
 
         <p class="code-caption">Fade in of 0.1 seconds, fade out of 0.3 seconds. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: torque($day, 40, fade(0.1, 0.3))
+  filter: animation($day, 40, fade(0.1, 0.3))
 `);</code></pre>
 
 
@@ -6795,6 +6877,300 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".image"><span class="type-signature">(static) </span>image<span class="signature">(url)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Image. Load an image and use it as a symbol.</p>
+<p>Note: image RGB color will be overridden if the viz <code>color</code> property is set.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>url</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Image path</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Load a svg image.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.image('./marker.svg')
+});</code></pre>
+
+        <p class="code-caption">Load a svg image. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   symbol: image('./marker.svg')
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".imageList"><span class="type-signature">(static) </span>imageList<span class="signature">(imageList)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>ImageList. Load an array of images and use them as a symbols.</p>
+<p>Note: images RGB color will be overridden if the viz <code>color</code> property is set.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>imageList</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;Image></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Array of images</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Match different images to the different categories generated by buckets.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.ramp(s.buckets(s.prop('pop_max'), [10]), s.imageList([s.image('./marker.svg'), s.image('./marker2.svg')]))
+});</code></pre>
+
+        <p class="code-caption">Match different images to the different categories generated by buckets. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   symbol: ramp(buckets($pop_max, [10]), imageList([image('./marker.svg'), image('./marker2.svg')]))
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -8696,7 +9072,7 @@ const viz = new carto.Viz({
         <p class="code-caption">Compare two numbers to show only elements with price not equal to 30. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: $price != 30  // Equivalent to neq($price, 30)
+  filter: $price !== 30  // Equivalent to neq($price, 30)
 `);</code></pre>
 
 
@@ -9075,7 +9451,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Get the current timestamp. This is an advanced form of animation, <code>torque</code> is preferred.</p>
+    <p>Get the current timestamp. This is an advanced form of animation, <code>animation</code> expression is preferred.</p>
 </div>
 
 
@@ -9574,11 +9950,11 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Placement. Define a sprite offset relative to its size. Where:</p>
+    <p>Placement. Define an image offset relative to its size. Where:</p>
 <ul>
-<li><code>symbolPlacement: placement(1,1)</code> means to align the bottom left corner of the sprite with the point center.</li>
-<li><code>symbolPlacement: placement(0,0)</code> means to align the center of the sprite with the point center.</li>
-<li><p><code>symbolPlacement: placement(-1,-1)</code> means to align the top right corner of the sprite with the point center.</p>
+<li><code>symbolPlacement: placement(1,1)</code> means to align the bottom left corner of the image with the point center.</li>
+<li><code>symbolPlacement: placement(0,0)</code> means to align the center of the image with the point center.</li>
+<li><p><code>symbolPlacement: placement(-1,-1)</code> means to align the top right corner of the image with the point center.</p>
 <pre class="prettyprint source"><code>    |1
     |
     |</code></pre><p>-1 -------+------- 1</p>
@@ -9642,7 +10018,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>first numeric expression that indicates the sprite offset in the X direction.</p></td>
+            <td class="description last"><p>first numeric expression that indicates the image offset in the X direction.</p></td>
         </tr>
 
     
@@ -9665,7 +10041,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>second numeric expression that indicates the sprite offset in the Y direction.</p></td>
+            <td class="description last"><p>second numeric expression that indicates the image offset in the Y direction.</p></td>
         </tr>
 
     
@@ -9752,9 +10128,9 @@ const viz = new carto.Viz({
 
     <h5>Example</h5>
     
-        <p class="code-caption">Setting the aligment to the top corner of the sprite.</p>
+        <p class="code-caption">Setting the aligment to the top corner of the image.</p>
     
-    <pre class="prettyprint"><code>  symbol: sprite('./marker.svg')
+    <pre class="prettyprint"><code>  symbol: image('./marker.svg')
   symbolPlacement: placement(1, 0)</code></pre>
 
 
@@ -10122,7 +10498,7 @@ const viz = new carto.Viz({
 `);
 
 const viz = new carto.Viz(`
-  filter: $name != 'london'
+  filter: $name !== 'london'
 `);</code></pre>
 
 
@@ -11483,301 +11859,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".sprite"><span class="type-signature">(static) </span>sprite<span class="signature">(url)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Sprite. Load an image and use it as a symbol.</p>
-<p>Note: sprite RGB color will be overridden if the viz <code>color</code> property is set.</p>
-<p>Limitation: images have to be square.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>url</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">string</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Image path</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Load a svg image.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  symbol: s.sprite('./marker.svg')
-});</code></pre>
-
-        <p class="code-caption">Load a svg image. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-   symbol: sprite('./marker.svg')
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".sprites"><span class="type-signature">(static) </span>sprites<span class="signature">(sprites)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Sprites. Load an array of images and use them as a symbols.</p>
-<p>Note: sprites RGB color will be overridden if the viz <code>color</code> property is set.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>sprites</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Sprite></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Array of sprites</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Match different sprites to the different categories generated by buckets.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  symbol: s.ramp(s.buckets(s.prop('pop_max'), [10]), s.sprites([s.sprite('./marker.svg'), s.sprite('./marker2.svg')]))
-});</code></pre>
-
-        <p class="code-caption">Match different sprites to the different categories generated by buckets. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-   symbol: ramp(buckets($pop_max, [10]), sprites([sprite('./marker.svg'), sprite('./marker2.svg')]))
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".sqrt"><span class="type-signature">(static) </span>sqrt<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -12660,7 +12741,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".torque"><span class="type-signature">(static) </span>torque<span class="signature">(input, duration, fade)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    <h4 class="name" id=".transition"><span class="type-signature">(static) </span>transition<span class="signature">(duration)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -12668,7 +12749,8 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Create an animated temporal filter (torque).</p>
+    <p>Transition returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
+The animation is not cyclic. It will stick to one once the elapsed number of milliseconds reach the animation's duration.</p>
 </div>
 
 
@@ -12704,40 +12786,13 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>input to base the temporal filter,
-if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
-this can be problematic if outliers are present. Otherwise input must be a number expression in which 0 means beginning of the animation and 1 means end.
-If <code>input</code> is NULL or NaN the filter won't be passed at any moment of the animation.</p>
-<p>It can be combined with linear and time expressions.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
                 <td class="name"><code>duration</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Number">Number</a></span>
+<span class="param-type">number</span>
 
 
             
@@ -12747,30 +12802,7 @@ If <code>input</code> is NULL or NaN the filter won't be passed at any moment of
 
             
 
-            <td class="description last"><p>duration of the animation in seconds, optional, defaults to 10 seconds</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>fade</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Fade">Fade</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut</p></td>
+            <td class="description last"><p>Animation duration in milliseconds</p></td>
         </tr>
 
     
@@ -12849,39 +12881,6 @@ If <code>input</code> is NULL or NaN the filter won't be passed at any moment of
     
 
 
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: 2
-  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
-  filter: torque($day, 40, fade(0.1, 0.3))
-`);</code></pre>
-
-        <p class="code-caption">Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: 2
-  color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
-  filter: torque(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
-`);</code></pre>
-
-        <p class="code-caption">Using the `getSimTime` method to get the simulated time.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-let torqueExpr = s.torque(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
-const torqueStyle = {
-  color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
-  width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
-  filter: torqueExpr
-};
-layer.on('updated', () => {
-  let currTime = Math.floor(torqueExpr.getSimTime());
-  document.getElementById('timestamp').innerHTML = currTime;
-});</code></pre>
 
 
 
@@ -13584,6 +13583,191 @@ const viz = new carto.Viz({
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp(viewportEqIntervals($density, 5), PRISM)
 `);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".viewportFeatures"><span class="type-signature">(static) </span>viewportFeatures<span class="signature">(&hellip;properties)</span><span class="type-signature"> &rarr; {ViewportFeatures}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Generates a list of features in the viewport</p>
+<p>For each feature, the properties specified as arguments to this expression will be available.
+Filtered features will not be present in the list.
+This expression cannot be used for rendering, it can only be used in JavaScript code as in the example below.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Property</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>properties that will appear in the feature list</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>ViewportFeatures</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">ViewportFeatures</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Define and use a list of features. (String)</p>
+    
+    <pre class="prettyprint"><code>const source = carto.source.Dataset('data');
+const viz = new carto.Viz(`
+         @list: viewportFeatures($value, $category)
+`);
+const layer = carto.Layer('layer', source, viz);
+...
+
+layer.on('updated', () => {
+    viz.variables.list.value.forEach(feature => {
+        console.log('value:', feature.value, 'category:', feature.category);
+    });
+});</code></pre>
 
 
 
@@ -14642,13 +14826,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Torque.html">carto.expressions.Torque</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jun 22 2018 17:25:13 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jul 17 2018 16:12:35 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
