@@ -1,11 +1,10 @@
 .DS_Store
 .vscode/
 *_out.png
+*_out.png
 *.html
 *.log
-carto-vl.js
-carto-vl.js.map
-carto-vl.min.js
+*.log
 dist/
 docs/all
 docs/public
