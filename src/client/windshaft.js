@@ -172,11 +172,7 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        let templateURL = this._subdomains.map(s => urlTemplate.replace('{s}', s));
-        if (this._subdomains.length === 0) {
-            templateURL = urlTemplate.replace('{s}', this._getSubdomain(0, 0));
-        }
-        this._mvtClient = new MVT(templateURL);
+        this._mvtClient = new MVT(this._URLTemplates);
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
@@ -209,10 +205,6 @@ export default class Windshaft {
         this.filtering = filters;
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
-    }
-    _getSubdomain(x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
     async _instantiate(MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
@@ -339,7 +331,7 @@ export default class Windshaft {
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
         }
-        this._subdomains = layergroup.cdn_url ? layergroup.cdn_url.templates.https.subdomains : [];
+        this._URLTemplates = layergroup.metadata.tilejson.vector.tiles;
         return {
             url: getLayerUrl(layergroup, LAYER_INDEX, conf),
             metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
@@ -435,7 +427,7 @@ function getMapRequest(conf, mapConfig) {
         return new Request(url, {
             method: 'GET',
             headers: {
-                'Accept': 'application/json'
+                'Accept': 'application/json',
             }
         });
     }
