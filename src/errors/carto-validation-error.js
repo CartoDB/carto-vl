@@ -6,7 +6,7 @@ import { CartoError } from './carto-error';
  * @return {CartoError} A well formed object representing the error.
  */
 export default class CartoValidationError extends CartoError {
-    constructor(type, message) {
+    constructor (type, message) {
         super({
             origin: 'validation',
             type: type,

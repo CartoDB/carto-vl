@@ -28,7 +28,7 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  * @api
  */
 export default class Between extends BaseExpression {
-    constructor(value, lowerLimit, upperLimit) {
+    constructor (value, lowerLimit, upperLimit) {
         value = implicitCast(value);
         lowerLimit = implicitCast(lowerLimit);
         upperLimit = implicitCast(upperLimit);
@@ -40,13 +40,13 @@ export default class Between extends BaseExpression {
         super({ value, lowerLimit, upperLimit });
         this.type = 'number';
     }
-    eval(feature) {
+    eval (feature) {
         const value = this.value.eval(feature);
         const lower = this.lowerLimit.eval(feature);
         const upper = this.upperLimit.eval(feature);
         return (value >= lower && value <= upper) ? 1 : 0;
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
 
         checkType('between', 'value', 0, 'number', this.value);

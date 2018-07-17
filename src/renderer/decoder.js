@@ -17,27 +17,27 @@ import * as earcut from 'earcut';
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
 // The geom will be an array of coordinates in this case
-export function decodeGeom(geomType, geom) {
-    if (geomType == 'point') {
+export function decodeGeom (geomType, geom) {
+    if (geomType === 'point') {
         return decodePoint(geom);
     }
-    if (geomType == 'polygon') {
+    if (geomType === 'polygon') {
         return decodePolygon(geom);
     }
-    if (geomType == 'line') {
+    if (geomType === 'line') {
         return decodeLine(geom);
     }
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(vertices) {
+function decodePoint (vertices) {
     return {
         vertices: vertices,
         breakpoints: []
     };
 }
 
-function isClipped(polygon, i, j) {
+function isClipped (polygon, i, j) {
     if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {
         if (polygon.clippedType[polygon.clipped.indexOf(i)] &
             polygon.clippedType[polygon.clipped.indexOf(j)]) {
@@ -47,8 +47,8 @@ function isClipped(polygon, i, j) {
     return false;
 }
 
-function decodePolygon(geometry) {
-    let vertices = []; //Array of triangle vertices
+function decodePolygon (geometry) {
+    let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     geometry.forEach(feature => {
@@ -115,7 +115,7 @@ function decodePolygon(geometry) {
     };
 }
 
-function decodeLine(geom) {
+function decodeLine (geom) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
@@ -169,22 +169,22 @@ function decodeLine(geom) {
     };
 }
 
-function getLineNormal(a, b) {
+function getLineNormal (a, b) {
     const dx = b[0] - a[0];
     const dy = b[1] - a[1];
     return normalize([-dy, dx]);
 }
 
-function getJointNormal(a, b, c) {
+function getJointNormal (a, b, c) {
     const u = normalize([a[0] - b[0], a[1] - b[1]]);
     const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = - u[1] * v[0] + u[0] * v[1];
+    const sin = -u[1] * v[0] + u[0] * v[1];
     if (sin !== 0) {
         return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
     }
 }
 
-function normalize(v) {
+function normalize (v) {
     const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
     return [v[0] / s, v[1] / s];
 }

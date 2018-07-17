@@ -3,7 +3,6 @@
  */
 
 export default class Map {
-
     /**
      * Create a simple carto.Map by specifying a container `id`.
      *
@@ -13,7 +12,7 @@ export default class Map {
      * @constructor Map
      * @memberof carto
      */
-    constructor(options) {
+    constructor (options) {
         options = options || {};
 
         if (typeof options.container === 'string') {
@@ -36,7 +35,7 @@ export default class Map {
         this._resizeCanvas(this._containerDimensions());
     }
 
-    addLayer(layer, beforeLayerID) {
+    addLayer (layer, beforeLayerID) {
         layer.initialize();
 
         let index;
@@ -50,7 +49,7 @@ export default class Map {
         window.requestAnimationFrame(this.update.bind(this));
     }
 
-    update(timestamp) {
+    update (timestamp) {
         // Don't re-render more than once per animation frame
         if (this.lastFrame === timestamp) {
             return;
@@ -77,7 +76,7 @@ export default class Map {
         }
     }
 
-    _drawBackground(color) {
+    _drawBackground (color) {
         switch (color) {
             case 'black':
                 this._gl.clearColor(0, 0, 0, 1);
@@ -100,7 +99,7 @@ export default class Map {
         }
     }
 
-    _createCanvas() {
+    _createCanvas () {
         const canvas = window.document.createElement('canvas');
 
         canvas.className = 'canvas';
@@ -109,7 +108,7 @@ export default class Map {
         return canvas;
     }
 
-    _containerDimensions() {
+    _containerDimensions () {
         let width = 0;
         let height = 0;
 
@@ -121,7 +120,7 @@ export default class Map {
         return { width, height };
     }
 
-    _resizeCanvas(size) {
+    _resizeCanvas (size) {
         const pixelRatio = window.devicePixelRatio || 1;
 
         this._canvas.width = pixelRatio * size.width;

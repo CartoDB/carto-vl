@@ -3,7 +3,6 @@ import util from '../utils/util';
 import BaseWindshaft from './BaseWindshaft';
 
 export default class SQL extends BaseWindshaft {
-
     /**
      * A SQL defines the data that will be displayed in a layer.
      *
@@ -47,18 +46,18 @@ export default class SQL extends BaseWindshaft {
      * @memberof carto.source
      * @api
      */
-    constructor(query, auth, config) {
+    constructor (query, auth, config) {
         super();
         this._checkQuery(query);
         this._query = query;
         this.initialize(auth, config);
     }
 
-    _clone() {
+    _clone () {
         return new SQL(this._query, this._auth, this._config);
     }
 
-    _checkQuery(query) {
+    _checkQuery (query) {
         if (util.isUndefined(query)) {
             throw new CartoValidationError('source', 'queryRequired');
         }

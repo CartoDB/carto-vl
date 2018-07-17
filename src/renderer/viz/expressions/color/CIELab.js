@@ -26,7 +26,7 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from '../uti
  * @api
  */
 export default class CIELab extends BaseExpression {
-    constructor(l, a, b) {
+    constructor (l, a, b) {
         l = implicitCast(l);
         a = implicitCast(a);
         b = implicitCast(b);
@@ -42,7 +42,7 @@ export default class CIELab extends BaseExpression {
         this.type = 'color';
     }
     // TODO EVAL
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
 
         checkType('cielab', 'l', 0, 'number', this.l);

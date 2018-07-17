@@ -18,7 +18,4 @@ describe('src/renderer/viz/expressions/imageList', () => {
     describe('eval', () => {
         // TODO
     });
-
 });
-
-

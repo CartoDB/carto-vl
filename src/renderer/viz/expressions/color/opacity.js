@@ -31,7 +31,7 @@ export default class Opacity extends BaseExpression {
      * @param {*} color input color
      * @param {*} alpha new opacity
      */
-    constructor(color, alpha) {
+    constructor (color, alpha) {
         if (Number.isFinite(alpha)) {
             alpha = number(alpha);
         }
@@ -40,16 +40,16 @@ export default class Opacity extends BaseExpression {
         super({ color, alpha });
         this.type = 'color';
     }
-    get value() {
+    get value () {
         return this.eval();
     }
-    eval(f) {
+    eval (f) {
         const color = this.color.eval(f);
         const alpha = this.alpha.eval(f);
         color.a = alpha;
         return color;
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
         checkType('opacity', 'color', 0, 'color', this.color);
         checkType('opacity', 'alpha', 1, 'number', this.alpha);

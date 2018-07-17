@@ -9,7 +9,7 @@ const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
 const PORT = 5000;
 
-function loadFiles(directory) {
+function loadFiles (directory) {
     testsDir = directory;
     let files = [];
     let fFiles = [];
@@ -28,18 +28,18 @@ function loadFiles(directory) {
     return files;
 }
 
-function loadTemplate(file) {
+function loadTemplate (file) {
     return template(fs.readFileSync(file), 'utf8');
 }
 
-function getName(file) {
+function getName (file) {
     return file.substr(
         testsDir.length,
         file.length - testsDir.length - testFile.length - 1
     );
 }
 
-function takeReference(file, template) {
+function takeReference (file, template) {
     if (!fs.existsSync(getPNG(file))) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
@@ -51,7 +51,7 @@ function takeReference(file, template) {
     }
 }
 
-async function testSST(file, template, browser) {
+async function testSST (file, template, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
@@ -76,7 +76,7 @@ async function testSST(file, template, browser) {
                 console.error(err);
                 capturedErrors.push(err);
             }
-        },
+        }
     };
     options.waitForFn = () => window.loaded;
 
@@ -87,7 +87,7 @@ async function testSST(file, template, browser) {
     return result;
 }
 
-function writeTemplate(file, template) {
+function writeTemplate (file, template) {
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
@@ -97,7 +97,7 @@ function writeTemplate(file, template) {
     }));
 }
 
-function loadGeoJSONSources() {
+function loadGeoJSONSources () {
     const sourcesDir = path.resolve(__dirname, 'sources');
     const geojsonFiles = glob.sync(path.join(sourcesDir, '*.geojson'));
     let sources = {};
@@ -108,22 +108,22 @@ function loadGeoJSONSources() {
     return JSON.stringify(sources);
 }
 
-function getLocalhostURL(file) {
+function getLocalhostURL (file) {
     return file.substr(file.indexOf('test/') + 'test/'.length).replace('scenario.js', '');
 }
-function getHTML(file) {
+function getHTML (file) {
     return file.replace(testFile, 'scenario.html');
 }
 
-function getPNG(file) {
+function getPNG (file) {
     return file.replace(testFile, 'reference.png');
 }
 
-function getOutPNG(file) {
+function getOutPNG (file) {
     return file.replace(testFile, 'reference_out.png');
 }
 
-function loadOptions() {
+function loadOptions () {
     return {
         delay: 100,
         viewportWidth: 400,
@@ -132,7 +132,7 @@ function loadOptions() {
     };
 }
 
-function headless() {
+function headless () {
     return process.platform === 'linux';
 }
 
@@ -141,7 +141,7 @@ function headless() {
  * https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-consolemessage
  * @param {ConsoleMessage} consoleMessage
  */
-function handleBrowserConsole(consoleMessage) {
+function handleBrowserConsole (consoleMessage) {
     if (process.env.VERBOSE_LOG) {
         console.log(consoleMessage.text());
     } else {
@@ -158,5 +158,5 @@ module.exports = {
     takeReference,
     testSST,
     headless,
-    PORT,
+    PORT
 };

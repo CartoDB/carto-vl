@@ -1,8 +1,6 @@
-import GeoJSON from '../../../src/sources/Geojson';
+import GeoJSON from '../../../src/sources/GeoJSON';
 
-describe('sources/geojson', () => {
-
-
+describe('sources/GeoJSON', () => {
     const createVizMock = (columns = []) => {
         return {
             getMinimumNeededSchema: () => { return { columns }; }
@@ -43,7 +41,7 @@ describe('sources/geojson', () => {
             const expected = {
                 numeric: new Float32Array(2 + 1024),
                 category: new Float32Array(2 + 1024),
-                cartodb_id: new Float32Array(2 + 1024),
+                cartodb_id: new Float32Array(2 + 1024)
             };
             expected.numeric[0] = 1;
             expected.numeric[1] = 2;
@@ -74,7 +72,7 @@ describe('sources/geojson', () => {
                     type: 'Point',
                     coordinates: [0, 0]
                 },
-                properties: {},
+                properties: {}
             }]);
         });
 
@@ -121,20 +119,20 @@ describe('sources/geojson', () => {
                         sum: 3,
                         count: 2
                     },
-                    category:{
+                    category: {
                         type: 'category',
-                        categoryNames: ['red', 'blue'],
-                    },
+                        categoryNames: ['red', 'blue']
+                    }
                 },
                 featureCount: 2,
                 sample: [
                     {
                         numeric: 1,
-                        category: 'red',
+                        category: 'red'
                     },
                     {
                         numeric: 2,
-                        category: 'blue',
+                        category: 'blue'
                     }
                 ]
             };
@@ -212,7 +210,6 @@ describe('sources/geojson', () => {
                     expect(properties.cartodb_id[0]).toEqual(-0);
                     done();
                 });
-
             });
 
             it('should be auto generated and unique for every feature in a featureCollection', done => {
@@ -273,5 +270,4 @@ describe('sources/geojson', () => {
         source.requestData();
         expect(fakeDataLoaded).toHaveBeenCalled();
     });
-
 });

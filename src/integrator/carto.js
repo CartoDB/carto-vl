@@ -1,7 +1,7 @@
 import Renderer from '../renderer/Renderer';
 
 let integrator = null;
-export default function getCartoMapIntegrator(map) {
+export default function getCartoMapIntegrator (map) {
     if (!integrator) {
         integrator = new CartoMapIntegrator(map);
     }
@@ -9,20 +9,20 @@ export default function getCartoMapIntegrator(map) {
 }
 
 class CartoMapIntegrator {
-    constructor(map) {
+    constructor (map) {
         this.map = map;
         this.renderer = new Renderer();
         this.renderer._initGL(this.map._gl);
         this.invalidateWebGLState = () => { };
     }
 
-    addLayer(layerId, layer) {
+    addLayer (layerId, layer) {
         this.map.addLayer(layerId, layer);
     }
-    needRefresh() {
+    needRefresh () {
     }
 
-    getZoomLevel(){
+    getZoomLevel () {
         return 0;
     }
 }

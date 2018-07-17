@@ -64,7 +64,6 @@
  * @api
  */
 
-
 /**
  * Type of Numeric Expressions.
  *
@@ -124,8 +123,6 @@
  */
 
 import { showDeprecationWarning } from './utils/warning';
-
-import * as svgs from './builtinSVGs';
 
 import Transition from './expressions/transition';
 
@@ -232,10 +229,12 @@ import ViewportFeatures from './expressions/viewportFeatures';
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import Image from './expressions/Image';
-import SVG from './expressions/SVG';
-import ImageList from './expressions/ImageList';
+
 import Placement from './expressions/placement';
+import Image from './expressions/Image';
+import ImageList from './expressions/ImageList';
+import SVG from './expressions/SVG';
+import svgs from './defaultSVGs';
 
 /* Expose classes as constructor functions */
 
@@ -402,7 +401,6 @@ export const STAR = new SVG(svgs.star);
 export const STAR_OUTLINE = new SVG(svgs.starOutline);
 export const TRIANGLE = new SVG(svgs.triangle);
 export const TRIANGLE_OUTLINE = new SVG(svgs.triangleOutline);
-
 
 export const ALIGN_CENTER = new Placement(constant(0), constant(0));
 export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));

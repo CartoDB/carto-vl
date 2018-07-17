@@ -5,7 +5,7 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         files: ['index.test.js'],
         reporters: ['mocha'],
-        port: 9876,  // karma web server port
+        port: 9876, // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
         browsers: ['ChromeHeadlessNoSandbox'],
@@ -13,7 +13,7 @@ module.exports = function (config) {
         singleRun: false,
         concurrency: Infinity,
         preprocessors: {
-            'index.test.js': ['webpack', 'sourcemap'],
+            'index.test.js': ['webpack', 'sourcemap']
         },
         webpack: webpackConfig,
         customLaunchers: {
@@ -22,6 +22,6 @@ module.exports = function (config) {
                 base: 'ChromeHeadless',
                 flags: ['--no-sandbox']
             }
-        },
+        }
     });
 };

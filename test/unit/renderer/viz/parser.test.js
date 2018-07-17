@@ -3,7 +3,6 @@
 import { parseVizDefinition, cleanComments } from '../../../../src/renderer/viz/parser';
 
 describe('src/renderer/viz/parser', () => {
-
     // TODO: missing lots of tests here
 
     describe('.cleanComments', () => {

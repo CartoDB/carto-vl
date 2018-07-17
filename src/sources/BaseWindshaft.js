@@ -6,13 +6,12 @@ import { getDefaultConfig, checkConfig } from '../setup/config-service';
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
 
 export default class BaseWindshaft extends Base {
-
-    constructor() {
+    constructor () {
         super();
         this._client = new Windshaft(this);
     }
 
-    initialize(auth, config) {
+    initialize (auth, config) {
         this._auth = auth || getDefaultAuth();
         this._config = config || getDefaultConfig();
         checkAuth(this._auth);
@@ -22,27 +21,27 @@ export default class BaseWindshaft extends Base {
         this._serverURL = this._generateURL(this._auth, this._config);
     }
 
-    bindLayer(...args) {
+    bindLayer (...args) {
         this._client.bindLayer(...args);
     }
 
-    requiresNewMetadata(viz){
+    requiresNewMetadata (viz) {
         return this._client.requiresNewMetadata(viz);
     }
 
-    requestMetadata(viz) {
+    requestMetadata (viz) {
         return this._client.getMetadata(viz);
     }
 
-    requestData(zoom, viewport) {
+    requestData (zoom, viewport) {
         return this._client.getData(zoom, viewport);
     }
 
-    free() {
+    free () {
         this._client.free();
     }
 
-    _generateURL(auth, config) {
+    _generateURL (auth, config) {
         let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
         url = url.replace(/{user}/, auth.username);
         return url;

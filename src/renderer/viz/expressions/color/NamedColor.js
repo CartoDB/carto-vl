@@ -25,7 +25,7 @@ import { CSS_COLOR_NAMES } from './cssColorNames';
  * @api
  */
 export default class NamedColor extends BaseExpression {
-    constructor(colorName) {
+    constructor (colorName) {
         checkString('namedColor', 'colorName', 0, colorName);
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
             throw new Error(getStringErrorPreface('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
@@ -35,18 +35,18 @@ export default class NamedColor extends BaseExpression {
         this.name = colorName;
         this.color = this._nameToRGBA();
     }
-    get value() {
+    get value () {
         return this.eval();
     }
-    eval() {
+    eval () {
         return this.color;
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
 
-    _nameToRGBA() {
+    _nameToRGBA () {
         const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
         const fakeDiv = document.createElement('div');
         fakeDiv.style.backgroundColor = this.name;

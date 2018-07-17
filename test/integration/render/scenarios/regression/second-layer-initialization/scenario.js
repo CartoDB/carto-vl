@@ -18,15 +18,15 @@ let layersLoaded = 0;
 
 layer1.on('loaded', () => {
     layersLoaded++;
-    if (layersLoaded == 2){
-        window.loaded=true;
+    if (layersLoaded === 2) {
+        window.loaded = true;
     }
     layer2.addTo(map);
 });
 
 layer2.on('loaded', () => {
     layersLoaded++;
-    if (layersLoaded == 2){
-        window.loaded=true;
+    if (layersLoaded === 2) {
+        window.loaded = true;
     }
 });

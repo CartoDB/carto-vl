@@ -5,7 +5,7 @@ const feature1 = {
     type: 'Feature',
     geometry: {
         type: 'Point',
-        coordinates: [0, 0],
+        coordinates: [0, 0]
     },
     properties: {
         id: 1,
@@ -18,7 +18,7 @@ const feature2 = {
     type: 'Feature',
     geometry: {
         type: 'Point',
-        coordinates: [10,12],
+        coordinates: [10, 12]
     },
     properties: {
         id: 2,
@@ -32,13 +32,15 @@ const features = {
     features: [ feature1, feature2 ]
 };
 
-function checkFeatures(list, expectedList) {
+function checkFeatures (list, expectedList) {
     // FIXME: this shouldn't require list to have the same order as expected
     expect(list.length).toEqual(expectedList.length);
-    for (let i=0; i<list.length; ++i) {
+    for (let i = 0; i < list.length; ++i) {
         const actual = {};
         const expected = expectedList[i];
-        Object.keys(expected).forEach(prop => actual[prop] = list[i][prop]);
+        Object.keys(expected).forEach(prop => {
+            actual[prop] = list[i][prop];
+        });
         expect(actual).toEqual(expected);
     }
 }
@@ -68,22 +70,22 @@ describe('viewportFeatures', () => {
         layer2.addTo(map);
     });
 
-    it ('should get the features properties of one layer', done => {
+    it('should get the features properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'},
-                { value: 1000, category: 'b'}
+                { value: 10, category: 'a' },
+                { value: 1000, category: 'b' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
 
-    it ('should get the features properties of another layer', done => {
+    it('should get the features properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a'},
-                { id: 2, value: 1000, category: 'b'}
+                { id: 1, value: 10, category: 'a' },
+                { id: 2, value: 1000, category: 'b' }
             ];
             const expectedValue = [
                 { value: 10 },
@@ -126,20 +128,20 @@ describe('viewportFeatures on a map with filters', () => {
         layer2.addTo(map);
     });
 
-    it ('should get the filtered feature properties of one layer', done => {
+    it('should get the filtered feature properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'}
+                { value: 10, category: 'a' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
 
-    it ('should get the filtered feature properties of another layer', done => {
+    it('should get the filtered feature properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 2, value: 1000, category: 'b'}
+                { id: 2, value: 1000, category: 'b' }
             ];
             const expectedValue = [
                 { value: 1000 }
@@ -154,7 +156,6 @@ describe('viewportFeatures on a map with filters', () => {
         document.body.removeChild(setup.div);
     });
 });
-
 
 describe('viewportFeatures on a zoomed-in map', () => {
     let map, source1, viz1, layer1, source2, viz2, layer2, setup;
@@ -181,20 +182,20 @@ describe('viewportFeatures on a zoomed-in map', () => {
         layer2.addTo(map);
     });
 
-    it ('should get only in-viewport feature properties of one layer', done => {
+    it('should get only in-viewport feature properties of one layer', done => {
         layer1.on('updated', () => {
             const expected = [
-                { value: 10, category: 'a'}
+                { value: 10, category: 'a' }
             ];
             checkFeatures(viz1.variables.list.eval(), expected);
             done();
         });
     });
 
-    it ('should get only in-viewport features properties of another layer', done => {
+    it('should get only in-viewport features properties of another layer', done => {
         layer2.on('updated', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a'}
+                { id: 1, value: 10, category: 'a' }
             ];
             const expectedValue = [
                 { value: 10 }
@@ -224,10 +225,9 @@ describe('viewportFeatures with invalid parameters', () => {
         layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map);
-
     });
 
-    it ('should fail with proper error', done => {
+    it('should fail with proper error', done => {
         expect(
             () => {
                 // FIXME: this isn't nice (calling the private method _resetViewportAgg to force the check here)

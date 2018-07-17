@@ -24,13 +24,13 @@ import BaseExpression from './base';
  * @function
  * @api
  */
-export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (value, list) => list.some(item => item == value) ? 1 : 0);
+export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (value, list) => list.some(item => item === value) ? 1 : 0);
 
-function IN_INLINE_MAKER(list) {
-    if (list.length == 0) {
+function IN_INLINE_MAKER (list) {
+    if (list.length === 0) {
         return () => '0.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    return inline => `(${list.map((cat, index) => `(${inline.value} === ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
 }
 
 /**
@@ -56,18 +56,18 @@ function IN_INLINE_MAKER(list) {
  * @function
  * @api
  */
-export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (value, list) => list.some(item => item == value) ? 0 : 1);
+export const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (value, list) => list.some(item => item === value) ? 0 : 1);
 
-function NIN_INLINE_MAKER(list) {
-    if (list.length == 0) {
+function NIN_INLINE_MAKER (list) {
+    if (list.length === 0) {
         return () => '1.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `(${list.map((cat, index) => `(${inline.value} !== ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
-function generateBelongsExpression(name, inlineMaker, jsEval) {
+function generateBelongsExpression (name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
-        constructor(value, list) {
+        constructor (value, list) {
             value = implicitCast(value);
             list = implicitCast(list);
 
@@ -78,16 +78,18 @@ function generateBelongsExpression(name, inlineMaker, jsEval) {
             checkLooseType(name, 'list', 1, 'category-array', list);
 
             let children = { value };
-            list.elems.map((arg, index) => children[`arg${index}`] = arg);
+            list.elems.map((arg, index) => {
+                children[`arg${index}`] = arg;
+            });
             super(children);
             this.list = list;
             this.inlineMaker = inlineMaker(this.list.elems);
             this.type = 'number';
         }
-        eval(feature) {
+        eval (feature) {
             return jsEval(this.value.eval(feature), this.list.eval(feature));
         }
-        _compile(meta) {
+        _compile (meta) {
             super._compile(meta);
             checkType(name, 'value', 0, 'category', this.value);
             checkType(name, 'list', 1, 'category-array', this.list);

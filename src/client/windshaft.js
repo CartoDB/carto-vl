@@ -1,15 +1,13 @@
 import { version } from '../../package';
-import MVT from '../sources/Mvt';
+import MVT from '../sources/MVT';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 
-
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -18,7 +16,6 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 // Cache dataframe
 
 export default class Windshaft {
-
     constructor(source) {
         this._source = source;
         this._exclusive = true;
@@ -26,7 +23,6 @@ export default class Windshaft {
         this._MNS = null;
         this._promiseMNS = null;
         this.inProgressInstantiations = {};
-
     }
 
     bindLayer(addDataframe, dataLoadedCallback) {
@@ -111,11 +107,11 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate(MNS, resolution, filtering) {
-        return !schema.equals(this._MNS, MNS)
-            || resolution != this.resolution
-            || (
-                JSON.stringify(filtering) != JSON.stringify(this.filtering)
-                && this.metadata.featureCount > MIN_FILTERING
+        return !schema.equals(this._MNS, MNS) ||
+            resolution !== this.resolution ||
+            (
+                JSON.stringify(filtering) !== JSON.stringify(this.filtering) &&
+                this.metadata.featureCount > MIN_FILTERING
             );
     }
 
@@ -158,7 +154,7 @@ export default class Windshaft {
         }
         if (backendFilters) {
             const filteredSQL = this._buildQuery(select, backendFilters);
-            backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
+            backendFiltersApplied = backendFiltersApplied || filteredSQL !== aggSQL;
             aggSQL = filteredSQL;
         }
 
@@ -182,14 +178,14 @@ export default class Windshaft {
             }
             switch (column.type) {
                 case 'date':
-                {
-                    const d = new Date();
-                    d.setTime(1000 * propertyValue);
-                    const min = column.min;
-                    const max = column.max;
-                    const n = (d - min) / (max.getTime() - min.getTime());
-                    return n;
-                }
+                    {
+                        const d = new Date();
+                        d.setTime(1000 * propertyValue);
+                        const min = column.min;
+                        const max = column.max;
+                        const n = (d - min) / (max.getTime() - min.getTime());
+                        return n;
+                    }
                 case 'category':
                     return this.metadata.categorizeString(propertyValue);
                 case 'number':
@@ -250,7 +246,7 @@ export default class Windshaft {
             dimensions: {},
             placement: 'centroid',
             resolution: resolution,
-            threshold: 1,
+            threshold: 1
         };
 
         MNS.columns
@@ -273,7 +269,7 @@ export default class Windshaft {
     _buildSelectClause(MNS) {
         const columns = MNS.columns.map(name => schema.column.getBase(name))
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
-        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
+        return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
     _buildQuery(select, filters) {
@@ -339,7 +335,7 @@ export default class Windshaft {
     }
 
     _adaptMetadata(meta, agg) {
-        const { stats, aggregation, dates_as_numbers } = meta;
+        const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
 
@@ -363,7 +359,7 @@ export default class Windshaft {
                     category.name = category.category;
                     delete category.category;
                 });
-            } else if (dates_as_numbers && dates_as_numbers.includes(propertyName)) {
+            } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
                     if (property[fn]) {
@@ -408,10 +404,9 @@ async function repeatablePromise(initialAssumptions, assumptionsFromResult, prom
     let promise = promiseGenerator(initialAssumptions);
     let result = await promise;
     let finalAssumptions = assumptionsFromResult(result);
-    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+    if (JSON.stringify(initialAssumptions) === JSON.stringify(finalAssumptions)) {
         return promise;
-    }
-    else {
+    } else {
         return promiseGenerator(finalAssumptions);
     }
 }

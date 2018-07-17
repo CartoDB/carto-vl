@@ -34,8 +34,6 @@ describe('src/renderer/viz/expressions/Animation', () => {
         });
     });
 
-
-
     describe('.pause', () => {
         it('should pause the simulation when playing', () => {
             const t = s.animation(1, 10, s.fade(1));
@@ -116,7 +114,6 @@ describe('src/renderer/viz/expressions/Animation', () => {
             expect(t.getProgressPct()).toEqual(0.8);
         });
     });
-
 
     describe('.stop and .play', () => {
         it('should reset the simulation time', () => {

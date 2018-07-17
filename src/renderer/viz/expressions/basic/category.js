@@ -13,42 +13,42 @@ import { checkString } from '../utils';
  * @IGNOREapi
  */
 export default class BaseCategory extends BaseExpression {
-    constructor(categoryName) {
+    constructor (categoryName) {
         checkString('category', 'categoryName', 0, categoryName);
         super({});
         this.expr = categoryName;
         this.type = 'category';
     }
-    
-    get value() {
+
+    get value () {
         // Return the plain string
         return this.expr;
     }
-    
-    eval() {        
+
+    eval () {
         return this.expr;
     }
-    
-    isAnimated() {
+
+    isAnimated () {
         return false;
     }
-    
-    _compile(metadata) {
+
+    _compile (metadata) {
         this._metadata = metadata;
     }
-    
-    _applyToShaderSource() {
+
+    _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform float cat${this._uid};\n`),
             inline: `cat${this._uid}`
         };
     }
-    
-    _postShaderCompile(program, gl) {
+
+    _postShaderCompile (program, gl) {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `cat${this._uid}`);
     }
-    
-    _preDraw(program, drawMetadata, gl) {
+
+    _preDraw (program, drawMetadata, gl) {
         const id = this._metadata.categoryToID.get(this.expr);
         gl.uniform1f(this._getBinding(program).uniformLocation, id);
     }
