@@ -31,7 +31,7 @@ describe('src/renderer/Dataframe', () => {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
                 filter: { eval: () => 1.0 },
-                symbol: { default: true }
+                symbol: { _default: true }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
