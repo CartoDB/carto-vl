@@ -131,7 +131,7 @@ Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 ## Release
 
-First create a release `patch/minor`. This command bumps the version, creates a tag and uploads all to GitHub.
+First create a release. This command bumps the version, creates a tag and uploads all to GitHub.
 
 ```
 yarn version
@@ -143,4 +143,4 @@ Then, use this command to publish to our `CDN` and `npm`.
 yarn publish
 ```
 
-NOTE: `yarn publish` calls `yarn version` at the beginning of the process.
+NOTE: `yarn publish` calls `yarn version` at the beginning of the process. If you don't want to bump the version just press `Enter` to skip the prompt and use the current version instead.
