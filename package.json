@@ -71,9 +71,8 @@
     "webpack-glsl-loader": "^1.0.1",
     "webpack": "^4.0.0"
   },
-  "main": "src/index.js",
-  "module": "src/index.js",
-  "jsnext:main": "src/index.js",
+  "module": "dist/carto-vl.js",
+  "main": "dist/carto-vl.js",
   "scripts": {
     "build": "yarn build:dev && yarn build:min",
     "build:dev": "webpack --config webpack/webpack.config.js",
@@ -99,10 +98,9 @@
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
     "serve": "yarn build:dev && yarn docs && http-server",
-    "bump:minor": "npm version minor",
-    "bump:patch": "npm version patch",
-    "release": "./scripts/release.sh",
+    "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",
+    "prepublishOnly": "./scripts/release.sh",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
     "loc": "sloc src/ examples/"
   }
