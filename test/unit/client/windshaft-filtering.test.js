@@ -1,24 +1,23 @@
 import * as f from '../../../src/client/windshaft-filtering';
-import Viz from '../../../src/api/viz';
-import * as s from '../../../src/core/viz/functions';
+import { Viz, expressions as s } from '../../../src/index';
 
-function preFilters(f, vizFilter) {
+function preFilters (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz).preaggregation;
 }
 
-function aggrFilters(f, vizFilter) {
+function aggrFilters (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz, { exclusive: false }).aggregation;
 }
 
-function aggrFiltersExclusive(f, vizFilter) {
+function aggrFiltersExclusive (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz, { exclusive: true }).aggregation;
 }
 
-function preSQL(f, preFilters) {
-    return f.getSQLWhere({preaggregation: preFilters});
+function preSQL (f, preFilters) {
+    return f.getSQLWhere({ preaggregation: preFilters });
 }
 
 describe('src/client/windshaft-filtering', () => {
@@ -75,7 +74,8 @@ describe('src/client/windshaft-filtering', () => {
 
             it('should AND sub-filter with non-unary filters', () => {
                 expect(preSQL(f,
-                    {   type: 'and',
+                    {
+                        type: 'and',
                         left: {
                             type: 'in',
                             property: 'categoricalProperty',
@@ -93,7 +93,8 @@ describe('src/client/windshaft-filtering', () => {
 
             it('should OR sub-filter with non-unary filters', () => {
                 expect(preSQL(f,
-                    {   type: 'or',
+                    {
+                        type: 'or',
                         left: {
                             type: 'in',
                             property: 'categoricalProperty',
@@ -343,7 +344,7 @@ describe('src/client/windshaft-filtering', () => {
                     const actual = preFilters(f,
                         s.and(
                             s.lt(s.property('numericProperty'), s.now()),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -382,9 +383,9 @@ describe('src/client/windshaft-filtering', () => {
                         s.and(
                             s.or(
                                 s.lt(s.property('numericProperty'), s.now()),
-                                s.between(s.property('numericProperty'), 100, 200),
+                                s.between(s.property('numericProperty'), 100, 200)
                             ),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -404,7 +405,7 @@ describe('src/client/windshaft-filtering', () => {
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);
@@ -464,7 +465,7 @@ describe('src/client/windshaft-filtering', () => {
                     right: {
                         type: 'notIn',
                         property: 'categoricalProperty',
-                        values: [ 'red', 'blue' ]
+                        values: ['red', 'blue']
                     }
                 };
                 const actual = preFilters(f,
@@ -481,7 +482,6 @@ describe('src/client/windshaft-filtering', () => {
                     s.lt(s.clusterSum(s.property('property')), 10)
                 )).toBeNull();
             });
-
         });
     });
 
@@ -490,8 +490,8 @@ describe('src/client/windshaft-filtering', () => {
             it('between($numericProperty, 10, 20)', () => {
                 const expected = {
                     numericProperty: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }]
                 };
                 const actual = aggrFilters(f,
@@ -503,8 +503,8 @@ describe('src/client/windshaft-filtering', () => {
             it('between(clusterAvg($numericProperty), 10, 20)', () => {
                 const expected = {
                     _cdb_agg_avg_numericProperty: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }]
                 };
                 const actual = aggrFilters(f,
@@ -516,8 +516,8 @@ describe('src/client/windshaft-filtering', () => {
             it('`between($numericProperty, 10,20) with constantFloats`', () => {
                 const expected = {
                     numericProperty: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }]
                 };
                 const actual = aggrFilters(f,
@@ -603,8 +603,8 @@ describe('src/client/windshaft-filtering', () => {
             it('between($prop1,10,20) and ($prop2=100 or 200=$prop2)', () => {
                 const expected = {
                     prop1: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }],
                     prop2: [{ equal: 100 }, { equal: 200 }]
                 };
@@ -623,11 +623,11 @@ describe('src/client/windshaft-filtering', () => {
             it('`between($prop1, 10,20) and ($prop2 < 100 and in($prop3, [\'red\', \'blue\']))`', () => {
                 const expected = {
                     prop1: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }],
                     prop2: [{ less_than: 100 }],
-                    prop3: [{ in: ['red', 'blue']}]
+                    prop3: [{ in: ['red', 'blue'] }]
                 };
                 const actual = aggrFilters(f,
                     s.and(
@@ -647,7 +647,7 @@ describe('src/client/windshaft-filtering', () => {
                         greater_than: 10,
                         less_than_or_equal_to: 100
                     }],
-                    prop2: [{ in: ['red', 'blue']}]
+                    prop2: [{ in: ['red', 'blue'] }]
                 };
                 const actual = aggrFilters(f,
                     s.and(
@@ -660,7 +660,6 @@ describe('src/client/windshaft-filtering', () => {
                 );
                 expect(actual).toEqual(expected);
             });
-
         });
 
         describe('when the filter is partial', () => {
@@ -668,8 +667,8 @@ describe('src/client/windshaft-filtering', () => {
                 it('`between($numericProperty, 10,20) and $numericProperty<now()`', () => {
                     const expected = {
                         numericProperty: [{
-                            greater_than_or_equal_to:  10,
-                            less_than_or_equal_to:  20
+                            greater_than_or_equal_to: 10,
+                            less_than_or_equal_to: 20
                         }]
                     };
                     const actual = aggrFilters(f,
@@ -684,14 +683,14 @@ describe('src/client/windshaft-filtering', () => {
                 it('`$numericProperty<now() and between($numericProperty, 10,20)`', () => {
                     const expected = {
                         numericProperty: [{
-                            greater_than_or_equal_to:  10,
-                            less_than_or_equal_to:  20
+                            greater_than_or_equal_to: 10,
+                            less_than_or_equal_to: 20
                         }]
                     };
                     const actual = aggrFilters(f,
                         s.and(
                             s.lt(s.property('numericProperty'), s.now()),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -722,17 +721,17 @@ describe('src/client/windshaft-filtering', () => {
                 it('`($numericProperty<now() or between($numericProperty, 100,200)) and between($numericProperty, 10,20)`', () => {
                     const expected = {
                         numericProperty: [{
-                            greater_than_or_equal_to:  10,
-                            less_than_or_equal_to:  20
+                            greater_than_or_equal_to: 10,
+                            less_than_or_equal_to: 20
                         }]
                     };
                     const actual = aggrFilters(f,
                         s.and(
                             s.or(
                                 s.lt(s.property('numericProperty'), s.now()),
-                                s.between(s.property('numericProperty'), 100, 200),
+                                s.between(s.property('numericProperty'), 100, 200)
                             ),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -741,8 +740,8 @@ describe('src/client/windshaft-filtering', () => {
                 it('`between($numericProperty, 10,20) and ($numericProperty < 100 or in($categoricalProperty, [\'red\', \'blue\']))`', () => {
                     const expected = {
                         numericProperty: [{
-                            greater_than_or_equal_to:  10,
-                            less_than_or_equal_to:  20
+                            greater_than_or_equal_to: 10,
+                            less_than_or_equal_to: 20
                         }]
                     };
                     const actual = aggrFilters(f,
@@ -756,7 +755,6 @@ describe('src/client/windshaft-filtering', () => {
                     );
                     expect(actual).toEqual(expected);
                 });
-
             });
         });
 
@@ -764,15 +762,15 @@ describe('src/client/windshaft-filtering', () => {
             it('should skip the animation, applying the final filter, when the mix is an Animation', () => {
                 const expected = {
                     numericProperty: [{
-                        greater_than_or_equal_to:  10,
-                        less_than_or_equal_to:  20
+                        greater_than_or_equal_to: 10,
+                        less_than_or_equal_to: 20
                     }]
                 };
                 const actual = aggrFilters(f,
                     s.blend(
                         s.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.animate(100)
+                        s.transition(100)
                     )
                 );
                 expect(actual).toEqual(expected);

@@ -9,3 +9,6 @@ const layer = new carto.Layer('layer', source, viz);
 
 viz.variables.num.blendTo(1, 0);
 layer.addTo(map);
+layer.on('loaded', () => {
+    window.loaded = true;
+});

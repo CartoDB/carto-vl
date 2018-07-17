@@ -1,9 +1,9 @@
 import mapboxgl from '@carto/mapbox-gl';
-import { projectToWebMercator, WM_2R } from '../../src/api/util';
+import { projectToWebMercator, WM_2R } from '../../src/utils/util';
 
 const mapSize = 600;
 
-export function createMap(name) {
+export function createMap (name) {
     const div = document.createElement('div');
     div.id = name;
     div.style.width = `${mapSize}px`;
@@ -23,7 +23,7 @@ export function createMap(name) {
     return { div, map };
 }
 
-export function simulateClick(coordinates) {
+export function simulateClick (coordinates) {
     const el = document.querySelector('.mapboxgl-canvas-container');
     const position = project(coordinates);
     const params = { clientX: position.x, clientY: position.y };
@@ -39,7 +39,7 @@ export function simulateClick(coordinates) {
     }
 }
 
-export function simulateMove(coordinates) {
+export function simulateMove (coordinates) {
     const el = document.querySelector('.mapboxgl-canvas-container');
     const position = project(coordinates);
     const params = { clientX: position.x, clientY: position.y };
@@ -51,10 +51,10 @@ export function simulateMove(coordinates) {
     }
 }
 
-function project(coordinates) {
+function project (coordinates) {
     const wm = projectToWebMercator(coordinates);
     return {
         x: mapSize * (0.5 + wm.x / WM_2R),
-        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /*offset*/ )
+        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /* offset */)
     };
 }

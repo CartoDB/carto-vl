@@ -40,7 +40,7 @@
  * of an RSys (usually NWMC).
  */
 
-/*eslint no-unused-vars: ["off"] */
+/* eslint no-unused-vars: ["off"] */
 
 /**
  * R coordinates to World
@@ -49,7 +49,7 @@
  * @param {number} y - y coordinate in r
  * @return {RPoint} World coordinates
  */
-function rToW(r, x, y) {
+function rToW (r, x, y) {
     return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };
 }
 
@@ -60,7 +60,7 @@ function rToW(r, x, y) {
  * @param {RSys} r - target ref. system
  * @return {RPoint} R coordinates
  */
-function wToR(x, y, r) {
+export function wToR (x, y, r) {
     return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };
 }
 
@@ -71,18 +71,9 @@ function wToR(x, y, r) {
  * @param {number} z - Tile zoom level
  * @return {RSys}
  */
-function tileRsys(x, y, z) {
+function tileRsys (x, y, z) {
     let max = Math.pow(2, z);
     return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };
-}
-
-/**
- * Minimum zoom level for which tiles are no larger than the RSys rectangle
- * @param {RSys} rsys
- * @return {number}
- */
-function rZoom(zoom) {
-    return Math.ceil(Math.log2(1. / zoom));
 }
 
 /**
@@ -91,8 +82,8 @@ function rZoom(zoom) {
  * @param {RSys} rsys
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function rTiles(bounds) {
-    return wRectangleTiles(rZoom((bounds[3] - bounds[1]) / 2.), bounds);
+export function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
+    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);
 }
 
 /**
@@ -101,19 +92,19 @@ function rTiles(bounds) {
  * @param {Array} - rectangle extents [minx, miny, maxx, maxy]
  * @return {Array} - array of TC tiles {x, y, z}
  */
-function wRectangleTiles(z, wr) {
-    const [w_minx, w_miny, w_maxx, w_maxy] = wr;
+function wRectangleTiles (z, wr) {
+    const [wMinx, wMiny, wMaxx, wMaxy] = wr;
     const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)
 
     const clamp = x => Math.min(Math.max(x, 0), n - 1);
     // compute tile coordinate ranges
-    const t_minx = clamp(Math.floor(n * (w_minx + 1) * 0.5));
-    const t_maxx = clamp(Math.ceil(n * (w_maxx + 1) * 0.5) - 1);
-    const t_miny = clamp(Math.floor(n * (1 - w_maxy) * 0.5));
-    const t_maxy = clamp(Math.ceil(n * (1 - w_miny) * 0.5) - 1);
+    const tMinx = clamp(Math.floor(n * (wMinx + 1) * 0.5));
+    const tMaxx = clamp(Math.ceil(n * (wMaxx + 1) * 0.5) - 1);
+    const tMiny = clamp(Math.floor(n * (1 - wMaxy) * 0.5));
+    const tMaxy = clamp(Math.ceil(n * (1 - wMiny) * 0.5) - 1);
     let tiles = [];
-    for (let x = t_minx; x <= t_maxx; ++x) {
-        for (let y = t_miny; y <= t_maxy; ++y) {
+    for (let x = tMinx; x <= tMaxx; ++x) {
+        for (let y = tMiny; y <= tMaxy; ++y) {
             tiles.push({ x: x, y: y, z: z });
         }
     }
@@ -127,14 +118,14 @@ function wRectangleTiles(z, wr) {
  * @param {*} z
  * @returns {RSys}
  */
-function getRsysFromTile(x, y, z) {
+export function getRsysFromTile (x, y, z) {
     return {
         center: {
-            x: ((x + 0.5) / Math.pow(2, z)) * 2. - 1,
-            y: (1. - (y + 0.5) / Math.pow(2, z)) * 2. - 1.
+            x: ((x + 0.5) / Math.pow(2, z)) * 2.0 - 1,
+            y: (1.0 - (y + 0.5) / Math.pow(2, z)) * 2.0 - 1.0
         },
         scale: 1 / Math.pow(2, z)
     };
 }
 
-export { rTiles, getRsysFromTile, wToR };
+export default { rTiles, getRsysFromTile, wToR };

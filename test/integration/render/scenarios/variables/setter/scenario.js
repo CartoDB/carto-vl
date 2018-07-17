@@ -15,3 +15,6 @@ layer.addTo(map);
 
 viz.variables.oneHundred = 100;
 
+layer.on('loaded', () => {
+    window.loaded = true;
+});

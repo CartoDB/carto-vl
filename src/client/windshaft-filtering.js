@@ -1,17 +1,16 @@
-import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../core/viz/expressions/binary';
-import { In, Nin } from '../core/viz/expressions/belongs';
-import Between from '../core/viz/expressions/between';
-import Property from '../core/viz/expressions/basic/property';
-import Blend from '../core/viz/expressions/blend';
-import Animate from '../core/viz/expressions/animate';
-import NumberExpression from '../core/viz/expressions/basic/number';
-import ConstantExpression from '../core/viz/expressions/basic/constant';
-import CategoryExpression from '../core/viz/expressions/basic/category';
-import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../core/viz/expressions/aggregation/clusterAggregation';
-import * as schema from '../core/schema';
+import { And, Or, Equals, NotEquals, LessThan, LessThanOrEqualTo, GreaterThan, GreaterThanOrEqualTo } from '../renderer/viz/expressions/binary';
+import { In, Nin } from '../renderer/viz/expressions/belongs';
+import Between from '../renderer/viz/expressions/between';
+import Property from '../renderer/viz/expressions/basic/property';
+import Blend from '../renderer/viz/expressions/blend';
+import Transition from '../renderer/viz/expressions/transition';
+import NumberExpression from '../renderer/viz/expressions/basic/number';
+import ConstantExpression from '../renderer/viz/expressions/basic/constant';
+import CategoryExpression from '../renderer/viz/expressions/basic/category';
+import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../renderer/viz/expressions/aggregation/clusterAggregation';
+import * as schema from '../renderer/schema';
 
 class AggregationFiltering {
-
     /**
      * Generate aggregation filters:
      * This extracts, from the vizs filters, those compatible to be
@@ -22,7 +21,7 @@ class AggregationFiltering {
      * be extracted too, but it is more efficient to not do so and apply those
      * filters before aggregation.
      */
-    constructor(options) {
+    constructor (options) {
         // exclusive mode: aggregate filters don't include pre-aggregate conditions (dimensions)
         // in that case pre-aggregate filters should always be applied, even with aggregation
         // (which can be more efficient)
@@ -30,7 +29,7 @@ class AggregationFiltering {
     }
 
     // return (partial) filters as an object (JSON) in the format of the Maps API aggregation interface
-    getFilters(vizFilter) {
+    getFilters (vizFilter) {
         let filters = {};
         let filterList = this._and(vizFilter).filter(Boolean);
         for (let p of filterList) {
@@ -40,32 +39,30 @@ class AggregationFiltering {
                 if (this._compatibleAndFilters(existingFilter, p.filters)) {
                     // combine inequalities into a range
                     Object.assign(existingFilter[0], p.filters[0]);
-                }
-                else {
+                } else {
                     // can't AND-combine filters for the same property
                     return {};
                 }
-            }
-            else {
+            } else {
                 filters[name] = p.filters;
             }
         }
         return filters;
     }
 
-    _and(f) {
-        if (f instanceof And) {
+    _and (f) {
+        if (f.isA(And)) {
             return this._and(f.a).concat(this._and(f.b)).filter(Boolean);
         }
         return [this._or(f)].filter(Boolean);
     }
 
-    _or(f) {
-        if (f instanceof Or) {
+    _or (f) {
+        if (f.isA(Or)) {
             let a = this._basicCondition(f.a);
             let b = this._basicCondition(f.b);
             if (a && b) {
-                if (a.property == b.property) {
+                if (a.property === b.property) {
                     a.filters = a.filters.concat(b.filters);
                     return a;
                 }
@@ -74,31 +71,31 @@ class AggregationFiltering {
         return this._basicCondition(f);
     }
 
-    _removeBlend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Animate) {
+    _removeBlend (f) {
+        if (f.isA(Blend) && f.originalMix.isA(Transition)) {
             return f.b;
         }
         return f;
     }
 
-    _basicCondition(f) {
+    _basicCondition (f) {
         f = this._removeBlend(f);
-        return this._between(f)
-            || this._equals(f) || this._notEquals(f)
-            || this._lessThan(f) || this._lessThanOrEqualTo(f)
-            || this._greaterThan(f) || this._greaterThanOrEqualTo(f)
-            || this._in(f) || this._notIn(f);
+        return this._between(f) ||
+            this._equals(f) || this._notEquals(f) ||
+            this._lessThan(f) || this._lessThanOrEqualTo(f) ||
+            this._greaterThan(f) || this._greaterThanOrEqualTo(f) ||
+            this._in(f) || this._notIn(f);
     }
 
-    _value(f) {
+    _value (f) {
         f = this._removeBlend(f);
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
+        if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
             return f.expr;
         }
     }
 
-    _between(f) {
-        if (f instanceof Between) {
+    _between (f) {
+        if (f.isA(Between)) {
             let p = this._aggregation(f.value);
             let lo = p && this._value(f.lowerLimit);
             let hi = p && lo && this._value(f.upperLimit);
@@ -112,11 +109,11 @@ class AggregationFiltering {
         }
     }
 
-    _in(f) {
-        if (f instanceof In) {
+    _in (f) {
+        if (f.isA(In)) {
             let p = this._aggregation(f.value);
-            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
                     in: values
                 });
@@ -125,11 +122,11 @@ class AggregationFiltering {
         }
     }
 
-    _notIn(f) {
-        if (f instanceof Nin) {
+    _notIn (f) {
+        if (f.isA(Nin)) {
             let p = this._aggregation(f.value);
-            let values = f.list.elems.map(c => this._value(c)).filter(v => v != null);
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
                     not_in: values
                 });
@@ -138,33 +135,33 @@ class AggregationFiltering {
         }
     }
 
-    _equals(f) {
+    _equals (f) {
         return this._cmpOp(f, Equals, 'equal');
     }
 
-    _notEquals(f) {
+    _notEquals (f) {
         return this._cmpOp(f, NotEquals, 'not_equal');
     }
 
-    _lessThan(f) {
+    _lessThan (f) {
         return this._cmpOp(f, LessThan, 'less_than', 'greater_than');
     }
 
-    _lessThanOrEqualTo(f) {
+    _lessThanOrEqualTo (f) {
         return this._cmpOp(f, LessThanOrEqualTo, 'less_than_or_equal_to', 'greater_than_or_equal_to');
     }
 
-    _greaterThan(f) {
+    _greaterThan (f) {
         return this._cmpOp(f, GreaterThan, 'greater_than', 'less_than');
     }
 
-    _greaterThanOrEqualTo(f) {
+    _greaterThanOrEqualTo (f) {
         return this._cmpOp(f, GreaterThanOrEqualTo, 'greater_than_or_equal_to', 'less_than_or_equal_to');
     }
 
-    _aggregation(f) {
+    _aggregation (f) {
         f = this._removeBlend(f);
-        if (f instanceof ClusterAvg || f instanceof ClusterMax || f instanceof ClusterMin || f instanceof ClusterMode || f instanceof ClusterSum) {
+        if (f.isA(ClusterAvg) || f.isA(ClusterMax) || f.isA(ClusterMin) || f.isA(ClusterMode) || f.isA(ClusterSum)) {
             let p = this._property(f.property);
             if (p) {
                 p.property = schema.column.aggColumn(p.property, f.aggName);
@@ -179,9 +176,9 @@ class AggregationFiltering {
         return this._property(f);
     }
 
-    _property(f) {
+    _property (f) {
         f = this._removeBlend(f);
-        if (f instanceof Property) {
+        if (f.isA(Property)) {
             return {
                 property: f.name,
                 filters: []
@@ -189,9 +186,9 @@ class AggregationFiltering {
         }
     }
 
-    _cmpOp(f, opClass, opParam, inverseOpParam) {
+    _cmpOp (f, opClass, opParam, inverseOpParam) {
         inverseOpParam = inverseOpParam || opParam;
-        if (f instanceof opClass) {
+        if (f.isA(opClass)) {
             let p = this._aggregation(f.a);
             let v = p && this._value(f.b);
             let op = opParam;
@@ -209,7 +206,7 @@ class AggregationFiltering {
         }
     }
 
-    _compatibleAndFilters(a, b) {
+    _compatibleAndFilters (a, b) {
         // check if a and b can be combined into a range filter
         if (a.length === 0 || b.length === 0) {
             return true;
@@ -220,10 +217,10 @@ class AggregationFiltering {
             if (Object.keys(af).length === 1 && Object.keys(bf).length === 1) {
                 const ka = Object.keys(af)[0];
                 const kb = Object.keys(bf)[0];
-                const less_ops = ['less_than', 'less_than_or_equal_to'];
-                const greater_ops = ['greater_than', 'greater_than_or_equal_to'];
-                return (less_ops.includes(ka) && greater_ops.includes(kb))
-                    || (less_ops.includes(kb) && greater_ops.includes(ka));
+                const lessOps = ['less_than', 'less_than_or_equal_to'];
+                const greaterOps = ['greater_than', 'greater_than_or_equal_to'];
+                return (lessOps.includes(ka) && greaterOps.includes(kb)) ||
+                    (lessOps.includes(kb) && greaterOps.includes(ka));
             }
         }
         return false;
@@ -231,7 +228,6 @@ class AggregationFiltering {
 }
 
 class PreaggregationFiltering {
-
     /**
      * Generate pre-aggregation filters, i.e. filters that can be
      * applied to the dataset before aggregation.
@@ -241,31 +237,29 @@ class PreaggregationFiltering {
      * each node has a `type` property and various other parameters
      * that depend on the type.
      */
-    constructor() {
-    }
 
     // return (partial) filters as an object (JSON) representing the SQL syntax tree
-    getFilter(vizFilter) {
+    getFilter (vizFilter) {
         return this._filter(vizFilter);
     }
 
-    _filter(f) {
-        return this._and(f) || this._or(f)
-            || this._in(f) || this._notIn(f)
-            || this._between(f)
-            || this._equals(f) || this._notEquals(f)
-            || this._lessThan(f) || this._lessThanOrEqualTo(f)
-            || this._greaterThan(f) || this._greaterThanOrEqualTo(f)
-            || this._blend(f) || null;
+    _filter (f) {
+        return this._and(f) || this._or(f) ||
+            this._in(f) || this._notIn(f) ||
+            this._between(f) ||
+            this._equals(f) || this._notEquals(f) ||
+            this._lessThan(f) || this._lessThanOrEqualTo(f) ||
+            this._greaterThan(f) || this._greaterThanOrEqualTo(f) ||
+            this._blend(f) || null;
     }
 
-    _and(f) {
-        if (f instanceof And) {
+    _and (f) {
+        if (f.isA(And)) {
             // we can ignore nonsupported (null) subexpressions that are combined with AND
             // and keep the supported ones as a partial filter
             const l = [this._filter(f.a), this._filter(f.b)].filter(Boolean).reduce((x, y) => x.concat(y), []);
             if (l.length) {
-                if (l.length == 1) {
+                if (l.length === 1) {
                     return l[0];
                 }
                 return {
@@ -277,8 +271,8 @@ class PreaggregationFiltering {
         }
     }
 
-    _or(f) {
-        if (f instanceof Or) {
+    _or (f) {
+        if (f.isA(Or)) {
             // if any subexpression is not supported the OR combination isn't supported either
             let a = this._filter(f.a);
             let b = this._filter(f.b);
@@ -292,32 +286,32 @@ class PreaggregationFiltering {
         }
     }
 
-    _lessThan(f) {
+    _lessThan (f) {
         return this._cmpOp(f, LessThan, 'lessThan');
     }
 
-    _lessThanOrEqualTo(f) {
+    _lessThanOrEqualTo (f) {
         return this._cmpOp(f, LessThanOrEqualTo, 'lessThanOrEqualTo');
     }
 
-    _greaterThan(f) {
+    _greaterThan (f) {
         return this._cmpOp(f, GreaterThan, 'greaterThan');
     }
 
-    _greaterThanOrEqualTo(f) {
+    _greaterThanOrEqualTo (f) {
         return this._cmpOp(f, GreaterThanOrEqualTo, 'greaterThanOrEqualTo');
     }
 
-    _equals(f) {
+    _equals (f) {
         return this._cmpOp(f, Equals, 'equals');
     }
 
-    _notEquals(f) {
+    _notEquals (f) {
         return this._cmpOp(f, NotEquals, 'notEquals');
     }
 
-    _cmpOp(f, opClass, type) {
-        if (f instanceof opClass) {
+    _cmpOp (f, opClass, type) {
+        if (f.isA(opClass)) {
             let a = this._property(f.a) || this._value(f.a);
             let b = this._property(f.b) || this._value(f.b);
             if (a && b) {
@@ -330,14 +324,14 @@ class PreaggregationFiltering {
         }
     }
 
-    _blend(f) {
-        if (f instanceof Blend && f.originalMix instanceof Animate) {
+    _blend (f) {
+        if (f.isA(Blend) && f.originalMix.isA(Transition)) {
             return this._filter(f.b);
         }
     }
 
-    _property(f) {
-        if (f instanceof Property) {
+    _property (f) {
+        if (f.isA(Property)) {
             return {
                 type: 'property',
                 property: f.name
@@ -345,8 +339,8 @@ class PreaggregationFiltering {
         }
     }
 
-    _value(f) {
-        if (f instanceof NumberExpression || f instanceof ConstantExpression || f instanceof CategoryExpression) {
+    _value (f) {
+        if (f.isA(NumberExpression) || f.isA(ConstantExpression) || f.isA(CategoryExpression)) {
             return {
                 type: 'value',
                 value: f.expr
@@ -354,11 +348,11 @@ class PreaggregationFiltering {
         }
     }
 
-    _in(f) {
-        if (f instanceof In) {
+    _in (f) {
+        if (f.isA(In)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
                     type: 'in',
                     property: p.property,
@@ -368,11 +362,11 @@ class PreaggregationFiltering {
         }
     }
 
-    _notIn(f) {
-        if (f instanceof Nin) {
+    _notIn (f) {
+        if (f.isA(Nin)) {
             let p = this._property(f.value);
             let values = f.list.elems.map(cat => this._value(cat));
-            if (p && values.length > 0 && values.length == f.list.elems.length) {
+            if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
                     type: 'notIn',
                     property: p.property,
@@ -382,12 +376,12 @@ class PreaggregationFiltering {
         }
     }
 
-    _between(f) {
-        if (f instanceof Between) {
+    _between (f) {
+        if (f.isA(Between)) {
             let p = this._property(f.value);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);
-            if (p && lo != null && hi != null) {
+            if (p && lo && hi) {
                 return {
                     type: 'between',
                     property: p.property,
@@ -399,45 +393,45 @@ class PreaggregationFiltering {
     }
 }
 
-function getSQL(node) {
+function getSQL (node) {
     if (node.type) {
         return `(${SQLGenerators[node.type](node)})`;
     }
     return sqlQ(node);
 }
 
-function sqlQ(value) {
+function sqlQ (value) {
     if (isFinite(value)) {
         return String(value);
     }
-    return `'${value.replace(/\'/g,'\'\'')}'`;
+    return `'${value.replace(/\'/g, '\'\'')}'`;
 }
 
-function sqlId(id) {
+function sqlId (id) {
     if (!id.match(/^[a-z\d_]+$/)) {
-        id = `"${id.replace(/\"/g,'""')}"`;
+        id = `"${id.replace(/\"/g, '""')}"`;
     }
     return id;
 }
 
-function sqlSep(sep, ...args) {
+function sqlSep (sep, ...args) {
     return args.map(arg => getSQL(arg)).join(sep);
 }
 
 const SQLGenerators = {
-    'and':                  f => sqlSep(' AND ', f.left, f.right),
-    'or':                   f => sqlSep(' OR ', f.left, f.right),
-    'between':              f => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
-    'in':                   f => `${sqlId(f.property)} IN (${sqlSep(',', ...f.values)})`,
-    'notIn':                f => `${sqlId(f.property)} NOT IN (${sqlSep(',', ...f.values)})`,
-    'equals':               f => sqlSep( ' = ', f.left, f.right),
-    'notEquals':            f => sqlSep(' <> ', f.left, f.right),
-    'lessThan':             f => sqlSep(' < ', f.left, f.right),
-    'lessThanOrEqualTo':    f => sqlSep(' <= ', f.left, f.right),
-    'greaterThan':          f => sqlSep( ' > ', f.left, f.right),
+    'and': f => sqlSep(' AND ', f.left, f.right),
+    'or': f => sqlSep(' OR ', f.left, f.right),
+    'between': f => `${sqlId(f.property)} BETWEEN ${sqlQ(f.lower)} AND ${sqlQ(f.upper)}`,
+    'in': f => `${sqlId(f.property)} IN (${sqlSep(',', ...f.values)})`,
+    'notIn': f => `${sqlId(f.property)} NOT IN (${sqlSep(',', ...f.values)})`,
+    'equals': f => sqlSep(' = ', f.left, f.right),
+    'notEquals': f => sqlSep(' <> ', f.left, f.right),
+    'lessThan': f => sqlSep(' < ', f.left, f.right),
+    'lessThanOrEqualTo': f => sqlSep(' <= ', f.left, f.right),
+    'greaterThan': f => sqlSep(' > ', f.left, f.right),
     'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
-    'property':             f => sqlId(f.property),
-    'value':                f => sqlQ(f.value)
+    'property': f => sqlId(f.property),
+    'value': f => sqlQ(f.value)
 };
 
 /**
@@ -445,7 +439,7 @@ const SQLGenerators = {
  * @param {*} viz
  * @returns {Filtering}
  */
-export function getFiltering(viz, options = {}) {
+export function getFiltering (viz, options = {}) {
     const aggrFiltering = new AggregationFiltering(options);
     const preFiltering = new PreaggregationFiltering(options);
     const filtering = {
@@ -464,7 +458,7 @@ export function getFiltering(viz, options = {}) {
  *
  * @param {Filtering} filtering
  */
-export function getSQLWhere(filtering) {
+export function getSQLWhere (filtering) {
     filtering = filtering && filtering.preaggregation;
     let sql;
     if (filtering && Object.keys(filtering).length > 0) {
@@ -473,6 +467,6 @@ export function getSQLWhere(filtering) {
     return sql ? 'WHERE ' + sql : '';
 }
 
-export function getAggregationFilters(filtering) {
+export function getAggregationFilters (filtering) {
     return filtering && filtering.aggregation;
 }
