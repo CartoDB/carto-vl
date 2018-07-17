@@ -39,8 +39,8 @@ export default class Image extends Base {
                 resolve();
             };
             this.image.onerror = reject;
-            this.image.src = this._url;
             this.image.crossOrigin = 'anonymous';
+            this.image.src = this._url;
         });
     }
 
