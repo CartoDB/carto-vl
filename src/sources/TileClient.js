@@ -42,7 +42,7 @@ export default class TileClient {
                         completedTiles.push(dataframe);
                     }
                     if (completedTiles.length === needToComplete && requestGroupID === this._requestGroupID) {
-                        this._oldDataframes.forE(d => {
+                        this._oldDataframes.forEach(d => {
                             d.active = false;
                         });
                         completedTiles.map(d => {
