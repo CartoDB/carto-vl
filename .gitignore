@@ -1,9 +1,6 @@
 .DS_Store
 .vscode/
 *_out.png
-*_out.png
-*.html
-*.log
 *.log
 dist/
 docs/all
