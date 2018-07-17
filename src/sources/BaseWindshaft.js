@@ -1,6 +1,5 @@
 import Base from './Base';
 import Windshaft from '../client/windshaft';
-import { validateServerURL } from '../utils/url';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
@@ -45,7 +44,6 @@ export default class BaseWindshaft extends Base {
     _generateURL (auth, config) {
         let url = (config && config.serverURL) || DEFAULT_SERVER_URL_TEMPLATE;
         url = url.replace(/{user}/, auth.username);
-        validateServerURL(url);
         return url;
     }
 }

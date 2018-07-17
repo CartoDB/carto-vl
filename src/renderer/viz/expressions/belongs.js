@@ -30,7 +30,7 @@ function IN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '0.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} === ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    return inline => `(${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
 }
 
 /**
@@ -62,7 +62,7 @@ function NIN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '1.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} !== ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `(${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
 }
 
 function generateBelongsExpression (name, inlineMaker, jsEval) {

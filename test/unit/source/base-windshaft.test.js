@@ -76,15 +76,6 @@ describe('sources/base-windshaft', () => {
                 source.initialize(auth, 1234);
             }).toThrowError('`config` property must be an object.');
         });
-
-        it('should throw an error if config.serverURL is not valid', function () {
-            expect(function () {
-                source.initialize(auth, { serverURL: 1234 });
-            }).toThrowError('`serverURL` property must be a string.');
-            expect(function () {
-                source.initialize(auth, { serverURL: 'invalid-url' });
-            }).toThrowError('`serverURL` property is not a valid URL.');
-        });
     });
 
     describe('.bindLayer', () => {

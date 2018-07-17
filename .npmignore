@@ -1,8 +1,8 @@
 .DS_Store
 .vscode/
 *_out.png
+*.html
 *.log
-dist/
 docs/all
 docs/public
 node_modules/
