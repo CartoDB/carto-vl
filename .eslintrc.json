@@ -5,7 +5,7 @@
         "node": true,
         "jasmine": true
     },
-    "extends": ["eslint:recommended", "semistandard"],
+    "extends": ["semistandard"],
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2017
