@@ -1,8 +1,9 @@
 import * as carto from '../../../../src';
-import features from './features';
+import features0 from './data/features-0';
+import features1 from './data/features-1';
 import mapboxgl from '@carto/mapbox-gl';
 
-describe('viewport features', () => {
+fdescribe('viewport features', () => {
     describe('given a list of features', () => {
         describe('when the viewport is in a predefined place (center/zoom)', () => {
             let map, source, viz, layer, div;
@@ -16,32 +17,46 @@ describe('viewport features', () => {
                 document.body.style.padding = '0';
                 document.body.appendChild(div);
 
-                map = new mapboxgl.Map({
+                window.map = map = new mapboxgl.Map({
                     container: 'map',
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-                    center: [-6.754536880813703, 35.30378023840868],
-                    zoom: 3.29
+                    center: [-9.886941182470537, 20.96696256294605],
+                    zoom: 3.5917036363401382
                 });
+            });
 
+            it('should correctly detect features inside viewport', done => {
                 // Define layer
-                source = new carto.source.GeoJSON(features);
+                source = new carto.source.GeoJSON(features0);
                 viz = new carto.Viz(`
                     @list: viewportFeatures();
                 `);
                 layer = new carto.Layer('layer', source, viz);
-            });
-
-            it('should correctly detect features inside viewport', done => {
                 layer.addTo(map, 'watername_ocean');
                 layer.on('loaded', () => {
-                    expect(viz.variables.list.value.length).toEqual(5);
+                    expect(viz.variables.list.value.length).toEqual(9);
                     done();
                 });
             });
 
-            afterEach(() => {
-                document.body.removeChild(div);
+            fit('should be aware of features whose bbox collides but not colliding', done => {
+                // Define layer
+                source = new carto.source.GeoJSON(features1);
+                viz = new carto.Viz(`
+                    @list: viewportFeatures();
+                `);
+                layer = new carto.Layer('layer', source, viz);
+                layer.addTo(map, 'watername_ocean');
+
+                layer.on('loaded', () => {
+                    expect(viz.variables.list.value.length).toEqual(0);
+                    done();
+                });
             });
+
+            // afterEach(() => {
+            //     document.body.removeChild(div);
+            // });
         });
     });
 });
