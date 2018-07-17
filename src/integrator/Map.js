@@ -35,8 +35,8 @@ export default class Map {
         this._resizeCanvas(this._containerDimensions());
     }
 
-    addLayer (layer, beforeLayerID) {
-        layer.initCallback();
+    addLayer(layer, beforeLayerID) {
+        layer.initialize();
 
         let index;
         for (index = 0; index < this._layers.length; index++) {

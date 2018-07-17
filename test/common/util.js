@@ -39,19 +39,27 @@ function getName (file) {
     );
 }
 
+<<<<<<< HEAD
 function takeReference (file, template, asyncLoad) {
+=======
+function takeReference(file, template) {
+>>>>>>> master
     if (!fs.existsSync(getPNG(file))) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
         let options = loadOptions();
         options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
         options.output = `${getPNG(file)}`;
-        if (asyncLoad) options.waitForFn = () => window.loaded;
+        options.waitForFn = () => window.loaded;
         return exquisite.getReference(options);
     }
 }
 
+<<<<<<< HEAD
 async function testSST (file, template, asyncLoad, browser) {
+=======
+async function testSST(file, template, browser) {
+>>>>>>> master
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
@@ -78,7 +86,7 @@ async function testSST (file, template, asyncLoad, browser) {
             }
         }
     };
-    if (asyncLoad) options.waitForFn = () => window.loaded;
+    options.waitForFn = () => window.loaded;
 
     const result = await exquisite.test(options);
     if (capturedErrors.length > 0) {
