@@ -39,11 +39,7 @@ function getName (file) {
     );
 }
 
-<<<<<<< HEAD
-function takeReference (file, template, asyncLoad) {
-=======
-function takeReference(file, template) {
->>>>>>> master
+function takeReference (file, template) {
     if (!fs.existsSync(getPNG(file))) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
@@ -55,11 +51,7 @@ function takeReference(file, template) {
     }
 }
 
-<<<<<<< HEAD
-async function testSST (file, template, asyncLoad, browser) {
-=======
-async function testSST(file, template, browser) {
->>>>>>> master
+async function testSST (file, template, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
