@@ -24,6 +24,18 @@ $ yarn
 $ yarn build
 ```
 
+## <a name="documentation">Document your changes</a>
+
+This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+
+```bash
+# Generate the public documentation
+$ yarn docs
+
+# Serve docs and examples
+$ yarn serve
+```
+
 ## <a name="tests">Tests</a>
 
 ### Unit tests
@@ -117,14 +129,18 @@ Adding `f-` at the beginning of any test folder marks this test to be executed w
 
 Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
-## <a name="documentation">Document your changes</a>
+## Release
 
-This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+First create a release `patch/minor`. This command bumps the version, creates a tag and uploads all to GitHub.
 
-```bash
-# Generate the public documentation
-$ yarn docs
-
-# Serve docs and examples
-$ yarn serve
 ```
+yarn version
+```
+
+Then, use this command to publish to our `CDN` and `npm`.
+
+```
+yarn publish
+```
+
+NOTE: `yarn publish` calls `yarn version` at the beginning of the process.
