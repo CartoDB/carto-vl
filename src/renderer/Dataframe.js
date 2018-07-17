@@ -1,6 +1,6 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
-import Polygon from '../core/geometries/Polygon';
+import Polygon from '../../src/core/geometries/Polygon';
 import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
@@ -29,7 +29,6 @@ export default class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
-        this._featureGeometries = this._getFeatureGeometries();
         this._aabb = this._computeAABB(geom, type);
     }
 
@@ -71,19 +70,6 @@ export default class Dataframe {
         }
 
         return aabbList;
-    }
-
-    _getFeatureGeometries () {
-        const vertices = this.decodedGeom.vertices;
-        const featureGeometries = [];
-        const INDEX_INCREMENT = 3;
-
-        for (let i = 0; i < vertices.length - INDEX_INCREMENT; i++) {
-            const triangle = [vertices[i], vertices[i++], vertices[i++]];
-            featureGeometries.push(new Polygon(0, 0, triangle));
-        }
-
-        return featureGeometries;
     }
 
     setFreeObserver (freeObserver) {
@@ -216,15 +202,12 @@ export default class Dataframe {
     }
 
     _geometryInViewport (featureIndex, scale, center, aspect) {
-        const height = scale * (center.y - this.center.y);
-        const width = (scale / aspect) * (center.x - this.center.x);
-
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
             case 'polygon':
-                return this._isPolygonInViewport(featureIndex, scale, center, aspect, height, width);
+                return this._isPolygonInViewport(featureIndex, scale, center, aspect);
             default:
                 return false;
         }
@@ -237,14 +220,24 @@ export default class Dataframe {
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport (featureIndex, scale, center, aspect, width, height) {
+    _isPolygonInViewport (featureIndex, scale, center, aspect) {
         const featureAABB = this._aabb[featureIndex];
         const viewportAABB = this._getBounds(scale, center, aspect);
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
-        const triangles = this._featureGeometries;
+        const trianglesList = [];
+
+        this.decodedGeom.triangles.forEach((trianglePoints) => {
+            const triangles = [];
+            
+            for (let i = 0; i < trianglePoints.length; i++) {
+                triangles.push([trianglePoints[i], trianglePoints[i++]]);
+            }
+
+            trianglesList.push(triangles);
+        });
 
         return aabbResult === aabbResults.INTERSECTS
-            ? _isPolygonCollidingViewport(triangles, center, width, height)
+            ? _isPolygonCollidingViewport(trianglesList, [ this.vertexScale, this.vertexOffset ])
             : aabbResult === aabbResults.INSIDE;
     }
 
@@ -480,28 +473,16 @@ function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (triangles, center, width, height) {
-    const viewport = _getViewportGeometry(center, width, height);
+function _isPolygonCollidingViewport (triangles, viewport) {
+    const viewportPolygon = new Polygon(0, 0, viewport);
 
     for (let i = 0; i < triangles.length; i++) {
-        if (triangles[i].collides(viewport)) {
+        const trianglePolygon = new Polygon(0, 0, triangles[i]);
+
+        if (trianglePolygon.collides(viewportPolygon)) {
             return true;
         }
     }
-
+   
     return false;
-}
-
-function _getViewportGeometry (center, width, height) {
-    const w = width / 2;
-    const h = height / 2;
-
-    const vertices = [
-        [center.x - w, center.y - h],
-        [center.x + w, center.y - h],
-        [center.x - w, center.y + h],
-        [center.x + w, center.y + h]
-    ];
-
-    return new Polygon(0, 0, vertices);
 }
