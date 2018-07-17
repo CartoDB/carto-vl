@@ -28,10 +28,10 @@ import { globalMin, globalMax } from '../expressions';
 * @api
 */
 export default class Linear extends BaseExpression {
-    constructor(input, min, max) {
+    constructor (input, min, max) {
         input = implicitCast(input);
 
-        if (min == undefined && max == undefined) {
+        if (min === undefined && max === undefined) {
             min = globalMin(input);
             max = globalMax(input);
         }
@@ -45,15 +45,16 @@ export default class Linear extends BaseExpression {
 
         super({ input, min, max });
 
-        if (this.min.type != 'time') {
+        if (this.min.type !== 'time') {
             checkLooseType('linear', 'input', 0, 'number', this.input);
             checkLooseType('linear', 'min', 1, 'number', this.min);
             checkLooseType('linear', 'max', 2, 'number', this.max);
         }
         this.type = 'number';
     }
-    eval(feature) {
-        if (this.input.type == 'date') {
+
+    eval (feature) {
+        if (this.input.type === 'date') {
             const input = this.input.eval(feature);
 
             const min = this.min.eval().getTime();
@@ -66,18 +67,18 @@ export default class Linear extends BaseExpression {
 
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
-            return (input-smin)/(smax-smin);
-
+            return (input - smin) / (smax - smin);
         }
         const v = this.input.eval(feature);
         const min = this.min.eval(feature);
         const max = this.max.eval(feature);
         return (v - min) / (max - min);
     }
-    _compile(metadata) {
+
+    _compile (metadata) {
         super._compile(metadata);
 
-        if (this.input.type == 'date') {
+        if (this.input.type === 'date') {
             const min = this.min.eval().getTime();
             const max = this.max.eval().getTime();
 
@@ -89,7 +90,6 @@ export default class Linear extends BaseExpression {
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);

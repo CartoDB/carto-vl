@@ -1,7 +1,34 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
-import { cielabToSRGB, sRGBToCielab } from '../colorspaces';
-import Sprites from './sprites';
+
+import { interpolateRGBAinCieLAB } from '../colorspaces';
+import NamedColor from './color/NamedColor';
+import Buckets from './buckets';
+import Property from './basic/property';
+import { Classifier } from './classifier';
+import ImageList from './ImageList';
+import Linear from './linear';
+import Top from './top';
+
+const paletteTypes = {
+    PALETTE: 'palette',
+    COLOR_ARRAY: 'color-array',
+    NUMBER_ARRAY: 'number-array',
+    IMAGE: 'image'
+};
+
+const rampTypes = {
+    COLOR: 'color',
+    NUMBER: 'number'
+};
+
+const inputTypes = {
+    NUMBER: 'number',
+    CATEGORY: 'category'
+};
+
+const COLOR_ARRAY_LENGTH = 256;
+const MAX_BYTE_VALUE = 255;
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -56,31 +83,29 @@ import Sprites from './sprites';
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor(input, palette) {
+    constructor (input, palette) {
         input = implicitCast(input);
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-        checkLooseType('ramp', 'input', 0, ['number', 'category'], input);
-        checkLooseType('ramp', 'palette', 1, ['palette', 'color-array', 'number-array', 'sprite'], palette);
-        if (palette.type == 'sprite') {
-            checkInstance('ramp', 'palette', 1, Sprites, palette);
-            checkLooseType('ramp', 'input', 0, 'category', input);
+        checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
+        checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
+
+        if (palette.type === paletteTypes.IMAGE) {
+            checkInstance('ramp', 'palette', 1, ImageList, palette);
+            checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
         super({ input: input });
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        if (palette.type == 'number-array') {
-            this.type = 'number';
-        } else {
-            this.type = 'color';
-        }
+        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
+
         try {
-            if (palette.type == 'number-array') {
+            if (palette.type === paletteTypes.NUMBER_ARRAY) {
                 this.palette.floats = this.palette.eval();
-            } else if (palette.type == 'color-array') {
+            } else if (palette.type === paletteTypes.COLOR_ARRAY) {
                 this.palette.colors = this.palette.eval();
             }
         } catch (error) {
@@ -88,159 +113,188 @@ export default class Ramp extends BaseExpression {
         }
     }
 
-    loadSprites() {
-        return Promise.all([this.input.loadSprites(), this.palette.loadSprites()]);
+    loadImages () {
+        return Promise.all([this.input.loadImages(), this.palette.loadImages()]);
     }
 
-    _setUID(idGenerator) {
+    _setUID (idGenerator) {
         super._setUID(idGenerator);
         this.palette._setUID(idGenerator);
     }
 
-    eval(o) {
-        if (this.palette.type != 'number-array') {
-            super.eval(o);
-        }
-        this._computeTextureIfNeeded();
-        const input = this.input.eval(o);
+    eval (feature) {
+        const texturePixels = this._computeTextureIfNeeded();
+        const input = this.input.eval(feature);
+
+        const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
-        const len = this.pixel.length - 1;
-        const lowIndex = clamp(Math.floor(len * m), 0, len);
-        const highIndex = clamp(Math.ceil(len * m), 0, len);
-        const low = this.pixel[lowIndex];
-        const high = this.pixel[highIndex];
-        const fract = len * m - Math.floor(len * m);
-        return fract * high + (1 - fract) * low;
+
+        const color = this.type === rampTypes.NUMBER
+            ? this._getValue(texturePixels, numValues, m)
+            : this._getColorValue(texturePixels, m);
+
+        return color;
     }
-    _compile(meta) {
-        super._compile(meta);
-        checkType('ramp', 'input', 0, ['number', 'category'], this.input);
-        if (this.palette.type == 'sprite') {
-            checkType('ramp', 'input', 0, 'category', this.input);
-            checkInstance('ramp', 'palette', 1, Sprites, this.palette);
+
+    _getValue (texturePixels, numValues, m) {
+        const lowIndex = clamp(Math.floor(numValues * m), 0, numValues);
+        const highIndex = clamp(Math.ceil(numValues * m), 0, numValues);
+        const fract = numValues * m - Math.floor(numValues * m);
+        const low = texturePixels[lowIndex];
+        const high = texturePixels[highIndex];
+
+        return Math.round(fract * high + (1 - fract) * low);
+    }
+
+    _getColorValue (texturePixels, m) {
+        const index = Math.round(m * MAX_BYTE_VALUE);
+
+        return {
+            r: Math.round(texturePixels[index * 4 + 0]),
+            g: Math.round(texturePixels[index * 4 + 1]),
+            b: Math.round(texturePixels[index * 4 + 2]),
+            a: Math.round(texturePixels[index * 4 + 3]) / MAX_BYTE_VALUE
+        };
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+
+        if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
+            this.input = new Linear(this.input);
+            this.input._compile(metadata);
         }
+
+        checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
+
+        if (this.palette.type === paletteTypes.IMAGE) {
+            checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
+            checkInstance('ramp', 'palette', 1, ImageList, this.palette);
+        }
+
         this._texCategories = null;
         this._GLtexCategories = null;
     }
 
-    _free(gl) {
+    _free (gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);
         }
     }
 
-    _applyToShaderSource(getGLSLforProperty) {
+    _applyToShaderSource (getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        if (this.palette.type == 'sprite') {
-            const sprites = this.palette._applyToShaderSource(getGLSLforProperty);
+
+        if (this.palette.type === paletteTypes.IMAGE) {
+            const images = this.palette._applyToShaderSource(getGLSLforProperty);
+
             return {
-                preface: input.preface + sprites.preface,
-                inline: `${sprites.inline}(spriteUV, ${input.inline})`
+                preface: input.preface + images.preface,
+                inline: `${images.inline}(imageUV, ${input.inline})`
             };
         }
+
         return {
             preface: this._prefaceCode(input.preface + `
                 uniform sampler2D texRamp${this._uid};
                 uniform float keyMin${this._uid};
                 uniform float keyWidth${this._uid};`
             ),
-            inline: this.palette.type == 'number-array'
+
+            inline: this.palette.type === paletteTypes.NUMBER_ARRAY
                 ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
                 : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
         };
     }
-    _getColorsFromPalette(input, palette) {
-        if (palette.type == 'palette') {
-            let colors;
-            if (input.numCategories) {
-                // If we are not gonna pop the others we don't need to get the extra color
-                const subPalette = (palette.tags.includes('qualitative') && !input.othersBucket) ? input.numCategories : input.numCategories - 1;
-                if (palette.subPalettes[subPalette]) {
-                    colors = palette.subPalettes[subPalette];
-                } else {
-                    // More categories than palettes, new colors will be created by linear interpolation
-                    colors = palette.getLongestSubPalette();
-                }
-            } else {
-                colors = palette.getLongestSubPalette();
-            }
-            // We need to remove the 'others' color if the palette has it (it is a qualitative palette) and if the input doesn't have a 'others' bucket
-            if (palette.tags.includes('qualitative') && !input.othersBucket) {
-                colors = colors.slice(0, colors.length - 1);
-            }
-            return colors;
-        } else {
+
+    _getColorsFromPalette (input, palette) {
+        if (palette.type === paletteTypes.IMAGE) {
             return palette.colors;
         }
+
+        const defaultOthersColor = new NamedColor('gray');
+
+        return palette.type === paletteTypes.PALETTE
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
     }
-    _postShaderCompile(program, gl) {
-        if (this.palette.type == 'sprite') {
+
+    _postShaderCompile (program, gl) {
+        if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
         }
+
         this.input._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
-    _computeTextureIfNeeded() {
-        if (this._texCategories !== this.input.numCategories) {
-            this._texCategories = this.input.numCategories;
 
-            if (this.input.type == 'category') {
-                this.maxKey = this.input.numCategories - 1;
-            }
-            const width = 256;
-            if (this.type == 'color') {
-                const pixel = new Uint8Array(4 * width);
-                const colors = this._getColorsFromPalette(this.input, this.palette);
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = colors[Math.floor(i / (width - 1) * (colors.length - 1))];
-                    const vhighRaw = colors[Math.ceil(i / (width - 1) * (colors.length - 1))];
-                    const vlow = [vlowRaw.r / 255, vlowRaw.g / 255, vlowRaw.b / 255, vlowRaw.a];
-                    const vhigh = [vhighRaw.r / 255, vhighRaw.g / 255, vhighRaw.b / 255, vhighRaw.a];
-                    const m = i / (width - 1) * (colors.length - 1) - Math.floor(i / (width - 1) * (colors.length - 1));
-                    const v = interpolate({ r: vlow[0], g: vlow[1], b: vlow[2], a: vlow[3] }, { r: vhigh[0], g: vhigh[1], b: vhigh[2], a: vhigh[3] }, m);
-                    pixel[4 * i + 0] = v.r * 255;
-                    pixel[4 * i + 1] = v.g * 255;
-                    pixel[4 * i + 2] = v.b * 255;
-                    pixel[4 * i + 3] = v.a * 255;
-                }
-                this.pixel = pixel;
-            } else {
-                const pixel = new Float32Array(width);
-                const floats = this.palette.floats;
-                for (let i = 0; i < width; i++) {
-                    const vlowRaw = floats[Math.floor(i / (width - 1) * (floats.length - 1))];
-                    const vhighRaw = floats[Math.ceil(i / (width - 1) * (floats.length - 1))];
-                    const m = i / (width - 1) * (floats.length - 1) - Math.floor(i / (width - 1) * (floats.length - 1));
-                    pixel[i] = ((1. - m) * vlowRaw + m * vhighRaw);
-                }
-                this.pixel = pixel;
-            }
+    _computeTextureIfNeeded () {
+        this._texCategories = this.input.numCategories;
+
+        if (this.input.type === inputTypes.CATEGORY) {
+            this.maxKey = this.input.numCategories - 1;
         }
+
+        return this.type === rampTypes.COLOR
+            ? this._computeColorRampTexture()
+            : this._computeNumericRampTexture();
     }
-    _computeGLTextureIfNeeded(gl) {
-        this._computeTextureIfNeeded();
+
+    _computeColorRampTexture () {
+        const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
+        const colors = this._getColorsFromPalette(this.input, this.palette);
+
+        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
+            const vColorARaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vColorBRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
+            const vColorA = [vColorARaw.r / (COLOR_ARRAY_LENGTH - 1), vColorARaw.g / (COLOR_ARRAY_LENGTH - 1), vColorARaw.b / (COLOR_ARRAY_LENGTH - 1), vColorARaw.a];
+            const vColorB = [vColorBRaw.r / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.g / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.b / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.a];
+            const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
+            const v = interpolateRGBAinCieLAB({ r: vColorA[0], g: vColorA[1], b: vColorA[2], a: vColorA[3] }, { r: vColorB[0], g: vColorB[1], b: vColorB[2], a: vColorB[3] }, m);
+
+            texturePixels[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
+            texturePixels[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);
+            texturePixels[4 * i + 2] = Math.round(v.b * MAX_BYTE_VALUE);
+            texturePixels[4 * i + 3] = Math.round(v.a * MAX_BYTE_VALUE);
+        }
+
+        return texturePixels;
+    }
+
+    _computeNumericRampTexture () {
+        const texturePixels = new Float32Array(COLOR_ARRAY_LENGTH);
+        const floats = this.palette.floats;
+
+        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
+            const vColorARaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const vColorBRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
+            const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
+            texturePixels[i] = ((1.0 - m) * vColorARaw + m * vColorBRaw);
+        }
+
+        return texturePixels;
+    }
+
+    _computeGLTextureIfNeeded (gl) {
+        const texturePixels = this._computeTextureIfNeeded();
+
         if (this._GLtexCategories !== this.input.numCategories) {
             this._GLtexCategories = this.input.numCategories;
 
-            const width = 256;
             this.texture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const pixel = this.pixel;
-            if (this.type == 'color') {
+
+            if (this.type === rampTypes.COLOR) {
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                    width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                    pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
             } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    width, 1, 0, gl.ALPHA, gl.FLOAT,
-                    pixel);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             }
@@ -249,12 +303,15 @@ export default class Ramp extends BaseExpression {
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         }
     }
-    _preDraw(program, drawMetadata, gl) {
+
+    _preDraw (program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
-        if (this.palette.type == 'sprite') {
+
+        if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }
+
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
         this._computeGLTextureIfNeeded(gl);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -265,26 +322,114 @@ export default class Ramp extends BaseExpression {
     }
 }
 
-function interpolate(low, high, m) {
-    const cielabLow = sRGBToCielab({
-        r: low.r,
-        g: low.g,
-        b: low.b,
-        a: low.a,
-    });
-    const cielabHigh = sRGBToCielab({
-        r: high.r,
-        g: high.g,
-        b: high.b,
-        a: high.a,
-    });
+function _getColorsFromPaletteType (input, palette, numCategories, defaultOthersColor) {
+    switch (true) {
+        case input.isA(Buckets):
+            return _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor);
+        case input.isA(Top):
+            return _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor);
+        default:
+            return _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor);
+    }
+}
 
-    const cielabInterpolated = {
-        l: (1 - m) * cielabLow.l + m * cielabHigh.l,
-        a: (1 - m) * cielabLow.a + m * cielabHigh.a,
-        b: (1 - m) * cielabLow.b + m * cielabHigh.b,
-        alpha: (1 - m) * cielabLow.alpha + m * cielabHigh.alpha,
-    };
+function _getColorsFromPaletteTypeBuckets (palette, numCategories, defaultOthersColor) {
+    let colors = _getSubPalettes(palette, numCategories);
 
-    return cielabToSRGB(cielabInterpolated);
+    if (palette.isQuantitative()) {
+        colors.push(defaultOthersColor);
+    }
+
+    if (palette.isQualitative()) {
+        defaultOthersColor = colors[numCategories];
+    }
+
+    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
+}
+
+function _getColorsFromPaletteTypeTop (palette, numCategories, defaultOthersColor) {
+    let colors = _getSubPalettes(palette, numCategories);
+
+    if (palette.isQualitative()) {
+        defaultOthersColor = colors[colors.length - 1];
+    }
+
+    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
+}
+
+function _getColorsFromPaletteTypeDefault (input, palette, defaultOthersColor) {
+    let colors = _getSubPalettes(palette, input.numCategories);
+
+    if (palette.isQualitative()) {
+        colors.pop();
+        defaultOthersColor = colors[input.numCategories];
+    }
+
+    if (input.numCategories === undefined) {
+        return colors;
+    }
+
+    return _avoidShowingInterpolation(input.numCategories, colors, defaultOthersColor);
+}
+
+function _getSubPalettes (palette, numCategories) {
+    return palette.subPalettes[numCategories]
+        ? palette.subPalettes[numCategories]
+        : palette.getLongestSubPalette();
+}
+
+function _getColorsFromColorArrayType (input, palette, numCategories, defaultOthersColor) {
+    return input.type === inputTypes.CATEGORY
+        ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, defaultOthersColor)
+        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
+}
+
+function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
+    switch (true) {
+        case input.isA(Classifier) && numCategories < colors.length:
+            return colors;
+        case input.isA(Property):
+            return colors;
+        case numCategories < colors.length:
+            return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
+        case numCategories > colors.length:
+            return _addothersColorToColors(colors, defaultOthersColor);
+        default:
+            colors = _addothersColorToColors(colors, defaultOthersColor);
+            return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
+    }
+}
+
+function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
+    let othersColor;
+
+    if (numCategories < colors.length) {
+        othersColor = colors[numCategories];
+        return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    }
+
+    if (numCategories === colors.length) {
+        othersColor = colors[colors.length - 1];
+        return _avoidShowingInterpolation(numCategories, colors, othersColor);
+    }
+
+    return colors;
+}
+
+function _addothersColorToColors (colors, othersColor) {
+    return [...colors, othersColor];
+}
+
+function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) {
+    const colorArray = [];
+
+    for (let i = 0; i < colors.length; i++) {
+        if (i < numCategories) {
+            colorArray.push(colors[i]);
+        } else if (i === numCategories) {
+            colorArray.push(defaultOthersColor);
+        }
+    }
+
+    return colorArray;
 }

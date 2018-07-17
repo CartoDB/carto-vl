@@ -332,11 +332,11 @@ describe('Interactivity', () => {
         });
     });
 
-    function onLoaded(callback) {
+    function onLoaded (callback) {
         let allLoaded = 0;
-        function loaded() {
+        function loaded () {
             allLoaded++;
-            if (allLoaded == 2) {
+            if (allLoaded === 2) {
                 callback();
             }
         }
@@ -345,15 +345,16 @@ describe('Interactivity', () => {
     }
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(div);
     });
 });
 
 describe('Cursor', () => {
-    let map, source1, viz1, layer1;
+    let map, source1, viz1, layer1, setup;
 
     beforeEach(() => {
-        const setup = util.createMap('map');
+        setup = util.createMap('map');
         map = setup.map;
 
         source1 = new carto.source.GeoJSON(feature1);
@@ -393,5 +394,10 @@ describe('Cursor', () => {
                 }, 0);
             });
         });
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(setup.div);
     });
 });

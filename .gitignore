@@ -5,6 +5,7 @@ test/acceptance/e2e/**/*.html
 test/integration/render/**/*.html
 .DS_Store
 
+temp/
 .vscode/
 dist/
 docs/all

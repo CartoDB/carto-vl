@@ -1,7 +1,6 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
 
-
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
@@ -77,7 +76,7 @@ describe('src/renderer/viz/expressions/unary', () => {
     });
 
     // Helper function to test binary expressions
-    function test(fn, param1, expected) {
+    function test (fn, param1, expected) {
         it(`${fn}(${param1}) should return ${expected}`, () => {
             let actual = s[fn](param1).eval();
             expect(actual).toEqual(expected);

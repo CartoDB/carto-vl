@@ -14,7 +14,8 @@ const aabbResults = {
 };
 
 export default class Dataframe {
-    constructor({ center, scale, geom, properties, type, active, size, metadata }) {
+    // `type` is one of 'point' or 'line' or 'polygon'
+    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -26,13 +27,13 @@ export default class Dataframe {
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
-        this.propertyID = {}; //Name => PID
+        this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
         this._featureGeometries = this._getFeatureGeometries();
         this._aabb = this._computeAABB(geom, type);
     }
 
-    _computeAABB(geometry, type) {
+    _computeAABB (geometry, type) {
         switch (type) {
             case 'point':
                 return [];
@@ -42,17 +43,17 @@ export default class Dataframe {
         }
     }
 
-    _computeFeatureAABB(geometry, type) {
+    _computeFeatureAABB (geometry, type) {
         const aabbList = [];
 
         for (let i = 0; i < geometry.length; i++) {
             const feature = geometry[i];
-            
+
             const aabb = {
                 minx: Number.POSITIVE_INFINITY,
                 miny: Number.POSITIVE_INFINITY,
                 maxx: Number.NEGATIVE_INFINITY,
-                maxy: Number.NEGATIVE_INFINITY,
+                maxy: Number.NEGATIVE_INFINITY
             };
 
             for (let j = 0; j < feature.length; j++) {
@@ -72,7 +73,7 @@ export default class Dataframe {
         return aabbList;
     }
 
-    _getFeatureGeometries() {
+    _getFeatureGeometries () {
         const vertices = this.decodedGeom.vertices;
         const featureGeometries = [];
         const INDEX_INCREMENT = 3;
@@ -85,11 +86,11 @@ export default class Dataframe {
         return featureGeometries;
     }
 
-    setFreeObserver(freeObserver) {
+    setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
     }
 
-    bind(renderer) {
+    bind (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
 
@@ -120,7 +121,7 @@ export default class Dataframe {
                     index++;
                 }
             } else {
-                while (i == breakpoints[index]) {
+                while (i === breakpoints[index]) {
                     index++;
                 }
             }
@@ -142,7 +143,7 @@ export default class Dataframe {
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
     }
 
-    getFeaturesAtPosition(pos, viz) {
+    getFeaturesAtPosition (pos, viz) {
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
@@ -155,17 +156,17 @@ export default class Dataframe {
         }
     }
 
-    inViewport(featureIndex, scale, center, aspect) {
+    inViewport (featureIndex, scale, center, aspect) {
         return this._geometryInViewport(featureIndex, scale, center, aspect); // FIXME
     }
 
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
-    addProperties(properties) {
+    addProperties (properties) {
         Object.keys(properties).forEach(this._addProperty.bind(this));
     }
 
-    getPropertyTexture(propertyName) {
+    getPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
             return this.propertyTex[propertyName];
         }
@@ -189,7 +190,7 @@ export default class Dataframe {
         return this.propertyTex[propertyName];
     }
 
-    free() {
+    free () {
         if (this.propertyTex) {
             const gl = this.renderer.gl;
             this.propertyTex.map(tex => gl.deleteTexture(tex));
@@ -202,19 +203,19 @@ export default class Dataframe {
             gl.deleteBuffer(this.featureIDBuffer);
         }
         const freeObserver = this.freeObserver;
-        
+
         Object.keys(this).map(key => {
             this[key] = null;
         });
 
         this.freed = true;
-        
+
         if (freeObserver) {
             freeObserver(this);
         }
     }
 
-    _geometryInViewport(featureIndex, scale, center, aspect) {
+    _geometryInViewport (featureIndex, scale, center, aspect) {
         const height = scale * (center.y - this.center.y);
         const width = (scale / aspect) * (center.x - this.center.x);
 
@@ -229,14 +230,14 @@ export default class Dataframe {
         }
     }
 
-    _isPointInViewport(featureIndex, scale, center, aspect) {
+    _isPointInViewport (featureIndex, scale, center, aspect) {
         const { minx, maxx, miny, maxy } = this._getBounds(scale, center, aspect);
         const x = this.geom[2 * featureIndex + 0];
         const y = this.geom[2 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport(featureIndex, scale, center, aspect, width, height) {
+    _isPolygonInViewport (featureIndex, scale, center, aspect, width, height) {
         const featureAABB = this._aabb[featureIndex];
         const viewportAABB = this._getBounds(scale, center, aspect);
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
@@ -247,9 +248,9 @@ export default class Dataframe {
             : aabbResult === aabbResults.INSIDE;
     }
 
-    _compareAABBs(featureAABB, viewportAABB) {
+    _compareAABBs (featureAABB, viewportAABB) {
         switch (true) {
-            case _isFeatureInsideViewport(featureAABB, viewportAABB): 
+            case _isFeatureInsideViewport(featureAABB, viewportAABB):
                 return aabbResults.INSIDE;
             case _isFeatureOutsideViewport(featureAABB, viewportAABB):
                 return aabbResults.OUTSIDE;
@@ -258,7 +259,7 @@ export default class Dataframe {
         }
     }
 
-    _getBounds(scale, center, aspect) {
+    _getBounds (scale, center, aspect) {
         this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
         this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
         const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
@@ -269,7 +270,7 @@ export default class Dataframe {
         return { minx, maxx, miny, maxy };
     }
 
-    _getPointsAtPosition(pos, viz) {
+    _getPointsAtPosition (pos, viz) {
         const p = wToR(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
@@ -287,11 +288,11 @@ export default class Dataframe {
             const featureIndex = i / 2;
             const center = {
                 x: points[i],
-                y: points[i + 1],
+                y: points[i + 1]
             };
 
             const feature = this._getFeature(columnNames, featureIndex);
-            
+
             if (this._isFeatureFiltered(feature, viz.filter)) {
                 continue;
             }
@@ -310,7 +311,7 @@ export default class Dataframe {
             }
 
             const inside = pointInCircle(p, center, scale);
-            
+
             if (inside) {
                 features.push(this._getUserFeature(featureIndex));
             }
@@ -319,15 +320,15 @@ export default class Dataframe {
         return features;
     }
 
-    _getLinesAtPosition(pos, viz) {
+    _getLinesAtPosition (pos, viz) {
         return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
     }
 
-    _getPolygonAtPosition(pos, viz) {
+    _getPolygonAtPosition (pos, viz) {
         return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
     }
 
-    _getFeaturesFromTriangles(pos, widthExpression, filterExpression) {
+    _getFeaturesFromTriangles (pos, widthExpression, filterExpression) {
         const p = wToR(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
@@ -352,7 +353,7 @@ export default class Dataframe {
         };
 
         for (let i = 0; i < vertices.length; i += 6) {
-            if (i == 0 || i >= breakpoints[featureIndex]) {
+            if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this._getFeature(columnNames, featureIndex);
                 if (this._isFeatureFiltered(feature, filterExpression)) {
@@ -389,9 +390,9 @@ export default class Dataframe {
         return features;
     }
 
-    _getFeature(columnNames, featureIndex) {
+    _getFeature (columnNames, featureIndex) {
         const feature = {};
-        
+
         columnNames.forEach(name => {
             feature[name] = this.properties[name][featureIndex];
         });
@@ -399,19 +400,19 @@ export default class Dataframe {
         return feature;
     }
 
-    _isFeatureFiltered(feature, filterExpression) {
+    _isFeatureFiltered (feature, filterExpression) {
         return filterExpression.eval(feature) < 0.5;
     }
 
-    _getUserFeature(featureIndex) {
+    _getUserFeature (featureIndex) {
         let id;
         const properties = {};
-        
+
         Object.keys(this.properties).map(propertyName => {
             let prop = this.properties[propertyName][featureIndex];
             const column = this.metadata.properties[propertyName];
-            
-            if (column && column.type == 'category') {
+
+            if (column && column.type === 'category') {
                 prop = this.metadata.IDToCategory.get(prop);
             }
 
@@ -425,13 +426,13 @@ export default class Dataframe {
         return { id, properties };
     }
 
-    _addProperty(propertyName) {
+    _addProperty (propertyName) {
         if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
             this.getPropertyTexture(propertyName);
         }
     }
 
-    _createStyleTileTexture(numFeatures) {
+    _createStyleTileTexture (numFeatures) {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this.renderer.gl;
@@ -466,21 +467,21 @@ const _geometryFeature = {
     }
 };
 
-function _getVerticesForGeometry(feature, geometryType) {
+function _getVerticesForGeometry (feature, geometryType) {
     return _geometryFeature[geometryType] ? _geometryFeature[geometryType](feature) : null;
 }
 
-function _isFeatureInsideViewport(featureAABB, viewportAABB) {
+function _isFeatureInsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
             featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
-function _isFeatureOutsideViewport(featureAABB, viewportAABB) {
+function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport(triangles, center, width, height) {
+function _isPolygonCollidingViewport (triangles, center, width, height) {
     const viewport = _getViewportGeometry(center, width, height);
 
     for (let i = 0; i < triangles.length; i++) {
@@ -492,8 +493,7 @@ function _isPolygonCollidingViewport(triangles, center, width, height) {
     return false;
 }
 
-
-function _getViewportGeometry(center, width, height) {
+function _getViewportGeometry (center, width, height) {
     const w = width / 2;
     const h = height / 2;
 

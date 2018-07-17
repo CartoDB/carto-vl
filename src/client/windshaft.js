@@ -1,15 +1,13 @@
 import { version } from '../../package';
-import MVT from '../sources/Mvt';
+import MVT from '../sources/MVT';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 
-
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-
 
 // Get dataframes <- MVT <- Windshaft
 // Get metadata
@@ -18,24 +16,22 @@ const REQUEST_GET_MAX_URL_LENGTH = 2048;
 // Cache dataframe
 
 export default class Windshaft {
-
-    constructor(source) {
+    constructor (source) {
         this._source = source;
         this._exclusive = true;
 
         this._MNS = null;
         this._promiseMNS = null;
         this.inProgressInstantiations = {};
-
     }
 
-    bindLayer(addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
         this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
     }
 
-    _getInstantiationID(MNS, resolution, filtering, choices) {
+    _getInstantiationID (MNS, resolution, filtering, choices) {
         return JSON.stringify({
             MNS,
             resolution,
@@ -50,7 +46,7 @@ export default class Windshaft {
      * Returns  a promise to a Metadata
      * @param {*} viz
      */
-    async getMetadata(viz) {
+    async getMetadata (viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
@@ -67,7 +63,7 @@ export default class Windshaft {
         return this.metadata;
     }
 
-    requiresNewMetadata(viz) {
+    requiresNewMetadata (viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
@@ -78,7 +74,7 @@ export default class Windshaft {
         return this._needToInstantiate(MNS, resolution, filtering);
     }
 
-    _checkAcceptableMNS(MNS) {
+    _checkAcceptableMNS (MNS) {
         const columnAgg = {};
         MNS.columns.map(column => {
             const basename = schema.column.getBase(column);
@@ -96,11 +92,10 @@ export default class Windshaft {
      * So long as the viz doesn't change, getData() can be called repeatedly for different
      * viewports. If viz changes getMetadata() should be called before requesting data
      * for the new viz.
-     * @param {*} viewport
      */
-    getData(viewport) {
+    getData (zoom, viewport) {
         if (this._mvtClient) {
-            return this._mvtClient.requestData(viewport);// FIXME extend
+            return this._mvtClient.requestData(zoom, viewport);// FIXME extend
         }
     }
 
@@ -111,20 +106,20 @@ export default class Windshaft {
      *  - When the resolution changed.
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
-    _needToInstantiate(MNS, resolution, filtering) {
-        return !schema.equals(this._MNS, MNS)
-            || resolution != this.resolution
-            || (
-                JSON.stringify(filtering) != JSON.stringify(this.filtering)
-                && this.metadata.featureCount > MIN_FILTERING
+    _needToInstantiate (MNS, resolution, filtering) {
+        return !schema.equals(this._MNS, MNS) ||
+            resolution !== this.resolution ||
+            (
+                JSON.stringify(filtering) !== JSON.stringify(this.filtering) &&
+                this.metadata.featureCount > MIN_FILTERING
             );
     }
 
-    _isInstantiated() {
+    _isInstantiated () {
         return !!this.metadata;
     }
 
-    _intantiationChoices(metadata) {
+    _intantiationChoices (metadata) {
         let choices = {
             // default choices
             backendFilters: true
@@ -137,7 +132,7 @@ export default class Windshaft {
         return choices;
     }
 
-    async _instantiateUncached(MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
+    async _instantiateUncached (MNS, resolution, filters, choices = { backendFilters: true }, overrideMetadata = null) {
         const conf = this._getConfig();
         const agg = await this._generateAggregation(MNS, resolution);
         let select = this._buildSelectClause(MNS);
@@ -159,7 +154,7 @@ export default class Windshaft {
         }
         if (backendFilters) {
             const filteredSQL = this._buildQuery(select, backendFilters);
-            backendFiltersApplied = backendFiltersApplied || filteredSQL != aggSQL;
+            backendFiltersApplied = backendFiltersApplied || filteredSQL !== aggSQL;
             aggSQL = filteredSQL;
         }
 
@@ -169,7 +164,7 @@ export default class Windshaft {
         return { MNS, resolution, filters, metadata, urlTemplate: url };
     }
 
-    _updateStateAfterInstantiating({ MNS, resolution, filters, metadata, urlTemplate }) {
+    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplate }) {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
@@ -211,11 +206,11 @@ export default class Windshaft {
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
-    _getSubdomain(x, y) {
+    _getSubdomain (x, y) {
         // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
         return this._subdomains[Math.abs(x + y) % this._subdomains.length];
     }
-    async _instantiate(MNS, resolution, filters, choices, metadata) {
+    async _instantiate (MNS, resolution, filters, choices, metadata) {
         if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
             return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
         }
@@ -224,7 +219,7 @@ export default class Windshaft {
         return instantiationPromise;
     }
 
-    async _repeatableInstantiate(MNS, resolution, filters) {
+    async _repeatableInstantiate (MNS, resolution, filters) {
         // TODO: we shouldn't reinstantiate just to not apply backend filters
         // (we'd need to add a choice comparison function argument to repeatablePromise)
         let finalMetadata = null;
@@ -237,7 +232,7 @@ export default class Windshaft {
         return repeatablePromise(initialChoices, finalChoices, choices => this._instantiate(MNS, resolution, filters, choices, finalMetadata));
     }
 
-    _checkLayerMeta(MNS) {
+    _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
                 throw new Error('Aggregation not supported for this dataset');
@@ -245,21 +240,21 @@ export default class Windshaft {
         }
     }
 
-    _isAggregated() {
+    _isAggregated () {
         return this.metadata && this.metadata.isAggregated;
     }
 
-    _requiresAggregation(MNS) {
+    _requiresAggregation (MNS) {
         return MNS.columns.some(column => schema.column.isAggregated(column));
     }
 
-    _generateAggregation(MNS, resolution) {
+    _generateAggregation (MNS, resolution) {
         let aggregation = {
             columns: {},
             dimensions: {},
             placement: 'centroid',
             resolution: resolution,
-            threshold: 1,
+            threshold: 1
         };
 
         MNS.columns
@@ -279,20 +274,20 @@ export default class Windshaft {
         return aggregation;
     }
 
-    _buildSelectClause(MNS) {
+    _buildSelectClause (MNS) {
         const columns = MNS.columns.map(name => schema.column.getBase(name))
             .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
-        return columns.filter((item, pos) => columns.indexOf(item) == pos); // get unique values
+        return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
-    _buildQuery(select, filters) {
+    _buildQuery (select, filters) {
         const columns = select.join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
     }
 
-    _getConfig() {
+    _getConfig () {
         return {
             apiKey: this._source._apiKey,
             username: this._source._username,
@@ -300,13 +295,13 @@ export default class Windshaft {
         };
     }
 
-    free() {
+    free () {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
     }
 
-    async _getInstantiationPromise(query, conf, agg, aggSQL, columns, overrideMetadata = null) {
+    async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata = null) {
         const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
@@ -347,8 +342,8 @@ export default class Windshaft {
         };
     }
 
-    _adaptMetadata(meta, agg) {
-        const { stats, aggregation, dates_as_numbers } = meta;
+    _adaptMetadata (meta, agg) {
+        const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
         const geomType = adaptGeometryType(stats.geometryType);
 
@@ -372,7 +367,7 @@ export default class Windshaft {
                     category.name = category.category;
                     delete category.category;
                 });
-            } else if (dates_as_numbers && dates_as_numbers.includes(propertyName)) {
+            } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
                 ['min', 'max', 'avg'].map(fn => {
                     if (property[fn]) {
@@ -389,7 +384,7 @@ export default class Windshaft {
     }
 }
 
-function adaptGeometryType(type) {
+function adaptGeometryType (type) {
     switch (type) {
         case 'ST_MultiPolygon':
         case 'ST_Polygon':
@@ -404,7 +399,7 @@ function adaptGeometryType(type) {
     }
 }
 
-function adaptColumnType(type) {
+function adaptColumnType (type) {
     if (type === 'string') {
         return 'category';
     }
@@ -413,19 +408,18 @@ function adaptColumnType(type) {
 
 // generate a promise under certain assumptions/choices; then if the result changes the assumptions,
 // repeat the generation with the new information
-async function repeatablePromise(initialAssumptions, assumptionsFromResult, promiseGenerator) {
+async function repeatablePromise (initialAssumptions, assumptionsFromResult, promiseGenerator) {
     let promise = promiseGenerator(initialAssumptions);
     let result = await promise;
     let finalAssumptions = assumptionsFromResult(result);
-    if (JSON.stringify(initialAssumptions) == JSON.stringify(finalAssumptions)) {
+    if (JSON.stringify(initialAssumptions) === JSON.stringify(finalAssumptions)) {
         return promise;
-    }
-    else {
+    } else {
         return promiseGenerator(finalAssumptions);
     }
 }
 
-function getMapRequest(conf, mapConfig) {
+function getMapRequest (conf, mapConfig) {
     const mapConfigPayload = JSON.stringify(mapConfig);
     const auth = encodeParameter('api_key', conf.apiKey);
     const client = encodeParameter('client', `vl-${version}`);
@@ -451,7 +445,7 @@ function getMapRequest(conf, mapConfig) {
     });
 }
 
-function getLayerUrl(layergroup, layerIndex, conf) {
+function getLayerUrl (layergroup, layerIndex, conf) {
     const params = [encodeParameter('api_key', conf.apiKey)];
     if (layergroup.cdn_url && layergroup.cdn_url.templates) {
         const urlTemplates = layergroup.cdn_url.templates.https;
@@ -460,15 +454,15 @@ function getLayerUrl(layergroup, layerIndex, conf) {
     return generateUrl(generateMapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
 }
 
-function encodeParameter(name, value) {
+function encodeParameter (name, value) {
     return `${name}=${encodeURIComponent(value)}`;
 }
 
-function generateUrl(url, parameters = []) {
+function generateUrl (url, parameters = []) {
     return `${url}?${parameters.join('&')}`;
 }
 
-function generateMapsApiUrl(conf, path) {
+function generateMapsApiUrl (conf, path) {
     let url = `${conf.serverURL}/api/v1/map`;
     if (path) {
         url += path;

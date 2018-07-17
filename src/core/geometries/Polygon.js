@@ -6,14 +6,14 @@ import Geometry from './Geometry';
  */
 
 export default class Polygon extends Geometry {
-    constructor(x = 0, y = 0, points = [], angle = 0, scaleX = 1, scaleY = 1) {
+    constructor (x = 0, y = 0, points = [], angle = 0, scaleX = 1, scaleY = 1) {
         super(x, y);
 
         this.angle = angle;
         this.scaleX = scaleX;
         this.scaleY = scaleY;
         this.isPolygon = true;
-        
+
         this._x = x;
         this._y = y;
         this._angle = angle;
@@ -35,7 +35,7 @@ export default class Polygon extends Geometry {
     /**
      * Sets the points making up the polygon. It's important to use this function when changing the polygon's shape to ensure internal data is also updated.
      */
-    setPoints(newPoints) {
+    setPoints (newPoints) {
         const count = newPoints.length;
 
         this._points = new Float64Array(count * 2);
@@ -58,7 +58,7 @@ export default class Polygon extends Geometry {
     /**
      * Calculates and caches the polygon's world coordinates based on its points, angle, and scale
      */
-    _calculateCoords() {
+    _calculateCoords () {
         const x = this.x;
         const y = this.y;
         const angle = this.angle;
@@ -85,7 +85,7 @@ export default class Polygon extends Geometry {
             coords[ix] = coordX;
             coords[iy] = coordY;
 
-            [ minX, maxX, minY, maxY] = _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY);
+            [ minX, maxX, minY, maxY ] = _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY);
         }
 
         this._x = x;
@@ -104,7 +104,7 @@ export default class Polygon extends Geometry {
     /**
      * Calculates the normals and edges of the polygon's sides
      */
-    _calculateNormalsAndEdges() {
+    _calculateNormalsAndEdges () {
         const coords = this._coords;
         const edges = this._edges;
         const normals = this._normals;
@@ -119,14 +119,14 @@ export default class Polygon extends Geometry {
             edges[ix] = x;
             edges[iy] = y;
             normals[ix] = length ? y / length : 0;
-            normals[iy] = length ? - x / length : 0;
+            normals[iy] = length ? -x / length : 0;
         }
 
         this._dirtyNormals = false;
     }
 }
 
-function _updateCoordsAngle(angle, coordX, coordY) {
+function _updateCoordsAngle (angle, coordX, coordY) {
     if (angle) {
         const cos = Math.cos(angle);
         const sin = Math.sin(angle);
@@ -137,10 +137,10 @@ function _updateCoordsAngle(angle, coordX, coordY) {
         coordY = tmpX * sin + tmpY * cos;
     }
 
-    return [ coordX, coordY];
+    return [ coordX, coordY ];
 }
 
-function _updateMinMax(ix, minX, maxX, minY, maxY, coordX, coordY) {
+function _updateMinMax (ix, minX, maxX, minY, maxY, coordX, coordY) {
     if (ix === 0) {
         minX = maxX = coordX;
         minY = maxY = coordY;

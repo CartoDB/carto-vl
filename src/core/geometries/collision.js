@@ -2,7 +2,7 @@
  * Determines if two bodies are colliding using the Separating Axis Theorem
  * https://github.com/Prozi/detect-collisions/
  */
-export default function collidesSAT(a, b, aabb = true) {
+export default function collidesSAT (a, b, aabb = true) {
     if (a.isPolygon) {
         if (
             a._dirtyCoords ||
@@ -45,7 +45,7 @@ export default function collidesSAT(a, b, aabb = true) {
 /**
  * Determines if two bodies' axis aligned bounding boxes are colliding
  */
-function _aabbAABB(a, b) {
+function _aabbAABB (a, b) {
     const aPolygon = a.isPolygon;
     const aX = aPolygon ? 0 : a.x;
     const aY = aPolygon ? 0 : a.y;
@@ -60,18 +60,18 @@ function _aabbAABB(a, b) {
     const bY = bPolygon ? 0 : b.y;
     const bRadius = bPolygon ? 0 : b.radius * b.scale;
     const bMinX = bPolygon ? b._minX : bX - bRadius;
-    const b_minY = bPolygon ? b._minY : bY - bRadius;
+    const bMinY = bPolygon ? b._minY : bY - bRadius;
     const bMaxX = bPolygon ? b._maxX : bX + bRadius;
-    const b_maxY = bPolygon ? b._maxY : bY + bRadius;
+    const bMaxY = bPolygon ? b._maxY : bY + bRadius;
 
-    return aMinX < bMaxX && aMinY < b_maxY && aMaxX > bMinX && aMaxY > b_minY;
+    return aMinX < bMaxX && aMinY < bMaxY && aMaxX > bMinX && aMaxY > bMinY;
 }
 
 /**
  * Determines if two polygons are colliding
  */
 
-function _polygonCollision(a, b) {
+function _polygonCollision (a, b) {
     const aCount = a._coords.length;
     const bCount = b._coords.length;
 
@@ -110,7 +110,7 @@ function _polygonCollision(a, b) {
 /**
  * Determines if two polygons are separated by an axis
  */
-function separatingAxis(aCoords, bCoords, x, y) {
+function separatingAxis (aCoords, bCoords, x, y) {
     const aCount = aCoords.length;
     const bCount = bCoords.length;
 

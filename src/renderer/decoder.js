@@ -18,27 +18,27 @@ import { getJointNormal, getLineNormal } from '../utils/geometry';
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
 // The geom will be an array of coordinates in this case`
-export function decodeGeom(geomType, geom) {
-    if (geomType == 'point') {
+export function decodeGeom (geomType, geom) {
+    if (geomType === 'point') {
         return decodePoint(geom);
     }
-    if (geomType == 'polygon') {
+    if (geomType === 'polygon') {
         return decodePolygon(geom);
     }
-    if (geomType == 'line') {
+    if (geomType === 'line') {
         return decodeLine(geom);
     }
     throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
-function decodePoint(vertices) {
+function decodePoint (vertices) {
     return {
         vertices: vertices,
         breakpoints: []
     };
 }
 
-function isClipped(polygon, i, j) {
+function isClipped (polygon, i, j) {
     if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {
         if (polygon.clippedType[polygon.clipped.indexOf(i)] &
             polygon.clippedType[polygon.clipped.indexOf(j)]) {
@@ -48,11 +48,11 @@ function isClipped(polygon, i, j) {
     return false;
 }
 
-function decodePolygon(geometry) {
-    let vertices = []; //Array of triangle vertices
+function decodePolygon (geometry) {
+    let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    
+
     geometry.forEach(feature => {
         feature.forEach(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
@@ -119,7 +119,7 @@ function decodePolygon(geometry) {
     };
 }
 
-function decodeLine(geom) {
+function decodeLine (geom) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature

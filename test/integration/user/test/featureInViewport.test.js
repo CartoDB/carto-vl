@@ -20,7 +20,7 @@ describe('viewport features', () => {
                     container: 'map',
                     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
                     center: [-6.754536880813703, 35.30378023840868],
-                    zoom: 3.29,
+                    zoom: 3.29
                 });
 
                 // Define layer
@@ -30,7 +30,7 @@ describe('viewport features', () => {
                 `);
                 layer = new carto.Layer('layer', source, viz);
             });
-           
+
             it('should correctly detect features inside viewport', done => {
                 layer.addTo(map, 'watername_ocean');
                 layer.on('loaded', () => {

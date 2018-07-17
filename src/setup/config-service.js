@@ -1,7 +1,7 @@
 import * as util from '../utils/util';
 import CartoValidationError from '../errors/carto-validation-error';
 
-let defaultConfig = undefined;
+let defaultConfig;
 
 /**
  * Set default configuration parameters
@@ -12,7 +12,7 @@ let defaultConfig = undefined;
  * @memberof carto
  * @api
  */
-function setDefaultConfig(config) {
+function setDefaultConfig (config) {
     checkConfig(config);
     defaultConfig = config;
 }
@@ -21,14 +21,14 @@ function setDefaultConfig(config) {
  * Get default config
  * @return {object}
  */
-function getDefaultConfig() {
+function getDefaultConfig () {
     return defaultConfig;
 }
 
 /**
  * Clean default config object
  */
-function cleanDefaultConfig() {
+function cleanDefaultConfig () {
     defaultConfig = undefined;
 }
 
@@ -37,7 +37,7 @@ function cleanDefaultConfig() {
  *
  * @param  {object} config
  */
-function checkConfig(config) {
+function checkConfig (config) {
     if (config) {
         if (!util.isObject(config)) {
             throw new CartoValidationError('setup', 'configObjectRequired');
@@ -46,7 +46,7 @@ function checkConfig(config) {
     }
 }
 
-function _checkServerURL(serverURL) {
+function _checkServerURL (serverURL) {
     if (!util.isString(serverURL)) {
         throw new CartoValidationError('setup', 'serverURLStringRequired');
     }

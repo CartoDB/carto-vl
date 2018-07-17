@@ -5,16 +5,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');
     describe('viewport filtering', () => {
-        function fakeDrawMetadata(expr) {
+        function fakeDrawMetadata (expr) {
             expr._compile({
                 properties: {
                     numeric_with_nulls: { type: 'number' },
                     price: { type: 'number' },
                     cat: {
-                        type: 'category', categories: { a: 0, b: 0, c: 0 },
+                        type: 'category', categories: { a: 0, b: 0, c: 0 }
                     }
                 },
-                IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']]),
+                IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']])
             });
             expr._resetViewportAgg();
             expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
@@ -107,14 +107,12 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
 
-
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
             viewportPercentile = s.viewportPercentile($price, 51);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(1.5);
-
 
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
@@ -126,7 +124,6 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 100);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
-
         });
 
         it('viewportHistogram($price, 1, 3) should eval to the correct histogram', () => {
@@ -166,6 +163,5 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 }
             ]);
         });
-
     });
 });

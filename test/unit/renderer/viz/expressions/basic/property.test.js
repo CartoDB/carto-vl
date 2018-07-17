@@ -13,7 +13,7 @@ describe('src/renderer/viz/expressions/basic/property', () => {
         it('should return the value from the feature', () => {
             const fakeFeature = {
                 property0: 'foo',
-                property1: 'bar',
+                property1: 'bar'
             };
 
             const $property0 = s.property('property0');

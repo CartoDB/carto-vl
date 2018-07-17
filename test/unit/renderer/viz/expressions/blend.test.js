@@ -25,7 +25,7 @@ describe('src/renderer/viz/expressions/blend', () => {
         });
 
         it('should interpolate a float value 50%', () => {
-            const actual = s.blend(0, 100, .5).eval();
+            const actual = s.blend(0, 100, 0.5).eval();
             expect(actual).toEqual(50);
         });
 
@@ -35,5 +35,3 @@ describe('src/renderer/viz/expressions/blend', () => {
         });
     });
 });
-
-

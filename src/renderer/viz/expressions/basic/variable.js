@@ -19,7 +19,7 @@ import { checkString } from '../utils';
  * @example <caption>(String)</caption>
  * const viz = new carto.Viz(`
  *   @sum_price: clusterSum($price)
- *   filter: @sum_price != 'london'
+ *   filter: @sum_price !== 'london'
  * `);
  *
  * @memberof carto.expressions
@@ -28,16 +28,16 @@ import { checkString } from '../utils';
  * @api
  */
 export class Variable extends BaseExpression {
-    constructor() {
+    constructor () {
         super({});
     }
 }
-function isFunction(functionToCheck) {
+function isFunction (functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
-export default function variable(name) {
+export default function variable (name) {
     checkString('variable', 'name', 0, name);
-    if (name == '') {
+    if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }
     let alias;
@@ -53,11 +53,11 @@ export default function variable(name) {
     };
     let aliaser = {
         set: (obj, prop, value) => {
-            if (prop == 'parent') {
+            if (prop === 'parent') {
                 obj[prop] = value;
-            } else if (prop == 'notify') {
-                return obj[prop];
-            } else if(alias && alias[prop]) {
+            } else if (prop === 'notify') {
+                obj[prop] = value;
+            } else if (alias && alias[prop]) {
                 alias[prop] = value;
             } else {
                 return false;
@@ -66,11 +66,15 @@ export default function variable(name) {
             return true;
         },
         get: (obj, prop) => {
-            if (prop == '_resolveAliases') {
+            if (prop === 'parent') {
+                return obj[prop];
+            } else if (prop === '_resolveAliases') {
                 return resolve;
-            } else if (prop == '_getDependencies') {
+            } else if (prop === '_getDependencies') {
                 return _getDependencies;
-            } else if (prop == 'notify') {
+            } else if (prop === 'notify') {
+                return obj[prop];
+            } else if (prop === 'blendTo') {
                 return obj[prop];
             }
             if (alias && alias[prop]) {

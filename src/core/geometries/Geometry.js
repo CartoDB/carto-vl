@@ -5,7 +5,7 @@ import collidesSAT from './collision';
  * https://github.com/Prozi/detect-collisions/
  */
 export default class Geometry {
-    constructor(x = 0, y = 0) {
+    constructor (x = 0, y = 0) {
         this.x = x;
         this.y = y;
     }
@@ -13,7 +13,7 @@ export default class Geometry {
     /**
      * Determines if the geometry is colliding with another geometry
      */
-    collides(geometry) {
+    collides (geometry) {
         return collidesSAT(this, geometry);
     }
 }

@@ -53,7 +53,6 @@ describe('api/layer', () => {
             }).toThrowError('The given object is not a valid viz. See "carto.Viz".');
         });
 
-
         it('should throw an error if a viz is already added to another layer', () => {
             new Layer('layer1', source, viz);
             expect(() => {
@@ -131,7 +130,7 @@ describe('api/layer', () => {
             let layer;
 
             const loadEvent = {};
-            
+
             const mapMock = {
                 isStyleLoaded: jasmine.createSpy('isStyleLoaded').and.returnValue(true),
                 on: (id, callback) => {

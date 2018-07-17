@@ -62,7 +62,7 @@ if (prerelease) {
     uploadFiles('v' + major + '.' + minor + '.' + patch);
 }
 
-function uploadFiles(version) {
+function uploadFiles (version) {
     console.log('Publish', version);
     let uploader = client.uploadDir({
         localDir: 'dist',
@@ -73,12 +73,12 @@ function uploadFiles(version) {
             Prefix: 'carto-vl/' + version + '/'
         }
     });
-    uploader.on('error', function(err) {
+    uploader.on('error', function (err) {
         console.error('Error: unable to upload:', err.stack);
     });
-    uploader.on('progress', function() {
+    uploader.on('progress', function () {
     });
-    uploader.on('end', function() {
+    uploader.on('end', function () {
         console.log('Done', version);
     });
 }

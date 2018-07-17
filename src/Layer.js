@@ -34,7 +34,6 @@ import Viz from './Viz';
  * @api
 */
 
-
 /**
 *
 * A Layer is the primary way to visualize geospatial data.
@@ -58,17 +57,16 @@ import Viz from './Viz';
 * @api
 */
 export default class Layer {
-    constructor(id, source, viz) {
+    constructor (id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
         this._oldDataframes = new Set();
-
+        this._isInitialized = false;
         this._init(id, source, viz);
-
     }
 
-    _init(id, source, viz) {
+    _init (id, source, viz) {
         viz._boundLayer = this;
         this.state = 'init';
         this._id = id;
@@ -77,9 +75,11 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
+
         this._context = new Promise((resolve) => {
-            this._contextInitCallback = resolve;
+            this._contextInitialize = resolve;
         });
+
         this._integratorPromise = new Promise((resolve) => {
             this._integratorCallback = resolve;
         });
@@ -102,7 +102,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    on(eventName, callback) {
+    on (eventName, callback) {
         return this._emitter.on(eventName, callback);
     }
 
@@ -115,7 +115,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    off(eventName, callback) {
+    off (eventName, callback) {
         return this._emitter.off(eventName, callback);
     }
 
@@ -128,7 +128,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    addTo(map, beforeLayerID) {
+    addTo (map, beforeLayerID) {
         if (this._isCartoMap(map)) {
             this._addToCartoMap(map, beforeLayerID);
         } else if (this._isMGLMap(map)) {
@@ -151,16 +151,16 @@ export default class Layer {
      * @instance
      * @api
      */
-    async update(source, viz) {
+    async update (source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
-        const loadSpritesPromise = viz.loadSprites();
+        const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
         await this._integratorPromise;
-        await loadSpritesPromise;
+        await loadImagesPromise;
 
         await this._context;
         if (this._atomicChangeUID > uid) {
@@ -215,7 +215,7 @@ export default class Layer {
      * @instance
      * @api
      */
-    async blendToViz(viz, ms = 400, interpolator = cubic) {
+    async blendToViz (viz, ms = 400, interpolator = cubic) {
         try {
             this._checkViz(viz);
             viz.setDefaultsIfRequired(this.metadata.geomType);
@@ -255,14 +255,17 @@ export default class Layer {
     }
 
     // The integrator will call this method once the webgl context is ready.
-    initCallback() {
-        this._renderLayer.renderer = this._integrator.renderer;
-        this._contextInitCallback();
-        this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
-        this.requestMetadata();
+    initialize () {
+        if (!this._isInitialized) {
+            this._isInitialized = true;
+            this._renderLayer.renderer = this._integrator.renderer;
+            this._contextInitialize();
+            this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
+            this.requestMetadata();
+        }
     }
 
-    async requestMetadata(viz) {
+    async requestMetadata (viz) {
         viz = viz || this._viz;
         if (!viz) {
             return;
@@ -270,60 +273,59 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData() {
+    async requestData () {
         if (!this.metadata) {
             return;
         }
-        this._source.requestData(this._getViewport());
+        this._source.requestData(this._getZoom(), this._getViewport());
         this._fireUpdateOnNextRender = true;
     }
 
-    hasDataframes() {
+    hasDataframes () {
         return this._renderLayer.hasDataframes();
     }
 
-    getId() {
+    getId () {
         return this._id;
     }
 
-    getSource() {
+    getSource () {
         return this._source;
     }
 
-    getViz() {
+    getViz () {
         return this._viz;
     }
 
-    getNumFeatures() {
+    getNumFeatures () {
         return this._renderLayer.getNumFeatures();
     }
 
-    getIntegrator() {
+    getIntegrator () {
         return this._integrator;
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition (pos) {
         return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
     }
 
-    $paintCallback() {
+    $paintCallback () {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
             this._integrator.renderer.renderLayer(this._renderLayer);
             if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
-
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-            if (!this._isLoaded && this.state == 'dataLoaded') {
+            if (!this._isLoaded && this.state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
             }
         }
     }
 
-    _fire(eventType, eventData) {
+    _fire (eventType, eventData) {
         try {
             return this._emitter.emit(eventType, eventData);
         } catch (err) {
@@ -335,7 +337,7 @@ export default class Layer {
      * Callback executed when the client adds a new dataframe
      * @param {Dataframe} dataframe
      */
-    _onDataframeAdded(dataframe) {
+    _onDataframeAdded (dataframe) {
         dataframe.setFreeObserver(() => {
             this._integrator.invalidateWebGLState();
             this._integrator.needRefresh();
@@ -352,32 +354,32 @@ export default class Layer {
     /**
      * Callback executed when the client finishes loading data
      */
-    _onDataLoaded() {
+    _onDataLoaded () {
         this.state = 'dataLoaded';
         this._integrator.needRefresh();
     }
 
-    _addLayerIdToFeature(feature) {
+    _addLayerIdToFeature (feature) {
         feature.layerId = this._id;
         return feature;
     }
 
-    _isCartoMap(map) {
+    _isCartoMap (map) {
         return map instanceof CartoMap;
     }
 
-    _isMGLMap() {
+    _isMGLMap () {
         // TODO: implement this
         return true;
     }
 
-    _addToCartoMap(map, beforeLayerID) {
+    _addToCartoMap (map, beforeLayerID) {
         this._integrator = getCMIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
         this._integratorCallback(this._integrator);
     }
 
-    _addToMGLMap(map, beforeLayerID) {
+    _addToMGLMap (map, beforeLayerID) {
         const STYLE_ERROR_REGEX = /Style is not done loading/;
 
         try {
@@ -393,25 +395,25 @@ export default class Layer {
         }
     }
 
-    _onMapLoaded(map, beforeLayerID) {
+    _onMapLoaded (map, beforeLayerID) {
         this._integrator = getMGLIntegrator(map);
         this._integrator.addLayer(this, beforeLayerID);
         this._integratorCallback(this._integrator);
     }
 
-    _compileShaders(viz, metadata) {
+    _compileShaders (viz, metadata) {
         viz.compileShaders(this._integrator.renderer.gl, metadata);
     }
 
-    async _vizChanged(viz) {
+    async _vizChanged (viz) {
         await this._context;
         if (!this._source) {
             throw new Error('A source is required before changing the viz');
         }
         const source = this._source;
-        const loadSpritesPromise = viz.loadSprites();
+        const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
-        await loadSpritesPromise;
+        await loadImagesPromise;
 
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
@@ -422,7 +424,7 @@ export default class Layer {
         return this.requestData();
     }
 
-    _checkId(id) {
+    _checkId (id) {
         if (util.isUndefined(id)) {
             throw new CartoValidationError('layer', 'idRequired');
         }
@@ -434,7 +436,7 @@ export default class Layer {
         }
     }
 
-    _checkSource(source) {
+    _checkSource (source) {
         if (util.isUndefined(source)) {
             throw new CartoValidationError('layer', 'sourceRequired');
         }
@@ -443,7 +445,7 @@ export default class Layer {
         }
     }
 
-    _checkViz(viz) {
+    _checkViz (viz) {
         if (util.isUndefined(viz)) {
             throw new CartoValidationError('layer', 'vizRequired');
         }
@@ -455,13 +457,18 @@ export default class Layer {
         }
     }
 
-    _getViewport() {
+    _getViewport () {
         if (this._integrator) {
             return this._integrator.renderer.getBounds();
         }
     }
+    _getZoom () {
+        if (this._integrator) {
+            return this._integrator.getZoomLevel();
+        }
+    }
 
-    _freeSource() {
+    _freeSource () {
         if (this._source) {
             this._source.free();
         }

@@ -24,7 +24,7 @@ import { checkString, hexToRgb, getStringErrorPreface } from '../utils';
  * @api
  */
 export default class Hex extends BaseExpression {
-    constructor(hexadecimalColor) {
+    constructor (hexadecimalColor) {
         checkString('hex', 'hexadecimalColor', 0, hexadecimalColor);
         super({});
         this.type = 'color';
@@ -34,13 +34,13 @@ export default class Hex extends BaseExpression {
             throw new Error(getStringErrorPreface('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
     }
-    get value() {
+    get value () {
         return this.eval();
     }
-    eval() {
+    eval () {
         return this.color;
     }
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
     }
