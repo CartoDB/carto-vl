@@ -25,8 +25,12 @@ export default class Base {
      */
     constructor (children) {
         this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => this[name] = implicitCast(children[name]));
-        this._getChildren().map(child => child.parent = this);
+        Object.keys(children).map(name => {
+            this[name] = implicitCast(children[name]);
+        });
+        this._getChildren().map(child => {
+            child.parent = this;
+        });
         this.preface = '';
         this._shaderBindings = new Map();
     }
@@ -91,7 +95,9 @@ export default class Base {
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
-        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        childSources.map((source, index) => {
+            childInlines[this.childrenNames[index]] = source.inline;
+        });
         return {
             preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + this.preface),
             inline: this.inlineMaker(childInlines, getGLSLforProperty)

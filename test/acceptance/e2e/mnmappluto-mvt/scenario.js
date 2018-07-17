@@ -51,7 +51,9 @@ async function loadMVT() {
     const layer = new carto.Layer('myCartoLayer', source, viz);
 
     layer.addTo(map);
-    layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
+    layer.on('loaded', () => {
+        window.loaded = true;
+    });
 }
 
 loadMVT();

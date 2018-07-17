@@ -75,11 +75,11 @@ export default class Layer {
         this._lastViewport = null;
         this._lastMNS = null;
         this._integrator = null;
-        
+
         this._context = new Promise((resolve) => {
             this._contextInitialize = resolve;
         });
-        
+
         this._integratorPromise = new Promise((resolve) => {
             this._integratorCallback = resolve;
         });
@@ -255,7 +255,7 @@ export default class Layer {
     }
 
     // The integrator will call this method once the webgl context is ready.
-    initialize() {
+    initialize () {
         if (!this._isInitialized) {
             this._isInitialized = true;
             this._renderLayer.renderer = this._integrator.renderer;

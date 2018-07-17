@@ -78,7 +78,9 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             checkLooseType(name, 'list', 1, 'category-array', list);
 
             let children = { value };
-            list.elems.map((arg, index) => children[`arg${index}`] = arg);
+            list.elems.map((arg, index) => {
+                children[`arg${index}`] = arg;
+            });
             super(children);
             this.list = list;
             this.inlineMaker = inlineMaker(this.list.elems);

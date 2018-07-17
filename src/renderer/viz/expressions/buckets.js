@@ -93,7 +93,9 @@ export default class Buckets extends BaseExpression {
             input
         };
 
-        list.elems.map((item, index) => children[`arg${index}`] = item);
+        list.elems.map((item, index) => {
+            children[`arg${index}`] = item;
+        });
         super(children);
         this.numCategories = list.elems.length + 1;
         this.list = list;
@@ -143,7 +145,9 @@ export default class Buckets extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
-        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        childSources.map((source, index) => {
+            childInlines[this.childrenNames[index]] = source.inline;
+        });
         const funcName = `buckets${this._uid}`;
         const cmp = this.input.type === 'category' ? '==' : '<';
         const elif = (_, index) =>

@@ -41,7 +41,9 @@ export class Classifier extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
-        childSources.map((source, index) => childInlines[this.childrenNames[index]] = source.inline);
+        childSources.map((source, index) => {
+            childInlines[this.childrenNames[index]] = source.inline;
+        });
         const funcName = `classifier${this.classifierUID}`;
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){

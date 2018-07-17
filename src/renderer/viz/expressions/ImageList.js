@@ -32,7 +32,9 @@ export default class ImageList extends Base {
 
         const children = {};
 
-        imageList.forEach((image, i) => children[`image${i}`] = image);
+        imageList.forEach((image, i) => {
+            children[`image${i}`] = image;
+        });
         super(children);
         this.numImages = imageList.length;
         this.type = 'image';
