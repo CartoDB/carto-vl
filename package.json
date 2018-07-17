@@ -63,8 +63,8 @@
     "webpack-cli": "^2.1.4",
     "webpack-glsl-loader": "^1.0.1"
   },
-  "main": "src/index.js",
   "module": "carto-vl.js",
+  "main": "carto-vl.js",
   "jsnext:main": "carto-vl.js",
   "scripts": {
     "prepublish": "yarn build:npm",
