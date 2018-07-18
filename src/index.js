@@ -29,9 +29,10 @@ import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import SQL from './sources/SQL';
+import { version } from '../package.json';
 
 // Namespaces
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export { version, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
