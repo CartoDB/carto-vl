@@ -20,8 +20,8 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run: echo "localhost localhost.localhost.lan" | sudo tee -a  /etc/hosts
-      - run: yarn wait-on http://localhost.localhost.lan:8181 && yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000
+      - run: echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
+      - run: yarn wait-on http://localhost.localhost.lan:8181 && yarn build:dev && yarn mocha test/acceptance/e2e.test.js --timeout 10000
 
 
 # test-unit-lint-docs
