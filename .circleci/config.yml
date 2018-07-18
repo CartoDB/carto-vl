@@ -26,6 +26,7 @@ jobs:
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
             sudo apt-get update && sudo apt-get install yarn
             yarn install
+            sudo echo "127.0.0.1 localhost.localhost.lan" >> /etc/hosts
             yarn test:e2e
 
 # test-unit-lint-docs
