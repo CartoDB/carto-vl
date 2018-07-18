@@ -175,16 +175,13 @@ let config = {
             // 64 may have artifacts but is faster.
             // Less important if we can turn metatiling on.
             bufferSize: 64,
-
             // SQL queries will be wrapped with ST_SnapToGrid
             // Snapping all points of the  geometry to a regular grid
             snapToGrid: false,
-
             // SQL queries will be wrapped with ST_ClipByBox2D
             // Returning the portion of a geometry falling within a rectangle
             // It will only work if snapToGrid is enabled
-            clipByBox2d: false, // this requires postgis >=2.2 and geos >=3.5
-
+            clipByBox2d: false,
             postgis: {
                 // Parameters to pass to datasource plugin of mapnik
                 // See http://github.com/mapnik/mapnik/wiki/PostGIS
@@ -194,19 +191,19 @@ let config = {
                 port: 5432,
                 extent: '-20037508.3,-20037508.3,20037508.3,20037508.3',
                 // max number of rows to return when querying data, 0 means no limit
-                row_limit: 65535,
+                row_limit: 0,
                 /*
-               * Set persist_connection to false if you want
-               * database connections to be closed on renderer
-               * expiration (1 minute after last use).
-               * Setting to true (the default) would never
-               * close any connection for the server's lifetime
-               */
+                * Set persist_connection to false if you want
+                * database connections to be closed on renderer
+                * expiration (1 minute after last use).
+                * Setting to true (the default) would never
+                * close any connection for the server's lifetime
+                */
                 persist_connection: false,
                 simplify_geometries: true,
                 use_overviews: true, // use overviews to retrieve raster
                 max_size: 500,
-                twkb_encoding: false
+                twkb_encoding: true
             },
 
             limits: {
