@@ -13,6 +13,9 @@ jobs:
       - checkout
       # - restore_cache: # special step to restore the dependency cache
       #     key: dependency-cache-{{ checksum "package.json" }}
+      - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
+      - run: nvm install 6
+      - run: nvm use 6
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       - run: echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       - run: sudo apt-get update && sudo apt-get install yarn
@@ -20,8 +23,6 @@ jobs:
       #     key: dependency-cache-{{ checksum "package.json" }}
       #     paths:
       #       - ./node_modules
-      - run: nvm install 8
-      - run: nvm use 8
       - run: yarn install
       - run: yarn test:e2e
 
