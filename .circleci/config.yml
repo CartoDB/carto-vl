@@ -8,12 +8,15 @@ jobs:
 
   lint:
     docker:
-      # specify the version you desire here
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+       # Primary container image where all steps run.
+       - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+       # Secondary container image on common network.
+       - image: carto/windshaft-cartovl-testing
+            command: [./prepare.sh]
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache: # special step to restore the dependency cache 
+      - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
       - run: yarn install
       - save_cache: # special step to save the dependency cache
@@ -30,7 +33,7 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      - restore_cache: # special step to restore the dependency cache 
+      - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
       - run: yarn install
       - save_cache: # special step to save the dependency cache
@@ -40,7 +43,7 @@ jobs:
       - run: yarn test:unit
       - run: yarn lint
       - run: yarn docs
-  
+
   test-user:
     docker:
       # specify the version you desire here
