@@ -14,7 +14,9 @@ jobs:
       # - restore_cache: # special step to restore the dependency cache
       #     key: dependency-cache-{{ checksum "package.json" }}
       - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-      - run: source ~/.bashrc
+      - run: 'export NVM_DIR="/opt/circleci/.nvm"'
+      - run: '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm'
+      - run: '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion'
       - run: nvm install 6
       - run: nvm use 6
       - run: curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
