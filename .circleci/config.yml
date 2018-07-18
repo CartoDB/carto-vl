@@ -7,50 +7,22 @@ version: 2
 jobs:
 # E2E
   lint:
-    machine: true
+    docker:
+      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: carto/windshaft-cartovl-testing
+        command: [./prepare.sh]
     working_directory: ~/repo
-    steps:
       - checkout
       - restore_cache: # special step to restore the dependency cache
-          key: dependency-cache-{{ checksum "test/acceptance/docker/Dockerfile" }}
-      - run: docker pull carto/windshaft-cartovl-testing
-      - save_cache: # special step to save the dependency cache
-          key: dependency-cache-{{ checksum "test/acceptance/docker/Dockerfile" }}
-          paths:
-            - /var/lib/docker/
-      - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
-      - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-      - run:
-          command: |
-            source ~/.bash_profile
-            nvm install 8
-      - run:
-          command: |
-            source ~/.bash_profile
-            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-            sudo apt-get update && sudo apt-get install yarn
-      - run:
-          command: |
-            source ~/.bash_profile
-            nvm use 8
-            sudo apt-get update && sudo apt-get install yarn
-      - run:
-          command: |
-            source ~/.bash_profile
-            nvm use 8
-            yarn install
-            echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
+      - run: yarn install
       - save_cache: # special step to save the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run:
-          command: |
-            source ~/.bash_profile
-            nvm use 8
-            yarn test:e2e
+      - run: echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
+      - run: yarn wait-on http://localhost.localhost.lan:8181 && yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000
+
 
 # test-unit-lint-docs
   test-unit:
