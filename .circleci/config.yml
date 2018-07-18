@@ -32,6 +32,7 @@ jobs:
       - run:
           command: |
             source ~/.bash_profile
+            nvm use 8
             yarn install
             echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
       - save_cache: # special step to save the dependency cache
