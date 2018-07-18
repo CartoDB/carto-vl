@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Animation demo | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,20 +10,22 @@
   <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
 
   <style>
-      body {
-        margin: 0;
-        padding: 0;
-      }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
   </style>
 
 </head>
+
 <body>
   <div id="map"></div>
 
   <script>
     const SIZE = 20;
     const VIEWPORT_SIZE = 500;
-    
+
     const $map = document.getElementById('map');
     $map.style.width = `${VIEWPORT_SIZE}px`;
     $map.style.height = `${VIEWPORT_SIZE}px`;
@@ -33,12 +36,11 @@
         version: 8,
         sources: {},
         layers: [{
-            id: 'background',
-            type: 'background',
-            paint: {
-              'background-color': 
-              'black'
-            }
+          id: 'background',
+          type: 'background',
+          paint: {
+            'background-color': 'black'
+          }
         }]
       },
       center: [0, 0],
@@ -46,60 +48,89 @@
       dragRotate: false
     });
 
-    const source = new carto.source.GeoJSON(generateData(), { id: 'cartodb_id' });
+    const source = new carto.source.GeoJSON(generateData(), {
+      id: 'cartodb_id'
+    });
 
     function generateData() {
-
       const innerTriangle = {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [ [0, 50], [0, 0], [50, 0], [0, 50] ]
-              ]
-            },
-            properties: {
-              cartodb_id: 1
-            }
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [0, 50],
+              [0, 0],
+              [50, 0],
+              [0, 50]
+            ]
+          ]
+        },
+        properties: {
+          cartodb_id: 1,
+          value: 1,
+          category: 'a'
+        }
       };
 
       const intersectingTriangle = {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [ [165, 50], [165, 0], [215, 0], [165, 50] ]
-              ]
-            },
-            properties: {
-              cartodb_id: 2
-            }
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [165, 50],
+              [165, 0],
+              [215, 0],
+              [165, 50]
+            ]
+          ]
+        },
+        properties: {
+          cartodb_id: 2,
+          value: 2,
+          category: 'b'
+        }
       };
 
       const outerTriangle = {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [ [200, 50], [200, 0], [250, 0], [200, 50] ]
-              ]
-            },
-            properties: {
-              cartodb_id: 3
-            }
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [200, 50],
+              [200, 0],
+              [250, 0],
+              [200, 50]
+            ]
+          ]
+        },
+        properties: {
+          cartodb_id: 3,
+          value: 3,
+          category: 'c'
+        }
       };
 
       const outerBBOXTriangle = {
-            type: 'Feature',
-            geometry: {
-              type: 'Polygon',
-              coordinates: [
-                [ [-230, -70], [-230, -85], [-180, -85], [-230, -70] ]
-              ]
-            },
-            properties: {
-              cartodb_id: 4
-            }
+        type: 'Feature',
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-226, -70],
+              [-226, -85],
+              [-176, -85],
+              [-226, -70]
+            ]
+          ]
+        },
+        properties: {
+          cartodb_id: 4,
+          value: 4,
+          category: 'd'
+        }
       };
 
       const features = [
@@ -108,8 +139,11 @@
         outerTriangle,
         outerBBOXTriangle
       ];
-      
-      return { type: 'FeatureCollection', features };
+
+      return {
+        type: 'FeatureCollection',
+        features
+      };
     }
 
     const viz = new carto.Viz(`
@@ -117,13 +151,15 @@
       strokeWidth: 0,
       @list: viewportFeatures();
     `);
-    
+
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
-    
+
     layer.on('updated', () => {
       console.log(viz.variables.list.value.length);
     });
+
   </script>
 </body>
+
 </html>
