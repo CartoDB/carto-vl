@@ -1,82 +1,121 @@
 import * as carto from '../../../../src';
 import * as util from '../../util';
 
-const feature1 = {
-    type: 'Feature',
-    geometry: {
-        type: 'Point',
-        coordinates: [0, 0]
-    },
-    properties: {
-        id: 1,
-        value: 10,
-        category: 'a'
-    }
-};
-
-const feature2 = {
-    type: 'Feature',
-    geometry: {
-        type: 'Point',
-        coordinates: [10, 12]
-    },
-    properties: {
-        id: 2,
-        value: 1000,
-        category: 'b'
-    }
-};
-
-const features = {
-    type: 'FeatureCollection',
-    features: [ feature1, feature2 ]
-};
-
 function checkFeatures (list, expectedList) {
     // FIXME: this shouldn't require list to have the same order as expected
     expect(list.length).toEqual(expectedList.length);
+
     for (let i = 0; i < list.length; ++i) {
         const actual = {};
         const expected = expectedList[i];
+
         Object.keys(expected).forEach(prop => {
             actual[prop] = list[i][prop];
         });
+
         expect(actual).toEqual(expected);
     }
 }
 
+const innerTriangle = {
+    type: 'Feature',
+    geometry: {
+        type: 'Polygon',
+        coordinates: [
+            [ [0, 50], [0, 0], [50, 0], [0, 50] ]
+        ]
+    },
+    properties: {
+        cartodb_id: 1
+    }
+};
+
+const intersectingTriangle = {
+    type: 'Feature',
+    geometry: {
+        type: 'Polygon',
+        coordinates: [
+            [ [165, 50], [165, 0], [215, 0], [165, 50] ]
+        ]
+    },
+    properties: {
+        cartodb_id: 2
+    }
+};
+
+const outerTriangle = {
+    type: 'Feature',
+    geometry: {
+        type: 'Polygon',
+        coordinates: [
+            [ [200, 50], [200, 0], [250, 0], [200, 50] ]
+        ]
+    },
+    properties: {
+        cartodb_id: 3
+    }
+};
+
+const outerBBOXTriangle = {
+    type: 'Feature',
+    geometry: {
+        type: 'Polygon',
+        coordinates: [
+            [ [-225, -70], [-225, -85], [-175, -85], [-225, -70] ]
+        ]
+    },
+    properties: {
+        cartodb_id: 4
+    }
+};
+
+function generateData (features) {
+    return { type: 'FeatureCollection', features };
+}
+
 describe('viewportFeatures', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
+    let map, viz1, viz2, layer1, layer2, source1, source2, setup;
 
     beforeEach(() => {
-        setup = util.createMap('map');
+        const VIEWPORT_SIZE = 500;
+
+        setup = util.createMap('map', VIEWPORT_SIZE);
         map = setup.map;
 
-        source1 = new carto.source.GeoJSON(features);
+        source1 = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            intersectingTriangle,
+            outerTriangle,
+            outerBBOXTriangle
+        ), { id: 'cartodb_id' });
+
         viz1 = new carto.Viz(`
-            @list: viewportFeatures($value,$category)
+          color: red,
+          strokeWidth: 0,
+          @list: viewportFeatures();
         `);
+
         layer1 = new carto.Layer('layer1', source1, viz1);
-
-        source2 = new carto.source.GeoJSON(features);
-        viz2 = new carto.Viz(`
-            @cat: $category
-            @list2all: viewportFeatures($value,@cat,$id)
-            @list2value: viewportFeatures($value)
-        `);
-        layer2 = new carto.Layer('layer2', source2, viz2);
-
         layer1.addTo(map);
+
+        source2 = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
+        viz2 = new carto.Viz(`
+          color: red,
+          strokeWidth: 0,
+          @list: viewportFeatures();
+        `);
+
+        layer2 = new carto.Layer('layer2', source2, viz2);
         layer2.addTo(map);
     });
 
     it('should get the features properties of one layer', done => {
         layer1.on('updated', () => {
-            const expected = [
-                { value: 10, category: 'a' },
-                { value: 1000, category: 'b' }
-            ];
-            checkFeatures(viz1.variables.list.eval(), expected);
+            expect(viz1.variables.list.value.length).toEqual(2);
             done();
         });
     });
@@ -91,49 +130,61 @@ describe('viewportFeatures', () => {
                 { value: 10 },
                 { value: 1000 }
             ];
-            checkFeatures(viz2.variables.list2all.eval(), expectedAll);
-            checkFeatures(viz2.variables.list2value.eval(), expectedValue);
+            checkFeatures(viz2.variables.list.eval(), expectedAll);
+            checkFeatures(viz2.variables.list.eval(), expectedValue);
             done();
         });
     });
 
-    afterEach(() => {
+    afterEach((done) => {
         document.body.removeChild(setup.div);
+        done();
     });
 });
 
 describe('viewportFeatures on a map with filters', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
+    let map, source, viz, layer, source2, viz2, layer2, setup;
 
     beforeEach(() => {
         setup = util.createMap('map');
         map = setup.map;
 
-        source1 = new carto.source.GeoJSON(features);
-        viz1 = new carto.Viz(`
+        source = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
+        viz = new carto.Viz(`
             @list: viewportFeatures($value,$category)
             filter: $value < 100
         `);
-        layer1 = new carto.Layer('layer1', source1, viz1);
 
-        source2 = new carto.source.GeoJSON(features);
+        layer = new carto.Layer('layer', source, viz);
+
+        source2 = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
         viz2 = new carto.Viz(`
             @list2all: viewportFeatures($value,$category,$id)
             @list2value: viewportFeatures($value)
             filter: $value > 10
         `);
+
         layer2 = new carto.Layer('layer2', source2, viz2);
 
-        layer1.addTo(map);
+        layer.addTo(map);
         layer2.addTo(map);
     });
 
     it('should get the filtered feature properties of one layer', done => {
-        layer1.on('updated', () => {
+        layer.on('updated', () => {
             const expected = [
                 { value: 10, category: 'a' }
             ];
-            checkFeatures(viz1.variables.list.eval(), expected);
+            checkFeatures(viz.variables.list.eval(), expected);
             done();
         });
     });
@@ -158,36 +209,46 @@ describe('viewportFeatures on a map with filters', () => {
 });
 
 describe('viewportFeatures on a zoomed-in map', () => {
-    let map, source1, viz1, layer1, source2, viz2, layer2, setup;
+    let map, source, viz, layer, source2, viz2, layer2, setup;
 
     beforeEach(() => {
         setup = util.createMap('map');
         map = setup.map;
         map.setZoom(10);
 
-        source1 = new carto.source.GeoJSON(features);
-        viz1 = new carto.Viz(`
+        source = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
+        viz = new carto.Viz(`
             @list: viewportFeatures($value,$category)
         `);
-        layer1 = new carto.Layer('layer1', source1, viz1);
+        layer = new carto.Layer('layer', source, viz);
 
-        source2 = new carto.source.GeoJSON(features);
+        source2 = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
         viz2 = new carto.Viz(`
             @list2all: viewportFeatures($value,$category,$id)
             @list2value: viewportFeatures($value)
         `);
+
         layer2 = new carto.Layer('layer2', source2, viz2);
 
-        layer1.addTo(map);
+        layer.addTo(map);
         layer2.addTo(map);
     });
 
     it('should get only in-viewport feature properties of one layer', done => {
-        layer1.on('updated', () => {
+        layer.on('updated', () => {
             const expected = [
                 { value: 10, category: 'a' }
             ];
-            checkFeatures(viz1.variables.list.eval(), expected);
+            checkFeatures(viz.variables.list.eval(), expected);
             done();
         });
     });
@@ -218,7 +279,12 @@ describe('viewportFeatures with invalid parameters', () => {
         setup = util.createMap('map');
         map = setup.map;
 
-        source = new carto.source.GeoJSON(features);
+        source = new carto.source.GeoJSON(generateData(
+            innerTriangle,
+            innerTriangle,
+            intersectingTriangle
+        ), { id: 'cartodb_id' });
+
         viz = new carto.Viz(`
             @list: viewportFeatures($value,$category,11)
         `);

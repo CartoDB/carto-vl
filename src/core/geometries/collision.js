@@ -1,155 +1,109 @@
-/**
- * Determines if two bodies are colliding using the Separating Axis Theorem
- * https://github.com/Prozi/detect-collisions/
- */
-export default function collidesSAT (a, b, aabb = true) {
-    if (a.isPolygon) {
-        if (
-            a._dirtyCoords ||
-            a.x !== a._x ||
-            a.y !== a._y ||
-            a.angle !== a._angle ||
-            a.scaleX !== a._scaleX ||
-            a.scaleY !== a._scaleY
-        ) {
-            a._calculateCoords();
-        }
-    }
+const bits = {
+    TOP: 8,
+    BOTTOM: 4,
+    RIGHT: 2,
+    LEFT: 1
+};
 
-    if (b.isPolygon) {
-        if (
-            b._dirtyCoords ||
-            b.x !== b._x ||
-            b.y !== b._y ||
-            b.angle !== b._angle ||
-            b.scaleX !== b._scaleX ||
-            b.scaleY !== b._scaleY
-        ) {
-            b._calculateCoords();
-        }
-    }
+/* Sutherland-Hodgeman polygon clipping algorithm
+* https://en.wikipedia.org/wiki/Sutherland%E2%80%93Hodgman_algorithm
+* https://github.com/mapbox/lineclip
+**/
+export function polygonClip (points, bbox) {
+    let result, prev, prevInside, i, p, inside;
 
-    if (!aabb || _aabbAABB(a, b)) {
-        if (a.isPolygon && a._dirtyNormals) {
-            a._calculateNormalsAndEdges();
-        }
+    for (let edge = 1; edge <= 8; edge *= 2) {
+        result = [];
+        prev = points[points.length - 1];
+        prevInside = !(_bitCode(prev, bbox) & edge);
 
-        if (b.isPolygon && b._dirtyNormals) {
-            b._calculateNormalsAndEdges();
-        }
-    }
+        for (i = 0; i < points.length; i++) {
+            p = points[i];
+            inside = !(_bitCode(p, bbox) & edge);
 
-    return _polygonCollision(a, b);
-}
-
-/**
- * Determines if two bodies' axis aligned bounding boxes are colliding
- */
-function _aabbAABB (a, b) {
-    const aPolygon = a.isPolygon;
-    const aX = aPolygon ? 0 : a.x;
-    const aY = aPolygon ? 0 : a.y;
-    const aRadius = aPolygon ? 0 : a.radius * a.scale;
-    const aMinX = aPolygon ? a._minX : aX - aRadius;
-    const aMinY = aPolygon ? a._minY : aY - aRadius;
-    const aMaxX = aPolygon ? a._maxX : aX + aRadius;
-    const aMaxY = aPolygon ? a._maxY : aY + aRadius;
-
-    const bPolygon = b.isPolygon;
-    const bX = bPolygon ? 0 : b.x;
-    const bY = bPolygon ? 0 : b.y;
-    const bRadius = bPolygon ? 0 : b.radius * b.scale;
-    const bMinX = bPolygon ? b._minX : bX - bRadius;
-    const bMinY = bPolygon ? b._minY : bY - bRadius;
-    const bMaxX = bPolygon ? b._maxX : bX + bRadius;
-    const bMaxY = bPolygon ? b._maxY : bY + bRadius;
-
-    return aMinX < bMaxX && aMinY < bMaxY && aMaxX > bMinX && aMaxY > bMinY;
-}
-
-/**
- * Determines if two polygons are colliding
- */
-
-function _polygonCollision (a, b) {
-    const aCount = a._coords.length;
-    const bCount = b._coords.length;
-
-    // Handle points specially
-    if (aCount === 2 && bCount === 2) {
-        const aCoords = a._coords;
-        const bCoords = b._coords;
-
-        return aCoords[0] === bCoords[0] && aCoords[1] === bCoords[1];
-    }
-
-    const aCoords = a._coords;
-    const bCoords = b._coords;
-    const aNormals = a._normals;
-    const bNormals = b._normals;
-
-    if (aCount > 2) {
-        for (let ix = 0, iy = 1; ix < aCount; ix += 2, iy += 2) {
-            if (separatingAxis(aCoords, bCoords, aNormals[ix], aNormals[iy])) {
-                return false;
+            if (inside !== prevInside) {
+                result.push(_intersect(prev, p, edge, bbox));
             }
-        }
-    }
 
-    if (bCount > 2) {
-        for (let ix = 0, iy = 1; ix < bCount; ix += 2, iy += 2) {
-            if (separatingAxis(aCoords, bCoords, bNormals[ix], bNormals[iy])) {
-                return false;
+            if (inside) {
+                result.push(p);
             }
+
+            prev = p;
+            prevInside = inside;
+        }
+
+        points = result;
+
+        if (!points.length) {
+            break;
         }
     }
 
-    return true;
+    return result;
 }
 
-/**
- * Determines if two polygons are separated by an axis
- */
-function separatingAxis (aCoords, bCoords, x, y) {
-    const aCount = aCoords.length;
-    const bCount = bCoords.length;
+export function triangleCollides (trianglePoints, bbox) {
+    return polygonClip(trianglePoints, bbox).length !== 0;
+}
 
-    if (!aCount || !bCount) {
-        return true;
+function _intersect (a, b, edge, bbox) {
+    if (edge & bits.TOP) {
+        return _top(a, b, bbox);
     }
 
-    let aStart = null;
-    let aEnd = null;
-    let bStart = null;
-    let bEnd = null;
-
-    for (let ix = 0, iy = 1; ix < aCount; ix += 2, iy += 2) {
-        const dot = aCoords[ix] * x + aCoords[iy] * y;
-
-        if (aStart === null || aStart > dot) {
-            aStart = dot;
-        }
-
-        if (aEnd === null || aEnd < dot) {
-            aEnd = dot;
-        }
+    if (edge & bits.BOTTOM) {
+        return _bottom(a, b, bbox);
     }
 
-    for (let ix = 0, iy = 1; ix < bCount; ix += 2, iy += 2) {
-        const dot = bCoords[ix] * x + bCoords[iy] * y;
-
-        if (bStart === null || bStart > dot) {
-            bStart = dot;
-        }
-
-        if (bEnd === null || bEnd < dot) {
-            bEnd = dot;
-        }
+    if (edge & bits.RIGHT) {
+        return _right(a, b, bbox);
     }
 
-    if (aStart > bEnd || aEnd < bStart) {
-        return true;
+    if (edge & bits.LEFT) {
+        return _left(a, b, bbox);
     }
 
-    return false;
+    return null;
+}
+
+function _top (a, b, bbox) {
+    return [ a[0] + (b[0] - a[0]) * (bbox[3] - a[1]) / (b[1] - a[1]), bbox[3] ];
+}
+
+function _bottom (a, b, bbox) {
+    return [ a[0] + (b[0] - a[0]) * (bbox[1] - a[1]) / (b[1] - a[1]), bbox[1] ];
+}
+
+function _right (a, b, bbox) {
+    return [ bbox[2], a[1] + (b[1] - a[1]) * (bbox[2] - a[0]) / (b[0] - a[0]) ];
+}
+
+function _left (a, b, bbox) {
+    return [ bbox[0], a[1] + (b[1] - a[1]) * (bbox[0] - a[0]) / (b[0] - a[0]) ];
+}
+
+// bit code reflects the point position relative to the bbox:
+
+//         left  mid  right
+//    top  1001  1000  1010
+//    mid  0001  0000  0010
+// bottom  0101  0100  0110
+
+function _bitCode (point, bbox) {
+    let bitCode = 0;
+
+    if (point[0] < bbox[0]) {
+        bitCode |= bits.LEFT;
+    } else if (point[0] > bbox[2]) {
+        bitCode |= bits.RIGHT;
+    }
+
+    if (point[1] < bbox[1]) {
+        bitCode |= bits.BOTTOM;
+    } else if (point[1] > bbox[3]) {
+        bitCode |= bits.TOP;
+    }
+
+    return bitCode;
 }

@@ -1,6 +1,6 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
-import Polygon from '../../src/core/geometries/Polygon';
+import { triangleCollides } from '../../src/core/geometries/collision';
 import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
@@ -14,7 +14,6 @@ const aabbResults = {
 };
 
 export default class Dataframe {
-    // `type` is one of 'point' or 'line' or 'polygon'
     constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
@@ -143,7 +142,7 @@ export default class Dataframe {
     }
 
     inViewport (featureIndex, scale, center, aspect) {
-        return this._geometryInViewport(featureIndex, scale, center, aspect); // FIXME
+        return this._geometryInViewport(featureIndex, scale, center, aspect);
     }
 
     // Add new properties to the dataframe or overwrite previously stored ones.
@@ -224,21 +223,18 @@ export default class Dataframe {
         const featureAABB = this._aabb[featureIndex];
         const viewportAABB = this._getBounds(scale, center, aspect);
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
-        const trianglesList = [];
+        const trianglePoints = this.decodedGeom.triangles[featureIndex];
+        const triangle = [];
 
-        this.decodedGeom.triangles.forEach((trianglePoints) => {
-            const triangles = [];
-            
-            for (let i = 0; i < trianglePoints.length; i++) {
-                triangles.push([trianglePoints[i], trianglePoints[i++]]);
-            }
+        for (let i = 0; i < trianglePoints.length; i++) {
+            triangle.push([trianglePoints[i], trianglePoints[i++]]);
+        }
 
-            trianglesList.push(triangles);
-        });
-
-        return aabbResult === aabbResults.INTERSECTS
-            ? _isPolygonCollidingViewport(trianglesList, [ this.vertexScale, this.vertexOffset ])
-            : aabbResult === aabbResults.INSIDE;
+        if (aabbResult === aabbResults.INTERSECTS) {
+            return _isPolygonCollidingViewport(triangle, viewportAABB);
+        } else {
+            return aabbResult === aabbResults.INSIDE;
+        }
     }
 
     _compareAABBs (featureAABB, viewportAABB) {
@@ -473,16 +469,13 @@ function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (triangles, viewport) {
-    const viewportPolygon = new Polygon(0, 0, viewport);
+function _isPolygonCollidingViewport (triangle, viewportAABB) {
+    const bbox = [
+        viewportAABB.minx,
+        viewportAABB.miny,
+        viewportAABB.maxx,
+        viewportAABB.maxy
+    ];
 
-    for (let i = 0; i < triangles.length; i++) {
-        const trianglePolygon = new Polygon(0, 0, triangles[i]);
-
-        if (trianglePolygon.collides(viewportPolygon)) {
-            return true;
-        }
-    }
-   
-    return false;
+    return triangleCollides(triangle, bbox);
 }
