@@ -123,7 +123,7 @@ function decodeLine (geom) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    
+
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
