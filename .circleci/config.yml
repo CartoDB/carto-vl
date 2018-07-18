@@ -21,18 +21,13 @@ jobs:
       - run:
           command: |
             source ~/.bash_profile
-            nvm use 8
             curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
             echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
             sudo apt-get update && sudo apt-get install yarn
-            yarn install
-            echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
-            yarn test:e2e
       - run:
           command: |
             source ~/.bash_profile
-            curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-            echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+            nvm use 8
             sudo apt-get update && sudo apt-get install yarn
       - run:
           command: |

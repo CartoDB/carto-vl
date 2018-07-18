@@ -15,4 +15,3 @@ echo ${PID_REDIS} > ${BASEDIR}/redis.pid
 
 cd /mnt/Windshaft-cartodb/
 node app.js development
-
