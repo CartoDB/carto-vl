@@ -12,6 +12,13 @@ jobs:
     steps:
       - checkout
       - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "test/acceptance/docker/Dockerfile" }}
+      - run: docker pull carto/windshaft-cartovl-testing
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "test/acceptance/docker/Dockerfile" }}
+          paths:
+            - /var/lib/docker/
+      - restore_cache: # special step to restore the dependency cache
           key: dependency-cache-{{ checksum "package.json" }}
       - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
       - run:
