@@ -98,7 +98,9 @@ Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 ### Acceptance tests (E2E tests)
 
-This end to end tests cover the entire library by perfoming tests againts real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images.
+This end to end tests cover the entire library by performing tests against real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. To achieve real E2E testing, a Windshaft-cartodb server is deployed within a Docker container.
+
+You'll need to add `127.0.0.1 localhost.localhost.lan` your `/etc/hosts/` file.
 
 ```bash
 # Running the tests
