@@ -1,3 +1,5 @@
+const path = require('path');
+
 let config = {
     environment: 'test',
     port: 8181,
@@ -245,7 +247,7 @@ let config = {
             // if provided the http renderer will use it instead of throw an error
             fallbackImage: {
                 type: 'fs', // 'fs' and 'url' supported
-                src: __dirname + '/../../assets/default-placeholder.png'
+                src: path.join(__dirname, '/../../assets/default-placeholder.png')
             }
         },
         torque: {}
