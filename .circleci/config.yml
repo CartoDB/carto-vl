@@ -10,7 +10,7 @@ jobs:
     docker:
       - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
       - image: carto/windshaft-cartovl-testing
-          command: [./prepare.sh]
+         command: [./prepare.sh]
     working_directory: ~/repo
     steps:
       - checkout
