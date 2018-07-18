@@ -11,12 +11,9 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      # - restore_cache: # special step to restore the dependency cache
-      #     key: dependency-cache-{{ checksum "package.json" }}
+      - restore_cache: # special step to restore the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
       - run: curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-      # - run: 'export NVM_DIR="/opt/circleci/.nvm"'
-      # - run: '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm'
-      # - run: '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion'
       - run:
           command: |
             source ~/.bash_profile
@@ -27,6 +24,15 @@ jobs:
             sudo apt-get update && sudo apt-get install yarn
             yarn install
             echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
+            yarn test:e2e
+      - save_cache: # special step to save the dependency cache
+          key: dependency-cache-{{ checksum "package.json" }}
+          paths:
+            - ./node_modules
+      - run:
+          command: |
+            source ~/.bash_profile
+            nvm use 8
             yarn test:e2e
 
 # test-unit-lint-docs
