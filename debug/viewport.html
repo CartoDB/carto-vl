@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Animation demo | CARTO VL</title>
+  <title>Viewport Features | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -14,16 +14,13 @@
       margin: 0;
       padding: 0;
     }
-
   </style>
-
 </head>
 
 <body>
   <div id="map"></div>
-
+  
   <script>
-    const SIZE = 20;
     const VIEWPORT_SIZE = 500;
 
     const $map = document.getElementById('map');
@@ -147,7 +144,7 @@
     }
 
     const viz = new carto.Viz(`
-      color: red,
+      color: blend(red, green, viewportCount() == 2)
       strokeWidth: 0,
       @list: viewportFeatures();
     `);
