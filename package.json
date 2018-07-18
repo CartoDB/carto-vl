@@ -94,7 +94,7 @@
     "test:render": "yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
     "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
-    "test:e2e": "docker run -d -p 127.0.0.1:8181:8181 -v `pwd`/test/acceptance/docker:/mnt carto/windshaft-cartovl-testing ./deploy.sh && yarn build:dev && yarn wait-on http://localhost.localhost.lan:8181 && mocha test/acceptance/e2e.test.js --timeout 10000",
+    "test:e2e": "./e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
