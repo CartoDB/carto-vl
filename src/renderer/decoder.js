@@ -52,15 +52,12 @@ function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    let triangleList = [];
-    
+
     geometry.forEach(feature => {
         feature.forEach(polygon => {
             const triangles = earcut(polygon.flat, polygon.holes);
-            triangleList.push(polygon.flat);
 
-            const trianglesLength = triangles.length;
-            for (let i = 0; i < trianglesLength; i++) {
+            for (let i = 0; i < triangles.length; i++) {
                 const index = triangles[i];
                 vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
@@ -118,8 +115,7 @@ function decodePolygon (geometry) {
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
-        normals: new Float32Array(normals),
-        triangles: triangleList
+        normals: new Float32Array(normals)
     };
 }
 
@@ -127,6 +123,7 @@ function decodeLine (geom) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    
     geom.map(feature => {
         feature.map(lineString => {
             // Create triangulation
@@ -176,7 +173,7 @@ function decodeLine (geom) {
         vertices: new Float32Array(vertices),
         breakpoints,
         normals: new Float32Array(normals),
-        triangles: [] // TODO
+        triangles: []
     };
 }
 

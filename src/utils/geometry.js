@@ -69,6 +69,19 @@ export function pointInTriangle (p, v1, v2, v3) {
     return (b1 === b2) && (b2 === b3);
 }
 
+export function pointInTriangleVector (p, v1, v2, v3) {
+    if (equalPointsVector(v1, v2) || equalPointsVector(v2, v3) || equalPointsVector(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
+
+    const b1 = halfPlaneTestVector(p, v1, v2) < 0;
+    const b2 = halfPlaneTestVector(p, v2, v3) < 0;
+    const b3 = halfPlaneTestVector(p, v3, v1) < 0;
+
+    return (b1 === b2) && (b2 === b3);
+}
+
 // Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
 // Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
 // returns >0 if the point is OUTSIDE
@@ -79,8 +92,16 @@ export function halfPlaneTest (p, a, b) {
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
 }
 
+export function halfPlaneTestVector (p, a, b) {
+    return (p[0] - b[0]) * (a[1] - b[1]) - (a[0] - b[0]) * (p[1] - b[1]);
+}
+
 export function equalPoints (a, b) {
     return (a.x === b.x) && (a.y === b.y);
+}
+
+export function equalPointsVector (a, b) {
+    return (a[0] === b[0]) && (a[1] === b[1]);
 }
 
 export function pointInCircle (p, center, scale) {
@@ -90,6 +111,22 @@ export function pointInCircle (p, center, scale) {
     };
     const lengthSquared = diff.x * diff.x + diff.y * diff.y;
     return lengthSquared <= scale * scale;
+}
+
+export function pointInRectangleVector (point, bbox) {
+    return ((bbox.minx <= point[0]) && (point[0] <= bbox.maxx) && (bbox.miny <= point[1]) && (point[1] <= bbox.maxy));
+}
+
+export function checkSign (positions) {
+    if (positions.every((position) => position < 0)) {
+        return true;
+    }
+
+    if (positions.every((position) => position > 0)) {
+        return true;
+    }
+
+    return false;
 }
 
 export default {
@@ -103,5 +140,7 @@ export default {
     halfPlaneTest,
     pointInTriangle,
     equalPoints,
-    pointInCircle
+    pointInCircle,
+    halfPlaneTestVector,
+    checkSign
 };

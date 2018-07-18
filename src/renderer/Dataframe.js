@@ -223,15 +223,11 @@ export default class Dataframe {
         const featureAABB = this._aabb[featureIndex];
         const viewportAABB = this._getBounds(scale, center, aspect);
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
-        const trianglePoints = this.decodedGeom.triangles[featureIndex];
-        const triangle = [];
-
-        for (let i = 0; i < trianglePoints.length; i++) {
-            triangle.push([trianglePoints[i], trianglePoints[i++]]);
-        }
+        const vertices = this.decodedGeom.vertices;
+        const viewport = this._getViewportPoints(scale, center, aspect);
 
         if (aabbResult === aabbResults.INTERSECTS) {
-            return _isPolygonCollidingViewport(triangle, viewportAABB);
+            return _isPolygonCollidingViewport(vertices, viewport, viewportAABB);
         } else {
             return aabbResult === aabbResults.INSIDE;
         }
@@ -251,12 +247,30 @@ export default class Dataframe {
     _getBounds (scale, center, aspect) {
         this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
         this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+
         const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
         const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
         const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
         const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
 
         return { minx, maxx, miny, maxy };
+    }
+
+    _getViewportPoints (scale, center, aspect) {
+        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
+        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
+
+        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
+        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+
+        return [
+            [ minx, maxy ],
+            [ maxx, maxy ],
+            [ maxx, miny ],
+            [ minx, miny ]
+        ];
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -469,13 +483,19 @@ function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (triangle, viewportAABB) {
-    const bbox = [
-        viewportAABB.minx,
-        viewportAABB.miny,
-        viewportAABB.maxx,
-        viewportAABB.maxy
-    ];
+function _isPolygonCollidingViewport (vertices, viewport, viewportAABB) {
+    for (let i = 0; i < vertices.length; i += 6) {
+        const triangle = [
+            [vertices[i], vertices[i + 1]],
+            [vertices[i + 2], vertices[i + 3]],
+            [vertices[i + 4], vertices[i + 5]],
+            [vertices[i], vertices[i + 1]]
+        ];
 
-    return triangleCollides(triangle, bbox);
+        if (triangleCollides(triangle, viewport, viewportAABB)) {
+            return true;
+        }
+    }
+
+    return false;
 }
