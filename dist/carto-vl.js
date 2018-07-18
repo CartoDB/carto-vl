@@ -9839,7 +9839,7 @@ const validation = {
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! exports provided: setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity */
+/*! exports provided: version, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9869,13 +9869,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sources_GeoJSON__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sources/GeoJSON */ "./src/sources/GeoJSON.js");
 /* harmony import */ var _sources_MVT__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sources/MVT */ "./src/sources/MVT.js");
 /* harmony import */ var _sources_SQL__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./sources/SQL */ "./src/sources/SQL.js");
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../package.json */ "./package.json");
+var _package_json__WEBPACK_IMPORTED_MODULE_11___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ "./package.json", 1);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _package_json__WEBPACK_IMPORTED_MODULE_11__["version"]; });
+
 /**
- *  @api
  *  @namespace carto
+ *  @api
  *
  *  @description
  *  The CARTO VL functionality is exposed through the **carto** namespace including:
  *
+ * - {@link carto.version|carto.version}
  * - {@link carto.source.Dataset|carto.source.Dataset}
  * - {@link carto.source.SQL|carto.source.SQL}
  * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
@@ -9899,6 +9904,16 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+/**
+ * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
+ *
+ * @var {string} version
+ *
+ * @memberof carto
+ * @api
+ */
 
 
 // Namespaces
