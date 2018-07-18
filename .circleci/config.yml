@@ -5,8 +5,8 @@
 version: 2
 
 jobs:
-
-  E2E:
+# E2E
+  lint:
     machine: true
     working_directory: ~/repo
     steps:
@@ -20,8 +20,8 @@ jobs:
             - ./node_modules
       - run: yarn test:e2e
 
-
-  test-unit-lint-docs:
+# test-unit-lint-docs
+  test-unit:
     docker:
       # specify the version you desire here
       - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
