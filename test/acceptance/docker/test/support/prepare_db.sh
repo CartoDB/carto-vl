@@ -106,7 +106,7 @@ if test x"$PREPARE_PGSQL" = xyes; then
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/pop_density_points.sql -o sql/pop_density_points.sql
   curl https://cartodb-libs.global.ssl.fastly.net/carto-vl/assets/sf_stclines.sql -o sql/sf_stclines.sql
 
-  LOCAL_SQL_SCRIPTS='analysis_catalog windshaft.test gadm4 countries_null_values ported/populated_places_simple_reduced cdb_analysis_check cdb_invalidate_varnish mnmappluto monarch_migration_1 pop_density_points sf_stclines '
+  LOCAL_SQL_SCRIPTS='analysis_catalog windshaft.test cdb_analysis_check cdb_invalidate_varnish mnmappluto monarch_migration_1 pop_density_points sf_stclines '
   REMOTE_SQL_SCRIPTS='CDB_QueryStatements CDB_QueryTables CDB_CartodbfyTable CDB_TableMetadata CDB_ForeignTable CDB_UserTables CDB_ColumnNames CDB_ZoomFromScale CDB_OverviewsSupport CDB_Overviews CDB_QuantileBins CDB_JenksBins CDB_HeadsTailsBins CDB_EqualIntervalBins CDB_Hexagon CDB_XYZ CDB_EstimateRowCount CDB_RectangleGrid'
 
   if test x"$DOWNLOAD_SQL_FILES" = xyes; then
