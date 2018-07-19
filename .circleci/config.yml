@@ -8,7 +8,7 @@ jobs:
 # E2E
   lint:
     docker:
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: circleci/node:8-browsers
       - image: carto/windshaft-cartovl-testing
     working_directory: ~/repo
     steps:
@@ -28,7 +28,7 @@ jobs:
   test-unit:
     docker:
       # specify the version you desire here
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: circleci/node:8-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -46,7 +46,7 @@ jobs:
   test-user:
     docker:
       # specify the version you desire here
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: circleci/node:8-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -65,7 +65,7 @@ jobs:
   test-integration:
     docker:
       # specify the version you desire here
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: circleci/node:8-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -85,7 +85,7 @@ jobs:
   test-acceptance:
     docker:
       # specify the version you desire here
-      - image: circleci/node@sha256:317e12895d27814da19d88af5da3743248fc48c349cc250ffdf17f290f257d96
+      - image: circleci/node:8-browsers
     working_directory: ~/repo
     steps:
       - checkout
