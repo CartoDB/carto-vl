@@ -7088,7 +7088,7 @@ module.exports = g;
 /*! exports provided: name, version, sideEffects, description, repository, author, contributors, license, files, dependencies, devDependencies, module, main, scripts, default */
 /***/ (function(module) {
 
-module.exports = {"name":"@carto/carto-vl","version":"0.5.3","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.4.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:benchmark":"node test/benchmark/benchmark.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
+module.exports = {"name":"@carto/carto-vl","version":"0.5.3","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:benchmark":"node test/benchmark/benchmark.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
 
 /***/ }),
 
@@ -10603,7 +10603,7 @@ class Feature {
             variables[varName] = new _featureVizProperty__WEBPACK_IMPORTED_MODULE_0__["default"](`__cartovl_variable_${varName}`, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         });
 
-        this.id = rawFeature.id;
+        this.id = rawFeature[idProperty];
         this.color = new _featureVizProperty__WEBPACK_IMPORTED_MODULE_0__["default"]('color', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.width = new _featureVizProperty__WEBPACK_IMPORTED_MODULE_0__["default"]('width', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.strokeColor = new _featureVizProperty__WEBPACK_IMPORTED_MODULE_0__["default"]('strokeColor', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
@@ -10652,50 +10652,49 @@ __webpack_require__.r(__webpack_exports__);
  * @api
  */
 class FeatureVizProperty {
+    constructor (propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
+        this._propertyName = propertyName;
+        this._properties = feature;
+        this._viz = viz;
+
+        this.blendTo = _generateBlenderFunction(propertyName, feature[idProperty], customizedFeatures, viz, trackFeatureViz, idProperty);
+        this.reset = _generateResetFunction(propertyName, feature[idProperty], customizedFeatures, viz, idProperty);
+    }
+
     get value () {
         return this._viz[this._propertyName].eval(this._properties);
     }
-
-    constructor (propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
-        this._propertyName = propertyName;
-        this._feature = feature;
-        this._viz = viz;
-        this._properties = this._feature.properties;
-
-        this.blendTo = _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty);
-        this.reset = _generateResetFunction(propertyName, feature, customizedFeatures, viz, idProperty);
-    }
 }
 
-function _generateResetFunction (propertyName, feature, customizedFeatures, viz, idProperty) {
+function _generateResetFunction (propertyName, id, customizedFeatures, viz, idProperty) {
     return function reset (duration = 500) {
-        if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
-            customizedFeatures[feature.id][propertyName].replaceChild(
-                customizedFeatures[feature.id][propertyName].mix,
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].replaceChild(
+                customizedFeatures[id][propertyName].mix,
                 // transition(0) is used to ensure that blend._predraw() "GC" collects it
-                Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["blend"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["notEquals"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["property"])(idProperty), feature.id), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(0), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(duration))
+                Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["blend"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["notEquals"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["property"])(idProperty), id), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(0), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(duration))
             );
             viz[propertyName].notify();
-            customizedFeatures[feature.id][propertyName] = undefined;
+            customizedFeatures[id][propertyName] = undefined;
         }
     };
 }
 
-function _generateBlenderFunction (propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty) {
+function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, trackFeatureViz, idProperty) {
     return function generatedBlendTo (newExpression, duration = 500) {
         if (typeof newExpression === 'string') {
             newExpression = Object(_renderer_viz_parser__WEBPACK_IMPORTED_MODULE_1__["parseVizExpression"])(newExpression);
         }
-        if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
-            customizedFeatures[feature.id][propertyName].a.blendTo(newExpression, duration);
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].a.blendTo(newExpression, duration);
             return;
         }
         const blendExpr = Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["blend"])(
             newExpression,
             viz[propertyName],
-            Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["blend"])(1, Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["notEquals"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["property"])(idProperty), feature.id), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(duration))
+            Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["blend"])(1, Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["notEquals"])(Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["property"])(idProperty), id), Object(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_0__["transition"])(duration))
         );
-        trackFeatureViz(feature.id, propertyName, blendExpr, customizedFeatures);
+        trackFeatureViz(id, propertyName, blendExpr, customizedFeatures);
         viz.replaceChild(
             viz[propertyName],
             blendExpr
@@ -10892,7 +10891,6 @@ class Dataframe {
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
         const vizWidth = viz.width;
         const vizStrokeWidth = viz.strokeWidth;
 
@@ -10902,7 +10900,7 @@ class Dataframe {
                 x: points[i],
                 y: points[i + 1]
             };
-            const f = this._getFeature(columnNames, featureIndex);
+            const f = this.getFeature(featureIndex);
             if (this._isFeatureFiltered(f, viz.filter)) {
                 continue;
             }
@@ -10920,7 +10918,7 @@ class Dataframe {
 
             const inside = _pointInCircle(p, center, scale);
             if (inside) {
-                features.push(this._getUserFeature(featureIndex));
+                features.push(this.getFeature(featureIndex));
             }
         }
         return features;
@@ -10940,7 +10938,6 @@ class Dataframe {
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
         // Linear search for all features
         // Tests triangles since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
@@ -10955,7 +10952,7 @@ class Dataframe {
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
-                const feature = this._getFeature(columnNames, featureIndex);
+                const feature = this.getFeature(featureIndex);
                 if (this._isFeatureFiltered(feature, filterExpression)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -10976,7 +10973,7 @@ class Dataframe {
             };
             const inside = _pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                features.push(this._getUserFeature(featureIndex));
+                features.push(this.getFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -10985,33 +10982,32 @@ class Dataframe {
         return features;
     }
 
-    _getFeature (columnNames, featureIndex) {
-        const f = {};
-        columnNames.forEach(name => {
-            f[name] = this.properties[name][featureIndex];
-        });
-        return f;
-    }
     _isFeatureFiltered (feature, filterExpression) {
         const isFiltered = filterExpression.eval(feature) < 0.5;
         return isFiltered;
     }
 
-    _getUserFeature (featureIndex) {
-        let id;
-        const properties = {};
-        Object.keys(this.properties).map(propertyName => {
-            let prop = this.properties[propertyName][featureIndex];
-            const column = this.metadata.properties[propertyName];
-            if (column && column.type === 'category') {
-                prop = this.metadata.IDToCategory.get(prop);
+    getFeature (index) {
+        if (!this.cachedFeatures) {
+            this.cachedFeatures = [];
+        }
+
+        if (this.cachedFeatures[index] !== undefined) {
+            return this.cachedFeatures[index];
+        }
+
+        const feature = {};
+        const propertyNames = Object.keys(this.properties);
+        for (let i = 0; i < propertyNames.length; i++) {
+            const name = propertyNames[i];
+            if (this.metadata.properties[name].type === 'category') {
+                feature[name] = this.metadata.IDToCategory.get(this.properties[name][index]);
+            } else {
+                feature[name] = this.properties[name][index];
             }
-            if (propertyName === this.metadata.idProperty) {
-                id = prop;
-            }
-            properties[propertyName] = prop;
-        });
-        return { id, properties };
+        }
+        this.cachedFeatures[index] = feature;
+        return feature;
     }
 
     _addProperty (propertyName) {
@@ -11258,14 +11254,11 @@ class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
-    }
-
-    /**
-     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
-     */
-    _generateApiFeature (rawFeature) {
-        return new _interactivity_feature__WEBPACK_IMPORTED_MODULE_0__["default"](rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
+        return [].concat(...this.getActiveDataframes().map(df =>
+            df.getFeaturesAtPosition(pos, this.viz)
+        )).map(rawFeature =>
+            new _interactivity_feature__WEBPACK_IMPORTED_MODULE_0__["default"](rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
+        );
     }
 
     trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {
@@ -11529,26 +11522,7 @@ class Renderer {
      * Build a feature object from a dataframe and an index copying all the properties.
      */
     _featureFromDataFrame (dataframe, index, metadata) {
-        if (!dataframe.cachedFeatures) {
-            dataframe.cachedFeatures = [];
-        }
-
-        if (dataframe.cachedFeatures[index] !== undefined) {
-            return dataframe.cachedFeatures[index];
-        }
-
-        const feature = {};
-        const propertyNames = Object.keys(dataframe.properties);
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            if (metadata.properties[name].type === 'category') {
-                feature[name] = metadata.IDToCategory.get(dataframe.properties[name][index]);
-            } else {
-                feature[name] = dataframe.properties[name][index];
-            }
-        }
-        dataframe.cachedFeatures[index] = feature;
-        return feature;
+        return dataframe.getFeature(index);
     }
 
     renderLayer (renderLayer) {
