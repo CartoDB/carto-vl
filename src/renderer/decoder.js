@@ -181,7 +181,7 @@ function getJointNormal (a, b, c) {
     const sin = -u[1] * v[0] + u[0] * v[1];
     const x = (u[0] + v[0]);
     const y = (u[1] + v[1]);
-    if (Math.abs(sin) > 1E-12 && Math.max(Math.abs(x), Math.abs(y)) < 1.5) {
+    if (Math.abs(sin) > 1E-12 && Math.max(Math.abs(x), Math.abs(y)) < 1.3) {
         return [x / sin, y / sin];
     }
 }
