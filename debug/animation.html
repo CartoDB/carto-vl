@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation demo | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background', type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    const animStart = '2018-04-11T12:00:00Z';
+    const animEnd = '2018-04-12T12:00:00Z';
+
+    const source = new carto.source.GeoJSON(generateData(), { dateColumns: ['sim_time'] });
+    function generateData() {
+      const features = [];
+      const length = 200;
+      const n = 50;
+      const x0 = 0;
+      const y0 = 0;
+      let id = 1;
+      const min_st = new Date(animStart);
+      const max_st = new Date(animEnd);
+      for (let step = 1; step <= n; ++step) {
+          features.push({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [step/n*length + x0 - length/2, y0]
+            },
+            properties: {
+              cartodb_id: id++,
+              sim_time: (min_st.getTime() + (max_st - min_st)*step/n)
+            }
+          });
+      }
+      return { type: 'FeatureCollection', features };
+    }
+
+    const s = carto.expressions;
+    const duration = 6;
+    const animation = s.animation(
+      s.prop('sim_time'),
+      duration,
+      s.fade(duration/10, duration/5)
+    );
+    const viz = new carto.Viz({
+        strokeWidth: 1,
+        color: s.hsv(animation, 1, 1),
+        width: s.add(1,s.mul(animation,30)),
+        order: s.desc(s.width())
+    });
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    layer.on('updated', () => {
+        const time = animation.getProgressValue().toISOString();
+        document.getElementById("timer").textContent = time;
+    });
+  </script>
+</body>
+</html>

@@ -15,7 +15,6 @@ exports.defineTags = function (dictionary) {
 /*
  * Only items with @api annotation should be documented
  */
-
 exports.handlers = {
   parseComplete: function (e) {
     var doclets = e.doclets;

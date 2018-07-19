@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>US Population by County | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <div id="map"></div>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-109.09006557529761, 38.851788545949745],
+      zoom: 8,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
+    });
+
+    // Define user
+    carto.setDefaultAuth({
+      user: 'mamataakella',
+      apiKey: 'default_public'
+    });
+
+    // Define layer
+    const source = new carto.source.Dataset('river_directions_upper_co');
+    const viz = new carto.Viz(`
+      width: $strahler/2
+      color: ramp(linear($strahler,0,10),ag_sunset)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    // Add layer to map
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+</html>

@@ -1,135 +1,137 @@
-{  
-    "main": {  
-        "file": "misc/guide.html"
+{
+    "main": {
+        "file": "advanced/taxi-pickups.html"
     },
-    "categories": [  
-        {  
+    "categories": [
+        {
             "title": "Basics",
-            "samples": [  
-                {  
-                    "title": "Add a layer",
-                    "desc": "Add one CARTO layer to your map",
-                    "file": "basics/single-layer.html"
-                },
-                {  
-                    "title": "Add multiple layers",
-                    "desc": "Add multiple CARTO layers to your map",
-                    "file": "basics/multi-layer.html"
-                },
-                {  
-                    "title": "Change the source",
-                    "desc": "Update the source of your layers",
-                    "file": "basics/change-source.html"
-                },
-                {  
-                    "title": "Change the style",
-                    "desc": "Update the style of your layers",
-                    "file": "basics/change-style.html"
-                }
-            ]
-        },
-        {  
-            "title": "Expressions",
             "samples": [
-                {  
-                    "title": "Default style",
-                    "desc": "",
-                    "file": "expressions/default.html"
-                },
-                {  
-                    "title": "Use color expressions",
-                    "desc": "",
-                    "file": "expressions/color.html"
-                },
-                {  
-                    "title": "Use category ramp",
-                    "desc": "",
-                    "file": "expressions/ramp-category.html"
-                },
-                {  
-                    "title": "Use numeric ramp",
-                    "desc": "",
-                    "file": "expressions/ramp-numeric.html"
-                },
-                {  
-                    "title": "Setup ordering",
-                    "desc": "",
-                    "file": "expressions/order.html"
-                },
-                {  
-                    "title": "Filter metadata",
-                    "desc": "",
-                    "file": "expressions/filter.html"
+                {
+                    "title": "Add CARTO dataset layer",
+                    "file": "basics/add-layer.html"
                 },
                 {
-                    "title": "Viewport interactivity",
-                    "desc": "",
-                    "file": "expressions/viewport.html"
+                    "title": "Style layer",
+                    "file": "basics/basic-style.html"
                 },
-                {  
-                    "title": "Animated dataset",
-                    "desc": "",
-                    "file": "expressions/animation.html"
+                {
+                    "title": "SQL Source layer",
+                    "file": "basics/query-layer.html"
                 },
-                {  
-                    "title": "Torque",
-                    "desc": "",
-                    "file": "expressions/torque.html"
+                {
+                    "title": "Add multiple layers",
+                    "file": "basics/multiple-layers.html"
+                },
+                {
+                    "title": "Select layer",
+                    "file": "basics/select-layer.html"
                 }
             ]
         },
-        {  
+        {
+            "title": "Styling",
+            "samples": [
+                {
+                    "title": "Color spaces",
+                    "file": "styling/color-spaces.html"
+                },
+                {
+                    "title": "Color schemes",
+                    "file": "styling/color-schemes.html"
+                },
+                {
+                    "title": "Style by category",
+                    "file": "styling/style-by-category.html"
+                },
+                {
+                    "title": "Style by number",
+                    "file": "styling/style-by-number.html"
+                },
+                {
+                    "title": "Style with variables",
+                    "file": "styling/style-with-variables.html"
+                },
+                {
+                    "title": "Animate by date/time",
+                    "file": "styling/animation.html"
+                },
+                {
+                    "title": "Filter based styling",
+                    "file": "styling/filter.html"
+                },
+                {
+                    "title": "Viewport based styling",
+                    "file": "styling/viewport.html"
+                },
+                {
+                    "title": "Zoom based styling",
+                    "file": "styling/zoom.html"
+                },
+                {
+                    "title": "Single Image",
+                    "file": "styling/image.html"
+                },
+                {
+                    "title": "Multiple Images",
+                    "file": "styling/multiple-images.html"
+                },
+                {
+                    "title": "Raw Image",
+                    "file": "styling/raw-image.html"
+                }
+            ]
+        },
+        {
             "title": "Interactivity",
-            "samples": [  
-                {  
-                    "title": "Detect feature click",
-                    "desc": "Interact with the features on the click event",
-                    "xfile": "interactivity/feature-click.html"
+            "samples": [
+                {
+                    "title": "Hover",
+                    "file": "interactivity/hover.html"
                 },
-                {  
-                    "title": "Detect feature over/out",
-                    "desc": "Interact with the features on the over/out events",
-                    "xfile": "interactivity/feature-over-out.html"
+                {
+                    "title": "Click",
+                    "file": "interactivity/click.html"
+                },
+                {
+                    "title": "Interact with multiple layers",
+                    "file": "interactivity/interact-multiple-layers.html"
+                },
+                {
+                    "title": "Interactive based styling",
+                    "file": "interactivity/interactive-based-styling.html"
+                },
+                {
+                    "title": "Add pop-ups",
+                    "file": "interactivity/pop-ups.html"
+                },
+                {
+                    "title": "Animation controls",
+                    "file": "interactivity/animation-controls.html"
                 }
             ]
         },
-        {  
-            "title": "Misc",
-            "samples": [  
-                {  
-                    "title": "Guide",
-                    "desc": "Full reference guide example",
-                    "xfile": "misc/guide.html"
+        {
+            "title": "Advanced",
+            "samples": [
+                {
+                    "title": "External GeoJSON layer",
+                    "file": "advanced/external-geojson.html"
                 },
-                {  
-                    "title": "Pop-Ups",
-                    "desc": "Create pop-up information windows and interact with your map",
-                    "xfile": "misc/popups.html"
+                {
+                    "title": "US population by county",
+                    "file": "advanced/us-population-by-county.html"
                 },
-                {  
-                    "title": "Legends",
-                    "desc": "Create dynamic legends",
-                    "xfile": "misc/legends.html"
+                {
+                    "title": "Taxi pickups",
+                    "file": "advanced/taxi-pickups.html"
                 },
-                {  
-                    "title": "Most/less populated places",
-                    "desc": "Filter the 20 most/less populated places in the world",
-                    "file": "misc/populated-places.html"
+                {
+                    "title": "Ocean bathymetry",
+                    "file": "advanced/ocean-bathymetry.html"
                 },
-                {  
-                    "title": "Edit SQL & Expressions",
-                    "desc": "Edit manually the SQL query and the Expressions style",
-                    "file": "misc/edit-sql-expressions.html"
-                },
-                {  
-                    "title": "GeoJSON viewer",
-                    "desc": "Load and view GeoJSON files",
-                    "file": "misc/geojson-viewer.html"
-                },
-                {  
-                    "title": "Error handling",
-                    "desc": "Handle common errors in maps",
-                    "xfile": "misc/error-handling.html"
+                {
+                    "title": "Hurricane Harvey",
+                    "file": "advanced/hurricane-harvey.html"
                 }
             ]
         }

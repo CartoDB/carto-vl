@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Animation | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO GL JS -->
-  <script src="../../dist/carto-gl.js"></script>
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="../../vendor/mapbox-gl-dev.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="../../vendor/mapbox-gl-dev.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <style>
     body {
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
@@ -22,33 +24,34 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [0, 30],
-      zoom: 1
+      center: [-104.93637263263889, 39.72562104533162],
+      zoom: 11
     });
 
     carto.setDefaultAuth({
-      user: 'cartogl',
-      apiKey: 'YOUR_API_KEY'
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset(`
-      wwi
-    `);
-    const s = carto.style.expressions;
-    const style = new carto.Style({
-        width: s.mul(s.blend(1, 2, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic), s.zoom()),
-        color: s.ramp(s.linear(s.avg(s.prop('temp')), 0, 30), s.palettes.tealrose),
-        filter: s.blend(0.005, 1, s.near(s.prop('day'), s.mod(s.mul(25, s.now()), 1000), 0, 10), s.cubic)
-    });
-    const layer = new carto.Layer('layer', source, style);
+    const source = new carto.source.Dataset('parcels');
+    const s = carto.expressions;
+    const viz = new carto.Viz(`
+    filter: ((animation(linear($ccyrblt, 1873, 2018), 20, fade(0, 100000))  +0.1   ) and neq($ccyrblt, 0))
+    color: ramp(linear(($total_valu/$area ), 0, (globalPercentile($total_valu, 99))/1000    )  , ag_sunset)
+    strokeColor: rgba(255,255,255,0.2)
+    strokeWidth: 0
+  `);
+    const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
   </script>
 </body>
+
 </html>

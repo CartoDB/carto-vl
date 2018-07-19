@@ -1,0 +1,12 @@
+.DS_Store
+.vscode/
+*_out.png
+*.html
+*.log
+docs/all
+docs/public
+node_modules/
+secrets.json
+temp/
+test/acceptance/e2e/**/*.html
+test/integration/render/**/*.html

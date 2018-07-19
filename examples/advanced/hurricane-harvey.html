@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Hurricane Harvey | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Hurricane Harvey</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Rainfall totals from Hurricane Harvey aggregated to counties. The animation is based on total rainfall. Counties with more rain draw first to lower rainfall totals. The opacity is based off population density (total pop / area). The brighter polygons have higher populations.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-96, 30],
+      zoom: 7,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
+    });
+
+    // Define user
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define layer
+    const source = new carto.source.Dataset('table_30');
+    const viz = new carto.Viz(`
+      color: opacity(ramp(linear($sum_qpf,1,120),temps),($e_totpop/$area_sqmi)/500)
+      filter: animation(linear($sum_qpf,144.5, 1.5),5,fade(0,100))+0.1
+      strokeWidth: 0
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+</html>

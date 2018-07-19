@@ -6,12 +6,19 @@ module.exports = {
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, '..', 'dist'),
-        filename: 'carto-gl.js',
+        filename: 'carto-vl.js',
         library: 'carto',
         libraryTarget: 'umd'
     },
     devtool: 'sourcemap',
+    mode: 'development',
     plugins: [
         new webpack.BannerPlugin(banner)
-    ]
+    ],
+    module: {
+        rules: [
+            { test: /\.glsl$/, use: 'webpack-glsl-loader' },
+            { test: /\.svg$/, use: 'svg-inline-loader' }
+        ]
+    }
 };

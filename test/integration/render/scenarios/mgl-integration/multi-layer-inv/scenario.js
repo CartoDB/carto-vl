@@ -6,18 +6,27 @@ const map = new mapboxgl.Map({
 });
 
 const source0 = new carto.source.GeoJSON(sources['point']);
-const style0 = new carto.Style(`
-    color: rgba(1,0,0,1)
+const viz0 = new carto.Viz(`
+    color: rgb(255,0,0)
     width: 40
 `);
-const layer0 = new carto.Layer('layer0', source0, style0);
+const layer0 = new carto.Layer('layer0', source0, viz0);
 
 const source1 = new carto.source.GeoJSON(sources['line-string']);
-const style1 = new carto.Style(`
-    color: rgba(0,1,0,1)
+const viz1 = new carto.Viz(`
+    color: rgb(0,255,0)
     width: 40
 `);
-const layer1 = new carto.Layer('layer1', source1, style1);
+const layer1 = new carto.Layer('layer1', source1, viz1);
 
 layer1.addTo(map);
 layer0.addTo(map);
+let loadedLayers = 0;
+layer0.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});
+layer1.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});

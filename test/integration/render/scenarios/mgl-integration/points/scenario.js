@@ -6,10 +6,13 @@ const map = new mapboxgl.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['points']);
-const style = new carto.Style(`
+const viz = new carto.Viz(`
     width: 20,
     color: hsv(0, 1, linear($numeric, 0, 10))
 `);
-const layer = new carto.Layer('layer', source, style);
+const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
+layer.on('loaded', () => {
+    window.loaded = true;
+});

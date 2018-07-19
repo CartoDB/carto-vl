@@ -7,8 +7,9 @@ const exquisite = require('exquisite-sst');
 let testsDir = '';
 const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
+const PORT = 5000;
 
-function loadFiles(directory) {
+function loadFiles (directory) {
     testsDir = directory;
     let files = [];
     let fFiles = [];
@@ -27,52 +28,76 @@ function loadFiles(directory) {
     return files;
 }
 
-function loadTemplate(file) {
+function loadTemplate (file) {
     return template(fs.readFileSync(file), 'utf8');
 }
 
-function getName(file) {
+function getName (file) {
     return file.substr(
         testsDir.length,
         file.length - testsDir.length - testFile.length - 1
     );
 }
 
-function takeReference(file, template, asyncLoad) {
+function takeReference (file, template) {
     if (!fs.existsSync(getPNG(file))) {
         console.log(`Taking reference from ${getName(file)}`);
         writeTemplate(file, template);
         let options = loadOptions();
-        options.url = `file://${getHTML(file)}`;
+        options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
         options.output = `${getPNG(file)}`;
-        if (asyncLoad) options.waitForFn = () => window.loaded;
+        options.waitForFn = () => window.loaded;
         return exquisite.getReference(options);
     }
 }
 
-function testSST(file, template, asyncLoad) {
+async function testSST (file, template, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
-    options.url = `file://${getHTML(file)}`;
+    options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
-    if (asyncLoad) options.waitForFn = () => window.loaded;
-    return exquisite.test(options);
+    options.browser = browser;
+    const capturedErrors = [];
+    options.pageEvents = {
+        error: err => {
+            console.error(err);
+            capturedErrors.push(err);
+        },
+        pageerror: err => {
+            console.error(err);
+            capturedErrors.push(err);
+        },
+        requestfailed: request => {
+            const failure = request.failure();
+            if (failure) {
+                const err = new Error(`Request failed: URL="${request.url()}"; Reason="${failure.errorText}"`);
+                console.error(err);
+                capturedErrors.push(err);
+            }
+        }
+    };
+    options.waitForFn = () => window.loaded;
+
+    const result = await exquisite.test(options);
+    if (capturedErrors.length > 0) {
+        throw new Error(capturedErrors.map(err => err.message).join(', '));
+    }
+    return result;
 }
 
-function writeTemplate(file, template) {
-    const mainDir = path.resolve(__dirname, '..', '..');
+function writeTemplate (file, template) {
     fs.writeFileSync(getHTML(file), template({
-        file: file,
+        file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
-        cartogl: path.join(mainDir, 'dist', 'carto-gl.js'),
-        mapboxgl: path.join(mainDir, 'vendor', 'mapbox-gl-dev.js'),
-        mapboxglcss: path.join(mainDir, 'vendor', 'mapbox-gl-dev.css')
+        cartovl: `http://localhost:${PORT}/dist/carto-vl.js`,
+        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
 }
 
-function loadGeoJSONSources() {
+function loadGeoJSONSources () {
     const sourcesDir = path.resolve(__dirname, 'sources');
     const geojsonFiles = glob.sync(path.join(sourcesDir, '*.geojson'));
     let sources = {};
@@ -83,25 +108,32 @@ function loadGeoJSONSources() {
     return JSON.stringify(sources);
 }
 
-function getHTML(file) {
+function getLocalhostURL (file) {
+    return file.substr(file.indexOf('test/') + 'test/'.length).replace('scenario.js', '');
+}
+function getHTML (file) {
     return file.replace(testFile, 'scenario.html');
 }
 
-function getPNG(file) {
+function getPNG (file) {
     return file.replace(testFile, 'reference.png');
 }
 
-function getOutPNG(file) {
+function getOutPNG (file) {
     return file.replace(testFile, 'reference_out.png');
 }
 
-function loadOptions() {
+function loadOptions () {
     return {
         delay: 100,
         viewportWidth: 400,
         viewportHeight: 300,
-        headless: process.platform === 'linux'
+        headless: headless()
     };
+}
+
+function headless () {
+    return process.platform === 'linux';
 }
 
 /**
@@ -109,7 +141,7 @@ function loadOptions() {
  * https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#class-consolemessage
  * @param {ConsoleMessage} consoleMessage
  */
-function handleBrowserConsole(consoleMessage) {
+function handleBrowserConsole (consoleMessage) {
     if (process.env.VERBOSE_LOG) {
         console.log(consoleMessage.text());
     } else {
@@ -124,5 +156,7 @@ module.exports = {
     loadFiles,
     loadTemplate,
     takeReference,
-    testSST
+    testSST,
+    headless,
+    PORT
 };

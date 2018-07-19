@@ -1,8 +1,7 @@
 {
     "source": {
         "include": [
-            "src",
-            "docs/README.md"
+            "src"
         ]
     },
     "templates": {
@@ -10,11 +9,12 @@
             "outputSourceFiles": false,
             "useLongnameInNav": true
         },
-        "referenceTitle": "CARTO GL"
+        "referenceTitle": "CARTO VL"
     },
     "plugins": [
         "plugins/api",
-        "plugins/markdown"
+        "plugins/markdown",
+        "node_modules/jsdoc-escape-at"
     ],
     "opts": {
         "recurse": true,

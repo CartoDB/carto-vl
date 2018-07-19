@@ -1,45 +1,48 @@
 /**
- *  @api
  *  @namespace carto
+ *  @api
  *
  *  @description
- *  The carto-gl functionality is exposed through the **carto** namespace including:
- * 
- * - carto.source
- *  - {@link carto.source.Dataset|carto.source.Dataset} 
- *  - {@link carto.source.SQL|carto.source.SQL}
- *  - {@link carto.source.GeoJSON|carto.source.GeoJSON}
- * - carto.style
- *  -   {@link carto.style.expressions|carto.style.expressions}
+ *  The CARTO VL functionality is exposed through the **carto** namespace including:
+ *
+ * - {@link carto.version|carto.version}
+ * - {@link carto.source.Dataset|carto.source.Dataset}
+ * - {@link carto.source.SQL|carto.source.SQL}
+ * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - {@link carto.source.MVT|carto.source.MVT}
+ * - {@link carto.source.MVT.Metadata|carto.source.MVT.Metadata}
+ * - {@link carto.expressions|carto.expressions}
  * - {@link carto.Layer|carto.Layer}
- * - {@link carto.Style|carto.Style}
+ * - {@link carto.Viz|carto.Viz}
+ * - {@link carto.Interactivity|carto.Interactivity}
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
 
-import * as expressions from './core/style/functions';
-import GeoJSON from './api/source/geojson';
-import Dataset from './api/source/dataset';
-import SQL from './api/source/sql';
-import Layer from './api/layer';
-import Style from './api/style';
-import { setDefaultAuth } from './api/setup/auth-service';
-import { setDefaultConfig } from './api/setup/config-service';
-import Map from './api/map';
-import Interactivity from './api/interactivity';
+import { setDefaultAuth } from './setup/auth-service';
+import { setDefaultConfig } from './setup/config-service';
+import Viz from './Viz';
+import Map from './integrator/Map';
+import Interactivity from './interactivity/Interactivity';
+import Layer from './Layer';
+import * as expressions from './renderer/viz/expressions';
+import Dataset from './sources/Dataset';
+import GeoJSON from './sources/GeoJSON';
+import MVT from './sources/MVT';
+import SQL from './sources/SQL';
+
+/**
+ * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
+ *
+ * @var {string} version
+ *
+ * @memberof carto
+ * @api
+ */
+import { version } from '../package.json';
 
 // Namespaces
 
-const style = { expressions };
-const source = { Dataset, SQL, GeoJSON };
+const source = { Dataset, SQL, GeoJSON, MVT };
 
-export {
-    source,
-    Layer,
-    setDefaultAuth,
-    setDefaultConfig,
-    style,
-    Style,
-    Map,
-    Interactivity
-};
+export { version, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };

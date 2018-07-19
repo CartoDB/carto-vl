@@ -5,10 +5,14 @@
         "node": true,
         "jasmine": true
     },
-    "extends": "eslint:recommended",
+    "extends": ["semistandard"],
     "parserOptions": {
         "sourceType": "module",
         "ecmaVersion": 2017
+    },
+    "globals": {
+        "before": true,
+        "after": true
     },
     "rules": {
         "indent": [
@@ -29,6 +33,9 @@
             "always"
         ],
         "no-console": "off",
-        "no-useless-escape": "off"
+        "no-useless-escape": "off",
+        "no-var": "error",
+        "no-new": "off",
+        "import/no-duplicates": "off"
     }
 }

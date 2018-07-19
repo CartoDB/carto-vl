@@ -1,9 +1,11 @@
+const webpackConfig = require('../../../webpack/webpack.config.js');
+
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
         files: ['index.test.js'],
         reporters: ['mocha'],
-        port: 9876,  // karma web server port
+        port: 9876, // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
         browsers: ['ChromeHeadlessNoSandbox'],
@@ -11,17 +13,15 @@ module.exports = function (config) {
         singleRun: false,
         concurrency: Infinity,
         preprocessors: {
-            'index.test.js': ['webpack', 'sourcemap'],
+            'index.test.js': ['webpack', 'sourcemap']
         },
-        webpack: {
-            devtool: 'inline-source-map'
-        },
+        webpack: webpackConfig,
         customLaunchers: {
             // Add no-sandbox flag due a bug. https://github.com/karma-runner/karma-chrome-launcher/issues/158
             ChromeHeadlessNoSandbox: {
                 base: 'ChromeHeadless',
                 flags: ['--no-sandbox']
             }
-        },
+        }
     });
 };
