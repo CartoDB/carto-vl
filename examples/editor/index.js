@@ -238,32 +238,28 @@ function setConfig (input) {
 }
 
 const superRefresh = (opts) => {
+    const sourceType = document.querySelector('input[name="source"]:checked').value;
+    const sourceAuth = {
+        user: document.getElementById('user').value,
+        apiKey: 'default_public'
+    };
+
+    const sourceUrl = {
+        serverURL: document.getElementById('serverURL').value
+    };
+
     opts = opts || {};
-    let SourceClass;
-
-    let sourceType = document.querySelector('input[name="source"]:checked').value;
     showLoader();
-    document.getElementById('feedback').style.display = 'none';
+    saveConfig();
 
-    SourceClass = sourceType === sourceTypes.QUERY
-        ? carto.source.SQL
-        : carto.source.Dataset;
-
-    const source = new SourceClass(
-        document.getElementById('source').value,
-        {
-            user: document.getElementById('user').value,
-            apiKey: 'default_public'
-        },
-        {
-            serverURL: document.getElementById('serverURL').value
-        }
-    );
+    const source = sourceType === sourceTypes.QUERY
+        ? new carto.source.SQL(document.getElementById('source').value, sourceAuth, sourceUrl)
+        : new carto.source.DATASET(document.getElementById('source').value, sourceAuth, sourceUrl);
 
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
 
-    saveConfig();
+    document.getElementById('feedback').style.display = 'none';
 
     if (!layer) {
         setupMap(opts);
