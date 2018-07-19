@@ -2,7 +2,7 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [-20, 33],
-    zoom: 3.5
+    zoom: 3.8
 });
 
 carto.setDefaultAuth({
