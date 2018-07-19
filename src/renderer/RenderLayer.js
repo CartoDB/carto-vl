@@ -25,7 +25,11 @@ export default class RenderLayer {
 
     getActiveDataframes () {
         this.dataframes = this.dataframes.filter(df => !df.freed);
-        return this.dataframes.filter(df => df.active && df.numVertex);
+        let active = this.dataframes.filter(df => df.active && df.numVertex);
+        if (active.length && active[0].orderID !== undefined) {
+            active = active.sort((a, b) => a.orderID - b.orderID);
+        }
+        return active;
     }
 
     hasDataframes () {
