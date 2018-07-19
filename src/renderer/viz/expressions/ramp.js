@@ -111,6 +111,8 @@ export default class Ramp extends BaseExpression {
         } catch (error) {
             throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
+
+        this.defaultOthersColor = new NamedColor('gray');
     }
 
     loadImages () {
@@ -212,11 +214,9 @@ export default class Ramp extends BaseExpression {
             return palette.colors;
         }
 
-        const defaultOthersColor = new NamedColor('gray');
-
         return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, this.defaultOthersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, this.defaultOthersColor.eval());
     }
 
     _postShaderCompile (program, gl) {
