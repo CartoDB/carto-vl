@@ -66,7 +66,6 @@ function uploadFiles (version) {
     console.log('Publish', version);
     let uploader = client.uploadDir({
         localDir: 'dist',
-        deleteRemoved: true,
         s3Params: {
             ACL: 'public-read',
             Bucket: secrets.AWS_S3_BUCKET,
