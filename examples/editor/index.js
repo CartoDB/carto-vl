@@ -83,6 +83,11 @@ const BASEMAPS = {
 
 const DEFAULT_BASEMAP = 'DarkMatter';
 
+const sourceTypes = {
+    DATASET: 'dataset',
+    QUERY: 'query'
+};
+
 let index = 0; // current debug step
 
 let basemap = DEFAULT_BASEMAP;
@@ -142,7 +147,7 @@ map.on('load', () => {
     }
 
     function barcelona () {
-        document.getElementById('dataset').value = 'spend_data';
+        document.getElementById('source').value = 'spend_data';
         document.getElementById('user').value = 'cartovl';
         document.getElementById('serverURL').value = 'https://{user}.carto.com';
 
@@ -151,14 +156,14 @@ map.on('load', () => {
     }
 
     document.getElementById('prev-button').addEventListener('click', () => {
-        if (document.getElementById('dataset').value !== 'spend_data') {
+        if (document.getElementById('source').value !== 'spend_data') {
             barcelona();
         }
         index = mod(--index, vizs.length);
         updateViz(vizs[index]);
     });
     document.getElementById('next-button').addEventListener('click', () => {
-        if (document.getElementById('dataset').value !== 'spend_data') {
+        if (document.getElementById('source').value !== 'spend_data') {
             barcelona();
         }
         index = mod(++index, vizs.length);
@@ -168,7 +173,7 @@ map.on('load', () => {
     document.getElementById('barcelona').addEventListener('click', barcelona);
     document.getElementById('styleEntry').addEventListener('input', updateViz);
 
-    document.getElementById('dataset').addEventListener('input', superRefresh);
+    document.getElementById('source').addEventListener('input', superRefresh);
     document.getElementById('user').addEventListener('input', superRefresh);
     document.getElementById('serverURL').addEventListener('input', superRefresh);
 
@@ -191,14 +196,15 @@ function getConfig () {
 
 function getJSONConfig () {
     return {
-        a: document.getElementById('dataset').value,
+        a: document.getElementById('source').value,
         b: '',
         c: document.getElementById('user').value,
         d: document.getElementById('serverURL').value,
         e: document.getElementById('styleEntry').value,
         f: map.getCenter(),
         g: map.getZoom(),
-        h: basemap
+        h: basemap,
+        i: document.querySelector('input[name="source"]:checked').value
     };
 }
 
@@ -211,7 +217,7 @@ function setConfig (input) {
     if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
     }
-    document.getElementById('dataset').value = c.a;
+    document.getElementById('source').value = c.a;
     document.getElementById('user').value = c.c;
     document.getElementById('serverURL').value = c.d;
     document.getElementById('styleEntry').value = c.e;
@@ -224,12 +230,19 @@ function setConfig (input) {
 }
 
 const superRefresh = (opts) => {
+    let sourceType = document.querySelector('input[name="source"]:checked').value;
+    let SourceClass;
+
     opts = opts || {};
     showLoader();
     document.getElementById('feedback').style.display = 'none';
-    const SourceClass = document.getElementById('dataset').value.toLowerCase().includes('select') ? carto.source.SQL : carto.source.Dataset;
+
+    SourceClass = sourceType === sourceTypes.QUERY
+        ? carto.source.SQL
+        : carto.source.Dataset;
+
     const source = new SourceClass(
-        document.getElementById('dataset').value,
+        document.getElementById('source').value,
         {
             user: document.getElementById('user').value,
             apiKey: 'default_public'
@@ -238,8 +251,10 @@ const superRefresh = (opts) => {
             serverURL: document.getElementById('serverURL').value
         }
     );
+
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
+
     if (!layer) {
         setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
@@ -380,7 +395,6 @@ if ($copyHTMLButton) {
  * Generates an HTML template for the given map configuration
  */
 function generateSnippet (config) {
-    const dataset = config.a;
     const apiKey = config.b || 'default_public';
     const username = config.c;
     const serverURL = config.d || 'https://{user}.carto.com';
@@ -388,6 +402,10 @@ function generateSnippet (config) {
     const center = config.f || { lat: 0, lng: 0 };
     const zoom = config.g || 10;
     const basemap = BASEMAPS[config.h] || 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json';
+
+    const source = config.i === sourceTypes.DATASET
+        ? `new carto.source.Dataset("${config.a}")`
+        : `new carto.source.SQL("${config.a}")`;
 
     return `<!DOCTYPE html>
         <html>
@@ -435,7 +453,7 @@ function generateSnippet (config) {
             });
 
 
-            const source = new carto.source.Dataset('${dataset}');
+            const source = ${source};
             const viz = new carto.Viz(\`${vizSpec}\`);
             const layer = new carto.Layer('layer', source, viz);
 
