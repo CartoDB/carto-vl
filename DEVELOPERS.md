@@ -109,6 +109,8 @@ You'll also need to add `127.0.0.1 localhost.localhost.lan` your `/etc/hosts/` f
 $ yarn test:e2e
 ```
 
+To rebuild the Docker image run: `docker build -t carto/windshaft-cartovl-testing test/acceptance/docker/`
+
 #### Generating new references
 
 To create new tests, crate a new folder with a new `scenario.js` file and run the following command:
