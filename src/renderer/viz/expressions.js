@@ -235,6 +235,7 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
+import Scale from './expressions/scale';
 
 /* Expose classes as constructor functions */
 
@@ -375,6 +376,8 @@ export const globalPercentile = (...args) => new GlobalPercentile(...args);
 export const xyz = (...args) => new XYZ(...args);
 
 export const zoom = (...args) => new Zoom(...args);
+export const scale = (...args) => new Scale(...args);
+
 export const placement = (...args) => new Placement(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);
