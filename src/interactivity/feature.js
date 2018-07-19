@@ -21,7 +21,7 @@ export default class Feature {
             variables[varName] = new FeatureVizProperty(`__cartovl_variable_${varName}`, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         });
 
-        this.id = rawFeature.id;
+        this.id = rawFeature[idProperty];
         this.color = new FeatureVizProperty('color', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.width = new FeatureVizProperty('width', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.strokeColor = new FeatureVizProperty('strokeColor', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
