@@ -45,10 +45,6 @@
       dragRotate: false
     });
 
-    const source = new carto.source.GeoJSON(generateData(), {
-      id: 'cartodb_id'
-    });
-
     function generateData() {
       const innerTriangle = {
         type: 'Feature',
@@ -143,17 +139,41 @@
       };
     }
 
+
+    const source = new carto.source.GeoJSON(generateData(), {
+      id: 'cartodb_id'
+    });
+
     const viz = new carto.Viz(`
       color: blend(red, green, viewportCount() == 2)
-      strokeWidth: 0,
+      strokeWidth: 0
       @list: viewportFeatures();
     `);
 
     const layer = new carto.Layer('layer', source, viz);
+
+    const source2 = new carto.source.GeoJSON(generateData(), {
+      id: 'cartodb_id'
+    });
+
+    const viz2 = new carto.Viz(`
+      color: transparent
+      strokeWidth: 30
+      strokeColor: red
+      @list: viewportFeatures();
+    `);
+
+    const layer2 = new carto.Layer('layer2', source2, viz2);
+
+    layer2.addTo(map, 'background');
     layer.addTo(map, 'background');
 
     layer.on('updated', () => {
-      console.log(viz.variables.list.value.length);
+      console.log('Layer 1:', viz.variables.list.value.length);
+    });
+
+    layer2.on('updated', () => {
+      console.log('Layer 2:', viz2.variables.list.value.length);
     });
 
   </script>

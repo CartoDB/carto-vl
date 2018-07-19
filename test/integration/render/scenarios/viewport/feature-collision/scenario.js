@@ -22,18 +22,35 @@ const map = new mapboxgl.Map({
     dragRotate: false
 });
 
-const source = new carto.source.GeoJSON(sources['triangle-collision']);
+const source1 = new carto.source.GeoJSON(sources['triangle-collision']);
+const source2 = new carto.source.GeoJSON(sources['triangle-collision']);
 
-const viz = new carto.Viz(`
+const viz1 = new carto.Viz(`
     color: blend(red, green, viewportCount() == 2)
     strokeWidth: 0,
     @list: viewportFeatures($value);
 `);
 
-const layer = new carto.Layer('layer', source, viz);
+const viz2 = new carto.Viz(`
+    strokeColor: blend(red, green, viewportCount() == 3)
+    strokeWidth: 30,
+    @list: viewportFeatures($value);
+`);
 
-layer.addTo(map, 'background');
+const layer1 = new carto.Layer('triangles_without_stroke', source1, viz1);
+const layer2 = new carto.Layer('triangles_with_stroke', source2, viz2);
 
-layer.on('loaded', () => {
-    window.loaded = true;
+layer2.addTo(map, 'background');
+layer1.addTo(map, 'background');
+
+layer1.on('loaded', () => {
+    if (!window.loaded) {
+        window.loaded = true;
+    }
+});
+
+layer2.on('loaded', () => {
+    if (!window.loaded) {
+        window.loaded = true;
+    }
 });
