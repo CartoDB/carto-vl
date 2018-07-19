@@ -31,6 +31,12 @@ export default class Dataframe {
         this._aabb = this._computeAABB(geom, type);
     }
 
+    get widthScale () {
+        return this.renderer
+            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
+            : 1;
+    }
+
     _computeAABB (geometry, type) {
         switch (type) {
             case 'point':
@@ -78,7 +84,6 @@ export default class Dataframe {
     bind (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
-
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
 
@@ -141,8 +146,8 @@ export default class Dataframe {
         }
     }
 
-    inViewport (featureIndex, scale, center, aspect) {
-        return this._geometryInViewport(featureIndex, scale, center, aspect);
+    inViewport (featureIndex, scale, center, aspect, viz) {
+        return this._geometryInViewport(featureIndex, scale, center, aspect, viz);
     }
 
     // Add new properties to the dataframe or overwrite previously stored ones.
@@ -200,13 +205,22 @@ export default class Dataframe {
         }
     }
 
-    _geometryInViewport (featureIndex, scale, center, aspect) {
+    _geometryInViewport (featureIndex, scale, center, aspect, viz) {
+        const columnNames = Object.keys(this.properties);
+        const feature = this._getFeature(columnNames, featureIndex);
+        let strokeScale = 1;
+        let stroke = 0;
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
+                strokeScale = _computeScale(feature, viz.stroke, this.widthScale);
+                stroke = viz.stroke.eval(feature) * strokeScale;
+                return this._isPolygonInViewport(featureIndex, scale, strokeScale, stroke, center, aspect);
             case 'polygon':
-                return this._isPolygonInViewport(featureIndex, scale, center, aspect);
+                strokeScale = _computeScale(feature, viz.strokeWidth, this.widthScale);
+                stroke = viz.strokeWidth.eval(feature) * strokeScale;
+                return this._isPolygonInViewport(featureIndex, scale, strokeScale, stroke, center, aspect);
             default:
                 return false;
         }
@@ -219,21 +233,27 @@ export default class Dataframe {
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport (featureIndex, scale, center, aspect) {
+    _isPolygonInViewport (featureIndex, scale, strokeScale, stroke, center, aspect) {
         const featureAABB = this._aabb[featureIndex];
         const viewportAABB = this._getBounds(scale, center, aspect);
-        const aabbResult = this._compareAABBs(featureAABB, viewportAABB);
+        const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeScale * stroke);
         const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
         const viewport = this._getViewportPoints(scale, center, aspect);
 
         if (aabbResult === aabbResults.INTERSECTS) {
-            return _isPolygonCollidingViewport(vertices, viewport, viewportAABB);
-        } else {
-            return aabbResult === aabbResults.INSIDE;
+            return _isPolygonCollidingViewport(vertices, normals, scale, viewport, viewportAABB);
         }
+        
+        return aabbResult === aabbResults.INSIDE;
     }
 
-    _compareAABBs (featureAABB, viewportAABB) {
+    _compareAABBs (featureAABB, viewportAABB, stroke) {
+        featureAABB.minx = featureAABB.minx - stroke;
+        featureAABB.miny = featureAABB.miny - stroke;
+        featureAABB.maxx = featureAABB.maxx + stroke;
+        featureAABB.maxy = featureAABB.maxy + stroke;
+
         switch (true) {
             case _isFeatureInsideViewport(featureAABB, viewportAABB):
                 return aabbResults.INSIDE;
@@ -282,7 +302,7 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const widthScale = this.widthScale;
         const columnNames = Object.keys(this.properties);
         const vizWidth = viz.width;
         const vizStrokeWidth = viz.strokeWidth;
@@ -340,19 +360,13 @@ export default class Dataframe {
         const breakpoints = this.decodedGeom.breakpoints;
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
+        const widthScale = this.widthScale;
         const columnNames = Object.keys(this.properties);
         // Linear search for all features
         // Tests triangles since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let scale;
-        let computeScale = feature => {
-            // Width is saturated at 336px
-            const width = Math.min(widthExpression.eval(feature), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            scale = width / 2 * widthScale;
-        };
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
@@ -362,7 +376,8 @@ export default class Dataframe {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
-                computeScale(feature);
+
+                scale = _computeScale(feature, widthExpression, widthScale);
             }
 
             const v1 = {
@@ -389,6 +404,7 @@ export default class Dataframe {
                 i = breakpoints[featureIndex] - 6;
             }
         }
+
         return features;
     }
 
@@ -483,13 +499,13 @@ function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (vertices, viewport, viewportAABB) {
+function _isPolygonCollidingViewport (vertices, normals, scale, viewport, viewportAABB) {
     for (let i = 0; i < vertices.length; i += 6) {
         const triangle = [
-            [vertices[i], vertices[i + 1]],
-            [vertices[i + 2], vertices[i + 3]],
-            [vertices[i + 4], vertices[i + 5]],
-            [vertices[i], vertices[i + 1]]
+            [vertices[i + 0] + normals[i + 0] * scale, vertices[i + 1] + normals[i + 1] * scale],
+            [vertices[i + 2] + normals[i + 2] * scale, vertices[i + 3] + normals[i + 3] * scale],
+            [vertices[i + 4] + normals[i + 4] * scale, vertices[i + 5] + normals[i + 5] * scale],
+            [vertices[i + 0] + normals[i + 0] * scale, vertices[i + 1] + normals[i + 1] * scale]
         ];
 
         if (triangleCollides(triangle, viewport, viewportAABB)) {
@@ -498,4 +514,11 @@ function _isPolygonCollidingViewport (vertices, viewport, viewportAABB) {
     }
 
     return false;
+}
+
+function _computeScale (feature, widthExpression, widthScale) {
+    // Width is saturated at 336px
+    const width = Math.min(widthExpression.eval(feature), 336);
+    // width is a diameter and scale is radius-like, we need to divide by 2
+    return width / 2 * widthScale;
 }
