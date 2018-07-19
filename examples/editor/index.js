@@ -254,7 +254,7 @@ const superRefresh = (opts) => {
 
     const source = sourceType === sourceTypes.QUERY
         ? new carto.source.SQL(document.getElementById('source').value, sourceAuth, sourceUrl)
-        : new carto.source.DATASET(document.getElementById('source').value, sourceAuth, sourceUrl);
+        : new carto.source.Dataset(document.getElementById('source').value, sourceAuth, sourceUrl);
 
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
