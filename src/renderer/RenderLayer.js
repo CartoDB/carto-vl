@@ -46,14 +46,11 @@ export default class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
-    }
-
-    /**
-     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
-     */
-    _generateApiFeature (rawFeature) {
-        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
+        return [].concat(...this.getActiveDataframes().map(df =>
+            df.getFeaturesAtPosition(pos, this.viz)
+        )).map(rawFeature =>
+            new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
+        );
     }
 
     trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {
