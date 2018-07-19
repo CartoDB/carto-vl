@@ -170,7 +170,6 @@ export default class Dataframe {
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
         const vizWidth = viz.width;
         const vizStrokeWidth = viz.strokeWidth;
 
@@ -180,7 +179,7 @@ export default class Dataframe {
                 x: points[i],
                 y: points[i + 1]
             };
-            const f = this._getFeature(columnNames, featureIndex);
+            const f = this.getFeature(featureIndex);
             if (this._isFeatureFiltered(f, viz.filter)) {
                 continue;
             }
@@ -198,7 +197,7 @@ export default class Dataframe {
 
             const inside = _pointInCircle(p, center, scale);
             if (inside) {
-                features.push(this._getUserFeature(featureIndex));
+                features.push(this.getFeature(featureIndex));
             }
         }
         return features;
@@ -218,7 +217,6 @@ export default class Dataframe {
         const features = [];
         // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
         const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const columnNames = Object.keys(this.properties);
         // Linear search for all features
         // Tests triangles since we already have the triangulated form
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
@@ -233,7 +231,7 @@ export default class Dataframe {
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
-                const feature = this._getFeature(columnNames, featureIndex);
+                const feature = this.getFeature(featureIndex);
                 if (this._isFeatureFiltered(feature, filterExpression)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -254,7 +252,7 @@ export default class Dataframe {
             };
             const inside = _pointInTriangle(p, v1, v2, v3);
             if (inside) {
-                features.push(this._getUserFeature(featureIndex));
+                features.push(this.getFeature(featureIndex));
                 // Don't repeat a feature if we the point is on a shared (by two triangles) edge
                 // Also, don't waste CPU cycles
                 i = breakpoints[featureIndex] - 6;
@@ -263,33 +261,32 @@ export default class Dataframe {
         return features;
     }
 
-    _getFeature (columnNames, featureIndex) {
-        const f = {};
-        columnNames.forEach(name => {
-            f[name] = this.properties[name][featureIndex];
-        });
-        return f;
-    }
     _isFeatureFiltered (feature, filterExpression) {
         const isFiltered = filterExpression.eval(feature) < 0.5;
         return isFiltered;
     }
 
-    _getUserFeature (featureIndex) {
-        let id;
-        const properties = {};
-        Object.keys(this.properties).map(propertyName => {
-            let prop = this.properties[propertyName][featureIndex];
-            const column = this.metadata.properties[propertyName];
-            if (column && column.type === 'category') {
-                prop = this.metadata.IDToCategory.get(prop);
+    getFeature (index) {
+        if (!this.cachedFeatures) {
+            this.cachedFeatures = [];
+        }
+
+        if (this.cachedFeatures[index] !== undefined) {
+            return this.cachedFeatures[index];
+        }
+
+        const feature = {};
+        const propertyNames = Object.keys(this.properties);
+        for (let i = 0; i < propertyNames.length; i++) {
+            const name = propertyNames[i];
+            if (this.metadata.properties[name].type === 'category') {
+                feature[name] = this.metadata.IDToCategory.get(this.properties[name][index]);
+            } else {
+                feature[name] = this.properties[name][index];
             }
-            if (propertyName === this.metadata.idProperty) {
-                id = prop;
-            }
-            properties[propertyName] = prop;
-        });
-        return { id, properties };
+        }
+        this.cachedFeatures[index] = feature;
+        return feature;
     }
 
     _addProperty (propertyName) {
