@@ -133,12 +133,14 @@ map.on('load', () => {
             if (layer) {
                 showLoader();
                 document.getElementById('feedback').style.display = 'none';
-                layer.blendToViz(new carto.Viz(v)).then(() => {
-                    hideLoader();
-                }).catch(error => {
-                    handleError(error);
-                    hideLoader();
-                });
+                layer.blendToViz(new carto.Viz(v))
+                    .then(() => {
+                        hideLoader();
+                    })
+                    .catch(error => {
+                        handleError(error);
+                        hideLoader();
+                    });
             }
         } catch (error) {
             handleError(error);
@@ -172,7 +174,8 @@ map.on('load', () => {
 
     document.getElementById('barcelona').addEventListener('click', barcelona);
     document.getElementById('styleEntry').addEventListener('input', updateViz);
-
+    document.getElementById('source-dataset').addEventListener('input', superRefresh);
+    document.getElementById('source-query').addEventListener('input', superRefresh);
     document.getElementById('source').addEventListener('input', superRefresh);
     document.getElementById('user').addEventListener('input', superRefresh);
     document.getElementById('serverURL').addEventListener('input', superRefresh);
@@ -210,6 +213,7 @@ function getJSONConfig () {
 
 function setConfig (input) {
     let c = JSON.parse(atob(input));
+
     if (c.c === 'dmanzanares-ded13') {
         c.c = 'cartovl';
         c.d = 'https://{user}.carto.com';
@@ -217,10 +221,14 @@ function setConfig (input) {
     if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
     }
+
     document.getElementById('source').value = c.a;
     document.getElementById('user').value = c.c;
     document.getElementById('serverURL').value = c.d;
     document.getElementById('styleEntry').value = c.e;
+    document.getElementById('source-dataset').checked = c.i === sourceTypes.DATASET;
+    document.getElementById('source-query').checked = c.i === sourceTypes.QUERY;
+
     try {
         superRefresh({ zoom: c.g, center: c.f, basemap: c.h });
     } catch (error) {
@@ -230,10 +238,10 @@ function setConfig (input) {
 }
 
 const superRefresh = (opts) => {
-    let sourceType = document.querySelector('input[name="source"]:checked').value;
+    opts = opts || {};
     let SourceClass;
 
-    opts = opts || {};
+    let sourceType = document.querySelector('input[name="source"]:checked').value;
     showLoader();
     document.getElementById('feedback').style.display = 'none';
 
@@ -255,6 +263,8 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
 
+    saveConfig();
+
     if (!layer) {
         setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
@@ -263,13 +273,15 @@ const superRefresh = (opts) => {
         });
         layer.addTo(map, 'watername_ocean');
     } else {
-        layer.update(source, viz).then(() => {
-            setupMap(opts);
-            hideLoader();
-        }).catch(error => {
-            handleError(error);
-            hideLoader();
-        });
+        layer.update(source, viz)
+            .then(() => {
+                setupMap(opts);
+                hideLoader();
+            })
+            .catch(error => {
+                handleError(error);
+                hideLoader();
+            });
     }
 };
 
