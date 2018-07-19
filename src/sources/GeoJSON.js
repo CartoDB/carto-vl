@@ -8,7 +8,6 @@ import Base from './Base';
 const SAMPLE_TARGET_SIZE = 1000;
 
 export default class GeoJSON extends Base {
-
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
@@ -35,7 +34,7 @@ export default class GeoJSON extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(data, options = {}) {
+    constructor (data, options = {}) {
         super();
         this._checkData(data);
 
@@ -59,16 +58,16 @@ export default class GeoJSON extends Base {
         }
     }
 
-    bindLayer(addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe, dataLoadedCallback) {
         this._addDataframe = addDataframe;
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestMetadata(viz) {
+    requestMetadata (viz) {
         return Promise.resolve(this._computeMetadata(viz));
     }
 
-    requestData() {
+    requestData () {
         if (this._dataframe) {
             const newProperties = this._decodeUnboundProperties();
             this._dataframe.addProperties(newProperties);
@@ -85,7 +84,7 @@ export default class GeoJSON extends Base {
             scale: 1,
             size: this._features.length,
             type: this._getDataframeType(this._type),
-            metadata: this._metadata,
+            metadata: this._metadata
         });
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
@@ -93,15 +92,15 @@ export default class GeoJSON extends Base {
         this._dataLoadedCallback();
     }
 
-    requiresNewMetadata() {
+    requiresNewMetadata () {
         return false;
     }
 
-    _clone() {
+    _clone () {
         return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
-    _checkData(data) {
+    _checkData (data) {
         if (util.isUndefined(data)) {
             throw new CartoValidationError('source', 'dataRequired');
         }
@@ -110,7 +109,7 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _computeMetadata(viz) {
+    _computeMetadata (viz) {
         const sample = [];
         this._addNumericColumnField('cartodb_id');
 
@@ -147,7 +146,7 @@ export default class GeoJSON extends Base {
         return this._metadata;
     }
 
-    _sampleFeatureOnMetadata(properties, sample, featureCount) {
+    _sampleFeatureOnMetadata (properties, sample, featureCount) {
         if (featureCount > SAMPLE_TARGET_SIZE) {
             const sampling = SAMPLE_TARGET_SIZE / featureCount;
             if (Math.random() > sampling) {
@@ -157,7 +156,7 @@ export default class GeoJSON extends Base {
         sample.push(properties);
     }
 
-    _addNumericPropertyToMetadata(propertyName, value) {
+    _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
@@ -168,7 +167,7 @@ export default class GeoJSON extends Base {
         property.sum += value;
     }
 
-    _addNumericColumnField(propertyName) {
+    _addNumericColumnField (propertyName) {
         if (!this._numFields.has(propertyName)) {
             this._numFields.add(propertyName);
             this._properties[propertyName] = {
@@ -182,7 +181,7 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _addDatePropertyToMetadata(propertyName, value) {
+    _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
@@ -195,7 +194,7 @@ export default class GeoJSON extends Base {
         column.count++;
     }
 
-    _addDateColumnField(propertyName) {
+    _addDateColumnField (propertyName) {
         if (!this._dateFields.has(propertyName)) {
             this._dateFields.add(propertyName);
             this._properties[propertyName] = {
@@ -209,7 +208,7 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _addPropertyToMetadata(propertyName, value) {
+    _addPropertyToMetadata (propertyName, value) {
         if (this._providedDateColumns.has(propertyName)) {
             return this._addDatePropertyToMetadata(propertyName, value);
         }
@@ -219,7 +218,7 @@ export default class GeoJSON extends Base {
         this._addCategoryPropertyToMetadata(propertyName, value);
     }
 
-    _addCategoryPropertyToMetadata(propertyName, value) {
+    _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
@@ -227,11 +226,11 @@ export default class GeoJSON extends Base {
             this._catFields.add(propertyName);
             this._properties[propertyName] = {
                 type: 'category',
-                categories: [],
+                categories: []
             };
         }
         const property = this._properties[propertyName];
-        const cat = property.categories.find(cat => cat.name == value);
+        const cat = property.categories.find(cat => cat.name === value);
         if (cat) {
             cat.frequency++;
         } else {
@@ -239,7 +238,7 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _decodeUnboundProperties() {
+    _decodeUnboundProperties () {
         const properties = {};
         [...this._numFields].concat([...this._catFields]).concat([...this._dateFields]).map(name => {
             if (this._boundColumns.has(name)) {
@@ -279,7 +278,7 @@ export default class GeoJSON extends Base {
         return properties;
     }
 
-    _getCategoryIDFromString(category) {
+    _getCategoryIDFromString (category) {
         if (this._categoryStringToIDMap[category] !== undefined) {
             return this._categoryStringToIDMap[category];
         }
@@ -288,7 +287,7 @@ export default class GeoJSON extends Base {
         return this._categoryStringToIDMap[category];
     }
 
-    _getDataframeType(type) {
+    _getDataframeType (type) {
         switch (type) {
             case 'Point':
                 return 'point';
@@ -303,7 +302,7 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _decodeGeometry() {
+    _decodeGeometry () {
         let geometry = null;
         const numFeatures = this._features.length;
         for (let i = 0; i < numFeatures; i++) {
@@ -323,29 +322,25 @@ export default class GeoJSON extends Base {
                     const point = this._computePointGeometry(coordinates);
                     geometry[2 * i + 0] = point.x;
                     geometry[2 * i + 1] = point.y;
-                }
-                else if (type === 'LineString') {
+                } else if (type === 'LineString') {
                     if (!geometry) {
                         geometry = [];
                     }
                     const line = this._computeLineStringGeometry(coordinates);
                     geometry.push([line]);
-                }
-                else if (type === 'MultiLineString') {
+                } else if (type === 'MultiLineString') {
                     if (!geometry) {
                         geometry = [];
                     }
                     const multiline = this._computeMultiLineStringGeometry(coordinates);
                     geometry.push(multiline);
-                }
-                else if (type === 'Polygon') {
+                } else if (type === 'Polygon') {
                     if (!geometry) {
                         geometry = [];
                     }
                     const polygon = this._computePolygonGeometry(coordinates);
                     geometry.push([polygon]);
-                }
-                else if (type === 'MultiPolygon') {
+                } else if (type === 'MultiPolygon') {
                     if (!geometry) {
                         geometry = [];
                     }
@@ -357,14 +352,14 @@ export default class GeoJSON extends Base {
         return geometry;
     }
 
-    _computePointGeometry(data) {
+    _computePointGeometry (data) {
         const lat = data[1];
         const lng = data[0];
         const wm = util.projectToWebMercator({ lat, lng });
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    _computeLineStringGeometry(data) {
+    _computeLineStringGeometry (data) {
         let line = [];
         for (let i = 0; i < data.length; i++) {
             const point = this._computePointGeometry(data[i]);
@@ -373,7 +368,7 @@ export default class GeoJSON extends Base {
         return line;
     }
 
-    _computeMultiLineStringGeometry(data) {
+    _computeMultiLineStringGeometry (data) {
         let multiline = [];
         for (let i = 0; i < data.length; i++) {
             let line = this._computeLineStringGeometry(data[i]);
@@ -384,7 +379,7 @@ export default class GeoJSON extends Base {
         return multiline;
     }
 
-    _computePolygonGeometry(data) {
+    _computePolygonGeometry (data) {
         let polygon = {
             flat: [],
             holes: [],
@@ -408,7 +403,7 @@ export default class GeoJSON extends Base {
         return polygon;
     }
 
-    _computeMultiPolygonGeometry(data) {
+    _computeMultiPolygonGeometry (data) {
         let multipolygon = [];
         for (let i = 0; i < data.length; i++) {
             let polygon = this._computePolygonGeometry(data[i]);
@@ -419,9 +414,10 @@ export default class GeoJSON extends Base {
         return multipolygon;
     }
 
-    _isClockWise(vertices) {
+    _isClockWise (vertices) {
         let total = 0;
-        let pt1 = vertices[0], pt2;
+        let pt1 = vertices[0];
+        let pt2;
         for (let i = 0; i < vertices.length - 1; i++) {
             pt2 = vertices[i + 1];
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
@@ -430,6 +426,6 @@ export default class GeoJSON extends Base {
         return total >= 0;
     }
 
-    free() {
+    free () {
     }
 }

@@ -11,11 +11,11 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
                     avg: 1,
                     max: 2,
                     sum: 3,
-                    count: 4,
+                    count: 4
                 }
-            },
+            }
         };
-        
+
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);
             globalMin._compile(fakeMetadata);
@@ -50,7 +50,7 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
             fakeMetadata.sample = [];
             for (let i = 0; i <= 1000; i++) {
                 fakeMetadata.sample.push({
-                    'price': i / 1000 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min,
+                    'price': i / 1000 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min
                 });
             }
             const globalPercentile = s.globalPercentile($price, 30);

@@ -54,11 +54,11 @@ export const RGB = genRGB('rgb', false);
  */
 export const RGBA = genRGB('rgba', true);
 
-//TODO refactor to uniformcolor, write color (plain, literal)
+// TODO refactor to uniformcolor, write color (plain, literal)
 
-function genRGB(name, alpha) {
+function genRGB (name, alpha) {
     return class RGBA extends BaseExpression {
-        constructor(r, g, b, a) {
+        constructor (r, g, b, a) {
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
             checkLooseType(name, 'r', 0, 'number', r);
             checkLooseType(name, 'g', 1, 'number', g);
@@ -72,18 +72,18 @@ function genRGB(name, alpha) {
             super(children);
             this.type = 'color';
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(f) {
+        eval (f) {
             return {
                 r: this.r.eval(f),
                 g: this.g.eval(f),
                 b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 1,
+                a: alpha ? this.a.eval(f) : 1
             };
         }
-        _compile(meta) {
+        _compile (meta) {
             super._compile(meta);
             checkType(name, 'r', 0, 'number', this.r);
             checkType(name, 'g', 1, 'number', this.g);

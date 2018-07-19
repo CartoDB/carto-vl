@@ -1,6 +1,6 @@
 import geometryUtils from '../../utils/geometry';
 export class Polygon {
-    constructor() {
+    constructor () {
         this.flat = [];
         this.holes = [];
         this.clipped = [];
@@ -8,12 +8,12 @@ export class Polygon {
     }
 }
 
-export function decodeLines(geometries, mvt_extent) {
+export function decodeLines (geometries, mvtExtent) {
     let decodedGeometries = [];
     geometries.map(l => {
         let line = [];
         l.map(point => {
-            line.push([2 * point.x / mvt_extent - 1, 2 * (1 - point.y / mvt_extent) - 1]);
+            line.push([2 * point.x / mvtExtent - 1, 2 * (1 - point.y / mvtExtent) - 1]);
         });
         decodedGeometries.push(...clipLine(line));
     });
@@ -27,13 +27,13 @@ export function decodeLines(geometries, mvt_extent) {
         https://github.com/mapbox/vector-tile-spec/tree/master/2.1
         https://en.wikipedia.org/wiki/Shoelace_formula
 */
-export function decodePolygons(geometries, mvtExtent) {
+export function decodePolygons (geometries, mvtExtent) {
     let currentPolygon = null;
     let decoded = [];
     let invertedOrientation;
     geometries.forEach(geom => {
         let area = signedPolygonArea(geom);
-        if (area == 0) {
+        if (area === 0) {
             return;
         }
         if (invertedOrientation === undefined) {
@@ -44,8 +44,6 @@ export function decodePolygons(geometries, mvtExtent) {
             invertedOrientation = area > 0;
         }
         const isExternalPolygon = invertedOrientation ? area > 0 : area < 0;
-
-
 
         const preClippedVertices = _getPreClippedVertices(geom, mvtExtent);
 
@@ -67,7 +65,7 @@ export function decodePolygons(geometries, mvtExtent) {
     return decoded;
 }
 
-export function signedPolygonArea(vertices) {
+export function signedPolygonArea (vertices) {
     // https://en.wikipedia.org/wiki/Shoelace_formula
     let a = 0;
     for (let i = 0; i < vertices.length; i++) {
@@ -105,7 +103,7 @@ const clippingEdges = [
 ];
 const numberOfEdges = clippingEdges.length;
 
-export function clipPolygon(preClippedVertices, polygon, isHole) {
+export function clipPolygon (preClippedVertices, polygon, isHole) {
     // Sutherland-Hodgman Algorithm to clip polygons to the tile
     // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf
 
@@ -172,7 +170,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     const MIN_VALID_NUM_VERTICES = 3;
 
     // preClippedVertices is closed by repeating the first vertex
-    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES+1) {
+    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES + 1) {
         if (isHole) {
             polygon.holes.push(polygon.flat.length / 2);
         }
@@ -180,7 +178,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
             polygon.flat.push(v[0], v[1]);
         });
         Object.keys(clippedTypes).forEach(i => {
-            polygon.clipped.push(Number(i)*2);
+            polygon.clipped.push(Number(i) * 2);
             polygon.clippedType.push(clippedTypes[i]);
         });
     }
@@ -188,7 +186,7 @@ export function clipPolygon(preClippedVertices, polygon, isHole) {
     return polygon;
 }
 
-function _getPreClippedVertices(geom, mvtExtent) {
+function _getPreClippedVertices (geom, mvtExtent) {
     return geom.map((coord) => {
         let x = coord.x;
         let y = coord.y;
@@ -200,21 +198,21 @@ function _getPreClippedVertices(geom, mvtExtent) {
     });
 }
 
-function clipLine(line) {
+function clipLine (line) {
     // linestring clipping based on the Cohen-Sutherland algorithm
     // input is a single linestring [point0, point1, ...]
     // output is an array of flat linestrings:
     // [[p0x, p0y, p1x, p1y, ...], ...]
     let clippedLine = [];
     const clippedLines = [];
-    function clipType(point) {
+    function clipType (point) {
         let type = 0;
         for (let i = 0; i < numberOfEdges; i++) {
             type = type | (clippingEdges[i].inside(point) ? 0 : (1 << i));
         }
         return type;
     }
-    function intersect(point1, point2, type) {
+    function intersect (point1, point2, type) {
         for (let i = 0; i < numberOfEdges; i++) {
             const mask = 1 << i;
             if (type & mask) {
@@ -226,13 +224,13 @@ function clipLine(line) {
     }
     let point0 = line[0];
     let type0 = clipType(point0);
-    for (let i=1; i<line.length; ++i) {
+    for (let i = 1; i < line.length; ++i) {
         let point1 = line[i];
         let type1 = clipType(point1);
         const nextType = type1;
         const nextPoint = point1;
 
-        for(;;) {
+        for (; ;) {
             if (!(type0 | type1)) {
                 // both points inside
                 clippedLine.push(...point0);
@@ -243,21 +241,17 @@ function clipLine(line) {
                         clippedLines.push(clippedLine);
                         clippedLine = [];
                     }
-                }
-                else if (i === line.length - 1) {
+                } else if (i === line.length - 1) {
                     clippedLine.push(...point1);
                 }
                 break;
-            }
-            else if (type0 & type1) {
+            } else if (type0 & type1) {
                 // both points outside
                 break;
-            }
-            else if (type0) {
+            } else if (type0) {
                 // only point1 inside
                 [point0, type0] = intersect(point0, point1, type0);
-            }
-            else {
+            } else {
                 // only point0 inside
                 [point1, type1] = intersect(point0, point1, type1);
             }
@@ -266,9 +260,27 @@ function clipLine(line) {
         point0 = nextPoint;
         type0 = nextType;
     }
+
+    clippedLine = _removeDuplicatedVerticesOnLine(clippedLine);
     if (clippedLine.length > 0) {
         clippedLines.push(clippedLine);
     }
 
     return clippedLines;
+}
+
+function _removeDuplicatedVerticesOnLine (line) {
+    const result = [];
+    let prevX;
+    let prevY;
+    for (let i = 0; i < line.length; i += 2) {
+        const x = line[i];
+        const y = line[i + 1];
+        if (x !== prevX || y !== prevY) {
+            result.push(x, y);
+            prevX = x;
+            prevY = y;
+        }
+    }
+    return result;
 }

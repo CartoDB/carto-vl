@@ -1,6 +1,6 @@
-//If AB intersects CD => return intersection point
+// If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
-export function intersect(a, b, c, d) {
+export function intersect (a, b, c, d) {
     const o1 = a;
     const o2 = c;
     const d1 = sub(b, a);
@@ -16,16 +16,15 @@ export function intersect(a, b, c, d) {
     }
 }
 
-
-export function sub([ax, ay], [bx, by]) {
+export function sub ([ax, ay], [bx, by]) {
     return ([ax - bx, ay - by]);
 }
 
-export function dot([ax, ay], [bx, by]) {
+export function dot ([ax, ay], [bx, by]) {
     return (ax * bx + ay * by);
 }
 
-export function perpendicular([x, y]) {
+export function perpendicular ([x, y]) {
     return [-y, x];
 }
 

@@ -1,5 +1,4 @@
 export default class Base {
-
     /**
      * Base data source object.
      *
@@ -15,6 +14,4 @@ export default class Base {
      * @abstract
      * @api
      */
-    constructor() {
-    }
 }

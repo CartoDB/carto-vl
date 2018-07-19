@@ -25,7 +25,7 @@ import { checkString } from './utils';
 */
 
 export default class Image extends Base {
-    constructor(url) {
+    constructor (url) {
         checkString('image', 'url', 0, url);
         super({});
         this.type = 'image';
@@ -39,40 +39,40 @@ export default class Image extends Base {
                 resolve();
             };
             this.image.onerror = reject;
-            this.image.src = this._url;
             this.image.crossOrigin = 'anonymous';
+            this.image.src = this._url;
         });
     }
 
-    loadImages() {
+    loadImages () {
         this.count = this.count + 1 || 1;
         return this._promise;
     }
 
-    eval() {}
+    eval () {}
 
-    _compile(meta) {
+    _compile (meta) {
         super._compile(meta);
     }
 
-    _free(gl) {
+    _free (gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);
         }
     }
 
-    _applyToShaderSource() {
+    _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
             inline: `texture2D(texSprite${this._uid}, imageUV).rgba`
         };
     }
 
-    _postShaderCompile(program, gl) {
+    _postShaderCompile (program, gl) {
         this._getBinding(program)._texLoc = gl.getUniformLocation(program, `texSprite${this._uid}`);
     }
 
-    _preDraw(program, drawMetadata, gl) {
+    _preDraw (program, drawMetadata, gl) {
         if (!this.init && this.canvas) {
             this.init = true;
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
@@ -97,7 +97,7 @@ export default class Image extends Base {
     }
 }
 
-function _getCanvasFromImage(img) {
+function _getCanvasFromImage (img) {
     const CANVAS_SIZE = 256;
     const canvas = document.createElement('canvas');
     canvas.width = CANVAS_SIZE;

@@ -6,19 +6,18 @@ let uid = 0;
 
 // TODO This needs to be separated by each mgl map to support multi map pages
 const integrators = new WeakMap();
-export default function getMGLIntegrator(map) {
+export default function getMGLIntegrator (map) {
     if (!integrators.get(map)) {
         integrators.set(map, new MGLIntegrator(map));
     }
     return integrators.get(map);
 }
 
-
 /**
  * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
  */
 class MGLIntegrator {
-    constructor(map) {
+    constructor (map) {
         this.renderer = new Renderer();
         this.map = map;
         this.invalidateWebGLState = null;
@@ -33,15 +32,15 @@ class MGLIntegrator {
         this.invalidateWebGLState = () => { };
     }
 
-    on(name, cb) {
+    on (name, cb) {
         return this._emitter.on(name, cb);
     }
 
-    off(name, cb) {
+    off (name, cb) {
         return this._emitter.off(name, cb);
     }
 
-    _suscribeToMapEvents(map) {
+    _suscribeToMapEvents (map) {
         map.on('movestart', this.move.bind(this));
         map.on('move', this.move.bind(this));
         map.on('moveend', this.move.bind(this));
@@ -55,29 +54,28 @@ class MGLIntegrator {
         });
     }
 
-    _registerMoveObserver(observerName, observerCallback) {
+    _registerMoveObserver (observerName, observerCallback) {
         this.moveObservers[observerName] = observerCallback;
     }
 
-    _unregisterMoveObserver(observerName) {
+    _unregisterMoveObserver (observerName) {
         delete this.moveObservers[observerName];
     }
 
-    addLayer(layer, beforeLayerID) {
+    addLayer (layer, beforeLayerID) {
         const callbackID = `_cartovl_${uid++}`;
         const layerId = layer.getId();
 
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
         this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-
             if (!this._isRendererInitialized) {
                 this._isRendererInitialized = true;
                 this.invalidateWebGLState = invalidate;
                 this.notifyObservers();
                 this.renderer._initGL(gl);
-                this._layers.map(layer => layer.initCallback());
             }
 
+            layer.initialize();
             layer.$paintCallback();
             this._paintedLayers++;
 
@@ -102,29 +100,33 @@ class MGLIntegrator {
         this.move();
     }
 
-    needRefresh() {
+    needRefresh () {
         this.map.repaint = true;
     }
 
-    move() {
+    move () {
         const c = this.map.getCenter();
         // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
+        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
         this.renderer.setZoom(this.getZoom());
         this.notifyObservers();
     }
 
-    notifyObservers() {
+    notifyObservers () {
         Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
     }
 
-    getZoom() {
+    getZoom () {
         const b = this.map.getBounds();
         const c = this.map.getCenter();
         const nw = b.getNorthWest();
         const sw = b.getSouthWest();
         const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
-        this.renderer.setCenter(c.lng / 180., util.projectToWebMercator(c).y / util.WM_R);
+        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
         return z;
+    }
+
+    getZoomLevel () {
+        return this.map.getZoom();
     }
 }

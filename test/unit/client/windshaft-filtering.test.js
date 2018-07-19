@@ -1,22 +1,22 @@
 import * as f from '../../../src/client/windshaft-filtering';
 import { Viz, expressions as s } from '../../../src/index';
 
-function preFilters(f, vizFilter) {
+function preFilters (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz).preaggregation;
 }
 
-function aggrFilters(f, vizFilter) {
+function aggrFilters (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz, { exclusive: false }).aggregation;
 }
 
-function aggrFiltersExclusive(f, vizFilter) {
+function aggrFiltersExclusive (f, vizFilter) {
     const viz = (vizFilter === undefined) ? new Viz() : new Viz({ filter: vizFilter });
     return f.getFiltering(viz, { exclusive: true }).aggregation;
 }
 
-function preSQL(f, preFilters) {
+function preSQL (f, preFilters) {
     return f.getSQLWhere({ preaggregation: preFilters });
 }
 
@@ -344,7 +344,7 @@ describe('src/client/windshaft-filtering', () => {
                     const actual = preFilters(f,
                         s.and(
                             s.lt(s.property('numericProperty'), s.now()),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -383,9 +383,9 @@ describe('src/client/windshaft-filtering', () => {
                         s.and(
                             s.or(
                                 s.lt(s.property('numericProperty'), s.now()),
-                                s.between(s.property('numericProperty'), 100, 200),
+                                s.between(s.property('numericProperty'), 100, 200)
                             ),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -482,7 +482,6 @@ describe('src/client/windshaft-filtering', () => {
                     s.lt(s.clusterSum(s.property('property')), 10)
                 )).toBeNull();
             });
-
         });
     });
 
@@ -661,7 +660,6 @@ describe('src/client/windshaft-filtering', () => {
                 );
                 expect(actual).toEqual(expected);
             });
-
         });
 
         describe('when the filter is partial', () => {
@@ -692,7 +690,7 @@ describe('src/client/windshaft-filtering', () => {
                     const actual = aggrFilters(f,
                         s.and(
                             s.lt(s.property('numericProperty'), s.now()),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -731,9 +729,9 @@ describe('src/client/windshaft-filtering', () => {
                         s.and(
                             s.or(
                                 s.lt(s.property('numericProperty'), s.now()),
-                                s.between(s.property('numericProperty'), 100, 200),
+                                s.between(s.property('numericProperty'), 100, 200)
                             ),
-                            s.between(s.property('numericProperty'), 10, 20),
+                            s.between(s.property('numericProperty'), 10, 20)
                         )
                     );
                     expect(actual).toEqual(expected);
@@ -757,7 +755,6 @@ describe('src/client/windshaft-filtering', () => {
                     );
                     expect(actual).toEqual(expected);
                 });
-
             });
         });
 

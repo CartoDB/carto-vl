@@ -7,7 +7,7 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add layer",
+                    "title": "Add CARTO dataset layer",
                     "file": "basics/add-layer.html"
                 },
                 {
@@ -114,8 +114,8 @@
             "title": "Advanced",
             "samples": [
                 {
-                    "title": "Denver trees",
-                    "file": "advanced/denver-trees.html"
+                    "title": "External GeoJSON layer",
+                    "file": "advanced/external-geojson.html"
                 },
                 {
                     "title": "US population by county",

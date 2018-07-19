@@ -1,11 +1,6 @@
 #!/bin/bash
 
-yarn
-
 VERSION=$(node --eval "console.log(require('./package.json').version);")
-
-yarn test || exit 1
-yarn test:user || exit 1
 
 echo "Ready to publish CARTO VL version $VERSION"
 echo "Has the version number been bumped?"
@@ -20,6 +15,4 @@ node scripts/cdn/invalidate.js
 
 echo "Uploading to npm..."
 
-npm publish
-
-echo "All done."
+# Then, npm publish is executed.

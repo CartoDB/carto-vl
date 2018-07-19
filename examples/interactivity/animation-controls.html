@@ -289,7 +289,7 @@
         }
         layer.on('updated', () => {
             if ($timeRange.value == last) {
-                $timeRange.value = viz.variables.animation.getProgress();
+                $timeRange.value = viz.variables.animation.getProgressPct();
                 last = $timeRange.value;
             }
         });

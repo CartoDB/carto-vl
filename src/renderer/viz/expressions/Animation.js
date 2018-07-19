@@ -66,7 +66,7 @@ let waitingForOthers = new Set();
  * @api
  */
 export class Animation extends BaseExpression {
-    constructor(input, duration = 10, fade = new Fade()) {
+    constructor (input, duration = 10, fade = new Fade()) {
         duration = implicitCast(duration);
         input = implicitCast(input);
         const originalInput = input;
@@ -89,11 +89,11 @@ export class Animation extends BaseExpression {
         this._paused = false;
     }
 
-    isAnimated() {
+    isAnimated () {
         return !this.paused;
     }
 
-    _dataReady() {
+    _dataReady () {
         if (waitingForLayer.has(this)) {
             waitingForLayer.delete(this);
             waitingForOthers.add(this);
@@ -121,13 +121,13 @@ export class Animation extends BaseExpression {
         }
     }
 
-    _postShaderCompile(program, gl) {
+    _postShaderCompile (program, gl) {
         waitingForLayer.add(this);
         this._paused = 'default';
         super._postShaderCompile(program, gl);
     }
 
-    _setTimestamp(timestamp) {
+    _setTimestamp (timestamp) {
         super._setTimestamp(timestamp);
 
         if (this._paused && this._lastTime === undefined) {
@@ -149,7 +149,7 @@ export class Animation extends BaseExpression {
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
     }
 
-    eval(feature) {
+    eval (feature) {
         const input = this._input.eval(feature);
 
         if (Number.isNaN(input)) {
@@ -174,8 +174,8 @@ export class Animation extends BaseExpression {
      * @instance
      * @name getProgressValue
      */
-    getProgressValue() {
-        const progress = this.progress.eval(); //from 0 to 1
+    getProgressValue () {
+        const progress = this.progress.eval(); // from 0 to 1
         const min = this._input.min.eval();
         const max = this._input.max.eval();
 
@@ -198,7 +198,7 @@ export class Animation extends BaseExpression {
      * @name setCurrent
      * @param {Date|number} value - A JavaScript Date object with the new animation time
      */
-    setTimestamp(timestamp) {
+    setTimestamp (timestamp) {
         const date = castDate(timestamp);
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
@@ -222,7 +222,7 @@ export class Animation extends BaseExpression {
      * @memberof carto.expressions.Animation
      * @name getProgressPct
      */
-    getProgressPct() {
+    getProgressPct () {
         return this.progress.value;
     }
 
@@ -234,7 +234,7 @@ export class Animation extends BaseExpression {
      * @memberof carto.expressions.Animation
      * @name setProgressPct
      */
-    setProgressPct(progress) {
+    setProgressPct (progress) {
         progress = Number.parseFloat(progress);
 
         if (progress < 0 || progress > 1) {
@@ -252,7 +252,7 @@ export class Animation extends BaseExpression {
      * @instance
      * @name pause
      */
-    pause() {
+    pause () {
         this._paused = true;
     }
 
@@ -264,7 +264,7 @@ export class Animation extends BaseExpression {
      * @instance
      * @name play
      */
-    play() {
+    play () {
         this._paused = false;
     }
 
@@ -276,12 +276,12 @@ export class Animation extends BaseExpression {
      * @instance
      * @name stop
      */
-    stop() {
+    stop () {
         this.progress.expr = 0;
         this._paused = true;
     }
 
-    _compile(meta) {
+    _compile (meta) {
         this._originalInput._compile(meta);
         this.duration._compile(meta);
 

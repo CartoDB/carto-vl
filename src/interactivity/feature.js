@@ -15,7 +15,7 @@ import FeatureVizProperty from './featureVizProperty';
  * @api
  */
 export default class Feature {
-    constructor(rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty) {
+    constructor (rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty) {
         const variables = {};
         Object.keys(viz.variables).map(varName => {
             variables[varName] = new FeatureVizProperty(`__cartovl_variable_${varName}`, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
@@ -29,7 +29,7 @@ export default class Feature {
         this.variables = variables;
     }
 
-    reset(duration = 500) {
+    reset (duration = 500) {
         this.color.reset(duration);
         this.width.reset(duration);
         this.strokeColor.reset(duration);
@@ -38,6 +38,5 @@ export default class Feature {
         for (let key in this.variables) {
             this.variables[key].reset(duration);
         }
-
     }
 }

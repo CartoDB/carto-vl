@@ -5,7 +5,6 @@ import TriangleShader from './geometry/triangle/TriangleShader';
 import * as styler from './styler/stylerShaders';
 import * as symbolizer from './symbolizer/symbolizerShaders';
 
-
 const AABlender = AntiAliasingShader;
 
 const renderer = {

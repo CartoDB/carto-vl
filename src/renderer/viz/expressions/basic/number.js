@@ -24,31 +24,31 @@ import { checkNumber } from '../utils';
  * @IGNOREapi
  */
 export default class BaseNumber extends BaseExpression {
-    constructor(x) {
+    constructor (x) {
         checkNumber('number', 'x', 0, x);
         super({});
         this.expr = x;
         this.type = 'number';
     }
-    get value() {
+    get value () {
         return this.eval();
     }
-    eval() {
+    eval () {
         return this.expr;
     }
-    isAnimated() {
+    isAnimated () {
         return false;
     }
-    _applyToShaderSource() {
+    _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform float number${this._uid};`),
             inline: `number${this._uid}`
         };
     }
-    _postShaderCompile(program, gl) {
+    _postShaderCompile (program, gl) {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `number${this._uid}`);
     }
-    _preDraw(program, drawMetadata, gl) {
+    _preDraw (program, drawMetadata, gl) {
         gl.uniform1f(this._getBinding(program).uniformLocation, this.expr);
     }
 }

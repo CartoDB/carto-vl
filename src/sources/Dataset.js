@@ -3,7 +3,6 @@ import util from '../utils/util';
 import BaseWindshaft from './BaseWindshaft';
 
 export default class Dataset extends BaseWindshaft {
-
     /**
      * A dataset defines the data that will be displayed in a layer and is equivalent
      * to a table in the server.
@@ -40,18 +39,18 @@ export default class Dataset extends BaseWindshaft {
      * @memberof carto.source
      * @api
      */
-    constructor(tableName, auth, config) {
+    constructor (tableName, auth, config) {
         super();
         this._checkTableName(tableName);
         this._tableName = tableName;
         this.initialize(auth, config);
     }
 
-    _clone() {
+    _clone () {
         return new Dataset(this._tableName, this._auth, this._config);
     }
 
-    _checkTableName(tableName) {
+    _checkTableName (tableName) {
         if (util.isUndefined(tableName)) {
             throw new CartoValidationError('source', 'tableNameRequired');
         }

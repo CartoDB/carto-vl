@@ -43,7 +43,4 @@ describe('src/renderer/viz/expressions/transition', () => {
             expect(actual).toEqual(0);
         });
     });
-
 });
-
-

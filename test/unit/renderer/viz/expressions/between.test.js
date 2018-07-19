@@ -22,7 +22,7 @@ describe('src/renderer/viz/expressions/between', () => {
         testEval(21, 0);
     });
 
-    function testEval(price, expected) {
+    function testEval (price, expected) {
         it(`between($price, 10, 20) should return 0 when $price is ${price}`, () => {
             const fakeFeature = { price };
             const $price = s.property('price');
@@ -32,5 +32,3 @@ describe('src/renderer/viz/expressions/between', () => {
         });
     }
 });
-
-

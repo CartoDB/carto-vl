@@ -7,19 +7,19 @@ const metadata = new Metadata({
         number: {
             type: 'number',
             min: 0,
-            max: 10,
+            max: 10
         },
         category: {
             type: 'category',
-            categories: [{ name: 'category0' }, { name: 'category1' }, { name: 'category2' }],
+            categories: [{ name: 'category0' }, { name: 'category1' }, { name: 'category2' }]
         }
-    },
+    }
 });
 
 // Validate feature independence checks at constructor and compile times, mark the dependent argument with 'dependent' in argTypes
-export function validateFeatureDependentErrors(expressionName, argTypes) {
+export function validateFeatureDependentErrors (expressionName, argTypes) {
     {
-        const args = argTypes.map(type => type == 'dependent' ? 'number-property' : type).map(getPropertyArg);
+        const args = argTypes.map(type => type === 'dependent' ? 'number-property' : type).map(getPropertyArg);
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time a feature dependent error`, () => {
             expect(() =>
                 s[expressionName](...args.map(arg => arg[0]))
@@ -28,7 +28,7 @@ export function validateFeatureDependentErrors(expressionName, argTypes) {
     }
     {
         const v = s.variable('var1');
-        const args = argTypes.map(type => type == 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
+        const args = argTypes.map(type => type === 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
             v._resolveAliases({var1: s.property('wadus')});
@@ -43,7 +43,7 @@ export function validateFeatureDependentErrors(expressionName, argTypes) {
     }
 }
 
-export function validateTypeErrors(expressionName, argTypes) {
+export function validateTypeErrors (expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
@@ -60,14 +60,14 @@ export function validateTypeErrors(expressionName, argTypes) {
         }
     });
 }
-export function validateDynamicTypeErrors(expressionName, argTypes) {
+export function validateDynamicTypeErrors (expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
         validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
     });
 }
 
-export function validateStaticTypeErrors(expressionName, argTypes) {
+export function validateStaticTypeErrors (expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
@@ -78,14 +78,14 @@ export function validateStaticTypeErrors(expressionName, argTypes) {
     });
 }
 
-function equalArgs(argsA, argsB) {
-    if (argsA.length != argsB.length) {
+function equalArgs (argsA, argsB) {
+    if (argsA.length !== argsB.length) {
         return false;
     }
-    return argsA.every((arg, index) => argsB[index] == arg);
+    return argsA.every((arg, index) => argsB[index] === arg);
 }
 
-function validateConstructorTimeTypeError(expressionName, args) {
+function validateConstructorTimeTypeError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
             s[expressionName](...args.map(arg => arg[0]))
@@ -93,7 +93,7 @@ function validateConstructorTimeTypeError(expressionName, args) {
     });
 }
 
-function validateCompileTimeTypeError(expressionName, args) {
+function validateCompileTimeTypeError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
@@ -102,7 +102,7 @@ function validateCompileTimeTypeError(expressionName, args) {
     });
 }
 
-export function validateStaticType(expressionName, argTypes, expectedType) {
+export function validateStaticType (expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
@@ -113,14 +113,14 @@ export function validateStaticType(expressionName, argTypes, expectedType) {
         validateCompileTimeType(expressionName, propertyArgs, expectedType);
     });
 }
-export function validateDynamicType(expressionName, argTypes, expectedType) {
+export function validateDynamicType (expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         validateConstructorTimeType(expressionName, argTypes.map(getSimpleArg), expectedType);
         validateCompileTimeType(expressionName, argTypes.map(getPropertyArg), expectedType);
     });
 }
 
-function validateConstructorTimeType(expressionName, args, expectedType) {
+function validateConstructorTimeType (expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
             s[expressionName](...args.map(arg => arg[0])).type
@@ -128,7 +128,7 @@ function validateConstructorTimeType(expressionName, args, expectedType) {
     });
 }
 
-function validateCompileTimeType(expressionName, args, expectedType) {
+function validateCompileTimeType (expressionName, args, expectedType) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
         expect(
             compile(s[expressionName](...args.map(arg => arg[0]))).type
@@ -136,7 +136,7 @@ function validateCompileTimeType(expressionName, args, expectedType) {
     });
 }
 
-function getSimpleArg(type) {
+function getSimpleArg (type) {
     switch (type) {
         case 'number':
             return [s.number(0), '0'];
@@ -165,7 +165,7 @@ function getSimpleArg(type) {
     }
 }
 
-function getPropertyArg(type) {
+function getPropertyArg (type) {
     switch (type) {
         case 'number':
         case 'number-property':
@@ -193,7 +193,7 @@ function getPropertyArg(type) {
     }
 }
 
-function compile(expression) {
+function compile (expression) {
     expression._compile(metadata);
     return expression;
 }

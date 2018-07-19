@@ -138,40 +138,40 @@ export const ClusterMode = genAggregationOp('clusterMode', 'category');
  */
 export const ClusterSum = genAggregationOp('clusterSum', 'number');
 
-function genAggregationOp(expressionName, aggType) {
+function genAggregationOp (expressionName, aggType) {
     const aggName = expressionName.replace('cluster', '').toLowerCase();
     return class AggregationOperation extends BaseExpression {
-        constructor(property) {
+        constructor (property) {
             checkInstance(expressionName, 'property', 0, PropertyExpression, property);
             super({ property });
             this._aggName = aggName;
             this.type = aggType;
         }
-        get name() {
+        get name () {
             return this.property.name;
         }
-        get aggName() {
+        get aggName () {
             return this._aggName;
         }
-        get numCategories() {
+        get numCategories () {
             return this.property.numCategories;
         }
-        eval(feature) {
+        eval (feature) {
             return feature[schema.column.aggColumn(this.property.name, aggName)];
         }
-        //Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-        _compile(metadata) {
+        // Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+        _compile (metadata) {
             super._compile(metadata);
             checkType(expressionName, 'property', 0, aggType, this.property);
         }
-        _applyToShaderSource(getGLSLforProperty) {
+        _applyToShaderSource (getGLSLforProperty) {
             return {
                 preface: '',
                 inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, aggName))}`
             };
         }
-        _postShaderCompile() { }
-        _getMinimumNeededSchema() {
+        _postShaderCompile () { }
+        _getMinimumNeededSchema () {
             return {
                 columns: [
                     schema.column.aggColumn(this.property.name, aggName)

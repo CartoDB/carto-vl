@@ -7,7 +7,7 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         _cdb_agg_min_price: 2,
         _cdb_agg_avg_price: 3,
         _cdb_agg_sum_price: 4,
-        _cdb_agg_mode_price: 5,
+        _cdb_agg_mode_price: 5
     };
 
     let $price = null;

@@ -1,7 +1,6 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
 
-
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
 s.FALSE.toString = () => 's.FALSE';
@@ -191,7 +190,7 @@ describe('src/renderer/viz/expressions/binary', () => {
             test('neq', 2, 3, 1);
         });
 
-        function test(fn, param1, param2, expected) {
+        function test (fn, param1, param2, expected) {
             it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
                 let actual = s[fn](param1, param2).eval();
                 expect(actual).toEqual(expected);

@@ -26,19 +26,21 @@ import { checkArray, checkLooseType } from './utils';
 */
 
 export default class ImageList extends Base {
-    constructor(imageList) {
+    constructor (imageList) {
         checkArray('imageList', 'imageList', 0, imageList);
         imageList.forEach((image, i) => checkLooseType('imageList', `imageList[${i}]`, 0, 'image', image));
-        
+
         const children = {};
-        
-        imageList.forEach((image, i) => children[`image${i}`] = image);
+
+        imageList.forEach((image, i) => {
+            children[`image${i}`] = image;
+        });
         super(children);
         this.numImages = imageList.length;
         this.type = 'image';
     }
-    
-    _applyToShaderSource() {
+
+    _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`
                 uniform sampler2D atlas${this._uid};
@@ -51,11 +53,11 @@ export default class ImageList extends Base {
         };
     }
 
-    _postShaderCompile(program, gl) {
+    _postShaderCompile (program, gl) {
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `atlas${this._uid}`);
     }
-    
-    _preDraw(program, drawMetadata, gl) {
+
+    _preDraw (program, drawMetadata, gl) {
         this.init = true;
         for (let i = 0; i < this.numImages; i++) {
             const image = this[`image${i}`];
