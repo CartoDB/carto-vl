@@ -12,28 +12,28 @@ import { parseVizExpression } from '../renderer/viz/parser';
  * @api
  */
 export default class FeatureVizProperty {
-    get value() {
+    get value () {
         return this._viz[this._propertyName].eval(this._properties);
     }
 
-    constructor(propertyName, feature, viz, customizedFeatures, trackFeatureViz) {
+    constructor (propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
         this._propertyName = propertyName;
         this._feature = feature;
         this._viz = viz;
         this._properties = this._feature.properties;
 
-        this.blendTo = _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz);
-        this.reset = _generateResetFunction(propertyName, feature, customizedFeatures, viz);
+        this.blendTo = _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty);
+        this.reset = _generateResetFunction(propertyName, feature, customizedFeatures, viz, idProperty);
     }
 }
 
-function _generateResetFunction(propertyName, feature, customizedFeatures, viz) {
-    return function reset(duration = 500) {
+function _generateResetFunction (propertyName, feature, customizedFeatures, viz, idProperty) {
+    return function reset (duration = 500) {
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
             customizedFeatures[feature.id][propertyName].replaceChild(
                 customizedFeatures[feature.id][propertyName].mix,
                 // transition(0) is used to ensure that blend._predraw() "GC" collects it
-                blend(notEquals(property('cartodb_id'), feature.id), transition(0), transition(duration))
+                blend(notEquals(property(idProperty), feature.id), transition(0), transition(duration))
             );
             viz[propertyName].notify();
             customizedFeatures[feature.id][propertyName] = undefined;
@@ -41,10 +41,9 @@ function _generateResetFunction(propertyName, feature, customizedFeatures, viz) 
     };
 }
 
-
-function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz) {
-    return function generatedBlendTo(newExpression, duration = 500) {
-        if (typeof newExpression == 'string') {
+function _generateBlenderFunction (propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty) {
+    return function generatedBlendTo (newExpression, duration = 500) {
+        if (typeof newExpression === 'string') {
             newExpression = parseVizExpression(newExpression);
         }
         if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
@@ -54,12 +53,12 @@ function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz
         const blendExpr = blend(
             newExpression,
             viz[propertyName],
-            blend(1, notEquals(property('cartodb_id'), feature.id), transition(duration))
+            blend(1, notEquals(property(idProperty), feature.id), transition(duration))
         );
         trackFeatureViz(feature.id, propertyName, blendExpr, customizedFeatures);
         viz.replaceChild(
             viz[propertyName],
-            blendExpr,
+            blendExpr
         );
         viz[propertyName].notify();
     };

@@ -63,7 +63,7 @@ const EVENTS = [
     'featureClickOut',
     'featureEnter',
     'featureHover',
-    'featureLeave',
+    'featureLeave'
 ];
 
 export default class Interactivity {
@@ -78,7 +78,7 @@ export default class Interactivity {
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     * @param {object} [options={}] - Object containing interactivity options
     * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
-    * 
+    *
     * @example
     * const interactivity = new carto.Interactivity(layer);
     * interactivity.on('click', event => {
@@ -97,7 +97,7 @@ export default class Interactivity {
     * @memberof carto
     * @api
     */
-    constructor(layerList, options = { autoChangePointer: true }) {
+    constructor (layerList, options = { autoChangePointer: true }) {
         if (layerList instanceof Layer) {
             // Allow one layer as input
             layerList = [layerList];
@@ -115,7 +115,7 @@ export default class Interactivity {
      * @instance
      * @api
      */
-    on(eventName, callback) {
+    on (eventName, callback) {
         checkEvent(eventName);
         this._numListeners[eventName] = (this._numListeners[eventName] || 0) + 1;
         return this._emitter.on(eventName, callback);
@@ -130,13 +130,13 @@ export default class Interactivity {
      * @instance
      * @api
      */
-    off(eventName, callback) {
+    off (eventName, callback) {
         checkEvent(eventName);
         this._numListeners[eventName] = this._numListeners[eventName] - 1;
         return this._emitter.off(eventName, callback);
     }
 
-    _init(layerList, options) {
+    _init (layerList, options) {
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
@@ -152,7 +152,7 @@ export default class Interactivity {
         });
     }
 
-    _setInteractiveCursor() {
+    _setInteractiveCursor () {
         const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
         if (!map.__carto_interacivities) {
             map.__carto_interacivities = new Set();
@@ -167,12 +167,12 @@ export default class Interactivity {
         });
     }
 
-    _subscribeToIntegratorEvents(integrator) {
+    _subscribeToIntegratorEvents (integrator) {
         integrator.on('mousemove', this._onMouseMove.bind(this));
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onMouseMove(event) {
+    _onMouseMove (event) {
         if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
             return;
         }
@@ -206,7 +206,7 @@ export default class Interactivity {
         this._fireEvent('featureHover', featureEvent);
     }
 
-    _onClick(event) {
+    _onClick (event) {
         if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
             return;
         }
@@ -231,7 +231,7 @@ export default class Interactivity {
         this._fireEvent('featureClick', featureEvent);
     }
 
-    _createFeatureEvent(eventData) {
+    _createFeatureEvent (eventData) {
         const features = this._getFeaturesAtPosition(eventData.lngLat);
         return {
             coordinates: eventData.lngLat,
@@ -240,11 +240,11 @@ export default class Interactivity {
         };
     }
 
-    _fireEvent(type, featureEvent) {
+    _fireEvent (type, featureEvent) {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition(lngLat) {
+    _getFeaturesAtPosition (lngLat) {
         const wm = projectToWebMercator(lngLat);
         const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
         return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
@@ -254,17 +254,17 @@ export default class Interactivity {
      * Return the difference between the feature arrays A and B.
      * The output value is also an array of features.
      */
-    _getDiffFeatures(featuresA, featuresB) {
+    _getDiffFeatures (featuresA, featuresB) {
         const IDs = this._getFeatureIDs(featuresB);
         return featuresA.filter(feature => !IDs.includes(feature.id));
     }
 
-    _getFeatureIDs(features) {
+    _getFeatureIDs (features) {
         return features.map(feature => feature.id);
     }
 }
 
-function preCheckLayerList(layerList) {
+function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
         throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
     }
@@ -275,13 +275,13 @@ function preCheckLayerList(layerList) {
         throw new Error('Invalid layer, layer must be an instance of carto.Layer');
     }
 }
-function postCheckLayerList(layerList) {
-    if (!layerList.every(layer => layer.getIntegrator() == layerList[0].getIntegrator())) {
+function postCheckLayerList (layerList) {
+    if (!layerList.every(layer => layer.getIntegrator() === layerList[0].getIntegrator())) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }
 
-function checkEvent(eventName) {
+function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
         throw new Error(`Unrecognized event: ${eventName}. Available events: ${EVENTS.join(', ')}`);
     }

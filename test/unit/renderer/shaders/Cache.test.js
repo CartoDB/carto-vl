@@ -32,9 +32,8 @@ describe('src/renderer/shaders/shader-cache', () => {
 
             expect(cache.has(fakeWebGLContext0, fakeShaderCode)).toEqual(true);
         });
-
     });
-    
+
     describe('get', () => {
         it('should return a previous stored shader', () => {
             const fakeWebGLContext0 = jasmine.createSpy();
@@ -60,7 +59,7 @@ describe('src/renderer/shaders/shader-cache', () => {
             const fakeShaderCode0 = 'fake_shader_fakeShaderCode_0';
             const fakeShaderCode1 = 'fake_shader_fakeShaderCode_1';
             const fakeShader = jasmine.createSpy();
-            
+
             cache.set(fakeWebGLContext0, fakeShaderCode0, fakeShader);
 
             expect(cache.get(fakeWebGLContext0, fakeShaderCode1)).toBeUndefined();

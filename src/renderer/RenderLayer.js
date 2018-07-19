@@ -1,16 +1,17 @@
 import Feature from '../interactivity/feature';
 
 export default class RenderLayer {
-    constructor() {
+    constructor () {
         this.dataframes = [];
         this.renderer = null;
         this.viz = null;
         this.type = null;
         this.customizedFeatures = {};
+        this.idProperty = null;
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
-    addDataframe(dataframe) {
+    addDataframe (dataframe) {
         if (this.type) {
             this._checkDataframeType(dataframe);
         }
@@ -19,28 +20,29 @@ export default class RenderLayer {
             dataframe.bind(this.renderer);
         }
         this.dataframes.push(dataframe);
+        this.idProperty = dataframe.metadata.idProperty;
     }
 
-    getActiveDataframes() {
+    getActiveDataframes () {
         this.dataframes = this.dataframes.filter(df => !df.freed);
         return this.dataframes.filter(df => df.active && df.numVertex);
     }
 
-    hasDataframes() {
+    hasDataframes () {
         return this.getActiveDataframes().length > 0;
     }
 
-    getNumFeatures() {
+    getNumFeatures () {
         return this.getActiveDataframes().map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
-    _checkDataframeType(dataframe) {
-        if (this.type != dataframe.type) {
+    _checkDataframeType (dataframe) {
+        if (this.type !== dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
         }
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition (pos) {
         if (!this.viz) {
             return [];
         }
@@ -50,16 +52,16 @@ export default class RenderLayer {
     /**
      * Return a public `Feature` object from the internal feature object obtained from a dataframe.
      */
-    _generateApiFeature(rawFeature) {
-        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz);
+    _generateApiFeature (rawFeature) {
+        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
     }
 
-    trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {
+    trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {
         customizedFeatures[featureID] = customizedFeatures[featureID] || {};
         customizedFeatures[featureID][vizProperty] = newViz;
     }
 
-    freeDataframes() {
+    freeDataframes () {
         this.dataframes.map(df => df.free());
         this.dataframes = [];
         this.type = null;

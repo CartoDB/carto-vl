@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="../../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Map goes here -->
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            center: [-73.954323, 40.711743],
+            zoom: 15.7,
+            dragRotate: false
+        });
+        map.touchZoomRotate.disableRotation();
+        // Autenticate the client
+        carto.setDefaultAuth({
+            user: 'cartovl',
+            apiKey: 'default_public'
+        });
+        // Create the source
+        const source = new carto.source.Dataset('table_311_complaints');
+        // Add better styles
+        const viz = new carto.Viz(`
+            symbol: cross
+            width: 25
+        `);
+        // Create the layer
+        const layer = new carto.Layer('layer', source, viz);
+        // Add the layer to the map
+        layer.addTo(map);
+    </script>
+</body>
+</html>

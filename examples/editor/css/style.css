@@ -27,8 +27,9 @@ body {
 }
 
 .cvl-Sidebar--label {
-    font-weight: 200;
+    font-weight: 400;
     font-size: 12px;
+    margin-right: 10px;
 }
 
 .cvl-Logo {
@@ -60,7 +61,7 @@ body {
 
 .cvl-Sidebar--BasemapConfig {
     display: flex;
-    font: 400 11px system-ui;
+    font: 400 12px system-ui;
 }
 
 .cvl-Sidebar--BasemapConfig label {
@@ -89,12 +90,32 @@ body {
     resize: vertical;
 }
 
+.cvl-Sidebar-RadioButtonContainer {
+    display: flex;
+    align-items: center;
+    font: 400 12px system-ui;
+    margin: 5px 0;
+}
+
+.cvl-Sidebar--RadioButtonContainer label {
+    margin: 10px 15px 0 0;
+}
+
+.cvl-Sidebar--RadioButton {
+    display: inline-block;
+    font-size: 12px;
+}
+
 .cvl-Sidebar--Textarea,
 .cvl-Main--Textarea {
     width: 100%;
     font-family: Monospace;
     resize: vertical;
     font-size: 16px;
+}
+
+.cvl-Small--Textarea {
+    font-size: 12px;
 }
 
 .cvl-Debugger {

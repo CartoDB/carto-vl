@@ -37,7 +37,7 @@ export const RTT_WIDTH = 1024;
  */
 
 export default class Renderer {
-    constructor(canvas) {
+    constructor (canvas) {
         if (canvas) {
             this.gl = canvas.getContext('webgl');
             if (!this.gl) {
@@ -51,10 +51,10 @@ export default class Renderer {
         this.dataframes = [];
     }
 
-    _initGL(gl) {
+    _initGL (gl) {
         this.gl = gl;
-        const OES_texture_float = gl.getExtension('OES_texture_float');
-        if (!OES_texture_float) {
+        const OESTextureFloat = gl.getExtension('OES_texture_float');
+        if (!OESTextureFloat) {
             throw new Error('WebGL extension OES_texture_float is unsupported');
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
@@ -72,7 +72,7 @@ export default class Renderer {
         const vertices = [
             10.0, -10.0,
             0.0, 10.0,
-            -10.0, -10.0,
+            -10.0, -10.0
         ];
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
@@ -99,7 +99,7 @@ export default class Renderer {
     * Get Renderer visualization center
     * @return {RPoint}
     */
-    getCenter() {
+    getCenter () {
         return { x: this._center.x, y: this._center.y };
     }
 
@@ -108,7 +108,7 @@ export default class Renderer {
      * @param {number} x
      * @param {number} y
      */
-    setCenter(x, y) {
+    setCenter (x, y) {
         this._center.x = x;
         this._center.y = y;
     }
@@ -117,7 +117,7 @@ export default class Renderer {
      * Get Renderer visualization bounds
      * @return {*}
      */
-    getBounds() {
+    getBounds () {
         const center = this.getCenter();
         const sx = this.getZoom() * this.getAspect();
         const sy = this.getZoom();
@@ -128,7 +128,7 @@ export default class Renderer {
      * Get Renderer visualization zoom
      * @return {number}
      */
-    getZoom() {
+    getZoom () {
         return this._zoom;
     }
 
@@ -136,11 +136,11 @@ export default class Renderer {
      * Set Renderer visualization zoom
      * @param {number} zoom
      */
-    setZoom(zoom) {
+    setZoom (zoom) {
         this._zoom = zoom;
     }
 
-    getAspect() {
+    getAspect () {
         if (this.gl) {
             return this.gl.canvas.width / this.gl.canvas.height;
         }
@@ -150,7 +150,7 @@ export default class Renderer {
     /**
      * Run aggregation functions over the visible features.
      */
-    _runViewportAggregations(renderLayer) {
+    _runViewportAggregations (renderLayer) {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
 
@@ -171,20 +171,22 @@ export default class Renderer {
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
-
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
         dataframes.forEach(dataframe => {
             for (let i = 0; i < dataframe.numFeatures; i++) {
+                const featureId = dataframe.properties[metadata.idProperty][i];
+
                 // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(dataframe.properties.cartodb_id[i])) {
+                if (processedFeaturesIDs.has(featureId)) {
                     continue;
                 }
                 // Ignore features outside viewport
                 if (!this._isFeatureInViewport(dataframe, i, aspect)) {
                     continue;
                 }
+                processedFeaturesIDs.add(featureId);
 
-                const feature = this._featureFromDataFrame(dataframe, i);
+                const feature = this._featureFromDataFrame(dataframe, i, metadata);
 
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
@@ -202,7 +204,7 @@ export default class Renderer {
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
      * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport(dataframe, index, aspect) {
+    _isFeatureInViewport (dataframe, index, aspect) {
         const scale = 1 / this._zoom;
         return dataframe.inViewport(index, scale, this._center, aspect);
     }
@@ -210,10 +212,10 @@ export default class Renderer {
     /**
      * Perform a depth first search through the expression tree collecting all viewport expressions.
      */
-    _getViewportExpressions(rootExpressions) {
+    _getViewportExpressions (rootExpressions) {
         const viewportExpressions = [];
 
-        function dfs(expr) {
+        function dfs (expr) {
             if (expr._isViewport) {
                 viewportExpressions.push(expr);
             } else {
@@ -228,7 +230,7 @@ export default class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame(dataframe, index) {
+    _featureFromDataFrame (dataframe, index, metadata) {
         if (!dataframe.cachedFeatures) {
             dataframe.cachedFeatures = [];
         }
@@ -241,19 +243,23 @@ export default class Renderer {
         const propertyNames = Object.keys(dataframe.properties);
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
-            feature[name] = dataframe.properties[name][index];
+            if (metadata.properties[name].type === 'category') {
+                feature[name] = metadata.IDToCategory.get(dataframe.properties[name][index]);
+            } else {
+                feature[name] = dataframe.properties[name][index];
+            }
         }
-        dataframe.cachedFeatures.push(feature);
+        dataframe.cachedFeatures[index] = feature;
         return feature;
     }
 
-    renderLayer(renderLayer) {
+    renderLayer (renderLayer) {
         const tiles = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
         const drawMetadata = {
-            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)), // Used by zoom expression
+            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)) // Used by zoom expression
         };
 
         if (!tiles.length) {
@@ -280,7 +286,7 @@ export default class Renderer {
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(textureId).length;
-            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(textureId).forEach((name, i) => {
@@ -309,12 +315,12 @@ export default class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (renderLayer.type != 'point') {
+        if (renderLayer.type !== 'point') {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
 
-            if (w != this._width || h != this._height) {
+            if (w !== this._width || h !== this._height) {
                 gl.bindTexture(gl.TEXTURE_2D, this._AATex);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
                     w * antialiasingScale, h * antialiasingScale, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
@@ -330,7 +336,7 @@ export default class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const scale = 1. / this._zoom;
+        const scale = 1.0 / this._zoom;
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
@@ -339,9 +345,9 @@ export default class Renderer {
             let renderer = null;
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
-            } else if (tile.type == 'point') {
+            } else if (tile.type === 'point') {
                 renderer = this.finalRendererProgram;
-            } else if (tile.type == 'line') {
+            } else if (tile.type === 'line') {
                 renderer = this.lineRendererProgram;
             } else {
                 renderer = this.triRendererProgram;
@@ -352,7 +358,7 @@ export default class Renderer {
                 gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
             }
 
-            //Set filtering condition on "... AND feature is in current order bucket"
+            // Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
@@ -362,9 +368,9 @@ export default class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (scale / aspect) * (this._center.x - tile.center.x),
                 scale * (this._center.y - tile.center.y));
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-            } else if (tile.type == 'point') {
+            } else if (tile.type === 'point') {
                 gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
             }
 
@@ -376,12 +382,11 @@ export default class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
             gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
-
             gl.enableVertexAttribArray(renderer.featureIdAttr);
             gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -406,10 +411,10 @@ export default class Renderer {
                 const textureId = viz.symbolShader.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
                 viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
-                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.);
+                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
                 viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
@@ -422,7 +427,7 @@ export default class Renderer {
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
-            } else if (tile.type != 'line') {
+            } else if (tile.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
@@ -435,11 +440,11 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            gl.drawArrays(tile.type == 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type == 'line' || tile.type == 'polygon') {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
             }
         });
@@ -447,7 +452,7 @@ export default class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type != 'point') {
+        if (renderLayer.type !== 'point') {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -466,14 +471,12 @@ export default class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
-
     }
-
 
     /**
      * Initialize static shaders
      */
-    _initShaders() {
+    _initShaders () {
         this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
         this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
         this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
@@ -481,7 +484,7 @@ export default class Renderer {
     }
 }
 
-function getOrderingRenderBuckets(renderLayer) {
+function getOrderingRenderBuckets (renderLayer) {
     const orderer = renderLayer.viz.order;
     let orderingMins = [0];
     let orderingMaxs = [1000];
@@ -489,10 +492,10 @@ function getOrderingRenderBuckets(renderLayer) {
     const NUM_BUCKETS = 64;
     if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
     } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i == (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
     }
     return {
         orderingMins,

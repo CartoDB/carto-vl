@@ -9,7 +9,6 @@ describe('sources/base-windshaft', () => {
         serverURL: 'https://{user}.test.com'
     };
 
-
     describe('constructor', () => {
         it('should build a new Source', () => {
             const source = new SourceBase();
@@ -25,8 +24,7 @@ describe('sources/base-windshaft', () => {
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
-            expect(source._serverURL.maps).toEqual('https://test.test.com');
-            expect(source._serverURL.sql).toEqual('https://test.test.com');
+            expect(source._serverURL).toEqual('https://test.test.com');
             expect(source._client).toBeDefined();
         });
 
@@ -36,8 +34,7 @@ describe('sources/base-windshaft', () => {
 
             expect(source._username).toEqual('test');
             expect(source._apiKey).toEqual('1234567890');
-            expect(source._serverURL.maps).toEqual('https://test.carto.com');
-            expect(source._serverURL.sql).toEqual('https://test.carto.com');
+            expect(source._serverURL).toEqual('https://test.carto.com');
             expect(source._client).toBeDefined();
         });
 
@@ -78,15 +75,6 @@ describe('sources/base-windshaft', () => {
             expect(function () {
                 source.initialize(auth, 1234);
             }).toThrowError('`config` property must be an object.');
-        });
-
-        it('should throw an error if config.serverURL is not valid', function () {
-            expect(function () {
-                source.initialize(auth, { serverURL: 1234 });
-            }).toThrowError('`serverURL` property must be a string.');
-            expect(function () {
-                source.initialize(auth, { serverURL: 'invalid-url' });
-            }).toThrowError('`serverURL` property is not a valid URL.');
         });
     });
 

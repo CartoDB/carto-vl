@@ -24,8 +24,8 @@ describe('src/renderer/viz/expressions/Fade', () => {
         });
 
         it('should set fadeIn and fadeOut parameters', () => {
-            expect(s.fade(1,2).fadeIn.eval()).toEqual(1);
-            expect(s.fade(1,2).fadeOut.eval()).toEqual(2);
+            expect(s.fade(1, 2).fadeIn.eval()).toEqual(1);
+            expect(s.fade(1, 2).fadeOut.eval()).toEqual(2);
         });
     });
 });

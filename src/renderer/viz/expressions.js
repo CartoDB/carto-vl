@@ -7,8 +7,8 @@
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
- *  - **symbol** - show a sprite instead in the place of points
- *  - **symbolPlacement** - when using `symbol`, offset to apply to the sprite
+ *  - **symbol** - show an image instead in the place of points
+ *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
  * For example the point diameter could be using the `add` expression:
@@ -63,7 +63,6 @@
  * @namespace carto.expressions
  * @api
  */
-
 
 /**
  * Type of Numeric Expressions.
@@ -123,12 +122,14 @@
  * @api
  */
 
+import { showDeprecationWarning } from './utils/warning';
+
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
 
-import { In } from './expressions/belongs.js';
-import { Nin } from './expressions/belongs.js';
+import { In } from './expressions/belongs';
+import { Nin } from './expressions/belongs';
 
 import Between from './expressions/between';
 
@@ -176,7 +177,7 @@ import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
 
-import { NamedColor } from './expressions/color/named-color';
+import NamedColor from './expressions/color/NamedColor';
 
 import Now from './expressions/now';
 
@@ -189,8 +190,8 @@ import { Desc } from './expressions/ordering';
 import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
-import { palettes } from './expressions/color/palettes';
-import { Reverse } from './expressions/color/palettes';
+import palettes from './expressions/color/palettes';
+import Reverse from './expressions/color/palettes/Reverse';
 
 import Property from './expressions/basic/property';
 
@@ -221,16 +222,19 @@ import { Ceil } from './expressions/unary';
 
 import variableFn from './expressions/basic/variable';
 
-import { ViewportAvg,ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
+import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
 import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
 import ViewportFeatures from './expressions/viewportFeatures';
 
 import XYZ from './expressions/xyz';
 
 import Zoom from './expressions/zoom';
-import Sprite from './expressions/sprite';
+
 import Placement from './expressions/placement';
-import Sprites from './expressions/sprites';
+import Image from './expressions/Image';
+import ImageList from './expressions/ImageList';
+import SVG from './expressions/SVG';
+import svgs from './defaultSVGs';
 
 /* Expose classes as constructor functions */
 
@@ -278,7 +282,13 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 
 export const constant = (...args) => new Constant(...args);
-export const sprite = (...args) => new Sprite(...args);
+
+export const image = (...args) => new Image(...args);
+export const imageList = (...args) => new ImageList(...args);
+export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
+export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
+
+export const svg = (...args) => new SVG(...args);
 
 export const hex = (...args) => new Hex(...args);
 
@@ -330,10 +340,7 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => {
-    console.warn('DeprecationWarning: "torque" expression is deprecated. Please use "animation" instead.');
-    return new Animation(...args);
-};
+export const torque = (...args) => showDeprecationWarning(args, Animation, 'torque', 'animation');
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
@@ -346,7 +353,6 @@ export const isNaN = (...args) => new IsNaN(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
-export const sprites = (...args) => new Sprites(...args);
 
 export const variable = (...args) => variableFn(...args);
 export { variable as var };
@@ -376,6 +382,25 @@ export const TRUE = new Constant(1);
 export const FALSE = new Constant(0);
 export const PI = new Constant(Math.PI);
 export const E = new Constant(Math.E);
+
+export const BICYCLE = new SVG(svgs.bicycle);
+export const BUILDING = new SVG(svgs.building);
+export const BUS = new SVG(svgs.bus);
+export const CAR = new SVG(svgs.car);
+export const CIRCLE = new SVG(svgs.circle);
+export const CIRCLE_OUTLINE = new SVG(svgs.circleOutline);
+export const CROSS = new SVG(svgs.cross);
+export const FLAG = new SVG(svgs.flag);
+export const HOUSE = new SVG(svgs.house);
+export const MARKER = new SVG(svgs.marker);
+export const MARKER_OUTLINE = new SVG(svgs.markerOutline);
+export const PLUS = new SVG(svgs.plus);
+export const SQUARE = new SVG(svgs.square);
+export const SQUARE_OUTLINE = new SVG(svgs.squareOutline);
+export const STAR = new SVG(svgs.star);
+export const STAR_OUTLINE = new SVG(svgs.starOutline);
+export const TRIANGLE = new SVG(svgs.triangle);
+export const TRIANGLE_OUTLINE = new SVG(svgs.triangleOutline);
 
 export const ALIGN_CENTER = new Placement(constant(0), constant(0));
 export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));

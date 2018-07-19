@@ -32,7 +32,7 @@ import { implicitCast } from './utils';
  * @api
  */
 export default class ViewportFeatures extends BaseExpression {
-    constructor(...properties) {
+    constructor (...properties) {
         properties = properties.map(p => implicitCast(p));
 
         // We need to set all the properties as children of the expression
@@ -44,54 +44,62 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
+        this._FeatureProxy = null;
     }
 
-    _compile() {
+    _compile () {
         throw new Error('viewportFeatures cannot be used in visualizations');
     }
 
-    isFeatureDependent() {
+    isFeatureDependent () {
         return false;
     }
 
-    get value() {
+    get value () {
         return this.expr;
     }
 
-    eval() {
+    eval () {
         return this.expr;
     }
 
-    _resetViewportAgg(metadata) {
-        if (!this._requiredProperties.every(p => (p.isA(Property)))) {
-            throw new Error('viewportFeatures arguments can only be properties');
+    _resetViewportAgg (metadata) {
+        if (!this._FeatureProxy) {
+            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+                throw new Error('viewportFeatures arguments can only be properties');
+            }
+            const columns = this._getMinimumNeededSchema().columns;
+            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
         }
-        this._metadata = metadata;
-        this._columns = this._getMinimumNeededSchema().columns;
         this.expr = [];
     }
 
-    accumViewportAgg(feature) {
-        this.expr.push(_adaptFeature(feature, this._columns, this._metadata));
+    accumViewportAgg (feature) {
+        this.expr.push(new this._FeatureProxy(feature));
+    }
+
+    genViewportFeatureClass (properties) {
+        const cls = class ViewportFeature {
+            constructor (feature) {
+                this._feature = feature;
+            }
+        };
+        properties.forEach(prop => {
+            Object.defineProperty(cls.prototype, prop, {
+                get: function () {
+                    return this._feature[prop];
+                }
+            });
+        });
+        return cls;
     }
 }
 
-function _adaptFeature(feature, propertyNames, metadata) {
-    const adaptedFeature = {};
-    for (let i = 0; i < propertyNames.length; i++) {
-        const name = propertyNames[i];
-        let value = feature[name];
-        if (metadata.properties[name].type === 'category') {
-            value = metadata.IDToCategory.get(value);
-        }
-        adaptedFeature[name] = value;
-    }
-    return adaptedFeature;
-}
-
-function _childrenFromProperties(properties) {
+function _childrenFromProperties (properties) {
     let i = 0;
     const childContainer = {};
-    properties.forEach(property => childContainer['p'+ ++i] = property);
+    properties.forEach(property => {
+        childContainer['p' + ++i] = property;
+    });
     return childContainer;
 }

@@ -1,7 +1,7 @@
 import * as LRU from 'lru-cache';
 
 export default class DataframeCache {
-    constructor() {
+    constructor () {
         const lruOptions = {
             max: 256,
             // TODO improve cache length heuristic
@@ -20,7 +20,7 @@ export default class DataframeCache {
 
     // Get the promise of the dataframe with the provided unique ID, by querying the local cache, and using the fetch function as a fallback.
     // The `fetch` function will be called with the provided `uid` and it is expected that it will return a promise to a Dataframe
-    get(uid, fetch) {
+    get (uid, fetch) {
         const cachedDataframe = this._cache.get(uid);
         if (cachedDataframe) {
             return cachedDataframe;
@@ -31,7 +31,7 @@ export default class DataframeCache {
         return dataframePromise;
     }
 
-    free(){
+    free () {
         this._cache.reset();
     }
 }

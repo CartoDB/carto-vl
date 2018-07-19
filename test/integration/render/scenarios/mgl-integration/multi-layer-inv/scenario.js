@@ -21,3 +21,12 @@ const layer1 = new carto.Layer('layer1', source1, viz1);
 
 layer1.addTo(map);
 layer0.addTo(map);
+let loadedLayers = 0;
+layer0.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});
+layer1.on('loaded', () => {
+    loadedLayers += 1;
+    window.loaded = loadedLayers === 2;
+});

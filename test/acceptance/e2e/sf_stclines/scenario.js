@@ -14,9 +14,11 @@ const source = new carto.source.Dataset('sf_stclines');
 const s = carto.expressions;
 const viz = new carto.Viz({
     width: 3,
-    color: s.hsv(0.2, 1, .9)
+    color: s.hsv(0.2, 1, 0.9)
 });
 const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);
-layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
+layer.on('loaded', () => {
+    window.loaded = true;
+});

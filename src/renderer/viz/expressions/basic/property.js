@@ -22,7 +22,7 @@ import { checkString } from '../utils';
  * `);
  *
  * const viz = new carto.Viz(`
- *   filter: $name != 'london'
+ *   filter: $name !== 'london'
  * `);
  *
  * @memberof carto.expressions
@@ -31,44 +31,52 @@ import { checkString } from '../utils';
  * @api
  */
 export default class Property extends BaseExpression {
-    constructor(name) {
+    constructor (name) {
         checkString('property', 'name', 0, name);
-        if (name == '') {
+        if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
     }
-    isFeatureDependent(){
+
+    isFeatureDependent () {
         return true;
     }
-    get value() {
+
+    get value () {
         return this.eval();
     }
-    eval(feature) {
+
+    eval (feature) {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
         return feature[this.name];
     }
-    _compile(meta) {
+
+    _compile (meta) {
         const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
-        if (this.type == 'category') {
+
+        if (this.type === 'category') {
             this.numCategories = metaColumn.categories.length;
         }
+
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
-    _applyToShaderSource(getGLSLforProperty) {
+
+    _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
             inline: getGLSLforProperty(this.name)
         };
     }
-    _getMinimumNeededSchema() {
+
+    _getMinimumNeededSchema () {
         return {
             columns: [
                 this.name

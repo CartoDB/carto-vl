@@ -11,8 +11,7 @@ describe('src/renderer/Dataframe', () => {
                     1, 1
                 ],
                 properties: {
-                    id: [1, 2],
-                    cartodb_id: [0, 1]
+                    id: [1, 2]
                 },
                 type: 'point',
                 size: 2,
@@ -20,21 +19,19 @@ describe('src/renderer/Dataframe', () => {
                 metadata: {
                     properties: {
                         id: {
-                            type: 'number',
-                        },
-                        cartodb_id: {
-                            type: 'number',
+                            type: 'number'
                         }
-                    }
+                    },
+                    idProperty: 'id'
                 }
             });
-            const feature1 = { id: 0, properties: { id: 1 } };
-            const feature2 = { id: 1, properties: { id: 2 } };
+            const feature1 = { id: 1, properties: { id: 1 } };
+            const feature2 = { id: 2, properties: { id: 2 } };
             const viz = {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
-                filter: { eval: () => 1. },
-                symbol: { default: true },
+                filter: { eval: () => 1.0 },
+                symbol: { _default: true }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -54,7 +51,7 @@ describe('src/renderer/Dataframe', () => {
                 const viz = {
                     width: { eval: () => 0.5 },
                     strokeWidth: { eval: () => 0.5 },
-                    filter: { eval: () => 0. },
+                    filter: { eval: () => 0.0 }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, viz)).toEqual([]);
@@ -81,29 +78,30 @@ describe('src/renderer/Dataframe', () => {
                 metadata: {
                     properties: {
                         numeric_prop: {
-                            type: 'number',
+                            type: 'number'
                         },
                         cartodb_id: {
-                            type: 'number',
+                            type: 'number'
                         }
-                    }
+                    },
+                    idProperty: 'cartodb_id'
                 }
             });
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_prop: 1
+                    numeric_prop: 1,
+                    cartodb_id: 0
                 }
             };
             const viz = {
                 width: { eval: () => 1 },
-                filter: { eval: () => 1. },
+                filter: { eval: () => 1.0 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             it('should return an empty list when there are no lines at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 1.001 / 1024 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, viz)).toEqual([]);
-
             });
             it('should return a list containing the features at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz)).toEqual([feature1]);
@@ -112,7 +110,7 @@ describe('src/renderer/Dataframe', () => {
             it('should return zero features when the filter is not passed', () => {
                 const viz = {
                     width: { eval: () => 1 },
-                    filter: { eval: () => 0. },
+                    filter: { eval: () => 0.0 }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, viz)).toEqual([]);
@@ -135,7 +133,7 @@ describe('src/renderer/Dataframe', () => {
                 geom: [[polygon1]],
                 properties: {
                     numeric_property: [0],
-                    cartodb_id: [0],
+                    cartodb_id: [0]
                 },
                 type: 'polygon',
                 size: 1,
@@ -143,23 +141,25 @@ describe('src/renderer/Dataframe', () => {
                 metadata: {
                     properties: {
                         id: {
-                            type: 'number',
+                            type: 'number'
                         },
                         numeric_property: {
-                            type: 'number',
+                            type: 'number'
                         }
-                    }
+                    },
+                    idProperty: 'cartodb_id'
                 }
             });
             const viz = {
                 strokeWidth: { eval: () => 1 },
-                filter: { eval: () => 1. },
+                filter: { eval: () => 1.0 }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
                 id: 0,
                 properties: {
-                    numeric_property: 0
+                    numeric_property: 0,
+                    cartodb_id: 0
                 }
             };
             it('should return an empty list when there are no features at the given position', () => {
@@ -177,7 +177,7 @@ describe('src/renderer/Dataframe', () => {
             it('should return zero features when the filter is not passed', () => {
                 const viz = {
                     strokeWidth: { eval: () => 1 },
-                    filter: { eval: () => 0. },
+                    filter: { eval: () => 0.0 }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([]);
@@ -185,7 +185,6 @@ describe('src/renderer/Dataframe', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, viz)).toEqual([]);
             });
         });
-
     });
 
     describe('.pointInTriangle', () => {

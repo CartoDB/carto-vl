@@ -5,24 +5,24 @@ export const IDENTITY = {
 };
 
 export default class Metadata {
-    constructor({ properties, featureCount, sample, geomType, isAggregated } = { properties: {} }) {
+    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
         this.properties = properties;
         this.featureCount = featureCount;
         this.sample = sample;
         this.geomType = geomType;
         this.isAggregated = isAggregated;
+        this.idProperty = idProperty || 'cartodb_id';
 
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
 
         Object.values(properties).map(property => {
-            if (property.categories) {
-                property.categories.map(category => this.categorizeString(category.name));
-            }
+            property.categories = property.categories || [];
+            property.categories.map(category => this.categorizeString(category.name));
         });
     }
-    categorizeString(category) {
+    categorizeString (category) {
         if (category === undefined) {
             category = null;
         }
@@ -34,7 +34,7 @@ export default class Metadata {
         this.numCategories++;
         return this.numCategories - 1;
     }
-    propertyNames(propertyName) {
+    propertyNames (propertyName) {
         const prop = this.properties[propertyName];
         if (prop.aggregations) {
             return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);

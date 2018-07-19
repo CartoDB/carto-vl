@@ -54,9 +54,9 @@ export const HSV = genHSV('hsv', false);
  */
 export const HSVA = genHSV('hsva', true);
 
-function genHSV(name, alpha) {
+function genHSV (name, alpha) {
     return class extends BaseExpression {
-        constructor(h, s, v, a) {
+        constructor (h, s, v, a) {
             h = implicitCast(h);
             s = implicitCast(s);
             v = implicitCast(v);
@@ -74,12 +74,12 @@ function genHSV(name, alpha) {
             super(children);
             this.type = 'color';
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(f) {
+        eval (f) {
             const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
+                if (value.type === 'category') {
                     return value.eval(f) / (hue ? value.numCategories + 1 : value.numCategories);
                 }
                 return value.eval(f);
@@ -93,7 +93,7 @@ function genHSV(name, alpha) {
                     r: Math.abs(h * 6 - 3) - 1,
                     g: 2 - Math.abs(h * 6 - 2),
                     b: 2 - Math.abs(h * 6 - 4),
-                    a: alpha ? clamp(this.a.eval(f), 0,1) : 1,
+                    a: alpha ? clamp(this.a.eval(f), 0, 1) : 1
                 };
 
                 c.r = clamp(c.r, 0, 1);
@@ -109,7 +109,7 @@ function genHSV(name, alpha) {
 
             return hsvToRgb(h, s, v);
         }
-        _compile(metadata) {
+        _compile (metadata) {
             super._compile(metadata);
             hsvCheckType('h', 0, this.h);
             hsvCheckType('s', 1, this.s);
@@ -118,7 +118,7 @@ function genHSV(name, alpha) {
                 checkType('hsva', 'a', 3, 'number', this.a);
             }
             const normalize = (value, hue = false) => {
-                if (value.type == 'category') {
+                if (value.type === 'category') {
                     return `/${hue ? value.numCategories + 1 : value.numCategories}.`;
                 }
                 return '';
@@ -144,9 +144,9 @@ function genHSV(name, alpha) {
         }
     };
 
-    function hsvCheckType(parameterName, parameterIndex, parameter) {
+    function hsvCheckType (parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
-        if (parameter.type != 'number' && parameter.type != 'category' && parameter.type !== undefined) {
+        if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }
