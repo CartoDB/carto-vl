@@ -210,6 +210,7 @@ export default class Dataframe {
         const feature = this._getFeature(columnNames, featureIndex);
         let strokeScale = 1;
         let stroke = 0;
+        
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
@@ -244,20 +245,22 @@ export default class Dataframe {
         if (aabbResult === aabbResults.INTERSECTS) {
             return _isPolygonCollidingViewport(vertices, normals, scale, viewport, viewportAABB);
         }
-        
+
         return aabbResult === aabbResults.INSIDE;
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
-        featureAABB.minx = featureAABB.minx - stroke;
-        featureAABB.miny = featureAABB.miny - stroke;
-        featureAABB.maxx = featureAABB.maxx + stroke;
-        featureAABB.maxy = featureAABB.maxy + stroke;
+        const featureStrokeAABB = {
+            minx: featureAABB.minx - stroke,
+            miny: featureAABB.miny - stroke,
+            maxx: featureAABB.maxx + stroke,
+            maxy: featureAABB.maxy + stroke
+        };
 
         switch (true) {
-            case _isFeatureInsideViewport(featureAABB, viewportAABB):
+            case _isFeatureInsideViewport(featureStrokeAABB, viewportAABB):
                 return aabbResults.INSIDE;
-            case _isFeatureOutsideViewport(featureAABB, viewportAABB):
+            case _isFeatureOutsideViewport(featureStrokeAABB, viewportAABB):
                 return aabbResults.OUTSIDE;
             default:
                 return aabbResults.INTERSECTS;
