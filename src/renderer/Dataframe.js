@@ -215,8 +215,8 @@ export default class Dataframe {
             case 'point':
                 return this._isPointInViewport(featureIndex, scale, center, aspect);
             case 'line':
-                strokeScale = _computeScale(feature, viz.stroke, this.widthScale);
-                stroke = viz.stroke.eval(feature) * strokeScale;
+                strokeScale = _computeScale(feature, viz.width, this.widthScale);
+                stroke = viz.width.eval(feature) * strokeScale;
                 return this._isPolygonInViewport(featureIndex, scale, strokeScale, stroke, center, aspect);
             case 'polygon':
                 strokeScale = _computeScale(feature, viz.strokeWidth, this.widthScale);
