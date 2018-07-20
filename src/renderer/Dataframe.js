@@ -53,7 +53,7 @@ export default class Dataframe {
         for (let i = 0; i < geometry.length; i++) {
             const feature = geometry[i];
 
-            const aabb = {
+            let aabb = {
                 minx: Number.POSITIVE_INFINITY,
                 miny: Number.POSITIVE_INFINITY,
                 maxx: Number.NEGATIVE_INFINITY,
@@ -61,14 +61,7 @@ export default class Dataframe {
             };
 
             for (let j = 0; j < feature.length; j++) {
-                const { vertices, numVertices } = _getVerticesForGeometry(feature[j], type);
-
-                for (let k = 0; k < numVertices; k++) {
-                    aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
-                    aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
-                    aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
-                    aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
-                }
+                aabb = _getVerticesForGeometry(feature[j], aabb, type);
             }
 
             aabbList.push(aabb);
@@ -460,23 +453,33 @@ export default class Dataframe {
 }
 
 const _geometryFeature = {
-    line: (feature) => {
-        return {
-            vertices: feature,
-            numVertices: feature.length
-        };
+    line: (feature, aabb) => {
+        const vertices = feature;
+
+        aabb.minx = Math.min(aabb.minx, vertices[0]);
+        aabb.miny = Math.min(aabb.miny, vertices[1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[2]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[3]);
+
+        return aabb;
     },
 
-    polygon: (feature) => {
-        return {
-            vertices: feature.flat,
-            numVertices: feature.holes[0] || feature.flat.length / 2
-        };
+    polygon: (feature, aabb) => {
+        const [ vertices, numVertices ] = [ feature.flat, feature.holes[0] || feature.flat.length / 2 ];
+ 
+        for (let k = 0; k < numVertices; k++) {
+            aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
+            aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
+            aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
+            aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
+        }
+
+        return aabb;
     }
 };
 
-function _getVerticesForGeometry (feature, geometryType) {
-    return _geometryFeature[geometryType] ? _geometryFeature[geometryType](feature) : null;
+function _getVerticesForGeometry (feature, aabb, geometryType) {
+    return _geometryFeature[geometryType] ? _geometryFeature[geometryType](feature, aabb) : null;
 }
 
 function _isFeatureInsideViewport (featureAABB, viewportAABB) {
