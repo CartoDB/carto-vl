@@ -466,7 +466,7 @@ const _geometryFeature = {
 
     polygon: (feature, aabb) => {
         const [ vertices, numVertices ] = [ feature.flat, feature.holes[0] || feature.flat.length / 2 ];
- 
+
         for (let k = 0; k < numVertices; k++) {
             aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
             aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
