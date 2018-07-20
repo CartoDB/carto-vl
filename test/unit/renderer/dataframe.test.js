@@ -1,4 +1,5 @@
 import Dataframe, { _pointInTriangle as pointInTriangle } from '../../../src/renderer/Dataframe';
+import Metadata from '../../../src/renderer/Metadata';
 
 describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
@@ -16,14 +17,14 @@ describe('src/renderer/Dataframe', () => {
                 type: 'point',
                 size: 2,
                 active: true,
-                metadata: {
+                metadata: new Metadata({
                     properties: {
                         id: {
                             type: 'number'
                         }
                     },
                     idProperty: 'id'
-                }
+                })
             });
             const feature1 = { id: 1 };
             const feature2 = { id: 2 };
@@ -42,9 +43,9 @@ describe('src/renderer/Dataframe', () => {
             });
 
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, viz)).toEqual([feature2]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 0.999 / 1024 }, viz)).toEqual([feature2]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz), [feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, viz), [feature2]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 0.999 / 1024 }, viz), [feature2]);
             });
 
             it('should return zero features when the filter is not passed', () => {
@@ -75,7 +76,7 @@ describe('src/renderer/Dataframe', () => {
                 type: 'line',
                 size: 1,
                 active: true,
-                metadata: {
+                metadata: new Metadata({
                     properties: {
                         numeric_prop: {
                             type: 'number'
@@ -85,7 +86,7 @@ describe('src/renderer/Dataframe', () => {
                         }
                     },
                     idProperty: 'cartodb_id'
-                }
+                })
             });
             const feature1 = {
                 numeric_prop: 1,
@@ -101,8 +102,8 @@ describe('src/renderer/Dataframe', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -1.001 / 1024 }, viz)).toEqual([]);
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, viz)).toEqual([feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz), [feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, viz), [feature1]);
             });
             it('should return zero features when the filter is not passed', () => {
                 const viz = {
@@ -135,7 +136,7 @@ describe('src/renderer/Dataframe', () => {
                 type: 'polygon',
                 size: 1,
                 active: true,
-                metadata: {
+                metadata: new Metadata({
                     properties: {
                         cartodb_id: {
                             type: 'number'
@@ -145,7 +146,7 @@ describe('src/renderer/Dataframe', () => {
                         }
                     },
                     idProperty: 'cartodb_id'
-                }
+                })
             });
             const viz = {
                 strokeWidth: { eval: () => 1 },
@@ -163,10 +164,10 @@ describe('src/renderer/Dataframe', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 1.01, y: 0.0 }, viz)).toEqual([]);
             });
             it('should return a list containing the features at the given position', () => {
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 }, viz)).toEqual([feature1]);
-                expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, viz)).toEqual([feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz), [feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz), [feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 0.0, y: 1.0 }, viz), [feature1]);
+                expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1.0, y: 0.0 }, viz), [feature1]);
             });
             it('should return zero features when the filter is not passed', () => {
                 const viz = {
@@ -195,3 +196,11 @@ describe('src/renderer/Dataframe', () => {
         });
     });
 });
+
+function expectEqualFeatures (result, expected) {
+    expected.forEach((_, index) => {
+        Object.keys(expected).forEach(propertyName => {
+            expect(result[index][propertyName]).toEqual(expected[index][propertyName]);
+        });
+    });
+}

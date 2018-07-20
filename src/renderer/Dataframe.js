@@ -302,6 +302,10 @@ export default class Dataframe {
             return this.cachedFeatures[index];
         }
 
+        if (!this._cls) {
+            this._genViewportFeatureClass();
+        }
+
         const feature = new this._cls(index);
         this.cachedFeatures[index] = feature;
         return feature;
