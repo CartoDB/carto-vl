@@ -19024,6 +19024,8 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         } catch (error) {
             throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
+
+        this.defaultOthersColor = new _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__["default"]('gray');
     }
 
     loadImages () {
@@ -19125,11 +19127,9 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             return palette.colors;
         }
 
-        const defaultOthersColor = new _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__["default"]('gray');
-
         return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, this.defaultOthersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, this.defaultOthersColor.eval());
     }
 
     _postShaderCompile (program, gl) {
@@ -22063,8 +22063,14 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
 
     decodeProperty (propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
+            if (this._metadata.properties[propertyName].type !== 'category') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
+            }
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
+            if (this._metadata.properties[propertyName].type !== 'number') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
+            }
             return propertyValue;
         } else if (propertyValue === null || propertyValue === undefined) {
             return Number.NaN;
