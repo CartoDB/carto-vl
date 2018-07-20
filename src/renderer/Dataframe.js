@@ -232,7 +232,7 @@ export default class Dataframe {
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeScale * stroke);
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
-        const viewport = this._getViewportPoints(scale, center, aspect);
+        const viewport = this._getViewportPoints(viewportAABB);
 
         if (aabbResult === aabbResults.INTERSECTS) {
             return _isPolygonCollidingViewport(vertices, normals, scale, viewport, viewportAABB);
@@ -271,20 +271,12 @@ export default class Dataframe {
         return { minx, maxx, miny, maxy };
     }
 
-    _getViewportPoints (scale, center, aspect) {
-        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
-        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
-
-        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
-        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
-
+    _getViewportPoints (viewportAABB) {
         return [
-            [ minx, maxy ],
-            [ maxx, maxy ],
-            [ maxx, miny ],
-            [ minx, miny ]
+            { x: viewportAABB.minx, y: viewportAABB.maxy },
+            { x: viewportAABB.maxx, y: viewportAABB.maxy },
+            { x: viewportAABB.maxx, y: viewportAABB.miny },
+            { x: viewportAABB.minx, y: viewportAABB.miny }
         ];
     }
 
@@ -495,10 +487,19 @@ function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
 function _isPolygonCollidingViewport (vertices, normals, scale, viewport, viewportAABB) {
     for (let i = 0; i < vertices.length; i += 6) {
         const triangle = [
-            [vertices[i + 0] + normals[i + 0] * scale, vertices[i + 1] + normals[i + 1] * scale],
-            [vertices[i + 2] + normals[i + 2] * scale, vertices[i + 3] + normals[i + 3] * scale],
-            [vertices[i + 4] + normals[i + 4] * scale, vertices[i + 5] + normals[i + 5] * scale],
-            [vertices[i + 0] + normals[i + 0] * scale, vertices[i + 1] + normals[i + 1] * scale]
+            {
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
+            }, {
+                x: vertices[i + 2] + normals[i + 2] * scale,
+                y: vertices[i + 3] + normals[i + 3] * scale
+            }, {
+                x: vertices[i + 4] + normals[i + 4] * scale,
+                y: vertices[i + 5] + normals[i + 5] * scale
+            }, {
+                x: vertices[i + 0] + normals[i + 0] * scale,
+                y: vertices[i + 1] + normals[i + 1] * scale
+            }
         ];
 
         if (triangleCollides(triangle, viewport, viewportAABB)) {
