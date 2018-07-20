@@ -26,8 +26,8 @@ describe('src/renderer/Dataframe', () => {
                     idProperty: 'id'
                 }
             });
-            const feature1 = { id: 1, properties: { id: 1 } };
-            const feature2 = { id: 2, properties: { id: 2 } };
+            const feature1 = { id: 1 };
+            const feature2 = { id: 2 };
             const viz = {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
@@ -89,11 +89,8 @@ describe('src/renderer/Dataframe', () => {
                 }
             });
             const feature1 = {
-                id: 0,
-                properties: {
-                    numeric_prop: 1,
-                    cartodb_id: 0
-                }
+                numeric_prop: 1,
+                cartodb_id: 0
             };
             const viz = {
                 width: { eval: () => 1 },
@@ -141,7 +138,7 @@ describe('src/renderer/Dataframe', () => {
                 active: true,
                 metadata: {
                     properties: {
-                        id: {
+                        cartodb_id: {
                             type: 'number'
                         },
                         numeric_property: {
@@ -157,11 +154,8 @@ describe('src/renderer/Dataframe', () => {
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
-                id: 0,
-                properties: {
-                    numeric_property: 0,
-                    cartodb_id: 0
-                }
+                numeric_property: 0,
+                cartodb_id: 0
             };
             it('should return an empty list when there are no features at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: -0.01, y: 0.0 }, viz)).toEqual([]);

@@ -232,26 +232,7 @@ export default class Renderer {
      * Build a feature object from a dataframe and an index copying all the properties.
      */
     _featureFromDataFrame (dataframe, index, metadata) {
-        if (!dataframe.cachedFeatures) {
-            dataframe.cachedFeatures = [];
-        }
-
-        if (dataframe.cachedFeatures[index] !== undefined) {
-            return dataframe.cachedFeatures[index];
-        }
-
-        const feature = {};
-        const propertyNames = Object.keys(dataframe.properties);
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            if (metadata.properties[name].type === 'category') {
-                feature[name] = metadata.IDToCategory.get(dataframe.properties[name][index]);
-            } else {
-                feature[name] = dataframe.properties[name][index];
-            }
-        }
-        dataframe.cachedFeatures[index] = feature;
-        return feature;
+        return dataframe.getFeature(index);
     }
 
     renderLayer (renderLayer) {
