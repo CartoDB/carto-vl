@@ -212,9 +212,11 @@ export default class MVT extends Base {
             propertyNames.push(...metadata.propertyNames(propertyName));
         }
 
+        const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
+
         for (let i = 0; i < propertyNames.length; i++) {
             const propertyName = propertyNames[i];
-            properties[propertyName] = new Float32Array(length + RTT_WIDTH);
+            properties[propertyName] = new Float32Array(size);
         }
 
         return { properties, propertyNames };
