@@ -122,8 +122,6 @@
  * @api
  */
 
-import { showDeprecationWarning } from './utils/warning';
-
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
