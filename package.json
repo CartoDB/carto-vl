@@ -94,7 +94,7 @@
     "test:render": "yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
     "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
-    "test:e2e": "./e2e.sh",
+    "test:e2e": "./scripts/run-local-e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
