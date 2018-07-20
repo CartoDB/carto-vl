@@ -64,6 +64,7 @@ export default class Dataframe {
                 this._aabb.push(aabb);
             });
         }
+        this._genViewportFeatureClass();
     }
 
     setFreeObserver (freeObserver) {
@@ -266,17 +267,33 @@ export default class Dataframe {
         return isFiltered;
     }
 
+    _genViewportFeatureClass () {
+        const cls = class ViewportFeature {
+            constructor (feature) {
+                this._feature = feature;
+            }
+        };
+        Object.keys(this.metadata.properties).forEach(propertyName => {
+            Object.defineProperty(cls, propertyName, {
+                value: this.metadata.properties[propertyName].type === 'number' ? 0 : '',
+                writable: true
+            });
+        });
+        this._cls = cls;
+        this._propertyNames = Object.keys(this.properties);
+    }
+
     getFeature (index) {
         if (!this.cachedFeatures) {
-            this.cachedFeatures = [];
+            this.cachedFeatures = new Array(this.numFeatures);
         }
 
         if (this.cachedFeatures[index] !== undefined) {
             return this.cachedFeatures[index];
         }
 
-        const feature = {};
-        const propertyNames = Object.keys(this.properties);
+        const feature = new this._cls();
+        const propertyNames = this._propertyNames;
         for (let i = 0; i < propertyNames.length; i++) {
             const name = propertyNames[i];
             if (this.metadata.properties[name].type === 'category') {
@@ -325,6 +342,7 @@ export default class Dataframe {
         Object.keys(properties).forEach(propertyName => {
             this._addProperty(propertyName);
         });
+        this._genViewportFeatureClass();
     }
 
     _createStyleTileTexture (numFeatures) {
