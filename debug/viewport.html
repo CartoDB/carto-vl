@@ -207,13 +207,11 @@
       }
     );
 
-    const viz = new carto.Viz(
-      `
+    const viz = new carto.Viz(`
       color: blend(red, green, viewportCount() == 2)
       strokeWidth: 0
       @list: viewportFeatures();
-    `
-    );
+    `);
 
     const layer = new carto.Layer('layer', source, viz);
 
@@ -226,8 +224,7 @@
       id: 'cartodb_id'
     });
 
-    const viz2 = new carto.Viz(
-      `
+    const viz2 = new carto.Viz(`
       color: transparent
       strokeWidth: 30
       strokeColor: red
@@ -246,12 +243,10 @@
       }
     );
 
-    const vizLine = new carto.Viz(
-      `
-      color: blend(blue, yellow, viewportCount() == 1)
-      width: 10
-      @list: viewportFeatures();
-      `
+    const vizLine = new carto.Viz(`
+      color: blend(blue, yellow, viewportCount() == 3)
+      width: 50
+      @list: viewportFeatures();`
     );
 
     const layerLine = new carto.Layer('layerLine', sourceLine, vizLine);

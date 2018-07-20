@@ -24,6 +24,7 @@ const map = new mapboxgl.Map({
 
 const source1 = new carto.source.GeoJSON(sources['triangle-collision']);
 const source2 = new carto.source.GeoJSON(sources['triangle-collision']);
+const source3 = new carto.source.GeoJSON(sources['line-collision']);
 
 const viz1 = new carto.Viz(`
     color: blend(red, green, viewportCount() == 2)
@@ -37,11 +38,19 @@ const viz2 = new carto.Viz(`
     @list: viewportFeatures($value);
 `);
 
+const viz3 = new carto.Viz(`
+    color: blend(blue, yellow, viewportCount() == 3)
+    width: 50
+    @list: viewportFeatures();
+`);
+
 const layer1 = new carto.Layer('triangles_without_stroke', source1, viz1);
 const layer2 = new carto.Layer('triangles_with_stroke', source2, viz2);
+const layer3 = new carto.Layer('lines', source3, viz3);
 
 layer2.addTo(map, 'background');
 layer1.addTo(map, 'background');
+layer3.addTo(map, 'background');
 
 layer1.on('loaded', () => {
     if (!window.loaded) {
@@ -50,6 +59,12 @@ layer1.on('loaded', () => {
 });
 
 layer2.on('loaded', () => {
+    if (!window.loaded) {
+        window.loaded = true;
+    }
+});
+
+layer3.on('loaded', () => {
     if (!window.loaded) {
         window.loaded = true;
     }

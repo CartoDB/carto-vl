@@ -1,45 +1,44 @@
 {
   "type": "FeatureCollection",
-  "features": [
-    {
-        "type": "Feature",
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [0, 50],
-              [0, 0],
-              [50, 0],
-              [0, 50]
-            ]
+  "features": [{
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [0, 50],
+            [0, 0],
+            [50, 0],
+            [0, 50]
           ]
-        },
-        "properties": {
-          "cartodb_id": 1,
-          "value": 1,
-          "category": "a",
-          "name": "innerTriangle"
-        }
+        ]
+      },
+      "properties": {
+        "cartodb_id": 1,
+        "value": 1,
+        "category": "a",
+        "name": "innerTriangle"
+      }
     },
     {
       "type": "Feature",
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [165, 50],
-              [165, 0],
-              [215, 0],
-              [165, 50]
-            ]
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [165, 50],
+            [165, 0],
+            [215, 0],
+            [165, 50]
           ]
-        },
-        "properties": {
-          "cartodb_id": 2,
-          "value": 2,
-          "category": "b",
-          "name": "intersectingTriangle"
-        }
+        ]
+      },
+      "properties": {
+        "cartodb_id": 2,
+        "value": 2,
+        "category": "b",
+        "name": "intersectingTriangle"
+      }
     },
     {
       "type": "Feature",
@@ -63,23 +62,23 @@
     },
     {
       "type": "Feature",
-        "geometry": {
-          "type": "Polygon",
-          "coordinates": [
-            [
-              [-226, -70],
-              [-226, -85],
-              [-176, -85],
-              [-226, -70]
-            ]
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [-226, -70],
+            [-226, -85],
+            [-176, -85],
+            [-226, -70]
           ]
-        },
-        "properties": {
-          "cartodb_id": 4,
-          "value": 4,
-          "category": "d",
-          "name": "outerBBOXTriangle"
-        }
+        ]
+      },
+      "properties": {
+        "cartodb_id": 4,
+        "value": 4,
+        "category": "d",
+        "name": "outerBBOXTriangle"
+      }
     }
   ]
 }
