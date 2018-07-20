@@ -64,7 +64,6 @@ export default class Dataframe {
                 this._aabb.push(aabb);
             });
         }
-        this._genViewportFeatureClass();
     }
 
     setFreeObserver (freeObserver) {
@@ -273,20 +272,25 @@ export default class Dataframe {
                 this._index = index;
             }
         };
-        const self = this;
-        Object.keys(this.metadata.properties).forEach(propertyName => {
+        const _getFeatureProperty = this._getFeatureProperty.bind(this);
+
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
             Object.defineProperty(cls.prototype, propertyName, {
                 get: function () {
-                    const index = this._index;
-                    if (self.metadata.properties[propertyName].type === 'category') {
-                        return self.metadata.IDToCategory.get(self.properties[propertyName][index]);
-                    } else {
-                        return self.properties[propertyName][index];
-                    }
+                    return _getFeatureProperty(this._index, propertyName);
                 }
             });
-        });
+        }
         this._cls = cls;
+    }
+
+    _getFeatureProperty (index, propertyName) {
+        if (this.metadata.properties[propertyName].type === 'category') {
+            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
+        } else {
+            return this.properties[propertyName][index];
+        }
     }
 
     getFeature (index) {
@@ -336,9 +340,10 @@ export default class Dataframe {
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties (properties) {
-        Object.keys(properties).forEach(propertyName => {
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
             this._addProperty(propertyName);
-        });
+        }
         this._genViewportFeatureClass();
     }
 

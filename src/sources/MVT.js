@@ -204,15 +204,18 @@ export default class MVT extends Base {
     _initializePropertyArrays (metadata, length) {
         const properties = {};
         const propertyNames = [];
-        Object.keys(metadata.properties)
-            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
-            .forEach(propertyName => {
-                propertyNames.push(...metadata.propertyNames(propertyName));
-            });
+        for (let i = 0; i < metadata.propertyKeys.length; i++) {
+            const propertyName = metadata.propertyKeys[i];
+            if (metadata.properties[propertyName].type === 'geometry') {
+                continue;
+            }
+            propertyNames.push(...metadata.propertyNames(propertyName));
+        }
 
-        propertyNames.forEach(propertyName => {
+        for (let i = 0; i < propertyNames.length; i++) {
+            const propertyName = propertyNames[i];
             properties[propertyName] = new Float32Array(length + RTT_WIDTH);
-        });
+        }
 
         return { properties, propertyNames };
     }
