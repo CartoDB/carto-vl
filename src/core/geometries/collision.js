@@ -1,21 +1,38 @@
 import { halfPlaneTestVector, pointInRectangleVector, pointInTriangleVector, checkSign } from '../../utils/geometry';
 
 export function triangleCollides (triangle, viewport, viewportAABB) {
-    // 0. Check the feature is bigger than the viewport
+    if (_isFeatureGreaterThanViewport(triangle, viewport)) {
+        return true;
+    }
+
+    if (_isTriangleInViewport(triangle, viewportAABB)) {
+        return true;
+    }
+
+    return _isViewportCollidingTriangleLines(triangle, viewport);
+}
+
+function _isFeatureGreaterThanViewport (triangle, viewport) {
     for (let i = 0; i < viewport.length; i++) {
         if (pointInTriangleVector(viewport[i], triangle[0], triangle[1], triangle[2])) {
             return true;
         }
     }
 
-    // 1. Check any triangle point is inside viewport
+    return false;
+}
+
+function _isTriangleInViewport (triangle, viewportAABB) {
     for (let i = 0; i < triangle.length; i++) {
         if (pointInRectangleVector(triangle[i], viewportAABB)) {
             return true;
         }
     }
 
-    // 2. Check viewport coordinates position against triangle lines
+    return false;
+}
+
+function _isViewportCollidingTriangleLines (triangle, viewport) {
     for (let i = 0; i < 3; i++) {
         const positions = [];
 
