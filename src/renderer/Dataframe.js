@@ -269,18 +269,24 @@ export default class Dataframe {
 
     _genViewportFeatureClass () {
         const cls = class ViewportFeature {
-            constructor (feature) {
-                this._feature = feature;
+            constructor (index) {
+                this._index = index;
             }
         };
+        const self = this;
         Object.keys(this.metadata.properties).forEach(propertyName => {
-            Object.defineProperty(cls, propertyName, {
-                value: this.metadata.properties[propertyName].type === 'number' ? 0 : '',
-                writable: true
+            Object.defineProperty(cls.prototype, propertyName, {
+                get: function () {
+                    const index = this._index;
+                    if (self.metadata.properties[propertyName].type === 'category') {
+                        return self.metadata.IDToCategory.get(self.properties[propertyName][index]);
+                    } else {
+                        return self.properties[propertyName][index];
+                    }
+                }
             });
         });
         this._cls = cls;
-        this._propertyNames = Object.keys(this.properties);
     }
 
     getFeature (index) {
@@ -292,16 +298,7 @@ export default class Dataframe {
             return this.cachedFeatures[index];
         }
 
-        const feature = new this._cls();
-        const propertyNames = this._propertyNames;
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            if (this.metadata.properties[name].type === 'category') {
-                feature[name] = this.metadata.IDToCategory.get(this.properties[name][index]);
-            } else {
-                feature[name] = this.properties[name][index];
-            }
-        }
+        const feature = new this._cls(index);
         this.cachedFeatures[index] = feature;
         return feature;
     }
