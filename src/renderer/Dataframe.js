@@ -266,7 +266,7 @@ export default class Dataframe {
         return isFiltered;
     }
 
-    _genViewportFeatureClass () {
+    _genFeatureClass () {
         const cls = class ViewportFeature {
             constructor (index) {
                 this._index = index;
@@ -274,14 +274,17 @@ export default class Dataframe {
         };
         const _getFeatureProperty = this._getFeatureProperty.bind(this);
 
+        const getters = {};
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
-            Object.defineProperty(cls.prototype, propertyName, {
+            getters[propertyName] = {
                 get: function () {
                     return _getFeatureProperty(this._index, propertyName);
                 }
-            });
+            };
         }
+
+        Object.defineProperties(cls.prototype, getters);
         this._cls = cls;
     }
 
@@ -303,7 +306,7 @@ export default class Dataframe {
         }
 
         if (!this._cls) {
-            this._genViewportFeatureClass();
+            this._genFeatureClass();
         }
 
         const feature = new this._cls(index);
@@ -348,7 +351,7 @@ export default class Dataframe {
             const propertyName = this.metadata.propertyKeys[i];
             this._addProperty(propertyName);
         }
-        this._genViewportFeatureClass();
+        this._genFeatureClass();
     }
 
     _createStyleTileTexture (numFeatures) {

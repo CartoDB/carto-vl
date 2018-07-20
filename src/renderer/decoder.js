@@ -46,13 +46,14 @@ function isClipped (polygon, i, j) {
     }
     return false;
 }
-
 function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geometry.forEach(feature => {
-        feature.forEach(polygon => {
+    for (let i = 0; i < geometry.length; i++) {
+        const feature = geometry[i];
+        for (let j = 0; j < feature.length; j++) {
+            const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
             const trianglesLength = triangles.length;
             for (let i = 0; i < trianglesLength; i++) {
@@ -62,52 +63,47 @@ function decodePolygon (geometry) {
             }
 
             const lineString = polygon.flat;
-            for (let i = 0; i < lineString.length - 2; i += 2) {
-                if (polygon.holes.includes((i + 2) / 2)) {
+            for (let k = 0; k < lineString.length - 2; k += 2) {
+                if (polygon.holes.includes((k + 2) / 2)) {
                     // Skip adding the line which connects two rings
                     continue;
                 }
 
-                const a = [lineString[i + 0], lineString[i + 1]];
-                const b = [lineString[i + 2], lineString[i + 3]];
+                const a = [lineString[k + 0], lineString[k + 1]];
+                const b = [lineString[k + 2], lineString[k + 3]];
 
-                if (isClipped(polygon, i, i + 2)) {
+                if (isClipped(polygon, k, k + 2)) {
                     continue;
                 }
 
-                let normal = getLineNormal(b, a);
+                const normal = getLineNormal(b, a);
 
-                if (isNaN(normal[0]) || isNaN(normal[1])) {
+                if (Number.isNaN(normal[0]) || Number.isNaN(normal[1])) {
                     // Skip when there is no normal vector
                     continue;
                 }
 
-                let na = normal;
-                let nb = normal;
+                vertices.push(
+                    a[0], a[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    b[0], b[1]
+                );
 
-                // First triangle
-
-                normals.push(-na[0], -na[1]);
-                normals.push(na[0], na[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-
-                // Second triangle
-
-                normals.push(na[0], na[1]);
-                normals.push(nb[0], nb[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-                vertices.push(b[0], b[1]);
+                normals.push(
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1]
+                );
             }
-        });
+        }
         breakpoints.push(vertices.length);
-    });
+    }
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
