@@ -17,8 +17,8 @@ export function on (eventName, layerList, callback) {
     if (eventName === 'loaded') {
         const waitingGroup = new Set(layerList);
         layerList.forEach(layer => {
-            layer.on(eventName, () => {
-                waitingGroup.remove(layer);
+            layer.on('loaded', () => {
+                waitingGroup.delete(layer);
                 if (waitingGroup.size === 0) {
                     callback();
                 }
