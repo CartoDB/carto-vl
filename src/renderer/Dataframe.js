@@ -3,7 +3,7 @@ import { wToR } from '../client/rsys';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
-const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
+const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 8;
 
 const featureClassCache = new Map();
 
@@ -329,9 +329,7 @@ export default class Dataframe {
     }
 
     _addProperty (propertyName) {
-        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
-            this.getPropertyTexture(propertyName);
-        }
+        this.getPropertyTexture(propertyName);
     }
 
     getPropertyTexture (propertyName) {
@@ -361,9 +359,11 @@ export default class Dataframe {
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties (properties) {
-        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
-            const propertyName = this.metadata.propertyKeys[i];
-            this._addProperty(propertyName);
+        if (this.metadata.propertyKeys.length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
+            for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+                const propertyName = this.metadata.propertyKeys[i];
+                this._addProperty(propertyName);
+            }
         }
         this._genFeatureClass();
     }
