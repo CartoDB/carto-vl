@@ -447,11 +447,14 @@ export default class Dataframe {
 const _geometryFeature = {
     line: (feature, aabb) => {
         const vertices = feature;
+        const numVertices = feature.length / 2;
 
-        aabb.minx = Math.min(aabb.minx, vertices[0]);
-        aabb.miny = Math.min(aabb.miny, vertices[1]);
-        aabb.maxx = Math.max(aabb.maxx, vertices[2]);
-        aabb.maxy = Math.max(aabb.maxy, vertices[3]);
+        for (let i = 0; i < numVertices; i += 4) {
+            aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
+            aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
+            aabb.maxx = Math.max(aabb.maxx, vertices[i + 2]);
+            aabb.maxy = Math.max(aabb.maxy, vertices[i + 3]);
+        }
 
         return aabb;
     },
