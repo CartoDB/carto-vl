@@ -235,7 +235,7 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
-import Scale from './expressions/scale';
+import Scale from './expressions/Scale';
 
 /* Expose classes as constructor functions */
 
