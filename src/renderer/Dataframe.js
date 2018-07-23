@@ -1,7 +1,7 @@
 import decoder from './decoder';
 import { wToR } from '../client/rsys';
 import { triangleCollides } from '../../src/core/geometries/collision';
-import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
+import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -345,7 +345,9 @@ export default class Dataframe {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                if (this._isFeatureFiltered(feature, viz.filter)) {
+
+                if (!pointInRectangle(p, this._aabb[featureIndex]) ||
+                    this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }

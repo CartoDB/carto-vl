@@ -107,5 +107,6 @@ export default {
     halfPlaneTest,
     pointInTriangle,
     equalPoints,
-    pointInCircle
+    pointInCircle,
+    pointInRectangle
 };
