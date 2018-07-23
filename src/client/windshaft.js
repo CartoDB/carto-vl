@@ -367,6 +367,8 @@ export default class Windshaft {
                         property[fn] = new Time(property[fn] * 1000).value;
                     }
                 });
+            } else if (property.type === 'geometry') {
+                delete properties[propertyName];
             }
         });
 

@@ -163,7 +163,7 @@ export default class MVT extends Base {
 
     _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {
         let numFeatures = 0;
-        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        // const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -185,9 +185,31 @@ export default class MVT extends Base {
             if (f.properties[this._metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);
             }
-            this._decodeProperties(propertyNames, properties, f, numFeatures);
+            // this._decodeProperties(propertyNames, properties, f, numFeatures);
             numFeatures++;
         }
+
+        const size = Math.ceil(mvtLayer.length / RTT_WIDTH) * RTT_WIDTH;
+        const self = this;
+        const properties = new Proxy({
+            numDecoded: 0
+        }, {
+            get: function (obj, propertyName) {
+                if (propertyName in obj) {
+                    return obj[propertyName];
+                }
+                const array = new Float32Array(size);
+                for (let i = 0; i < mvtLayer.length; i++) {
+                    const feature = mvtLayer.feature(i);
+                    const propertyValue = feature.properties[propertyName];
+                    array[i] = self.decodeProperty(propertyName, propertyValue);
+                }
+                obj[propertyName] = array;
+                obj.numDecoded++;
+                console.log(obj.numDecoded);
+                return array;
+            }
+        });
 
         return { properties, geometries, numFeatures };
     }
@@ -214,7 +236,8 @@ export default class MVT extends Base {
 
         const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
 
-        for (let i = 0; i < propertyNames.length; i++) {
+        const propertyNamesLength = propertyNames.length;
+        for (let i = 0; i < propertyNamesLength; i++) {
             const propertyName = propertyNames[i];
             properties[propertyName] = new Float32Array(size);
         }
@@ -224,6 +247,7 @@ export default class MVT extends Base {
 
     _decodeProperties (propertyNames, properties, feature, i) {
         const length = propertyNames.length;
+
         for (let j = 0; j < length; j++) {
             const propertyName = propertyNames[j];
             const propertyValue = feature.properties[propertyName];
