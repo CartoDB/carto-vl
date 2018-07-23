@@ -6,8 +6,11 @@ const map = new mapboxgl.Map({
 });
 
 carto.setDefaultAuth({
-    user: 'cartovl',
-    apiKey: 'default_public'
+    user: 'localhost',
+    apiKey: '1234'
+});
+carto.setDefaultConfig({
+    serverURL: 'http://{user}.localhost.lan:8181'
 });
 
 const source = new carto.source.Dataset('sf_stclines');

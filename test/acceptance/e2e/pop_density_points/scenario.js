@@ -2,12 +2,15 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
     center: [-20, 33],
-    zoom: 3
+    zoom: 3.8
 });
 
 carto.setDefaultAuth({
-    user: 'cartovl',
-    apiKey: 'default_public'
+    user: 'localhost',
+    apiKey: '1234'
+});
+carto.setDefaultConfig({
+    serverURL: 'http://{user}.localhost.lan:8181'
 });
 
 const source = new carto.source.Dataset('pop_density_points');

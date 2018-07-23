@@ -1,0 +1,6 @@
+CREATE OR REPLACE FUNCTION CDB_CheckAnalysisQuota(table_name TEXT)
+RETURNS void AS
+$$
+BEGIN
+END;
+$$ LANGUAGE PLPGSQL;
