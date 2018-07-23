@@ -122,8 +122,6 @@
  * @api
  */
 
-import { showDeprecationWarning } from './utils/warning';
-
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
@@ -285,8 +283,6 @@ export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
 export const imageList = (...args) => new ImageList(...args);
-export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
-export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
 
 export const svg = (...args) => new SVG(...args);
 
@@ -340,7 +336,6 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => showDeprecationWarning(args, Animation, 'torque', 'animation');
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
