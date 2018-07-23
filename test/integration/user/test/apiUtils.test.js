@@ -60,6 +60,20 @@ describe('api utils', () => {
         });
     });
 
+    describe('.off', () => {
+        it('should stop firing events', () => {
+            const layerLoaded = jasmine.createSpy('layerLoaded1');
+            layer1.on('loaded', layerLoaded);
+            layer2.on('loaded', layerLoaded);
+            carto.on('loaded', [layer1, layer2], layerLoaded);
+            carto.on('loaded', [layer1, layer2], () => {
+                setTimeout(() => {
+                    expect(layerLoaded).toHaveBeenCalledTimes(0);
+                });
+            });
+        });
+    });
+
     afterEach(() => {
         map.remove();
         document.body.removeChild(div);
