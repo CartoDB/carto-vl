@@ -207,7 +207,7 @@ export default class Renderer {
      */
     _isFeatureInViewport (dataframe, index, aspect, viz) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, aspect, viz); // TODO viz
+        return dataframe.inViewport(index, scale, this._center, aspect, viz);
     }
 
     /**

@@ -44,7 +44,7 @@ export function getJointNormal (a, b, c) {
 }
 
 export function normalize (v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    const s = Math.hypot(v[0], v[1]);
     return [v[0] / s, v[1] / s];
 }
 
@@ -96,18 +96,6 @@ export function pointInRectangle (point, bbox) {
     return ((bbox.minx <= point.x) && (point.x <= bbox.maxx) && (bbox.miny <= point.y) && (point.y <= bbox.maxy));
 }
 
-export function checkSign (positions) {
-    if (positions.every((position) => position < 0)) {
-        return true;
-    }
-
-    if (positions.every((position) => position > 0)) {
-        return true;
-    }
-
-    return false;
-}
-
 export default {
     intersect,
     sub,
@@ -119,6 +107,5 @@ export default {
     halfPlaneTest,
     pointInTriangle,
     equalPoints,
-    pointInCircle,
-    checkSign
+    pointInCircle
 };

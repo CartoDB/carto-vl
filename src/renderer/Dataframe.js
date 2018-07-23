@@ -7,7 +7,7 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
-const aabbResults = {
+const AABBTestResults = {
     INSIDE: 1,
     OUTSIDE: -1,
     INTERSECTS: 0
@@ -43,11 +43,11 @@ export default class Dataframe {
                 return [];
             case 'line':
             case 'polygon':
-                return this._computeFeatureAABB(geometry, type);
+                return this._computeFeatureAABBList(geometry, type);
         }
     }
 
-    _computeFeatureAABB (geometry, type) {
+    _computeFeatureAABBList (geometry, type) {
         const aabbList = [];
 
         for (let i = 0; i < geometry.length; i++) {
@@ -231,11 +231,11 @@ export default class Dataframe {
         const normals = this.decodedGeom.normals;
         const viewport = this._getViewportPoints(viewportAABB);
 
-        if (aabbResult === aabbResults.INTERSECTS) {
+        if (aabbResult === AABBTestResults.INTERSECTS) {
             return _isPolygonCollidingViewport(vertices, normals, strokeWidthScale, viewport, viewportAABB);
         }
 
-        return aabbResult === aabbResults.INSIDE;
+        return aabbResult === AABBTestResults.INSIDE;
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
@@ -248,11 +248,11 @@ export default class Dataframe {
 
         switch (true) {
             case _isFeatureInsideViewport(featureStrokeAABB, viewportAABB):
-                return aabbResults.INSIDE;
+                return AABBTestResults.INSIDE;
             case _isFeatureOutsideViewport(featureStrokeAABB, viewportAABB):
-                return aabbResults.OUTSIDE;
+                return AABBTestResults.OUTSIDE;
             default:
-                return aabbResults.INTERSECTS;
+                return AABBTestResults.INTERSECTS;
         }
     }
 
@@ -406,6 +406,7 @@ export default class Dataframe {
                 feature[name] = this.properties[name][index];
             }
         }
+
         this.cachedFeatures[index] = feature;
         return feature;
     }

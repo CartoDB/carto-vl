@@ -172,8 +172,7 @@ function decodeLine (geom) {
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
-        normals: new Float32Array(normals),
-        triangles: []
+        normals: new Float32Array(normals)
     };
 }
 
