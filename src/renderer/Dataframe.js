@@ -5,6 +5,8 @@ import { wToR } from '../client/rsys';
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
+const featureClassCache = new Map();
+
 export default class Dataframe {
     // `type` is one of 'point' or 'line' or 'polygon'
     constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
@@ -267,24 +269,36 @@ export default class Dataframe {
     }
 
     _genFeatureClass () {
+        if (featureClassCache.has(this.metadata)) {
+            this._cls = featureClassCache.get(this.metadata);
+            return;
+        }
         const cls = class ViewportFeature {
-            constructor (index) {
+            constructor (index, dataframe) {
                 this._index = index;
+                this._dataframe = dataframe;
             }
         };
-        const _getFeatureProperty = this._getFeatureProperty.bind(this);
 
+        const metadata = this.metadata;
         const getters = {};
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
             getters[propertyName] = {
                 get: function () {
-                    return _getFeatureProperty(this._index, propertyName);
+                    const index = this._index;
+                    if (metadata.properties[propertyName].type === 'category') {
+                        return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
+                    } else {
+                        return this._dataframe.properties[propertyName][index];
+                    }
                 }
             };
         }
 
         Object.defineProperties(cls.prototype, getters);
+
+        featureClassCache.set(this.metadata, cls);
         this._cls = cls;
     }
 
@@ -309,7 +323,7 @@ export default class Dataframe {
             this._genFeatureClass();
         }
 
-        const feature = new this._cls(index);
+        const feature = new this._cls(index, this);
         this.cachedFeatures[index] = feature;
         return feature;
     }
