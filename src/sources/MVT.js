@@ -195,6 +195,9 @@ export default class MVT extends Base {
             numDecoded: 0
         }, {
             get: function (obj, propertyName) {
+                if (metadata.properties[propertyName].type === 'geometry') {
+                    return;
+                }
                 if (propertyName in obj) {
                     return obj[propertyName];
                 }
