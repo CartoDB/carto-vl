@@ -67,6 +67,7 @@
     "sloc": "^0.2.0",
     "svg-inline-loader": "^0.8.0",
     "uglifyjs-webpack-plugin": "^1.2.7",
+    "wait-on": "^2.1.0",
     "webpack": "^4.0.0",
     "webpack-cli": "^2.1.4",
     "webpack-glsl-loader": "^1.0.1"
@@ -93,7 +94,7 @@
     "test:render": "yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
     "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
-    "test:e2e": "yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000",
+    "test:e2e": "./scripts/run-local-e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:benchmark": "node test/benchmark/benchmark.js",
