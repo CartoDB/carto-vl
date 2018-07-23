@@ -36,6 +36,7 @@ export default class TileClient {
         tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
                 dataframe => {
+                    dataframe.orderID = x + y / 1000;
                     if (dataframe.empty) {
                         needToComplete--;
                     } else {
