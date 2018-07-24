@@ -112,12 +112,6 @@ describe('Layer', () => {
                     done();
                 });
             });
-
-            describe('when interactivity is defined', () => {
-                it('should disable interactivity', () => {
-
-                });
-            });
         });
 
         describe('.show', () => {
@@ -133,11 +127,6 @@ describe('Layer', () => {
                     layer.show();
                     expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
                     done();
-                });
-            });
-
-            describe('when interactivity is defined', () => {
-                it('should enable interactivity', () => {
                 });
             });
         });
