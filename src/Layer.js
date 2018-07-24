@@ -89,7 +89,7 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this._isLoaded = false;
-        this.visible = true;
+        this._visible = true;
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
@@ -100,7 +100,15 @@ export default class Layer {
      * @readonly
      */
     get visibility () {
-        return this.visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
+        return this._visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
+    }
+
+    /**
+     * Get layer visibility. Can be true or false.
+     * @readonly
+     */
+    get visible () {
+        return this._visible;
     }
 
     /**
@@ -291,57 +299,22 @@ export default class Layer {
         this._fireUpdateOnNextRender = true;
     }
 
-    /**
-     *  Check if the layer has any dataframe.
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     hasDataframes () {
         return this._renderLayer.hasDataframes();
     }
 
-    /**
-     *  Get layer id
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     getId () {
         return this._id;
     }
 
-    /**
-     *  Get layer source
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     getSource () {
         return this._source;
     }
 
-    /**
-     *  Get layer viz
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     getViz () {
         return this._viz;
     }
 
-    /**
-     *  Get the number of features of the layer
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     getNumFeatures () {
         return this._renderLayer.getNumFeatures();
     }
@@ -350,17 +323,8 @@ export default class Layer {
         return this._integrator;
     }
 
-    /**
-     *  Get the features in a position
-     * @param  {object} pos
-     * @param  {number} pos.x
-     * @param  {number} pos.y
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     */
     getFeaturesAtPosition (pos) {
-        return this.visible
+        return this._visible
             ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
             : [];
     }
@@ -375,9 +339,9 @@ export default class Layer {
      * @fires updated
      */
     show () {
-        this.visible = true;
-        this._integrator.changeVisibility(this._id, this.visibility);
-        this._fire('updated', { visibility: this.visibility });
+        this._visible = true;
+        this._integrator.changeVisibility(this);
+        this._fire('updated');
     }
 
     /**
@@ -390,9 +354,9 @@ export default class Layer {
      * @fires updated
      */
     hide () {
-        this.visible = false;
-        this._integrator.changeVisibility(this._id, this.visibility);
-        this._fire('updated', { visibility: this.visibility });
+        this._visible = false;
+        this._integrator.changeVisibility(this);
+        this._fire('updated');
     }
 
     $paintCallback () {

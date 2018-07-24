@@ -27,8 +27,8 @@ export default class Map {
 
         this._background = options.background || '';
 
-        this._layers = [];
-        this._hiddenLayers = [];
+        this._layers = new Set();
+        this._hiddenLayers = new Set();
         this._repaint = true;
         this.invalidateWebGLState = () => {};
         this._canvas = this._createCanvas();
@@ -41,14 +41,10 @@ export default class Map {
     addLayer (layer, beforeLayerID) {
         layer.initialize();
 
-        let index;
-        for (index = 0; index < this._layers.length; index++) {
-            if (this._layers[index].getId() === beforeLayerID) {
-                break;
-            }
+        if (!this._layers.has(layer)) {
+            this._layers.add(layer);
         }
 
-        this._layers.splice(index, 0, layer);
         window.requestAnimationFrame(this.update.bind(this));
     }
 
@@ -67,9 +63,11 @@ export default class Map {
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
+
             if (hasData || hasAnimation) {
                 layer.$paintCallback();
             }
+            
             loaded = loaded && hasData;
             animated = animated || hasAnimation;
         });
@@ -80,34 +78,28 @@ export default class Map {
         }
     }
 
-    changeVisibility (layerId, visibility) {
-        switch (visibility) {
+    changeVisibility (layer) {
+        switch (layer.visibility) {
             case layerVisibility.VISIBLE:
-                this.show(layerId);
+                this.show(layer);
                 break;
             case layerVisibility.HIDDEN:
-                this.hide(layerId);
+                this.hide(layer);
                 break;
         }
     }
 
-    hide (layerId) {
-        for (let index = 0; index < this._layers.length; index++) {
-            if (this._layers[index].getId() === layerId) {
-                this._hiddenLayers.splice(index, 0, this._layers[index]);
-                this._layers.splice(index, 1);
-                break;
-            }
+    hide (layer) {
+        if (this._layers.has(layer)) {
+            this._layers.delete(layer);
+            this._hiddenLayers.add(layer);
         }
     }
 
-    show (layerId) {
-        for (let index = 0; index < this._hiddenLayers.length; index++) {
-            if (this._hiddenLayers[index].getId() === layerId) {
-                this._layers.splice(index, 0, this._hiddenLayers[index]);
-                this._hiddenLayers.splice(index, 1);
-                break;
-            }
+    show (layer) {
+        if (this._hiddenLayers.has(layer)) {
+            this._hiddenLayers.delete(layer);
+            this._layers.add(layer);
         }
     }
 

@@ -130,7 +130,7 @@ class MGLIntegrator {
         return this.map.getZoom();
     }
 
-    changeVisibility (layerId, visibility) {
-        this.map.setLayoutProperty(layerId, 'visibility', visibility);
+    changeVisibility (layer) {
+        this.map.setLayoutProperty(layer.getId(), 'visibility', layer.visibility);
     }
 }
