@@ -191,12 +191,13 @@ function addLine (lineString, vertices, normals) {
 
                 } else {
                     // bevel
-                    const l = Math.hypot(joinNormal[0], joinNormal[1]);
-                    const prevL = Math.hypot(currentPoint[0]-prevPoint[0], currentPoint[1]-prevPoint[1]);
-                    const nextL = Math.hypot(nextPoint[0]-currentPoint[0], nextPoint[1]-currentPoint[1]);
-                    const ll = Math.min(prevL, nextL);
-                    if (l > ll) {
-                        joinNormal = [joinNormal[0]*ll/l, joinNormal[1]*ll/l];
+                    const joinLength = length(joinormal);
+                    const segmentLength = Math.min(
+                        length(vector(prevPoint, currentPoint)),
+                        length(vector(currentPoint, nextPoint))
+                    );
+                    if (joinLength > segmentLength) {
+                        joinNormal = [joinNormal[0]*segmentLength/joinLength, joinNormal[1]*segmentLength/joinLength];
                     }
 
                     if (turnLeft) {
@@ -313,8 +314,12 @@ function vector (p1, p2) {
  * Return the vector scaled to length 1
  */
 function normalize (v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    const s = length(v);
     return [v[0] / s, v[1] / s];
+}
+
+function length (v) {
+    return Math.hypot(v[0], v[1]);
 }
 
 export default { decodeGeom };
