@@ -104,14 +104,6 @@ export default class Layer {
     }
 
     /**
-     * Get true if the layer is visible and false if the layer is hidden.
-     * @readonly
-     */
-    get visible () {
-        return this.visible;
-    }
-
-    /**
      * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
      *
      * @param {string} eventName - Type of event to listen for
