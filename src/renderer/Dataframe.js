@@ -346,8 +346,12 @@ export default class Dataframe {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
 
-                if (!pointInRectangle(p, this._aabb[featureIndex]) ||
-                    this._isFeatureFiltered(feature, viz.filter)) {
+                if (geometryType === 'polygon' && !pointInRectangle(p, this._aabb[featureIndex])) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
+
+                if (this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -439,8 +443,8 @@ export default class Dataframe {
 
     _computePointWidthScale (feature, viz) {
         const SATURATION_PX = 126;
-
         const diameter = Math.min(viz.width.eval(feature) + viz.strokeWidth.eval(feature), SATURATION_PX);
+
         return diameter / 2 * this.widthScale;
     }
 
