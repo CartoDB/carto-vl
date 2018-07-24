@@ -43,31 +43,27 @@ export default class Dataframe {
                 return [];
             case 'line':
             case 'polygon':
-                return this._computeFeatureAABBList(geometry, type);
+                const aabbList = [];
+
+                for (let i = 0; i < geometry.length; i++) {
+                    const feature = geometry[i];
+
+                    let aabb = {
+                        minx: Number.POSITIVE_INFINITY,
+                        miny: Number.POSITIVE_INFINITY,
+                        maxx: Number.NEGATIVE_INFINITY,
+                        maxy: Number.NEGATIVE_INFINITY
+                    };
+
+                    for (let j = 0; j < feature.length; j++) {
+                        aabb = _updateAABBForGeometry(feature[j], aabb, type);
+                    }
+
+                    aabbList.push(aabb);
+                }
+
+                return aabbList;
         }
-    }
-
-    _computeFeatureAABBList (geometry, type) {
-        const aabbList = [];
-
-        for (let i = 0; i < geometry.length; i++) {
-            const feature = geometry[i];
-
-            let aabb = {
-                minx: Number.POSITIVE_INFINITY,
-                miny: Number.POSITIVE_INFINITY,
-                maxx: Number.NEGATIVE_INFINITY,
-                maxy: Number.NEGATIVE_INFINITY
-            };
-
-            for (let j = 0; j < feature.length; j++) {
-                aabb = _getVerticesForGeometry(feature[j], aabb, type);
-            }
-
-            aabbList.push(aabb);
-        }
-
-        return aabbList;
     }
 
     setFreeObserver (freeObserver) {
@@ -131,16 +127,31 @@ export default class Dataframe {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
             case 'line':
-                return this._getLinesAtPosition(pos, viz);
+                return this._getFeaturesFromTriangles('line', pos, viz);
             case 'polygon':
-                return this._getPolygonAtPosition(pos, viz);
+                return this._getFeaturesFromTriangles('polygon', pos, viz);
             default:
                 return [];
         }
     }
 
     inViewport (featureIndex, renderScale, center, aspect, viz) {
-        return this._geometryInViewport(featureIndex, renderScale, center, aspect, viz);
+        const feature = this.getFeature(featureIndex);
+        const viewportAABB = this._getBounds(renderScale, center, aspect);
+        let strokeWidthScale = 1;
+
+        switch (this.type) {
+            case 'point':
+                return this._isPointInViewport(featureIndex, viewportAABB);
+            case 'line':
+                strokeWidthScale = this._computeLineWidthScale(feature, viz);
+                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+            case 'polygon':
+                strokeWidthScale = this._computePolygonWidthScale(feature, viz);
+                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+            default:
+                return false;
+        }
     }
 
     // Add new properties to the dataframe or overwrite previously stored ones.
@@ -198,41 +209,21 @@ export default class Dataframe {
         }
     }
 
-    _geometryInViewport (featureIndex, renderScale, center, aspect, viz) {
-        const feature = this.getFeature(featureIndex);
-        let strokeWidthScale = 1;
-
-        switch (this.type) {
-            case 'point':
-                return this._isPointInViewport(featureIndex, renderScale, center, aspect);
-            case 'line':
-                strokeWidthScale = this._computeLineWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, renderScale, strokeWidthScale, center, aspect);
-            case 'polygon':
-                strokeWidthScale = this._computePolygonWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, renderScale, strokeWidthScale, center, aspect);
-            default:
-                return false;
-        }
-    }
-
-    _isPointInViewport (featureIndex, renderScale, center, aspect) {
-        const { minx, maxx, miny, maxy } = this._getBounds(renderScale, center, aspect);
+    _isPointInViewport (featureIndex, viewportAABB) {
+        const { minx, maxx, miny, maxy } = viewportAABB;
         const x = this.geom[2 * featureIndex + 0];
         const y = this.geom[2 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
-    _isPolygonInViewport (featureIndex, renderScale, strokeWidthScale, center, aspect) {
+    _isPolygonInViewport (featureIndex, viewportAABB, strokeWidthScale) {
         const featureAABB = this._aabb[featureIndex];
-        const viewportAABB = this._getBounds(renderScale, center, aspect);
         const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeWidthScale);
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
-        const viewport = this._getViewportPoints(viewportAABB);
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
-            return _isPolygonCollidingViewport(vertices, normals, strokeWidthScale, viewport, viewportAABB);
+            return _isPolygonCollidingViewport(vertices, normals, strokeWidthScale, viewportAABB);
         }
 
         return aabbResult === AABBTestResults.INSIDE;
@@ -247,9 +238,9 @@ export default class Dataframe {
         };
 
         switch (true) {
-            case _isFeatureInsideViewport(featureStrokeAABB, viewportAABB):
+            case _isFeatureAABBInsideViewport(featureStrokeAABB, viewportAABB):
                 return AABBTestResults.INSIDE;
-            case _isFeatureOutsideViewport(featureStrokeAABB, viewportAABB):
+            case _isFeatureAABBOutsideViewport(featureStrokeAABB, viewportAABB):
                 return AABBTestResults.OUTSIDE;
             default:
                 return AABBTestResults.INTERSECTS;
@@ -266,15 +257,6 @@ export default class Dataframe {
         const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
 
         return { minx, maxx, miny, maxy };
-    }
-
-    _getViewportPoints (viewportAABB) {
-        return [
-            { x: viewportAABB.minx, y: viewportAABB.miny },
-            { x: viewportAABB.minx, y: viewportAABB.maxy },
-            { x: viewportAABB.maxx, y: viewportAABB.miny },
-            { x: viewportAABB.maxx, y: viewportAABB.maxy }
-        ];
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -317,14 +299,6 @@ export default class Dataframe {
         return features;
     }
 
-    _getLinesAtPosition (pos, viz) {
-        return this._getFeaturesFromTriangles('line', pos, viz);
-    }
-
-    _getPolygonAtPosition (pos, viz) {
-        return this._getFeaturesFromTriangles('polygon', pos, viz);
-    }
-
     _getFeaturesFromTriangles (geometryType, pos, viz) {
         const p = wToR(pos.x, pos.y, {
             center: this.center,
@@ -346,7 +320,7 @@ export default class Dataframe {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
 
-                if (geometryType === 'polygon' && !pointInRectangle(p, this._aabb[featureIndex])) {
+                if (!pointInRectangle(p, this._aabb[featureIndex])) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -463,68 +437,66 @@ export default class Dataframe {
     }
 }
 
-const _geometryFeature = {
-    line: (feature, aabb) => {
-        const vertices = feature;
-        const numVertices = feature.length / 2;
-
-        for (let i = 0; i < numVertices; i += 4) {
-            aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
-            aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
-            aabb.maxx = Math.max(aabb.maxx, vertices[i + 2]);
-            aabb.maxy = Math.max(aabb.maxy, vertices[i + 3]);
-        }
-
-        return aabb;
-    },
-
-    polygon: (feature, aabb) => {
-        const [ vertices, numVertices ] = [ feature.flat, feature.holes[0] || feature.flat.length / 2 ];
-
-        for (let k = 0; k < numVertices; k++) {
-            aabb.minx = Math.min(aabb.minx, vertices[2 * k + 0]);
-            aabb.miny = Math.min(aabb.miny, vertices[2 * k + 1]);
-            aabb.maxx = Math.max(aabb.maxx, vertices[2 * k + 0]);
-            aabb.maxy = Math.max(aabb.maxy, vertices[2 * k + 1]);
-        }
-
-        return aabb;
+function _updateAABBForGeometry (feature, aabb, geometryType) {
+    switch (geometryType) {
+        case 'line':
+            return _updateAABBLine(feature, aabb);
+        case 'polygon':
+            return _updateAABBPolygon(feature, aabb);
     }
-};
-
-function _getVerticesForGeometry (feature, aabb, geometryType) {
-    return _geometryFeature[geometryType] ? _geometryFeature[geometryType](feature, aabb) : null;
 }
 
-function _isFeatureInsideViewport (featureAABB, viewportAABB) {
+function _updateAABBLine (line, aabb) {
+    const vertices = line;
+    const numVertices = line.length;
+
+    for (let i = 0; i < numVertices; i += 2) {
+        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);
+    }
+
+    return aabb;
+}
+
+function _updateAABBPolygon (polygon, aabb) {
+    const [ vertices, numVertices ] = [ polygon.flat, polygon.holes[0] || polygon.flat.length / 2 ];
+
+    for (let i = 0; i < numVertices; i++) {
+        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+    }
+
+    return aabb;
+}
+
+function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
             featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
-function _isFeatureOutsideViewport (featureAABB, viewportAABB) {
+function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (vertices, normals, strokeWidthScale, viewport, viewportAABB) {
+function _isPolygonCollidingViewport (vertices, normals, strokeWidthScale, viewportAABB) {
     for (let i = 0; i < vertices.length; i += 6) {
-        const triangle = [
-            {
-                x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            }, {
-                x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
-            }, {
-                x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
-            }, {
-                x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            }
-        ];
+        const triangle = [{
+            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
+        }, {
+            x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+            y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
+        }, {
+            x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+            y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
+        }];
 
-        if (triangleCollides(triangle, viewport, viewportAABB)) {
+        if (triangleCollides(triangle, viewportAABB)) {
             return true;
         }
     }
