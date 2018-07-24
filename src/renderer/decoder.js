@@ -191,7 +191,7 @@ function addLine (lineString, vertices, normals) {
 
                 } else {
                     // bevel
-                    const joinLength = length(joinormal);
+                    const joinLength = length(joinNormal);
                     const segmentLength = Math.min(
                         length(vector(prevPoint, currentPoint)),
                         length(vector(currentPoint, nextPoint))
