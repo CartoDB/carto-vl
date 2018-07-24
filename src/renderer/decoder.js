@@ -274,7 +274,7 @@ function getLineNormal (a, b) {
 /**
  * Compute the normal of the join from the lines' normals.
  * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
- * multiplied by a factor of `1/sin(theta)` to reach the intersecction of the wide lines.
+ * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.
  * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
  * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
  */
@@ -283,13 +283,12 @@ function getJoinNormal (prevNormal, nextNormal) {
     const v = [nextNormal[1], -nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
     const cos = v[0] * u[0] + v[1] * u[1];
-    // const sin = v[1] * u[0] - v[0] * u[1];
     const factor = Math.abs(sin);
     const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
     return {
         turnLeft: sin > 0,
         miter: miterJoin,
-        joinNormal: [ // TODO: factor === 0 case (long miter)
+        joinNormal: [
             (u[0] + v[0]) / factor, // TODO sin => join not always inner but R
             (u[1] + v[1]) / factor
         ]
