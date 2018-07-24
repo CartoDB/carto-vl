@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Single Image | CARTO</title>
+  <title>External Image | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -19,10 +19,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Single Image</h1>
+        <h1>External Image</h1>
       </header>
       <section>
-        <p class="description open-sans">Show an image instead of points</p>
+        <p class="description open-sans">Symbolize points with an external image</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -38,11 +38,9 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
-      scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+      center: [-95.907985, 37.746163],
+      zoom: 4,
+      dragRotate: false
     });
 
     carto.setDefaultAuth({
@@ -50,14 +48,11 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
-    width: (sqrt($pop_max) * 0.003)*zoom()
-    color: white
-    strokeColor: black
-    symbol: image('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
+    width: 25
+    symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
     `);
-
 
     const layer = new carto.Layer('layer', source, viz);
 

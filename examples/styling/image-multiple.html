@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>External Image | CARTO</title>
+  <title>Multiple Images | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -19,10 +19,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>External Image</h1>
+        <h1>Multiple Images</h1>
       </header>
       <section>
-        <p class="description open-sans">Symbolize points with an external image</p>
+        <p class="description open-sans">Assign images to different categories</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -37,10 +37,12 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [-95.907985, 37.746163],
-      zoom: 4,
-      dragRotate: false
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 30],
+      zoom: 3,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
     });
 
     carto.setDefaultAuth({
@@ -48,11 +50,13 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('walmarts');
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
-    width: 25
-    symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
+    width: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]),[24,12,6,0])
+    color: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated Place"]),[violet,limegreen,gray])
+    symbol: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]), imageList([star,triangle,marker]))
     `);
+
 
     const layer = new carto.Layer('layer', source, viz);
 
