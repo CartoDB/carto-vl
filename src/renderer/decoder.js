@@ -154,7 +154,7 @@ function decodeLine (geometry) {
                     const prev = [lineString[k - 2], lineString[k - 1]];
                     na = getJointNormal(prev, a, b) || na;
                 }
-                if (k < lineString.length - 4) {
+                if (k < lineStringLength - 4) {
                     const next = [lineString[k + 4], lineString[k + 5]];
                     nb = getJointNormal(a, b, next) || nb;
                 }
