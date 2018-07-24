@@ -134,7 +134,7 @@ function decodeLine (geometry) {
 
 const NOJOIN = false;
 const MITERJOIN = false;
-const BEVELJOIN = true;
+const BEVELJOIN = false;
 
 
 /**
@@ -145,7 +145,7 @@ function addLine (lineString, vertices, normals) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, prevRNormal, prevLNormal;
     let currentNormal, currentRNormal, currentLNormal;
-    let nextNormal, nextRNormal, nextLNormal;
+    let nextRNormal, nextLNormal;
     let nextPNormal, nextPRNormal, nextPLNormal;
 
 
@@ -163,16 +163,15 @@ function addLine (lineString, vertices, normals) {
             if (i <= lineString.length - 2) {
                 // If there is a next point, compute its properties
                 nextPoint = [lineString[i], lineString[i + 1]];
-                nextLNormal = nextNormal = getLineNormal(currentPoint, nextPoint);
+                nextLNormal = getLineNormal(currentPoint, nextPoint);
                 nextRNormal = neg(nextLNormal);
                 nextPNormal = nextPNormal;
                 nextPRNormal = nextPRNormal;
                 nextPLNormal = nextPLNormal;
-                // currentNormal = currentLNormal = currentRNormal = nextNormal;
                 // `turnLeft` indicates that the nextLine turns to the left
                 // `joinNormal` contains the direction and size for the `miter` vertex
                 //  If this is not defined means that the join must be `bevel`.
-                let {turnLeft, joinNormal, miter, longMiter } = getJoinNormal(prevNormal, nextNormal);
+                let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextLNormal);
 
                 if (NOJOIN) {
                     nextPLNormal = nextLNormal;
@@ -192,10 +191,14 @@ function addLine (lineString, vertices, normals) {
 
                 } else {
                     // bevel
-                    // TODO: no joinNormal case
-                    if (longMiter) {
-                        joinNormal = [0,0]; // turnLeft ? prevLNormal : prevRNormal;
+                    const l = Math.hypot(joinNormal[0], joinNormal[1]);
+                    const prevL = Math.hypot(currentPoint[0]-prevPoint[0], currentPoint[1]-prevPoint[1]);
+                    const nextL = Math.hypot(nextPoint[0]-currentPoint[0], nextPoint[1]-currentPoint[1]);
+                    const ll = Math.min(prevL, nextL);
+                    if (l > ll) {
+                        joinNormal = [joinNormal[0]*ll/l, joinNormal[1]*ll/l];
                     }
+
                     if (turnLeft) {
                         nextPLNormal = joinNormal;
                         nextPRNormal = nextRNormal
@@ -211,8 +214,8 @@ function addLine (lineString, vertices, normals) {
                     addTriangle(
                         [currentPoint, currentPoint, currentPoint],
                         [joinNormal,
-                            turnLeft ? neg(prevNormal) : nextNormal,
-                            turnLeft ? neg(nextNormal) : prevNormal
+                            turnLeft ? neg(prevNormal) : nextLNormal,
+                            turnLeft ? nextRNormal : prevNormal
                             ]
                     );
 
@@ -237,13 +240,12 @@ function addLine (lineString, vertices, normals) {
             prevPoint = currentPoint;
             currentPoint = nextPoint;
 
-            prevNormal = nextNormal;
+            prevNormal = nextLNormal;
 
             prevRNormal = nextPRNormal;
             prevLNormal = nextPLNormal;
 
             // only for last segment:
-            // currentNormal = nextNormal;
             currentLNormal = nextLNormal;
             currentRNormal = nextRNormal;
         }
@@ -280,17 +282,12 @@ function getJoinNormal (prevNormal, nextNormal) {
     const v = [nextNormal[1], -nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
     const cos = v[0] * u[0] + v[1] * u[1];
-    console.log(u);
-    console.log(v);
-    console.log(sin);
     // const sin = v[1] * u[0] - v[0] * u[1];
     const factor = Math.abs(sin);
     const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
-    console.log(Math.asin(sin)*180/Math.PI, miterJoin, sin > 0);
     return {
         turnLeft: sin > 0,
         miter: miterJoin,
-        longMiter: factor < 1E-12,
         joinNormal: [ // TODO: factor === 0 case (long miter)
             (u[0] + v[0]) / factor, // TODO sin => join not always inner but R
             (u[1] + v[1]) / factor
