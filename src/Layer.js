@@ -312,17 +312,21 @@ export default class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+        return this._visible
+            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+            : [];
     }
 
     show () {
         this._visible = true;
         this._integrator.changeVisibility(this._id, this.visibility);
+        this._fire('updated');
     }
 
     hide () {
         this._visible = false;
         this._integrator.changeVisibility(this._id, this.visibility);
+        this._fire('updated');
     }
 
     $paintCallback () {

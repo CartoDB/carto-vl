@@ -93,47 +93,47 @@ describe('Layer', () => {
         });
 
         describe('.hide', () => {
-            it('should hide a visible layer', () => {
-                layer.hide();
-
-                expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+            it('should hide a visible layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    layer.hide();
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    done();
+                });
             });
 
-            it('should not listen to events', () => {
+            it('should trigger an update event', (done) => {
                 let update = jasmine.createSpy('update');
-                layer.hide();
 
-                layer._fire('updated', {});
-                layer.on('updated', update);
-
-                expect(update).not.toHaveBeenCalled();
+                layer.on('loaded', () => {
+                    layer.on('updated', update);
+                    layer.hide();
+                    expect(update).toHaveBeenCalledTimes(1);
+                    done();
+                });
             });
 
             describe('when interactivity is defined', () => {
                 it('should disable interactivity', () => {
+
                 });
             });
         });
 
         describe('.show', () => {
             beforeEach(() => {
-                layer.hide();
+                layer.on('loaded', () => {
+                    layer.hide();
+                });
             });
 
-            it('should show a hidden layer', () => {
-                layer.show();
-
-                expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
-            });
-
-            it('should listen to events', () => {
-                let update = jasmine.createSpy('update');
-                layer.show();
-
-                layer._fire('updated', {});
-                layer.on('updated', update);
-
-                expect(update).toHaveBeenCalled();
+            it('should show a hidden layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    layer.show();
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    done();
+                });
             });
 
             describe('when interactivity is defined', () => {

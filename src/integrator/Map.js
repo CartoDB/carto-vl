@@ -47,7 +47,7 @@ export default class Map {
                 break;
             }
         }
-        
+
         this._layers.splice(index, 0, layer);
         window.requestAnimationFrame(this.update.bind(this));
     }
@@ -63,7 +63,7 @@ export default class Map {
 
         let loaded = true;
         let animated = false;
-        
+
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
