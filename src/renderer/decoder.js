@@ -105,10 +105,19 @@ function decodePolygon (geometry) {
         breakpoints.push(vertices.length);
     }
     return {
-        vertices: new Float32Array(vertices),
+        vertices: f32(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: f32(normals)
     };
+}
+
+function f32 (array) {
+    const length = array.length;
+    const f = new Float32Array(length);
+    for (let i = 0; i < array.length; i++) {
+        f[i] = array[i];
+    }
+    return f;
 }
 
 function decodeLine (geom) {
