@@ -48,6 +48,7 @@ function isClipped (polygon, i, j) {
 }
 
 function decodePolygon (geometry) {
+    window.CARTO_VL_PPROF && console.time('decodepolygon-decode');
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
@@ -108,11 +109,34 @@ function decodePolygon (geometry) {
         });
         breakpoints.push(vertices.length);
     });
-    return {
-        vertices: new Float32Array(vertices),
+    window.CARTO_VL_PPROF && console.timeEnd('decodepolygon-decode');
+    window.CARTO_VL_PPROF && console.time('decodepolygon-f32');
+    const vertices32 = get32(vertices);
+    const normals32 = get32(normals);
+    window.CARTO_VL_PPROF && console.timeEnd('decodepolygon-f32');
+    // console.time('decodepolygon3');
+    const obj = {
+        vertices: vertices32,
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: normals32
     };
+    // console.timeEnd('decodepolygon3');
+    return obj;
+}
+
+function get32 (array) {
+    if (window.CARTO_VL_FIX_F32) {
+        // Workaround path
+        const length = array.length;
+        const array32 = new Float32Array(length);
+        for (let i = 0; i < length; i++) {
+            array32[i] = array[i];
+        }
+        return array32;
+    } else {
+        // Original path
+        return new Float32Array(array);
+    }
 }
 
 function decodeLine (geom) {
