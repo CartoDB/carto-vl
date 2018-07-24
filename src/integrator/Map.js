@@ -24,6 +24,7 @@ export default class Map {
                 this._container = container;
             }
         }
+
         this._background = options.background || '';
 
         this._layers = [];
@@ -31,7 +32,6 @@ export default class Map {
         this._repaint = true;
         this.invalidateWebGLState = () => {};
         this._canvas = this._createCanvas();
-        this._visible = true;
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
 

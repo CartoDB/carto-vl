@@ -27,7 +27,6 @@ class MGLIntegrator {
         this._layers = [];
         this._paintedLayers = 0;
         this._isRendererInitialized = false;
-        this._visible = true;
 
         this._suscribeToMapEvents(map);
         this.invalidateWebGLState = () => { };
