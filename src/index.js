@@ -30,7 +30,7 @@ import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import SQL from './sources/SQL';
-import {on} from './apiUtils';
+import { on, off } from './apiUtils';
 
 /**
  * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
@@ -46,4 +46,4 @@ import { version } from '../package.json';
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { version, on, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };

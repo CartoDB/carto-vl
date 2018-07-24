@@ -16,27 +16,32 @@ let registeredHandlers = [];
  * @api
  */
 export function on (eventName, layerList, callback) {
+    let internalCallbacks = [];
     if (eventName === 'loaded') {
         const waitingGroup = new Set(layerList);
         layerList.forEach(layer => {
-            layer.on('loaded', () => {
+            const internalCallback = () => {
                 waitingGroup.delete(layer);
                 if (waitingGroup.size === 0) {
                     callback();
                 }
-            });
+            };
+            layer.on('loaded', internalCallback);
+            internalCallbacks.push(internalCallback);
         });
     } else if (eventName === 'updated') {
         let scheduledRAF = false;
         layerList.forEach(layer => {
-            layer.on(eventName, () => {
+            const internalCallback = () => {
                 if (!scheduledRAF) {
                     window.requestAnimationFrame(() => {
                         scheduledRAF = false;
                         callback();
                     });
                 }
-            });
+            };
+            layer.on(eventName, internalCallback);
+            internalCallbacks.push(internalCallback);
         });
     } else {
         throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
@@ -44,7 +49,8 @@ export function on (eventName, layerList, callback) {
     registeredHandlers.push({
         eventName,
         layerList,
-        callback
+        callback,
+        internalCallbacks
     });
 }
 
@@ -61,17 +67,19 @@ export function on (eventName, layerList, callback) {
 export function off (eventName, layerList, callback) {
     registeredHandlers.forEach(register => {
         if (register.eventName === eventName &&
-            register.layerList.every(registeredLayer => layerList.includes(registeredHandlers)) &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
             register.callback === callback) {
             register.layerList.forEach(layer => {
-                layer.off(eventName, callback);
+                register.internalCallbacks.forEach(internalCallback => {
+                    layer.off(eventName, internalCallback);
+                });
             });
         }
     });
     registeredHandlers = registeredHandlers.filter(register =>
         !(
             register.eventName === eventName &&
-            register.layerList.every(registeredLayer => layerList.includes(registeredHandlers)) &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
             register.callback === callback
         )
     );
