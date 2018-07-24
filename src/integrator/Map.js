@@ -67,7 +67,7 @@ export default class Map {
             if (hasData || hasAnimation) {
                 layer.$paintCallback();
             }
-            
+
             loaded = loaded && hasData;
             animated = animated || hasAnimation;
         });
