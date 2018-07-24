@@ -7,6 +7,7 @@ import RenderLayer from './renderer/RenderLayer';
 import { cubic } from './renderer/viz/expressions';
 import SourceBase from './sources/Base';
 import util from './utils/util';
+import { layerVisibility } from './constants/layer';
 import Viz from './Viz';
 
 /**
@@ -88,9 +89,14 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this._isLoaded = false;
+        this._visible = true;
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
+    }
+
+    get visibility () {
+        return this._visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
     }
 
     /**
@@ -307,6 +313,16 @@ export default class Layer {
 
     getFeaturesAtPosition (pos) {
         return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+    }
+
+    show () {
+        this._visible = true;
+        this._integrator.changeVisibility(this._id, this.visibility);
+    }
+
+    hide () {
+        this._visible = false;
+        this._integrator.changeVisibility(this._id, this.visibility);
     }
 
     $paintCallback () {

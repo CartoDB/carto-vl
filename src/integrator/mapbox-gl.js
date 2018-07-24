@@ -27,6 +27,7 @@ class MGLIntegrator {
         this._layers = [];
         this._paintedLayers = 0;
         this._isRendererInitialized = false;
+        this._visible = true;
 
         this._suscribeToMapEvents(map);
         this.invalidateWebGLState = () => { };
@@ -128,5 +129,9 @@ class MGLIntegrator {
 
     getZoomLevel () {
         return this.map.getZoom();
+    }
+
+    changeVisibility (layerId, visibility) {
+        this.map.setLayoutProperty(layerId, 'visibility', visibility);
     }
 }

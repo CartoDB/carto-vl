@@ -1,3 +1,4 @@
+import { layerVisibility } from '../constants/layer';
 /**
  * @description A simple non-interactive map.
  */
@@ -26,9 +27,11 @@ export default class Map {
         this._background = options.background || '';
 
         this._layers = [];
+        this._hiddenLayers = [];
         this._repaint = true;
-        this.invalidateWebGLState = () => { };
+        this.invalidateWebGLState = () => {};
         this._canvas = this._createCanvas();
+        this._visible = true;
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
 
@@ -44,8 +47,8 @@ export default class Map {
                 break;
             }
         }
+        
         this._layers.splice(index, 0, layer);
-
         window.requestAnimationFrame(this.update.bind(this));
     }
 
@@ -60,6 +63,7 @@ export default class Map {
 
         let loaded = true;
         let animated = false;
+        
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
@@ -73,6 +77,37 @@ export default class Map {
         // Update until all layers are loaded or there is an animation
         if (!loaded || animated) {
             window.requestAnimationFrame(this.update.bind(this));
+        }
+    }
+
+    changeVisibility (layerId, visibility) {
+        switch (visibility) {
+            case layerVisibility.VISIBLE:
+                this.show(layerId);
+                break;
+            case layerVisibility.HIDDEN:
+                this.hide(layerId);
+                break;
+        }
+    }
+
+    hide (layerId) {
+        for (let index = 0; index < this._layers.length; index++) {
+            if (this._layers[index].getId() === layerId) {
+                this._hiddenLayers.splice(index, 0, this._layers[index]);
+                this._layers.splice(index, 1);
+                break;
+            }
+        }
+    }
+
+    show (layerId) {
+        for (let index = 0; index < this._hiddenLayers.length; index++) {
+            if (this._hiddenLayers[index].getId() === layerId) {
+                this._layers.splice(index, 0, this._hiddenLayers[index]);
+                this._hiddenLayers.splice(index, 1);
+                break;
+            }
         }
     }
 

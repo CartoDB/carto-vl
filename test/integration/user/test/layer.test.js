@@ -1,4 +1,5 @@
 import * as carto from '../../../../src/';
+import { layerVisibility } from '../../../../src/constants/layer';
 import * as util from '../../util';
 
 const featureData = {
@@ -88,6 +89,56 @@ describe('Layer', () => {
                 layer.$paintCallback();
                 expect(update).toHaveBeenCalledTimes(3);
                 done();
+            });
+        });
+
+        describe('.hide', () => {
+            it('should hide a visible layer', () => {
+                layer.hide();
+
+                expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+            });
+
+            it('should not listen to events', () => {
+                let update = jasmine.createSpy('update');
+                layer.hide();
+
+                layer._fire('updated', {});
+                layer.on('updated', update);
+
+                expect(update).not.toHaveBeenCalled();
+            });
+
+            describe('when interactivity is defined', () => {
+                it('should disable interactivity', () => {
+                });
+            });
+        });
+
+        describe('.show', () => {
+            beforeEach(() => {
+                layer.hide();
+            });
+
+            it('should show a hidden layer', () => {
+                layer.show();
+
+                expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+            });
+
+            it('should listen to events', () => {
+                let update = jasmine.createSpy('update');
+                layer.show();
+
+                layer._fire('updated', {});
+                layer.on('updated', update);
+
+                expect(update).toHaveBeenCalled();
+            });
+
+            describe('when interactivity is defined', () => {
+                it('should enable interactivity', () => {
+                });
             });
         });
     });
