@@ -320,13 +320,13 @@ export default class Layer {
     show () {
         this._visible = true;
         this._integrator.changeVisibility(this._id, this.visibility);
-        this._fire('updated');
+        this._fire('updated', { visibility: this.visibility });
     }
 
     hide () {
         this._visible = false;
         this._integrator.changeVisibility(this._id, this.visibility);
-        this._fire('updated');
+        this._fire('updated', { visibility: this.visibility });
     }
 
     $paintCallback () {
