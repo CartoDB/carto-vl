@@ -1,4 +1,4 @@
-import { signedDistanceFromPointToLine } from '../../utils/geometry';
+import { signedDistanceFromPointToLine } from './geometry';
 
 const separatingLineFound = 'separatingLineFound';
 const noSeparatingLineFound = 'noSeparatingLineFound';
@@ -19,7 +19,6 @@ export function triangleCollides (triangle, viewportAABB) {
     // if (_isAnyViewportVertexInTriangle(triangle, viewport)) {
     //     return true;
     // }
-
     if (_viewportLineSeparatesTriangle(viewportAABB, triangle) === separatingLineFound) {
         return false;
     }
@@ -83,7 +82,7 @@ function _viewportLineSeparatesTriangle (viewportAABB, triangle) {
 function _triangleLineSeparatesViewport (triangle, viewport) {
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < viewport.length; j++) {
-            const position = signedDistanceFromPointToLine(viewport[j], triangle[i], triangle[i + 1]);
+            const position = signedDistanceFromPointToLine(viewport[j], triangle[i], triangle[(i + 1) % 3]);
 
             if (position > 0) {
                 break;
