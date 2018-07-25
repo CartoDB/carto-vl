@@ -204,11 +204,11 @@ function addLine (lineString, vertices, normals) {
                         nextPLNormal = joinNormal;
                         nextPRNormal = nextRNormal
                         currentLNormal = joinNormal;
-                        currentRNormal = prevRNormal;
+                        currentRNormal = neg(prevNormal);
                     } else {
                         nextPRNormal = joinNormal;
                         nextPLNormal = nextLNormal;
-                        currentLNormal = prevLNormal;
+                        currentLNormal = prevNormal;
                         currentRNormal = joinNormal;
                     }
 
