@@ -40,7 +40,7 @@ export function on (eventName, layerList, callback) {
                     });
                 }
             };
-            layer.on(eventName, internalCallback);
+            layer.on('updated', internalCallback);
             internalCallbacks.push(internalCallback);
         });
     } else {
