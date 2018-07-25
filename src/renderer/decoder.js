@@ -222,12 +222,11 @@ function addLine (lineString, vertices, normals) {
                     // Bevel triangle
                     addTriangle(
                         [currentPoint, currentPoint, currentPoint],
-                        [[0,0],
+                        [[0, 0],
                             turnLeft ? neg(prevNormal) : nextNormal,
                             turnLeft ? neg(nextNormal) : prevNormal
                         ]
                     );
-
                 }
             }
 
