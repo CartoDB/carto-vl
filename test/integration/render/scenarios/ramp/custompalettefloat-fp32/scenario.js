@@ -9,3 +9,6 @@ const viz = new carto.Viz('width: ramp(linear($numeric, 0, 10), [0.10,0.20,0.30]
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
+layer.on('loaded', () => {
+    window.loaded = true;
+});

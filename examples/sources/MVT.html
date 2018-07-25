@@ -40,7 +40,6 @@
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [-73.97720677029952, 40.77784846220871],
       zoom: 13,
-      scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
     });
@@ -50,7 +49,7 @@
         buffersize: { mvt: 0 },
         layers: [
           {
-            id: 'europe',
+            id: 'europeLayer',
             type: 'mapnik',
             options: {
               sql: `SELECT * FROM mnmappluto`
@@ -68,11 +67,15 @@
       });
       const layergroup = await response.json();
       const tilejson = layergroup.metadata.tilejson.vector;
-
       const source = new carto.source.MVT(tilejson.tiles[0], {
         properties: {
-          numfloors: { type: 'number' }
-        }
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      }, {
+          layerID: 'europeLayer',
+          viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 1), 11)
       });
 
       const viz = new carto.Viz(`

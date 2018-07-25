@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GPS Track + Accelerations | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [-3.589442037237177, 40.614912811223235],
+            zoom: 15,
+            dragRotate: false
+        });
+        carto.setDefaultAuth({
+            user: 'rochoa',
+            apiKey: 'default_public'
+        });
+        const s = carto.expressions;
+        const jaramaSource = new carto.source.Dataset('circuito_del_jarama');
+        const racetrackLayer = new carto.Layer('racetrack', jaramaSource, new carto.Viz(`
+            color: grey
+            width: 12
+        `));
+        racetrackLayer.addTo(map, 'watername_ocean');
+        const source = new carto.source.Dataset('laptimer_0009_0033_20171119_164902');
+        const viz = new carto.Viz(`
+            strokeWidth: 0
+            width: sqrt($speed*($accel_lateral*$accel_lateral)) + 1
+            color: ramp(linear(abs($accel_lateral), 0, 1.2), temps)
+            filter: $lap == 24 and animation(linear($date), 20, fade(0, 100))
+        `);
+        const layer = new carto.Layer('gpstrack', source, viz);
+        layer.addTo(map, 'watername_ocean');
+        const fishnetSource = new carto.source.SQL(`
+        WITH fishnet AS (
+            SELECT ST_SetSRID(cells.geom, 4326) as the_geom
+            FROM ST_CreateFishnet(4, 6, 0.001, 0.001, -3.5959, 40.6114) AS cells
+            )
+            select row_number() over() cartodb_id, the_geom, ST_Transform(the_geom, 3857) the_geom_webmercator
+            from fishnet
+        `);
+        const fishnet = new carto.Viz(`
+            strokeWidth: 0.5
+            strokeColor: opacity(grey, 0.4)
+            color: opacity(grey, 0.1)
+        `);
+        const fishnetLayer = new carto.Layer('fishnet', fishnetSource, fishnet);
+        fishnetLayer.addTo(map, 'watername_ocean');
+        const accelerationsSource = new carto.source.SQL(`
+WITH geoms AS (
+  SELECT
+  ST_Translate(
+    ST_SetSRID(ST_MakePoint(
+      0.002 * accel_lateral,
+      0.002 * accel_lineal
+    ), 4326), -3.593, 40.614
+  ) as the_geom,
+  cartodb_id,
+  date,
+  lap,
+  accel_lateral,
+  accel_lineal
+  FROM rochoa.laptimer_0009_0033_20171119_164902
+)
+SELECT ST_Transform(the_geom, 3857) as the_geom_webmercator, *
+FROM geoms
+        `);
+        const accelerationsBg = new carto.Viz(`
+            width: 4
+            strokeWidth: 0
+            color: opacity(grey, 0.15)
+            filter: $lap == 24
+        `);
+        const accelerationsBgLayer = new carto.Layer('accelerationsBg', accelerationsSource, accelerationsBg);
+        accelerationsBgLayer.addTo(map, 'watername_ocean');
+        const accelerations = new carto.Viz(`
+            width: 4
+            color: ramp(linear(abs($accel_lateral), 0, 1), temps)
+            strokeWidth: 0
+            filter: $lap == 24 and animation(linear($date), 20, fade(0, 1))
+        `);
+        const accelerationsLayer = new carto.Layer('accelerations', accelerationsSource, accelerations);
+        accelerationsLayer.addTo(map, 'watername_ocean');
+
+        setInterval(() => {
+            const a = viz.filter.b.getProgressPct();
+            const b = accelerations.filter.b.getProgressPct();
+            if (Math.abs(a - b) * 20 * 1000 > 16) {
+                console.log('broken', (a - b) * 20 * 1000, 'ms of diff');
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>

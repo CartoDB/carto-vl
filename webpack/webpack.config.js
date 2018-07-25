@@ -16,6 +16,9 @@ module.exports = {
         new webpack.BannerPlugin(banner)
     ],
     module: {
-        rules: [{ test: /\.glsl$/, use: 'webpack-glsl-loader' }]
+        rules: [
+            { test: /\.glsl$/, use: 'webpack-glsl-loader' },
+            { test: /\.svg$/, use: 'svg-inline-loader' }
+        ]
     }
 };

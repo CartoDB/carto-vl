@@ -6,16 +6,20 @@ const map = new mapboxgl.Map({
 });
 
 carto.setDefaultAuth({
-    user: 'cartovl',
-    apiKey: 'default_public'
+    user: 'localhost',
+    apiKey: '1234'
 });
-
+carto.setDefaultConfig({
+    serverURL: 'http://{user}.localhost.lan:8181'
+});
 const source = new carto.source.Dataset('mnmappluto');
 const viz = new carto.Viz(`
-    color: ramp(linear(($numfloors), 1, 300), [hsva(0,1,1,0.2)])
+    color: ramp(linear($numfloors), prism)
     strokeWidth: 0
 `);
 const layer = new carto.Layer('myCartoLayer', source, viz);
 
 layer.addTo(map);
-layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
+layer.on('loaded', () => {
+    window.loaded = true;
+});

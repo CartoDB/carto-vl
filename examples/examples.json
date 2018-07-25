@@ -7,7 +7,7 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add layer",
+                    "title": "Add CARTO dataset layer",
                     "file": "basics/add-layer.html"
                 },
                 {
@@ -68,16 +68,16 @@
                     "file": "styling/zoom.html"
                 },
                 {
-                    "title": "Single Sprite",
-                    "file": "styling/sprite.html"
+                    "title": "Single Image",
+                    "file": "styling/image.html"
                 },
                 {
-                    "title": "Multiple Sprites",
-                    "file": "styling/multiple-sprites.html"
+                    "title": "Multiple Images",
+                    "file": "styling/multiple-images.html"
                 },
                 {
-                    "title": "Raw Sprite",
-                    "file": "styling/raw-sprite.html"
+                    "title": "Raw Image",
+                    "file": "styling/raw-image.html"
                 }
             ]
         },
@@ -114,8 +114,8 @@
             "title": "Advanced",
             "samples": [
                 {
-                    "title": "Denver trees",
-                    "file": "advanced/denver-trees.html"
+                    "title": "External GeoJSON layer",
+                    "file": "advanced/external-geojson.html"
                 },
                 {
                     "title": "US population by county",
