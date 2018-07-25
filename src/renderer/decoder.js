@@ -132,11 +132,6 @@ function decodeLine (geometry) {
     };
 }
 
-const NOJOIN = false;
-const MITERJOIN = false;
-const BEVELJOIN = false;
-
-
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
@@ -181,13 +176,11 @@ function addLine (lineString, vertices, normals) {
                 //  `miter` indicates that the join must be `miter`, not `bevel`.
                 let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextNormal);
 
-                if (NOJOIN || !joinNormal) {
+                if (!joinNormal) {
+                    // No join
                     nextLeft = nextNormal;
                     nextRight = neg(nextNormal);
-                }
-                else {
-
-                if (MITERJOIN || (miter && !BEVELJOIN)) {
+                } else if (miter) {
                     // Miter join: adjust left/right vertices
                     if (turnLeft) {
                         nextLeft = currentLeft = joinNormal;
@@ -231,8 +224,6 @@ function addLine (lineString, vertices, normals) {
                             ]
                     );
                 }
-
-                }; // NOJOIN
             }
 
             // Segment from prevPoint to currentPoint triangles
@@ -301,7 +292,7 @@ function getJoinNormal (prevNormal, nextNormal) {
         turnLeft: sin > 0,
         miter: miterJoin,
         joinNormal: (factor !== 0) && [
-            (u[0] + v[0]) / factor, // TODO sin => join not always inner but R
+            (u[0] + v[0]) / factor,
             (u[1] + v[1]) / factor
         ]
     };
