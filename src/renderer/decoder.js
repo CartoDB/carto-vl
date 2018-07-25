@@ -173,7 +173,7 @@ function addLine (lineString, vertices, normals) {
                 //  If this is not defined means that the join must be `bevel`.
                 let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextLNormal);
 
-                if (NOJOIN) {
+                if (NOJOIN || !joinNormal) {
                     nextPLNormal = nextLNormal;
                     nextPRNormal = nextRNormal;
                 }
@@ -288,7 +288,7 @@ function getJoinNormal (prevNormal, nextNormal) {
     return {
         turnLeft: sin > 0,
         miter: miterJoin,
-        joinNormal: [
+        joinNormal: (factor !== 0) && [
             (u[0] + v[0]) / factor, // TODO sin => join not always inner but R
             (u[1] + v[1]) / factor
         ]
