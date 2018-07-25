@@ -489,6 +489,9 @@ function _isPolygonCollidingViewport (vertices, normals, strokeWidthScale, viewp
         }, {
             x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
             y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
+        }, {
+            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
         }];
 
         if (triangleCollides(triangle, viewportAABB)) {

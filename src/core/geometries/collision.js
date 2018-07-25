@@ -30,7 +30,7 @@ function _isAnyViewportVertexInTriangle (triangle, viewport) {
 }
 
 function _isAnyTriangleVertexInViewport (triangle, viewportAABB) {
-    for (let i = 0; i < triangle.length; i++) {
+    for (let i = 0; i < 3; i++) {
         if (pointInRectangle(triangle[i], viewportAABB)) {
             return true;
         }
