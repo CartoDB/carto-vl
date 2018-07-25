@@ -142,113 +142,125 @@ const BEVELJOIN = false;
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
 function addLine (lineString, vertices, normals) {
+    // At joins we have:
+    // prevPoint, currentPoint, nextPoint
+    // with the previous segment from prevPoint to currentPoint and the next one from currentPoint to nextPoint
+    // we keep track of:
+    // prevNormal: normal to previous segment (to the left)
+    // prevLeft: adjusted position of left triangle vertex at prevPoint (previous segment)
+    // prevRight: adjusted position of right triangle vertex at prevPoint (previous segment)
+    // currentLeft: adjusted position of left triangle vertex at currentPoint (previous segment)
+    // currentRight: adjusted position of right triangle vertex at currentPoint (previous segment)
+    // nextNormal: normal to next segment (to the left)
+    // nextLeft, nextRight are the values of prevLeft, prevRight for the next iteration
+    // (i.e. the adjusted points for the next segment triangles)
+    // currentLeft, curentRight are used
     let prevPoint, currentPoint, nextPoint;
-    let prevNormal, prevRNormal, prevLNormal;
-    let currentNormal, currentRNormal, currentLNormal;
-    let nextRNormal, nextLNormal;
-    let nextPNormal, nextPRNormal, nextPLNormal;
-
+    let prevNormal, prevRight, prevLeft;
+    let currentRight, currentLeft;
+    let nextNormal, nextRight, nextLeft;
 
     // We need at least two points
     if (lineString.length >= 4) {
         // Initialize the first two points
         prevPoint = [lineString[0], lineString[1]];
         currentPoint = [lineString[2], lineString[3]];
-        prevLNormal = prevNormal = getLineNormal(prevPoint, currentPoint);
-        prevRNormal = neg(prevLNormal);
-        currentLNormal = currentNormal = prevNormal;
-        currentRNormal = neg(currentLNormal);
+        prevLeft = prevNormal = getLineNormal(prevPoint, currentPoint);
+        prevRight = neg(prevLeft);
+        currentLeft = prevNormal;
+        currentRight = neg(currentLeft);
 
         for (let i = 4; i <= lineString.length; i += 2) {
             if (i <= lineString.length - 2) {
                 // If there is a next point, compute its properties
                 nextPoint = [lineString[i], lineString[i + 1]];
-                nextLNormal = getLineNormal(currentPoint, nextPoint);
-                nextRNormal = neg(nextLNormal);
-                nextPNormal = nextPNormal;
-                nextPRNormal = nextPRNormal;
-                nextPLNormal = nextPLNormal;
+                nextNormal = getLineNormal(currentPoint, nextPoint);
+
                 // `turnLeft` indicates that the nextLine turns to the left
                 // `joinNormal` contains the direction and size for the `miter` vertex
-                //  If this is not defined means that the join must be `bevel`.
-                let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextLNormal);
+                //  `miter` indicates that the join must be `miter`, not `bevel`.
+                let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextNormal);
 
                 if (NOJOIN || !joinNormal) {
-                    nextPLNormal = nextLNormal;
-                    nextPRNormal = nextRNormal;
+                    nextLeft = nextNormal;
+                    nextRight = neg(nextNormal);
                 }
                 else {
 
                 if (MITERJOIN || (miter && !BEVELJOIN)) {
-                    // miter adjustment
+                    // Miter join: adjust left/right vertices
                     if (turnLeft) {
-                        nextPLNormal = currentLNormal = joinNormal;
-                        nextPRNormal = currentRNormal = neg(joinNormal);
+                        nextLeft = currentLeft = joinNormal;
+                        nextRight = currentRight = neg(joinNormal);
                     } else {
-                        nextPLNormal = currentLNormal = neg(joinNormal);
-                        nextPRNormal = currentRNormal = joinNormal;
+                        nextLeft = currentLeft = neg(joinNormal);
+                        nextRight = currentRight = joinNormal;
                     }
 
                 } else {
-                    // bevel
+                    // Bevel join: adjust vertices and produce bevel triangle
                     const joinLength = length(joinNormal);
                     const segmentLength = Math.min(
                         length(vector(prevPoint, currentPoint)),
                         length(vector(currentPoint, nextPoint))
                     );
+
                     if (joinLength > segmentLength) {
+                        // This is a coarse adjustment for problematic large join normals
                         joinNormal = [joinNormal[0]*segmentLength/joinLength, joinNormal[1]*segmentLength/joinLength];
                     }
 
                     if (turnLeft) {
-                        nextPLNormal = joinNormal;
-                        nextPRNormal = nextRNormal
-                        currentLNormal = joinNormal;
-                        currentRNormal = neg(prevNormal);
+                        nextLeft = joinNormal;
+                        nextRight = neg(nextNormal);
+                        currentLeft = joinNormal;
+                        currentRight = neg(prevNormal);
                     } else {
-                        nextPRNormal = joinNormal;
-                        nextPLNormal = nextLNormal;
-                        currentLNormal = prevNormal;
-                        currentRNormal = joinNormal;
+                        nextRight = joinNormal;
+                        nextLeft = nextNormal;
+                        currentLeft = prevNormal;
+                        currentRight = joinNormal;
                     }
 
+                    // Bevel triangle
                     addTriangle(
                         [currentPoint, currentPoint, currentPoint],
                         [joinNormal,
-                            turnLeft ? neg(prevNormal) : nextLNormal,
-                            turnLeft ? nextRNormal : prevNormal
+                            turnLeft ? neg(prevNormal) : nextNormal,
+                            turnLeft ? neg(nextNormal) : prevNormal
                             ]
                     );
-
                 }
 
                 }; // NOJOIN
             }
 
+            // Segment from prevPoint to currentPoint triangles
             // First triangle
             addTriangle(
                 [currentPoint, prevPoint, prevPoint],
-                [currentRNormal, prevLNormal, prevRNormal]
+                [currentRight, prevLeft, prevRight]
             );
 
             // Second triangle
             addTriangle(
                 [currentPoint, currentPoint, prevPoint],
-                [currentRNormal, currentLNormal, prevLNormal]
+                [currentRight, currentLeft, prevLeft]
             );
 
             // Update the variables for the next iteration
             prevPoint = currentPoint;
             currentPoint = nextPoint;
 
-            prevNormal = nextLNormal;
+            prevNormal = nextNormal;
 
-            prevRNormal = nextPRNormal;
-            prevLNormal = nextPLNormal;
+            prevRight = nextRight;
+            prevLeft = nextLeft;
 
-            // only for last segment:
-            currentLNormal = nextLNormal;
-            currentRNormal = nextRNormal;
+            if (nextNormal) {
+                currentLeft = nextNormal;
+                currentRight = neg(nextNormal);
+            }
         }
     }
 
