@@ -1,5 +1,8 @@
 import { signedDistanceFromPointToLine, pointInRectangle, pointInTriangle } from '../../utils/geometry';
 
+const nocollides = 'no-collides';
+const unknown = 'unknown';
+
 export function triangleCollides (triangle, viewportAABB) {
     const viewport = [
         { x: viewportAABB.minx, y: viewportAABB.miny },
@@ -16,7 +19,15 @@ export function triangleCollides (triangle, viewportAABB) {
         return true;
     }
 
-    return _isViewportCollidingTriangleLines(triangle, viewport);
+    if (_viewportLineSeparatesTriangle(viewportAABB, triangle) === nocollides) {
+        return false;
+    }
+
+    if (_triangleLineSeparatesViewport(triangle, viewport) === nocollides) {
+        return false;
+    }
+
+    return true;
 }
 
 function _isAnyViewportVertexInTriangle (triangle, viewport) {
@@ -39,26 +50,25 @@ function _isAnyTriangleVertexInViewport (triangle, viewportAABB) {
     return false;
 }
 
-function _isViewportCollidingTriangleLines (triangle, viewport) {
-    let sign = null;
+function _viewportLineSeparatesTriangle (viewportAABB, triangle) {
+    // TODO
+}
 
+function _triangleLineSeparatesViewport (triangle, viewport) {
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < viewport.length; j++) {
             const position = signedDistanceFromPointToLine(viewport[j], triangle[i], triangle[i + 1]);
 
-            if (!sign) {
-                sign = Math.sign(position);
+            if (position < 0) {
+                break;
             }
 
-            if (_isSeparatedAxis(sign, position)) {
-                return false;
+            if (j === 3) {
+                // is separating line
+                return nocollides;
             }
         }
     }
 
-    return true;
-}
-
-function _isSeparatedAxis (sign, position) {
-    return sign !== Math.sign(position);
+    return unknown;
 }
