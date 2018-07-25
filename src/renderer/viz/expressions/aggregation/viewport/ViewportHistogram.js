@@ -1,5 +1,5 @@
 import BaseExpression from '../../base';
-import { implicitCast } from '../../utils';
+import { implicitCast, checkExpression } from '../../utils';
 
 /**
  * Generates an histogram.
@@ -36,11 +36,13 @@ import { implicitCast } from '../../utils';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, weight = 1, size = 1000) {
-        super({
-            x: implicitCast(x),
-            weight: implicitCast(weight)
-        });
+    constructor (x, weight, size) {
+        x = implicitCast(x);
+        weight = implicitCast(weight);
+
+        super({ x, weight });
+
+        this.name = 'viewportHistogram';
         this._size = size;
         this._isViewport = true;
         this.inlineMaker = () => null;
@@ -53,9 +55,12 @@ export default class ViewportHistogram extends BaseExpression {
 
     accumViewportAgg (feature) {
         const x = this.x.eval(feature);
-        const weight = this.weight.eval(feature);
-        const count = this._histogram.get(x) || 0;
-        this._histogram.set(x, count + weight);
+
+        if (x !== undefined) {
+            const weight = this.weight.eval(feature);
+            const count = this._histogram.get(x) || 0;
+            this._histogram.set(x, count + weight);
+        }
     }
 
     get value () {
@@ -63,41 +68,52 @@ export default class ViewportHistogram extends BaseExpression {
             if (!this._histogram) {
                 return null;
             }
-            if (this.x.type === 'number') {
-                const array = [...this._histogram];
-                let min = Number.POSITIVE_INFINITY;
-                let max = Number.NEGATIVE_INFINITY;
-                for (let i = 0; i < array.length; i++) {
-                    const x = array[i][0];
-                    min = Math.min(min, x);
-                    max = Math.max(max, x);
-                }
-                const hist = Array(this._size).fill(0);
-                const range = max - min;
-                const sizeMinusOne = this._size - 1;
-                for (let i = 0; i < array.length; i++) {
-                    const x = array[i][0];
-                    const y = array[i][1];
-                    const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
-                    hist[index] += y;
-                }
-                this._cached = hist.map((count, index) => {
-                    return {
-                        x: [min + index / this._size * range, min + (index + 1) / this._size * range],
-                        y: count
-                    };
-                });
-            } else {
-                this._cached = [...this._histogram].map(([x, y]) => {
-                    return { x: this._metatada.IDToCategory.get(x), y };
-                });
+            // type === number
+            const array = [...this._histogram];
+            let min = Number.POSITIVE_INFINITY;
+            let max = Number.NEGATIVE_INFINITY;
+
+            for (let i = 0; i < array.length; i++) {
+                const x = array[i][0];
+                min = Math.min(min, x);
+                max = Math.max(max, x);
             }
+
+            const hist = Array(this._size).fill(0);
+            const range = max - min;
+            const sizeMinusOne = this._size - 1;
+            for (let i = 0; i < array.length; i++) {
+                const x = array[i][0];
+                const y = array[i][1];
+                const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
+                hist[index] += y;
+            }
+
+            this._cached = hist.map((count, index) => {
+                return {
+                    x: [min + index / this._size * range, min + (index + 1) / this._size * range],
+                    y: count
+                };
+            });
+
+            // type === category
+
+            // this._cached = [...this._histogram].map(([x, y]) => {
+            //     if (this._metadata) {
+            //         return { x: this._metatada.IDToCategory.get(x), y };
+            //     }
+            // });
         }
+
         return this._cached;
     }
 
-    _compile (metadata) {
-        this._metatada = metadata;
-        super._compile(metadata);
+    eval () {
+        return this.value;
     }
+
+    // _compile (metadata) {
+    //     this._metatada = metadata;
+    //     super._compile(metadata);
+    // }
 }
