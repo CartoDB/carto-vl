@@ -1,4 +1,4 @@
-import { signedDistanceFromPointToLine, pointInRectangle, pointInTriangle } from '../../utils/geometry';
+import { signedDistanceFromPointToLine } from '../../utils/geometry';
 
 const separatingLineFound = 'separatingLineFound';
 const noSeparatingLineFound = 'noSeparatingLineFound';
