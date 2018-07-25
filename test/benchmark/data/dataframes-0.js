@@ -1,5 +1,5 @@
 
-import Dataframe from '../../../src/core/dataframe';
+import Dataframe from '../../../src/renderer/Dataframe';
 
 export const dataframe = new Dataframe({
     center: { x: 0, y: 0 },
@@ -9,28 +9,25 @@ export const dataframe = new Dataframe({
         1, 1
     ],
     properties: {
-        id: [1, 2],
-        cartodb_id: [0, 1]
+        id: [1, 2]
     },
     type: 'point',
     size: 2,
     active: true,
     metadata: {
-        columns: [{
-            name: 'id',
-            type: 'number'
-        },
-        {
-            name: 'cartodb_id',
-            type: 'number'
-        }]
+        properties: {
+            id: {
+                type: 'number'
+            }
+        }
     }
 });
 
 export const viz = {
     width: { eval: () => 0.5 },
     strokeWidth: { eval: () => 0.5 },
-    filter: { eval: () => 1. },
+    filter: { eval: () => 1.0 },
+    symbol: {_default: true}
 };
 
 dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
