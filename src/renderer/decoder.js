@@ -189,9 +189,8 @@ function addLine (lineString, vertices, normals) {
                         nextLeft = currentLeft = neg(joinNormal);
                         nextRight = currentRight = joinNormal;
                     }
-                } else {
+                } else if (checkJoinNormal(joinNormal, prevPoint, currentPoint, nextPoint)) {
                     // Bevel join: adjust vertices and produce bevel triangle
-                    joinNormal = adjustJoinNormal(joinNormal, prevPoint, currentPoint, nextPoint);
 
                     if (turnLeft) {
                         nextLeft = joinNormal;
@@ -213,6 +212,22 @@ function addLine (lineString, vertices, normals) {
                             turnLeft ? neg(nextNormal) : prevNormal
                         ]
                     );
+                } else {
+                    // overlapping bevel
+                    // this bevel technique does not suffer from large joinNormal spikes,
+                    // but creates some overlapping between the previous and next segments.
+                    nextLeft = nextNormal;
+                    nextRight = neg(nextNormal);
+
+                    // Bevel triangle
+                    addTriangle(
+                        [currentPoint, currentPoint, currentPoint],
+                        [[0,0],
+                            turnLeft ? neg(prevNormal) : nextNormal,
+                            turnLeft ? neg(nextNormal) : prevNormal
+                        ]
+                    );
+
                 }
             }
 
@@ -317,7 +332,7 @@ function length (v) {
 /**
  * Adjust join normal to avoid spurious spkies
  */
-function adjustJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
+function checkJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
     // Spike avoidance: joinNormal can produce points farther away than the geometry segments.
     // FIXME
     // This solution is fundamentally flawed: joinNormal dimensions are based on unit vectors,
@@ -330,10 +345,7 @@ function adjustJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
         length(vector(prevPoint, currentPoint)),
         length(vector(currentPoint, nextPoint))
     );
-    if (joinLength > segmentLength) {
-        joinNormal = [joinNormal[0] * segmentLength / joinLength, joinNormal[1] * segmentLength / joinLength];
-    }
-    return joinNormal;
+    return joinLength <= segmentLength;
 }
 
 export default { decodeGeom };
