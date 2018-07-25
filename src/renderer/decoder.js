@@ -174,7 +174,7 @@ function addLine (lineString, vertices, normals) {
                 // `turnLeft` indicates that the nextLine turns to the left
                 // `joinNormal` contains the direction and size for the `miter` vertex
                 //  `miter` indicates that the join must be `miter`, not `bevel`.
-                let {turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextNormal);
+                let { turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextNormal);
 
                 if (!joinNormal) {
                     // No join
@@ -189,7 +189,6 @@ function addLine (lineString, vertices, normals) {
                         nextLeft = currentLeft = neg(joinNormal);
                         nextRight = currentRight = joinNormal;
                     }
-
                 } else {
                     // Bevel join: adjust vertices and produce bevel triangle
 
@@ -200,12 +199,12 @@ function addLine (lineString, vertices, normals) {
                     // (prev and/or next vertices) with each vertex.
                     const MAGIC = 10;
                     const joinLength = length(joinNormal);
-                    const segmentLength = MAGIC*Math.min(
+                    const segmentLength = MAGIC * Math.min(
                         length(vector(prevPoint, currentPoint)),
                         length(vector(currentPoint, nextPoint))
                     );
                     if (joinLength > segmentLength) {
-                        joinNormal = [joinNormal[0]*segmentLength/joinLength, joinNormal[1]*segmentLength/joinLength];
+                        joinNormal = [joinNormal[0] * segmentLength / joinLength, joinNormal[1] * segmentLength / joinLength];
                     }
 
                     if (turnLeft) {
@@ -226,7 +225,7 @@ function addLine (lineString, vertices, normals) {
                         [joinNormal,
                             turnLeft ? neg(prevNormal) : nextNormal,
                             turnLeft ? neg(nextNormal) : prevNormal
-                            ]
+                        ]
                     );
                 }
             }
@@ -276,7 +275,7 @@ function addLine (lineString, vertices, normals) {
  */
 function getLineNormal (a, b) {
     const u = normalize(vector(a, b));
-    return [-u[1], u[0]]
+    return [-u[1], u[0]];
 }
 
 /**
