@@ -39,7 +39,7 @@ const viz2 = new carto.Viz(`
 `);
 
 const viz3 = new carto.Viz(`
-    color: blend(blue, yellow, viewportCount() == 3)
+    color: blend(blue, yellow, viewportCount() == 2)
     width: 50
     @list: viewportFeatures();
 `);
