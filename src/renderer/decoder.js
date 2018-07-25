@@ -191,21 +191,7 @@ function addLine (lineString, vertices, normals) {
                     }
                 } else {
                     // Bevel join: adjust vertices and produce bevel triangle
-
-                    // Spike avoidance: joinNormal can produce points farther away than the geometry segments
-                    // This if fundamentally flawed: joinNormal dimensions are based on unit vectors, with no
-                    // relation to the segment geometry.
-                    // This could be performed properly in the vertex shader, if we pass segment information
-                    // (prev and/or next vertices) with each vertex.
-                    const MAGIC = 10;
-                    const joinLength = length(joinNormal);
-                    const segmentLength = MAGIC * Math.min(
-                        length(vector(prevPoint, currentPoint)),
-                        length(vector(currentPoint, nextPoint))
-                    );
-                    if (joinLength > segmentLength) {
-                        joinNormal = [joinNormal[0] * segmentLength / joinLength, joinNormal[1] * segmentLength / joinLength];
-                    }
+                    joinNormal = adjustJoinNormal(joinNormal, prevPoint, currentPoint, nextPoint);
 
                     if (turnLeft) {
                         nextLeft = joinNormal;
@@ -326,6 +312,28 @@ function normalize (v) {
 
 function length (v) {
     return Math.hypot(v[0], v[1]);
+}
+
+/**
+ * Adjust join normal to avoid spurious spkies
+ */
+function adjustJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
+    // Spike avoidance: joinNormal can produce points farther away than the geometry segments.
+    // FIXME
+    // This solution is fundamentally flawed: joinNormal dimensions are based on unit vectors,
+    // with no relation to the segment geometry.
+    // This could be performed properly in the vertex shader, if we pass segment information
+    // (prev and/or next vertices) with each vertex.
+    const MAGIC = 10;
+    const joinLength = length(joinNormal);
+    const segmentLength = MAGIC * Math.min(
+        length(vector(prevPoint, currentPoint)),
+        length(vector(currentPoint, nextPoint))
+    );
+    if (joinLength > segmentLength) {
+        joinNormal = [joinNormal[0] * segmentLength / joinLength, joinNormal[1] * segmentLength / joinLength];
+    }
+    return joinNormal;
 }
 
 export default { decodeGeom };
