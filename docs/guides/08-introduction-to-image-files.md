@@ -1,4 +1,4 @@
-## Introduction to Image Markers
+## Introduction to Image Files
 
 CARTO VL supports the use of images to render point data. Image files can be accessed directly from CARTO VL's built-in symbol library, or from external sources via an HTTP request. Any image (built-in or external) can be colored, sized and placed using CARTO VL expressions.
 
