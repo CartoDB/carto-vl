@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType } from '../utils';
+import { checkInstance, checkType, checkExpression, checkNumber } from '../utils';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -36,8 +36,10 @@ export default class GlobalQuantiles extends Classifier {
 
     _compile (metadata) {
         super._compile(metadata);
-        const copy = metadata.sample.map(s => s[this.input.name]);
+        checkExpression('globalQuantiles', 'input', 0, this.input);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
+
+        const copy = metadata.sample.map(s => s[this.input.name]);
 
         copy.sort((x, y) => x - y);
 

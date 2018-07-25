@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
 import { viewportMax, viewportMin } from '../../expressions';
-import { checkNumber, checkInstance, checkType } from '../utils';
+import { checkNumber, checkInstance, checkType, checkExpression } from '../utils';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -32,9 +32,11 @@ export default class ViewportEqIntervals extends Classifier {
     constructor (input, buckets) {
         checkInstance('viewportEqIntervals', 'input', 0, Property, input && (input.property || input));
         checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
+
         let children = {
             input
         };
+
         children._min = viewportMin(input);
         children._max = viewportMax(input);
         super(children, buckets);
@@ -42,7 +44,8 @@ export default class ViewportEqIntervals extends Classifier {
 
     _compile (metadata) {
         super._compile(metadata);
-        checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
+        checkExpression('viewportEqIntervals', 'input', 0, this.input);
+        checkType('viewportEqIntervals', 'input', 0, ['number'], this.input);
     }
 
     _genBreakpoints () {

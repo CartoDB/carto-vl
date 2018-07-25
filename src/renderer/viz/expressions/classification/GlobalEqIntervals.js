@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType } from '../utils';
+import { checkNumber, checkInstance, checkType, checkExpression } from '../utils';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -31,11 +31,13 @@ export default class GlobalEqIntervals extends Classifier {
     constructor (input, buckets) {
         checkInstance('globalEqIntervals', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalEqIntervals', 'buckets', 1, buckets);
+
         super({ input }, buckets);
     }
 
     _compile (metadata) {
         super._compile(metadata);
+        checkExpression('globalEqIntervals', 'input', 0, this.input);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
         const { min, max } = metadata.properties[this.input.name];
         this.min = min;

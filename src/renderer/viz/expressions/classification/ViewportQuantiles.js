@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType } from '../utils';
+import { checkNumber, checkInstance, checkType, checkExpression } from '../utils';
 import { viewportHistogram } from '../../expressions';
 
 /**
@@ -43,7 +43,8 @@ export default class ViewportQuantiles extends Classifier {
 
     _compile (metadata) {
         super._compile(metadata);
-        checkType('viewportQuantiles', 'input', 0, 'number', this.input);
+        checkExpression('viewportQuantiles', 'input', 0, this.input);
+        checkType('viewportQuantiles', 'input', 0, ['number', 'number-property'], this.input);
     }
 
     _genBreakpoints () {

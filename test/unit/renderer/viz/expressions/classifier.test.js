@@ -4,11 +4,28 @@ import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, view
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateStaticTypeErrors('viewportQuantiles', []);
-        validateStaticTypeErrors('viewportQuantiles', ['number']);
         validateStaticTypeErrors('viewportQuantiles', ['number', 'category']);
         validateDynamicTypeErrors('viewportQuantiles', ['category', 2]);
         validateStaticTypeErrors('viewportQuantiles', ['color', 2]);
         validateStaticTypeErrors('viewportQuantiles', ['number', 'color']);
+
+        validateStaticTypeErrors('viewportEqIntervals', []);
+        validateStaticTypeErrors('viewportEqIntervals', ['number', 'category']);
+        validateDynamicTypeErrors('viewportEqIntervals', ['category', 2]);
+        validateStaticTypeErrors('viewportEqIntervals', ['color', 2]);
+        validateStaticTypeErrors('viewportEqIntervals', ['number', 'color']);
+
+        validateStaticTypeErrors('globalQuantiles', []);
+        validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
+        validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
+        validateStaticTypeErrors('globalQuantiles', ['color', 2]);
+        validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
+
+        validateStaticTypeErrors('globalEqIntervals', []);
+        validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
+        validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
+        validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
+        validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
     });
 
     describe('type', () => {
