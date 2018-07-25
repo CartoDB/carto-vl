@@ -1,4 +1,5 @@
 import * as earcut from 'earcut';
+import { getFloat32ArrayFromArray } from '../utils/util';
 
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
@@ -109,9 +110,9 @@ function decodePolygon (geometry) {
         breakpoints.push(vertices.length);
     });
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 
@@ -163,9 +164,9 @@ function decodeLine (geom) {
         breakpoints.push(vertices.length);
     });
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 
