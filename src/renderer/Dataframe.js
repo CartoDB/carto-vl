@@ -320,11 +320,6 @@ export default class Dataframe {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
 
-                if (!pointInRectangle(p, this._aabb[featureIndex])) {
-                    i = breakpoints[featureIndex] - 6;
-                    continue;
-                }
-
                 if (this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
