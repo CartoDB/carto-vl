@@ -1,5 +1,5 @@
 import BaseExpression from '../../base';
-import { implicitCast, checkExpression } from '../../utils';
+import { implicitCast } from '../../utils';
 
 /**
  * Generates an histogram.
@@ -36,10 +36,8 @@ import { implicitCast, checkExpression } from '../../utils';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, weight = 1000, size = 1) {
-        x = implicitCast(x);
-
-        super({ x, weight });
+    constructor (x, weight = 1, size = 1000) {
+        super({ x: implicitCast(x), weight: implicitCast(weight) });
 
         this._size = size;
         this._isViewport = true;
@@ -109,7 +107,7 @@ function _getNumericValue (histogram, size) {
 
     return hist.map((count, index) => {
         return {
-            x: [min + index / this._size * range, min + (index + 1) / size * range],
+            x: [min + index / size * range, min + (index + 1) / size * range],
             y: count
         };
     });
