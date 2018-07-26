@@ -1,12 +1,13 @@
 import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
+import { number } from '../../../expressions';
 
 export default class ViewportAggregation extends BaseExpression {
     /**
      * @param {*} property
      */
     constructor ({ property }) {
-        super({ property: implicitCast(property) });
+        super({ property: implicitCast(property), _impostor: number(0) });
         this._isViewport = true;
     }
 

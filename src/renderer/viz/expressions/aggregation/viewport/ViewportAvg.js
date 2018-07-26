@@ -1,5 +1,4 @@
 import ViewportAggregation from './ViewportAggregation';
-import { number } from '../../../expressions';
 
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -27,7 +26,7 @@ import { number } from '../../../expressions';
  */
 export default class ViewportAvg extends ViewportAggregation {
     constructor (property) {
-        super({ property, _impostor: number(0) });
+        super({ property });
         this._sum = 0;
         this._count = 0;
     }
