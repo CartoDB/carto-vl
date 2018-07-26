@@ -119,13 +119,13 @@ function decodePolygon (geometry) {
             }
         }
 
-        if (breakpoints.length > 0) {
-            featureIDToVertexIndex[breakpoints.length - 1].end = vertices.length;
-        }
-        featureIDToVertexIndex[breakpoints.length] = {start: vertices.length};
+        featureIDToVertexIndex[breakpoints.length] = breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex[breakpoints.length - 1].end, end: vertices.length };
+
         breakpoints.push(vertices.length);
     }
-    featureIDToVertexIndex[breakpoints.length - 1].end = vertices.length;
+
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
@@ -138,6 +138,7 @@ function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let featureIDToVertexIndex = [];
 
     const geometryLength = geometry.length;
 
@@ -187,12 +188,17 @@ function decodeLine (geometry) {
             }
         }
 
+        featureIDToVertexIndex[breakpoints.length] = breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex[breakpoints.length - 1].end, end: vertices.length };
+
         breakpoints.push(vertices.length);
     }
 
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
+        featureIDToVertexIndex,
         normals: getFloat32ArrayFromArray(normals)
     };
 }

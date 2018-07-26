@@ -223,7 +223,8 @@ export default class Dataframe {
         const normals = this.decodedGeom.normals;
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
-            return _isPolygonCollidingViewport(vertices, start, end, normals, strokeWidthScale, viewportAABB);
+            const range = this.decodedGeom.featureIDToVertexIndex[featureIndex];
+            return _isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
         }
 
         return aabbResult === AABBTestResults.INSIDE;
@@ -479,8 +480,8 @@ function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
             featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (vertices, normals, strokeWidthScale, viewportAABB) {
-    for (let i = 0; i < vertices.length; i += 6) {
+function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
+    for (let i = start; i < end; i += 6) {
         const triangle = [{
             x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
             y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
