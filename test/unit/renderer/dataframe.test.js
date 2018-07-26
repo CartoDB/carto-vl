@@ -1,5 +1,6 @@
-import Dataframe, { _pointInTriangle as pointInTriangle } from '../../../src/renderer/Dataframe';
+import Dataframe from '../../../src/renderer/Dataframe';
 import Metadata from '../../../src/renderer/Metadata';
+import { pointInTriangle } from '../../../src/utils/geometry';
 
 describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
