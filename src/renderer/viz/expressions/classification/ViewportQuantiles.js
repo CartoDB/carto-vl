@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkExpression } from '../utils';
+import { checkNumber, checkInstance, checkType, checkLooseType, checkExpression } from '../utils';
 import { viewportHistogram } from '../../expressions';
 
 /**
@@ -34,7 +34,7 @@ export default class ViewportQuantiles extends Classifier {
             checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
         } else {
             checkExpression('viewportQuantiles', 'input', 0, input);
-            checkType('viewportQuantiles', 'input', 0, ['number', 'number-property'], input);
+            checkLooseType('viewportQuantiles', 'input', 0, ['number', 'number-property'], input);
         }
 
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
