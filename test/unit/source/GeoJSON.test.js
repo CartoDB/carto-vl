@@ -62,8 +62,7 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                },
-                properties: {}
+                }
             };
             const source = new GeoJSON(data);
             expect(source._features).toEqual([{
@@ -71,8 +70,7 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                },
-                properties: {}
+                }
             }]);
         });
 
@@ -84,8 +82,7 @@ describe('sources/GeoJSON', () => {
                     geometry: {
                         type: 'Point',
                         coordinates: [0, 0]
-                    },
-                    properties: {}
+                    }
                 }]
             };
             const source = new GeoJSON(data);
@@ -94,8 +91,7 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                },
-                properties: {}
+                }
             }]);
         });
 
@@ -166,16 +162,14 @@ describe('sources/GeoJSON', () => {
                     geometry: {
                         type: 'Point',
                         coordinates: [0, 0]
-                    },
-                    properties: {}
+                    }
                 },
                 {
                     type: 'Feature',
                     geometry: {
                         type: 'LineString',
                         coordinates: [[0, 0], [1, 1]]
-                    },
-                    properties: {}
+                    }
                 }]
             });
             expect(function () {
@@ -189,8 +183,7 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Polygon',
                     coordinates: [[0, 0], [0, 1], [1, 1], [0, 0]]
-                },
-                properties: {}
+                }
             });
             expect(function () {
                 source.requestData();
@@ -201,8 +194,7 @@ describe('sources/GeoJSON', () => {
             it('should be auto generated and unique for a single feature', done => {
                 const data = {
                     type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
-                    properties: {}
+                    geometry: { type: 'Point', coordinates: [0, 0] }
                 };
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
@@ -217,18 +209,15 @@ describe('sources/GeoJSON', () => {
                     type: 'FeatureCollection',
                     features: [{
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [0, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [0, 0] }
                     },
                     {
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [1, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [1, 0] }
                     },
                     {
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [3, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [3, 0] }
                     }]
                 };
                 const source = new GeoJSON(data);
@@ -244,8 +233,7 @@ describe('sources/GeoJSON', () => {
             it('should not mutate the original data', () => {
                 const data = {
                     type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
-                    properties: {}
+                    geometry: { type: 'Point', coordinates: [0, 0] }
                 };
                 new GeoJSON(data);
                 expect(data.properties.cartodb_id).toBeUndefined();
@@ -259,8 +247,7 @@ describe('sources/GeoJSON', () => {
             geometry: {
                 type: 'Point',
                 coordinates: [0, 0]
-            },
-            properties: {}
+            }
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
