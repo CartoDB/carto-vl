@@ -294,11 +294,7 @@ export default class Layer {
     }
 
     async requestData () {
-        if (!this.metadata) {
-            return;
-        }
-
-        if (!this._visible) {
+        if (!this.metadata || !this._visible) {
             return;
         }
 
