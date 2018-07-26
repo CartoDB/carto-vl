@@ -329,15 +329,14 @@ function length (v) {
 }
 
 /**
- * Adjust join normal to avoid spurious spkies
+ * Check if join normal can led to spikes
  */
 function checkJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
     // Spike avoidance: joinNormal can produce points farther away than the geometry segments.
     // FIXME
     // This solution is fundamentally flawed: joinNormal dimensions are based on unit vectors,
     // with no relation to the segment geometry.
-    // This could be performed properly in the vertex shader, if we pass segment information
-    // (prev and/or next vertices) with each vertex.
+    // Only in the vertex shader have the actual geometry and can avoid these artifacts.
     const MAGIC = 10;
     const joinLength = length(joinNormal);
     const segmentLength = MAGIC * Math.min(
