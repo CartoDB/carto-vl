@@ -52,11 +52,11 @@ feature included in the `features` array.
 
 ```js
 interactivity.on('featureEnter', featureEvent => {
-    featureEvent.features[0].color.blendTo('rgba(255, 0, 0, 0.5)', 100);
+    featureEvent.features[0].color.blendTo('rgba(0, 255, 0, 0.8)', 100);
 });
 ```
 
-By the other side, when the `featureLeave` event is fired we tell our callback to `reset` the color of the feature
+When the `featureLeave` event is fired we tell our callback to `reset` the color of the feature
 
 ```js
 interactivity.on('featureLeave', featureEvent => {

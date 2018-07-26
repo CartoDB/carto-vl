@@ -51,7 +51,7 @@
             strokeWidth: 0
             width: sqrt($speed*($accel_lateral*$accel_lateral)) + 1
             color: ramp(linear(abs($accel_lateral), 0, 1.2), temps)
-            filter: $lap == 24 and torque(linear($date), 20, fade(0, 100))
+            filter: $lap == 24 and animation(linear($date), 20, fade(0, 100))
         `);
         const layer = new carto.Layer('gpstrack', source, viz);
         layer.addTo(map, 'watername_ocean');
@@ -101,7 +101,7 @@ FROM geoms
             width: 4
             color: ramp(linear(abs($accel_lateral), 0, 1), temps)
             strokeWidth: 0
-            filter: $lap == 24 and torque(linear($date), 20, fade(0, 1))
+            filter: $lap == 24 and animation(linear($date), 20, fade(0, 1))
         `);
         const accelerationsLayer = new carto.Layer('accelerations', accelerationsSource, accelerations);
         accelerationsLayer.addTo(map, 'watername_ocean');

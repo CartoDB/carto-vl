@@ -233,15 +233,20 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureIfNeeded () {
+        if (this._cachedTexturePixels) {
+            return this._cachedTexturePixels;
+        }
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
             this.maxKey = this.input.numCategories - 1;
         }
 
-        return this.type === rampTypes.COLOR
+        this._cachedTexturePixels = this.type === rampTypes.COLOR
             ? this._computeColorRampTexture()
             : this._computeNumericRampTexture();
+
+        return this._cachedTexturePixels;
     }
 
     _computeColorRampTexture () {

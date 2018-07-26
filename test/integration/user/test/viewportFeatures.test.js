@@ -243,3 +243,118 @@ describe('viewportFeatures with invalid parameters', () => {
         document.body.removeChild(setup.div);
     });
 });
+
+describe('viewportFeatures collision', () => {
+    const innerTriangle = {
+        type: 'Feature',
+        geometry: {
+            type: 'Polygon',
+            coordinates: [
+                [ [0, 50], [0, 0], [50, 0], [0, 50] ]
+            ]
+        },
+        properties: {
+            cartodb_id: 1,
+            value: 1,
+            category: 'a'
+        }
+    };
+
+    const intersectingTriangle = {
+        type: 'Feature',
+        geometry: {
+            type: 'Polygon',
+            coordinates: [
+                [ [165, 50], [165, 0], [215, 0], [165, 50] ]
+            ]
+        },
+        properties: {
+            cartodb_id: 2,
+            value: 2,
+            category: 'b'
+        }
+    };
+
+    const outerTriangle = {
+        type: 'Feature',
+        geometry: {
+            type: 'Polygon',
+            coordinates: [
+                [ [200, 50], [200, 0], [250, 0], [200, 50] ]
+            ]
+        },
+        properties: {
+            cartodb_id: 3,
+            value: 3,
+            category: 'c'
+        }
+    };
+
+    const outerBBOXTriangle = {
+        type: 'Feature',
+        geometry: {
+            type: 'Polygon',
+            coordinates: [
+                [ [-226, -70], [-226, -85], [-176, -85], [-226, -70] ]
+            ]
+        },
+        properties: {
+            cartodb_id: 4,
+            value: 4,
+            category: 'd'
+        }
+    };
+
+    function generateData (features) {
+        return { type: 'FeatureCollection', features };
+    }
+
+    let map, viz1, layer1, source1, setup;
+
+    beforeEach(() => {
+        const VIEWPORT_SIZE = 500;
+
+        setup = util.createMap('map', VIEWPORT_SIZE);
+        map = setup.map;
+
+        source1 = new carto.source.GeoJSON(
+            generateData([
+                innerTriangle,
+                intersectingTriangle,
+                outerTriangle,
+                outerBBOXTriangle
+            ]),
+            {
+                id: 'cartodb_id',
+                value: ['value'],
+                category: ['category']
+            }
+        );
+
+        viz1 = new carto.Viz(`
+              color: red,
+              strokeWidth: 0,
+              @list: viewportFeatures($value ,$category, $cartodb_id);
+            `);
+
+        layer1 = new carto.Layer('layer1', source1, viz1);
+        layer1.addTo(map);
+    });
+
+    it('should get the properties in the viewport', done => {
+        layer1.on('loaded', () => {
+            const expected = [
+                { cartodb_id: 1, value: 1, category: 'a' },
+                { cartodb_id: 2, value: 2, category: 'b' }
+            ];
+
+            checkFeatures(viz1.variables.list.eval(), expected);
+            done();
+        });
+    });
+
+    afterEach((done) => {
+        document.body.removeChild(setup.div);
+        done();
+    });
+});
