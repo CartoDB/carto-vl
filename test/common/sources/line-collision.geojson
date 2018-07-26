@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "features": [{
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [0, 50],
+          [0, 0]
+        ]
+      },
+      "properties": {
+        "cartodb_id": 11,
+        "value": 11,
+        "category": "aa",
+        "name": "innerLine"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [165, 50],
+          [165, 0]
+        ]
+      },
+      "properties": {
+        "cartodb_id": 12,
+        "value": 12,
+        "category": "bb",
+        "name": "intersectingLine"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [200, 50],
+          [200, 0]
+        ]
+      },
+      "properties": {
+        "cartodb_id": 13,
+        "value": 13,
+        "category": "cc",
+        "name": "outerLine"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-176, -85],
+          [-226, -70]
+        ]
+      },
+      "properties": {
+        "cartodb_id": 14,
+        "value": 14,
+        "category": "dd",
+        "name": "outerBBOXLine"
+      }
+    }
+  ]
+}
