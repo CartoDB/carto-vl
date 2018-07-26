@@ -53,7 +53,7 @@ function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-
+    let featureIDToVertexIndex = new Map();
     const geometryLength = geometry.length;
 
     for (let i = 0; i < geometryLength; i++) {
@@ -119,12 +119,17 @@ function decodePolygon (geometry) {
             }
         }
 
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
     }
 
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
+        featureIDToVertexIndex,
         normals: getFloat32ArrayFromArray(normals)
     };
 }
@@ -133,6 +138,7 @@ function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let featureIDToVertexIndex = new Map();
 
     const geometryLength = geometry.length;
 
@@ -182,12 +188,17 @@ function decodeLine (geometry) {
             }
         }
 
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
     }
 
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
+        featureIDToVertexIndex,
         normals: getFloat32ArrayFromArray(normals)
     };
 }
