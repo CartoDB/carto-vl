@@ -1,4 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
+import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
@@ -6,16 +7,22 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $cat = s.property('cat');
     describe('viewport filtering', () => {
         function fakeDrawMetadata (expr) {
-            expr._compile({
+            const METADATA = new Metadata({
                 properties: {
                     numeric_with_nulls: { type: 'number' },
                     price: { type: 'number' },
                     cat: {
-                        type: 'category', categories: { a: 0, b: 0, c: 0 }
+                        type: 'category',
+                        categories: [
+                            { name: 'a' },
+                            { name: 'b' },
+                            { name: 'c' }
+                        ]
                     }
-                },
-                IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']])
+                }
             });
+
+            expr._compile(METADATA);
             expr._resetViewportAgg();
             expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
             expr.accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
