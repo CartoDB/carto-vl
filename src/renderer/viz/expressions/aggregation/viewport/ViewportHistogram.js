@@ -46,13 +46,19 @@ export default class ViewportHistogram extends BaseExpression {
 
     _resetViewportAgg (metadata) {
         this._metadata = metadata || this._metadata;
-        this.type = this._metadata.properties[this.x.name].type;
+        if (this.x.name) {
+            this.type = metadata.properties[this.x.name].type;
+        }
         this._cached = null;
         this._histogram = new Map();
     }
 
     accumViewportAgg (feature) {
         const x = this.x.eval(feature);
+
+        if (!this.type) {
+            this.type = typeof x === 'number' ? 'number' : 'category';
+        }
 
         if (x !== undefined) {
             const weight = this.weight.eval(feature);
@@ -84,7 +90,9 @@ export default class ViewportHistogram extends BaseExpression {
     _compile (metadata) {
         super._compile(metadata);
         this._metadata = metadata;
-        this.type = metadata.properties[this.x.name].type;
+        if (this.x.name) {
+            this.type = metadata.properties[this.x.name].type;
+        }
     }
 }
 

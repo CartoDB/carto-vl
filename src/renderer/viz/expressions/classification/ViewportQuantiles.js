@@ -30,7 +30,12 @@ import { viewportHistogram } from '../../expressions';
  */
 export default class ViewportQuantiles extends Classifier {
     constructor (input, buckets) {
-        checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
+        if (input.isA(Property)) {
+            checkInstance('viewportQuantiles', 'input', 0, Property, input && (input.property || input));
+        } else {
+            checkExpression('viewportQuantiles', 'input', 0, input);
+        }
+
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
         let children = {
