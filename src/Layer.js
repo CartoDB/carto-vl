@@ -189,9 +189,11 @@ export default class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+        
         if (this._source !== source) {
             this._freeSource();
         }
+
         this._source = source;
         this.requestData();
 
@@ -295,6 +297,11 @@ export default class Layer {
         if (!this.metadata) {
             return;
         }
+
+        if (!this._visible) {
+            return;
+        }
+
         this._source.requestData(this._getZoom(), this._getViewport());
         this._fireUpdateOnNextRender = true;
     }

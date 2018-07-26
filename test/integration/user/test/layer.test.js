@@ -112,6 +112,17 @@ describe('Layer', () => {
                     done();
                 });
             });
+
+            it('should not request source data', (done) => {                
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).not.toHaveBeenCalled();
+                    done();
+                });
+            });
         });
 
         describe('.show', () => {
@@ -126,6 +137,18 @@ describe('Layer', () => {
                     expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
                     layer.show();
                     expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    done();
+                });
+            });
+
+            it('should not request source data', (done) => {
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.show();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).toHaveBeenCalled();
                     done();
                 });
             });
