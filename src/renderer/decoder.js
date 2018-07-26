@@ -1,4 +1,5 @@
 import * as earcut from 'earcut';
+import { getFloat32ArrayFromArray } from '../utils/util';
 import { getJointNormal, getLineNormal } from '../utils/geometry';
 
 // Decode a tile geometry
@@ -122,9 +123,9 @@ function decodePolygon (geometry) {
     }
 
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 
@@ -185,9 +186,9 @@ function decodeLine (geometry) {
     }
 
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 

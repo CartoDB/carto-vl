@@ -1,5 +1,6 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
+import { getFloat32ArrayFromArray } from '../utils/util';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -74,7 +75,7 @@ export default class Renderer {
             0.0, 10.0,
             -10.0, -10.0
         ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, getFloat32ArrayFromArray(vertices), gl.STATIC_DRAW);
 
         // Create a 1x1 RGBA texture set to [0,0,0,0]
         // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
