@@ -36,19 +36,19 @@ import { implicitCast, checkExpression } from '../../utils';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, weight, size) {
+    constructor (x, weight = 1000, size = 1) {
         x = implicitCast(x);
-        weight = implicitCast(weight);
 
         super({ x, weight });
 
-        this.name = 'viewportHistogram';
         this._size = size;
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
 
-    _resetViewportAgg () {
+    _resetViewportAgg (metadata) {
+        this.type = metadata.properties[this.x.name].type;
+        this._metadata = metadata;
         this._cached = null;
         this._histogram = new Map();
     }
@@ -68,41 +68,12 @@ export default class ViewportHistogram extends BaseExpression {
             if (!this._histogram) {
                 return null;
             }
-            // type === number
-            const array = [...this._histogram];
-            let min = Number.POSITIVE_INFINITY;
-            let max = Number.NEGATIVE_INFINITY;
 
-            for (let i = 0; i < array.length; i++) {
-                const x = array[i][0];
-                min = Math.min(min, x);
-                max = Math.max(max, x);
-            }
+            this._cached = this.type === 'number'
+                ? _getNumericValue(this._histogram, this._size)
+                : _getCategoryValue(this._histogram, this._metadata);
 
-            const hist = Array(this._size).fill(0);
-            const range = max - min;
-            const sizeMinusOne = this._size - 1;
-            for (let i = 0; i < array.length; i++) {
-                const x = array[i][0];
-                const y = array[i][1];
-                const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
-                hist[index] += y;
-            }
-
-            this._cached = hist.map((count, index) => {
-                return {
-                    x: [min + index / this._size * range, min + (index + 1) / this._size * range],
-                    y: count
-                };
-            });
-
-            // type === category
-
-            // this._cached = [...this._histogram].map(([x, y]) => {
-            //     if (this._metadata) {
-            //         return { x: this._metatada.IDToCategory.get(x), y };
-            //     }
-            // });
+            return this._cached;
         }
 
         return this._cached;
@@ -111,9 +82,41 @@ export default class ViewportHistogram extends BaseExpression {
     eval () {
         return this.value;
     }
+}
 
-    // _compile (metadata) {
-    //     this._metatada = metadata;
-    //     super._compile(metadata);
-    // }
+function _getNumericValue (histogram, size) {
+    const array = [...histogram];
+    const arrayLength = array.length;
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+
+    for (let i = 0; i < arrayLength; i++) {
+        const x = array[i][0];
+        min = Math.min(min, x);
+        max = Math.max(max, x);
+    }
+
+    const hist = Array(size).fill(0);
+    const range = max - min;
+    const sizeMinusOne = size - 1;
+
+    for (let i = 0; i < arrayLength; i++) {
+        const x = array[i][0];
+        const y = array[i][1];
+        const index = Math.min(Math.floor(size * (x - min) / range), sizeMinusOne);
+        hist[index] += y;
+    }
+
+    return hist.map((count, index) => {
+        return {
+            x: [min + index / this._size * range, min + (index + 1) / size * range],
+            y: count
+        };
+    });
+}
+
+function _getCategoryValue (histogram, metadata) {
+    return [...histogram].map(([x, y], index) => {
+        return { x: metadata.IDToCategory.get(index), y };
+    });
 }
