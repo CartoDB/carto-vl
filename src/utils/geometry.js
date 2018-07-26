@@ -62,9 +62,9 @@ export function pointInTriangle (p, v1, v2, v3) {
 
     // A point is inside a triangle or in one of the triangles edges
     // if the point is in the three half-plane defined by the 3 edges
-    const b1 = signedDistanceFromPointToLine(p, v1, v2) < 0;
-    const b2 = signedDistanceFromPointToLine(p, v2, v3) < 0;
-    const b3 = signedDistanceFromPointToLine(p, v3, v1) < 0;
+    const b1 = halfPlaneSign(p, v1, v2) < 0;
+    const b2 = halfPlaneSign(p, v2, v3) < 0;
+    const b3 = halfPlaneSign(p, v3, v1) < 0;
 
     return (b1 === b2) && (b2 === b3);
 }
@@ -73,7 +73,7 @@ export function pointInTriangle (p, v1, v2, v3) {
 // Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
 // returns >0 if the point is OUTSIDE
 // Parameters in {x: 0, y:0} form
-export function signedDistanceFromPointToLine (p, a, b) {
+export function halfPlaneSign (p, a, b) {
     // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
     // The result's sign is the half plane test result
     return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
@@ -109,7 +109,7 @@ export default {
     normalize,
     getLineNormal,
     getJointNormal,
-    signedDistanceFromPointToLine,
+    halfPlaneSign,
     pointInTriangle,
     equalPoints,
     pointInCircle,

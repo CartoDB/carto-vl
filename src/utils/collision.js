@@ -1,4 +1,4 @@
-import { signedDistanceFromPointToLine } from './geometry';
+import { halfPlaneSign } from './geometry';
 
 const separatingLineFound = 'separatingLineFound';
 const noSeparatingLineFound = 'noSeparatingLineFound';
@@ -82,7 +82,7 @@ function _viewportLineSeparatesTriangle (viewportAABB, triangle) {
 function _triangleLineSeparatesViewport (triangle, viewport) {
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < viewport.length; j++) {
-            const position = signedDistanceFromPointToLine(viewport[j], triangle[i], triangle[(i + 1) % 3]);
+            const position = halfPlaneSign(viewport[j], triangle[i], triangle[(i + 1) % 3]);
 
             if (position > 0) {
                 break;
