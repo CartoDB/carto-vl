@@ -119,9 +119,9 @@ function decodePolygon (geometry) {
             }
         }
 
-        featureIDToVertexIndex[breakpoints.length] = breakpoints.length === 0
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
             ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex[breakpoints.length - 1].end, end: vertices.length };
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
 
         breakpoints.push(vertices.length);
     }
@@ -138,7 +138,7 @@ function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    let featureIDToVertexIndex = [];
+    let featureIDToVertexIndex = new Map();
 
     const geometryLength = geometry.length;
 
@@ -188,9 +188,9 @@ function decodeLine (geometry) {
             }
         }
 
-        featureIDToVertexIndex[breakpoints.length] = breakpoints.length === 0
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
             ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex[breakpoints.length - 1].end, end: vertices.length };
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
 
         breakpoints.push(vertices.length);
     }

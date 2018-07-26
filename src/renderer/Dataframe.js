@@ -223,7 +223,7 @@ export default class Dataframe {
         const normals = this.decodedGeom.normals;
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
-            const range = this.decodedGeom.featureIDToVertexIndex[featureIndex];
+            const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
             return _isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
         }
 
