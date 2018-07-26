@@ -1,4 +1,5 @@
 import * as earcut from 'earcut';
+import { getFloat32ArrayFromArray } from '../utils/util';
 import { getJointNormal, getLineNormal } from '../utils/geometry';
 
 // Decode a tile geometry
@@ -52,7 +53,7 @@ function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-
+    let featureIDToVertexIndex = new Map();
     const geometryLength = geometry.length;
 
     for (let i = 0; i < geometryLength; i++) {
@@ -118,13 +119,18 @@ function decodePolygon (geometry) {
             }
         }
 
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
     }
 
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        featureIDToVertexIndex,
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 
@@ -132,6 +138,7 @@ function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let featureIDToVertexIndex = new Map();
 
     const geometryLength = geometry.length;
 
@@ -181,13 +188,18 @@ function decodeLine (geometry) {
             }
         }
 
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
     }
 
     return {
-        vertices: new Float32Array(vertices),
+        vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        featureIDToVertexIndex,
+        normals: getFloat32ArrayFromArray(normals)
     };
 }
 

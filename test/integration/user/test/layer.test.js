@@ -1,4 +1,5 @@
 import * as carto from '../../../../src/';
+import { layerVisibility } from '../../../../src/constants/layer';
 import * as util from '../../util';
 
 const featureData = {
@@ -88,6 +89,68 @@ describe('Layer', () => {
                 layer.$paintCallback();
                 expect(update).toHaveBeenCalledTimes(3);
                 done();
+            });
+        });
+
+        describe('.hide', () => {
+            it('should hide a visible layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    layer.hide();
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    done();
+                });
+            });
+
+            it('should trigger an update event', (done) => {
+                let update = jasmine.createSpy('update');
+
+                layer.on('loaded', () => {
+                    layer.on('updated', update);
+                    layer.hide();
+                    expect(update).toHaveBeenCalledTimes(1);
+                    done();
+                });
+            });
+
+            it('should not request source data', (done) => {
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).not.toHaveBeenCalled();
+                    done();
+                });
+            });
+        });
+
+        describe('.show', () => {
+            beforeEach(() => {
+                layer.on('loaded', () => {
+                    layer.hide();
+                });
+            });
+
+            it('should show a hidden layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    layer.show();
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    done();
+                });
+            });
+
+            it('should request source data', (done) => {
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.show();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).toHaveBeenCalled();
+                    done();
+                });
             });
         });
     });
