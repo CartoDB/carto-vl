@@ -189,7 +189,7 @@ export default class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
-        
+
         if (this._source !== source) {
             this._freeSource();
         }

@@ -113,7 +113,7 @@ describe('Layer', () => {
                 });
             });
 
-            it('should not request source data', (done) => {                
+            it('should not request source data', (done) => {
                 layer.on('loaded', () => {
                     const requestDataSourceSpy = spyOn(layer._source, 'requestData');
                     layer.hide();
