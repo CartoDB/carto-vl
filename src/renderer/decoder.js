@@ -53,7 +53,7 @@ function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-
+    let featureIDToVertexIndex = new Map();
     const geometryLength = geometry.length;
 
     for (let i = 0; i < geometryLength; i++) {
@@ -119,12 +119,17 @@ function decodePolygon (geometry) {
             }
         }
 
+        if (breakpoints.length > 0) {
+            featureIDToVertexIndex[breakpoints.length - 1].end = vertices.length;
+        }
+        featureIDToVertexIndex[breakpoints.length] = {start: vertices.length};
         breakpoints.push(vertices.length);
     }
-
+    featureIDToVertexIndex[breakpoints.length - 1].end = vertices.length;
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
+        featureIDToVertexIndex,
         normals: getFloat32ArrayFromArray(normals)
     };
 }
