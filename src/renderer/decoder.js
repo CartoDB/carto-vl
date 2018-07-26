@@ -137,61 +137,125 @@ function decodeLine (geometry) {
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
 function addLine (lineString, vertices, normals) {
+    // At joins we have:
+    // prevPoint, currentPoint, nextPoint
+    // with the previous segment from prevPoint to currentPoint and the next one from currentPoint to nextPoint
+    // we keep track of:
+    // prevNormal: normal to previous segment (to the left)
+    // prevLeft: adjusted position of left triangle vertex at prevPoint (previous segment)
+    // prevRight: adjusted position of right triangle vertex at prevPoint (previous segment)
+    // currentLeft: adjusted position of left triangle vertex at currentPoint (previous segment)
+    // currentRight: adjusted position of right triangle vertex at currentPoint (previous segment)
+    // nextNormal: normal to next segment (to the left)
+    // nextLeft, nextRight are the values of prevLeft, prevRight for the next iteration
+    // (i.e. the adjusted points for the next segment triangles)
+    // currentLeft, curentRight are used
     let prevPoint, currentPoint, nextPoint;
-    let prevNormal, nextNormal;
+    let prevNormal, prevRight, prevLeft;
+    let currentRight, currentLeft;
+    let nextNormal, nextRight, nextLeft;
 
     // We need at least two points
     if (lineString.length >= 4) {
         // Initialize the first two points
         prevPoint = [lineString[0], lineString[1]];
         currentPoint = [lineString[2], lineString[3]];
-        prevNormal = getLineNormal(prevPoint, currentPoint);
+        prevLeft = prevNormal = getLineNormal(prevPoint, currentPoint);
+        prevRight = neg(prevLeft);
+        currentLeft = prevNormal;
+        currentRight = neg(currentLeft);
 
         for (let i = 4; i <= lineString.length; i += 2) {
-            // First triangle
-            addTriangle(
-                [prevPoint, prevPoint, currentPoint],
-                [neg(prevNormal), prevNormal, prevNormal]
-            );
-
-            // Second triangle
-            addTriangle(
-                [prevPoint, currentPoint, currentPoint],
-                [neg(prevNormal), prevNormal, neg(prevNormal)]
-            );
-
             if (i <= lineString.length - 2) {
                 // If there is a next point, compute its properties
                 nextPoint = [lineString[i], lineString[i + 1]];
                 nextNormal = getLineNormal(currentPoint, nextPoint);
+
                 // `turnLeft` indicates that the nextLine turns to the left
                 // `joinNormal` contains the direction and size for the `miter` vertex
-                //  If this is not defined means that the join must be `bevel`.
-                let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+                //  `miter` indicates that the join must be `miter`, not `bevel`.
+                let { turnLeft, joinNormal, miter } = getJoinNormal(prevNormal, nextNormal);
 
-                // Third triangle
-                addTriangle(
-                    [currentPoint, currentPoint, currentPoint],
-                    [[0, 0],
-                        turnLeft ? prevNormal : neg(nextNormal),
-                        turnLeft ? nextNormal : neg(prevNormal)]
-                );
+                if (!joinNormal) {
+                    // No join
+                    nextLeft = nextNormal;
+                    nextRight = neg(nextNormal);
+                } else if (miter) {
+                    // Miter join: adjust left/right vertices
+                    if (turnLeft) {
+                        nextLeft = currentLeft = joinNormal;
+                        nextRight = currentRight = neg(joinNormal);
+                    } else {
+                        nextLeft = currentLeft = neg(joinNormal);
+                        nextRight = currentRight = joinNormal;
+                    }
+                } else if (checkJoinNormal(joinNormal, prevPoint, currentPoint, nextPoint)) {
+                    // Bevel join: adjust vertices and produce bevel triangle
 
-                if (joinNormal) {
-                    // Forth triangle
+                    if (turnLeft) {
+                        nextLeft = joinNormal;
+                        nextRight = neg(nextNormal);
+                        currentLeft = joinNormal;
+                        currentRight = neg(prevNormal);
+                    } else {
+                        nextRight = joinNormal;
+                        nextLeft = nextNormal;
+                        currentLeft = prevNormal;
+                        currentRight = joinNormal;
+                    }
+
+                    // Bevel triangle
                     addTriangle(
                         [currentPoint, currentPoint, currentPoint],
                         [joinNormal,
-                            turnLeft ? nextNormal : neg(prevNormal),
-                            turnLeft ? prevNormal : neg(nextNormal)]
+                            turnLeft ? neg(prevNormal) : nextNormal,
+                            turnLeft ? neg(nextNormal) : prevNormal
+                        ]
+                    );
+                } else {
+                    // overlapping bevel
+                    // this bevel technique does not suffer from large joinNormal spikes,
+                    // but creates some overlapping between the previous and next segments.
+                    nextLeft = nextNormal;
+                    nextRight = neg(nextNormal);
+
+                    // Bevel triangle
+                    addTriangle(
+                        [currentPoint, currentPoint, currentPoint],
+                        [[0, 0],
+                            turnLeft ? neg(prevNormal) : nextNormal,
+                            turnLeft ? neg(nextNormal) : prevNormal
+                        ]
                     );
                 }
             }
 
+            // Segment from prevPoint to currentPoint triangles
+            // First triangle
+            addTriangle(
+                [currentPoint, prevPoint, prevPoint],
+                [currentRight, prevLeft, prevRight]
+            );
+
+            // Second triangle
+            addTriangle(
+                [currentPoint, currentPoint, prevPoint],
+                [currentRight, currentLeft, prevLeft]
+            );
+
             // Update the variables for the next iteration
             prevPoint = currentPoint;
             currentPoint = nextPoint;
+
             prevNormal = nextNormal;
+
+            prevRight = nextRight;
+            prevLeft = nextLeft;
+
+            if (nextNormal) {
+                currentLeft = nextNormal;
+                currentRight = neg(nextNormal);
+            }
         }
     }
 
@@ -207,32 +271,34 @@ function addLine (lineString, vertices, normals) {
 
 /**
  * Compute the normal of a line AB.
- * By definition it is the unitary vector from B to A, rotated +90 degrees
+ * By definition it is the unitary vector from A to B, rotated +90 degrees counter-clockwise
  */
 function getLineNormal (a, b) {
-    const u = normalize(vector(b, a));
+    const u = normalize(vector(a, b));
     return [-u[1], u[0]];
 }
 
 /**
  * Compute the normal of the join from the lines' normals.
  * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
- * multiplied by a factor of `1/sin(theta)` to reach the intersecction of the wide lines.
+ * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.
  * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
  * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
  */
 function getJoinNormal (prevNormal, nextNormal) {
-    const u = [prevNormal[1], -prevNormal[0]];
-    const v = [-nextNormal[1], nextNormal[0]];
+    const u = [-prevNormal[1], prevNormal[0]];
+    const v = [nextNormal[1], -nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
+    const cos = v[0] * u[0] + v[1] * u[1];
     const factor = Math.abs(sin);
-    const miterJoin = factor > 0.866; // 60 deg
+    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
     return {
         turnLeft: sin > 0,
-        joinNormal: miterJoin && neg([
+        miter: miterJoin,
+        joinNormal: (factor !== 0) && [
             (u[0] + v[0]) / factor,
             (u[1] + v[1]) / factor
-        ])
+        ]
     };
 }
 
@@ -254,8 +320,30 @@ function vector (p1, p2) {
  * Return the vector scaled to length 1
  */
 function normalize (v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+    const s = length(v);
     return [v[0] / s, v[1] / s];
+}
+
+function length (v) {
+    return Math.hypot(v[0], v[1]);
+}
+
+/**
+ * Check if join normal can led to spikes
+ */
+function checkJoinNormal (joinNormal, prevPoint, currentPoint, nextPoint) {
+    // Spike avoidance: joinNormal can produce points farther away than the geometry segments.
+    // FIXME
+    // This solution is fundamentally flawed: joinNormal dimensions are based on unit vectors,
+    // with no relation to the segment geometry.
+    // Only in the vertex shader have the actual geometry and can avoid these artifacts.
+    const MAGIC = 10;
+    const joinLength = length(joinNormal);
+    const segmentLength = MAGIC * Math.min(
+        length(vector(prevPoint, currentPoint)),
+        length(vector(currentPoint, nextPoint))
+    );
+    return joinLength <= segmentLength;
 }
 
 export default { decodeGeom };
