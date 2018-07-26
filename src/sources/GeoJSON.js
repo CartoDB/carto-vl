@@ -56,6 +56,11 @@ export default class GeoJSON extends Base {
         } else {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
+
+        // Initialize properties attr
+        for (let i = 0; i < this._features.length; i++) {
+            this._features[i].properties = this._features[i].properties || {};
+        }
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
