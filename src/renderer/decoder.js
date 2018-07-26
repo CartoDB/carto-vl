@@ -1,4 +1,5 @@
 import * as earcut from 'earcut';
+import { getJointNormal, getLineNormal } from '../utils/geometry';
 
 // Decode a tile geometry
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
@@ -16,18 +17,18 @@ import * as earcut from 'earcut';
             ]
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
-// The geom will be an array of coordinates in this case
+// The geom will be an array of coordinates in this case`
 export function decodeGeom (geomType, geom) {
-    if (geomType === 'point') {
-        return decodePoint(geom);
+    switch (geomType) {
+        case 'point':
+            return decodePoint(geom);
+        case 'polygon':
+            return decodePolygon(geom);
+        case 'line':
+            return decodeLine(geom);
+        default:
+            throw new Error(`Unimplemented geometry type: '${geomType}'`);
     }
-    if (geomType === 'polygon') {
-        return decodePolygon(geom);
-    }
-    if (geomType === 'line') {
-        return decodeLine(geom);
-    }
-    throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
 function decodePoint (vertices) {
@@ -51,27 +52,37 @@ function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geometry.forEach(feature => {
-        feature.forEach(polygon => {
+
+    const geometryLength = geometry.length;
+
+    for (let i = 0; i < geometryLength; i++) {
+        const feature = geometry[i];
+        const featureLength = feature.length;
+
+        for (let j = 0; j < featureLength; j++) {
+            const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
             const trianglesLength = triangles.length;
-            for (let i = 0; i < trianglesLength; i++) {
-                const index = triangles[i];
+
+            for (let k = 0; k < trianglesLength; k++) {
+                const index = triangles[k];
                 vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
 
             const lineString = polygon.flat;
-            for (let i = 0; i < lineString.length - 2; i += 2) {
-                if (polygon.holes.includes((i + 2) / 2)) {
+            const lineStringLength = lineString.length;
+
+            for (let l = 0; l < lineStringLength - 2; l += 2) {
+                if (polygon.holes.includes((l + 2) / 2)) {
                     // Skip adding the line which connects two rings
                     continue;
                 }
 
-                const a = [lineString[i + 0], lineString[i + 1]];
-                const b = [lineString[i + 2], lineString[i + 3]];
+                const a = [lineString[l + 0], lineString[l + 1]];
+                const b = [lineString[l + 2], lineString[l + 3]];
 
-                if (isClipped(polygon, i, i + 2)) {
+                if (isClipped(polygon, l, l + 2)) {
                     continue;
                 }
 
@@ -105,9 +116,11 @@ function decodePolygon (geometry) {
                 vertices.push(b[0], b[1]);
                 vertices.push(b[0], b[1]);
             }
-        });
+        }
+
         breakpoints.push(vertices.length);
-    });
+    }
+
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
@@ -115,27 +128,34 @@ function decodePolygon (geometry) {
     };
 }
 
-function decodeLine (geom) {
+function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geom.map(feature => {
-        feature.map(lineString => {
-            // Create triangulation
 
-            for (let i = 0; i < lineString.length - 2; i += 2) {
-                const a = [lineString[i + 0], lineString[i + 1]];
-                const b = [lineString[i + 2], lineString[i + 3]];
+    const geometryLength = geometry.length;
+
+    for (let i = 0; i < geometryLength; i++) {
+        const feature = geometry[i];
+        const featureLength = feature.length;
+
+        for (let j = 0; j < featureLength; j++) {
+            const lineString = feature[j];
+            const lineStringLength = lineString.length;
+
+            for (let k = 0; k < lineStringLength - 2; k += 2) {
+                const a = [lineString[k + 0], lineString[k + 1]];
+                const b = [lineString[k + 2], lineString[k + 3]];
                 const normal = getLineNormal(b, a);
                 let na = normal;
                 let nb = normal;
 
-                if (i > 0) {
-                    const prev = [lineString[i - 2], lineString[i - 1]];
+                if (k > 0) {
+                    const prev = [lineString[k - 2], lineString[k - 1]];
                     na = getJointNormal(prev, a, b) || na;
                 }
-                if (i < lineString.length - 4) {
-                    const next = [lineString[i + 4], lineString[i + 5]];
+                if (k < lineStringLength - 4) {
+                    const next = [lineString[k + 4], lineString[k + 5]];
                     nb = getJointNormal(a, b, next) || nb;
                 }
 
@@ -159,34 +179,16 @@ function decodeLine (geom) {
                 vertices.push(b[0], b[1]);
                 vertices.push(b[0], b[1]);
             }
-        });
+        }
+
         breakpoints.push(vertices.length);
-    });
+    }
+
     return {
         vertices: new Float32Array(vertices),
         breakpoints,
         normals: new Float32Array(normals)
     };
-}
-
-function getLineNormal (a, b) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    return normalize([-dy, dx]);
-}
-
-function getJointNormal (a, b, c) {
-    const u = normalize([a[0] - b[0], a[1] - b[1]]);
-    const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = -u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
-    }
-}
-
-function normalize (v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-    return [v[0] / s, v[1] / s];
 }
 
 export default { decodeGeom };
