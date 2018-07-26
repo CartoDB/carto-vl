@@ -4,7 +4,7 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['points']);
-const viz = new carto.Viz('color: ramp(viewportQuantiles(mul($numeric, 5), 3), PRISM), width: 50');
+const viz = new carto.Viz('color: ramp(viewportEqIntervals(div($numeric, 10), 3), PRISM), width: 50');
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

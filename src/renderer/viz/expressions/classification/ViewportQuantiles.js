@@ -39,9 +39,7 @@ export default class ViewportQuantiles extends Classifier {
 
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
-        let children = {
-            input
-        };
+        let children = { input };
 
         children._histogram = viewportHistogram(input);
         super(children, buckets);
