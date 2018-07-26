@@ -214,9 +214,10 @@ export default class MVT extends Base {
 
         const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
 
+        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
         for (let i = 0; i < propertyNames.length; i++) {
             const propertyName = propertyNames[i];
-            properties[propertyName] = new Float32Array(size);
+            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
         }
 
         return { properties, propertyNames };
