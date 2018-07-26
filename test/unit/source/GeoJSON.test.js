@@ -70,7 +70,8 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                }
+                },
+                properties: {}
             }]);
         });
 
@@ -91,7 +92,8 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                }
+                },
+                properties: {}
             }]);
         });
 
@@ -177,17 +179,54 @@ describe('sources/GeoJSON', () => {
             }).toThrowError('multiple types not supported: Point, LineString.');
         });
 
-        it('should throw an error if data has a the first polygon cw', function () {
-            const source = new GeoJSON({
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [[0, 0], [0, 1], [1, 1], [0, 0]]
-                }
+        describe('decodeGeometry', () => {
+            it('should load a cw polygon', function () {
+                const source = new GeoJSON({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [[0, 0], [0, 80], [80, 80], [0, 0]],
+                            [[20, 20], [50, 50], [20, 50], [20, 20]]
+                        ]
+                    }
+                });
+                let geom = source._decodeGeometry();
+
+                let actualFlat = geom[0][0].flat;
+                let expectedFlat = [
+                    0, 0, 0.444, 0.775, 0, 0.775, 0, 0,
+                    0.111, 0.113, 0.111, 0.322, 0.2778, 0.322, 0.111, 0.113];
+                actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
+
+                let actualHoles = geom[0][0].holes;
+                let expectedHoles = [4];
+                actualHoles.forEach((x, i) => expect(x).toBe(expectedHoles[i]));
             });
-            expect(function () {
-                source.requestData();
-            }).toThrowError('first polygon ring must be external.');
+
+            it('should load a ccw polygon', function () {
+                const source = new GeoJSON({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [[0, 0], [80, 80], [0, 80], [0, 0]],
+                            [[20, 20], [20, 50], [50, 50], [20, 20]]
+                        ]
+                    }
+                });
+                let geom = source._decodeGeometry();
+
+                let actualFlat = geom[0][0].flat;
+                let expectedFlat = [
+                    0, 0, 0.444, 0.775, 0, 0.775, 0, 0,
+                    0.111, 0.113, 0.111, 0.322, 0.2778, 0.322, 0.111, 0.113];
+                actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
+
+                let actualHoles = geom[0][0].holes;
+                let expectedHoles = [4];
+                actualHoles.forEach((x, i) => expect(x).toBe(expectedHoles[i]));
+            });
         });
 
         describe('cartodb_id', () => {
