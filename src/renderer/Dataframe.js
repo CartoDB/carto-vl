@@ -7,6 +7,7 @@ import { triangleCollides } from '../utils/collision';
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
+const featureClassCache = new Map();
 const AABBTestResults = {
     INSIDE: 1,
     OUTSIDE: -1,
@@ -152,12 +153,6 @@ export default class Dataframe {
             default:
                 return false;
         }
-    }
-
-    // Add new properties to the dataframe or overwrite previously stored ones.
-    // `properties` is of the form: {propertyName: Float32Array}
-    addProperties (properties) {
-        Object.keys(properties).forEach(this._addProperty.bind(this));
     }
 
     getPropertyTexture (propertyName) {
@@ -364,26 +359,62 @@ export default class Dataframe {
         return filterExpression.eval(feature) < 0.5;
     }
 
+    _genFeatureClass () {
+        if (featureClassCache.has(this.metadata)) {
+            this._cls = featureClassCache.get(this.metadata);
+            return;
+        }
+        const cls = class ViewportFeature {
+            constructor (index, dataframe) {
+                this._index = index;
+                this._dataframe = dataframe;
+            }
+        };
+
+        const metadata = this.metadata;
+        const getters = {};
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
+            getters[propertyName] = {
+                get: function () {
+                    const index = this._index;
+                    if (metadata.properties[propertyName].type === 'category') {
+                        return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
+                    } else {
+                        return this._dataframe.properties[propertyName][index];
+                    }
+                }
+            };
+        }
+
+        Object.defineProperties(cls.prototype, getters);
+
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _getFeatureProperty (index, propertyName) {
+        if (this.metadata.properties[propertyName].type === 'category') {
+            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
+        } else {
+            return this.properties[propertyName][index];
+        }
+    }
+
     getFeature (index) {
         if (!this.cachedFeatures) {
-            this.cachedFeatures = [];
+            this.cachedFeatures = new Array(this.numFeatures);
         }
 
         if (this.cachedFeatures[index] !== undefined) {
             return this.cachedFeatures[index];
         }
 
-        const feature = {};
-        const propertyNames = Object.keys(this.properties);
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            if (this.metadata.properties[name].type === 'category') {
-                feature[name] = this.metadata.IDToCategory.get(this.properties[name][index]);
-            } else {
-                feature[name] = this.properties[name][index];
-            }
+        if (!this._cls) {
+            this._genFeatureClass();
         }
 
+        const feature = new this._cls(index, this);
         this.cachedFeatures[index] = feature;
         return feature;
     }
@@ -392,6 +423,16 @@ export default class Dataframe {
         if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
             this.getPropertyTexture(propertyName);
         }
+    }
+
+    // Add new properties to the dataframe or overwrite previously stored ones.
+    // `properties` is of the form: {propertyName: Float32Array}
+    addProperties (properties) {
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
+            this._addProperty(propertyName);
+        }
+        this._genFeatureClass();
     }
 
     _createStyleTileTexture (numFeatures) {

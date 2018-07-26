@@ -48,7 +48,6 @@ function isClipped (polygon, i, j) {
     }
     return false;
 }
-
 function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
@@ -87,35 +86,30 @@ function decodePolygon (geometry) {
                     continue;
                 }
 
-                let normal = getLineNormal(b, a);
+                const normal = getLineNormal(b, a);
 
-                if (isNaN(normal[0]) || isNaN(normal[1])) {
+                if (Number.isNaN(normal[0]) || Number.isNaN(normal[1])) {
                     // Skip when there is no normal vector
                     continue;
                 }
 
-                let na = normal;
-                let nb = normal;
+                vertices.push(
+                    a[0], a[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    b[0], b[1]
+                );
 
-                // First triangle
-
-                normals.push(-na[0], -na[1]);
-                normals.push(na[0], na[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-
-                // Second triangle
-
-                normals.push(na[0], na[1]);
-                normals.push(nb[0], nb[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-                vertices.push(b[0], b[1]);
+                normals.push(
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1]
+                );
             }
         }
 
@@ -125,7 +119,6 @@ function decodePolygon (geometry) {
 
         breakpoints.push(vertices.length);
     }
-
     return {
         vertices: getFloat32ArrayFromArray(vertices),
         breakpoints,
