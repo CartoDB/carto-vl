@@ -344,6 +344,7 @@ export default class Layer {
     show () {
         this._visible = true;
         this._integrator.changeVisibility(this);
+        this.requestData();
         this._fire('updated');
     }
 
