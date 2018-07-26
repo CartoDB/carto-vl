@@ -386,18 +386,22 @@ export default class GeoJSON extends Base {
             clipped: []
         };
         let holeIndex = 0;
+        let firstReverse = false;
         for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[i].length; j++) {
-                const point = this._computePointGeometry(data[i][j]);
-                polygon.flat.push(point.x, point.y);
+            let reverse = this._isReversed(data[i]);
+            if (i === 0) {
+                firstReverse = reverse;
+            } else if (firstReverse !== reverse) {
+                holeIndex += data[i - 1].length;
+                polygon.holes.push(holeIndex);
             }
-            if (!this._isClockWise(data[i])) {
-                if (i > 0) {
-                    holeIndex += data[i - 1].length;
-                    polygon.holes.push(holeIndex);
-                } else {
-                    throw new CartoValidationError('source', 'firstPolygonExternal');
-                }
+
+            let l = data[i].length;
+            for (let j = 0; j < l; j++) {
+                const point = this._computePointGeometry(
+                    data[i][firstReverse ? j : (l - j - 1)]
+                );
+                polygon.flat.push(point.x, point.y);
             }
         }
         return polygon;
@@ -414,7 +418,7 @@ export default class GeoJSON extends Base {
         return multipolygon;
     }
 
-    _isClockWise (vertices) {
+    _isReversed (vertices) {
         let total = 0;
         let pt1 = vertices[0];
         let pt2;
@@ -423,7 +427,7 @@ export default class GeoJSON extends Base {
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
             pt1 = pt2;
         }
-        return total >= 0;
+        return total >= 0; // CW
     }
 
     free () {
