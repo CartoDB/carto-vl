@@ -22,7 +22,7 @@
         <h1>Single Image</h1>
       </header>
       <section>
-        <p class="description open-sans">Show an image instead of points</p>
+        <p class="description open-sans">Symbolize points with a built-in image</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -37,9 +37,9 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2,
+      zoom: 3,
       scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
@@ -52,10 +52,7 @@
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
-    width: (sqrt($pop_max) * 0.003)*zoom()
-    color: white
-    strokeColor: black
-    symbol: image('https://libs.cartocdn.com/carto-vl/assets/marker.svg')
+    symbol: star
     `);
 
 

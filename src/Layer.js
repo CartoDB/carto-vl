@@ -7,6 +7,7 @@ import RenderLayer from './renderer/RenderLayer';
 import { cubic } from './renderer/viz/expressions';
 import SourceBase from './sources/Base';
 import util from './utils/util';
+import { layerVisibility } from './constants/layer';
 import Viz from './Viz';
 
 /**
@@ -88,9 +89,26 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
         this.state = 'init';
         this._isLoaded = false;
+        this._visible = true;
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
+    }
+
+    /**
+     * Get layer visibility. Can be 'visible' or 'none'.
+     * @readonly
+     */
+    get visibility () {
+        return this._visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
+    }
+
+    /**
+     * Get layer visibility. Can be true or false.
+     * @readonly
+     */
+    get visible () {
+        return this._visible;
     }
 
     /**
@@ -171,9 +189,11 @@ export default class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+
         if (this._source !== source) {
             this._freeSource();
         }
+
         this._source = source;
         this.requestData();
 
@@ -274,9 +294,10 @@ export default class Layer {
     }
 
     async requestData () {
-        if (!this.metadata) {
+        if (!this.metadata || !this._visible) {
             return;
         }
+
         this._source.requestData(this._getZoom(), this._getViewport());
         this._fireUpdateOnNextRender = true;
     }
@@ -306,7 +327,40 @@ export default class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+        return this._visible
+            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+            : [];
+    }
+
+    /**
+     * Change layer visibility to visible
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    show () {
+        this._visible = true;
+        this._integrator.changeVisibility(this);
+        this.requestData();
+        this._fire('updated');
+    }
+
+    /**
+     * Change layer visibility to hidden
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    hide () {
+        this._visible = false;
+        this._integrator.changeVisibility(this);
+        this._fire('updated');
     }
 
     $paintCallback () {

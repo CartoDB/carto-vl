@@ -84,6 +84,7 @@ export default class Viz {
         this.updated = true;
         this._changeCallback = null;
 
+        this._updateRootExpressionList();
         this._updateRootExpressions();
 
         this._resolveAliases();
@@ -138,17 +139,7 @@ export default class Viz {
     }
 
     _getRootExpressions () {
-        return [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.order,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement,
-            ...Object.values(this.variables)
-        ];
+        return this._rootExpressions;
     }
 
     _updateRootExpressions () {
@@ -173,11 +164,26 @@ export default class Viz {
     }
 
     _changed () {
+        this._updateRootExpressionList();
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
             this._changeCallback(this);
         }
+    }
+
+    _updateRootExpressionList () {
+        this._rootExpressions = [
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.order,
+            this.filter,
+            this.symbol,
+            this.symbolPlacement,
+            ...Object.values(this.variables)
+        ];
     }
 
     getMinimumNeededSchema () {

@@ -1,5 +1,6 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
+import { getFloat32ArrayFromArray } from '../utils/util';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -74,7 +75,7 @@ export default class Renderer {
             0.0, 10.0,
             -10.0, -10.0
         ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, getFloat32ArrayFromArray(vertices), gl.STATIC_DRAW);
 
         // Create a 1x1 RGBA texture set to [0,0,0,0]
         // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
@@ -181,9 +182,10 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i, aspect)) {
+                if (!this._isFeatureInViewport(dataframe, i, aspect, viz)) {
                     continue;
                 }
+
                 processedFeaturesIDs.add(featureId);
 
                 const feature = this._featureFromDataFrame(dataframe, i, metadata);
@@ -204,9 +206,9 @@ export default class Renderer {
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
      * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport (dataframe, index, aspect) {
+    _isFeatureInViewport (dataframe, index, aspect, viz) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, aspect);
+        return dataframe.inViewport(index, scale, this._center, aspect, viz);
     }
 
     /**
