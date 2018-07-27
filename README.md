@@ -108,9 +108,9 @@ $ yarn serve
 
 Lastly, check out [CONTRIBUTING.md](https://github.com/CartoDB/carto-vl/blob/master/CONTRIBUTING.md) for more information about submitting pull requests to us. You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
 
-## <a name="feedback">Feedback</a>
+## Feedback
 
-CARTO VL is still in Beta but we encourage you to start playing with it and to please [send us feedback](URL) so we can create an even better library, suited to your needs.
+CARTO VL is still in Beta but we encourage you to start playing with it and to please [send us feedback](https://github.com/CartoDB/carto-vl/issues) so we can create an even better library, suited to your needs.
 
 ## Works with
 
