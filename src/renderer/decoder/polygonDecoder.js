@@ -1,6 +1,6 @@
 import * as earcut from 'earcut';
+import { addLine } from './lineDecoder';
 import { getFloat32ArrayFromArray } from '../../utils/util';
-import { getLineNormal, neg } from '../../utils/geometry';
 
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
 //      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
@@ -17,62 +17,27 @@ import { getLineNormal, neg } from '../../utils/geometry';
 */
 
 export function decodePolygon (geometry) {
-    let vertices = []; // Array of triangle vertices
+    let vertices = [];
     let normals = [];
-    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let breakpoints = [];
     let featureIDToVertexIndex = new Map();
-    const geometryLength = geometry.length;
 
-    for (let i = 0; i < geometryLength; i++) {
+    for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
-        const featureLength = feature.length;
-
-        for (let j = 0; j < featureLength; j++) {
+        for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
-            const trianglesLength = triangles.length;
-
-            for (let k = 0; k < trianglesLength; k++) {
+            for (let k = 0; k < triangles.length; k++) {
                 const index = triangles[k];
                 vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
 
             const lineString = polygon.flat;
-            const lineStringLength = lineString.length;
-
-            for (let l = 0; l < lineStringLength - 2; l += 2) {
-                if (polygon.holes.includes((l + 2) / 2)) {
-                    // Skip adding the line which connects two rings
-                    continue;
-                }
-
-                const a = [lineString[l + 0], lineString[l + 1]];
-                const b = [lineString[l + 2], lineString[l + 3]];
-
-                if (isClipped(polygon, l, l + 2)) {
-                    continue;
-                }
-
-                const normal = getLineNormal(b, a);
-
-                if (Number.isNaN(normal[0]) || Number.isNaN(normal[1])) {
-                    // Skip when there is no normal vector
-                    continue;
-                }
-
-                // First triangle
-                addTriangle(
-                    [a, a, b],
-                    [normal, neg(normal), normal]
-                );
-
-                // Second triangle
-                addTriangle(
-                    [a, b, b],
-                    [neg(normal), neg(normal), normal]
-                );
-            }
+            addLine(lineString, vertices, normals, (index) => {
+                // Skip adding the line which connects two rings OR is clipped
+                return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
+            });
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
@@ -80,19 +45,6 @@ export function decodePolygon (geometry) {
             : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
 
         breakpoints.push(vertices.length);
-    }
-
-    function addTriangle (p, n) {
-        vertices.push(
-            p[0][0], p[0][1],
-            p[1][0], p[1][1],
-            p[2][0], p[2][1]
-        );
-        normals.push(
-            n[0][0], n[0][1],
-            n[1][0], n[1][1],
-            n[2][0], n[2][1]
-        );
     }
 
     return {

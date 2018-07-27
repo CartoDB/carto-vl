@@ -7,7 +7,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
 export function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
-    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
+    let breakpoints = [];
     let featureIDToVertexIndex = new Map();
 
     for (let i = 0; i < geometry.length; i++) {
@@ -36,9 +36,10 @@ export function decodeLine (geometry) {
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-function addLine (lineString, vertices, normals) {
+export function addLine (lineString, vertices, normals, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
+    let skipLine = false;
 
     // We need at least two points
     if (lineString.length >= 4) {
@@ -48,6 +49,8 @@ function addLine (lineString, vertices, normals) {
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
         for (let i = 4; i <= lineString.length; i += 2) {
+            skipLine = skipCallback && skipCallback(i);
+
             // First triangle
             addTriangle(
                 [prevPoint, prevPoint, currentPoint],
@@ -96,15 +99,17 @@ function addLine (lineString, vertices, normals) {
     }
 
     function addTriangle (p, n) {
-        vertices.push(
-            p[0][0], p[0][1],
-            p[1][0], p[1][1],
-            p[2][0], p[2][1]
-        );
-        normals.push(
-            n[0][0], n[0][1],
-            n[1][0], n[1][1],
-            n[2][0], n[2][1]
-        );
+        if (!skipLine) {
+            vertices.push(
+                p[0][0], p[0][1],
+                p[1][0], p[1][1],
+                p[2][0], p[2][1]
+            );
+            normals.push(
+                n[0][0], n[0][1],
+                n[1][0], n[1][1],
+                n[2][0], n[2][1]
+            );
+        }
     }
 }
