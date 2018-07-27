@@ -61,7 +61,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._compile();
                     actual = r.eval();
-                    expected = firstColor._nameToRGBA();
+                    expected = firstColor.color;
 
                     expect(actual).toEqual(expected);
                 });
@@ -71,7 +71,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._compile();
                     actual = r.eval();
-                    expected = secondColor._nameToRGBA();
+                    expected = secondColor.color;
 
                     expect(actual).toEqual(expected);
                 });
@@ -116,7 +116,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = red._nameToRGBA();
+                            expected = red.color;
 
                             expect(actual).toEqual(expected);
 
@@ -124,7 +124,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = blue._nameToRGBA();
+                            expected = blue.color;
 
                             expect(actual).toEqual(expected);
 
@@ -132,7 +132,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
+                            expected = yellow.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -142,7 +142,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = purple._nameToRGBA();
+                            expected = purple.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -156,7 +156,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = red._nameToRGBA();
+                            expected = red.color;
 
                             expect(actual).toEqual(expected);
 
@@ -164,7 +164,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = blue._nameToRGBA();
+                            expected = blue.color;
 
                             expect(actual).toEqual(expected);
 
@@ -172,7 +172,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
+                            expected = yellow.color;
 
                             expect(actual).toEqual(expected);
 
@@ -180,7 +180,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = green._nameToRGBA();
+                            expected = green.color;
 
                             expect(actual).toEqual(expected);
 
@@ -188,7 +188,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = green._nameToRGBA();
+                            expected = green.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -200,7 +200,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = orange._nameToRGBA();
+                            expected = orange.color;
 
                             expect(actual).not.toEqual(expected);
                         });
@@ -219,21 +219,21 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = red._nameToRGBA();
+                            expected = red.color;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('B', categories), colors);
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = green._nameToRGBA();
+                            expected = green.color;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('C', categories), colors);
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
+                            expected = yellow.color;
                             expect(actual).toEqual(expected);
                         });
 
@@ -242,7 +242,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
+                            expected = DEFAULT_COLOR.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -252,7 +252,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r._compile(METADATA);
 
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
+                            expected = DEFAULT_COLOR.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -270,7 +270,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                                 r._compile(METADATA);
 
                                 actual = r.eval();
-                                expected = colors[index]._nameToRGBA();
+                                expected = colors[index].color;
 
                                 expect(actual).toEqual(expected);
                             });
@@ -285,7 +285,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                             r._compile(METADATA);
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
+                            expected = DEFAULT_COLOR.color;
 
                             expect(actual).toEqual(expected);
                         });
@@ -314,7 +314,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
+                        expected = COLORS[0].color;
 
                         expect(actual).toEqual(expected);
 
@@ -322,7 +322,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
+                        expected = COLORS[1].color;
 
                         expect(actual).toEqual(expected);
 
@@ -330,7 +330,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
+                        expected = COLORS[2].color;
 
                         expect(actual).toEqual(expected);
                     });
@@ -340,7 +340,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = orange._nameToRGBA();
+                        expected = orange.color;
                     });
                 });
 
@@ -357,7 +357,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
+                        expected = COLORS[0].color;
 
                         expect(actual).toEqual(expected);
 
@@ -365,7 +365,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
+                        expected = COLORS[1].color;
 
                         expect(actual).toEqual(expected);
 
@@ -373,7 +373,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
+                        expected = COLORS[2].color;
 
                         expect(actual).toEqual(expected);
                     });
@@ -383,7 +383,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
                     });
                 });
 
@@ -400,7 +400,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
+                        expected = COLORS[0].color;
 
                         expect(actual).toEqual(expected);
 
@@ -408,7 +408,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
+                        expected = COLORS[1].color;
 
                         expect(actual).not.toEqual(expected);
 
@@ -416,7 +416,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
+                        expected = COLORS[2].color;
 
                         expect(actual).not.toEqual(expected);
                     });
@@ -426,7 +426,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r._compile();
                         actual = r.eval();
-                        expected = DEFAULT_COLOR._nameToRGBA();
+                        expected = DEFAULT_COLOR.color;
 
                         expect(actual).toEqual(expected);
                     });
@@ -601,17 +601,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r._compile(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
+                        expected = blue.color;
 
                         expect(actual).not.toEqual(expected);
 
                         actual = r.eval({ price: 3.1 });
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
 
                         expect(actual).not.toEqual(expected);
                     });
@@ -624,17 +624,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r._compile(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
+                        expected = blue.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 3.1 });
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
 
                         expect(actual).toEqual(expected);
                     });
@@ -647,12 +647,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r._compile(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 3 });
-                        expected = blue._nameToRGBA();
+                        expected = blue.color;
 
                         expect(actual).not.toEqual(expected);
                     });
@@ -680,22 +680,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r._compile(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
+                        expected = blue.color;
 
                         expect(actual).not.toEqual(expected);
 
                         actual = r.eval({ price: 3.1 });
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
 
                         expect(actual).not.toEqual(expected);
 
                         actual = r.eval({ price: 4.1 });
-                        expected = purple._nameToRGBA();
+                        expected = purple.color;
 
                         expect(actual).not.toEqual(expected);
                     });
@@ -708,17 +708,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         r._compile(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
+                        expected = blue.color;
 
                         expect(actual).not.toEqual(expected);
 
                         actual = r.eval({ price: 3.1 });
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
 
                         expect(actual).not.toEqual(expected);
                     });

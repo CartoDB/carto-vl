@@ -56,6 +56,8 @@ export default class GeoJSON extends Base {
         } else {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
+
+        this._features = this._initializeFeatureProperties(this._features);
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -107,6 +109,13 @@ export default class GeoJSON extends Base {
         if (!util.isObject(data)) {
             throw new CartoValidationError('source', 'dataObjectRequired');
         }
+    }
+
+    _initializeFeatureProperties (features) {
+        for (let i = 0; i < features.length; i++) {
+            features[i].properties = features[i].properties || {};
+        }
+        return features;
     }
 
     _computeMetadata (viz) {
@@ -359,10 +368,12 @@ export default class GeoJSON extends Base {
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    _computeLineStringGeometry (data) {
+    _computeLineStringGeometry (data, reverse) {
         let line = [];
         for (let i = 0; i < data.length; i++) {
-            const point = this._computePointGeometry(data[i]);
+            const point = this._computePointGeometry(
+                data[reverse ? (data.length - i - 1) : i]
+            );
             line.push(point.x, point.y);
         }
         return line;
@@ -386,19 +397,20 @@ export default class GeoJSON extends Base {
             clipped: []
         };
         let holeIndex = 0;
-        for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[i].length; j++) {
-                const point = this._computePointGeometry(data[i][j]);
-                polygon.flat.push(point.x, point.y);
+        let firstReverse = false;
+
+        if (data.length) {
+            firstReverse = this._isReversed(data[0]);
+            const flat = this._computeLineStringGeometry(data[0], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
+        }
+        for (let i = 1; i < data.length; i++) {
+            if (firstReverse !== this._isReversed(data[i])) {
+                holeIndex += data[i - 1].length;
+                polygon.holes.push(holeIndex);
             }
-            if (!this._isClockWise(data[i])) {
-                if (i > 0) {
-                    holeIndex += data[i - 1].length;
-                    polygon.holes.push(holeIndex);
-                } else {
-                    throw new CartoValidationError('source', 'firstPolygonExternal');
-                }
-            }
+            const flat = this._computeLineStringGeometry(data[i], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
         }
         return polygon;
     }
@@ -414,7 +426,7 @@ export default class GeoJSON extends Base {
         return multipolygon;
     }
 
-    _isClockWise (vertices) {
+    _isReversed (vertices) {
         let total = 0;
         let pt1 = vertices[0];
         let pt2;
@@ -423,6 +435,8 @@ export default class GeoJSON extends Base {
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
             pt1 = pt2;
         }
+        // When total is positive it means that vertices are oriented clock wise
+        // and, since positive orientation is counter-clock wise, it is reversed.
         return total >= 0;
     }
 

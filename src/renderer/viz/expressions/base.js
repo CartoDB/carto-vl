@@ -119,8 +119,8 @@ export default class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _resetViewportAgg () {
-        this._getChildren().forEach(child => child._resetViewportAgg());
+    _resetViewportAgg (metadata) {
+        this._getChildren().forEach(child => child._resetViewportAgg(metadata));
     }
 
     accumViewportAgg (feature) {

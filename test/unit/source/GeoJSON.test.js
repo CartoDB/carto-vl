@@ -62,8 +62,7 @@ describe('sources/GeoJSON', () => {
                 geometry: {
                     type: 'Point',
                     coordinates: [0, 0]
-                },
-                properties: {}
+                }
             };
             const source = new GeoJSON(data);
             expect(source._features).toEqual([{
@@ -84,8 +83,7 @@ describe('sources/GeoJSON', () => {
                     geometry: {
                         type: 'Point',
                         coordinates: [0, 0]
-                    },
-                    properties: {}
+                    }
                 }]
             };
             const source = new GeoJSON(data);
@@ -166,16 +164,14 @@ describe('sources/GeoJSON', () => {
                     geometry: {
                         type: 'Point',
                         coordinates: [0, 0]
-                    },
-                    properties: {}
+                    }
                 },
                 {
                     type: 'Feature',
                     geometry: {
                         type: 'LineString',
                         coordinates: [[0, 0], [1, 1]]
-                    },
-                    properties: {}
+                    }
                 }]
             });
             expect(function () {
@@ -183,26 +179,61 @@ describe('sources/GeoJSON', () => {
             }).toThrowError('multiple types not supported: Point, LineString.');
         });
 
-        it('should throw an error if data has a the first polygon cw', function () {
-            const source = new GeoJSON({
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [[0, 0], [0, 1], [1, 1], [0, 0]]
-                },
-                properties: {}
+        describe('decodeGeometry', () => {
+            it('should load a cw polygon', function () {
+                const source = new GeoJSON({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [[0, 0], [0, 80], [80, 80], [0, 0]],
+                            [[20, 20], [50, 50], [20, 50], [20, 20]]
+                        ]
+                    }
+                });
+                let geom = source._decodeGeometry();
+
+                let actualFlat = geom[0][0].flat;
+                let expectedFlat = [
+                    0, 0, 0, 0.775, 0.444, 0.775, 0, 0,
+                    0.111, 0.113, 0.2778, 0.322, 0.111, 0.322, 0.111, 0.113];
+                actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
+
+                let actualHoles = geom[0][0].holes;
+                let expectedHoles = [4];
+                actualHoles.forEach((x, i) => expect(x).toBe(expectedHoles[i]));
             });
-            expect(function () {
-                source.requestData();
-            }).toThrowError('first polygon ring must be external.');
+
+            it('should load a ccw polygon', function () {
+                const source = new GeoJSON({
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [
+                            [[0, 0], [80, 80], [0, 80], [0, 0]],
+                            [[20, 20], [20, 50], [50, 50], [20, 20]]
+                        ]
+                    }
+                });
+                let geom = source._decodeGeometry();
+
+                let actualFlat = geom[0][0].flat;
+                let expectedFlat = [
+                    0, 0, 0, 0.775, 0.444, 0.775, 0, 0,
+                    0.111, 0.113, 0.2778, 0.322, 0.111, 0.322, 0.111, 0.113];
+                actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
+
+                let actualHoles = geom[0][0].holes;
+                let expectedHoles = [4];
+                actualHoles.forEach((x, i) => expect(x).toBe(expectedHoles[i]));
+            });
         });
 
         describe('cartodb_id', () => {
             it('should be auto generated and unique for a single feature', done => {
                 const data = {
                     type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
-                    properties: {}
+                    geometry: { type: 'Point', coordinates: [0, 0] }
                 };
                 const source = new GeoJSON(data);
                 source.requestMetadata(createVizMock()).then(() => {
@@ -217,18 +248,15 @@ describe('sources/GeoJSON', () => {
                     type: 'FeatureCollection',
                     features: [{
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [0, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [0, 0] }
                     },
                     {
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [1, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [1, 0] }
                     },
                     {
                         type: 'Feature',
-                        geometry: { type: 'Point', coordinates: [3, 0] },
-                        properties: {}
+                        geometry: { type: 'Point', coordinates: [3, 0] }
                     }]
                 };
                 const source = new GeoJSON(data);
@@ -244,8 +272,7 @@ describe('sources/GeoJSON', () => {
             it('should not mutate the original data', () => {
                 const data = {
                     type: 'Feature',
-                    geometry: { type: 'Point', coordinates: [0, 0] },
-                    properties: {}
+                    geometry: { type: 'Point', coordinates: [0, 0] }
                 };
                 new GeoJSON(data);
                 expect(data.properties.cartodb_id).toBeUndefined();
@@ -259,8 +286,7 @@ describe('sources/GeoJSON', () => {
             geometry: {
                 type: 'Point',
                 coordinates: [0, 0]
-            },
-            properties: {}
+            }
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
