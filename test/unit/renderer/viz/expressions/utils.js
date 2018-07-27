@@ -48,22 +48,23 @@ export function validateTypeErrors (expressionName, argTypes) {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
 
-        validateConstructorTimeTypeError(expressionName, simpleArgs);
+        _validateConstructorTimeTypeError(expressionName, simpleArgs);
 
         if (equalArgs(simpleArgs, propertyArgs)) {
             return;
         }
         if (argTypes.every(isArgConstructorTimeTyped)) {
-            validateConstructorTimeTypeError(expressionName, propertyArgs);
+            _validateConstructorTimeTypeError(expressionName, propertyArgs);
         } else {
-            validateCompileTimeTypeError(expressionName, propertyArgs);
+            _validateCompileTimeTypeError(expressionName, propertyArgs);
         }
     });
 }
+
 export function validateDynamicTypeErrors (expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
-        validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
-        validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
+        _validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
+        _validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
     });
 }
 
@@ -71,21 +72,27 @@ export function validateStaticTypeErrors (expressionName, argTypes) {
     describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
-        validateConstructorTimeTypeError(expressionName, simpleArgs);
+        _validateConstructorTimeTypeError(expressionName, simpleArgs);
         if (!equalArgs(simpleArgs, propertyArgs)) {
-            validateConstructorTimeTypeError(expressionName, propertyArgs);
+            _validateConstructorTimeTypeError(expressionName, propertyArgs);
         }
     });
+}
+
+export function validateCompileTypeError (expressionName, argTypes) {
+    const simpleArgs = argTypes.map(getSimpleArg);
+    _validateCompileTimeTypeError(expressionName, simpleArgs);
 }
 
 function equalArgs (argsA, argsB) {
     if (argsA.length !== argsB.length) {
         return false;
     }
+
     return argsA.every((arg, index) => argsB[index] === arg);
 }
 
-function validateConstructorTimeTypeError (expressionName, args) {
+function _validateConstructorTimeTypeError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at constructor time`, () => {
         expect(() =>
             s[expressionName](...args.map(arg => arg[0]))
@@ -93,7 +100,7 @@ function validateConstructorTimeTypeError (expressionName, args) {
     });
 }
 
-function validateCompileTimeTypeError (expressionName, args) {
+function _validateCompileTimeTypeError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));

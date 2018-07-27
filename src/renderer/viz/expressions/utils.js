@@ -90,7 +90,7 @@ export function throwInvalidInstance (expressionName, parameterName, parameterIn
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${number}' is not a number`);
+    type of '${number}' is ${typeof number}, 'number' was expected`);
 }
 
 export function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {

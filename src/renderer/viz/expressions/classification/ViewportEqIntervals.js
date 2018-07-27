@@ -30,26 +30,15 @@ import { checkNumber, checkInstance, checkType, checkExpression, checkLooseType 
  */
 export default class ViewportEqIntervals extends Classifier {
     constructor (input, buckets) {
-        if (input && input.isA(Property)) {
-            checkInstance('viewportEqIntervals', 'input', 0, Property, input && (input.property || input));
-        } else {
-            checkExpression('viewportEqIntervals', 'input', 0, input);
-            checkLooseType('viewportEqIntervals', 'input', 0, ['number', 'number-property'], input);
-        }
-
         checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
 
-        let children = { input };
-
-        children._min = viewportMin(input);
-        children._max = viewportMax(input);
+        const children = { input, _min: viewportMin(input), _max: viewportMax(input) };
         super(children, buckets);
     }
 
     _compile (metadata) {
         super._compile(metadata);
-        checkExpression('viewportEqIntervals', 'input', 0, this.input);
-        checkType('viewportEqIntervals', 'input', 0, ['number', 'number-property'], this.input);
+        checkType('viewportEqIntervals', 'input', 0, ['number'], this.input);
     }
 
     _genBreakpoints () {
