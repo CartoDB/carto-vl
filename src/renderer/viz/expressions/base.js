@@ -24,13 +24,8 @@ export default class Base {
      * @param {*} preface
      */
     constructor (children) {
-        this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => {
-            this[name] = implicitCast(children[name]);
-        });
-        this._getChildren().map(child => {
-            child.parent = this;
-        });
+        this._initializeChildren(children);
+        this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
     }
@@ -42,6 +37,37 @@ export default class Base {
     _bind (metadata) {
         this._compile(metadata);
         return this;
+    }
+
+    _initializeChildren (children) {
+        if (Array.isArray(children)) {
+            this._initializeChildrenArray(children);
+        } else {
+            this._initializeChildrenObject(children);
+        }
+    }
+
+    _initializeChildrenArray (children) {
+        this.childrenNames = [];
+
+        children.map((child, index) => {
+            const childName = `${child.type}-${index}`;
+            this.childrenNames.push(childName);
+            this[childName] = implicitCast(child);
+        });
+    }
+
+    _initializeChildrenObject (children) {
+        this.childrenNames = Object.keys(children);
+        Object.keys(children).map(name => {
+            this[name] = implicitCast(children[name]);
+        });
+    }
+
+    _addParentToChildren () {
+        this._getChildren().map(child => {
+            child.parent = this;
+        });
     }
 
     _setUID (idGenerator) {

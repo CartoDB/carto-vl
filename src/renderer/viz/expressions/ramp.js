@@ -96,22 +96,22 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        super({ input: input });
-        this.minKey = 0;
-        this.maxKey = 1;
-        this.palette = palette;
-        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-
         try {
             if (palette.type === paletteTypes.NUMBER_ARRAY) {
-                this.palette.floats = this.palette.eval();
+                palette.floats = palette.eval();
             } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-                this.palette.colors = this.palette.eval();
+                palette.colors = palette.eval();
             }
         } catch (error) {
             throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
         }
 
+        super({ input, palette });
+
+        this.minKey = 0;
+        this.maxKey = 1;
+        this.palette = palette;
+        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
     }
 
@@ -125,6 +125,16 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
+        try {
+            if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
+                this.palette.floats = this.palette.eval(feature);
+            } else if (this.palette.type === paletteTypes.COLOR_ARRAY) {
+                this.palette.colors = this.palette.eval(feature);
+            }
+        } catch (error) {
+            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+        }
+
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
