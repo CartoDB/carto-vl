@@ -4890,200 +4890,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalPercentile"><span class="type-signature">(static) </span>globalPercentile<span class="signature">(property, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the Nth percentile of the feature property for the entire source data.</p>
-<p>Note: <code>globalPercentile</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>property expression of number type</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>percentile</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Numeric expression [0, 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Result of the aggregation</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Assign the global percentile of the `amount` property to a variable.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  variables: {
-     g_percentile: s.globalPercentile(s.prop('amount'))
-  }
-});</code></pre>
-
-        <p class="code-caption">Assign the global percentile of the `amount` property to a variable. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  @g_percentile: globalPercentile($amount)
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".globalQuantiles"><span class="type-signature">(static) </span>globalQuantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
     
 
@@ -14117,6 +13923,199 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>percentile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression [0, 100]</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Result of the aggregation</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the percentile of the `amount` property in the viewport to a variable.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  variables: {
+     v_percentile: s.viewportPercentile(s.prop('amount'), 90)
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the percentile of the `amount` property in the viewport to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  @v_percentile: viewportPercentile($amount, 90)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, weight, size)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
     
 
@@ -14329,199 +14328,6 @@ console.log(viz.variables.categoryHistogram.eval());
 console.log(viz.variables.numericHistogram.eval());
 // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
 // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Numeric expression</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>percentile</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Numeric expression [0, 100]</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Result of the aggregation</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Assign the percentile of the `amount` property in the viewport to a variable.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  variables: {
-     v_percentile: s.viewportPercentile(s.prop('amount'), 90)
-  }
-});</code></pre>
-
-        <p class="code-caption">Assign the percentile of the `amount` property in the viewport to a variable. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  @v_percentile: viewportPercentile($amount, 90)
-`);</code></pre>
 
 
 
@@ -14832,7 +14638,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 20 2018 10:48:45 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 27 2018 16:45:25 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

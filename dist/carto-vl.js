@@ -1,6 +1,6 @@
 /*!
  * CARTO VL js https://carto.com/
- * Version: 0.5.3
+ * Version: 0.6.0
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -7088,7 +7088,7 @@ module.exports = g;
 /*! exports provided: name, version, sideEffects, description, repository, author, contributors, license, files, dependencies, devDependencies, module, main, scripts, default */
 /***/ (function(module) {
 
-module.exports = {"name":"@carto/carto-vl","version":"0.5.3","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"yarn build:dev && mocha test/acceptance/e2e.test.js --timeout 10000","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:benchmark":"node test/benchmark/benchmark.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
+module.exports = {"name":"@carto/carto-vl","version":"0.6.0","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","wait-on":"^2.1.0","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:benchmark":"node test/benchmark/benchmark.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
 
 /***/ }),
 
@@ -7111,7 +7111,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./renderer/viz/expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _sources_Base__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./sources/Base */ "./src/sources/Base.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/util */ "./src/utils/util.js");
-/* harmony import */ var _Viz__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./Viz */ "./src/Viz.js");
+/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./constants/layer */ "./src/constants/layer.js");
+/* harmony import */ var _Viz__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Viz */ "./src/Viz.js");
+
 
 
 
@@ -7202,9 +7204,26 @@ class Layer {
         this._renderLayer = new _renderer_RenderLayer__WEBPACK_IMPORTED_MODULE_5__["default"]();
         this.state = 'init';
         this._isLoaded = false;
+        this._visible = true;
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
+    }
+
+    /**
+     * Get layer visibility. Can be 'visible' or 'none'.
+     * @readonly
+     */
+    get visibility () {
+        return this._visible ? _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].VISIBLE : _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].HIDDEN;
+    }
+
+    /**
+     * Get layer visibility. Can be true or false.
+     * @readonly
+     */
+    get visible () {
+        return this._visible;
     }
 
     /**
@@ -7285,9 +7304,11 @@ class Layer {
         this.metadata = metadata;
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+
         if (this._source !== source) {
             this._freeSource();
         }
+
         this._source = source;
         this.requestData();
 
@@ -7388,9 +7409,10 @@ class Layer {
     }
 
     async requestData () {
-        if (!this.metadata) {
+        if (!this.metadata || !this._visible) {
             return;
         }
+
         this._source.requestData(this._getZoom(), this._getViewport());
         this._fireUpdateOnNextRender = true;
     }
@@ -7420,7 +7442,40 @@ class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this));
+        return this._visible
+            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+            : [];
+    }
+
+    /**
+     * Change layer visibility to visible
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    show () {
+        this._visible = true;
+        this._integrator.changeVisibility(this);
+        this.requestData();
+        this._fire('updated');
+    }
+
+    /**
+     * Change layer visibility to hidden
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    hide () {
+        this._visible = false;
+        this._integrator.changeVisibility(this);
+        this._fire('updated');
     }
 
     $paintCallback () {
@@ -7563,7 +7618,7 @@ class Layer {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isUndefined(viz)) {
             throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'vizRequired');
         }
-        if (!(viz instanceof _Viz__WEBPACK_IMPORTED_MODULE_9__["default"])) {
+        if (!(viz instanceof _Viz__WEBPACK_IMPORTED_MODULE_10__["default"])) {
             throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'nonValidViz');
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
@@ -7698,6 +7753,7 @@ class Viz {
         this.updated = true;
         this._changeCallback = null;
 
+        this._updateRootExpressionList();
         this._updateRootExpressions();
 
         this._resolveAliases();
@@ -7752,17 +7808,7 @@ class Viz {
     }
 
     _getRootExpressions () {
-        return [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.order,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement,
-            ...Object.values(this.variables)
-        ];
+        return this._rootExpressions;
     }
 
     _updateRootExpressions () {
@@ -7787,11 +7833,26 @@ class Viz {
     }
 
     _changed () {
+        this._updateRootExpressionList();
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
             this._changeCallback(this);
         }
+    }
+
+    _updateRootExpressionList () {
+        this._rootExpressions = [
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.order,
+            this.filter,
+            this.symbol,
+            this.symbolPlacement,
+            ...Object.values(this.variables)
+        ];
     }
 
     getMinimumNeededSchema () {
@@ -8086,6 +8147,107 @@ class Viz {
 function _markDefault (expression) {
     expression.default = true;
     return expression;
+}
+
+
+/***/ }),
+
+/***/ "./src/apiUtils.js":
+/*!*************************!*\
+  !*** ./src/apiUtils.js ***!
+  \*************************/
+/*! exports provided: on, off */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "on", function() { return on; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "off", function() { return off; });
+
+let registeredHandlers = [];
+
+/**
+ * Register an event handler for the given event name and for the given list of layers. Valid names are: `loaded`, `updated`.
+ *
+ * The 'loaded' event will be fired when all the layers are loaded (and their 'loaded' events are fired).
+ *
+ * The 'updated' event will be fired whenever one of the layers fired an 'updated' event,
+ * but throttled by requestAnimationFrame to return a maximum of one event per frame.
+ *
+ * @param {string} eventName - Supported event names are 'loaded' and 'updated'
+ * @param {carto.Layer[]} layerList - List of layers
+ *
+ * @memberof carto
+ * @api
+ */
+function on (eventName, layerList, callback) {
+    let internalCallbacks = [];
+    if (eventName === 'loaded') {
+        const waitingGroup = new Set(layerList);
+        layerList.forEach(layer => {
+            const internalCallback = () => {
+                waitingGroup.delete(layer);
+                if (waitingGroup.size === 0) {
+                    callback();
+                }
+            };
+            layer.on('loaded', internalCallback);
+            internalCallbacks.push(internalCallback);
+        });
+    } else if (eventName === 'updated') {
+        let scheduledRAF = false;
+        layerList.forEach(layer => {
+            const internalCallback = () => {
+                if (!scheduledRAF) {
+                    window.requestAnimationFrame(() => {
+                        scheduledRAF = false;
+                        callback();
+                    });
+                }
+            };
+            layer.on('updated', internalCallback);
+            internalCallbacks.push(internalCallback);
+        });
+    } else {
+        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
+    }
+    registeredHandlers.push({
+        eventName,
+        layerList,
+        callback,
+        internalCallbacks
+    });
+}
+
+/**
+* Remove an event handler for the given event name, layer list and callback.
+*
+* @param {string} eventName - event
+* @param {carto.Layer} layerList - List of layers
+* @param {function} callback - Handler function to unregister
+*
+* @memberof carto
+* @api
+*/
+function off (eventName, layerList, callback) {
+    registeredHandlers.forEach(register => {
+        if (register.eventName === eventName &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
+            register.callback === callback) {
+            register.layerList.forEach(layer => {
+                register.internalCallbacks.forEach(internalCallback => {
+                    layer.off(eventName, internalCallback);
+                });
+            });
+        }
+    });
+    registeredHandlers = registeredHandlers.filter(register =>
+        !(
+            register.eventName === eventName &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
+            register.callback === callback
+        )
+    );
 }
 
 
@@ -8564,8 +8726,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _renderer_viz_expressions_basic_number__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../renderer/viz/expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
 /* harmony import */ var _renderer_viz_expressions_basic_constant__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../renderer/viz/expressions/basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
 /* harmony import */ var _renderer_viz_expressions_basic_category__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../renderer/viz/expressions/basic/category */ "./src/renderer/viz/expressions/basic/category.js");
-/* harmony import */ var _renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/clusterAggregation */ "./src/renderer/viz/expressions/aggregation/clusterAggregation.js");
-/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../renderer/schema */ "./src/renderer/schema.js");
+/* harmony import */ var _renderer_viz_expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/cluster/ClusterAvg */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js");
+/* harmony import */ var _renderer_viz_expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/cluster/ClusterMax */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js");
+/* harmony import */ var _renderer_viz_expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/cluster/ClusterMin */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js");
+/* harmony import */ var _renderer_viz_expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/cluster/ClusterMode */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js");
+/* harmony import */ var _renderer_viz_expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../renderer/viz/expressions/aggregation/cluster/ClusterSum */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js");
+/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../renderer/schema */ "./src/renderer/schema.js");
+
+
+
+
+
 
 
 
@@ -8729,10 +8900,10 @@ class AggregationFiltering {
 
     _aggregation (f) {
         f = this._removeBlend(f);
-        if (f.isA(_renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__["ClusterAvg"]) || f.isA(_renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__["ClusterMax"]) || f.isA(_renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__["ClusterMin"]) || f.isA(_renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__["ClusterMode"]) || f.isA(_renderer_viz_expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_9__["ClusterSum"])) {
+        if (f.isA(_renderer_viz_expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__["default"]) || f.isA(_renderer_viz_expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__["default"]) || f.isA(_renderer_viz_expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__["default"]) || f.isA(_renderer_viz_expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__["default"]) || f.isA(_renderer_viz_expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__["default"])) {
             let p = this._property(f.property);
             if (p) {
-                p.property = _renderer_schema__WEBPACK_IMPORTED_MODULE_10__["column"].aggColumn(p.property, f.aggName);
+                p.property = _renderer_schema__WEBPACK_IMPORTED_MODULE_14__["column"].aggColumn(p.property, f.aggName);
                 return p;
             }
         }
@@ -9527,6 +9698,24 @@ function generateMapsApiUrl (conf, path) {
 
 /***/ }),
 
+/***/ "./src/constants/layer.js":
+/*!********************************!*\
+  !*** ./src/constants/layer.js ***!
+  \********************************/
+/*! exports provided: layerVisibility */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "layerVisibility", function() { return layerVisibility; });
+const layerVisibility = Object.freeze({
+    VISIBLE: 'visible',
+    HIDDEN: 'none'
+});
+
+
+/***/ }),
+
 /***/ "./src/errors/carto-error.js":
 /*!***********************************!*\
   !*** ./src/errors/carto-error.js ***!
@@ -9839,7 +10028,7 @@ const validation = {
 /*!**********************!*\
   !*** ./src/index.js ***!
   \**********************/
-/*! exports provided: version, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity */
+/*! exports provided: version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -9869,9 +10058,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sources_GeoJSON__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sources/GeoJSON */ "./src/sources/GeoJSON.js");
 /* harmony import */ var _sources_MVT__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sources/MVT */ "./src/sources/MVT.js");
 /* harmony import */ var _sources_SQL__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./sources/SQL */ "./src/sources/SQL.js");
-/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../package.json */ "./package.json");
-var _package_json__WEBPACK_IMPORTED_MODULE_11___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ "./package.json", 1);
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _package_json__WEBPACK_IMPORTED_MODULE_11__["version"]; });
+/* harmony import */ var _apiUtils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./apiUtils */ "./src/apiUtils.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "on", function() { return _apiUtils__WEBPACK_IMPORTED_MODULE_11__["on"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "off", function() { return _apiUtils__WEBPACK_IMPORTED_MODULE_11__["off"]; });
+
+/* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../package.json */ "./package.json");
+var _package_json__WEBPACK_IMPORTED_MODULE_12___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ "./package.json", 1);
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "version", function() { return _package_json__WEBPACK_IMPORTED_MODULE_12__["version"]; });
 
 /**
  *  @namespace carto
@@ -9893,6 +10087,7 @@ var _package_json__WEBPACK_IMPORTED_MODULE_11___namespace = /*#__PURE__*/__webpa
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
  */
+
 
 
 
@@ -9935,6 +10130,8 @@ const source = { Dataset: _sources_Dataset__WEBPACK_IMPORTED_MODULE_7__["default
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Map; });
+/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/layer */ "./src/constants/layer.js");
+
 /**
  * @description A simple non-interactive map.
  */
@@ -9960,11 +10157,13 @@ class Map {
                 this._container = container;
             }
         }
+
         this._background = options.background || '';
 
-        this._layers = [];
+        this._layers = new Set();
+        this._hiddenLayers = new Set();
         this._repaint = true;
-        this.invalidateWebGLState = () => { };
+        this.invalidateWebGLState = () => {};
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
@@ -9975,13 +10174,9 @@ class Map {
     addLayer (layer, beforeLayerID) {
         layer.initialize();
 
-        let index;
-        for (index = 0; index < this._layers.length; index++) {
-            if (this._layers[index].getId() === beforeLayerID) {
-                break;
-            }
+        if (!this._layers.has(layer)) {
+            this._layers.add(layer);
         }
-        this._layers.splice(index, 0, layer);
 
         window.requestAnimationFrame(this.update.bind(this));
     }
@@ -9997,12 +10192,15 @@ class Map {
 
         let loaded = true;
         let animated = false;
+
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
+
             if (hasData || hasAnimation) {
                 layer.$paintCallback();
             }
+
             loaded = loaded && hasData;
             animated = animated || hasAnimation;
         });
@@ -10010,6 +10208,31 @@ class Map {
         // Update until all layers are loaded or there is an animation
         if (!loaded || animated) {
             window.requestAnimationFrame(this.update.bind(this));
+        }
+    }
+
+    changeVisibility (layer) {
+        switch (layer.visibility) {
+            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].VISIBLE:
+                this.show(layer);
+                break;
+            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].HIDDEN:
+                this.hide(layer);
+                break;
+        }
+    }
+
+    hide (layer) {
+        if (this._layers.has(layer)) {
+            this._layers.delete(layer);
+            this._hiddenLayers.add(layer);
+        }
+    }
+
+    show (layer) {
+        if (this._hiddenLayers.has(layer)) {
+            this._hiddenLayers.delete(layer);
+            this._layers.add(layer);
         }
     }
 
@@ -10257,6 +10480,10 @@ class MGLIntegrator {
 
     getZoomLevel () {
         return this.map.getZoom();
+    }
+
+    changeVisibility (layer) {
+        this.map.setLayoutProperty(layer.getId(), 'visibility', layer.visibility);
     }
 }
 
@@ -10710,15 +10937,18 @@ function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, tr
 /*!***********************************!*\
   !*** ./src/renderer/Dataframe.js ***!
   \***********************************/
-/*! exports provided: default, _pointInTriangle */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Dataframe; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "_pointInTriangle", function() { return _pointInTriangle; });
 /* harmony import */ var _decoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./decoder */ "./src/renderer/decoder.js");
 /* harmony import */ var _client_rsys__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../client/rsys */ "./src/client/rsys.js");
+/* harmony import */ var _src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src/utils/geometry */ "./src/utils/geometry.js");
+/* harmony import */ var _utils_collision__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils/collision */ "./src/utils/collision.js");
+
+
 
 
 
@@ -10726,8 +10956,14 @@ __webpack_require__.r(__webpack_exports__);
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
+const featureClassCache = new Map();
+const AABBTestResults = {
+    INSIDE: 1,
+    OUTSIDE: -1,
+    INTERSECTS: 0
+};
+
 class Dataframe {
-    // `type` is one of 'point' or 'line' or 'polygon'
     constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
@@ -10742,48 +10978,41 @@ class Dataframe {
         this.metadata = metadata;
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
-        if (this.type === 'polygon') {
-            this._aabb = [];
-            geom.forEach(feature => {
-                const aabb = {
-                    minx: Number.POSITIVE_INFINITY,
-                    miny: Number.POSITIVE_INFINITY,
-                    maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY
-                };
-                feature.forEach(polygon => {
-                    const vertices = polygon.flat;
-                    const numVertices = polygon.holes[0] || polygon.flat.length / 2;
-                    for (let i = 0; i < numVertices; i++) {
-                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+        this._aabb = this._computeAABB(geom, type);
+    }
+
+    get widthScale () {
+        return this.renderer
+            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
+            : 1;
+    }
+
+    _computeAABB (geometry, type) {
+        switch (type) {
+            case 'point':
+                return [];
+            case 'line':
+            case 'polygon':
+                const aabbList = [];
+
+                for (let i = 0; i < geometry.length; i++) {
+                    const feature = geometry[i];
+
+                    let aabb = {
+                        minx: Number.POSITIVE_INFINITY,
+                        miny: Number.POSITIVE_INFINITY,
+                        maxx: Number.NEGATIVE_INFINITY,
+                        maxy: Number.NEGATIVE_INFINITY
+                    };
+
+                    for (let j = 0; j < feature.length; j++) {
+                        aabb = _updateAABBForGeometry(feature[j], aabb, type);
                     }
-                });
-                this._aabb.push(aabb);
-            });
-        } else if (this.type === 'line') {
-            this._aabb = [];
-            geom.forEach(feature => {
-                const aabb = {
-                    minx: Number.POSITIVE_INFINITY,
-                    miny: Number.POSITIVE_INFINITY,
-                    maxx: Number.NEGATIVE_INFINITY,
-                    maxy: Number.NEGATIVE_INFINITY
-                };
-                feature.forEach(line => {
-                    const vertices = line;
-                    const numVertices = line.length;
-                    for (let i = 0; i < numVertices; i++) {
-                        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-                        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-                        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-                        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
-                    }
-                });
-                this._aabb.push(aabb);
-            });
+
+                    aabbList.push(aabb);
+                }
+
+                return aabbList;
         }
     }
 
@@ -10794,7 +11023,6 @@ class Dataframe {
     bind (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
-
         const vertices = this.decodedGeom.vertices;
         const breakpoints = this.decodedGeom.breakpoints;
 
@@ -10815,6 +11043,7 @@ class Dataframe {
 
         const ids = new Float32Array(vertices.length);
         let index = 0;
+
         for (let i = 0; i < vertices.length; i += 2) {
             if (!breakpoints.length) {
                 if (i > 0) {
@@ -10829,6 +11058,7 @@ class Dataframe {
             ids[i + 0] = ((index) % width) / (width - 1);
             ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -10847,172 +11077,30 @@ class Dataframe {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
             case 'line':
-                return this._getLinesAtPosition(pos, viz);
+                return this._getFeaturesFromTriangles('line', pos, viz);
             case 'polygon':
-                return this._getPolygonAtPosition(pos, viz);
+                return this._getFeaturesFromTriangles('polygon', pos, viz);
             default:
                 return [];
         }
     }
 
-    inViewport (featureIndex, scale, center, aspect) {
-        const { minx, miny, maxx, maxy } = this._getBounds(scale, center, aspect);
+    inViewport (featureIndex, renderScale, center, aspect, viz) {
+        const feature = this.getFeature(featureIndex);
+        const viewportAABB = this._getBounds(renderScale, center, aspect);
+        let strokeWidthScale = 1;
 
         switch (this.type) {
-            case 'point': {
-                const x = this.geom[2 * featureIndex + 0];
-                const y = this.geom[2 * featureIndex + 1];
-                return x > minx && x < maxx && y > miny && y < maxy;
-            }
+            case 'point':
+                return this._isPointInViewport(featureIndex, viewportAABB);
             case 'line':
-            case 'polygon': {
-                const aabb = this._aabb[featureIndex];
-                return !(minx > aabb.maxx || maxx < aabb.minx || miny > aabb.maxy || maxy < aabb.miny);
-            }
+                strokeWidthScale = this._computeLineWidthScale(feature, viz);
+                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+            case 'polygon':
+                strokeWidthScale = this._computePolygonWidthScale(feature, viz);
+                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
             default:
                 return false;
-        }
-    }
-
-    _getBounds (scale, center, aspect) {
-        this.vertexScale = [(scale / aspect) * this.scale, scale * this.scale];
-        this.vertexOffset = [(scale / aspect) * (center.x - this.center.x), scale * (center.y - this.center.y)];
-        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
-        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
-
-        return { minx, maxx, miny, maxy };
-    }
-
-    _getPointsAtPosition (p, viz) {
-        p = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(p.x, p.y, { center: this.center, scale: this.scale });
-        const points = this.decodedGeom.vertices;
-        const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        const vizWidth = viz.width;
-        const vizStrokeWidth = viz.strokeWidth;
-
-        for (let i = 0; i < points.length; i += 2) {
-            const featureIndex = i / 2;
-            const center = {
-                x: points[i],
-                y: points[i + 1]
-            };
-            const f = this.getFeature(featureIndex);
-            if (this._isFeatureFiltered(f, viz.filter)) {
-                continue;
-            }
-            const pointWidth = vizWidth.eval(f);
-            const pointStrokeWidth = vizStrokeWidth.eval(f);
-            const diameter = Math.min(pointWidth + pointStrokeWidth, 126);
-
-            // width and strokeWidth are diameters and scale is a radius, we need to divide by 2
-            const scale = diameter / 2 * widthScale;
-            if (!viz.symbol._default) {
-                const offset = viz.symbolPlacement.eval();
-                center.x += offset[0] * scale;
-                center.y += offset[1] * scale;
-            }
-
-            const inside = _pointInCircle(p, center, scale);
-            if (inside) {
-                features.push(this.getFeature(featureIndex));
-            }
-        }
-        return features;
-    }
-
-    _getLinesAtPosition (pos, viz) {
-        return this._getFeaturesFromTriangles(pos, viz.width, viz.filter);
-    }
-    _getPolygonAtPosition (pos, viz) {
-        return this._getFeaturesFromTriangles(pos, viz.strokeWidth, viz.filter);
-    }
-    _getFeaturesFromTriangles (pos, widthExpression, filterExpression) {
-        const p = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(pos.x, pos.y, { center: this.center, scale: this.scale });
-        const vertices = this.decodedGeom.vertices;
-        const normals = this.decodedGeom.normals;
-        const breakpoints = this.decodedGeom.breakpoints;
-        const features = [];
-        // The viewport is in the [-1,1] range (on Y axis), therefore a pixel is equal to the range size (2) divided by the viewport height in pixels
-        const widthScale = (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom;
-        // Linear search for all features
-        // Tests triangles since we already have the triangulated form
-        // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
-        let featureIndex = -1;
-        let scale;
-        let computeScale = feature => {
-            // Width is saturated at 336px
-            const width = Math.min(widthExpression.eval(feature), 336);
-            // width is a diameter and scale is radius-like, we need to divide by 2
-            scale = width / 2 * widthScale;
-        };
-        for (let i = 0; i < vertices.length; i += 6) {
-            if (i === 0 || i >= breakpoints[featureIndex]) {
-                featureIndex++;
-                const feature = this.getFeature(featureIndex);
-                if (this._isFeatureFiltered(feature, filterExpression)) {
-                    i = breakpoints[featureIndex] - 6;
-                    continue;
-                }
-                computeScale(feature);
-            }
-            const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * scale,
-                y: vertices[i + 1] + normals[i + 1] * scale
-            };
-            const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * scale,
-                y: vertices[i + 3] + normals[i + 3] * scale
-            };
-            const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * scale,
-                y: vertices[i + 5] + normals[i + 5] * scale
-            };
-            const inside = _pointInTriangle(p, v1, v2, v3);
-            if (inside) {
-                features.push(this.getFeature(featureIndex));
-                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
-                // Also, don't waste CPU cycles
-                i = breakpoints[featureIndex] - 6;
-            }
-        }
-        return features;
-    }
-
-    _isFeatureFiltered (feature, filterExpression) {
-        const isFiltered = filterExpression.eval(feature) < 0.5;
-        return isFiltered;
-    }
-
-    getFeature (index) {
-        if (!this.cachedFeatures) {
-            this.cachedFeatures = [];
-        }
-
-        if (this.cachedFeatures[index] !== undefined) {
-            return this.cachedFeatures[index];
-        }
-
-        const feature = {};
-        const propertyNames = Object.keys(this.properties);
-        for (let i = 0; i < propertyNames.length; i++) {
-            const name = propertyNames[i];
-            if (this.metadata.properties[name].type === 'category') {
-                feature[name] = this.metadata.IDToCategory.get(this.properties[name][index]);
-            } else {
-                feature[name] = this.properties[name][index];
-            }
-        }
-        this.cachedFeatures[index] = feature;
-        return feature;
-    }
-
-    _addProperty (propertyName) {
-        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
-            this.getPropertyTexture(propertyName);
         }
     }
 
@@ -11040,12 +11128,260 @@ class Dataframe {
         return this.propertyTex[propertyName];
     }
 
+    free () {
+        if (this.propertyTex) {
+            const gl = this.renderer.gl;
+            this.propertyTex.map(tex => gl.deleteTexture(tex));
+            gl.deleteTexture(this.texColor);
+            gl.deleteTexture(this.texStrokeColor);
+            gl.deleteTexture(this.texWidth);
+            gl.deleteTexture(this.texStrokeWidth);
+            gl.deleteTexture(this.texFilter);
+            gl.deleteBuffer(this.vertexBuffer);
+            gl.deleteBuffer(this.featureIDBuffer);
+        }
+        const freeObserver = this.freeObserver;
+
+        Object.keys(this).map(key => {
+            this[key] = null;
+        });
+
+        this.freed = true;
+
+        if (freeObserver) {
+            freeObserver(this);
+        }
+    }
+
+    _isPointInViewport (featureIndex, viewportAABB) {
+        const { minx, maxx, miny, maxy } = viewportAABB;
+        const x = this.geom[2 * featureIndex + 0];
+        const y = this.geom[2 * featureIndex + 1];
+        return x > minx && x < maxx && y > miny && y < maxy;
+    }
+
+    _isPolygonInViewport (featureIndex, viewportAABB, strokeWidthScale) {
+        const featureAABB = this._aabb[featureIndex];
+        const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeWidthScale);
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+
+        if (aabbResult === AABBTestResults.INTERSECTS) {
+            const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
+            return _isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
+        }
+
+        return aabbResult === AABBTestResults.INSIDE;
+    }
+
+    _compareAABBs (featureAABB, viewportAABB, stroke) {
+        const featureStrokeAABB = {
+            minx: featureAABB.minx - stroke,
+            miny: featureAABB.miny - stroke,
+            maxx: featureAABB.maxx + stroke,
+            maxy: featureAABB.maxy + stroke
+        };
+
+        switch (true) {
+            case _isFeatureAABBInsideViewport(featureStrokeAABB, viewportAABB):
+                return AABBTestResults.INSIDE;
+            case _isFeatureAABBOutsideViewport(featureStrokeAABB, viewportAABB):
+                return AABBTestResults.OUTSIDE;
+            default:
+                return AABBTestResults.INTERSECTS;
+        }
+    }
+
+    _getBounds (renderScale, center, aspect) {
+        this.vertexScale = [(renderScale / aspect) * this.scale, renderScale * this.scale];
+        this.vertexOffset = [(renderScale / aspect) * (center.x - this.center.x), renderScale * (center.y - this.center.y)];
+
+        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
+        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
+        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+
+        return { minx, maxx, miny, maxy };
+    }
+
+    _getPointsAtPosition (pos, viz) {
+        const p = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(pos.x, pos.y, {
+            center: this.center,
+            scale: this.scale
+        });
+
+        const points = this.decodedGeom.vertices;
+        const features = [];
+
+        for (let i = 0; i < points.length; i += 2) {
+            const featureIndex = i / 2;
+            const center = {
+                x: points[i],
+                y: points[i + 1]
+            };
+
+            const feature = this.getFeature(featureIndex);
+
+            if (this._isFeatureFiltered(feature, viz.filter)) {
+                continue;
+            }
+
+            const strokeWidthScale = this._computePointWidthScale(feature, viz);
+
+            if (!viz.symbol._default) {
+                const offset = viz.symbolPlacement.eval();
+                center.x += offset[0] * strokeWidthScale;
+                center.y += offset[1] * strokeWidthScale;
+            }
+
+            const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInCircle"])(p, center, strokeWidthScale);
+
+            if (inside) {
+                features.push(this.getFeature(featureIndex));
+            }
+        }
+
+        return features;
+    }
+
+    _getFeaturesFromTriangles (geometryType, pos, viz) {
+        const p = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(pos.x, pos.y, {
+            center: this.center,
+            scale: this.scale
+        });
+
+        const vertices = this.decodedGeom.vertices;
+        const normals = this.decodedGeom.normals;
+        const breakpoints = this.decodedGeom.breakpoints;
+        const features = [];
+        // Linear search for all features
+        // Tests triangles since we already have the triangulated form
+        // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
+        let featureIndex = -1;
+        let strokeWidthScale;
+
+        for (let i = 0; i < vertices.length; i += 6) {
+            if (i === 0 || i >= breakpoints[featureIndex]) {
+                featureIndex++;
+                const feature = this.getFeature(featureIndex);
+
+                if (!Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInRectangle"])(p, this._aabb[featureIndex]) ||
+                    this._isFeatureFiltered(feature, viz.filter)) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
+
+                strokeWidthScale = geometryType === 'line'
+                    ? this._computeLineWidthScale(feature, viz)
+                    : this._computePolygonWidthScale(feature, viz);
+            }
+
+            const v1 = {
+                x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+                y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
+            };
+
+            const v2 = {
+                x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+                y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
+            };
+
+            const v3 = {
+                x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+                y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
+            };
+
+            const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInTriangle"])(p, v1, v2, v3);
+
+            if (inside) {
+                features.push(this.getFeature(featureIndex));
+                // Don't repeat a feature if we the point is on a shared (by two triangles) edge
+                // Also, don't waste CPU cycles
+                i = breakpoints[featureIndex] - 6;
+            }
+        }
+
+        return features;
+    }
+
+    _isFeatureFiltered (feature, filterExpression) {
+        return filterExpression.eval(feature) < 0.5;
+    }
+
+    _genFeatureClass () {
+        if (featureClassCache.has(this.metadata)) {
+            this._cls = featureClassCache.get(this.metadata);
+            return;
+        }
+        const cls = class ViewportFeature {
+            constructor (index, dataframe) {
+                this._index = index;
+                this._dataframe = dataframe;
+            }
+        };
+
+        const metadata = this.metadata;
+        const getters = {};
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
+            getters[propertyName] = {
+                get: function () {
+                    const index = this._index;
+                    if (metadata.properties[propertyName].type === 'category') {
+                        return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
+                    } else {
+                        return this._dataframe.properties[propertyName][index];
+                    }
+                }
+            };
+        }
+
+        Object.defineProperties(cls.prototype, getters);
+
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _getFeatureProperty (index, propertyName) {
+        if (this.metadata.properties[propertyName].type === 'category') {
+            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
+        } else {
+            return this.properties[propertyName][index];
+        }
+    }
+
+    getFeature (index) {
+        if (!this.cachedFeatures) {
+            this.cachedFeatures = new Array(this.numFeatures);
+        }
+
+        if (this.cachedFeatures[index] !== undefined) {
+            return this.cachedFeatures[index];
+        }
+
+        if (!this._cls) {
+            this._genFeatureClass();
+        }
+
+        const feature = new this._cls(index, this);
+        this.cachedFeatures[index] = feature;
+        return feature;
+    }
+
+    _addProperty (propertyName) {
+        if (Object.keys(this.propertyTex).length < MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT) {
+            this.getPropertyTexture(propertyName);
+        }
+    }
+
     // Add new properties to the dataframe or overwrite previously stored ones.
     // `properties` is of the form: {propertyName: Float32Array}
     addProperties (properties) {
-        Object.keys(properties).forEach(propertyName => {
+        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
+            const propertyName = this.metadata.propertyKeys[i];
             this._addProperty(propertyName);
-        });
+        }
+        this._genFeatureClass();
     }
 
     _createStyleTileTexture (numFeatures) {
@@ -11066,71 +11402,96 @@ class Dataframe {
         return texture;
     }
 
-    free () {
-        if (this.propertyTex) {
-            const gl = this.renderer.gl;
-            this.propertyTex.map(tex => gl.deleteTexture(tex));
-            gl.deleteTexture(this.texColor);
-            gl.deleteTexture(this.texStrokeColor);
-            gl.deleteTexture(this.texWidth);
-            gl.deleteTexture(this.texStrokeWidth);
-            gl.deleteTexture(this.texFilter);
-            gl.deleteBuffer(this.vertexBuffer);
-            gl.deleteBuffer(this.featureIDBuffer);
-        }
-        const freeObserver = this.freeObserver;
-        Object.keys(this).map(key => {
-            this[key] = null;
-        });
-        this.freed = true;
-        if (freeObserver) {
-            freeObserver(this);
-        }
+    _computePointWidthScale (feature, viz) {
+        const SATURATION_PX = 126;
+        const diameter = Math.min(viz.width.eval(feature) + viz.strokeWidth.eval(feature), SATURATION_PX);
+
+        return diameter / 2 * this.widthScale;
+    }
+
+    _computeLineWidthScale (feature, viz) {
+        const SATURATION_PX = 336;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
+
+        return diameter / 2 * this.widthScale;
+    }
+
+    _computePolygonWidthScale (feature, viz) {
+        const SATURATION_PX = 336;
+        const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
+
+        return diameter / 2 * this.widthScale;
     }
 }
 
-// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
-// Parameters in {x: 0, y:0} form
-function _pointInTriangle (p, v1, v2, v3) {
-    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
-    // contains an explanation of both this algorithm and one based on barycentric coordinates,
-    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+function _updateAABBForGeometry (feature, aabb, geometryType) {
+    switch (geometryType) {
+        case 'line':
+            return _updateAABBLine(feature, aabb);
+        case 'polygon':
+            return _updateAABBPolygon(feature, aabb);
+    }
+}
 
-    if (_equal(v1, v2) || _equal(v2, v3) || _equal(v3, v1)) {
-        // Avoid zero area triangle
-        return false;
+function _updateAABBLine (line, aabb) {
+    const vertices = line;
+    const numVertices = line.length;
+
+    for (let i = 0; i < numVertices; i += 2) {
+        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);
     }
 
-    // A point is inside a triangle or in one of the triangles edges
-    // if the point is in the three half-plane defined by the 3 edges
-    const b1 = _halfPlaneTest(p, v1, v2) < 0;
-    const b2 = _halfPlaneTest(p, v2, v3) < 0;
-    const b3 = _halfPlaneTest(p, v3, v1) < 0;
-
-    return (b1 === b2) && (b2 === b3);
+    return aabb;
 }
 
-// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
-// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
-// returns >0 if the point is OUTSIDE
-// Parameters in {x: 0, y:0} form
-function _halfPlaneTest (p, a, b) {
-    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
-    // The result's sign is the half plane test result
-    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+function _updateAABBPolygon (polygon, aabb) {
+    const [ vertices, numVertices ] = [ polygon.flat, polygon.holes[0] || polygon.flat.length / 2 ];
+
+    for (let i = 0; i < numVertices; i++) {
+        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+    }
+
+    return aabb;
 }
 
-function _equal (a, b) {
-    return (a.x === b.x) && (a.y === b.y);
+function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
+    return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
+            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
-function _pointInCircle (p, center, scale) {
-    const diff = {
-        x: p.x - center.x,
-        y: p.y - center.y
-    };
-    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
-    return lengthSquared <= scale * scale;
+function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
+    return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
+            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+}
+
+function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
+    for (let i = start; i < end; i += 6) {
+        const triangle = [{
+            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
+        }, {
+            x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+            y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
+        }, {
+            x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+            y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
+        }, {
+            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
+        }];
+
+        if (Object(_utils_collision__WEBPACK_IMPORTED_MODULE_3__["triangleCollides"])(triangle, viewportAABB)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 
@@ -11170,6 +11531,8 @@ class Metadata {
             property.categories = property.categories || [];
             property.categories.map(category => this.categorizeString(category.name));
         });
+
+        this.propertyKeys = Object.keys(this.properties);
     }
     categorizeString (category) {
         if (category === undefined) {
@@ -11233,7 +11596,11 @@ class RenderLayer {
 
     getActiveDataframes () {
         this.dataframes = this.dataframes.filter(df => !df.freed);
-        return this.dataframes.filter(df => df.active && df.numVertex);
+        let active = this.dataframes.filter(df => df.active && df.numVertex);
+        if (active.length && active[0].orderID !== undefined) {
+            active = active.sort((a, b) => a.orderID - b.orderID);
+        }
+        return active;
     }
 
     hasDataframes () {
@@ -11289,6 +11656,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Renderer; });
 /* harmony import */ var _shaders__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./shaders */ "./src/renderer/shaders/index.js");
 /* harmony import */ var _viz_expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viz/expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
+
 
 
 
@@ -11365,7 +11734,7 @@ class Renderer {
             0.0, 10.0,
             -10.0, -10.0
         ];
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, Object(_utils_util__WEBPACK_IMPORTED_MODULE_2__["getFloat32ArrayFromArray"])(vertices), gl.STATIC_DRAW);
 
         // Create a 1x1 RGBA texture set to [0,0,0,0]
         // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
@@ -11472,9 +11841,10 @@ class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i, aspect)) {
+                if (!this._isFeatureInViewport(dataframe, i, aspect, viz)) {
                     continue;
                 }
+
                 processedFeaturesIDs.add(featureId);
 
                 const feature = this._featureFromDataFrame(dataframe, i, metadata);
@@ -11495,9 +11865,9 @@ class Renderer {
      * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
      * NOTE: requires `this.aspect` to be set
      */
-    _isFeatureInViewport (dataframe, index, aspect) {
+    _isFeatureInViewport (dataframe, index, aspect, viz) {
         const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, aspect);
+        return dataframe.inViewport(index, scale, this._center, aspect, viz);
     }
 
     /**
@@ -11790,6 +12160,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodeGeom", function() { return decodeGeom; });
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! earcut */ "./node_modules/earcut/src/earcut.js");
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(earcut__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
+/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/geometry */ "./src/utils/geometry.js");
+
+
 
 
 // Decode a tile geometry
@@ -11808,18 +12182,18 @@ __webpack_require__.r(__webpack_exports__);
             ]
 */
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with mitter joints.
-// The geom will be an array of coordinates in this case
+// The geom will be an array of coordinates in this case`
 function decodeGeom (geomType, geom) {
-    if (geomType === 'point') {
-        return decodePoint(geom);
+    switch (geomType) {
+        case 'point':
+            return decodePoint(geom);
+        case 'polygon':
+            return decodePolygon(geom);
+        case 'line':
+            return decodeLine(geom);
+        default:
+            throw new Error(`Unimplemented geometry type: '${geomType}'`);
     }
-    if (geomType === 'polygon') {
-        return decodePolygon(geom);
-    }
-    if (geomType === 'line') {
-        return decodeLine(geom);
-    }
-    throw new Error(`Unimplemented geometry type: '${geomType}'`);
 }
 
 function decodePoint (vertices) {
@@ -11838,97 +12212,115 @@ function isClipped (polygon, i, j) {
     }
     return false;
 }
-
 function decodePolygon (geometry) {
     let vertices = []; // Array of triangle vertices
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geometry.forEach(feature => {
-        feature.forEach(polygon => {
+    let featureIDToVertexIndex = new Map();
+    const geometryLength = geometry.length;
+
+    for (let i = 0; i < geometryLength; i++) {
+        const feature = geometry[i];
+        const featureLength = feature.length;
+
+        for (let j = 0; j < featureLength; j++) {
+            const polygon = feature[j];
             const triangles = earcut__WEBPACK_IMPORTED_MODULE_0__(polygon.flat, polygon.holes);
             const trianglesLength = triangles.length;
-            for (let i = 0; i < trianglesLength; i++) {
-                const index = triangles[i];
+
+            for (let k = 0; k < trianglesLength; k++) {
+                const index = triangles[k];
                 vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
 
             const lineString = polygon.flat;
-            for (let i = 0; i < lineString.length - 2; i += 2) {
-                if (polygon.holes.includes((i + 2) / 2)) {
+            const lineStringLength = lineString.length;
+
+            for (let l = 0; l < lineStringLength - 2; l += 2) {
+                if (polygon.holes.includes((l + 2) / 2)) {
                     // Skip adding the line which connects two rings
                     continue;
                 }
 
-                const a = [lineString[i + 0], lineString[i + 1]];
-                const b = [lineString[i + 2], lineString[i + 3]];
+                const a = [lineString[l + 0], lineString[l + 1]];
+                const b = [lineString[l + 2], lineString[l + 3]];
 
-                if (isClipped(polygon, i, i + 2)) {
+                if (isClipped(polygon, l, l + 2)) {
                     continue;
                 }
 
-                let normal = getLineNormal(b, a);
+                const normal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["getLineNormal"])(b, a);
 
-                if (isNaN(normal[0]) || isNaN(normal[1])) {
+                if (Number.isNaN(normal[0]) || Number.isNaN(normal[1])) {
                     // Skip when there is no normal vector
                     continue;
                 }
 
-                let na = normal;
-                let nb = normal;
+                vertices.push(
+                    a[0], a[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    a[0], a[1],
+                    b[0], b[1],
+                    b[0], b[1]
+                );
 
-                // First triangle
-
-                normals.push(-na[0], -na[1]);
-                normals.push(na[0], na[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-
-                // Second triangle
-
-                normals.push(na[0], na[1]);
-                normals.push(nb[0], nb[1]);
-                normals.push(-nb[0], -nb[1]);
-
-                vertices.push(a[0], a[1]);
-                vertices.push(b[0], b[1]);
-                vertices.push(b[0], b[1]);
+                normals.push(
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1],
+                    normal[0], normal[1],
+                    normal[0], normal[1],
+                    -normal[0], -normal[1]
+                );
             }
-        });
+        }
+
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
-    });
+    }
     return {
-        vertices: new Float32Array(vertices),
+        vertices: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(vertices),
         breakpoints,
-        normals: new Float32Array(normals)
+        featureIDToVertexIndex,
+        normals: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(normals)
     };
 }
 
-function decodeLine (geom) {
+function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
-    geom.map(feature => {
-        feature.map(lineString => {
-            // Create triangulation
+    let featureIDToVertexIndex = new Map();
 
-            for (let i = 0; i < lineString.length - 2; i += 2) {
-                const a = [lineString[i + 0], lineString[i + 1]];
-                const b = [lineString[i + 2], lineString[i + 3]];
-                const normal = getLineNormal(b, a);
+    const geometryLength = geometry.length;
+
+    for (let i = 0; i < geometryLength; i++) {
+        const feature = geometry[i];
+        const featureLength = feature.length;
+
+        for (let j = 0; j < featureLength; j++) {
+            const lineString = feature[j];
+            const lineStringLength = lineString.length;
+
+            for (let k = 0; k < lineStringLength - 2; k += 2) {
+                const a = [lineString[k + 0], lineString[k + 1]];
+                const b = [lineString[k + 2], lineString[k + 3]];
+                const normal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["getLineNormal"])(b, a);
                 let na = normal;
                 let nb = normal;
 
-                if (i > 0) {
-                    const prev = [lineString[i - 2], lineString[i - 1]];
-                    na = getJointNormal(prev, a, b) || na;
+                if (k > 0) {
+                    const prev = [lineString[k - 2], lineString[k - 1]];
+                    na = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["getJointNormal"])(prev, a, b) || na;
                 }
-                if (i < lineString.length - 4) {
-                    const next = [lineString[i + 4], lineString[i + 5]];
-                    nb = getJointNormal(a, b, next) || nb;
+                if (k < lineStringLength - 4) {
+                    const next = [lineString[k + 4], lineString[k + 5]];
+                    nb = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["getJointNormal"])(a, b, next) || nb;
                 }
 
                 // First triangle
@@ -11951,34 +12343,21 @@ function decodeLine (geom) {
                 vertices.push(b[0], b[1]);
                 vertices.push(b[0], b[1]);
             }
-        });
+        }
+
+        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
+            ? { start: 0, end: vertices.length }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+
         breakpoints.push(vertices.length);
-    });
-    return {
-        vertices: new Float32Array(vertices),
-        breakpoints,
-        normals: new Float32Array(normals)
-    };
-}
-
-function getLineNormal (a, b) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    return normalize([-dy, dx]);
-}
-
-function getJointNormal (a, b, c) {
-    const u = normalize([a[0] - b[0], a[1] - b[1]]);
-    const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = -u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
     }
-}
 
-function normalize (v) {
-    const s = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
-    return [v[0] / s, v[1] / s];
+    return {
+        vertices: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(vertices),
+        breakpoints,
+        featureIDToVertexIndex,
+        normals: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(normals)
+    };
 }
 
 /* harmony default export */ __webpack_exports__["default"] = ({ decodeGeom });
@@ -12942,7 +13321,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*****************************************!*\
   !*** ./src/renderer/viz/expressions.js ***!
   \*****************************************/
-/*! exports provided: transition, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, image, imageList, sprite, sprites, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, animation, torque, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, xyz, zoom, placement, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
+/*! exports provided: transition, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, image, imageList, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, xyz, zoom, placement, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12983,8 +13362,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "constant", function() { return constant; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "image", function() { return image; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "imageList", function() { return imageList; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sprite", function() { return sprite; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sprites", function() { return sprites; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "svg", function() { return svg; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hex", function() { return hex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsl", function() { return hsl; });
@@ -13018,7 +13395,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "top", function() { return top; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fade", function() { return fade; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "animation", function() { return animation; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "torque", function() { return torque; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "log", function() { return log; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sqrt", function() { return sqrt; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sin", function() { return sin; });
@@ -13074,56 +13450,73 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TRIANGLE_OUTLINE", function() { return TRIANGLE_OUTLINE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ALIGN_CENTER", function() { return ALIGN_CENTER; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ALIGN_BOTTOM", function() { return ALIGN_BOTTOM; });
-/* harmony import */ var _utils_warning__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils/warning */ "./src/renderer/viz/utils/warning.js");
-/* harmony import */ var _expressions_transition__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expressions/transition */ "./src/renderer/viz/expressions/transition.js");
-/* harmony import */ var _expressions_basic_array__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expressions/basic/array */ "./src/renderer/viz/expressions/basic/array.js");
-/* harmony import */ var _expressions_belongs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./expressions/belongs */ "./src/renderer/viz/expressions/belongs.js");
-/* harmony import */ var _expressions_between__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./expressions/between */ "./src/renderer/viz/expressions/between.js");
-/* harmony import */ var _expressions_binary__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./expressions/binary */ "./src/renderer/viz/expressions/binary.js");
-/* harmony import */ var _expressions_blend__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./expressions/blend */ "./src/renderer/viz/expressions/blend.js");
-/* harmony import */ var _expressions_buckets__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./expressions/buckets */ "./src/renderer/viz/expressions/buckets.js");
-/* harmony import */ var _expressions_basic_category__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./expressions/basic/category */ "./src/renderer/viz/expressions/basic/category.js");
-/* harmony import */ var _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./expressions/color/CIELab */ "./src/renderer/viz/expressions/color/CIELab.js");
-/* harmony import */ var _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./expressions/aggregation/clusterAggregation */ "./src/renderer/viz/expressions/aggregation/clusterAggregation.js");
-/* harmony import */ var _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./expressions/basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
-/* harmony import */ var _expressions_color_hex__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./expressions/color/hex */ "./src/renderer/viz/expressions/color/hex.js");
-/* harmony import */ var _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./expressions/color/hsl */ "./src/renderer/viz/expressions/color/hsl.js");
-/* harmony import */ var _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./expressions/color/hsv */ "./src/renderer/viz/expressions/color/hsv.js");
-/* harmony import */ var _expressions_interpolators__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./expressions/interpolators */ "./src/renderer/viz/expressions/interpolators.js");
-/* harmony import */ var _expressions_linear__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./expressions/linear */ "./src/renderer/viz/expressions/linear.js");
-/* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
-/* harmony import */ var _expressions_now__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./expressions/now */ "./src/renderer/viz/expressions/now.js");
-/* harmony import */ var _expressions_basic_number__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
-/* harmony import */ var _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./expressions/color/opacity */ "./src/renderer/viz/expressions/color/opacity.js");
-/* harmony import */ var _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./expressions/ordering */ "./src/renderer/viz/expressions/ordering.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["Asc"]; });
+/* harmony import */ var _expressions_transition__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./expressions/transition */ "./src/renderer/viz/expressions/transition.js");
+/* harmony import */ var _expressions_basic_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expressions/basic/array */ "./src/renderer/viz/expressions/basic/array.js");
+/* harmony import */ var _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expressions/belongs */ "./src/renderer/viz/expressions/belongs.js");
+/* harmony import */ var _expressions_between__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./expressions/between */ "./src/renderer/viz/expressions/between.js");
+/* harmony import */ var _expressions_binary__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./expressions/binary */ "./src/renderer/viz/expressions/binary.js");
+/* harmony import */ var _expressions_blend__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./expressions/blend */ "./src/renderer/viz/expressions/blend.js");
+/* harmony import */ var _expressions_buckets__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./expressions/buckets */ "./src/renderer/viz/expressions/buckets.js");
+/* harmony import */ var _expressions_basic_category__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./expressions/basic/category */ "./src/renderer/viz/expressions/basic/category.js");
+/* harmony import */ var _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./expressions/color/CIELab */ "./src/renderer/viz/expressions/color/CIELab.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterAvg */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMax */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMin */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMode */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterSum */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js");
+/* harmony import */ var _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./expressions/basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
+/* harmony import */ var _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./expressions/color/hex */ "./src/renderer/viz/expressions/color/hex.js");
+/* harmony import */ var _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./expressions/color/hsl */ "./src/renderer/viz/expressions/color/hsl.js");
+/* harmony import */ var _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./expressions/color/hsv */ "./src/renderer/viz/expressions/color/hsv.js");
+/* harmony import */ var _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./expressions/interpolators */ "./src/renderer/viz/expressions/interpolators.js");
+/* harmony import */ var _expressions_linear__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./expressions/linear */ "./src/renderer/viz/expressions/linear.js");
+/* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
+/* harmony import */ var _expressions_now__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./expressions/now */ "./src/renderer/viz/expressions/now.js");
+/* harmony import */ var _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
+/* harmony import */ var _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/color/opacity */ "./src/renderer/viz/expressions/color/opacity.js");
+/* harmony import */ var _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./expressions/ordering */ "./src/renderer/viz/expressions/ordering.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["Desc"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Desc"]; });
 
-/* harmony import */ var _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./expressions/color/palettes */ "./src/renderer/viz/expressions/color/palettes.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_22__["default"]; });
+/* harmony import */ var _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./expressions/color/palettes */ "./src/renderer/viz/expressions/color/palettes.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__["default"]; });
 
-/* harmony import */ var _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/color/palettes/Reverse */ "./src/renderer/viz/expressions/color/palettes/Reverse.js");
-/* harmony import */ var _expressions_basic_property__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./expressions/basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _expressions_classifier__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./expressions/classifier */ "./src/renderer/viz/expressions/classifier.js");
-/* harmony import */ var _expressions_ramp__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/ramp */ "./src/renderer/viz/expressions/ramp.js");
-/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
-/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
-/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
-/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
-/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
-/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
-/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
-/* harmony import */ var _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./expressions/aggregation/viewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewportAggregation.js");
-/* harmony import */ var _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/aggregation/globalAggregation */ "./src/renderer/viz/expressions/aggregation/globalAggregation.js");
-/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
-/* harmony import */ var _expressions_xyz__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/xyz */ "./src/renderer/viz/expressions/xyz.js");
-/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
-/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
-/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
-/* harmony import */ var _expressions_ImageList__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/ImageList */ "./src/renderer/viz/expressions/ImageList.js");
-/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
-/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/color/palettes/Reverse */ "./src/renderer/viz/expressions/color/palettes/Reverse.js");
+/* harmony import */ var _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./expressions/basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./expressions/classification/GlobalEqIntervals */ "./src/renderer/viz/expressions/classification/GlobalEqIntervals.js");
+/* harmony import */ var _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./expressions/classification/GlobalQuantiles */ "./src/renderer/viz/expressions/classification/GlobalQuantiles.js");
+/* harmony import */ var _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./expressions/classification/ViewportEqIntervals */ "./src/renderer/viz/expressions/classification/ViewportEqIntervals.js");
+/* harmony import */ var _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./expressions/classification/ViewportQuantiles */ "./src/renderer/viz/expressions/classification/ViewportQuantiles.js");
+/* harmony import */ var _expressions_ramp__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./expressions/ramp */ "./src/renderer/viz/expressions/ramp.js");
+/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
+/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
+/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
+/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
+/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
+/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
+/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportAvg */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMax */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMin */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportSum */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportCount */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportPercentile */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportHistogram */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalAvg */ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalCount */ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMax */ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMin */ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
+/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
+/* harmony import */ var _expressions_xyz__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/xyz */ "./src/renderer/viz/expressions/xyz.js");
+/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
+/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
+/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
+/* harmony import */ var _expressions_ImageList__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/ImageList */ "./src/renderer/viz/expressions/ImageList.js");
+/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
 /**
  *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
  *  A viz has the following properties:
@@ -13362,32 +13755,46 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* Expose classes as constructor functions */
 
-const transition = (...args) => new _expressions_transition__WEBPACK_IMPORTED_MODULE_1__["default"](...args);
+const transition = (...args) => new _expressions_transition__WEBPACK_IMPORTED_MODULE_0__["default"](...args);
 
-const array = (...args) => new _expressions_basic_array__WEBPACK_IMPORTED_MODULE_2__["default"](...args);
+const array = (...args) => new _expressions_basic_array__WEBPACK_IMPORTED_MODULE_1__["default"](...args);
 
-const in_ = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_3__["In"](...args);
-const nin = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_3__["Nin"](...args);
+const in_ = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__["In"](...args);
+const nin = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__["Nin"](...args);
 
 
-const between = (...args) => new _expressions_between__WEBPACK_IMPORTED_MODULE_4__["default"](...args);
+const between = (...args) => new _expressions_between__WEBPACK_IMPORTED_MODULE_3__["default"](...args);
 
-const mul = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Mul"](...args);
-const div = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Div"](...args);
-const add = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Add"](...args);
-const sub = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Sub"](...args);
-const pow = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Pow"](...args);
-const mod = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Mod"](...args);
-const greaterThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["GreaterThan"](...args);
-const greaterThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["GreaterThanOrEqualTo"](...args);
-const lessThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["LessThan"](...args);
-const lessThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["LessThanOrEqualTo"](...args);
-const equals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Equals"](...args);
-const notEquals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["NotEquals"](...args);
-const and = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["And"](...args);
-const or = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_5__["Or"](...args);
+const mul = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Mul"](...args);
+const div = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Div"](...args);
+const add = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Add"](...args);
+const sub = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Sub"](...args);
+const pow = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Pow"](...args);
+const mod = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Mod"](...args);
+const greaterThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["GreaterThan"](...args);
+const greaterThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["GreaterThanOrEqualTo"](...args);
+const lessThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["LessThan"](...args);
+const lessThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["LessThanOrEqualTo"](...args);
+const equals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Equals"](...args);
+const notEquals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["NotEquals"](...args);
+const and = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["And"](...args);
+const or = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Or"](...args);
 const gt = greaterThan;
 const gte = greaterThanOrEqualTo;
 const lt = lessThan;
@@ -13395,141 +13802,138 @@ const lte = lessThanOrEqualTo;
 const eq = equals;
 const neq = notEquals;
 
-const blend = (...args) => new _expressions_blend__WEBPACK_IMPORTED_MODULE_6__["default"](...args);
+const blend = (...args) => new _expressions_blend__WEBPACK_IMPORTED_MODULE_5__["default"](...args);
 
-const buckets = (...args) => new _expressions_buckets__WEBPACK_IMPORTED_MODULE_7__["default"](...args);
+const buckets = (...args) => new _expressions_buckets__WEBPACK_IMPORTED_MODULE_6__["default"](...args);
 
-const cielab = (...args) => new _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_9__["default"](...args);
+const cielab = (...args) => new _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_8__["default"](...args);
 
-const clusterAvg = (...args) => new _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__["ClusterAvg"](...args);
-const clusterMax = (...args) => new _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__["ClusterMax"](...args);
-const clusterMin = (...args) => new _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__["ClusterMin"](...args);
-const clusterMode = (...args) => new _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__["ClusterMode"](...args);
-const clusterSum = (...args) => new _expressions_aggregation_clusterAggregation__WEBPACK_IMPORTED_MODULE_10__["ClusterSum"](...args);
+const clusterAvg = (...args) => new _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__["default"](...args);
+const clusterMax = (...args) => new _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__["default"](...args);
+const clusterMin = (...args) => new _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__["default"](...args);
+const clusterMode = (...args) => new _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__["default"](...args);
+const clusterSum = (...args) => new _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__["default"](...args);
 
-const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](...args);
+const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](...args);
 
-const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_40__["default"](...args);
-const imageList = (...args) => new _expressions_ImageList__WEBPACK_IMPORTED_MODULE_41__["default"](...args);
-const sprite = (...args) => Object(_utils_warning__WEBPACK_IMPORTED_MODULE_0__["showDeprecationWarning"])(args, _expressions_Image__WEBPACK_IMPORTED_MODULE_40__["default"], 'sprite', 'image');
-const sprites = (...args) => Object(_utils_warning__WEBPACK_IMPORTED_MODULE_0__["showDeprecationWarning"])(args, _expressions_ImageList__WEBPACK_IMPORTED_MODULE_41__["default"], 'sprites', 'imageList');
+const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
+const imageList = (...args) => new _expressions_ImageList__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
 
-const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](...args);
+const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
 
-const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_12__["default"](...args);
+const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__["default"](...args);
 
-const hsl = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_13__["HSL"](...args);
-const hsla = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_13__["HSLA"](...args);
+const hsl = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__["HSL"](...args);
+const hsla = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__["HSLA"](...args);
 
-const hsv = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_14__["HSV"](...args);
-const hsva = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_14__["HSVA"](...args);
+const hsv = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__["HSV"](...args);
+const hsva = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__["HSVA"](...args);
 
-const cubic = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_15__["Cubic"](...args);
-const ilinear = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_15__["ILinear"](...args);
+const cubic = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__["Cubic"](...args);
+const ilinear = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__["ILinear"](...args);
 
-const linear = (...args) => new _expressions_linear__WEBPACK_IMPORTED_MODULE_16__["default"](...args);
+const linear = (...args) => new _expressions_linear__WEBPACK_IMPORTED_MODULE_19__["default"](...args);
 
-const namedColor = (...args) => new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_17__["default"](...args);
+const namedColor = (...args) => new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__["default"](...args);
 
-const now = (...args) => new _expressions_now__WEBPACK_IMPORTED_MODULE_18__["default"](...args);
+const now = (...args) => new _expressions_now__WEBPACK_IMPORTED_MODULE_21__["default"](...args);
 
-const number = (...args) => new _expressions_basic_number__WEBPACK_IMPORTED_MODULE_19__["default"](...args);
+const number = (...args) => new _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__["default"](...args);
 
-const opacity = (...args) => new _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_20__["default"](...args);
+const opacity = (...args) => new _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
 
-const asc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["Asc"](...args);
-const desc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["Desc"](...args);
-const noOrder = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["NoOrder"](...args);
-const width = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_21__["Width"](...args);
+const asc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"](...args);
+const desc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Desc"](...args);
+const noOrder = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["NoOrder"](...args);
+const width = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Width"](...args);
 
-const reverse = (...args) => new _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
+const reverse = (...args) => new _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_26__["default"](...args);
 
-const property = (...args) => new _expressions_basic_property__WEBPACK_IMPORTED_MODULE_24__["default"](...args);
+const property = (...args) => new _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__["default"](...args);
 
 
-const viewportQuantiles = (...args) => new _expressions_classifier__WEBPACK_IMPORTED_MODULE_25__["ViewportQuantiles"](...args);
-const globalQuantiles = (...args) => new _expressions_classifier__WEBPACK_IMPORTED_MODULE_25__["GlobalQuantiles"](...args);
-const globalEqIntervals = (...args) => new _expressions_classifier__WEBPACK_IMPORTED_MODULE_25__["GlobalEqIntervals"](...args);
-const viewportEqIntervals = (...args) => new _expressions_classifier__WEBPACK_IMPORTED_MODULE_25__["ViewportEqIntervals"](...args);
+const viewportQuantiles = (...args) => new _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_31__["default"](...args);
+const globalQuantiles = (...args) => new _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_29__["default"](...args);
+const globalEqIntervals = (...args) => new _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_28__["default"](...args);
+const viewportEqIntervals = (...args) => new _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_30__["default"](...args);
 
-const ramp = (...args) => new _expressions_ramp__WEBPACK_IMPORTED_MODULE_26__["default"](...args);
+const ramp = (...args) => new _expressions_ramp__WEBPACK_IMPORTED_MODULE_32__["default"](...args);
 
-const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_27__["RGB"](...args);
-const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_27__["RGBA"](...args);
+const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_33__["RGB"](...args);
+const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_33__["RGBA"](...args);
 
-const category = (...args) => new _expressions_basic_category__WEBPACK_IMPORTED_MODULE_8__["default"](...args);
+const category = (...args) => new _expressions_basic_category__WEBPACK_IMPORTED_MODULE_7__["default"](...args);
 
-const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_28__["default"](...args);
-
-
-const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_29__["default"](...args);
-
-const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_30__["Fade"](...args);
-const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_31__["Animation"](...args);
-const torque = (...args) => Object(_utils_warning__WEBPACK_IMPORTED_MODULE_0__["showDeprecationWarning"])(args, _expressions_Animation__WEBPACK_IMPORTED_MODULE_31__["Animation"], 'torque', 'animation');
-
-const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Log"](...args);
-const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Sqrt"](...args);
-const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Sin"](...args);
-const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Cos"](...args);
-const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Tan"](...args);
-const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Sign"](...args);
-const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Abs"](...args);
-const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["IsNaN"](...args);
-const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Not"](...args);
-const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Floor"](...args);
-const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_32__["Ceil"](...args);
-
-const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_33__["default"])(...args);
+const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_34__["default"](...args);
 
 
-const viewportAvg = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportAvg"](...args);
-const viewportMax = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportMax"](...args);
-const viewportMin = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportMin"](...args);
-const viewportSum = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportSum"](...args);
-const viewportCount = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportCount"](...args);
-const viewportPercentile = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportPercentile"](...args);
-const viewportHistogram = (...args) => new _expressions_aggregation_viewportAggregation__WEBPACK_IMPORTED_MODULE_34__["ViewportHistogram"](...args);
-const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_36__["default"](...args);
-const globalAvg = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalAvg"](...args);
-const globalMax = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalMax"](...args);
-const globalMin = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalMin"](...args);
-const globalSum = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalSum"](...args);
-const globalCount = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalCount"](...args);
-const globalPercentile = (...args) => new _expressions_aggregation_globalAggregation__WEBPACK_IMPORTED_MODULE_35__["GlobalPercentile"](...args);
+const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_35__["default"](...args);
 
-const xyz = (...args) => new _expressions_xyz__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
+const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_36__["Fade"](...args);
+const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_37__["Animation"](...args);
 
-const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_38__["default"](...args);
-const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_39__["default"](...args);
+const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Log"](...args);
+const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Sqrt"](...args);
+const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Sin"](...args);
+const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Cos"](...args);
+const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Tan"](...args);
+const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Sign"](...args);
+const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Abs"](...args);
+const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["IsNaN"](...args);
+const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Not"](...args);
+const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Floor"](...args);
+const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_38__["Ceil"](...args);
 
-const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](Number.MAX_SAFE_INTEGER);
-const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](1);
-const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](0);
-const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](Math.PI);
-const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_11__["default"](Math.E);
+const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_39__["default"])(...args);
 
-const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].bicycle);
-const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].building);
-const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].bus);
-const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].car);
-const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].circle);
-const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].circleOutline);
-const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].cross);
-const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].flag);
-const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].house);
-const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].marker);
-const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].markerOutline);
-const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].plus);
-const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].square);
-const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].squareOutline);
-const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].star);
-const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].starOutline);
-const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].triangle);
-const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_42__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_43__["default"].triangleOutline);
 
-const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_39__["default"](constant(0), constant(0));
-const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_39__["default"](constant(0), constant(1));
+const viewportAvg = (...args) => new _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_40__["default"](...args);
+const viewportMax = (...args) => new _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_41__["default"](...args);
+const viewportMin = (...args) => new _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_42__["default"](...args);
+const viewportSum = (...args) => new _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_43__["default"](...args);
+const viewportCount = (...args) => new _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_44__["default"](...args);
+const viewportPercentile = (...args) => new _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_45__["default"](...args);
+const viewportHistogram = (...args) => new _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_46__["default"](...args);
+const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_53__["default"](...args);
+const globalAvg = (...args) => new _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_47__["default"](...args);
+const globalMax = (...args) => new _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_49__["default"](...args);
+const globalMin = (...args) => new _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_50__["default"](...args);
+const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_51__["default"](...args);
+const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
+const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
+
+const xyz = (...args) => new _expressions_xyz__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+
+const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
+const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
+
+const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Number.MAX_SAFE_INTEGER);
+const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](1);
+const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](0);
+const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.PI);
+const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.E);
+
+const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bicycle);
+const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].building);
+const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bus);
+const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].car);
+const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circle);
+const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circleOutline);
+const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].cross);
+const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].flag);
+const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].house);
+const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].marker);
+const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].markerOutline);
+const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].plus);
+const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].square);
+const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].squareOutline);
+const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].star);
+const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].starOutline);
+const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangle);
+const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangleOutline);
+
+const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](constant(0), constant(0));
+const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](constant(0), constant(1));
 
 
 
@@ -14241,28 +14645,90 @@ class SVG extends _Image__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/aggregation/clusterAggregation.js":
-/*!************************************************************************!*\
-  !*** ./src/renderer/viz/expressions/aggregation/clusterAggregation.js ***!
-  \************************************************************************/
-/*! exports provided: ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum */
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js":
+/*!********************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js ***!
+  \********************************************************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClusterAvg", function() { return ClusterAvg; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClusterMax", function() { return ClusterMax; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClusterMin", function() { return ClusterMin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClusterMode", function() { return ClusterMode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ClusterSum", function() { return ClusterSum; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../schema */ "./src/renderer/schema.js");
-/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterAggregation; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../schema */ "./src/renderer/schema.js");
 
 
 
 
+
+class ClusterAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor ({ property, expressionName, aggName, aggType }) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])(expressionName, 'property', 0, _basic_property__WEBPACK_IMPORTED_MODULE_1__["default"], property);
+        super({ property });
+        this._aggName = aggName;
+        this._expressionName = expressionName;
+        this.type = aggType;
+    }
+
+    get name () {
+        return this.property.name;
+    }
+
+    get aggName () {
+        return this._aggName;
+    }
+
+    get numCategories () {
+        return this.property.numCategories;
+    }
+
+    eval (feature) {
+        return feature[_schema__WEBPACK_IMPORTED_MODULE_3__["column"].aggColumn(this.property.name, this._aggName)];
+    }
+
+    // Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
+    _compile (metadata) {
+        super._compile(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])(this._expressionName, 'property', 0, this.type, this.property);
+    }
+
+    _resolveAliases () {}
+
+    _applyToShaderSource (getGLSLforProperty) {
+        return {
+            preface: '',
+            inline: `${getGLSLforProperty(_schema__WEBPACK_IMPORTED_MODULE_3__["column"].aggColumn(this.property.name, this._aggName))}`
+        };
+    }
+
+    _postShaderCompile () {}
+
+    _getMinimumNeededSchema () {
+        return {
+            columns: [
+                _schema__WEBPACK_IMPORTED_MODULE_3__["column"].aggColumn(this.property.name, this._aggName)
+            ]
+        };
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterAvg; });
+/* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
 
 /**
  * Aggregate using the average. This operation disables the access to the property
@@ -14289,7 +14755,27 @@ __webpack_require__.r(__webpack_exports__);
  * @function
  * @api
  */
-const ClusterAvg = genAggregationOp('clusterAvg', 'number');
+class ClusterAvg extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, expressionName: 'clusterAvg', aggName: 'avg', aggType: 'number' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMax; });
+/* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+
 
 /**
  * Aggregate using the maximum. This operation disables the access to the property
@@ -14316,7 +14802,27 @@ const ClusterAvg = genAggregationOp('clusterAvg', 'number');
  * @function
  * @api
  */
-const ClusterMax = genAggregationOp('clusterMax', 'number');
+class ClusterMax extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, expressionName: 'clusterMax', aggName: 'max', aggType: 'number' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMin; });
+/* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+
 
 /**
  * Aggregate using the minimum. This operation disables the access to the property
@@ -14343,7 +14849,26 @@ const ClusterMax = genAggregationOp('clusterMax', 'number');
  * @function
  * @api
  */
-const ClusterMin = genAggregationOp('clusterMin', 'number');
+class ClusterMin extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, expressionName: 'clusterMin', aggName: 'min', aggType: 'number' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js":
+/*!*************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js ***!
+  \*************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMode; });
+/* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
 
 /**
  * Aggregate using the mode. This operation disables the access to the property
@@ -14370,7 +14895,27 @@ const ClusterMin = genAggregationOp('clusterMin', 'number');
  * @function
  * @api
  */
-const ClusterMode = genAggregationOp('clusterMode', 'category');
+class ClusterMode extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, expressionName: 'clusterMode', aggName: 'mode', aggType: 'category' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterSum; });
+/* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+
 
 /**
  * Aggregate using the sum. This operation disables the access to the property
@@ -14397,76 +14942,96 @@ const ClusterMode = genAggregationOp('clusterMode', 'category');
  * @function
  * @api
  */
-const ClusterSum = genAggregationOp('clusterSum', 'number');
-
-function genAggregationOp (expressionName, aggType) {
-    const aggName = expressionName.replace('cluster', '').toLowerCase();
-    return class AggregationOperation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-        constructor (property) {
-            Object(_utils__WEBPACK_IMPORTED_MODULE_3__["checkInstance"])(expressionName, 'property', 0, _basic_property__WEBPACK_IMPORTED_MODULE_2__["default"], property);
-            super({ property });
-            this._aggName = aggName;
-            this.type = aggType;
-        }
-        get name () {
-            return this.property.name;
-        }
-        get aggName () {
-            return this._aggName;
-        }
-        get numCategories () {
-            return this.property.numCategories;
-        }
-        eval (feature) {
-            return feature[_schema__WEBPACK_IMPORTED_MODULE_1__["column"].aggColumn(this.property.name, aggName)];
-        }
-        // Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-        _compile (metadata) {
-            super._compile(metadata);
-            Object(_utils__WEBPACK_IMPORTED_MODULE_3__["checkType"])(expressionName, 'property', 0, aggType, this.property);
-        }
-        _applyToShaderSource (getGLSLforProperty) {
-            return {
-                preface: '',
-                inline: `${getGLSLforProperty(_schema__WEBPACK_IMPORTED_MODULE_1__["column"].aggColumn(this.property.name, aggName))}`
-            };
-        }
-        _postShaderCompile () { }
-        _getMinimumNeededSchema () {
-            return {
-                columns: [
-                    _schema__WEBPACK_IMPORTED_MODULE_1__["column"].aggColumn(this.property.name, aggName)
-                ]
-            };
-        }
-    };
+class ClusterSum extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, expressionName: 'clusterSum', aggName: 'sum', aggType: 'number' });
+    }
 }
 
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/aggregation/globalAggregation.js":
-/*!***********************************************************************!*\
-  !*** ./src/renderer/viz/expressions/aggregation/globalAggregation.js ***!
-  \***********************************************************************/
-/*! exports provided: GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile */
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js":
+/*!******************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js ***!
+  \******************************************************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalAvg", function() { return GlobalAvg; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalMax", function() { return GlobalMax; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalMin", function() { return GlobalMin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalSum", function() { return GlobalSum; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalCount", function() { return GlobalCount; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalPercentile", function() { return GlobalPercentile; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../schema */ "./src/renderer/schema.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalAggregation; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../schema */ "./src/renderer/schema.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 
+
+
+class GlobalAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    /**
+     * @param {*} property
+     * @param {*} name
+     */
+    constructor ({ property, name, type }) {
+        super({ _value: Object(_expressions__WEBPACK_IMPORTED_MODULE_2__["number"])(0) });
+        this.property = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["implicitCast"])(property);
+        this._name = name;
+        this.type = type;
+    }
+
+    isFeatureDependent () {
+        return false;
+    }
+
+    get value () {
+        return this._value.expr;
+    }
+
+    eval () {
+        return this._value.expr;
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+
+        super.inlineMaker = inline => inline._value;
+        if (metadata.properties[this.property.name][this._name] === undefined) {
+            throw new Error(`Metadata ${this._name} for property ${this.property.name} is not defined`);
+        }
+        this._value.expr = metadata.properties[this.property.name][this._name];
+    }
+
+    _getMinimumNeededSchema () {
+        return this.property._getMinimumNeededSchema();
+    }
+
+    _getColumnName () {
+        if (this.property.aggName) {
+            return _schema__WEBPACK_IMPORTED_MODULE_1__["column"].aggColumn(this.property.name, this.property.aggName);
+        }
+        return this.property.name;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js":
+/*!**********************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js ***!
+  \**********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalCount; });
+/* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
 
 
 /**
@@ -14495,91 +15060,27 @@ __webpack_require__.r(__webpack_exports__);
  * @function
  * @api
  */
-const GlobalAvg = generateGlobalAggregattion('avg');
+class GlobalCount extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, name: 'avg', type: 'number' });
+    }
+}
 
-/**
- * Return the maximum of the feature property for the entire source data.
- *
- * Note: `globalMax` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
- *
- * @param {Number|Date} property - property expression of date or number type
- * @return {Number|Date} Result of the aggregation
- *
- * @example <caption>Assign the global maximum of the `amount` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_max: s.globalMax(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global maximum of the `amount` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@g_max: globalMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMax
- * @function
- * @api
- */
-const GlobalMax = generateGlobalAggregattion('max');
 
-/**
- * Return the minimum of the feature property for the entire source data.
- *
- * Note: `globalMin` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
- *
- * @param {Number|Date} property - property expression of date or number type
- * @return {Number|Date} Result of the aggregation
- *
- * @example <caption>Assign the global minimum of the `amount` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_min: s.globalMin(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global minimum of the `amount` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@g_min: globalMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalMin
- * @function
- * @api
- */
-const GlobalMin = generateGlobalAggregattion('min');
+/***/ }),
 
-/**
- * Return the sum of the feature property for the entire source data.
- *
- * Note: `globalSum` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
- *
- * @param {Number} property - property expression of number type
- * @return {Number} Result of the aggregation
- *
- * @example <caption>Assign the global sum of the `amount` property to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      g_sum: s.globalSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the global sum of the `amount` property to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@g_sum: globalSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name globalSum
- * @function
- * @api
- */
-const GlobalSum = generateGlobalAggregattion('sum');
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalCount.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalCount; });
+/* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+
 
 /**
  * Return the feature count for the entire source data.
@@ -14607,95 +15108,142 @@ const GlobalSum = generateGlobalAggregattion('sum');
  * @function
  * @api
  */
-const GlobalCount = generateGlobalAggregattion('count');
-
-function generateGlobalAggregattion (metadataPropertyName) {
-    return class GlobalAggregattion extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-        /**
-         * @param {*} property
-         */
-        constructor (property) {
-            super({ _value: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
-            this.property = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["implicitCast"])(property);
-        }
-        isFeatureDependent () {
-            return false;
-        }
-        get value () {
-            return this._value.expr;
-        }
-
-        eval () {
-            return this._value.expr;
-        }
-
-        _compile (metadata) {
-            super._compile(metadata);
-            // TODO improve type check
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline._value;
-            if (metadata.properties[this.property.name][metadataPropertyName] === undefined) {
-                throw new Error(`Metadata ${metadataPropertyName} for property ${this.property.name} is not defined`);
-            }
-            this._value.expr = metadata.properties[this.property.name][metadataPropertyName];
-        }
-        _getMinimumNeededSchema () {
-            return this.property._getMinimumNeededSchema();
-        }
-        _getColumnName () {
-            if (this.property.aggName) {
-                // Property has aggregation
-                return _schema__WEBPACK_IMPORTED_MODULE_2__["column"].aggColumn(this.property.name, this.property.aggName);
-            }
-            return this.property.name;
-        }
-    };
+class GlobalCount extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, name: 'count', type: 'number' });
+    }
 }
 
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js":
+/*!**********************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalMax.js ***!
+  \**********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalMax; });
+/* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+
+
 /**
- * Return the Nth percentile of the feature property for the entire source data.
+ * Return the maximum of the feature property for the entire source data.
  *
- * Note: `globalPercentile` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ * Note: `globalMax` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
  *
- * @param {Number} property - property expression of number type
- * @param {Number} percentile - Numeric expression [0, 100]
- * @return {Number} Result of the aggregation
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
  *
- * @example <caption>Assign the global percentile of the `amount` property to a variable.</caption>
+ * @example <caption>Assign the global maximum of the `amount` property to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *      g_percentile: s.globalPercentile(s.prop('amount'))
+ *      g_max: s.globalMax(s.prop('amount'))
  *   }
  * });
  *
- * @example <caption>Assign the global percentile of the `amount` property to a variable. (String)</caption>
+ * @example <caption>Assign the global maximum of the `amount` property to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   \@g_percentile: globalPercentile($amount)
+ *   \@g_max: globalMax($amount)
  * `);
  *
  * @memberof carto.expressions
- * @name globalPercentile
+ * @name globalMax
  * @function
  * @api
  */
+class GlobalMax extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, name: 'max', type: 'number' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js":
+/*!**********************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalMin.js ***!
+  \**********************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalMin; });
+/* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+
+/**
+ * Return the minimum of the feature property for the entire source data.
+ *
+ * Note: `globalMin` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number|Date} property - property expression of date or number type
+ * @return {Number|Date} Result of the aggregation
+ *
+ * @example <caption>Assign the global minimum of the `amount` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_min: s.globalMin(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global minimum of the `amount` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@g_min: globalMin($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalMin
+ * @function
+ * @api
+ */
+class GlobalMin extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, name: 'min', type: 'number' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js":
+/*!*****************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js ***!
+  \*****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalPercentile; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../schema */ "./src/renderer/schema.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+
+
+
+
 class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    /**
-     * @param {*} property
-     */
     constructor (property, percentile) {
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');
         }
-        super({ _value: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
+        super({ _value: Object(_expressions__WEBPACK_IMPORTED_MODULE_2__["number"])(0) });
         // TODO improve type check
         this.property = property;
         this.percentile = percentile;
     }
+
     isFeatureDependent () {
         return false;
     }
+
     get value () {
         return this._value.expr;
     }
@@ -14710,13 +15258,15 @@ class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const p = this.percentile / 100;
         this._value.expr = copy[Math.floor(p * copy.length)];
     }
+
     _getMinimumNeededSchema () {
         return this.property._getMinimumNeededSchema();
     }
+
     _getColumnName () {
         if (this.property.aggName) {
             // Property has aggregation
-            return _schema__WEBPACK_IMPORTED_MODULE_2__["column"].aggColumn(this.property.name, this.property.aggName);
+            return _schema__WEBPACK_IMPORTED_MODULE_1__["column"].aggColumn(this.property.name, this.property.aggName);
         }
         return this.property.name;
     }
@@ -14725,27 +15275,116 @@ class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/aggregation/viewportAggregation.js":
-/*!*************************************************************************!*\
-  !*** ./src/renderer/viz/expressions/aggregation/viewportAggregation.js ***!
-  \*************************************************************************/
-/*! exports provided: ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram */
+/***/ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js":
+/*!**********************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/global/GlobalSum.js ***!
+  \**********************************************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportAvg", function() { return ViewportAvg; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportMax", function() { return ViewportMax; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportMin", function() { return ViewportMin; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportSum", function() { return ViewportSum; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportCount", function() { return ViewportCount; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportPercentile", function() { return ViewportPercentile; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportHistogram", function() { return ViewportHistogram; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalSum; });
+/* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
 
 
+/**
+ * Return the sum of the feature property for the entire source data.
+ *
+ * Note: `globalSum` can only be created by {@link carto.expressions.prop|carto.expressions.prop}, not other expressions.
+ *
+ * @param {Number} property - property expression of number type
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the global sum of the `amount` property to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      g_sum: s.globalSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the global sum of the `amount` property to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@g_sum: globalSum($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalSum
+ * @function
+ * @api
+ */
+class GlobalSum extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property, name: 'sum' });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js":
+/*!**********************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js ***!
+  \**********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportAggregation; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+
+
+
+
+class ViewportAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    /**
+     * @param {*} property
+     */
+    constructor ({ property }) {
+        super({ property: Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(property), _impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_2__["number"])(0) });
+        this._isViewport = true;
+    }
+
+    isFeatureDependent () {
+        return false;
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline._impostor;
+    }
+
+    _getMinimumNeededSchema () {
+        return this.property._getMinimumNeededSchema();
+    }
+
+    _preDraw (...args) {
+        this._impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportAvg; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
 
 
 /**
@@ -14772,118 +15411,53 @@ __webpack_require__.r(__webpack_exports__);
  * @function
  * @api
  */
-const ViewportAvg = genViewportAgg('avg',
-    self => {
-        self._sum = 0; self._count = 0;
-    },
-    (self, x) => {
-        if (!Number.isNaN(x)) {
-            self._count++;
-            self._sum += x;
-        }
-    },
-    self => self._sum / self._count
-);
+class ViewportAvg extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property });
+        this._sum = 0;
+        this._count = 0;
+    }
 
-/**
- * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
- *
- * @param {Number} input - numeric expression
- * @return {Number} Result of the aggregation
- *
- * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_max: s.viewportMax(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@v_max: viewportMax($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportMax
- * @function
- * @api
- */
-const ViewportMax = genViewportAgg('max',
-    self => { self._value = Number.NEGATIVE_INFINITY; },
-    (self, y) => {
-        if (!Number.isNaN(y)) {
-            self._value = Math.max(self._value, y);
-        }
-    },
-    self => self._value
-);
+    get value () {
+        return this._sum / this._count;
+    }
 
-/**
- * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
- *
- * @param {Number} input - numeric expression
- * @return {Number} Result of the aggregation
- *
- * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_min: s.viewportMin(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@v_min: viewportMin($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportMin
- * @function
- * @api
- */
-const ViewportMin = genViewportAgg('min',
-    self => { self._value = Number.POSITIVE_INFINITY; },
-    (self, y) => {
-        if (!Number.isNaN(y)) {
-            self._value = Math.min(self._value, y);
-        }
-    },
-    self => self._value);
+    eval () {
+        return this.value;
+    }
 
-/**
- * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
- *
- * @param {Number} input - numeric expression
- * @return {Number} Result of the aggregation
- *
- * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_sum: s.viewportSum(s.prop('amount'))
- *   }
- * });
- *
- * @example <caption>Assign the sum of the `amount` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@v_sum: viewportSum($amount)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportSum
- * @function
- * @api
- */
-const ViewportSum = genViewportAgg('sum',
-    self => { self._value = 0; },
-    (self, y) => {
-        if (!Number.isNaN(y)) {
-            self._value = self._value + y;
+    accumViewportAgg (feature) {
+        const propertyValue = this.property.eval(feature);
+
+        if (!Number.isNaN(propertyValue)) {
+            this._count++;
+            this._sum += propertyValue;
         }
-    },
-    self => self._value);
+    }
+
+    _resetViewportAgg () {
+        this._sum = 0;
+        this._count = 0;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js":
+/*!****************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportCount; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+
+
 
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -14909,147 +15483,46 @@ const ViewportSum = genViewportAgg('sum',
  * @function
  * @api
  */
-const ViewportCount = genViewportAgg('count',
-    self => { self._value = 0; },
-    self => { self._value++; },
-    self => self._value);
-
-function genViewportAgg (metadataPropertyName, zeroFn, accumFn, resolveFn) {
-    return class ViewportAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-        /**
-         * @param {*} property
-         */
-        constructor (property) {
-            super({
-                property: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(metadataPropertyName === 'count' ? Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) : property),
-                _impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0)
-            });
-            this._isViewport = true;
-        }
-
-        isFeatureDependent () {
-            return false;
-        }
-
-        get value () {
-            return resolveFn(this);
-        }
-
-        eval () {
-            return resolveFn(this);
-        }
-
-        _compile (metadata) {
-            super._compile(metadata);
-            // TODO improve type check
-            this.property._compile(metadata);
-            this.type = 'number';
-            super.inlineMaker = inline => inline._impostor;
-        }
-
-        _getMinimumNeededSchema () {
-            return this.property._getMinimumNeededSchema();
-        }
-
-        _resetViewportAgg () {
-            zeroFn(this);
-        }
-
-        accumViewportAgg (feature) {
-            accumFn(this, this.property.eval(feature));
-        }
-
-        _preDraw (...args) {
-            this._impostor.expr = this.eval();
-            super._preDraw(...args);
-        }
-    };
-}
-
-/**
- * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
- *
- * @param {Number} input - Numeric expression
- * @param {Number} percentile - Numeric expression [0, 100]
- * @return {Number} Result of the aggregation
- *
- * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   variables: {
- *      v_percentile: s.viewportPercentile(s.prop('amount'), 90)
- *   }
- * });
- *
- * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
- * const viz = new carto.Viz(`
- *   \@v_percentile: viewportPercentile($amount, 90)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportPercentile
- * @function
- * @api
- */
-class ViewportPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    /**
-     * @param {*} property
-     */
-    constructor (property, percentile) {
-        super({
-            property: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(property),
-            percentile: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(percentile),
-            impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0)
-        });
-        this._isViewport = true;
-    }
-
-    isFeatureDependent () {
-        return false;
+class ViewportCount extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor () {
+        super({ property: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
+        this._value = 0;
     }
 
     get value () {
-        return this.eval();
-    }
-
-    eval (f) {
-        if (this._value === null) {
-            this._array.sort((a, b) => a - b);
-            const index = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["clamp"])(
-                Math.floor(this.percentile.eval(f) / 100 * this._array.length),
-                0, this._array.length - 1);
-            this._value = this._array[index];
-        }
         return this._value;
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
-        // TODO improve type check
-        this.property._compile(metadata);
-        this.type = 'number';
-        super.inlineMaker = inline => inline.impostor;
+    eval () {
+        return this.value;
     }
 
-    _getMinimumNeededSchema () {
-        return this.property._getMinimumNeededSchema();
+    accumViewportAgg () {
+        this._value++;
     }
 
     _resetViewportAgg () {
-        this._value = null;
-        this._array = [];
-    }
-
-    accumViewportAgg (feature) {
-        const v = this.property.eval(feature);
-        this._array.push(v);
-    }
-
-    _preDraw (...args) {
-        this.impostor.expr = this.eval();
-        super._preDraw(...args);
+        this._value = 0;
     }
 }
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js":
+/*!********************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js ***!
+  \********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportHistogram; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
 
 /**
  * Generates an histogram.
@@ -15087,25 +15560,22 @@ class ViewportPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
  */
 class ViewportHistogram extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (x, weight = 1, size = 1000) {
-        super({
-            x: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(x),
-            weight: Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(weight)
-        });
+        super({ x: Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x), weight: Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(weight) });
+
+        this.type = 'histogram';
         this._size = size;
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
 
-    _resetViewportAgg () {
-        this._cached = null;
-        this._histogram = new Map();
-    }
-
     accumViewportAgg (feature) {
         const x = this.x.eval(feature);
-        const weight = this.weight.eval(feature);
-        const count = this._histogram.get(x) || 0;
-        this._histogram.set(x, count + weight);
+
+        if (x !== undefined) {
+            const weight = this.weight.eval(feature);
+            const count = this._histogram.get(x) || 0;
+            this._histogram.set(x, count + weight);
+        }
     }
 
     get value () {
@@ -15113,42 +15583,384 @@ class ViewportHistogram extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             if (!this._histogram) {
                 return null;
             }
-            if (this.x.type === 'number') {
-                const array = [...this._histogram];
-                let min = Number.POSITIVE_INFINITY;
-                let max = Number.NEGATIVE_INFINITY;
-                for (let i = 0; i < array.length; i++) {
-                    const x = array[i][0];
-                    min = Math.min(min, x);
-                    max = Math.max(max, x);
-                }
-                const hist = Array(this._size).fill(0);
-                const range = max - min;
-                const sizeMinusOne = this._size - 1;
-                for (let i = 0; i < array.length; i++) {
-                    const x = array[i][0];
-                    const y = array[i][1];
-                    const index = Math.min(Math.floor(this._size * (x - min) / range), sizeMinusOne);
-                    hist[index] += y;
-                }
-                this._cached = hist.map((count, index) => {
-                    return {
-                        x: [min + index / this._size * range, min + (index + 1) / this._size * range],
-                        y: count
-                    };
-                });
-            } else {
-                this._cached = [...this._histogram].map(([x, y]) => {
-                    return { x: this._metatada.IDToCategory.get(x), y };
-                });
-            }
+
+            this._cached = this.x.type === 'number'
+                ? _getNumericValue(this._histogram, this._size)
+                : _getCategoryValue(this._histogram);
+
+            return this._cached;
         }
+
         return this._cached;
     }
 
+    eval () {
+        return this.value;
+    }
+
     _compile (metadata) {
-        this._metatada = metadata;
         super._compile(metadata);
+        this._metadata = metadata;
+    }
+
+    _resetViewportAgg (metadata) {
+        metadata = metadata || [];
+        this._compile(metadata);
+        this._cached = null;
+        this._histogram = new Map();
+    }
+}
+
+function _getNumericValue (histogram, size) {
+    const array = [...histogram];
+    const arrayLength = array.length;
+    let min = Number.POSITIVE_INFINITY;
+    let max = Number.NEGATIVE_INFINITY;
+
+    for (let i = 0; i < arrayLength; i++) {
+        const x = array[i][0];
+        min = Math.min(min, x);
+        max = Math.max(max, x);
+    }
+
+    const hist = Array(size).fill(0);
+    const range = max - min;
+    const sizeMinusOne = size - 1;
+
+    for (let i = 0; i < arrayLength; i++) {
+        const x = array[i][0];
+        const y = array[i][1];
+        const index = Math.min(Math.floor(size * (x - min) / range), sizeMinusOne);
+        hist[index] += y;
+    }
+
+    return hist.map((count, index) => {
+        return {
+            x: [min + index / size * range, min + (index + 1) / size * range],
+            y: count
+        };
+    });
+}
+
+function _getCategoryValue (histogram) {
+    return [...histogram]
+        .map(([x, y]) => {
+            return { x, y };
+        })
+        .sort(_sortFirstNumerically);
+}
+
+function _sortFirstNumerically (a, b) {
+    if (b.y - a.y === 0) {
+        return a.x.localeCompare(b.x);
+    }
+
+    return b.y - a.y;
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportCount; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+
+
+/**
+ * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
+ *
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_max: s.viewportMax(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the maximum of the `amount` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@v_max: viewportMax($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportMax
+ * @function
+ * @api
+ */
+class ViewportCount extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property });
+        this._value = Number.NEGATIVE_INFINITY;
+    }
+
+    get value () {
+        return this._value;
+    }
+
+    eval () {
+        return this.value;
+    }
+
+    accumViewportAgg (feature) {
+        const propertyValue = this.property.eval(feature);
+
+        if (!Number.isNaN(propertyValue)) {
+            this._value = Math.max(this._value, propertyValue);
+        }
+    }
+
+    _resetViewportAgg () {
+        this._value = Number.NEGATIVE_INFINITY;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportCount; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+
+
+/**
+ * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
+ *
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_min: s.viewportMin(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the minimum of the `amount` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@v_min: viewportMin($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportMin
+ * @function
+ * @api
+ */
+class ViewportCount extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property });
+        this._value = Number.POSITIVE_INFINITY;
+    }
+
+    get value () {
+        return this._value;
+    }
+
+    eval () {
+        return this.value;
+    }
+
+    accumViewportAgg (feature) {
+        const propertyValue = this.property.eval(feature);
+
+        if (!Number.isNaN(propertyValue)) {
+            this._value = Math.min(this._value, propertyValue);
+        }
+    }
+
+    _resetViewportAgg () {
+        this._value = Number.POSITIVE_INFINITY;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js":
+/*!*********************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js ***!
+  \*********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportPercentile; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
+ *
+ * @param {Number} input - Numeric expression
+ * @param {Number} percentile - Numeric expression [0, 100]
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_percentile: s.viewportPercentile(s.prop('amount'), 90)
+ *   }
+ * });
+ *
+ * @example <caption>Assign the percentile of the `amount` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@v_percentile: viewportPercentile($amount, 90)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportPercentile
+ * @function
+ * @api
+ */
+class ViewportPercentile extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    /**
+     * @param {*} property
+     * @param {*} percentile
+     */
+    constructor (property, percentile) {
+        super({ property, _impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
+
+        this._isViewport = true;
+        this.percentile = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(percentile);
+    }
+
+    get value () {
+        return this.eval();
+    }
+
+    eval (feature) {
+        if (this._value === null) {
+            const percentile = _getPercentile(this.percentile.eval(feature), this._array.length);
+            const index = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["clamp"])(percentile, 0, this._array.length - 1);
+
+            this._array.sort((a, b) => a - b);
+            this._value = this._array[index];
+        }
+
+        return this._value;
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        // TODO improve type check
+        this.property._compile(metadata);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
+    }
+
+    _getMinimumNeededSchema () {
+        return this.property._getMinimumNeededSchema();
+    }
+
+    _resetViewportAgg () {
+        this._value = null;
+        this._array = [];
+    }
+
+    accumViewportAgg (feature) {
+        const v = this.property.eval(feature);
+        this._array.push(v);
+    }
+
+    _preDraw (...args) {
+        this.impostor.expr = this.eval();
+        super._preDraw(...args);
+    }
+}
+
+function _getPercentile (value, length) {
+    return Math.floor(value / 100 * length);
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportSum; });
+/* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+
+
+/**
+ * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
+ *
+ * @param {Number} input - numeric expression
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_sum: s.viewportSum(s.prop('amount'))
+ *   }
+ * });
+ *
+ * @example <caption>Assign the sum of the `amount` property in the viewport to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@v_sum: viewportSum($amount)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportSum
+ * @function
+ * @api
+ */
+class ViewportSum extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        super({ property });
+        this._value = 0;
+    }
+
+    get value () {
+        return this._value;
+    }
+
+    eval () {
+        return this.value;
+    }
+
+    accumViewportAgg (feature) {
+        const propertyValue = this.property.eval(feature);
+
+        if (!Number.isNaN(propertyValue)) {
+            this._value = this._value + propertyValue;
+        }
+    }
+
+    _resetViewportAgg () {
+        this._value = 0;
     }
 }
 
@@ -15289,8 +16101,8 @@ class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _resetViewportAgg () {
-        this._getChildren().forEach(child => child._resetViewportAgg());
+    _resetViewportAgg (metadata) {
+        this._getChildren().forEach(child => child._resetViewportAgg(metadata));
     }
 
     accumViewportAgg (feature) {
@@ -16957,27 +17769,19 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/classifier.js":
-/*!****************************************************!*\
-  !*** ./src/renderer/viz/expressions/classifier.js ***!
-  \****************************************************/
-/*! exports provided: Classifier, ViewportQuantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals */
+/***/ "./src/renderer/viz/expressions/classification/Classifier.js":
+/*!*******************************************************************!*\
+  !*** ./src/renderer/viz/expressions/classification/Classifier.js ***!
+  \*******************************************************************/
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Classifier", function() { return Classifier; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportQuantiles", function() { return ViewportQuantiles; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalQuantiles", function() { return GlobalQuantiles; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GlobalEqIntervals", function() { return GlobalEqIntervals; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ViewportEqIntervals", function() { return ViewportEqIntervals; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
-/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../schema */ "./src/renderer/schema.js");
-
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Classifier; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../schema */ "./src/renderer/schema.js");
 
 
 
@@ -16985,12 +17789,10 @@ __webpack_require__.r(__webpack_exports__);
 let classifierUID = 0;
 class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (children, buckets) {
-        let breakpoints = [];
-        for (let i = 0; i < buckets - 1; i++) {
-            children[`arg${i}`] = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0);
-            breakpoints.push(children[`arg${i}`]);
-        }
+        const breakpoints = _genBreakpoints(children, buckets);
+
         super(children);
+
         this.classifierUID = classifierUID++;
         this.numCategories = buckets;
         this.buckets = buckets;
@@ -17008,13 +17810,12 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         return index === NOT_FOUND_INDEX ? this.breakpoints.length : index;
     }
 
-    _genBreakpoints () {
-    }
-
     getBreakpointList () {
         this._genBreakpoints();
         return this.breakpoints.map(br => br.expr);
     }
+
+    _genBreakpoints () {}
 
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
@@ -17047,11 +17848,246 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     _getColumnName () {
         if (this.input.aggName) {
             // Property has aggregation
-            return _schema__WEBPACK_IMPORTED_MODULE_4__["column"].aggColumn(this.input.name, this.input.aggName);
+            return _schema__WEBPACK_IMPORTED_MODULE_2__["column"].aggColumn(this.input.name, this.input.aggName);
         }
         return this.input.name;
     }
 }
+
+function _genBreakpoints (children, buckets) {
+    const breakpoints = [];
+
+    for (let i = 0; i < buckets - 1; i++) {
+        children[`arg${i}`] = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0);
+        breakpoints.push(children[`arg${i}`]);
+    }
+
+    return breakpoints;
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/classification/GlobalEqIntervals.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/classification/GlobalEqIntervals.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalEqIntervals; });
+/* harmony import */ var _Classifier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Classify `input` by using the equal intervals method with `n` buckets.
+ *
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ *
+ * @param {Number} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {Category}
+ *
+ * @example <caption>Use global equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use global equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalEqIntervals
+ * @function
+ * @api
+ */
+class GlobalEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalEqIntervals', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_1__["default"], input && (input.property || input));
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalEqIntervals', 'buckets', 1, buckets);
+
+        super({ input }, buckets);
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('globalEqIntervals', 'input', 0, this.input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('globalEqIntervals', 'input', 0, 'number', this.input);
+        const { min, max } = metadata.properties[this.input.name];
+        this.min = min;
+        this.max = max;
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/classification/GlobalQuantiles.js":
+/*!************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/classification/GlobalQuantiles.js ***!
+  \************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalQuantiles; });
+/* harmony import */ var _Classifier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Classify `input` by using the quantiles method with `n` buckets.
+ *
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ *
+ * @param {Number} input - The input expression used in the quantiles
+ * @param {number} n - Number of buckets to be returned
+ * @return {Category}
+ *
+ * @example <caption>Use global quantiles to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(globalQuantiles($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalQuantiles
+ * @function
+ * @api
+ */
+class GlobalQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalQuantiles', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_1__["default"], input && (input.property || input));
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalQuantiles', 'buckets', 1, buckets);
+        super({ input }, buckets);
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('globalQuantiles', 'input', 0, this.input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('globalQuantiles', 'input', 0, 'number', this.input);
+
+        const copy = metadata.sample.map(s => s[this.input.name]);
+
+        copy.sort((x, y) => x - y);
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = copy[Math.floor(p * copy.length)];
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/classification/ViewportEqIntervals.js":
+/*!****************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/classification/ViewportEqIntervals.js ***!
+  \****************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportEqIntervals; });
+/* harmony import */ var _Classifier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Classify `input` by using the equal intervals method with `n` buckets.
+ *
+ * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
+ *
+ * @param {Number} input - The input expression to classify
+ * @param {number} n - Number of buckets
+ * @return {Category}
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.viewportEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
+ * });
+ *
+ * @example <caption>Use viewport equal intervals to define a color ramp. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp(viewportEqIntervals($density, 5), PRISM)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name viewportEqIntervals
+ * @function
+ * @api
+ */
+class ViewportEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('viewportEqIntervals', 'buckets', 1, buckets);
+
+        const children = { input, _min: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMin"])(input), _max: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMax"])(input) };
+        super(children, buckets);
+    }
+
+    _compile (metadata) {
+        super._compile(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('viewportEqIntervals', 'input', 0, ['number'], this.input);
+    }
+
+    _genBreakpoints () {
+        const min = this._min.eval();
+        const max = this._max.eval();
+
+        this.breakpoints.map((breakpoint, index) => {
+            const p = (index + 1) / this.buckets;
+            breakpoint.expr = min + (max - min) * p;
+        });
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/classification/ViewportQuantiles.js":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/viz/expressions/classification/ViewportQuantiles.js ***!
+  \**************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportQuantiles; });
+/* harmony import */ var _Classifier__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
+
+
+
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -17078,22 +18114,17 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
  * @function
  * @api
  */
-class ViewportQuantiles extends Classifier {
+class ViewportQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, buckets) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('viewportQuantiles', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"], input && (input.property || input));
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('viewportQuantiles', 'buckets', 1, buckets);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('viewportQuantiles', 'buckets', 1, buckets);
 
-        let children = {
-            input
-        };
-
-        children._histogram = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportHistogram"])(input);
+        const children = { input, _histogram: Object(_expressions__WEBPACK_IMPORTED_MODULE_2__["viewportHistogram"])(input) };
         super(children, buckets);
     }
 
     _compile (metadata) {
         super._compile(metadata);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('viewportQuantiles', 'input', 0, 'number', this.input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('viewportQuantiles', 'input', 0, ['number'], this.input);
     }
 
     _genBreakpoints () {
@@ -17122,148 +18153,6 @@ class ViewportQuantiles extends Classifier {
             const percentileValue = i / histogramBuckets * (max - min) + min;
             brs.push(percentileValue);
             breakpoint.expr = percentileValue;
-        });
-    }
-}
-
-/**
- * Classify `input` by using the quantiles method with `n` buckets.
- *
- * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
- *
- * @param {Number} input - The input expression used in the quantiles
- * @param {number} n - Number of buckets to be returned
- * @return {Category}
- *
- * @example <caption>Use global quantiles to define a color ramp.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
- * });
- *
- * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp(globalQuantiles($density, 5), PRISM)
- * `);
- *
- * @memberof carto.expressions
- * @name globalQuantiles
- * @function
- * @api
- */
-class GlobalQuantiles extends Classifier {
-    constructor (input, buckets) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalQuantiles', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"], input && (input.property || input));
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalQuantiles', 'buckets', 1, buckets);
-        super({ input }, buckets);
-    }
-
-    _compile (metadata) {
-        super._compile(metadata);
-        const copy = metadata.sample.map(s => s[this.input.name]);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('globalQuantiles', 'input', 0, 'number', this.input);
-
-        copy.sort((x, y) => x - y);
-
-        this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
-            breakpoint.expr = copy[Math.floor(p * copy.length)];
-        });
-    }
-}
-
-/**
- * Classify `input` by using the equal intervals method with `n` buckets.
- *
- * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
- *
- * @param {Number} input - The input expression to classify
- * @param {number} n - Number of buckets
- * @return {Category}
- *
- * @example <caption>Use global equal intervals to define a color ramp.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.globalEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
- * });
- *
- * @example <caption>Use global equal intervals to define a color ramp. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp(globalEqIntervals($density, 5), PRISM)
- * `);
- *
- * @memberof carto.expressions
- * @name globalEqIntervals
- * @function
- * @api
- */
-class GlobalEqIntervals extends Classifier {
-    constructor (input, buckets) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalEqIntervals', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"], input && (input.property || input));
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalEqIntervals', 'buckets', 1, buckets);
-        super({ input }, buckets);
-    }
-
-    _compile (metadata) {
-        super._compile(metadata);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('globalEqIntervals', 'input', 0, 'number', this.input);
-        const { min, max } = metadata.properties[this.input.name];
-        this.min = min;
-        this.max = max;
-        this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
-            breakpoint.expr = min + (max - min) * p;
-        });
-    }
-}
-
-/**
- * Classify `input` by using the equal intervals method with `n` buckets.
- *
- * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
- *
- * @param {Number} input - The input expression to classify
- * @param {number} n - Number of buckets
- * @return {Category}
- *
- * @example <caption>Use viewport equal intervals to define a color ramp.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.viewportEqIntervals(s.prop('density'), 5), s.palettes.PRISM)
- * });
- *
- * @example <caption>Use viewport equal intervals to define a color ramp. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp(viewportEqIntervals($density, 5), PRISM)
- * `);
- *
- * @memberof carto.expressions
- * @name viewportEqIntervals
- * @function
- * @api
- */
-class ViewportEqIntervals extends Classifier {
-    constructor (input, buckets) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('viewportEqIntervals', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"], input && (input.property || input));
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('viewportEqIntervals', 'buckets', 1, buckets);
-        let children = {
-            input
-        };
-        children._min = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMin"])(input);
-        children._max = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMax"])(input);
-        super(children, buckets);
-    }
-    _compile (metadata) {
-        super._compile(metadata);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('viewportEqIntervals', 'input', 0, 'number', this.input);
-    }
-    _genBreakpoints () {
-        const min = this._min.eval();
-        const max = this._max.eval();
-
-        this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
-            breakpoint.expr = min + (max - min) * p;
         });
     }
 }
@@ -17436,7 +18325,7 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super({});
         this.type = 'color';
         this.name = colorName;
-        this.color = this._nameToRGBA();
+        this.color = _nameToRGBA(this.name);
     }
     get value () {
         return this.eval();
@@ -17448,19 +18337,27 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super._compile(meta);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
+}
 
-    _nameToRGBA () {
-        const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
-        const fakeDiv = document.createElement('div');
-        fakeDiv.style.backgroundColor = this.name;
-        document.body.appendChild(fakeDiv);
-        const rgbSring = getComputedStyle(fakeDiv).backgroundColor;
-        document.body.removeChild(fakeDiv);
+const nameToRGBACache = {};
 
-        const match = colorRegex.exec(rgbSring);
-
-        return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
+function _nameToRGBA (name) {
+    if (nameToRGBACache[name]) {
+        return nameToRGBACache[name];
     }
+    const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
+    const fakeDiv = document.createElement('div');
+    fakeDiv.style.backgroundColor = name;
+    document.body.appendChild(fakeDiv);
+    const rgbSring = getComputedStyle(fakeDiv).backgroundColor;
+    document.body.removeChild(fakeDiv);
+
+    const match = colorRegex.exec(rgbSring);
+
+    const color = { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
+
+    nameToRGBACache[name] = color;
+    return color;
 }
 
 
@@ -18907,7 +19804,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
 /* harmony import */ var _buckets__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./buckets */ "./src/renderer/viz/expressions/buckets.js");
 /* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _classifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./classifier */ "./src/renderer/viz/expressions/classifier.js");
+/* harmony import */ var _classification_Classifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./classification/Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
 /* harmony import */ var _ImageList__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ImageList */ "./src/renderer/viz/expressions/ImageList.js");
 /* harmony import */ var _linear__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./linear */ "./src/renderer/viz/expressions/linear.js");
 /* harmony import */ var _top__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./top */ "./src/renderer/viz/expressions/top.js");
@@ -19146,15 +20043,20 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
 
     _computeTextureIfNeeded () {
+        if (this._cachedTexturePixels) {
+            return this._cachedTexturePixels;
+        }
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
             this.maxKey = this.input.numCategories - 1;
         }
 
-        return this.type === rampTypes.COLOR
+        this._cachedTexturePixels = this.type === rampTypes.COLOR
             ? this._computeColorRampTexture()
             : this._computeNumericRampTexture();
+
+        return this._cachedTexturePixels;
     }
 
     _computeColorRampTexture () {
@@ -19299,7 +20201,7 @@ function _getColorsFromColorArrayType (input, palette, numCategories, defaultOth
 
 function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
     switch (true) {
-        case input.isA(_classifier__WEBPACK_IMPORTED_MODULE_6__["Classifier"]) && numCategories < colors.length:
+        case input.isA(_classification_Classifier__WEBPACK_IMPORTED_MODULE_6__["default"]) && numCategories < colors.length:
             return colors;
         case input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"]):
             return colors;
@@ -20056,7 +20958,7 @@ function throwInvalidInstance (expressionName, parameterName, parameterIndex, ex
 
 function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${number}' is not a number`);
+    type of '${number}' is ${typeof number}, 'number' was expected`);
 }
 
 function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {
@@ -20490,6 +21392,9 @@ lowerCaseFunctions.flag = _expressions__WEBPACK_IMPORTED_MODULE_1__["FLAG"];
 lowerCaseFunctions.house = _expressions__WEBPACK_IMPORTED_MODULE_1__["HOUSE"];
 lowerCaseFunctions.marker = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER"];
 lowerCaseFunctions.markeroutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER_OUTLINE"];
+lowerCaseFunctions.plus = _expressions__WEBPACK_IMPORTED_MODULE_1__["PLUS"];
+lowerCaseFunctions.square = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE"];
+lowerCaseFunctions.squareoutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE_OUTLINE"];
 lowerCaseFunctions.star = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR"];
 lowerCaseFunctions.staroutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR_OUTLINE"];
 lowerCaseFunctions.triangle = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRIANGLE"];
@@ -20938,24 +21843,6 @@ module.exports = "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" view
 /***/ (function(module, exports) {
 
 module.exports = "<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 15 15\"><path d=\"M7.524 1.5a.77.77 0 0 0-.69.395l-5.5 9.87C1.022 12.307 1.395 13 2 13h11c.605 0 .978-.692.666-1.236l-5.5-9.869a.773.773 0 0 0-.642-.395zM7.5 3.9l4.127 7.47H3.373L7.5 3.9z\"></path></svg>"
-
-/***/ }),
-
-/***/ "./src/renderer/viz/utils/warning.js":
-/*!*******************************************!*\
-  !*** ./src/renderer/viz/utils/warning.js ***!
-  \*******************************************/
-/*! exports provided: showDeprecationWarning */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "showDeprecationWarning", function() { return showDeprecationWarning; });
-function showDeprecationWarning (args, ExpressionClass, deprecatedExpressionName, newExpressionName) {
-    console.warn(`DeprecationWarning: "${deprecatedExpressionName}" expression is deprecated. Please use "${newExpressionName}" instead.`);
-    return new ExpressionClass(...args);
-}
-
 
 /***/ }),
 
@@ -21435,6 +22322,8 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         } else {
             throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'nonValidGeoJSONData');
         }
+
+        this._features = this._initializeFeatureProperties(this._features);
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -21486,6 +22375,13 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].isObject(data)) {
             throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'dataObjectRequired');
         }
+    }
+
+    _initializeFeatureProperties (features) {
+        for (let i = 0; i < features.length; i++) {
+            features[i].properties = features[i].properties || {};
+        }
+        return features;
     }
 
     _computeMetadata (viz) {
@@ -21738,10 +22634,12 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         return _client_rsys__WEBPACK_IMPORTED_MODULE_0__["wToR"](wm.x, wm.y, { scale: _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].WM_R, center: { x: 0, y: 0 } });
     }
 
-    _computeLineStringGeometry (data) {
+    _computeLineStringGeometry (data, reverse) {
         let line = [];
         for (let i = 0; i < data.length; i++) {
-            const point = this._computePointGeometry(data[i]);
+            const point = this._computePointGeometry(
+                data[reverse ? (data.length - i - 1) : i]
+            );
             line.push(point.x, point.y);
         }
         return line;
@@ -21765,19 +22663,20 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             clipped: []
         };
         let holeIndex = 0;
-        for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[i].length; j++) {
-                const point = this._computePointGeometry(data[i][j]);
-                polygon.flat.push(point.x, point.y);
+        let firstReverse = false;
+
+        if (data.length) {
+            firstReverse = this._isReversed(data[0]);
+            const flat = this._computeLineStringGeometry(data[0], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
+        }
+        for (let i = 1; i < data.length; i++) {
+            if (firstReverse !== this._isReversed(data[i])) {
+                holeIndex += data[i - 1].length;
+                polygon.holes.push(holeIndex);
             }
-            if (!this._isClockWise(data[i])) {
-                if (i > 0) {
-                    holeIndex += data[i - 1].length;
-                    polygon.holes.push(holeIndex);
-                } else {
-                    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'firstPolygonExternal');
-                }
-            }
+            const flat = this._computeLineStringGeometry(data[i], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
         }
         return polygon;
     }
@@ -21793,7 +22692,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         return multipolygon;
     }
 
-    _isClockWise (vertices) {
+    _isReversed (vertices) {
         let total = 0;
         let pt1 = vertices[0];
         let pt2;
@@ -21802,6 +22701,8 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
             pt1 = pt2;
         }
+        // When total is positive it means that vertices are oriented clock wise
+        // and, since positive orientation is counter-clock wise, it is reversed.
         return total >= 0;
     }
 
@@ -22039,15 +22940,21 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
     _initializePropertyArrays (metadata, length) {
         const properties = {};
         const propertyNames = [];
-        Object.keys(metadata.properties)
-            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
-            .forEach(propertyName => {
-                propertyNames.push(...metadata.propertyNames(propertyName));
-            });
+        for (let i = 0; i < metadata.propertyKeys.length; i++) {
+            const propertyName = metadata.propertyKeys[i];
+            if (metadata.properties[propertyName].type === 'geometry') {
+                continue;
+            }
+            propertyNames.push(...metadata.propertyNames(propertyName));
+        }
 
-        propertyNames.forEach(propertyName => {
-            properties[propertyName] = new Float32Array(length + _renderer_Renderer__WEBPACK_IMPORTED_MODULE_6__["RTT_WIDTH"]);
-        });
+        const size = Math.ceil(length / _renderer_Renderer__WEBPACK_IMPORTED_MODULE_6__["RTT_WIDTH"]) * _renderer_Renderer__WEBPACK_IMPORTED_MODULE_6__["RTT_WIDTH"];
+
+        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
+        for (let i = 0; i < propertyNames.length; i++) {
+            const propertyName = propertyNames[i];
+            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
+        }
 
         return { properties, propertyNames };
     }
@@ -22242,6 +23149,7 @@ class TileClient {
         tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
                 dataframe => {
+                    dataframe.orderID = x + y / 1000;
                     if (dataframe.empty) {
                         needToComplete--;
                     } else {
@@ -22284,11 +23192,135 @@ class TileClient {
 
 /***/ }),
 
+/***/ "./src/utils/collision.js":
+/*!********************************!*\
+  !*** ./src/utils/collision.js ***!
+  \********************************/
+/*! exports provided: triangleCollides */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "triangleCollides", function() { return triangleCollides; });
+/* harmony import */ var _geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./geometry */ "./src/utils/geometry.js");
+
+
+const SEPARATING_LINE_FOUND = 'separatingLineFound';
+const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
+
+function triangleCollides (triangle, viewportAABB) {
+    const viewport = [
+        { x: viewportAABB.minx, y: viewportAABB.miny },
+        { x: viewportAABB.minx, y: viewportAABB.maxy },
+        { x: viewportAABB.maxx, y: viewportAABB.miny },
+        { x: viewportAABB.maxx, y: viewportAABB.maxy }
+    ];
+
+    /*
+     * TODO
+     *
+     * Optimize triangle collision:
+     *
+     * if (_isAnyTriangleVertexInViewport(triangle, viewportAABB)) {
+     *   return true;
+     * }
+     *
+     * if (_isAnyViewportVertexInTriangle(triangle, viewport)) {
+     *   return true;
+     * }
+     */
+
+    if (_viewportLineSeparatesTriangle(viewportAABB, triangle) === SEPARATING_LINE_FOUND) {
+        return false;
+    }
+
+    if (_triangleLineSeparatesViewport(triangle, viewport) === SEPARATING_LINE_FOUND) {
+        return false;
+    }
+
+    return true;
+}
+
+/*
+ * TODO
+ *
+ * Optimize triangle collision:
+ *
+ * function _isAnyViewportVertexInTriangle (triangle, viewport) {
+ *     for (let i = 0; i < viewport.length; i++) {
+ *         if (pointInTriangle(viewport[i], triangle[0], triangle[1], triangle[2])) {
+ *             return true;
+ *         }
+ *     }
+ *
+ *     return false;
+ * }
+ * function _isAnyTriangleVertexInViewport (triangle, viewportAABB) {
+ *  for (let i = 0; i < 3; i++) {
+ *       if (pointInRectangle(triangle[i], viewportAABB)) {
+ *           return true;
+ *       }
+ *   }
+ *   return false;
+ * }
+ */
+
+function _viewportLineSeparatesTriangle (viewportAABB, triangle) {
+    if (triangle[0].x < viewportAABB.minx &&
+        triangle[1].x < viewportAABB.minx &&
+        triangle[2].x < viewportAABB.minx) {
+        return SEPARATING_LINE_FOUND;
+    }
+
+    if (triangle[0].y < viewportAABB.miny &&
+        triangle[1].y < viewportAABB.miny &&
+        triangle[2].y < viewportAABB.miny) {
+        return SEPARATING_LINE_FOUND;
+    }
+
+    if (triangle[0].x > viewportAABB.maxx &&
+        triangle[1].x > viewportAABB.maxx &&
+        triangle[2].x > viewportAABB.maxx) {
+        return SEPARATING_LINE_FOUND;
+    }
+
+    if (triangle[0].y > viewportAABB.maxy &&
+        triangle[1].y > viewportAABB.maxy &&
+        triangle[2].y > viewportAABB.maxy) {
+        return SEPARATING_LINE_FOUND;
+    }
+
+    return SEPARATING_LINE_NOT_FOUND;
+}
+
+function _triangleLineSeparatesViewport (triangle, viewport) {
+    const TRIANGLE_VERTICES = 3;
+
+    for (let i = 0; i < TRIANGLE_VERTICES; i++) {
+        for (let j = 0; j < viewport.length; j++) {
+            const position = Object(_geometry__WEBPACK_IMPORTED_MODULE_0__["halfPlaneSign"])(viewport[j], triangle[i], triangle[(i + 1) % TRIANGLE_VERTICES]);
+
+            if (position > 0) {
+                break;
+            }
+
+            if (j === TRIANGLE_VERTICES) {
+                return SEPARATING_LINE_FOUND;
+            }
+        }
+    }
+
+    return SEPARATING_LINE_NOT_FOUND;
+}
+
+
+/***/ }),
+
 /***/ "./src/utils/geometry.js":
 /*!*******************************!*\
   !*** ./src/utils/geometry.js ***!
   \*******************************/
-/*! exports provided: intersect, sub, dot, perpendicular, default */
+/*! exports provided: intersect, sub, dot, perpendicular, getLineNormal, getJointNormal, normalize, pointInTriangle, halfPlaneSign, equalPoints, pointInCircle, pointInRectangle, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22297,6 +23329,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "sub", function() { return sub; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dot", function() { return dot; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "perpendicular", function() { return perpendicular; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getLineNormal", function() { return getLineNormal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getJointNormal", function() { return getJointNormal; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "normalize", function() { return normalize; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointInTriangle", function() { return pointInTriangle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "halfPlaneSign", function() { return halfPlaneSign; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equalPoints", function() { return equalPoints; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointInCircle", function() { return pointInCircle; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "pointInRectangle", function() { return pointInRectangle; });
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
 function intersect (a, b, c, d) {
@@ -22327,11 +23367,92 @@ function perpendicular ([x, y]) {
     return [-y, x];
 }
 
+function getLineNormal (a, b) {
+    const dx = b[0] - a[0];
+    const dy = b[1] - a[1];
+    return normalize([-dy, dx]);
+}
+
+function getJointNormal (a, b, c) {
+    const u = normalize([a[0] - b[0], a[1] - b[1]]);
+    const v = normalize([c[0] - b[0], c[1] - b[1]]);
+    const sin = -u[1] * v[0] + u[0] * v[1];
+    if (sin !== 0) {
+        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
+    }
+}
+
+function normalize (v) {
+    const s = Math.hypot(v[0], v[1]);
+    return [v[0] / s, v[1] / s];
+}
+
+// Returns true if p is inside the triangle or on a triangle's edge, false otherwise
+// Parameters in {x: 0, y:0} form
+function pointInTriangle (p, v1, v2, v3) {
+    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
+    // contains an explanation of both this algorithm and one based on barycentric coordinates,
+    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations
+
+    if (equalPoints(v1, v2) || equalPoints(v2, v3) || equalPoints(v3, v1)) {
+        // Avoid zero area triangle
+        return false;
+    }
+
+    // A point is inside a triangle or in one of the triangles edges
+    // if the point is in the three half-plane defined by the 3 edges
+    const b1 = halfPlaneSign(p, v1, v2) < 0;
+    const b2 = halfPlaneSign(p, v2, v3) < 0;
+    const b3 = halfPlaneSign(p, v3, v1) < 0;
+
+    return (b1 === b2) && (b2 === b3);
+}
+
+// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`
+// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,
+// returns >0 if the point is OUTSIDE
+// Parameters in {x: 0, y:0} form
+function halfPlaneSign (p, a, b) {
+    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`
+    // The result's sign is the half plane test result
+    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);
+}
+
+function equalPoints (a, b) {
+    return (a.x === b.x) && (a.y === b.y);
+}
+
+function pointInCircle (p, center, scale) {
+    const diff = {
+        x: p.x - center.x,
+        y: p.y - center.y
+    };
+    const lengthSquared = diff.x * diff.x + diff.y * diff.y;
+    return lengthSquared <= scale * scale;
+}
+
+function pointInRectangle (point, bbox) {
+    const p = {
+        x: point.x.toFixed(2),
+        y: point.y.toFixed(2)
+    };
+
+    return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));
+}
+
 /* harmony default export */ __webpack_exports__["default"] = ({
     intersect,
     sub,
     dot,
-    perpendicular
+    perpendicular,
+    normalize,
+    getLineNormal,
+    getJointNormal,
+    halfPlaneSign,
+    pointInTriangle,
+    equalPoints,
+    pointInCircle,
+    pointInRectangle
 });
 
 
@@ -22341,7 +23462,7 @@ function perpendicular ([x, y]) {
 /*!***************************!*\
   !*** ./src/utils/util.js ***!
   \***************************/
-/*! exports provided: WM_R, WM_2R, projectToWebMercator, isUndefined, isString, isNumber, isObject, castDate, isSetsEqual, default */
+/*! exports provided: WM_R, WM_2R, projectToWebMercator, isUndefined, isString, isNumber, isObject, getFloat32ArrayFromArray, castDate, isSetsEqual, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -22353,6 +23474,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNumber", function() { return isNumber; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFloat32ArrayFromArray", function() { return getFloat32ArrayFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "castDate", function() { return castDate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSetsEqual", function() { return isSetsEqual; });
 /**
@@ -22387,6 +23509,15 @@ function isNumber (value) {
 function isObject (value) {
     const type = typeof value;
     return value !== null && (type === 'object' || type === 'function');
+}
+
+function getFloat32ArrayFromArray (array) {
+    const length = array.length;
+    const float32Array = new Float32Array(length);
+    for (let i = 0; i < length; i++) {
+        float32Array[i] = array[i];
+    }
+    return float32Array;
 }
 
 /**
