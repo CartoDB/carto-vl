@@ -5,7 +5,7 @@ import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
-import { Classifier } from './classifier';
+import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
