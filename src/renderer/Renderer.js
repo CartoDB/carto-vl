@@ -313,6 +313,11 @@ export default class Renderer {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
 
+                const renderbuffer = gl.createRenderbuffer();
+                gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+                gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, w * antialiasingScale, h * antialiasingScale);
+                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
                 [this._width, this._height] = [w, h];
             }
             gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
@@ -421,6 +426,14 @@ export default class Renderer {
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
                 gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
                 freeTexUnit++;
+            }
+
+            if (tile.type === 'line' || tile.type === 'polygon') {
+                gl.clearDepth(1);
+                gl.depthFunc(gl.NOTEQUAL);
+                gl.depthMask(true);
+                gl.clear(gl.DEPTH_BUFFER_BIT);
+                gl.enable(gl.DEPTH_TEST);
             }
 
             gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);

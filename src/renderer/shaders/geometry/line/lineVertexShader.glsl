@@ -34,7 +34,11 @@ void main(void) {
     color.rgb *= color.a;
     float size = decodeWidth(texture2D(widthTex, featureID).a);
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+    // 64 is computed based on RTT_WIDTH and the depth buffer precision
+    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
+    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
+
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
