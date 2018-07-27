@@ -1,14 +1,45 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, viewportQuantiles } from '../../../../../src/renderer/viz/expressions';
+import {
+    validateDynamicTypeErrors,
+    validateStaticType,
+    validateStaticTypeErrors,
+    validateCompileTypeError
+} from './utils';
+
+import {
+    globalQuantiles,
+    property,
+    globalEqIntervals,
+    viewportEqIntervals,
+    viewportQuantiles
+} from '../../../../../src/renderer/viz/expressions';
+
+import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('viewportQuantiles', []);
-        validateStaticTypeErrors('viewportQuantiles', ['number']);
-        validateStaticTypeErrors('viewportQuantiles', ['number', 'category']);
-        validateDynamicTypeErrors('viewportQuantiles', ['category', 2]);
-        validateStaticTypeErrors('viewportQuantiles', ['color', 2]);
-        validateStaticTypeErrors('viewportQuantiles', ['number', 'color']);
+        validateCompileTypeError('viewportQuantiles', []);
+        validateCompileTypeError('viewportQuantiles', ['number', 'category']);
+        validateCompileTypeError('viewportQuantiles', ['category', 2]);
+        validateCompileTypeError('viewportQuantiles', ['color', 2]);
+        validateCompileTypeError('viewportQuantiles', ['number', 'color']);
+
+        validateCompileTypeError('viewportEqIntervals', []);
+        validateCompileTypeError('viewportEqIntervals', ['number', 'category']);
+        validateCompileTypeError('viewportEqIntervals', ['category', 2]);
+        validateCompileTypeError('viewportEqIntervals', ['color', 2]);
+        validateCompileTypeError('viewportEqIntervals', ['number', 'color']);
+
+        validateStaticTypeErrors('globalQuantiles', []);
+        validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
+        validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
+        validateStaticTypeErrors('globalQuantiles', ['color', 2]);
+        validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
+
+        validateStaticTypeErrors('globalEqIntervals', []);
+        validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
+        validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
+        validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
+        validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
     });
 
     describe('type', () => {
@@ -17,29 +48,58 @@ describe('src/renderer/viz/expressions/classifier', () => {
 
     describe('eval', () => {
         const $price = property('price');
+        const METADATA = new Metadata({
+            properties: {
+                price: {
+                    type: 'number',
+                    min: 0,
+                    max: 5
+                }
+            },
+            sample: [{
+                price: 0
+            },
+            {
+                price: 1
+            },
+            {
+                price: 2
+            },
+            {
+                price: 3
+            },
+            {
+                price: 4
+            },
+            {
+                price: 5
+            }
+            ]
+        });
+
         function prepare (expr) {
-            expr._compile({
-                properties: {
-                    price: { type: 'number', min: 0, max: 5 }
-                },
-                sample: [
-                    { price: 0 },
-                    { price: 1 },
-                    { price: 2 },
-                    { price: 3 },
-                    { price: 4 },
-                    { price: 5 }
-                ]
+            expr._compile(METADATA);
+            expr._resetViewportAgg(METADATA);
+            expr.accumViewportAgg({
+                price: 0
             });
-            expr._resetViewportAgg();
-            expr.accumViewportAgg({ price: 0 });
-            expr.accumViewportAgg({ price: 1 });
+            expr.accumViewportAgg({
+                price: 1
+            });
 
-            expr.accumViewportAgg({ price: 2 });
-            expr.accumViewportAgg({ price: 3 });
+            expr.accumViewportAgg({
+                price: 2
+            });
+            expr.accumViewportAgg({
+                price: 3
+            });
 
-            expr.accumViewportAgg({ price: 4 });
-            expr.accumViewportAgg({ price: 5 });
+            expr.accumViewportAgg({
+                price: 4
+            });
+            expr.accumViewportAgg({
+                price: 5
+            });
         }
         it('globalQuantiles($price, 2)', () => {
             const q = globalQuantiles($price, 2);

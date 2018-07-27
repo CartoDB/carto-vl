@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -31,6 +31,7 @@
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
+    "karma-carto-benchmark-reporter": "^0.0.0",
     "lru-cache": "^4.1.1",
     "mitt": "^1.1.3",
     "pbf": "^3.1.0"
@@ -55,6 +56,8 @@
     "jsdoc-escape-at": "^1.0.1",
     "karma": "^2.0.2",
     "karma-chrome-launcher": "^2.2.0",
+    "karma-falcon-benchmark": "^0.1.0",
+    "karma-falcon-benchmark-reporter": "^0.0.0",
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
@@ -97,7 +100,8 @@
     "test:e2e": "./scripts/run-local-e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
-    "test:benchmark": "node test/benchmark/benchmark.js",
+    "test:benchmark": "node test/benchmark/fps/benchmark.js",
+    "test:perf": "karma start --single-run --browsers Chrome test/benchmark/karma.conf.js",
     "serve": "yarn build:dev && yarn docs && http-server",
     "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",

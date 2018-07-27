@@ -1,6 +1,7 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-import { GlobalMin, GlobalMax } from '../../../../../src/renderer/viz/expressions/aggregation/globalAggregation';
+import GlobalMin from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMin';
+import GlobalMax from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMax';
 
 describe('src/renderer/viz/expressions/linear', () => {
     describe('error control', () => {

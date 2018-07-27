@@ -2659,6 +2659,12 @@ falafel@^2.1.0:
     isarray "0.0.1"
     object-keys "^1.0.6"
 
+falcon-benchmark@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/falcon-benchmark/-/falcon-benchmark-0.1.0.tgz#ad091869cecd72bbd5bd35a49ed54706b9b2a7b5"
+  dependencies:
+    mitt "^1.1.3"
+
 fast-deep-equal@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/fast-deep-equal/-/fast-deep-equal-1.1.0.tgz#c053477817c86b51daa853c81e059b733d023614"
@@ -4041,12 +4047,26 @@ jsprim@^1.2.2:
     json-schema "0.2.3"
     verror "1.10.0"
 
+karma-carto-benchmark-reporter@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/karma-carto-benchmark-reporter/-/karma-carto-benchmark-reporter-0.0.0.tgz#f786bfb717039ed5b2b2283a50c3cc0481ca05a6"
+
 karma-chrome-launcher@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/karma-chrome-launcher/-/karma-chrome-launcher-2.2.0.tgz#cf1b9d07136cc18fe239327d24654c3dbc368acf"
   dependencies:
     fs-access "^1.0.0"
     which "^1.2.1"
+
+karma-falcon-benchmark-reporter@^0.0.0:
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/karma-falcon-benchmark-reporter/-/karma-falcon-benchmark-reporter-0.0.0.tgz#7e525cbf143538b4d2231f01bf51b321d6adfa0f"
+
+karma-falcon-benchmark@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/karma-falcon-benchmark/-/karma-falcon-benchmark-0.1.0.tgz#51829ec74b21d00f9b19fb362c42855a2398b711"
+  dependencies:
+    falcon-benchmark "^0.1.0"
 
 karma-jasmine@^1.1.2:
   version "1.1.2"
