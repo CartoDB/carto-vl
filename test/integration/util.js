@@ -3,11 +3,13 @@ import { projectToWebMercator, WM_2R } from '../../src/utils/util';
 
 const mapSize = 600;
 
-export function createMap (name) {
+export function createMap (name, size) {
+    size = size || mapSize;
+
     const div = document.createElement('div');
     div.id = name;
-    div.style.width = `${mapSize}px`;
-    div.style.height = `${mapSize}px`;
+    div.style.width = `${size}px`;
+    div.style.height = `${size}px`;
     div.style.position = 'absolute';
     document.body.style.margin = '0';
     document.body.style.padding = '0';

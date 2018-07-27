@@ -10,3 +10,5 @@ secrets.json
 temp/
 test/acceptance/e2e/**/*.html
 test/integration/render/**/*.html
+test/acceptance/docker/Windshaft-cartodb/
+.docker.run

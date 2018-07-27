@@ -204,15 +204,21 @@ export default class MVT extends Base {
     _initializePropertyArrays (metadata, length) {
         const properties = {};
         const propertyNames = [];
-        Object.keys(metadata.properties)
-            .filter(propertyName => metadata.properties[propertyName].type !== 'geometry')
-            .forEach(propertyName => {
-                propertyNames.push(...metadata.propertyNames(propertyName));
-            });
+        for (let i = 0; i < metadata.propertyKeys.length; i++) {
+            const propertyName = metadata.propertyKeys[i];
+            if (metadata.properties[propertyName].type === 'geometry') {
+                continue;
+            }
+            propertyNames.push(...metadata.propertyNames(propertyName));
+        }
 
-        propertyNames.forEach(propertyName => {
-            properties[propertyName] = new Float32Array(length + RTT_WIDTH);
-        });
+        const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
+
+        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
+        for (let i = 0; i < propertyNames.length; i++) {
+            const propertyName = propertyNames[i];
+            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
+        }
 
         return { properties, propertyNames };
     }
@@ -228,8 +234,14 @@ export default class MVT extends Base {
 
     decodeProperty (propertyName, propertyValue) {
         if (typeof propertyValue === 'string') {
+            if (this._metadata.properties[propertyName].type !== 'category') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
+            }
             return this._metadata.categorizeString(propertyValue);
         } else if (typeof propertyValue === 'number') {
+            if (this._metadata.properties[propertyName].type !== 'number') {
+                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
+            }
             return propertyValue;
         } else if (propertyValue === null || propertyValue === undefined) {
             return Number.NaN;

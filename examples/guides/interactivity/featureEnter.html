@@ -43,7 +43,7 @@
 
         const interactivity = new carto.Interactivity(layer);
         interactivity.on('featureEnter', featureEvent => {
-            featureEvent.features[0].color.blendTo('rgba(255, 0, 0, 0.5)', 100);
+            featureEvent.features[0].color.blendTo('rgba(0, 255, 0, 0.8)', 100);
         });
 
         interactivity.on('featureLeave', featureEvent => {

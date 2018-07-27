@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Show / Hide Layers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <!-- <script src="https://cartodb.github.io/carto-vl/dist/carto-vl.js"></script> -->
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400" rel="stylesheet">
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+    }
+
+    #map {
+      flex: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Show / Hide Layers</h1>
+      </header>
+      <section>
+        <button id="hide-layer-1">Hide Layer 1</button>
+        <button id="show-layer-1">Show Layer 1</button>
+        <button id="hide-layer-2">Hide Layer 2</button>
+        <button id="show-layer-2">Show Layer 2</button>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+
+  <script type="text/javascript">
+    let layer1Added = false;
+    let layer2Added = false;
+    let layer1;
+    let layer2;
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 43],
+      zoom: 4,
+      scrollZoom: false,
+      dragRotate: false,
+      touchZoomRotate: false,
+    });
+
+    const hideLayer1Button$ = document.getElementById('hide-layer-1');
+    const showLayer1Button$ = document.getElementById('show-layer-1');
+    const hideLayer2Button$ = document.getElementById('hide-layer-2');
+    const showLayer2Button$ = document.getElementById('show-layer-2');
+
+    const source1 = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const viz1 = new carto.Viz();
+    layer1 = new carto.Layer('layer1', source1, viz1);
+
+    layer1.addTo(map);
+    layer1.on('loaded', function () {
+      console.log('Layer 1 Loaded');
+
+      hideLayer1Button$.addEventListener('click', () => {
+        layer1.hide();
+      });
+
+      showLayer1Button$.addEventListener('click', () => {
+        layer1.show();
+      });
+    });
+
+    const source2 = new carto.source.Dataset('ne_adm0_europe');
+    const viz2 = new carto.Viz();
+    layer2 = new carto.Layer('layer2', source2, viz2);
+
+    layer2.addTo(map);
+    layer2.on('loaded', function () {
+      console.log('Layer 2 loaded');
+
+      hideLayer2Button$.addEventListener('click', () => {
+        layer2.hide();
+      });
+
+      showLayer2Button$.addEventListener('click', () => {
+        layer2.show();
+      });
+    });
+
+    layer1.on('updated', (data) => {
+      if (data) {
+        console.log('Layer 1 visibility:', data.visibility);
+      }
+    });
+
+    layer2.on('updated', (data) => {
+      if (data) {
+        console.log('Layer 1 visibility:', data.visibility);
+      }
+    });
+  </script>
+</body>
+
+</html>

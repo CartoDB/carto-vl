@@ -396,6 +396,108 @@ describe('Cursor', () => {
         });
     });
 
+    describe('when layer visibility changes to hidden', () => {
+        it('should not fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    describe('when layer visibility changes to visible', () => {
+        it('should fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                layer1.show();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('pointer');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(setup.div);
+    });
+});
+
+describe('regression with a category filter', () => {
+    let map, setup, source1, viz1, layer1, interactivity;
+    beforeEach(() => {
+        setup = util.createMap('map');
+        map = setup.map;
+
+        const feature1 = {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [
+                    [
+                        [0, 0],
+                        [40, 0],
+                        [40, 40],
+                        [0, 40],
+                        [0, 0]
+                    ],
+                    [
+                        [10, 10],
+                        [10, 30],
+                        [30, 30],
+                        [30, 10],
+                        [10, 10]
+                    ]
+                ]
+            },
+            properties: {
+                cat: 'asdf'
+            }
+        };
+
+        source1 = new carto.source.GeoJSON(feature1);
+        viz1 = new carto.Viz(`
+            color: red
+            @wadus: 123
+            filter: $cat == 'asdf'
+        `);
+        layer1 = new carto.Layer('layer1', source1, viz1);
+        interactivity = new carto.Interactivity([layer1]);
+        layer1.addTo(map);
+    });
+
+    it('should fire a featureClick event with the feature 1 when it is clicked', done => {
+        interactivity.on('featureClick', event => {
+            expect(event.features.length).toBe(1);
+            expect(event.features[0].id).toEqual(-0);
+            expect(event.features[0].layerId).toEqual('layer1');
+            done();
+        });
+
+        layer1.on('loaded', () => {
+            // Click on the feature 1
+            util.simulateClick({ lng: 5, lat: 5 });
+        });
+    });
+
     afterEach(() => {
         map.remove();
         document.body.removeChild(setup.div);

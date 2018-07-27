@@ -25,7 +25,11 @@ export default class RenderLayer {
 
     getActiveDataframes () {
         this.dataframes = this.dataframes.filter(df => !df.freed);
-        return this.dataframes.filter(df => df.active && df.numVertex);
+        let active = this.dataframes.filter(df => df.active && df.numVertex);
+        if (active.length && active[0].orderID !== undefined) {
+            active = active.sort((a, b) => a.orderID - b.orderID);
+        }
+        return active;
     }
 
     hasDataframes () {
@@ -46,14 +50,11 @@ export default class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
-    }
-
-    /**
-     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
-     */
-    _generateApiFeature (rawFeature) {
-        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
+        return [].concat(...this.getActiveDataframes().map(df =>
+            df.getFeaturesAtPosition(pos, this.viz)
+        )).map(rawFeature =>
+            new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
+        );
     }
 
     trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {

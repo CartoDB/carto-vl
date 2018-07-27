@@ -34,7 +34,7 @@ filter: $dn > 60
 
 To see
 
-![IMAGE](docs/images/map-example.png)
+![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/map-example.png)
 
 ## I want to make a map
 
