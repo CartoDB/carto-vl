@@ -5,6 +5,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $price = s.property('price');
     const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');
+
     describe('viewport filtering', () => {
         function fakeDrawMetadata (expr) {
             const METADATA = new Metadata({
@@ -23,7 +24,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             });
 
             expr._compile(METADATA);
-            expr._resetViewportAgg();
+            expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
             expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
             expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });

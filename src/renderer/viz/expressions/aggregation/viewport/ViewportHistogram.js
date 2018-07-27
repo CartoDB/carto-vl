@@ -39,28 +39,14 @@ export default class ViewportHistogram extends BaseExpression {
     constructor (x, weight = 1, size = 1000) {
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 
+        this.type = 'histogram';
         this._size = size;
         this._isViewport = true;
         this.inlineMaker = () => null;
     }
 
-    _resetViewportAgg (metadata) {
-        this._metadata = metadata || this._metadata;
-
-        if (this.x.name) {
-            this.type = this._metadata.properties[this.x.name].type;
-        }
-
-        this._cached = null;
-        this._histogram = new Map();
-    }
-
     accumViewportAgg (feature) {
         const x = this.x.eval(feature);
-
-        if (!this.type) {
-            this.type = typeof x === 'number' ? 'number' : 'category';
-        }
 
         if (x !== undefined) {
             const weight = this.weight.eval(feature);
@@ -75,7 +61,7 @@ export default class ViewportHistogram extends BaseExpression {
                 return null;
             }
 
-            this._cached = this.type === 'number'
+            this._cached = this.x.type === 'number'
                 ? _getNumericValue(this._histogram, this._size)
                 : _getCategoryValue(this._histogram);
 
@@ -92,9 +78,13 @@ export default class ViewportHistogram extends BaseExpression {
     _compile (metadata) {
         super._compile(metadata);
         this._metadata = metadata;
-        if (this.x.name) {
-            this.type = this._metadata.properties[this.x.name].type;
-        }
+    }
+
+    _resetViewportAgg (metadata) {
+        metadata = metadata || [];
+        this._compile(metadata);
+        this._cached = null;
+        this._histogram = new Map();
     }
 }
 

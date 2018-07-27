@@ -13,6 +13,8 @@ import {
     viewportQuantiles
 } from '../../../../../src/renderer/viz/expressions';
 
+import Metadata from '../../../../../src/renderer/Metadata';
+
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         validateCompileTypeError('viewportQuantiles', []);
@@ -46,37 +48,38 @@ describe('src/renderer/viz/expressions/classifier', () => {
 
     describe('eval', () => {
         const $price = property('price');
+        const METADATA = new Metadata({
+            properties: {
+                price: {
+                    type: 'number',
+                    min: 0,
+                    max: 5
+                }
+            },
+            sample: [{
+                price: 0
+            },
+            {
+                price: 1
+            },
+            {
+                price: 2
+            },
+            {
+                price: 3
+            },
+            {
+                price: 4
+            },
+            {
+                price: 5
+            }
+            ]
+        });
 
         function prepare (expr) {
-            expr._compile({
-                properties: {
-                    price: {
-                        type: 'number',
-                        min: 0,
-                        max: 5
-                    }
-                },
-                sample: [{
-                    price: 0
-                },
-                {
-                    price: 1
-                },
-                {
-                    price: 2
-                },
-                {
-                    price: 3
-                },
-                {
-                    price: 4
-                },
-                {
-                    price: 5
-                }
-                ]
-            });
-            expr._resetViewportAgg();
+            expr._compile(METADATA);
+            expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({
                 price: 0
             });
