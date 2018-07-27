@@ -57,10 +57,7 @@ export default class GeoJSON extends Base {
             throw new CartoValidationError('source', 'nonValidGeoJSONData');
         }
 
-        // Initialize properties attr
-        for (let i = 0; i < this._features.length; i++) {
-            this._features[i].properties = this._features[i].properties || {};
-        }
+        this._features = this._initializeFeatureProperties(this._features);
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -112,6 +109,13 @@ export default class GeoJSON extends Base {
         if (!util.isObject(data)) {
             throw new CartoValidationError('source', 'dataObjectRequired');
         }
+    }
+
+    _initializeFeatureProperties (features) {
+        for (let i = 0; i < features.length; i++) {
+            features[i].properties = features[i].properties || {};
+        }
+        return features;
     }
 
     _computeMetadata (viz) {
@@ -401,7 +405,7 @@ export default class GeoJSON extends Base {
                 polygon.holes.push(holeIndex);
             }
 
-            let l = data[i].length;
+            const l = data[i].length;
             for (let j = 0; j < l; j++) {
                 const point = this._computePointGeometry(
                     data[i][firstReverse ? j : (l - j - 1)]
@@ -432,7 +436,9 @@ export default class GeoJSON extends Base {
             total += (pt2[1] - pt1[1]) * (pt2[0] + pt1[0]);
             pt1 = pt2;
         }
-        return total >= 0; // CW
+        // When total is positive it means that vertices are oriented clock wise
+        // and, since positive orientation is counter-clock wise, it is reversed.
+        return total >= 0;
     }
 
     free () {
