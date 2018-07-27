@@ -24,10 +24,10 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
 
             expr._compile(METADATA);
             expr._resetViewportAgg();
-            expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
-            expr.accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
-            expr.accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });
-            expr.accumViewportAgg({ price: 2, cat: 2, numeric_with_nulls: 2 });
+            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
+            expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });
+            expr.accumViewportAgg({ price: 0, cat: 'a', numeric_with_nulls: 0 });
         }
 
         describe('viewportMin()', () => {
@@ -157,12 +157,12 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportHistogram);
             expect(viewportHistogram.value).toEqual([
                 {
-                    x: 'a',
-                    y: 1
-                },
-                {
                     x: 'b',
                     y: 2
+                },
+                {
+                    x: 'a',
+                    y: 1
                 },
                 {
                     x: 'c',

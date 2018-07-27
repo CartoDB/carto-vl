@@ -77,7 +77,7 @@ export default class ViewportHistogram extends BaseExpression {
 
             this._cached = this.type === 'number'
                 ? _getNumericValue(this._histogram, this._size)
-                : _getCategoryValue(this._histogram, this._metadata);
+                : _getCategoryValue(this._histogram);
 
             return this._cached;
         }
@@ -129,8 +129,18 @@ function _getNumericValue (histogram, size) {
     });
 }
 
-function _getCategoryValue (histogram, metadata) {
-    return [...histogram].map(([x, y], index) => {
-        return { x: metadata.IDToCategory.get(index), y };
-    });
+function _getCategoryValue (histogram) {
+    return [...histogram]
+        .map(([x, y]) => {
+            return { x, y };
+        })
+        .sort(_sortFirstNumerically);
+}
+
+function _sortFirstNumerically (a, b) {
+    if (b.y - a.y === 0) {
+        return a.x.localeCompare(b.x);
+    }
+
+    return b.y - a.y;
 }
