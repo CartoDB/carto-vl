@@ -1,7 +1,6 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
 import { viewportMax, viewportMin } from '../../expressions';
-import { checkNumber, checkInstance, checkType, checkExpression, checkLooseType } from '../utils';
+import { checkNumber, checkType } from '../utils';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.

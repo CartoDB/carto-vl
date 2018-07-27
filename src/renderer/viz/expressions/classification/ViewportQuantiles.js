@@ -1,6 +1,5 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkLooseType, checkExpression } from '../utils';
+import { checkNumber, checkType } from '../utils';
 import { viewportHistogram } from '../../expressions';
 
 /**

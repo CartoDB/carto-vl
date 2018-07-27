@@ -47,7 +47,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
     describe('eval', () => {
         const $price = property('price');
 
-        function prepare(expr) {
+        function prepare (expr) {
             expr._compile({
                 properties: {
                     price: {
@@ -57,23 +57,23 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     }
                 },
                 sample: [{
-                        price: 0
-                    },
-                    {
-                        price: 1
-                    },
-                    {
-                        price: 2
-                    },
-                    {
-                        price: 3
-                    },
-                    {
-                        price: 4
-                    },
-                    {
-                        price: 5
-                    }
+                    price: 0
+                },
+                {
+                    price: 1
+                },
+                {
+                    price: 2
+                },
+                {
+                    price: 3
+                },
+                {
+                    price: 4
+                },
+                {
+                    price: 5
+                }
                 ]
             });
             expr._resetViewportAgg();
