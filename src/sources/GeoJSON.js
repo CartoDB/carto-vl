@@ -368,10 +368,12 @@ export default class GeoJSON extends Base {
         return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    _computeLineStringGeometry (data) {
+    _computeLineStringGeometry (data, reverse) {
         let line = [];
         for (let i = 0; i < data.length; i++) {
-            const point = this._computePointGeometry(data[i]);
+            const point = this._computePointGeometry(
+                data[reverse ? (data.length - i - 1) : i]
+            );
             line.push(point.x, point.y);
         }
         return line;
@@ -396,22 +398,19 @@ export default class GeoJSON extends Base {
         };
         let holeIndex = 0;
         let firstReverse = false;
-        for (let i = 0; i < data.length; i++) {
-            let reverse = this._isReversed(data[i]);
-            if (i === 0) {
-                firstReverse = reverse;
-            } else if (firstReverse !== reverse) {
+
+        if (data.length) {
+            firstReverse = this._isReversed(data[0]);
+            const flat = this._computeLineStringGeometry(data[0], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
+        }
+        for (let i = 1; i < data.length; i++) {
+            if (firstReverse !== this._isReversed(data[i])) {
                 holeIndex += data[i - 1].length;
                 polygon.holes.push(holeIndex);
             }
-
-            const l = data[i].length;
-            for (let j = 0; j < l; j++) {
-                const point = this._computePointGeometry(
-                    data[i][firstReverse ? j : (l - j - 1)]
-                );
-                polygon.flat.push(point.x, point.y);
-            }
+            const flat = this._computeLineStringGeometry(data[i], firstReverse);
+            polygon.flat = polygon.flat.concat(flat);
         }
         return polygon;
     }

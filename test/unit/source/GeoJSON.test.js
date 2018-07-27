@@ -195,8 +195,8 @@ describe('sources/GeoJSON', () => {
 
                 let actualFlat = geom[0][0].flat;
                 let expectedFlat = [
-                    0, 0, 0.444, 0.775, 0, 0.775, 0, 0,
-                    0.111, 0.113, 0.111, 0.322, 0.2778, 0.322, 0.111, 0.113];
+                    0, 0, 0, 0.775, 0.444, 0.775, 0, 0,
+                    0.111, 0.113, 0.2778, 0.322, 0.111, 0.322, 0.111, 0.113];
                 actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
 
                 let actualHoles = geom[0][0].holes;
@@ -219,8 +219,8 @@ describe('sources/GeoJSON', () => {
 
                 let actualFlat = geom[0][0].flat;
                 let expectedFlat = [
-                    0, 0, 0.444, 0.775, 0, 0.775, 0, 0,
-                    0.111, 0.113, 0.111, 0.322, 0.2778, 0.322, 0.111, 0.113];
+                    0, 0, 0, 0.775, 0.444, 0.775, 0, 0,
+                    0.111, 0.113, 0.2778, 0.322, 0.111, 0.322, 0.111, 0.113];
                 actualFlat.forEach((x, i) => expect(x).toBeCloseTo(expectedFlat[i], 3));
 
                 let actualHoles = geom[0][0].holes;
