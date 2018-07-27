@@ -1,17 +1,26 @@
-import { dataframe, viz } from './data/dataframes-0';
+import { decodeGeom } from '../../src/renderer/decoder';
+import GeoJSON from '../../src/sources/GeoJSON';
 
-falcon.benchmark('getFeaturesAtPosition', () => {
-    dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz);
-});
+const geojson = new GeoJSON({
+    "type": "Feature",
+    "properties": {
+      "name": "Bermuda Triangle",
+      "area": 1150180
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [-64.73, 32.31],
+          [-80.19, 25.76],
+          [-66.09, 18.43],
+          [-64.73, 32.31]
+        ]
+      ]
+    }
+  });
+const polygonGeometry = geojson._decodeGeometry();
 
-falcon.benchmark('getFeaturesAtPosition', () => {
-    dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz);
-});
-
-falcon.benchmark('getFeaturesAtPosition', () => {
-    dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz);
-});
-
-falcon.benchmark('getFeaturesAtPosition', () => {
-    dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz);
-});
+falcon.benchmark('decodePolygon', () => {
+    decodeGeom('polygon', polygonGeometry);
+}, {runs: 1});
