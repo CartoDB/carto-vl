@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance } from './utils';
 import Property from './basic/property';
+import { number } from '../expressions';
 
 /**
  * Get the top `n` properties, aggregating the rest into an "others" bucket category.
@@ -31,7 +32,11 @@ export default class Top extends BaseExpression {
         checkInstance('top', 'property', 0, Property, property);
         checkLooseType('top', 'buckets', 1, 'number', buckets);
         checkFeatureIndependent('top', 'buckets', 1, buckets);
-        super({ property, buckets });
+        const children = { property, buckets };
+        for (let i = 0; i < 8; i++) {
+            children[`_top${i}`] = number(0);
+        }
+        super(children);
         this.type = 'category';
     }
     eval (feature) {
@@ -62,53 +67,59 @@ export default class Top extends BaseExpression {
         return Math.round(this.buckets.eval()) + 1;
     }
     _applyToShaderSource (getGLSLforProperty) {
-        const property = this.property._applyToShaderSource(getGLSLforProperty);
+        const childSources = {};
+        this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
         return {
-            preface: this._prefaceCode(property.preface + `uniform sampler2D topMap${this._uid};\n`),
-            inline: `(255.*texture2D(topMap${this._uid}, vec2(${property.inline}/1024., 0.5)).a)`
+            preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).reduce((a, b) => a + b, '') + `
+            float top${this._uid}(float id){
+                float r = 0.;
+                if (${childSources._top0.inline} == id){
+                    r = 1.;
+                } else if (${childSources._top1.inline} == id){
+                    r = 2.;
+                } else if (${childSources._top2.inline} == id){
+                    r = 3.;
+                } else if (${childSources._top3.inline} == id){
+                    r = 4.;
+                } else if (${childSources._top4.inline} == id){
+                    r = 5.;
+                } else if (${childSources._top5.inline} == id){
+                    r = 6.;
+                } else if (${childSources._top6.inline} == id){
+                    r = 7.;
+                } else if (${childSources._top7.inline} == id){
+                    r = 8.;
+                }
+                return r;
+            }`),
+            inline: `top${this._uid}(${childSources.property.inline})`
         };
     }
     _postShaderCompile (program, gl) {
+        super._postShaderCompile(program, gl);
+
         this.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         this.property._postShaderCompile(program);
         this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
     }
     _preDraw (program, drawMetadata, gl) {
-        this.property._preDraw(program, drawMetadata);
-        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+        super._preDraw(program, drawMetadata, gl);
         let buckets = Math.round(this.buckets.eval());
         if (buckets > this.property.numCategories) {
             buckets = this.property.numCategories;
         }
-        if (this._textureBuckets !== buckets) {
-            this._textureBuckets = buckets;
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            const width = 1024;
-            let texturePixels = new Uint8Array(4 * width);
-            const metaColumn = this._meta.properties[this.property.name];
+        const metaColumn = this._meta.properties[this.property.name];
 
-            const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
-                b.frequency - a.frequency
-            );
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
 
-            orderedCategoryNames.map((cat, i) => {
-                if (i < buckets) {
-                    texturePixels[4 * this._meta.categoryToID.get(cat.name) + 3] = (i + 1);
-                }
-            });
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
-                width, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-                texturePixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
-        drawMetadata.freeTexUnit++;
+        orderedCategoryNames.map((cat, i) => {
+            if (i < buckets) {
+                this[`_top${i}`].expr = (i + 1);
+            }
+        });
     }
     // TODO _free
 }
