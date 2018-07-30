@@ -467,19 +467,17 @@ export default class GeoJSON extends Base {
             if (!this._type) {
                 this._type = geometry.type;
             }
-            let samplePoint = this._samplePoint(geometry);
-            x += samplePoint[0];
-            y += samplePoint[1];
+            const samplePoint = this._samplePoint(geometry);
+            const sampleXY = util.projectToWebMercator({ lng: x, lat: y });
+            x += samplePoint.x;
+            y += samplePoint.y;
         });
         if (nPoints > 1) {
             x /= nPoints;
             y /= nPoints;
         }
 
-        this._center = util.projectToWebMercator({
-            lng: x,
-            lat: y
-        });
+        this._center = { x, y };
         this._dataframeCenter = rsys.wToR(this._center.x, this._center.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
