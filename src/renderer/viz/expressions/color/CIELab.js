@@ -40,14 +40,6 @@ export default class CIELab extends BaseExpression {
 
         super({ l, a, b });
         this.type = 'color';
-    }
-    // TODO EVAL
-    _compile (meta) {
-        super._compile(meta);
-
-        checkType('cielab', 'l', 0, 'number', this.l);
-        checkType('cielab', 'a', 1, 'number', this.a);
-        checkType('cielab', 'b', 2, 'number', this.b);
 
         this._setGenericGLSL(inline =>
             `vec4(xyztosrgb(cielabtoxyz(
@@ -97,5 +89,13 @@ export default class CIELab extends BaseExpression {
         }
         #endif
         `);
+    }
+    // TODO EVAL
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        checkType('cielab', 'l', 0, 'number', this.l);
+        checkType('cielab', 'a', 1, 'number', this.a);
+        checkType('cielab', 'b', 2, 'number', this.b);
     }
 }

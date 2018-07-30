@@ -23,7 +23,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 }
             });
 
-            expr._compile(METADATA);
+            expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
             expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });

@@ -78,7 +78,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
         });
 
         function prepare (expr) {
-            expr._compile(METADATA);
+            expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({
                 price: 0

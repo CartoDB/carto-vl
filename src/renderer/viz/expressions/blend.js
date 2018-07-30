@@ -57,6 +57,7 @@ export default class Blend extends BaseExpression {
         if (a.type && b.type) {
             this.type = a.type;
         }
+        this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
     eval (feature) {
         const a = clamp(this.mix.eval(feature), 0, 1);
@@ -70,15 +71,13 @@ export default class Blend extends BaseExpression {
         }
         super.replaceChild(toReplace, replacer);
     }
-    _compile (meta) {
-        super._compile(meta);
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
 
         abTypeCheck(this.a, this.b);
         checkType('blend', 'mix', 1, 'number', this.mix);
 
         this.type = this.a.type;
-
-        this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
     _preDraw (...args) {
         super._preDraw(...args);

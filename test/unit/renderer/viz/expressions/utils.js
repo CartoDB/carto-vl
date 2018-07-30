@@ -33,7 +33,7 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
             const expr = s[expressionName](...args.map(arg => arg[0]));
             v._resolveAliases({var1: s.property('wadus')});
             expect(() =>
-                expr._compile({
+                expr._bindMetadata({
                     properties: {
                         wadus: { type: 'number' }
                     }
@@ -104,7 +104,7 @@ function _validateCompileTimeTypeError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
-            expression._compile(metadata);
+            expression._bindMetadata(metadata);
         }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g'));
     });
 }
@@ -201,6 +201,6 @@ function getPropertyArg (type) {
 }
 
 function compile (expression) {
-    expression._compile(metadata);
+    expression._bindMetadata(metadata);
     return expression;
 }

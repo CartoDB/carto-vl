@@ -50,9 +50,9 @@ export default class Top extends BaseExpression {
         });
         return ret;
     }
-    _compile (metadata) {
+    _bindMetadata (metadata) {
         checkFeatureIndependent('top', 'buckets', 1, this.buckets);
-        super._compile(metadata);
+        super._bindMetadata(metadata);
         checkType('top', 'property', 0, 'category', this.property);
         checkType('top', 'buckets', 1, 'number', this.buckets);
         this._meta = metadata;

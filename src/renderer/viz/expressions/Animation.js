@@ -87,6 +87,27 @@ export class Animation extends BaseExpression {
         this.type = 'number';
         this._originalInput = originalInput;
         this._paused = false;
+
+        this.preface = `
+        #ifndef ANIMATION
+        #define ANIMATION
+
+        float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
+            float x = 0.;
+
+            // Check for NaN
+            if (_input <= 0.0 || 0.0 <= _input){
+                x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
+            }
+
+            return x;
+        }
+
+        #endif
+    `;
+
+        this.inlineMaker = inline =>
+            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 
     isAnimated () {
@@ -281,37 +302,16 @@ export class Animation extends BaseExpression {
         this._paused = true;
     }
 
-    _compile (meta) {
-        this._originalInput._compile(meta);
-        this.duration._compile(meta);
+    _bindMetadata (meta) {
+        this._originalInput._bindMetadata(meta);
+        this.duration._bindMetadata(meta);
 
         checkType('animation', 'input', 0, ['number', 'date'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
-        super._compile(meta);
+        super._bindMetadata(meta);
 
         checkType('animation', 'input', 0, 'number', this._input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
-
-        this.preface = `
-            #ifndef ANIMATION
-            #define ANIMATION
-
-            float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
-                float x = 0.;
-
-                // Check for NaN
-                if (_input <= 0.0 || 0.0 <= _input){
-                    x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
-                }
-
-                return x;
-            }
-
-            #endif
-        `;
-
-        this.inlineMaker = inline =>
-            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }

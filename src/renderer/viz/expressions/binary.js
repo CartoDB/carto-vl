@@ -461,6 +461,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
 
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
+            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
         get value () {
             return this.eval();
@@ -468,8 +469,8 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
         eval (feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
-        _compile (meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             const [a, b] = [this.a, this.b];
 
             const signature = getSignature(a, b);
@@ -477,8 +478,6 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
                 throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
             this.type = getReturnTypeFromSignature(signature);
-
-            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
     };
 }

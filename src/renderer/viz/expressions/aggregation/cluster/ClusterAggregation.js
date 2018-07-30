@@ -28,9 +28,8 @@ export default class ClusterAggregation extends BaseExpression {
         return feature[schema.column.aggColumn(this.property.name, this._aggName)];
     }
 
-    // Override super methods, we don't want to let the property use the raw column, we must use the agg suffixed one
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         checkType(this._expressionName, 'property', 0, this.type, this.property);
     }
 

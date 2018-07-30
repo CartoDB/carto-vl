@@ -75,8 +75,8 @@ export default class Linear extends BaseExpression {
         return (v - min) / (max - min);
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
 
         if (this.input.type === 'date') {
             const min = this.min.eval().getTime();

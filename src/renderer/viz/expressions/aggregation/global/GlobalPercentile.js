@@ -21,9 +21,9 @@ export default class GlobalPercentile extends BaseExpression {
         return this._value.expr;
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
-        this.property._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        this.property._bindMetadata(metadata);
         this.type = 'number';
         super.inlineMaker = inline => inline._value;
         const copy = metadata.sample.map(s => s[this.property.name]);

@@ -31,7 +31,7 @@ import { implicitCast } from '../../utils';
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name viewportPercentile
+ * @name ViewportHistogram
  * @function
  * @api
  */
@@ -75,14 +75,14 @@ export default class ViewportHistogram extends BaseExpression {
         return this.value;
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         this._metadata = metadata;
     }
 
     _resetViewportAgg (metadata) {
         metadata = metadata || [];
-        this._compile(metadata);
+        this._bindMetadata(metadata);
         this._cached = null;
         this._histogram = new Map();
     }

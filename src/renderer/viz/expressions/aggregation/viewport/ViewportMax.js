@@ -24,7 +24,7 @@ import ViewportAggregation from './ViewportAggregation';
  * @function
  * @api
  */
-export default class ViewportCount extends ViewportAggregation {
+export default class ViewportMax extends ViewportAggregation {
     constructor (property) {
         super({ property });
         this._value = Number.NEGATIVE_INFINITY;
