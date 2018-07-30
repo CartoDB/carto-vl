@@ -35,7 +35,7 @@ export default class Top extends BaseExpression {
         this.type = 'category';
     }
     eval (feature) {
-        const p = this.property.eval(feature);
+        const catID = this._meta.categoryToID.get(this.property.eval(feature));
         const buckets = Math.round(this.buckets.eval());
         const metaColumn = this._meta.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
@@ -44,8 +44,8 @@ export default class Top extends BaseExpression {
 
         let ret;
         orderedCategoryNames.map((name, i) => {
-            if (i === p) {
-                ret = i < buckets ? i + 1 : 0;
+            if (i === catID) {
+                ret = i < buckets ? this._meta.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
             }
         });
         return ret;
