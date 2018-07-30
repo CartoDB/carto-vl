@@ -446,15 +446,16 @@ export default class GeoJSON extends Base {
 
     _samplePoint (geometry) {
         const type = geometry.type;
+
         const coordinates = geometry.coordinates;
         if (type === 'Point') {
             return coordinates;
-        } else if (type === 'LineString' || type === 'Polygon') {
+        } else if (type === 'LineString') {
             return coordinates[0];
-        } else if (type === 'MultiLineString') {
+        } else if (type === 'MultiLineString' || type === 'Polygon') {
             return coordinates[0][0];
         } else if (type === 'MultiPolygon') {
-            return coordinates[0][0];
+            return coordinates[0][0][0];
         }
     }
 
@@ -468,9 +469,10 @@ export default class GeoJSON extends Base {
                 this._type = geometry.type;
             }
             const samplePoint = this._samplePoint(geometry);
-            const sampleXY = util.projectToWebMercator({ lng: x, lat: y });
-            x += samplePoint.x;
-            y += samplePoint.y;
+            const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
+            x += sampleXY.x;
+            y += sampleXY.y;
+            nPoints += 1;
         });
         if (nPoints > 1) {
             x /= nPoints;
