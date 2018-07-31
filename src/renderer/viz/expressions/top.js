@@ -89,7 +89,7 @@ export default class Top extends BaseExpression {
         const childSources = {};
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
         return {
-            preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).reduce((a, b) => a + b, '') + `
+            preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).join('') + `
             float top${this._uid}(float id){
                 float r = 0.;
                 if (${childSources._top0.inline} == id){
