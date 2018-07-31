@@ -3,11 +3,14 @@ import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, check
 import Property from './basic/property';
 import { number } from '../expressions';
 
+// Careful! This constant must match with the shader code of the Top expression
+const MAX_TOP_BUCKETS = 16;
+
 /**
  * Get the top `n` properties, aggregating the rest into an "others" bucket category.
  *
  * @param {Category} property - Column of the table
- * @param {number} n - Number of top properties to be returned
+ * @param {number} n - Number of top properties to be returned, the maximum value is 16, values higher than that will result in an error
  * @return {Category}
  *
  * @example <caption>Use top 3 categories to define a color ramp.</caption>
@@ -33,7 +36,7 @@ export default class Top extends BaseExpression {
         checkLooseType('top', 'buckets', 1, 'number', buckets);
         checkFeatureIndependent('top', 'buckets', 1, buckets);
         const children = { property, buckets };
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
         }
         super(children);
@@ -41,7 +44,7 @@ export default class Top extends BaseExpression {
     }
     eval (feature) {
         const p = this.property.eval(feature);
-        const buckets = Math.round(this.buckets.eval());
+        const buckets = this.numBuckets;
         const metaColumn = this._meta.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
@@ -64,7 +67,23 @@ export default class Top extends BaseExpression {
         this._textureBuckets = null;
     }
     get numCategories () {
-        return Math.round(this.buckets.eval()) + 1;
+        return this.numBuckets + 1;
+    }
+    get numBuckets () {
+        let buckets = Math.round(this.buckets.eval());
+        if (buckets > this.property.numCategories) {
+            buckets = this.property.numCategories;
+        }
+        if (buckets > MAX_TOP_BUCKETS) {
+            // setTimeout is used here because throwing within the renderer stack leaves the state in an invalid state,
+            // making this error an unrecoverable error, within the setTimeout the error is recoverable
+            const prev = this.buckets.eval();
+            setTimeout(() => {
+                throw new Error(`top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified`);
+            });
+            buckets = 0;
+        }
+        return buckets;
     }
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = {};
@@ -89,31 +108,40 @@ export default class Top extends BaseExpression {
                     r = 7.;
                 } else if (${childSources._top7.inline} == id){
                     r = 8.;
+                } else if (${childSources._top8.inline} == id){
+                    r = 9.;
+                } else if (${childSources._top9.inline} == id){
+                    r = 10.;
+                } else if (${childSources._top10.inline} == id){
+                    r = 11.;
+                } else if (${childSources._top11.inline} == id){
+                    r = 12.;
+                } else if (${childSources._top12.inline} == id){
+                    r = 13.;
+                } else if (${childSources._top13.inline} == id){
+                    r = 14.;
+                } else if (${childSources._top14.inline} == id){
+                    r = 15.;
+                } else if (${childSources._top15.inline} == id){
+                    r = 16.;
                 }
                 return r;
             }`),
             inline: `top${this._uid}(${childSources.property.inline})`
         };
     }
-    _postShaderCompile (program, gl) {
-        super._postShaderCompile(program, gl);
-
-        this.texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        this.property._postShaderCompile(program);
-        this._getBinding(program)._texLoc = gl.getUniformLocation(program, `topMap${this._uid}`);
-    }
     _preDraw (program, drawMetadata, gl) {
         super._preDraw(program, drawMetadata, gl);
-        let buckets = Math.round(this.buckets.eval());
-        if (buckets > this.property.numCategories) {
-            buckets = this.property.numCategories;
-        }
+        const buckets = this.numBuckets;
         const metaColumn = this._meta.properties[this.property.name];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
+
+        for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
+            this[`_top${i}`].expr = Number.POSITIVE_INFINITY;
+        }
 
         orderedCategoryNames.map((cat, i) => {
             if (i < buckets) {
