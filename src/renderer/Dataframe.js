@@ -23,7 +23,7 @@ export default class Dataframe {
         this.scale = scale;
         this.type = type;
         this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size : this.decodedGeom.vertices.length / 2;
+        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
@@ -95,21 +95,42 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
 
-        for (let i = 0; i < vertices.length; i += 2) {
-            if (!breakpoints.length) {
-                if (i > 0) {
-                    index++;
-                }
-            } else {
-                while (i === breakpoints[index]) {
-                    index++;
-                }
-            }
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-            ids[i + 0] = ((index) % width) / (width - 1);
-            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
-        }
+        if (!breakpoints.length) {
+            for (let i = 0; i < vertices.length; i += 6) {
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
 
+                if (ids[i + 0] === 0) {
+                    ids[i + 0] += 1 / (1024 * 64);
+                }
+                if (ids[i + 1] === 0) {
+                    ids[i + 1] += 1 / (1024 * 64);
+                }
+
+                ids[i + 2] = -ids[i + 0];
+                ids[i + 3] = ids[i + 1];
+
+                ids[i + 4] = ids[i + 0];
+                ids[i + 5] = -ids[i + 1];
+                index++;
+            }
+        } else {
+            for (let i = 0; i < vertices.length; i += 2) {
+                if (!breakpoints.length) {
+                    if (i > 0) {
+                        index++;
+                    }
+                } else {
+                    while (i === breakpoints[index]) {
+                        index++;
+                    }
+                }
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+            }
+        }
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 

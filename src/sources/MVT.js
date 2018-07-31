@@ -137,7 +137,7 @@ export default class MVT extends Base {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2));
+                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
             case geometryTypes.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
             case geometryTypes.POLYGON:
@@ -179,8 +179,12 @@ export default class MVT extends Base {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                geometries[2 * numFeatures + 0] = x;
-                geometries[2 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 0] = x;
+                geometries[6 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 2] = x;
+                geometries[6 * numFeatures + 3] = y;
+                geometries[6 * numFeatures + 4] = x;
+                geometries[6 * numFeatures + 5] = y;
             }
             if (f.properties[this._metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);

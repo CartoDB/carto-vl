@@ -6,6 +6,7 @@ varying highp float dp;
 varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
+varying highp vec2 pointCoord;
 
 float distanceAntialias(vec2 p){
     return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
@@ -13,7 +14,8 @@ float distanceAntialias(vec2 p){
 
 
 void main(void) {
-    vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
+    // vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;
+    vec2 p = pointCoord;
     vec4 c = color;
 
     vec4 s = stroke;

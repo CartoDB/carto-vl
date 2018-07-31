@@ -250,7 +250,7 @@ export default class Renderer {
         }
         viz._getRootExpressions().map(expr => expr._dataReady());
 
-        gl.enable(gl.CULL_FACE);
+        // gl.enable(gl.CULL_FACE);
         gl.disable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.STENCIL_TEST);
@@ -354,7 +354,7 @@ export default class Renderer {
             if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             } else if (tile.type === 'point') {
-                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
+                gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
             }
 
             tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
@@ -423,7 +423,7 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            gl.drawArrays(tile.type === 'point' ? gl.TRIANGLES : gl.TRIANGLES, 0, tile.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
