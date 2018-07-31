@@ -159,12 +159,12 @@ export default class Ramp extends BaseExpression {
         };
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
 
         if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
             this.input = new Linear(this.input);
-            this.input._compile(metadata);
+            this.input._bindMetadata(metadata);
         }
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);

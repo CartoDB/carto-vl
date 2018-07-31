@@ -24,7 +24,7 @@ describe('sources/GeoJSON', () => {
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [1, 0]
+                    coordinates: [20, 20]
                 },
                 properties: {
                     numeric: 2,
@@ -95,6 +95,13 @@ describe('sources/GeoJSON', () => {
                 },
                 properties: {}
             }]);
+        });
+
+        it('should compute the center of the coordintates', () => {
+            const source = new GeoJSON(createData());
+            expect(source._dataframeCenter).toBeDefined();
+            expect(source._dataframeCenter.x).toBeCloseTo(0.0555);
+            expect(source._dataframeCenter.x).toBeCloseTo(0.0567);
         });
 
         it('should compute metadata for numeric and category properties', done => {

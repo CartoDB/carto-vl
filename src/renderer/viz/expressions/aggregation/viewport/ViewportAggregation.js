@@ -9,18 +9,17 @@ export default class ViewportAggregation extends BaseExpression {
     constructor ({ property }) {
         super({ property: implicitCast(property), _impostor: number(0) });
         this._isViewport = true;
+        this.type = 'number';
+        this.inlineMaker = inline => inline._impostor;
     }
 
     isFeatureDependent () {
         return false;
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
         // TODO improve type check
-        this.property._compile(metadata);
-        this.type = 'number';
-        super.inlineMaker = inline => inline._impostor;
+        super._bindMetadata(metadata);
     }
 
     _getMinimumNeededSchema () {

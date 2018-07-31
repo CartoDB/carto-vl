@@ -58,6 +58,8 @@ export default class GeoJSON extends Base {
         }
 
         this._features = this._initializeFeatureProperties(this._features);
+
+        this._setCoordinatesCenter();
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -80,7 +82,7 @@ export default class GeoJSON extends Base {
         }
         const dataframe = new Dataframe({
             active: true,
-            center: { x: 0, y: 0 },
+            center: this._dataframeCenter,
             geom: this._decodeGeometry(),
             properties: this._decodeUnboundProperties(),
             scale: 1,
@@ -311,61 +313,63 @@ export default class GeoJSON extends Base {
         }
     }
 
-    _decodeGeometry () {
+    _fetchFeatureGeometry (options = {}, callback) {
         let geometry = null;
         const numFeatures = this._features.length;
-        for (let i = 0; i < numFeatures; i++) {
+        const incr = options.sample ? Math.max(1, Math.floor(numFeatures / options.sample)) : 1;
+
+        for (let i = 0; i < numFeatures; i += incr) {
             const feature = this._features[i];
             if (feature.type === 'Feature') {
-                const type = feature.geometry.type;
-                const coordinates = feature.geometry.coordinates;
-                if (!this._type) {
-                    this._type = type;
-                } else if (this._type !== type) {
-                    throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
-                }
-                if (type === 'Point') {
-                    if (!geometry) {
-                        geometry = new Float32Array(numFeatures * 2);
-                    }
-                    const point = this._computePointGeometry(coordinates);
-                    geometry[2 * i + 0] = point.x;
-                    geometry[2 * i + 1] = point.y;
-                } else if (type === 'LineString') {
-                    if (!geometry) {
-                        geometry = [];
-                    }
-                    const line = this._computeLineStringGeometry(coordinates);
-                    geometry.push([line]);
-                } else if (type === 'MultiLineString') {
-                    if (!geometry) {
-                        geometry = [];
-                    }
-                    const multiline = this._computeMultiLineStringGeometry(coordinates);
-                    geometry.push(multiline);
-                } else if (type === 'Polygon') {
-                    if (!geometry) {
-                        geometry = [];
-                    }
-                    const polygon = this._computePolygonGeometry(coordinates);
-                    geometry.push([polygon]);
-                } else if (type === 'MultiPolygon') {
-                    if (!geometry) {
-                        geometry = [];
-                    }
-                    const multipolygon = this._computeMultiPolygonGeometry(coordinates);
-                    geometry.push(multipolygon);
-                }
+                callback(i, feature.geometry);
             }
         }
         return geometry;
+    }
+
+    _allocGeometry () {
+        if (this._type === 'Point') {
+            return new Float32Array(this._features.length * 2);
+        }
+        return [];
+    }
+
+    _decodeGeometry () {
+        let geometries = this._allocGeometry();
+
+        this._fetchFeatureGeometry({}, (i, geometry) => {
+            const type = geometry.type;
+            const coordinates = geometry.coordinates;
+            if (this._type !== type) {
+                throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
+            }
+            if (type === 'Point') {
+                const point = this._computePointGeometry(coordinates);
+                geometries[2 * i + 0] = point.x;
+                geometries[2 * i + 1] = point.y;
+            } else if (type === 'LineString') {
+                const line = this._computeLineStringGeometry(coordinates);
+                geometries.push([line]);
+            } else if (type === 'MultiLineString') {
+                const multiline = this._computeMultiLineStringGeometry(coordinates);
+                geometries.push(multiline);
+            } else if (type === 'Polygon') {
+                const polygon = this._computePolygonGeometry(coordinates);
+                geometries.push([polygon]);
+            } else if (type === 'MultiPolygon') {
+                const multipolygon = this._computeMultiPolygonGeometry(coordinates);
+                geometries.push(multipolygon);
+            }
+        });
+
+        return geometries;
     }
 
     _computePointGeometry (data) {
         const lat = data[1];
         const lng = data[0];
         const wm = util.projectToWebMercator({ lat, lng });
-        return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+        return rsys.wToR(wm.x, wm.y, { scale: util.WM_R, center: this._center });
     }
 
     _computeLineStringGeometry (data, reverse) {
@@ -438,6 +442,45 @@ export default class GeoJSON extends Base {
         // When total is positive it means that vertices are oriented clock wise
         // and, since positive orientation is counter-clock wise, it is reversed.
         return total >= 0;
+    }
+
+    _samplePoint (geometry) {
+        const type = geometry.type;
+
+        const coordinates = geometry.coordinates;
+        if (type === 'Point') {
+            return coordinates;
+        } else if (type === 'LineString') {
+            return coordinates[0];
+        } else if (type === 'MultiLineString' || type === 'Polygon') {
+            return coordinates[0][0];
+        } else if (type === 'MultiPolygon') {
+            return coordinates[0][0][0];
+        }
+    }
+
+    // sets this._type, this._center, this._dataframeCenter
+    _setCoordinatesCenter () {
+        let x = 0;
+        let y = 0;
+        let nPoints = 0;
+        this._fetchFeatureGeometry({ sample: 10 }, (_, geometry) => {
+            if (!this._type) {
+                this._type = geometry.type;
+            }
+            const samplePoint = this._samplePoint(geometry);
+            const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
+            x += sampleXY.x;
+            y += sampleXY.y;
+            nPoints += 1;
+        });
+        if (nPoints > 1) {
+            x /= nPoints;
+            y /= nPoints;
+        }
+
+        this._center = { x, y };
+        this._dataframeCenter = rsys.wToR(this._center.x, this._center.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
     free () {

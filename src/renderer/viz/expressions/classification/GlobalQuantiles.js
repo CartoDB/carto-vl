@@ -34,8 +34,8 @@ export default class GlobalQuantiles extends Classifier {
         super({ input }, buckets);
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         checkExpression('globalQuantiles', 'input', 0, this.input);
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
 
