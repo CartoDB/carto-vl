@@ -37,6 +37,8 @@ export default class ViewportPercentile extends ViewportAggregation {
 
         this._isViewport = true;
         this.percentile = implicitCast(percentile);
+        this.type = 'number';
+        super.inlineMaker = inline => inline.impostor;
     }
 
     get value () {
@@ -53,14 +55,6 @@ export default class ViewportPercentile extends ViewportAggregation {
         }
 
         return this._value;
-    }
-
-    _compile (metadata) {
-        super._compile(metadata);
-        // TODO improve type check
-        this.property._compile(metadata);
-        this.type = 'number';
-        super.inlineMaker = inline => inline.impostor;
     }
 
     _getMinimumNeededSchema () {

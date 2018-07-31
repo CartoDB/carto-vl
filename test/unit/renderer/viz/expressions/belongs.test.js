@@ -37,7 +37,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('in($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 'category0' };
                 const sIn = s.in($category, ['category1', 'category2']);
-                sIn._compile(fakeMetadata);
+                sIn._bindMetadata(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
@@ -45,7 +45,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('in($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 'category1' };
                 const sIn = s.in($category, ['category1', 'category2']);
-                sIn._compile(fakeMetadata);
+                sIn._bindMetadata(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
@@ -55,7 +55,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('nin($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 'category0' };
                 const nin = s.nin($category, ['category1', 'category2']);
-                nin._compile(fakeMetadata);
+                nin._bindMetadata(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
@@ -63,7 +63,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('nin($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 'category1' };
                 const nin = s.nin($category, ['category1', 'category2']);
-                nin._compile(fakeMetadata);
+                nin._bindMetadata(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });

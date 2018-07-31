@@ -26,7 +26,7 @@ import GlobalAggregation from './GlobalAggregation';
  * @function
  * @api
  */
-export default class GlobalCount extends GlobalAggregation {
+export default class GlobalAvg extends GlobalAggregation {
     constructor (property) {
         super({ property, name: 'avg', type: 'number' });
     }

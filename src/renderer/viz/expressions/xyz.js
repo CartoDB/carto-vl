@@ -10,8 +10,8 @@ export default class XYZ extends BaseExpression {
         super({ x: x, y: y, z: z });
         // TODO improve type check
     }
-    _compile (meta) {
-        super._compile(meta);
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
         if (this.x.type !== 'number' || this.y.type !== 'number' || this.z.type !== 'number') {
             throw new Error('XYZ() invalid parameters');
         }

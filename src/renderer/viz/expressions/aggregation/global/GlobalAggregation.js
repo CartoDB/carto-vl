@@ -13,6 +13,7 @@ export default class GlobalAggregation extends BaseExpression {
         this.property = implicitCast(property);
         this._name = name;
         this.type = type;
+        super.inlineMaker = inline => inline._value;
     }
 
     isFeatureDependent () {
@@ -27,12 +28,10 @@ export default class GlobalAggregation extends BaseExpression {
         return this._value.expr;
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        this.property._bindMetadata(metadata);
         // TODO improve type check
-        this.property._compile(metadata);
-
-        super.inlineMaker = inline => inline._value;
         if (metadata.properties[this.property.name][this._name] === undefined) {
             throw new Error(`Metadata ${this._name} for property ${this.property.name} is not defined`);
         }

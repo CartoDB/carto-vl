@@ -46,8 +46,8 @@ export default class Placement extends BaseExpression {
     eval (v) {
         return [this.x.eval(v), this.y.eval(v)];
     }
-    _compile (meta) {
-        super._compile(meta);
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
         checkType('placement', 'x', 0, 'number', this.x);
         checkType('placement', 'y', 1, 'number', this.y);
     }
