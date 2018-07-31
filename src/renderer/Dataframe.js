@@ -227,8 +227,8 @@ export default class Dataframe {
 
     _isPointInViewport (featureIndex, viewportAABB) {
         const { minx, maxx, miny, maxy } = viewportAABB;
-        const x = this.geom[2 * featureIndex + 0];
-        const y = this.geom[2 * featureIndex + 1];
+        const x = this.geom[6 * featureIndex + 0];
+        const y = this.geom[6 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
@@ -285,8 +285,8 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
-        for (let i = 0; i < points.length; i += 2) {
-            const featureIndex = i / 2;
+        for (let i = 0; i < points.length; i += 6) {
+            const featureIndex = i / 6;
             const center = {
                 x: points[i],
                 y: points[i + 1]
