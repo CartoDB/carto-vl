@@ -39,6 +39,7 @@ export default class Opacity extends BaseExpression {
         checkLooseType('opacity', 'alpha', 1, 'number', alpha);
         super({ color, alpha });
         this.type = 'color';
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
     get value () {
         return this.eval();
@@ -49,10 +50,9 @@ export default class Opacity extends BaseExpression {
         color.a = alpha;
         return color;
     }
-    _compile (meta) {
-        super._compile(meta);
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
         checkType('opacity', 'color', 0, 'color', this.color);
         checkType('opacity', 'alpha', 1, 'number', this.alpha);
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
     }
 }

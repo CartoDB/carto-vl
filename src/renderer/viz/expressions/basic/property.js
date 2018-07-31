@@ -38,6 +38,7 @@ export default class Property extends BaseExpression {
         }
         super({});
         this.name = name;
+        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
     isFeatureDependent () {
@@ -55,7 +56,7 @@ export default class Property extends BaseExpression {
         return feature[this.name];
     }
 
-    _compile (meta) {
+    _bindMetadata (meta) {
         const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
@@ -65,8 +66,6 @@ export default class Property extends BaseExpression {
         if (this.type === 'category') {
             this.numCategories = metaColumn.categories.length;
         }
-
-        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
     _applyToShaderSource (getGLSLforProperty) {

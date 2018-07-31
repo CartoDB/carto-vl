@@ -109,14 +109,16 @@ function genHSL (name, alpha) {
 
             return hslToRgb(h, s, l);
         }
-        _compile (meta) {
-            super._compile(meta);
+
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             hslCheckType('h', 0, this.h);
             hslCheckType('s', 1, this.s);
             hslCheckType('l', 2, this.l);
             if (alpha) {
                 checkType('hsla', 'a', 3, 'number', this.a);
             }
+
             const normalize = (value, hue = false) => {
                 if (value.type === 'category') {
                     return `/${hue ? value.numCategories + 1 : value.numCategories}.`;

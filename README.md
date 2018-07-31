@@ -3,7 +3,7 @@
 [![CircleCI](https://circleci.com/gh/CartoDB/carto-vl.svg?style=svg)](https://circleci.com/gh/CartoDB/carto-vl)
 
 **CARTO VL** is an open source JavaScript library for developers to create vector-based visualizations inside Location Intelligence applications.
-The library is currently in its Beta version and we welcome [your feedback](#Feedback) and requests to make it even better!
+The library is currently in its Beta version and we welcome [your feedback](https://github.com/CartoDB/carto-vl/issues) and requests to make it even better!
 
 ## Features
 
@@ -34,7 +34,7 @@ filter: $dn > 60
 
 To see
 
-![](https://github.com/CartoDB/carto-vl/blob/master/docs/images/map-example.png)
+![](https://raw.githubusercontent.com/CartoDB/carto-vl/master/docs/images/map-example.png)
 
 ## I want to make a map
 
@@ -108,9 +108,9 @@ $ yarn serve
 
 Lastly, check out [CONTRIBUTING.md](https://github.com/CartoDB/carto-vl/blob/master/CONTRIBUTING.md) for more information about submitting pull requests to us. You will need to sign a Contributor License Agreement (CLA) before making a submission. [Learn more here.](https://carto.com/contributions/)
 
-## <a name="feedback">Feedback</a>
+## Feedback
 
-CARTO VL is still in Beta but we encourage you to start playing with it and to please [send us feedback](URL) so we can create an even better library, suited to your needs.
+CARTO VL is still in Beta but we encourage you to start playing with it and to please [send us feedback](https://github.com/CartoDB/carto-vl/issues) so we can create an even better library, suited to your needs.
 
 ## Works with
 

@@ -7,7 +7,12 @@ import Transition from '../renderer/viz/expressions/transition';
 import NumberExpression from '../renderer/viz/expressions/basic/number';
 import ConstantExpression from '../renderer/viz/expressions/basic/constant';
 import CategoryExpression from '../renderer/viz/expressions/basic/category';
-import { ClusterAvg, ClusterMax, ClusterMin, ClusterMode, ClusterSum } from '../renderer/viz/expressions/aggregation/clusterAggregation';
+import ClusterAvg from '../renderer/viz/expressions/aggregation/cluster/ClusterAvg';
+import ClusterMax from '../renderer/viz/expressions/aggregation/cluster/ClusterMax';
+import ClusterMin from '../renderer/viz/expressions/aggregation/cluster/ClusterMin';
+import ClusterMode from '../renderer/viz/expressions/aggregation/cluster/ClusterMode';
+import ClusterSum from '../renderer/viz/expressions/aggregation/cluster/ClusterSum';
+
 import * as schema from '../renderer/schema';
 
 class AggregationFiltering {

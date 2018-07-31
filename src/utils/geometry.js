@@ -30,7 +30,7 @@ export function perpendicular ([x, y]) {
 
 /**
  * Compute the normal of a line AB.
- * By definition it is the unitary vector from B to A, rotated +90 degrees
+ * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise
  */
 export function getLineNormal (a, b) {
     const u = normalize(vector(b, a));
@@ -40,7 +40,7 @@ export function getLineNormal (a, b) {
 /**
  * Compute the normal of the join from the lines' normals.
  * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
- * multiplied by a factor of `1/sin(theta)` to reach the intersecction of the wide lines.
+ * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.
  * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
  * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
  */
@@ -48,8 +48,9 @@ export function getJoinNormal (prevNormal, nextNormal) {
     const u = [prevNormal[1], -prevNormal[0]];
     const v = [-nextNormal[1], nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
+    const cos = v[0] * u[0] + v[1] * u[1];
     const factor = Math.abs(sin);
-    const miterJoin = factor > 0.866; // 60 deg
+    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
     return {
         turnLeft: sin > 0,
         joinNormal: miterJoin && neg([

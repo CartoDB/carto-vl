@@ -430,6 +430,7 @@ export default class Renderer {
 
             if (tile.type === 'line' /* || tile.type === 'polygon' */) {
                 gl.clearDepth(1);
+                gl.depthRange(0, 1);
                 gl.depthFunc(gl.NOTEQUAL);
                 gl.depthMask(true);
                 gl.clear(gl.DEPTH_BUFFER_BIT);
@@ -442,6 +443,7 @@ export default class Renderer {
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
+                gl.disable(gl.DEPTH_TEST);
             }
         });
         orderingMins.map((_, orderingIndex) => {

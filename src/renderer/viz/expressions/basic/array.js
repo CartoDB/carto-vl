@@ -10,7 +10,7 @@ import { checkExpression, implicitCast, getOrdinalFromIndex } from '../utils';
  * @memberof carto.expressions
  * @name array
  * @function
- * @IGNOREapi
+ * @api
  */
 export default class BaseArray extends BaseExpression {
     constructor (elems) {
@@ -56,8 +56,9 @@ export default class BaseArray extends BaseExpression {
     _resolveAliases (aliases) {
         this.elems.map(c => c._resolveAliases(aliases));
     }
-    _compile (metadata) {
-        super._compile(metadata);
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
 
         const type = this.elems[0].type;
         if (['number', 'category', 'color', 'time'].indexOf(type) === -1) {

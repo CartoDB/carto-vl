@@ -67,8 +67,8 @@ function genInterpolator (inlineMaker, preface, jsEval) {
         eval (feature) {
             return jsEval(this.m.eval(feature));
         }
-        _compile (meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             if (this.m.type !== 'number') {
                 throw new Error(`Blending cannot be performed by '${this.m.type}'`);
             }

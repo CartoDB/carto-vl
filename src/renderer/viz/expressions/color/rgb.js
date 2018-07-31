@@ -71,6 +71,7 @@ function genRGB (name, alpha) {
             }
             super(children);
             this.type = 'color';
+            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
         get value () {
             return this.eval();
@@ -83,15 +84,14 @@ function genRGB (name, alpha) {
                 a: alpha ? this.a.eval(f) : 1
             };
         }
-        _compile (meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             checkType(name, 'r', 0, 'number', this.r);
             checkType(name, 'g', 1, 'number', this.g);
             checkType(name, 'b', 2, 'number', this.b);
             if (alpha) {
                 checkType('rgba', 'a', 3, 'number', this.a);
             }
-            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
     };
 }
