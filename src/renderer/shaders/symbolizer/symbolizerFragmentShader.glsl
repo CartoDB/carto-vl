@@ -21,8 +21,8 @@ void main(void) {
         c = symbolColor;
     }
     if (imageUV!=clamp(imageUV, 0.,1.)){
-        c.a=0.;
+        c.a = 0.;
     }
 
-    gl_FragColor = vec4(c.rgb*c.a, c.a) +0.*vec4(0.,0.3,0.,0.4);
+    gl_FragColor = vec4(c.rgb*c.a, c.a);
 }

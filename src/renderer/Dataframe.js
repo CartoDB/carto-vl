@@ -117,14 +117,8 @@ export default class Dataframe {
             }
         } else {
             for (let i = 0; i < vertices.length; i += 2) {
-                if (!breakpoints.length) {
-                    if (i > 0) {
-                        index++;
-                    }
-                } else {
-                    while (i === breakpoints[index]) {
-                        index++;
-                    }
+                while (i === breakpoints[index]) {
+                    index++;
                 }
                 // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
                 ids[i + 0] = ((index) % width) / (width - 1);
@@ -475,8 +469,8 @@ export default class Dataframe {
     }
 
     _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 126;
-        const diameter = Math.min(viz.width.eval(feature) + viz.strokeWidth.eval(feature), SATURATION_PX);
+        const SATURATION_PX = 336;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }

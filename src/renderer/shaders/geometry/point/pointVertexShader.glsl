@@ -19,7 +19,6 @@ uniform sampler2D filterTex;
 varying highp vec4 color;
 varying highp vec4 stroke;
 varying highp float dp;
-varying highp float sizeNormalizer;
 varying highp float fillScale;
 varying highp float strokeScale;
 varying highp vec2 pointCoord;
@@ -53,17 +52,17 @@ void main(void) {
     stroke.a = 0.;
   }
   dp = 1.0 / (size + 1.);
-  sizeNormalizer = (size +1.)/size;
+  float sizeNormalizer = (size +1.)/size;
 
 
   vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
 
   vec2 size2 = (2.*size+4.)*normalScale;
 
-  if (featureID.x<0.){
+  if (featureID.y<0.){
       pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
       p.xy += size2*vec2(0.866025, -0.5);
-  }else if (featureID.y<0.){
+  }else if (featureID.x<0.){
       pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;
       p.xy += size2*vec2(-0.866025, -0.5);
   }else{

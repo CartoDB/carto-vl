@@ -48,10 +48,10 @@ void main(void) {
     float sizeNormalizer = (size +2.)/size;
     vec2 size2 = (2.*size+4.)*normalScale;
 
-    if (featureID.x<0.){
+    if (featureID.y<0.){
         pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
         p.xy += size2*vec2(0.866025, -0.5);
-    }else if (featureID.y<0.){
+    }else if (featureID.x<0.){
         pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;
         p.xy += size2*vec2(-0.866025, -0.5);
     }else{
