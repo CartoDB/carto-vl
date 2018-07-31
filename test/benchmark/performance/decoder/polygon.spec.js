@@ -1,12 +1,8 @@
-import { decodeGeom } from '../../src/renderer/decoder';
-import GeoJSON from '../../src/sources/GeoJSON';
+import { decodeGeom } from '../../../../src/renderer/decoder';
+import GeoJSON from '../../../../src/sources/GeoJSON';
 
 const geojson = new GeoJSON({
     'type': 'Feature',
-    'properties': {
-        'name': 'Bermuda Triangle',
-        'area': 1150180
-    },
     'geometry': {
         'type': 'Polygon',
         'coordinates': [
@@ -22,5 +18,7 @@ const geojson = new GeoJSON({
 const polygonGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodePolygon', () => {
-    decodeGeom('polygon', polygonGeometry);
-}, {runs: 1});
+    for (let i = 0; i < 10000; i++) {
+        decodeGeom('polygon', polygonGeometry);
+    }
+}, {runs: 100});

@@ -100,7 +100,7 @@
     "test:e2e": "./scripts/run-local-e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
-    "test:benchmark": "node test/benchmark/fps/benchmark.js",
+    "test:fps": "node test/benchmark/fps/benchmark.js",
     "test:perf": "karma start --single-run --browsers Chrome test/benchmark/karma.conf.js",
     "serve": "yarn build:dev && yarn docs && http-server",
     "preversion": "./scripts/preversion.sh",
