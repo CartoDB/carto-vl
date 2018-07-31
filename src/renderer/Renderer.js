@@ -442,6 +442,7 @@ export default class Renderer {
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
+                gl.disable(gl.DEPTH_TEST);
             }
         });
         orderingMins.map((_, orderingIndex) => {
