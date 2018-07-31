@@ -37,6 +37,8 @@ void main(void) {
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
     // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
     float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
+    // Set z range (-1, 1)
+    z = z * 2. - 1.;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
     if (size==0. || color.a==0.){
