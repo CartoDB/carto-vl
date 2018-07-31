@@ -21,17 +21,14 @@ varying highp vec4 color;
 varying highp vec2 pointCoord;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
-float decodeWidth(float x){
-    x*=255.;
-    if (x < 64.){
-        return x*0.25;
-    }else if (x<128.){
-        return (x-64.)+16.;
-    }else{
-        return (x-127.)*2.+80.;
-    }
+float decodeWidth(float x) {
+  float w;
+  x*=255.;
+  float exponent = floor(x/32.); // Skip first 5 bits
+  float fraction = x-exponent*32.; // Ignore last 3 bits
+  w = pow(2., exponent) * (fraction/32. +1.);
+  return (w-4.)*4.;
 }
-
 $symbolPlacement_preface
 $propertyPreface
 

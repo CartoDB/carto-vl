@@ -16,16 +16,13 @@ uniform sampler2D filterTex;
 varying lowp vec4 color;
 
 // From [0.,1.] in exponential-like form to pixels in [0.,255.]
-float decodeWidth(float x){
-    float w;
-    if (x < 0.25098039215686274){ // x < 64/255
-        w = 63.75 * x; // 255 * 0.25
-    }else if (x < 0.5019607843137255){ // x < 128/255
-        w = x*255. -48.;
-    }else {
-        w = x*510. -174.;
-    }
-    return w;
+float decodeWidth(float x) {
+  float w;
+  x*=255.;
+  float exponent = floor(x/32.); // Skip first 5 bits
+  float fraction = x-exponent*32.; // Ignore last 3 bits
+  w = pow(2., exponent) * (fraction/32. +1.);
+  return (w-4.)*4.;
 }
 
 void main(void) {
