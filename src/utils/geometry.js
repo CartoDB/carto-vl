@@ -48,8 +48,9 @@ export function getJoinNormal (prevNormal, nextNormal) {
     const u = [prevNormal[1], -prevNormal[0]];
     const v = [-nextNormal[1], nextNormal[0]];
     const sin = v[0] * u[1] - v[1] * u[0];
+    const cos = v[0] * u[0] + v[1] * u[1];
     const factor = Math.abs(sin);
-    const miterJoin = factor > 0.866; // 60 deg
+    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
     return {
         turnLeft: sin > 0,
         joinNormal: miterJoin && neg([
