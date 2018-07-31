@@ -8,10 +8,15 @@ describe('src/renderer/Dataframe', () => {
             const dataframe = new Dataframe({
                 center: { x: 0, y: 0 },
                 scale: 1,
-                geom: [
+                geom: new Float32Array([
                     0, 0,
+                    0, 0,
+                    0, 0,
+
+                    1, 1,
+                    1, 1,
                     1, 1
-                ],
+                ]),
                 properties: {
                     id: [1, 2]
                 },
