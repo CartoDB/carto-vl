@@ -28,22 +28,56 @@ export function perpendicular ([x, y]) {
     return [-y, x];
 }
 
+/**
+ * Compute the normal of a line AB.
+ * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise
+ */
 export function getLineNormal (a, b) {
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    return normalize([-dy, dx]);
+    const u = normalize(vector(b, a));
+    return [-u[1], u[0]];
 }
 
-export function getJointNormal (a, b, c) {
-    const u = normalize([a[0] - b[0], a[1] - b[1]]);
-    const v = normalize([c[0] - b[0], c[1] - b[1]]);
-    const sin = -u[1] * v[0] + u[0] * v[1];
-    if (sin !== 0) {
-        return [(u[0] + v[0]) / sin, (u[1] + v[1]) / sin];
-    }
+/**
+ * Compute the normal of the join from the lines' normals.
+ * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)
+ * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.
+ * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,
+ * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`
+ */
+export function getJoinNormal (prevNormal, nextNormal) {
+    const u = [prevNormal[1], -prevNormal[0]];
+    const v = [-nextNormal[1], nextNormal[0]];
+    const sin = v[0] * u[1] - v[1] * u[0];
+    const cos = v[0] * u[0] + v[1] * u[1];
+    const factor = Math.abs(sin);
+    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
+    return {
+        turnLeft: sin > 0,
+        joinNormal: miterJoin && neg([
+            (u[0] + v[0]) / factor,
+            (u[1] + v[1]) / factor
+        ])
+    };
 }
 
-export function normalize (v) {
+/**
+ * Return the negative of the provided vector
+ */
+export function neg (v) {
+    return [-v[0], -v[1]];
+}
+
+/**
+ * Create a vector which goes from p1 to p2
+ */
+function vector (p1, p2) {
+    return [p2[0] - p1[0], p2[1] - p1[1]];
+}
+
+/**
+ * Return the vector scaled to length 1
+ */
+function normalize (v) {
     const s = Math.hypot(v[0], v[1]);
     return [v[0] / s, v[1] / s];
 }
@@ -108,7 +142,8 @@ export default {
     perpendicular,
     normalize,
     getLineNormal,
-    getJointNormal,
+    getJoinNormal,
+    neg,
     halfPlaneSign,
     pointInTriangle,
     equalPoints,
