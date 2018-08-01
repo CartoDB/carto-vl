@@ -1032,6 +1032,163 @@ layer.on('updated', () => {
     
 
     
+    <h4 class="name" id=".array"><span class="type-signature">(static) </span>array<span class="signature">(elements)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Color">Color</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Date">Date</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -12443,7 +12600,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Number of top properties to be returned</p></td>
+            <td class="description last"><p>Number of top properties to be returned, the maximum value is 16, values higher than that will result in an error</p></td>
         </tr>
 
     
@@ -13583,6 +13740,227 @@ layer.on('updated', () => {
     
 
     
+    <h4 class="name" id=".ViewportHistogram"><span class="type-signature">(static) </span>ViewportHistogram<span class="signature">(input, weight, size)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Generates an histogram.</p>
+<p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
+The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
+at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the <code>size</code> parameter.</p>
+<p>Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>expression to base the histogram</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>weight</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Weight each occurrence differently based on this weight, defaults to <code>1</code>, which will generate a simple, non-weighted count.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>size</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional (defaults to 1000). Number of bars to use if <code>x</code> is a numeric expression</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Histogram</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Histogram</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Create and use an histogram. (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(`
+         @categoryHistogram: viewportHistogram($type)
+         @numericHistogram:  viewportHistogram($amount, 1, 3)
+`);
+...
+console.log(viz.variables.categoryHistogram.eval());
+// [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+// There are 10 features of type A and 20 of type B
+
+console.log(viz.variables.numericHistogram.eval());
+// [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+// There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".viewportMax"><span class="type-signature">(static) </span>viewportMax<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -14116,227 +14494,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportPercentile"><span class="type-signature">(static) </span>viewportPercentile<span class="signature">(input, weight, size)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Generates an histogram.</p>
-<p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
-The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
-at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the <code>size</code> parameter.</p>
-<p>Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>expression to base the histogram</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>weight</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Weight each occurrence differently based on this weight, defaults to <code>1</code>, which will generate a simple, non-weighted count.</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>size</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Optional (defaults to 1000). Number of bars to use if <code>x</code> is a numeric expression</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Histogram</p>
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Histogram</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Example</h5>
-    
-        <p class="code-caption">Create and use an histogram. (String)</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz(`
-         @categoryHistogram: viewportHistogram($type)
-         @numericHistogram:  viewportHistogram($amount, 1, 3)
-`);
-...
-console.log(viz.variables.categoryHistogram.eval());
-// [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
-// There are 10 features of type A and 20 of type B
-
-console.log(viz.variables.numericHistogram.eval());
-// [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
-// There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".viewportSum"><span class="type-signature">(static) </span>viewportSum<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -14638,7 +14795,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Jul 27 2018 16:45:25 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Aug 01 2018 09:50:36 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
