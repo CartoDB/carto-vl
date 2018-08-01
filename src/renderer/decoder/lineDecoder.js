@@ -36,7 +36,7 @@ export function decodeLine (geometry) {
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLine (lineString, vertices, normals, skipCallback) {
+export function addLine (lineString, vertices, normals, closeLoop, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let skipLine = false;
@@ -63,9 +63,14 @@ export function addLine (lineString, vertices, normals, skipCallback) {
                 [neg(prevNormal), prevNormal, neg(prevNormal)]
             );
 
+            // If there is a next point, compute its properties
             if (i <= lineString.length - 2) {
-                // If there is a next point, compute its properties
                 nextPoint = [lineString[i], lineString[i + 1]];
+            } else if (closeLoop) {
+                nextPoint = [lineString[2], lineString[3]];
+            }
+
+            if (nextPoint) {
                 nextNormal = getLineNormal(currentPoint, nextPoint);
                 // `turnLeft` indicates that the nextLine turns to the left
                 // `joinNormal` contains the direction and size for the `miter` vertex
@@ -95,6 +100,7 @@ export function addLine (lineString, vertices, normals, skipCallback) {
             prevPoint = currentPoint;
             currentPoint = nextPoint;
             prevNormal = nextNormal;
+            nextPoint = null;
         }
     }
 

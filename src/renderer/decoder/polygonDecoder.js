@@ -28,7 +28,7 @@ export function decodePolygon (geometry) {
             const polygon = feature[j];
 
             const lineString = polygon.flat;
-            addLine(lineString, vertices, normals, (index) => {
+            addLine(lineString, vertices, normals, true, (index) => {
                 // Skip adding the line which connects two rings OR is clipped
                 return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
             });
