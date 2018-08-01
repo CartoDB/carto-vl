@@ -1,4 +1,3 @@
-// From pixels in [0.,1023.] to [0.,1.] in exponential-like form
 vec2 encodeWidth(float x) {
     float high, low;
     x = min(x, 1023.);

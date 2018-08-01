@@ -23,7 +23,6 @@ varying highp float fillScale;
 varying highp float strokeScale;
 varying highp vec2 pointCoord;
 
-// From [0.,1.] in exponential-like form to pixels in [0., 1024.)
 float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }

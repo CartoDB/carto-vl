@@ -14,7 +14,6 @@ uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
-// From [0.,1.] in exponential-like form to pixels in [0., 1024.)
 float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }
