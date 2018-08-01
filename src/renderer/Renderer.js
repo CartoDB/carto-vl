@@ -480,7 +480,7 @@ export default class Renderer {
 
 function getOrderingRenderBuckets (renderLayer) {
     const orderer = renderLayer.viz.order;
-    const MAX_SIZE = 1009;
+    const MAX_SIZE = 1030;
     let orderingMins = [0];
     let orderingMaxs = [MAX_SIZE];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels

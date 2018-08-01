@@ -14,14 +14,9 @@ uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
-// From [0.,1.] in exponential-like form to pixels in [0.,1004.]
-float decodeWidth(float x) {
-  float w;
-  x*=255.;
-  float exponent = floor(x/32.); // Skip first 5 bits
-  float fraction = x-exponent*32.; // Ignore last 3 bits
-  w = pow(2., exponent) * (fraction/32. +1.);
-  return w*4. - 4.;
+// From [0.,1.] in exponential-like form to pixels in [0., 1024.)
+float decodeWidth(vec2 enc) {
+  return enc.x*(255.*4.) + 4.*enc.y;
 }
 
 void main(void) {
@@ -29,7 +24,7 @@ void main(void) {
     float filtering = texture2D(filterTex, featureID).a;
     color.a *= filtering;
     color.rgb *= color.a;
-    float size = decodeWidth(texture2D(widthTex, featureID).a);
+    float size = decodeWidth(texture2D(widthTex, featureID).rg);
 
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
     // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64

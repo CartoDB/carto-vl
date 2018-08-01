@@ -15,14 +15,9 @@ uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
-// From [0.,1.] in exponential-like form to pixels in [0.,1004.]
-float decodeWidth(float x) {
-  float w;
-  x*=255.;
-  float exponent = floor(x/32.); // Skip first 5 bits
-  float fraction = x-exponent*32.; // Ignore last 3 bits
-  w = pow(2., exponent) * (fraction/32. +1.);
-  return w*4. - 4.;
+// From [0.,1.] in exponential-like form to pixels in [0., 1024.)
+float decodeWidth(vec2 enc) {
+  return enc.x*(255.*4.) + 4.*enc.y;
 }
 
 void main(void) {
@@ -34,7 +29,7 @@ void main(void) {
     }
     float filtering = texture2D(filterTex, featureID).a;
     c.a *= filtering;
-    float size = decodeWidth(texture2D(strokeWidthTex, featureID).a);
+    float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
 
