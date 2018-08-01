@@ -294,7 +294,7 @@ export default class Dataframe {
 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 const offset = viz.symbolPlacement.eval();
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;

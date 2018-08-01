@@ -27,6 +27,9 @@ float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }
 
+$propertyPreface
+$offset_preface
+
 void main(void) {
   color = texture2D(colorTex, abs(featureID));
   stroke = texture2D(colorStrokeTex, abs(featureID));
@@ -61,6 +64,7 @@ void main(void) {
       p.y += size2.y;
   }
 
+  p.xy += normalScale*($offset_inline);
   if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {
     p.x = 10000.;
   }
