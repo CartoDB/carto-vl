@@ -39,6 +39,7 @@ export default class Between extends BaseExpression {
 
         super({ value, lowerLimit, upperLimit });
         this.type = 'number';
+        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
     eval (feature) {
         const value = this.value.eval(feature);
@@ -46,13 +47,11 @@ export default class Between extends BaseExpression {
         const upper = this.upperLimit.eval(feature);
         return (value >= lower && value <= upper) ? 1 : 0;
     }
-    _compile (meta) {
-        super._compile(meta);
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
 
         checkType('between', 'value', 0, 'number', this.value);
         checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
         checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
-
-        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
 }

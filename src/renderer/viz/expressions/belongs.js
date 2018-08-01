@@ -89,8 +89,8 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
         eval (feature) {
             return jsEval(this.value.eval(feature), this.list.eval(feature));
         }
-        _compile (meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             checkType(name, 'value', 0, 'category', this.value);
             checkType(name, 'list', 1, 'category-array', this.list);
         }

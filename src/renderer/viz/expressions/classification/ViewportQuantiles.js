@@ -35,8 +35,8 @@ export default class ViewportQuantiles extends Classifier {
         super(children, buckets);
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         checkType('viewportQuantiles', 'input', 0, ['number'], this.input);
     }
 

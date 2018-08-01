@@ -35,8 +35,8 @@ export default class GlobalEqIntervals extends Classifier {
         super({ input }, buckets);
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         checkExpression('globalEqIntervals', 'input', 0, this.input);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
         const { min, max } = metadata.properties[this.input.name];

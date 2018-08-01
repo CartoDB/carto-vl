@@ -39,9 +39,8 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
-    _bind (metadata) {
-        this._compile(metadata);
-        return this;
+    _bindMetadata (metadata) {
+        this._getChildren().forEach(child => child._bindMetadata(metadata));
     }
 
     _setUID (idGenerator) {
@@ -77,10 +76,6 @@ export default class Base {
 
     _resolveAliases (aliases) {
         this._getChildren().map(child => child._resolveAliases(aliases));
-    }
-
-    _compile (metadata) {
-        this._getChildren().map(child => child._compile(metadata));
     }
 
     _setGenericGLSL (inlineMaker, preface) {

@@ -282,12 +282,7 @@ export default class Viz {
     }
 
     compileShaders (gl, metadata) {
-        this.color._bind(metadata);
-        this.width._bind(metadata);
-        this.strokeColor._bind(metadata);
-        this.strokeWidth._bind(metadata);
-        this.symbol._bind(metadata);
-        this.filter._bind(metadata);
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
 
         this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
         this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
@@ -295,7 +290,6 @@ export default class Viz {
         this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
         this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
 
-        this.symbolPlacement._bind(metadata);
         if (!this.symbol._default) {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,

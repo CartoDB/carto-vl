@@ -1,4 +1,4 @@
-import decoder from './decoder';
+import { decodeGeom } from './decoder';
 import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
@@ -22,7 +22,7 @@ export default class Dataframe {
         this.properties = properties;
         this.scale = scale;
         this.type = type;
-        this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
+        this.decodedGeom = decodeGeom(this.type, this.geom);
         this.numVertex = type === 'point' ? size : this.decodedGeom.vertices.length / 2;
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];

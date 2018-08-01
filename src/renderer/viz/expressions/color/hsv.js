@@ -109,8 +109,8 @@ function genHSV (name, alpha) {
 
             return hsvToRgb(h, s, v);
         }
-        _compile (metadata) {
-            super._compile(metadata);
+        _bindMetadata (metadata) {
+            super._bindMetadata(metadata);
             hsvCheckType('h', 0, this.h);
             hsvCheckType('s', 1, this.s);
             hsvCheckType('v', 2, this.v);
