@@ -5,7 +5,7 @@ const map = new mapboxgl.Map({
     zoom: 0
 });
 
-const points = new carto.source.GeoJSON(sources['collection-point']);
+const points = new carto.source.GeoJSON(sources['point-collection']);
 const polygon = new carto.source.GeoJSON(sources['polygon']);
 const viz1 = new carto.Viz('color: rgb(255, 0, 0), width: 50');
 const viz2 = new carto.Viz('color: rgb(255, 0, 255)');
