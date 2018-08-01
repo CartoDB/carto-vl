@@ -1,10 +1,10 @@
 import { compileProgram } from '../../utils';
-import triangleFragmentShader from './triangleFragmentShader.glsl';
-import triangleVertexShader from './triangleVertexShader.glsl';
+import polygonFragmentShader from './polygonFragmentShader.glsl';
+import polygonVertexShader from './polygonVertexShader.glsl';
 
 export default class TriangleShader {
     constructor (gl) {
-        Object.assign(this, compileProgram(gl, `${triangleVertexShader}`, `${triangleFragmentShader}`));
+        Object.assign(this, compileProgram(gl, `${polygonVertexShader}`, `${polygonFragmentShader}`));
         this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
         this.normalAttr = gl.getAttribLocation(this.program, 'normal');
         this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');

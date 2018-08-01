@@ -1,16 +1,16 @@
 import AntiAliasingShader from './common/antialiasing/AntiAliasingShader';
 import LineShader from './geometry/line/LineShader';
 import PointShader from './geometry/point/PointShader';
-import TriangleShader from './geometry/triangle/TriangleShader';
+import PolygonShader from './geometry/polygon/PolygonShader';
 import * as styler from './styler/stylerShaders';
 import * as symbolizer from './symbolizer/symbolizerShaders';
 
 const AABlender = AntiAliasingShader;
 
 const renderer = {
+    createLineShader: gl => new LineShader(gl),
     createPointShader: gl => new PointShader(gl),
-    createTriShader: gl => new TriangleShader(gl),
-    createLineShader: gl => new LineShader(gl)
+    createPolygonShader: gl => new PolygonShader(gl)
 };
 
 export { renderer, styler, symbolizer, AABlender };

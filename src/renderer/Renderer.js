@@ -334,11 +334,11 @@ export default class Renderer {
             if (!viz.symbol._default) {
                 renderer = viz.symbolShader;
             } else if (tile.type === 'point') {
-                renderer = this.finalRendererProgram;
+                renderer = this.pointRendererProgram;
             } else if (tile.type === 'line') {
                 renderer = this.lineRendererProgram;
             } else {
-                renderer = this.triRendererProgram;
+                renderer = this.polygonRendererProgram;
             }
             gl.useProgram(renderer.program);
 
@@ -475,8 +475,8 @@ export default class Renderer {
      * Initialize static shaders
      */
     _initShaders () {
-        this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
-        this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
+        this.pointRendererProgram = shaders.renderer.createPointShader(this.gl);
+        this.polygonRendererProgram = shaders.renderer.createPolygonShader(this.gl);
         this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
         this._aaBlendShader = new shaders.AABlender(this.gl);
     }
