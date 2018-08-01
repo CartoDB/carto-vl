@@ -26,19 +26,18 @@ export function decodePolygon (geometry) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
-
-            const lineString = polygon.flat;
-            addLine(lineString, vertices, normals, true, (index) => {
-                // Skip adding the line which connects two rings OR is clipped
-                return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
-            });
-
             const triangles = earcut(polygon.flat, polygon.holes);
             for (let k = 0; k < triangles.length; k++) {
                 const index = triangles[k];
                 vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
                 normals.push(0, 0);
             }
+
+            const lineString = polygon.flat;
+            addLine(lineString, vertices, normals, true, (index) => {
+                // Skip adding the line which connects two rings OR is clipped
+                return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
+            });
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0

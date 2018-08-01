@@ -20,21 +20,22 @@ float decodeWidth(vec2 enc) {
 }
 
 void main(void) {
+    // 64 is computed based on RTT_WIDTH and the depth buffer precision
+    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
+    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
+
     vec4 c;
     if (normal == vec2(0.)){
+        // Fill: positive z range (0, 1)
         c = texture2D(colorTex, featureID);
     }else{
+        // Stroke: negative z range (-1, 0)
+        z = z - 1.;
         c = texture2D(strokeColorTex, featureID);
     }
     float filtering = texture2D(filterTex, featureID).a;
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
-
-    // 64 is computed based on RTT_WIDTH and the depth buffer precision
-    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
-    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
-    // Set z range (-1, 1)
-    z = z * 2. - 1.;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
 
