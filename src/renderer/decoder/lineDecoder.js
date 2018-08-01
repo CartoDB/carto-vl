@@ -75,7 +75,7 @@ export function addLine (lineString, vertices, normals, skipCallback) {
                 // Third triangle
                 addTriangle(
                     [currentPoint, currentPoint, currentPoint],
-                    [[0, 0],
+                    [[0, 1e-37],
                         turnLeft ? prevNormal : neg(nextNormal),
                         turnLeft ? nextNormal : neg(prevNormal)]
                 );
