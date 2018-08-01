@@ -84,7 +84,7 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.orderMinWidth = gl.getUniformLocation(shader.program, 'orderMinWidth');
     shader.orderMaxWidth = gl.getUniformLocation(shader.program, 'orderMaxWidth');
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
-    shader.devicePixelRatio = gl.getUniformLocation(shader.program, 'devicePixelRatio');
+    shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     shader.overrideColor = gl.getUniformLocation(shader.program, 'overrideColor');
 

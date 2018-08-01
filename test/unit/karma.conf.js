@@ -5,6 +5,9 @@ module.exports = function (config) {
         frameworks: ['jasmine'],
         files: ['index.test.js'],
         reporters: ['mocha'],
+        mochaReporter: {
+            ignoreSkipped: true
+        },
         port: 9876, // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
