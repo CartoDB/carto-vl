@@ -13,20 +13,8 @@ const layer1 = new carto.Layer('layer1', points, viz1);
 const layer2 = new carto.Layer('layer2', polygon, viz2);
 
 layer1.addTo(map);
+layer2.addTo(map);
 
-let layersLoaded = 0;
-
-layer1.on('loaded', () => {
-    layersLoaded++;
-    if (layersLoaded === 2) {
-        window.loaded = true;
-    }
-    layer2.addTo(map);
-});
-
-layer2.on('loaded', () => {
-    layersLoaded++;
-    if (layersLoaded === 2) {
-        window.loaded = true;
-    }
+carto.on('loaded', [layer1, layer2], () => {
+    window.loaded = true;
 });
