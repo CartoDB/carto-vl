@@ -267,7 +267,7 @@ export default class GeoJSON extends Base {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
@@ -287,15 +287,6 @@ export default class GeoJSON extends Base {
             });
         }
         return properties;
-    }
-
-    _getCategoryIDFromString (category) {
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _getDataframeType (type) {
