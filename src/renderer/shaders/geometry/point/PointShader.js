@@ -16,6 +16,6 @@ export default class PointShader {
         this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
         this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
         this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
+        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
     }
 }
