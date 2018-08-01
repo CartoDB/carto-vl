@@ -109,7 +109,7 @@ function loadGeoJSONSources () {
 }
 
 function getLocalhostURL (file) {
-    return file.substr(file.indexOf('test/') + 'test/'.length).replace('scenario.js', '');
+    return file.substr(file.indexOf('test/') + 'test/'.length).replace('/scenario.js', '');
 }
 function getHTML (file) {
     return file.replace(testFile, 'scenario.html');
