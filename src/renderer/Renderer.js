@@ -428,7 +428,7 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            if (tile.type === 'line' /* || tile.type === 'polygon' */) {
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.clearDepth(1);
                 gl.depthRange(0, 1);
                 gl.depthFunc(gl.NOTEQUAL);
