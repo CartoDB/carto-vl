@@ -7,7 +7,7 @@ const map = new mapboxgl.Map({
 
 const source = new carto.source.GeoJSON(sources['polygon-collection']);
 const viz = new carto.Viz(`
-    color: opacity(ramp($color, [blue, red]), 0.5)
+    color: opacity(ramp($color, [blue, red]), 0.8)
     strokeColor: opacity(black, 0.5)
     strokeWidth: 10
 `);
