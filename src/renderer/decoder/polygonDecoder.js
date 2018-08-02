@@ -14,11 +14,13 @@ import { getFloat32ArrayFromArray } from '../../utils/util';
      }]
 */
 
+let vertices = new Array(2000000);
+let normals = new Array(2000000);
+
 export function decodePolygon (geometry) {
-    let vertices = [];
-    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
+    let vertexIndex = 0;
 
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
@@ -27,26 +29,30 @@ export function decodePolygon (geometry) {
             const triangles = earcut(polygon.flat, polygon.holes);
             for (let k = 0; k < triangles.length; k++) {
                 const index = triangles[k];
-                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
-                normals.push(0, 0);
+                vertices[vertexIndex] = polygon.flat[2 * index];
+                normals[vertexIndex++] = 0;
+                vertices[vertexIndex] = polygon.flat[2 * index + 1];
+                normals[vertexIndex++] = 0;
+                // vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
+                // normals.push(0, 0);
             }
 
-            addLine(polygon.flat, vertices, normals, true, (index) => {
+            vertexIndex = addLine(polygon.flat, vertices, normals, vertexIndex, true, (index) => {
                 // Skip adding the line which connects two rings OR is clipped
                 return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
             });
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
-            ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+            ? { start: 0, end: vertexIndex }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertexIndex });
 
-        breakpoints.push(vertices.length);
+        breakpoints.push(vertexIndex);
     }
 
     return {
-        vertices: getFloat32ArrayFromArray(vertices),
-        normals: getFloat32ArrayFromArray(normals),
+        vertices: getFloat32ArrayFromArray(vertices, vertexIndex),
+        normals: getFloat32ArrayFromArray(normals, vertexIndex),
         featureIDToVertexIndex,
         breakpoints
     };

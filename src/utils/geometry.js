@@ -33,7 +33,7 @@ export function perpendicular ([x, y]) {
  * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise
  */
 export function getLineNormal (a, b) {
-    const u = normalize(vector(b, a));
+    const u = normalize(a[0] - b[0], a[1] - b[1]);
     return [-u[1], u[0]];
 }
 
@@ -68,18 +68,11 @@ export function neg (v) {
 }
 
 /**
- * Create a vector which goes from p1 to p2
- */
-function vector (p1, p2) {
-    return [p2[0] - p1[0], p2[1] - p1[1]];
-}
-
-/**
  * Return the vector scaled to length 1
  */
-function normalize (v) {
-    const s = Math.hypot(v[0], v[1]);
-    return [v[0] / s, v[1] / s];
+function normalize (v1, v2) {
+    const s = Math.hypot(v1, v2);
+    return [v1 / s, v2 / s];
 }
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
@@ -140,7 +133,6 @@ export default {
     sub,
     dot,
     perpendicular,
-    normalize,
     getLineNormal,
     getJoinNormal,
     neg,

@@ -32,8 +32,8 @@ export function isObject (value) {
     return value !== null && (type === 'object' || type === 'function');
 }
 
-export function getFloat32ArrayFromArray (array) {
-    const length = array.length;
+export function getFloat32ArrayFromArray (array, length) {
+    length = length || array.length;
     const float32Array = new Float32Array(length);
     for (let i = 0; i < length; i++) {
         float32Array[i] = array[i];
