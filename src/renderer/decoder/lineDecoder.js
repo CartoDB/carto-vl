@@ -13,8 +13,7 @@ export function decodeLine (geometry) {
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
-            const lineString = feature[j];
-            addLine(lineString, vertices, normals);
+            addLine(feature[j], vertices, normals);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0

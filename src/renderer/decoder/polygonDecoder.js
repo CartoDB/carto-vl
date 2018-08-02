@@ -31,8 +31,7 @@ export function decodePolygon (geometry) {
                 normals.push(0, 0);
             }
 
-            const lineString = polygon.flat;
-            addLine(lineString, vertices, normals, true, (index) => {
+            addLine(polygon.flat, vertices, normals, true, (index) => {
                 // Skip adding the line which connects two rings OR is clipped
                 return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
             });
