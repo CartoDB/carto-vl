@@ -11,7 +11,7 @@ uniform vec2 normalScale;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
-uniform sampler2D colorStrokeTex;
+uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
 //TODO order bucket texture
@@ -32,7 +32,7 @@ $offset_preface
 
 void main(void) {
   color = texture2D(colorTex, abs(featureID));
-  stroke = texture2D(colorStrokeTex, abs(featureID));
+  stroke = texture2D(strokeColorTex, abs(featureID));
   float filtering = texture2D(filterTex, abs(featureID)).a;
   color.a *= filtering;
   stroke.a *= filtering;

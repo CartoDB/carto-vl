@@ -53,5 +53,9 @@ export function compileShader (gl, template, expressions, viz) {
 
     shader.textureIds.set(viz, tid);
 
+    // For debugging purposes
+    shader._codes = codes;
+    shader._template = template;
+
     return shader;
 }

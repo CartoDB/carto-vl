@@ -9,6 +9,10 @@ import util from './utils/util';
 import CartoValidationError from './errors/carto-validation-error';
 import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
 import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
+import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexShader.glsl';
+import lineFragmentShaderGLSL from './renderer/shaders/geometry/line/lineFragmentShader.glsl';
+import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygonVertexShader.glsl';
+import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -304,6 +308,16 @@ export default class Viz {
         if (!this._geomType || this._geomType === 'point') {
             this.pointShader = compileShader(gl,
                 { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'line') {
+            this.lineShader = compileShader(gl,
+                { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'polygon') {
+            this.polygonShader = compileShader(gl,
+                { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
                 { offset: this.offset }, this);
         }
     }
