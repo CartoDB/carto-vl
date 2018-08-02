@@ -20,7 +20,7 @@ export function compileShader (gl, template, expressions, viz) {
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }
-        return `texture2D(propertyTex${tid[name]}, featureID).a`;
+        return `texture2D(propertyTex${tid[name]}, abs(featureID)).a`;
     };
 
     let codes = {};
