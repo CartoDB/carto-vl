@@ -4,7 +4,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLine (lineString, vertices, normals, closeLoop, skipCallback) {
+export function addLine (lineString, vertices, normals, isPolygon, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let skipLine = false;
@@ -34,7 +34,7 @@ export function addLine (lineString, vertices, normals, closeLoop, skipCallback)
             // If there is a next point, compute its properties
             if (i <= lineString.length - 2) {
                 nextPoint = [lineString[i], lineString[i + 1]];
-            } else if (closeLoop) {
+            } else if (isPolygon) {
                 nextPoint = [lineString[2], lineString[3]];
             }
 
@@ -48,7 +48,10 @@ export function addLine (lineString, vertices, normals, closeLoop, skipCallback)
                 // Third triangle
                 addTriangle(
                     [currentPoint, currentPoint, currentPoint],
-                    [[0, 1e-37],
+                    // Mark vertex to be stroke in PolygonShader with the
+                    // non-zero value 1e-37, so it validates the expression
+                    // `normal != vec2(0.)` without affecting the vertex position.
+                    [[0, isPolygon ? 1e-37 : 0],
                         turnLeft ? prevNormal : neg(nextNormal),
                         turnLeft ? nextNormal : neg(prevNormal)]
                 );
