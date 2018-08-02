@@ -1,19 +1,17 @@
 import * as earcut from 'earcut';
-import { addLine } from './lineDecoder';
+import { addLine } from './common';
 import { getFloat32ArrayFromArray } from '../../utils/util';
 
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
-//      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
-//      Example:
-/*         let geom = [
-                {
-                    flat: [
-                        0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
-                        0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
-                    ]
-                    holes: [5]
-                }
-            ]
+// geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
+// Example:
+/*   let geom = [{
+       flat: [
+         0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
+         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
+       ]
+       holes: [5]
+     }]
 */
 
 export function decodePolygon (geometry) {
