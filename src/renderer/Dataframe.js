@@ -279,6 +279,8 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
+        const widthScale = this.widthScale / 2;
+
         for (let i = 0; i < points.length; i += 6) {
             const featureIndex = i / 6;
             const center = {
@@ -298,6 +300,11 @@ export default class Dataframe {
                 const offset = viz.symbolPlacement.eval();
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;
+            }
+            if (!viz.offset.default) {
+                const offset = viz.offset.eval();
+                center.x += offset[0] * widthScale;
+                center.y += offset[1] * widthScale;
             }
 
             const inside = pointInCircle(p, center, strokeWidthScale);
@@ -469,21 +476,21 @@ export default class Dataframe {
     }
 
     _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
