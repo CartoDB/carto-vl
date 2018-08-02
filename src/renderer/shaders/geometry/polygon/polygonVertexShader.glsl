@@ -29,7 +29,7 @@ void main(void) {
         z = 2.*z - 1.;
         c = texture2D(colorTex, featureID);
     }else{
-        z = mod(z + 1./64., 1.);
+        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);
         z = 2.*z - 1.;
 
         c = texture2D(strokeColorTex, featureID);
