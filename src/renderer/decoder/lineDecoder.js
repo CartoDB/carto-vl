@@ -7,7 +7,7 @@ import { getFloat32ArrayFromArray } from '../../utils/util';
 export function decodeLine (geometry) {
     let vertices = [];
     let normals = [];
-    let breakpoints = [];
+    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
     for (let i = 0; i < geometry.length; i++) {
