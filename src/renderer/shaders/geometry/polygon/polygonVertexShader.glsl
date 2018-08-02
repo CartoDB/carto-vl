@@ -29,7 +29,7 @@ void main(void) {
         z = 2.*z - 1.;
         c = texture2D(colorTex, featureID);
     }else{
-        z = 2.*z - 1. + 1./128.;
+        z = mod(z - 0.5, 1.);
         c = texture2D(strokeColorTex, featureID);
     }
     float filtering = texture2D(filterTex, featureID).a;
