@@ -26,11 +26,10 @@ void main(void) {
 
     vec4 c;
     if (normal == vec2(0.)){
-        // Fill: positive z range (0, 1)
+        z = 2.*z - 1.;
         c = texture2D(colorTex, featureID);
     }else{
-        // Stroke: negative z range (-1, 0)
-        z = z - 1.;
+        z = 2.*z - 1. + 1./128.;
         c = texture2D(strokeColorTex, featureID);
     }
     float filtering = texture2D(filterTex, featureID).a;
