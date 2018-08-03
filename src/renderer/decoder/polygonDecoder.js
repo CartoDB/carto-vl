@@ -1,6 +1,5 @@
 import * as earcut from 'earcut';
 import { addLineString } from './common';
-import { getFloat32ArrayFromArray } from '../../utils/util';
 
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
 // geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
@@ -16,8 +15,8 @@ import { getFloat32ArrayFromArray } from '../../utils/util';
 
 const geomBuffer = {
     index: 0,
-    vertices: new Array(2000000),
-    normals: new Array(2000000)
+    vertices: new Float32Array(2000000),
+    normals: new Float32Array(2000000)
 };
 
 export function decodePolygon (geometry) {
@@ -48,8 +47,8 @@ export function decodePolygon (geometry) {
     }
 
     return {
-        vertices: getFloat32ArrayFromArray(geomBuffer.vertices, geomBuffer.index),
-        normals: getFloat32ArrayFromArray(geomBuffer.normals, geomBuffer.index),
+        vertices: new Float32Array(geomBuffer.vertices.slice(0, geomBuffer.index)),
+        normals: new Float32Array(geomBuffer.normals.slice(0, geomBuffer.index)),
         featureIDToVertexIndex,
         breakpoints
     };

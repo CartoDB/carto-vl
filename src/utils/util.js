@@ -32,15 +32,6 @@ export function isObject (value) {
     return value !== null && (type === 'object' || type === 'function');
 }
 
-export function getFloat32ArrayFromArray (array, length) {
-    length = length || array.length;
-    const float32Array = new Float32Array(length);
-    for (let i = 0; i < length; i++) {
-        float32Array[i] = array[i];
-    }
-    return float32Array;
-}
-
 /**
  * Transform the given parameter into a Date object.
  * When a number is given as a parameter is asummed to be a milliseconds epoch.

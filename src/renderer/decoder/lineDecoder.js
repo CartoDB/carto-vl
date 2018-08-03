@@ -1,13 +1,12 @@
 import { addLineString } from './common';
-import { getFloat32ArrayFromArray } from '../../utils/util';
 
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
 
 const geomBuffer = {
     index: 0,
-    vertices: new Array(1000000),
-    normals: new Array(1000000)
+    vertices: new Float32Array(1000000),
+    normals: new Float32Array(1000000)
 };
 
 export function decodeLine (geometry) {
@@ -29,8 +28,8 @@ export function decodeLine (geometry) {
     }
 
     return {
-        vertices: getFloat32ArrayFromArray(geomBuffer.vertices, geomBuffer.index),
-        normals: getFloat32ArrayFromArray(geomBuffer.normals, geomBuffer.index),
+        vertices: new Float32Array(geomBuffer.vertices.slice(0, geomBuffer.index)),
+        normals: new Float32Array(geomBuffer.normals.slice(0, geomBuffer.index)),
         featureIDToVertexIndex,
         breakpoints
     };
