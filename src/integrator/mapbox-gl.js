@@ -67,33 +67,43 @@ class MGLIntegrator {
         const layerId = layer.getId();
 
         this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (!this._isRendererInitialized) {
-                this._isRendererInitialized = true;
-                this.invalidateWebGLState = invalidate;
-                this.notifyObservers();
-                this.renderer._initGL(gl);
-            }
+        // this.map.setCustomWebGLDrawCallback(layerId);
 
-            layer.initialize();
-            layer.$paintCallback();
-            this._paintedLayers++;
-
-            // Last layer has been painted
-            const isAnimated = this._layers.some(layer =>
-                layer.getViz() && layer.getViz().isAnimated());
-            // Checking this.map.repaint is needed, because MGL repaint is a setter and it has the strange quite buggy side-effect of doing a "final" repaint after being disabled
-            // if we disable it every frame, MGL will do a "final" repaint every frame, which will not disabled it in practice
-            if (!isAnimated && this.map.repaint) {
-                this.map.repaint = false;
-            }
-
-            invalidate();
-        });
+        // this.map.addLayer({
+        //     id: layerId,
+        //     type: 'custom-webgl'
+        // }, beforeLayerID);
 
         this.map.addLayer({
             id: layerId,
-            type: 'custom-webgl'
+            type: 'custom',
+            render: (gl) => {
+                const invalidate = () => {};
+                if (!this._isRendererInitialized) {
+                    this._isRendererInitialized = true;
+                    this.invalidateWebGLState = invalidate;
+                    this.notifyObservers();
+                    this.renderer._initGL(gl);
+                }
+
+                layer.initialize();
+                layer.$paintCallback();
+                this._paintedLayers++;
+
+                // Last layer has been painted
+                const isAnimated = this._layers.some(layer =>
+                    layer.getViz() && layer.getViz().isAnimated());
+                // Checking this.map.repaint is needed, because MGL repaint is a setter and it has the strange quite buggy side-effect of doing a "final" repaint after being disabled
+                // if we disable it every frame, MGL will do a "final" repaint every frame, which will not disabled it in practice
+                if (!isAnimated && this.map.repaint) {
+                    this.map.repaint = false;
+                }
+
+                invalidate();
+            },
+            render3D: null,
+            onAdd: null,
+            onRemove: null
         }, beforeLayerID);
 
         this._layers.push(layer);
