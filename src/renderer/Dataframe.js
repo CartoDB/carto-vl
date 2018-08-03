@@ -318,7 +318,7 @@ export default class Dataframe {
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const p = wToR(pos.x, pos.y, {
+        const point = wToR(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
         });
@@ -332,13 +332,21 @@ export default class Dataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
+        const widthScale = this.widthScale / 2;
+        let pointWithOffset;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-
-                if (!pointInRectangle(p, this._aabb[featureIndex]) ||
+                let offset = {x: 0, y: 0};
+                if (!viz.offset.default) {
+                    const vizOffset = viz.offset.eval();
+                    offset.x = vizOffset[0] * widthScale;
+                    offset.y = vizOffset[1] * widthScale;
+                }
+                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -364,7 +372,7 @@ export default class Dataframe {
                 y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
             };
 
-            const inside = pointInTriangle(p, v1, v2, v3);
+            const inside = pointInTriangle(pointWithOffset, v1, v2, v3);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
