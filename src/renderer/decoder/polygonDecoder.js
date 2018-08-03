@@ -7,19 +7,13 @@ import { addLineString } from './common';
 /*   let geom = [{
        flat: [
          0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
-         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
-       ]
+         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25 //A small square
+       ],
        holes: [5]
      }]
 */
 
-const geomBuffer = {
-    index: 0,
-    vertices: new Float32Array(2000000),
-    normals: new Float32Array(2000000)
-};
-
-export function decodePolygon (geometry) {
+export function decodePolygon (geometry, geomBuffer) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
