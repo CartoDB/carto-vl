@@ -23,10 +23,9 @@ export function decodePolygon (geometry, geomBuffer) {
     let numberTriangles = 0;
     let numberSegments = 0;
     let commonIndex = 0;
-    let polygonArray = [];
     let trianglesArray = [];
 
-    // Store polygons and triangles and compute max number of vertices
+    // Store triangles and compute max number of vertices
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
@@ -36,7 +35,6 @@ export function decodePolygon (geometry, geomBuffer) {
             numberTriangles += triangles.length;
             numberSegments += polygon.flat.length;
 
-            polygonArray[commonIndex] = polygon;
             trianglesArray[commonIndex++] = triangles;
         }
     }
@@ -50,19 +48,23 @@ export function decodePolygon (geometry, geomBuffer) {
     }
 
     // Add vertices and normals
+    commonIndex = 0;
     geomBuffer.index = 0;
-    for (let i = 0; i < commonIndex; i++) {
-        const polygon = polygonArray[i];
-        const triangles = trianglesArray[i];
+    for (let i = 0; i < geometry.length; i++) {
+        const feature = geometry[i];
+        for (let j = 0; j < feature.length; j++) {
+            const polygon = feature[j];
+            const triangles = trianglesArray[commonIndex++];
 
-        for (let k = 0; k < triangles.length; k++) {
-            addVertex(polygon.flat, 2 * triangles[k], geomBuffer);
+            for (let k = 0; k < triangles.length; k++) {
+                addVertex(polygon.flat, 2 * triangles[k], geomBuffer);
+            }
+
+            addLineString(polygon.flat, geomBuffer, true, (index) => {
+                // Skip adding the line which connects two rings OR is clipped
+                return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
+            });
         }
-
-        addLineString(polygon.flat, geomBuffer, true, (index) => {
-            // Skip adding the line which connects two rings OR is clipped
-            return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
-        });
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
             ? { start: 0, end: geomBuffer.index }
