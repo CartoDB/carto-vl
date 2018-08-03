@@ -3,16 +3,28 @@ import { addLineString } from './common';
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
 
-const geomBuffer = {
-    index: 0,
-    vertices: new Float32Array(1000000),
-    normals: new Float32Array(1000000)
-};
+const MAX_VERTICES_PER_SEGMENT = 12;
 
-export function decodeLine (geometry) {
+export function decodeLine (geometry, geomBuffer) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
+    let maxNumberVertices = 0;
+    let numberSegments = 0;
 
+    // Compute max number of vertices
+    for (let i = 0; i < geometry.length; i++) {
+        numberSegments += geometry[i].length;
+    }
+    maxNumberVertices = MAX_VERTICES_PER_SEGMENT * numberSegments;
+
+    // Allocate static memory if required
+    if (geomBuffer.vertices.length < maxNumberVertices) {
+        // Resize the buffers
+        geomBuffer.vertices = new Float32Array(maxNumberVertices);
+        geomBuffer.normals = new Float32Array(maxNumberVertices);
+    }
+
+    // Add vertices and normals
     geomBuffer.index = 0;
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];

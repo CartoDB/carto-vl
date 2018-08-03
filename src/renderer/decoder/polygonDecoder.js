@@ -7,28 +7,55 @@ import { addLineString } from './common';
 /*   let geom = [{
        flat: [
          0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
-         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
-       ]
+         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25 //A small square
+       ],
        holes: [5]
      }]
 */
 
-const geomBuffer = {
-    index: 0,
-    vertices: new Float32Array(2000000),
-    normals: new Float32Array(2000000)
-};
+const VERTICES_PER_TRIANGLE = 2;
+const MAX_VERTICES_PER_SEGMENT = 12;
 
-export function decodePolygon (geometry) {
+export function decodePolygon (geometry, geomBuffer) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
+    let maxNumberVertices = 0;
+    let numberTriangles = 0;
+    let numberSegments = 0;
+    let commonIndex = 0;
+    let trianglesArray = [];
 
-    geomBuffer.index = 0;
+    // Store triangles and compute max number of vertices
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
+
+            numberTriangles += triangles.length;
+            numberSegments += polygon.flat.length;
+
+            trianglesArray[commonIndex++] = triangles;
+        }
+    }
+    maxNumberVertices = VERTICES_PER_TRIANGLE * numberTriangles +
+                        MAX_VERTICES_PER_SEGMENT * numberSegments;
+
+    // Allocate static memory if required
+    if (geomBuffer.vertices.length < maxNumberVertices) {
+        geomBuffer.vertices = new Float32Array(maxNumberVertices);
+        geomBuffer.normals = new Float32Array(maxNumberVertices);
+    }
+
+    // Add vertices and normals
+    commonIndex = 0;
+    geomBuffer.index = 0;
+    for (let i = 0; i < geometry.length; i++) {
+        const feature = geometry[i];
+        for (let j = 0; j < feature.length; j++) {
+            const polygon = feature[j];
+            const triangles = trianglesArray[commonIndex++];
+
             for (let k = 0; k < triangles.length; k++) {
                 addVertex(polygon.flat, 2 * triangles[k], geomBuffer);
             }
