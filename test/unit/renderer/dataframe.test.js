@@ -39,7 +39,8 @@ describe('src/renderer/Dataframe', () => {
                 width: { eval: () => 0.5 },
                 strokeWidth: { eval: () => 0.5 },
                 filter: { eval: () => 1.0 },
-                symbol: { default: true }
+                symbol: { default: true },
+                offset: { default: true }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -261,7 +262,7 @@ describe('src/renderer/Dataframe', () => {
     });
 });
 
-function expectEqualFeatures(result, expected) {
+function expectEqualFeatures (result, expected) {
     expected.forEach((_, index) => {
         Object.keys(expected).forEach(propertyName => {
             expect(result[index][propertyName]).toEqual(expected[index][propertyName]);
