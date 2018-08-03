@@ -126,8 +126,8 @@ function getOutPNG (file) {
 function loadOptions () {
     return {
         delay: 100,
-        viewportWidth: 400,
-        viewportHeight: 300,
+        viewportWidth: 500,
+        viewportHeight: 500,
         headless: headless()
     };
 }
