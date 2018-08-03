@@ -16,7 +16,5 @@ const geojson = new GeoJSON({
 const lineGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodeLine', () => {
-    for (let i = 0; i < 10000; i++) {
-        decodeGeom('line', lineGeometry);
-    }
-}, {runs: 100});
+    decodeGeom('line', lineGeometry);
+}, {runs: 10000});
