@@ -4,14 +4,14 @@ import { decodePolygon } from './polygonDecoder';
 
 const geomLineBuffer = {
     index: 0,
-    vertices: new Float32Array(8 * 1024 * 1024 / 32),
-    normals: new Float32Array(8 * 1024 * 1024 / 32)
+    vertices: new Float32Array(1024 * 1024 / 4),
+    normals: new Float32Array(1024 * 1024 / 4)
 };
 
 const geomPolygonBuffer = {
     index: 0,
-    vertices: new Float32Array(2000000),
-    normals: new Float32Array(2000000)
+    vertices: new Float32Array(1024 * 1024 / 4),
+    normals: new Float32Array(1024 * 1024 / 4)
 };
 
 export function decodeGeom (geomType, geom) {
