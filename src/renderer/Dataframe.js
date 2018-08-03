@@ -156,6 +156,15 @@ export default class Dataframe {
         const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
 
+        if (!viz.offset.default) {
+            const offset = viz.offset.eval();
+            const widthScale = this.widthScale / 2;
+            viewportAABB.minx -= offset[0] * widthScale;
+            viewportAABB.maxx -= offset[0] * widthScale;
+            viewportAABB.miny -= offset[1] * widthScale;
+            viewportAABB.maxy -= offset[1] * widthScale;
+        }
+
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, viewportAABB);
