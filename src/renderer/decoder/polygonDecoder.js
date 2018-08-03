@@ -13,11 +13,31 @@ import { addLineString } from './common';
      }]
 */
 
+const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 / 4; // 1 MB
 const geomBuffer = {
     index: 0,
-    vertices: new Float32Array(2000000),
-    normals: new Float32Array(2000000)
+    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),
+    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
 };
+
+// Resize `geomBuffer` as needed if `additionalSize` floats overflow the current buffers
+function _realloc (additionalSize) {
+    const minimumNeededSize = geomBuffer.index + additionalSize;
+    if (minimumNeededSize > geomBuffer.vertices.length) {
+        // Buffer overflow
+        const newSize = 2 * minimumNeededSize;
+        geomBuffer.vertices = _resizeBuffer(geomBuffer.vertices, newSize);
+        geomBuffer.normals = _resizeBuffer(geomBuffer.normals, newSize);
+    }
+}
+function _resizeBuffer (oldBuffer, newSize) {
+    const newBuffer = new Float32Array(newSize);
+    // Copy values from the previous buffer
+    for (let i = 0; i < oldBuffer.length; i++) {
+        newBuffer[i] = oldBuffer[i];
+    }
+    return newBuffer;
+}
 
 export function decodePolygon (geometry) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
@@ -29,6 +49,7 @@ export function decodePolygon (geometry) {
         for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
+            _realloc(2 * triangles.length);
             for (let k = 0; k < triangles.length; k++) {
                 addVertex(polygon.flat, 2 * triangles[k], geomBuffer);
             }
@@ -36,7 +57,7 @@ export function decodePolygon (geometry) {
             addLineString(polygon.flat, geomBuffer, true, (index) => {
                 // Skip adding the line which connects two rings OR is clipped
                 return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
-            });
+            }, _realloc);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0

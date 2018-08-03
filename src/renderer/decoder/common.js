@@ -4,7 +4,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) {
+export function addLineString (lineString, geomBuffer, isPolygon, skipCallback, reallocFn) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
@@ -20,6 +20,7 @@ export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) 
             drawLine = !(skipCallback && skipCallback(i));
 
             if (drawLine) {
+                reallocFn(12);
                 // First triangle
                 geomBuffer.vertices[geomBuffer.index] = prevPoint[0];
                 geomBuffer.normals[geomBuffer.index++] = -prevNormal[0];
@@ -67,6 +68,7 @@ export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) 
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
+                    reallocFn(12);
 
                     // Third triangle
                     geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
