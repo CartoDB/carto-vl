@@ -23,8 +23,8 @@ const geomBuffer = {
 export function decodePolygon (geometry) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
-    geomBuffer.index = 0;
 
+    geomBuffer.index = 0;
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
@@ -32,8 +32,6 @@ export function decodePolygon (geometry) {
             const triangles = earcut(polygon.flat, polygon.holes);
             for (let k = 0; k < triangles.length; k++) {
                 addVertex(polygon.flat, 2 * triangles[k], geomBuffer);
-                // vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
-                // normals.push(0, 0);
             }
 
             addLineString(polygon.flat, geomBuffer, true, (index) => {
