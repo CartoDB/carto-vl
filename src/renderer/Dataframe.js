@@ -157,7 +157,7 @@ export default class Dataframe {
         let strokeWidthScale = 1;
 
         if (!viz.offset.default) {
-            const offset = viz.offset.eval();
+            const offset = viz.offset.eval(feature);
             const widthScale = this.widthScale / 2;
             viewportAABB.minx -= offset[0] * widthScale;
             viewportAABB.maxx -= offset[0] * widthScale;
@@ -306,12 +306,12 @@ export default class Dataframe {
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
             if (!viz.symbol.default) {
-                const offset = viz.symbolPlacement.eval();
+                const offset = viz.symbolPlacement.eval(feature);
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;
             }
             if (!viz.offset.default) {
-                const offset = viz.offset.eval();
+                const offset = viz.offset.eval(feature);
                 center.x += offset[0] * widthScale;
                 center.y += offset[1] * widthScale;
             }
@@ -350,7 +350,7 @@ export default class Dataframe {
                 const feature = this.getFeature(featureIndex);
                 let offset = {x: 0, y: 0};
                 if (!viz.offset.default) {
-                    const vizOffset = viz.offset.eval();
+                    const vizOffset = viz.offset.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
