@@ -13,7 +13,7 @@ import { addLineString } from './common';
      }]
 */
 
-const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 / 4; // 1 MB
+const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024; // 4 MB
 const geomBuffer = {
     index: 0,
     vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),
