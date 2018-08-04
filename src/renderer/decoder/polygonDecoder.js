@@ -72,8 +72,8 @@ export function decodePolygon (geometry) {
     // console.log(geomBufferindex);
 
     return {
-        vertices: new Float32Array(geomBuffer.vertices.slice(0, geomBufferindex)),
-        normals: new Float32Array(geomBuffer.normals.slice(0, geomBufferindex)),
+        vertices: geomBuffer.vertices.slice(0, geomBufferindex),
+        normals: geomBuffer.normals.slice(0, geomBufferindex),
         featureIDToVertexIndex,
         breakpoints
     };
