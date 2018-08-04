@@ -68,7 +68,7 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
-                    reallocFn(12);
+                    reallocFn(6);
 
                     // Third triangle
                     geomBuffer.vertices[geomBufferindex] = currentPoint[0];
@@ -88,6 +88,7 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
                     geomBuffer.normals[geomBufferindex++] = rightNormal[1];
 
                     if (joinNormal) {
+                        reallocFn(6)
                         // Forth triangle
                         geomBuffer.vertices[geomBufferindex] = currentPoint[0];
                         geomBuffer.normals[geomBufferindex++] = joinNormal[0];
