@@ -70,9 +70,9 @@ export function neg (v) {
 /**
  * Return the vector scaled to length 1
  */
-function normalize (v1, v2) {
-    const s = Math.hypot(v1, v2);
-    return [v1 / s, v2 / s];
+function normalize (x, y) {
+    const s = Math.hypot(x, y);
+    return [x / s, y / s];
 }
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
