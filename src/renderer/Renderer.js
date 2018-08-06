@@ -331,18 +331,18 @@ export default class Renderer {
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
             let renderer = null;
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 renderer = viz.symbolShader;
             } else if (tile.type === 'point') {
-                renderer = this.finalRendererProgram;
+                renderer = viz.pointShader;
             } else if (tile.type === 'line') {
-                renderer = this.lineRendererProgram;
+                renderer = viz.lineShader;
             } else {
-                renderer = this.triRendererProgram;
+                renderer = viz.polygonShader;
             }
             gl.useProgram(renderer.program);
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
             }
 
@@ -391,7 +391,7 @@ export default class Renderer {
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
@@ -415,7 +415,7 @@ export default class Renderer {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-                gl.uniform1i(renderer.colorStrokeTexture, freeTexUnit);
+                gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
                 freeTexUnit++;
 
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -431,6 +431,25 @@ export default class Renderer {
                 gl.depthMask(true);
                 gl.clear(gl.DEPTH_BUFFER_BIT);
                 gl.enable(gl.DEPTH_TEST);
+            }
+
+            if (!viz.offset.default) {
+                const textureId = renderer.textureIds.get(viz);
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
+                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+
+                freeTexUnit = drawMetadata.freeTexUnit;
+
+                Object.keys(textureId).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
 
             gl.drawArrays(gl.TRIANGLES, 0, tile.numVertex);
@@ -471,9 +490,6 @@ export default class Renderer {
      * Initialize static shaders
      */
     _initShaders () {
-        this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
-        this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
-        this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
         this._aaBlendShader = new shaders.AABlender(this.gl);
     }
 }

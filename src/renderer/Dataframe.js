@@ -156,6 +156,15 @@ export default class Dataframe {
         const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
 
+        if (!viz.offset.default) {
+            const offset = viz.offset.eval(feature);
+            const widthScale = this.widthScale / 2;
+            viewportAABB.minx -= offset[0] * widthScale;
+            viewportAABB.maxx -= offset[0] * widthScale;
+            viewportAABB.miny -= offset[1] * widthScale;
+            viewportAABB.maxy -= offset[1] * widthScale;
+        }
+
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex, viewportAABB);
@@ -279,6 +288,8 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
+        const widthScale = this.widthScale / 2;
+
         for (let i = 0; i < points.length; i += 6) {
             const featureIndex = i / 6;
             const center = {
@@ -294,10 +305,15 @@ export default class Dataframe {
 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
-            if (!viz.symbol._default) {
-                const offset = viz.symbolPlacement.eval();
+            if (!viz.symbol.default) {
+                const offset = viz.symbolPlacement.eval(feature);
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;
+            }
+            if (!viz.offset.default) {
+                const offset = viz.offset.eval(feature);
+                center.x += offset[0] * widthScale;
+                center.y += offset[1] * widthScale;
             }
 
             const inside = pointInCircle(p, center, strokeWidthScale);
@@ -311,7 +327,7 @@ export default class Dataframe {
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const p = wToR(pos.x, pos.y, {
+        const point = wToR(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
         });
@@ -325,13 +341,21 @@ export default class Dataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
+        const widthScale = this.widthScale / 2;
+        let pointWithOffset;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-
-                if (!pointInRectangle(p, this._aabb[featureIndex]) ||
+                let offset = {x: 0, y: 0};
+                if (!viz.offset.default) {
+                    const vizOffset = viz.offset.eval(feature);
+                    offset.x = vizOffset[0] * widthScale;
+                    offset.y = vizOffset[1] * widthScale;
+                }
+                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -357,7 +381,7 @@ export default class Dataframe {
                 y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
             };
 
-            const inside = pointInTriangle(p, v1, v2, v3);
+            const inside = pointInTriangle(pointWithOffset, v1, v2, v3);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -469,21 +493,21 @@ export default class Dataframe {
     }
 
     _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;

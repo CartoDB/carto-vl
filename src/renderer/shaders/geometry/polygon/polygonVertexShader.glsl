@@ -19,6 +19,9 @@ float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }
 
+$propertyPreface
+$offset_preface
+
 void main(void) {
     vec4 c;
     if (normal == vec2(0.)){
@@ -31,6 +34,7 @@ void main(void) {
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+    p.xy += normalScale*($offset_inline);
 
     if (c.a==0.){
         p.x=10000.;
