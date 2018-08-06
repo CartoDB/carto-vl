@@ -1,6 +1,5 @@
 import * as earcut from 'earcut';
-import { addLine } from './common';
-import { getFloat32ArrayFromArray } from '../../utils/util';
+import { addLineString, resizeBuffer } from './common';
 
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
 // geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
@@ -14,43 +13,74 @@ import { getFloat32ArrayFromArray } from '../../utils/util';
      }]
 */
 
+const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 * 2; // 8 MB
+const VERTEX_COORDINATES_PER_TRIANGLE = 2;
+const MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;
+
+let index = 0;
+let geomBuffer = {
+    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),
+    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
+};
+
 export function decodePolygon (geometry) {
-    let vertices = [];
-    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
+    index = 0;
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
             const triangles = earcut(polygon.flat, polygon.holes);
+
+            // Increase buffers size if required
+            resizeBuffers(VERTEX_COORDINATES_PER_TRIANGLE * triangles.length +
+                          MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);
+
+            // Add polygon
             for (let k = 0; k < triangles.length; k++) {
-                const index = triangles[k];
-                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
-                normals.push(0, 0);
+                addVertex(polygon.flat, 2 * triangles[k]);
             }
 
-            const lineString = polygon.flat;
-            addLine(lineString, vertices, normals, true, (index) => {
+            // Add polygon stroke
+            index = addLineString(polygon.flat, geomBuffer, index, true, (pointIndex) => {
                 // Skip adding the line which connects two rings OR is clipped
-                return polygon.holes.includes((index - 2) / 2) || isClipped(polygon, index - 4, index - 2);
+                return polygon.holes.includes((pointIndex - 2) / 2) || isClipped(polygon, pointIndex - 4, pointIndex - 2);
             });
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
-            ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+            ? { start: 0, end: index }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });
 
-        breakpoints.push(vertices.length);
+        breakpoints.push(index);
     }
 
     return {
-        vertices: getFloat32ArrayFromArray(vertices),
-        normals: getFloat32ArrayFromArray(normals),
+        vertices: geomBuffer.vertices.slice(0, index),
+        normals: geomBuffer.normals.slice(0, index),
         featureIDToVertexIndex,
         breakpoints
     };
+}
+
+// Resize buffers as needed if `additionalSize` floats overflow the current buffers
+function resizeBuffers (additionalSize) {
+    const minimumNeededSize = index + additionalSize;
+    if (minimumNeededSize > geomBuffer.vertices.length) {
+        const newSize = 2 * minimumNeededSize;
+        geomBuffer.vertices = resizeBuffer(geomBuffer.vertices, newSize);
+        geomBuffer.normals = resizeBuffer(geomBuffer.normals, newSize);
+    }
+}
+
+// Add vertex in triangles.
+function addVertex (array, vertexIndex) {
+    geomBuffer.vertices[index] = array[vertexIndex];
+    geomBuffer.normals[index++] = 0;
+    geomBuffer.vertices[index] = array[vertexIndex + 1];
+    geomBuffer.normals[index++] = 0;
 }
 
 function isClipped (polygon, i, j) {

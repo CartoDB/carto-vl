@@ -4,10 +4,10 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLine (lineString, vertices, normals, isPolygon, skipCallback) {
+export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
-    let skipLine = false;
+    let drawLine;
 
     // We need at least two points
     if (lineString.length >= 4) {
@@ -17,19 +17,37 @@ export function addLine (lineString, vertices, normals, isPolygon, skipCallback)
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
         for (let i = 4; i <= lineString.length; i += 2) {
-            skipLine = skipCallback && skipCallback(i);
+            drawLine = !(skipCallback && skipCallback(i));
 
-            // First triangle
-            addTriangle(
-                [prevPoint, prevPoint, currentPoint],
-                [neg(prevNormal), prevNormal, prevNormal]
-            );
+            if (drawLine) {
+                // First triangle
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
 
-            // Second triangle
-            addTriangle(
-                [prevPoint, currentPoint, currentPoint],
-                [neg(prevNormal), prevNormal, neg(prevNormal)]
-            );
+                // Second triangle
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+            }
 
             // If there is a next point, compute its properties
             if (i <= lineString.length - 2) {
@@ -40,30 +58,48 @@ export function addLine (lineString, vertices, normals, isPolygon, skipCallback)
 
             if (nextPoint) {
                 nextNormal = getLineNormal(currentPoint, nextPoint);
-                // `turnLeft` indicates that the nextLine turns to the left
-                // `joinNormal` contains the direction and size for the `miter` vertex
-                //  If this is not defined means that the join must be `bevel`.
-                let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
 
-                // Third triangle
-                addTriangle(
-                    [currentPoint, currentPoint, currentPoint],
+                if (drawLine) {
+                    // `turnLeft` indicates that the nextLine turns to the left
+                    // `joinNormal` contains the direction and size for the `miter` vertex
+                    //  If this is not defined means that the join must be `bevel`.
+                    let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+
+                    let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
+                    let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
+
+                    // Third triangle
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = 0;
+                    geomBuffer.vertices[index] = currentPoint[1];
                     // Mark vertex to be stroke in PolygonShader with the
                     // non-zero value 1e-37, so it validates the expression
                     // `normal != vec2(0.)` without affecting the vertex position.
-                    [[0, isPolygon ? 1e-37 : 0],
-                        turnLeft ? prevNormal : neg(nextNormal),
-                        turnLeft ? nextNormal : neg(prevNormal)]
-                );
+                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = leftNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = leftNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = rightNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = rightNormal[1];
 
-                if (joinNormal) {
-                    // Forth triangle
-                    addTriangle(
-                        [currentPoint, currentPoint, currentPoint],
-                        [joinNormal,
-                            turnLeft ? nextNormal : neg(prevNormal),
-                            turnLeft ? prevNormal : neg(nextNormal)]
-                    );
+                    if (joinNormal) {
+                        // Forth triangle
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = joinNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = joinNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = rightNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = rightNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = leftNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = leftNormal[1];
+                    }
                 }
             }
 
@@ -74,19 +110,14 @@ export function addLine (lineString, vertices, normals, isPolygon, skipCallback)
             nextPoint = null;
         }
     }
+    return index;
+}
 
-    function addTriangle (p, n) {
-        if (!skipLine) {
-            vertices.push(
-                p[0][0], p[0][1],
-                p[1][0], p[1][1],
-                p[2][0], p[2][1]
-            );
-            normals.push(
-                n[0][0], n[0][1],
-                n[1][0], n[1][1],
-                n[2][0], n[2][1]
-            );
-        }
-    }
+/**
+ * Resize a Float32Array buffer in an efficient way
+ */
+export function resizeBuffer (oldBuffer, newSize) {
+    const newBuffer = new Float32Array(newSize);
+    newBuffer.set(oldBuffer);
+    return newBuffer;
 }
