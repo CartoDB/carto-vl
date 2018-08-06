@@ -327,6 +327,14 @@ export default class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
+        if (tiles[0].type === 'line' || tiles[0].type === 'polygon') {
+            gl.clearDepth(1);
+            gl.depthRange(0, 1);
+            gl.depthFunc(gl.NOTEQUAL);
+            gl.depthMask(true);
+            gl.enable(gl.DEPTH_TEST);
+        }
+
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
             let renderer = null;
@@ -424,12 +432,7 @@ export default class Renderer {
             }
 
             if (tile.type === 'line' || tile.type === 'polygon') {
-                gl.clearDepth(1);
-                gl.depthRange(0, 1);
-                gl.depthFunc(gl.NOTEQUAL);
-                gl.depthMask(true);
                 gl.clear(gl.DEPTH_BUFFER_BIT);
-                gl.enable(gl.DEPTH_TEST);
             }
 
             if (!viz.offset.default) {
