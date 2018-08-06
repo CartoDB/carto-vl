@@ -255,7 +255,6 @@ const superRefresh = (opts) => {
 
     opts = opts || {};
     showLoader();
-    saveConfig();
 
     const source = sourceType === sourceTypes.QUERY
         ? new carto.source.SQL(document.getElementById('source').value, sourceAuth, sourceUrl)
@@ -268,14 +267,16 @@ const superRefresh = (opts) => {
         setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
-            hideLoader();
+            saveConfig();
             document.getElementById('feedback').style.display = 'none';
+            hideLoader();
         });
         layer.addTo(map, 'watername_ocean');
     } else {
         layer.update(source, viz)
             .then(() => {
                 setupMap(opts);
+                saveConfig();
                 document.getElementById('feedback').style.display = 'none';
                 hideLoader();
             })
