@@ -22,16 +22,16 @@ float decodeWidth(vec2 enc) {
 void main(void) {
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
     // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
-    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
+    float z = featureID.y * 63. / 64. + featureID.x / 64.;
 
     vec4 c;
     if (normal == vec2(0.)){
-        z = 2.*z - 1.;
         c = texture2D(colorTex, featureID);
     }else{
-        z = mod(z - 0.5, 1.);
+        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);
         c = texture2D(strokeColorTex, featureID);
     }
+    z = 2.*z - 1.;
     float filtering = texture2D(filterTex, featureID).a;
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
