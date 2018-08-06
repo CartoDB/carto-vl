@@ -4,7 +4,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) {
+export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
@@ -21,32 +21,32 @@ export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) 
 
             if (drawLine) {
                 // First triangle
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[1];
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[1];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[1];
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
 
                 // Second triangle
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = prevPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[1];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = prevNormal[1];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[0];
-                geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                geomBuffer.normals[geomBuffer.index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
             }
 
             // If there is a next point, compute its properties
@@ -69,36 +69,36 @@ export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) 
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
 
                     // Third triangle
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                    geomBuffer.normals[geomBuffer.index++] = 0;
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = 0;
+                    geomBuffer.vertices[index] = currentPoint[1];
                     // Mark vertex to be stroke in PolygonShader with the
                     // non-zero value 1e-37, so it validates the expression
                     // `normal != vec2(0.)` without affecting the vertex position.
-                    geomBuffer.normals[geomBuffer.index++] = isPolygon ? 1e-37 : 0;
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                    geomBuffer.normals[geomBuffer.index++] = leftNormal[0];
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                    geomBuffer.normals[geomBuffer.index++] = leftNormal[1];
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                    geomBuffer.normals[geomBuffer.index++] = rightNormal[0];
-                    geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                    geomBuffer.normals[geomBuffer.index++] = rightNormal[1];
+                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = leftNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = leftNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = rightNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = rightNormal[1];
 
                     if (joinNormal) {
                         // Forth triangle
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                        geomBuffer.normals[geomBuffer.index++] = joinNormal[0];
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                        geomBuffer.normals[geomBuffer.index++] = joinNormal[1];
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                        geomBuffer.normals[geomBuffer.index++] = rightNormal[0];
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                        geomBuffer.normals[geomBuffer.index++] = rightNormal[1];
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[0];
-                        geomBuffer.normals[geomBuffer.index++] = leftNormal[0];
-                        geomBuffer.vertices[geomBuffer.index] = currentPoint[1];
-                        geomBuffer.normals[geomBuffer.index++] = leftNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = joinNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = joinNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = rightNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = rightNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = leftNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = leftNormal[1];
                     }
                 }
             }
@@ -110,4 +110,14 @@ export function addLineString (lineString, geomBuffer, isPolygon, skipCallback) 
             nextPoint = null;
         }
     }
+    return index;
+}
+
+/**
+ * Resize a Float32Array buffer in an efficient way
+ */
+export function resizeBuffer (oldBuffer, newSize) {
+    const newBuffer = new Float32Array(newSize);
+    newBuffer.set(oldBuffer);
+    return newBuffer;
 }
