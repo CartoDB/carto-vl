@@ -3,10 +3,9 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['collection-point']);
+const source = new carto.source.GeoJSON(sources['point']);
 const viz = new carto.Viz(`
-    strokeWidth: 3
-    strokeColor: blue
+    strokeWidth: 0
 `);
 const layer = new carto.Layer('layer', source, viz);
 

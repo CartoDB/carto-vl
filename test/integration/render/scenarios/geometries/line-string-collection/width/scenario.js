@@ -5,11 +5,8 @@ const map = new mapboxgl.Map({
     zoom: 2
 });
 
-const source = new carto.source.GeoJSON(sources['lines-collection']);
-const viz = new carto.Viz(`
-    width: 20
-    color: opacity(ramp($color, [blue, red]), 0.5)
-`);
+const source = new carto.source.GeoJSON(sources['line-string-collection']);
+const viz = new carto.Viz('width: 30');
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

@@ -23,17 +23,23 @@ $propertyPreface
 $offset_preface
 
 void main(void) {
+    // 64 is computed based on RTT_WIDTH and the depth buffer precision
+    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
+    float z = featureID.y * 63. / 64. + featureID.x / 64.;
+
     vec4 c;
     if (normal == vec2(0.)){
         c = texture2D(colorTex, featureID);
     }else{
+        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);
         c = texture2D(strokeColorTex, featureID);
     }
+    z = 2.*z - 1.;
     float filtering = texture2D(filterTex, featureID).a;
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);
+    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
     p.xy += normalScale*($offset_inline);
 
     if (c.a==0.){

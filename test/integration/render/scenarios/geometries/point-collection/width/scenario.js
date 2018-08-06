@@ -3,10 +3,8 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['collection-point']);
-const viz = new carto.Viz(`
-    color: rgba(0, 0, 255, 1)
-`);
+const source = new carto.source.GeoJSON(sources['point-collection']);
+const viz = new carto.Viz('width: 100');
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

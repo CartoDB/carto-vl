@@ -18,7 +18,5 @@ const geojson = new GeoJSON({
 const polygonGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodePolygon', () => {
-    for (let i = 0; i < 10000; i++) {
-        decodeGeom('polygon', polygonGeometry);
-    }
-}, {runs: 100});
+    decodeGeom('polygon', polygonGeometry);
+}, {runs: 10000});
