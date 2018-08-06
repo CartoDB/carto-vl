@@ -24,10 +24,7 @@ function _realloc (additionalSize) {
 }
 function _resizeBuffer (oldBuffer, newSize) {
     const newBuffer = new Float32Array(newSize);
-    // Copy values from the previous buffer
-    for (let i = 0; i < oldBuffer.length; i++) {
-        newBuffer[i] = oldBuffer[i];
-    }
+    newBuffer.set(oldBuffer);
     return newBuffer;
 }
 
