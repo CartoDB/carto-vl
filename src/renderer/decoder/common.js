@@ -3,6 +3,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
+ * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
  */
 export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
