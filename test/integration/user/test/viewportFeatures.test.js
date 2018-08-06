@@ -71,7 +71,7 @@ describe('viewportFeatures', () => {
     });
 
     it('should get the features properties of one layer', done => {
-        layer1.on('updated', () => {
+        layer1.on('loaded', () => {
             const expected = [
                 { value: 10, category: 'a' },
                 { value: 1000, category: 'b' }
@@ -82,7 +82,7 @@ describe('viewportFeatures', () => {
     });
 
     it('should get the features properties of another layer', done => {
-        layer2.on('updated', () => {
+        layer2.on('loaded', () => {
             const expectedAll = [
                 { id: 1, value: 10, category: 'a' },
                 { id: 2, value: 1000, category: 'b' }
@@ -129,7 +129,7 @@ describe('viewportFeatures on a map with filters', () => {
     });
 
     it('should get the filtered feature properties of one layer', done => {
-        layer1.on('updated', () => {
+        layer1.on('loaded', () => {
             const expected = [
                 { value: 10, category: 'a' }
             ];
@@ -139,7 +139,7 @@ describe('viewportFeatures on a map with filters', () => {
     });
 
     it('should get the filtered feature properties of another layer', done => {
-        layer2.on('updated', () => {
+        layer2.on('loaded', () => {
             const expectedAll = [
                 { id: 2, value: 1000, category: 'b' }
             ];
@@ -183,7 +183,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     });
 
     it('should get only in-viewport feature properties of one layer', done => {
-        layer1.on('updated', () => {
+        layer1.on('loaded', () => {
             const expected = [
                 { value: 10, category: 'a' }
             ];
@@ -193,7 +193,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     });
 
     it('should get only in-viewport features properties of another layer', done => {
-        layer2.on('updated', () => {
+        layer2.on('loaded', () => {
             const expectedAll = [
                 { id: 1, value: 10, category: 'a' }
             ];

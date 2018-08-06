@@ -3,8 +3,8 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['points-repeated']);
-const viz = new carto.Viz('color: ramp(top($cat, 2), PRISM), width: 50');
+const source = new carto.source.GeoJSON(sources['points2']);
+const viz = new carto.Viz('color: ramp(buckets($cat2, [\'a\',\'b\',\'c\']), prism), @cat: $cat');
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

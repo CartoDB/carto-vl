@@ -11,7 +11,7 @@ uniform vec2 normalScale;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
-uniform sampler2D colorStrokeTex;
+uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
 //TODO order bucket texture
@@ -27,9 +27,12 @@ float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }
 
+$propertyPreface
+$offset_preface
+
 void main(void) {
   color = texture2D(colorTex, abs(featureID));
-  stroke = texture2D(colorStrokeTex, abs(featureID));
+  stroke = texture2D(strokeColorTex, abs(featureID));
   float filtering = texture2D(filterTex, abs(featureID)).a;
   color.a *= filtering;
   stroke.a *= filtering;
@@ -61,6 +64,7 @@ void main(void) {
       p.y += size2.y;
   }
 
+  p.xy += normalScale*($offset_inline);
   if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {
     p.x = 10000.;
   }

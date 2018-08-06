@@ -19,6 +19,9 @@ float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
 }
 
+$propertyPreface
+$offset_preface
+
 void main(void) {
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
     // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
@@ -37,6 +40,7 @@ void main(void) {
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
+    p.xy += normalScale*($offset_inline);
 
     if (c.a==0.){
         p.x=10000.;

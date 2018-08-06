@@ -72,13 +72,14 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
 
     const shader = compileProgram(gl, vertexShader, fragmentShader);
 
-    shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
+    shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
+
     shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
     shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
-    shader.colorStrokeTexture = gl.getUniformLocation(shader.program, 'colorStrokeTex');
+    shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
     shader.widthTexture = gl.getUniformLocation(shader.program, 'widthTex');
     shader.orderMinWidth = gl.getUniformLocation(shader.program, 'orderMinWidth');

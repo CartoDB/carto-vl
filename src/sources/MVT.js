@@ -52,12 +52,42 @@ const MVT_TO_CARTO_TYPES = {
  * @api
  */
 
+/**
+ * An MVTMetadata object declares metadata information of a a carto.Source.
+ *
+ * @typedef {object} MVTMetadata
+ * @property {MVTProperty} properties - property names, types and optionally ranges
+ * @property {string} [idProperty='cartodb_id'] - property name of the property that should be used as ID
+ *
+ * @example <caption> Creating a MVTMetadata object</caption>
+ * const metadata = {
+        properties: {
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      };
+ *
+ * @api
+ */
+
+/**
+ * MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.
+ *
+ * @typedef {object} MVTProperty
+ * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
+ * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
+ * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
+ *
+ * @api
+ */
+
 export default class MVT extends Base {
     /**
      * Create a carto.source.MVT.
      *
      * @param {object} data - A MVT data object
-     * @param {object} [metadata] - A carto.source.mvt.Metadata object
+     * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
      * @example
