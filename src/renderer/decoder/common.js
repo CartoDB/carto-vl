@@ -4,7 +4,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  */
-export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygon, skipCallback, reallocFn) {
+export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygon, skipCallback) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
@@ -20,7 +20,6 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
             drawLine = !(skipCallback && skipCallback(i));
 
             if (drawLine) {
-                reallocFn(12);
                 // First triangle
                 geomBuffer.vertices[geomBufferindex] = prevPoint[0];
                 geomBuffer.normals[geomBufferindex++] = -prevNormal[0];
@@ -68,7 +67,6 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
-                    reallocFn(6);
 
                     // Third triangle
                     geomBuffer.vertices[geomBufferindex] = currentPoint[0];
@@ -88,7 +86,6 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
                     geomBuffer.normals[geomBufferindex++] = rightNormal[1];
 
                     if (joinNormal) {
-                        reallocFn(6)
                         // Forth triangle
                         geomBuffer.vertices[geomBufferindex] = currentPoint[0];
                         geomBuffer.normals[geomBufferindex++] = joinNormal[0];
@@ -114,4 +111,13 @@ export function addLineString (lineString, geomBuffer, geomBufferindex, isPolygo
         }
     }
     return geomBufferindex;
+}
+
+/**
+ * Resize a Float32Array buffer in an efficient way
+ */
+export function resizeBuffer (oldBuffer, newSize) {
+    const newBuffer = new Float32Array(newSize);
+    newBuffer.set(oldBuffer);
+    return newBuffer;
 }

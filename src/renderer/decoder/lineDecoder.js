@@ -1,4 +1,4 @@
-import { addLineString } from './common';
+import { addLineString, resizeBuffer } from './common';
 
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
@@ -11,23 +11,6 @@ const geomBuffer = {
 
 let geomBufferindex = 0;
 
-// Resize `geomBuffer` as needed if `additionalSize` floats overflow the current buffers
-function _realloc (additionalSize) {
-    const minimumNeededSize = geomBufferindex + additionalSize;
-    if (minimumNeededSize > geomBuffer.vertices.length) {
-        console.log('RESIZE', minimumNeededSize, geomBuffer.vertices.length);
-        // Buffer overflow
-        const newSize = 2 * minimumNeededSize;
-        geomBuffer.vertices = _resizeBuffer(geomBuffer.vertices, newSize);
-        geomBuffer.normals = _resizeBuffer(geomBuffer.normals, newSize);
-    }
-}
-function _resizeBuffer (oldBuffer, newSize) {
-    const newBuffer = new Float32Array(newSize);
-    newBuffer.set(oldBuffer);
-    return newBuffer;
-}
-
 export function decodeLine (geometry) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
@@ -36,7 +19,8 @@ export function decodeLine (geometry) {
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
-            geomBufferindex = addLineString(feature[j], geomBuffer, geomBufferindex, false, false, _realloc);
+            _realloc(24 * feature[j].length);
+            geomBufferindex = addLineString(feature[j], geomBuffer, geomBufferindex);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
@@ -52,4 +36,16 @@ export function decodeLine (geometry) {
         featureIDToVertexIndex,
         breakpoints
     };
+}
+
+// Resize `geomBuffer` as needed if `additionalSize` floats overflow the current buffers
+function _realloc (additionalSize) {
+    const minimumNeededSize = geomBufferindex + additionalSize;
+    if (minimumNeededSize > geomBuffer.vertices.length) {
+        console.log('RESIZE', minimumNeededSize, geomBuffer.vertices.length);
+        // Buffer overflow
+        const newSize = 2 * minimumNeededSize;
+        geomBuffer.vertices = resizeBuffer(geomBuffer.vertices, newSize);
+        geomBuffer.normals = resizeBuffer(geomBuffer.normals, newSize);
+    }
 }
