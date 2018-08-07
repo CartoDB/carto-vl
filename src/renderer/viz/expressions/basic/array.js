@@ -29,7 +29,7 @@ export default class BaseArray extends BaseExpression {
                 break;
             }
         }
-        if (['number', 'category', 'color', 'time', undefined].indexOf(type) === -1) {
+        if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         elems.map((item, index) => {
@@ -61,7 +61,7 @@ export default class BaseArray extends BaseExpression {
         super._bindMetadata(metadata);
 
         const type = this.elems[0].type;
-        if (['number', 'category', 'color', 'time'].indexOf(type) === -1) {
+        if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         this.elems.map((item, index) => {
