@@ -988,6 +988,189 @@
 
             
                 
+<h4 class="name" id="MVTMetadata">MVTMetadata</h4>
+
+
+
+
+<div class="description">
+    <p>An MVTMetadata object declares metadata information of a a carto.Source.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>properties</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#MVTProperty">MVTProperty</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>property names, types and optionally ranges</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>idProperty</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    'cartodb_id'
+                
+                </td>
+            
+
+            <td class="description last"><p>property name of the property that should be used as ID</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption"> Creating a MVTMetadata object</p>
+    
+    <pre class="prettyprint"><code>const metadata = {
+        properties: {
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      };</code></pre>
+
+
+
+            
+                
 <h4 class="name" id="MVTOptions">MVTOptions</h4>
 
 
@@ -1210,6 +1393,171 @@
     layerID: 'myAwesomeLayer',
     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
 };</code></pre>
+
+
+
+            
+                
+<h4 class="name" id="MVTProperty">MVTProperty</h4>
+
+
+
+
+<div class="description">
+    <p>MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>type</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>min</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>With <code>type='number'</code> min specifies the minimum value in the dataset, this is used in global aggregation expressions</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>max</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>With <code>type='number'</code> max specifies the maximum value in the dataset, this is used in global aggregation expressions</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
 
 
 
@@ -1539,6 +1887,29 @@ For a better understanding we recommend reading the VIZ guide</p>
             
 
             <td class="description last"><p>when using <code>symbol</code>, offset to apply to the image</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>offset</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Placement</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>offset to apply to the features in pixels</p></td>
         </tr>
 
     
@@ -2558,7 +2929,7 @@ This is useful to create external widgets that are refreshed reactively to chang
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Aug 01 2018 09:50:36 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 07 2018 13:15:54 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

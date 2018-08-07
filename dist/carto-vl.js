@@ -1,6 +1,6 @@
 /*!
  * CARTO VL js https://carto.com/
- * Version: 0.6.0
+ * Version: 0.6.2
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -7088,7 +7088,7 @@ module.exports = g;
 /*! exports provided: name, version, sideEffects, description, repository, author, contributors, license, files, dependencies, devDependencies, module, main, scripts, default */
 /***/ (function(module) {
 
-module.exports = {"name":"@carto/carto-vl","version":"0.6.0","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","karma-carto-benchmark-reporter":"^0.0.0","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","wait-on":"^2.1.0","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
+module.exports = {"name":"@carto/carto-vl","version":"0.6.2","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","karma-carto-benchmark-reporter":"^0.0.0","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","wait-on":"^2.1.0","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
 
 /***/ }),
 
@@ -7667,6 +7667,24 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _renderer_viz_parser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./renderer/viz/parser */ "./src/renderer/viz/parser.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/util */ "./src/utils/util.js");
 /* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointVertexShader.glsl */ "./src/renderer/shaders/geometry/point/pointVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9__);
+/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointFragmentShader.glsl */ "./src/renderer/shaders/geometry/point/pointFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineVertexShader.glsl */ "./src/renderer/shaders/geometry/line/lineVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineFragmentShader.glsl */ "./src/renderer/shaders/geometry/line/lineFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonVertexShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonFragmentShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14__);
+
+
+
+
+
+
 
 
 
@@ -7681,10 +7699,11 @@ const DEFAULT_COLOR_EXPRESSION = () => _markDefault(_renderer_viz_expressions__W
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["number"](1));
 const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["rgb"](0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["number"](0));
-const DEFAULT_ORDER_EXPRESSION = () => _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["noOrder"]();
-const DEFAULT_FILTER_EXPRESSION = () => _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](1);
-const DEFAULT_SYMBOL_EXPRESSION = () => { const expr = _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["FALSE"]; expr._default = true; return expr; };
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["ALIGN_BOTTOM"];
+const DEFAULT_ORDER_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["noOrder"]());
+const DEFAULT_FILTER_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](1));
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["FALSE"]);
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["ALIGN_BOTTOM"]);
+const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["placement"](0, 0));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -7699,6 +7718,7 @@ const SUPPORTED_PROPERTIES = [
     'filter',
     'symbol',
     'symbolPlacement',
+    'offset',
     'resolution',
     'variables'
 ];
@@ -7734,6 +7754,7 @@ class Viz {
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+    * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
@@ -7810,6 +7831,9 @@ class Viz {
     _getRootExpressions () {
         return this._rootExpressions;
     }
+    _getRootStyleExpressions () {
+        return this._rootStyleExpressions;
+    }
 
     _updateRootExpressions () {
         this._getRootExpressions().forEach(expr => {
@@ -7819,13 +7843,7 @@ class Viz {
     }
 
     isAnimated () {
-        return this.color.isAnimated() ||
-            this.width.isAnimated() ||
-            this.strokeColor.isAnimated() ||
-            this.strokeWidth.isAnimated() ||
-            this.filter.isAnimated() ||
-            this.symbol.isAnimated() ||
-            this.symbolPlacement.isAnimated();
+        return this._getRootStyleExpressions().some(expr => expr.isAnimated);
     }
 
     onChange (callback) {
@@ -7851,7 +7869,19 @@ class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
+            this.offset,
             ...Object.values(this.variables)
+        ];
+        this._rootStyleExpressions = [
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.order,
+            this.filter,
+            this.symbol,
+            this.symbolPlacement,
+            this.offset
         ];
     }
 
@@ -7861,6 +7891,7 @@ class Viz {
     }
 
     setDefaultsIfRequired (geomType) {
+        this._geomType = geomType;
         if (this._appliedDefaults) {
             return;
         }
@@ -7909,17 +7940,9 @@ class Viz {
     }
 
     _resolveAliases () {
-        [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement
-        ].concat(Object.values(this.variables)).forEach(expr =>
-            expr._resolveAliases(this.variables)
-        );
+        this._getRootExpressions().forEach(expr => {
+            expr._resolveAliases(this.variables);
+        });
     }
 
     _validateAliasDAG () {
@@ -7937,14 +7960,11 @@ class Viz {
             node._getDependencies().forEach(visit);
             permanentMarkedSet.add(node);
         };
-        const unmarked = [
-            ...this.color._getDependencies(),
-            ...this.strokeColor._getDependencies(),
-            ...this.width._getDependencies(),
-            ...this.strokeWidth._getDependencies(),
-            ...this.filter._getDependencies(),
-            ...this.symbol._getDependencies(),
-            ...this.symbolPlacement._getDependencies()];
+        const unmarked = this._getRootExpressions().map(
+            expr => expr._getDependencies()
+        ).reduce((a, b) =>
+            [...a, ...b]
+            , []);
         while (unmarked.length) {
             visit(unmarked.pop());
         }
@@ -7959,11 +7979,27 @@ class Viz {
         this.strokeWidthShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl, _renderer_shaders_index__WEBPACK_IMPORTED_MODULE_1__["default"].styler.widthShaderGLSL, { width: this.strokeWidth }, this);
         this.filterShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl, _renderer_shaders_index__WEBPACK_IMPORTED_MODULE_1__["default"].styler.filterShaderGLSL, { filter: this.filter }, this);
 
-        if (!this.symbol._default) {
+        if (!this.symbol.default) {
             this.symbolShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl, _renderer_shaders_index__WEBPACK_IMPORTED_MODULE_1__["default"].symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement
             }, this);
+        }
+
+        if (!this._geomType || this._geomType === 'point') {
+            this.pointShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
+                { vertexShader: _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9___default.a, fragmentShader: _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10___default.a },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'line') {
+            this.lineShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
+                { vertexShader: _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11___default.a, fragmentShader: _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12___default.a },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'polygon') {
+            this.polygonShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
+                { vertexShader: _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13___default.a, fragmentShader: _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14___default.a },
+                { offset: this.offset }, this);
         }
     }
 
@@ -7999,6 +8035,10 @@ class Viz {
             replacer.notify = toReplace.notify;
         } else if (toReplace === this.symbolPlacement) {
             this.symbolPlacement = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace === this.offset) {
+            this.offset = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -8062,6 +8102,9 @@ class Viz {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isUndefined(vizSpec.symbolPlacement)) {
             vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
         }
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isUndefined(vizSpec.offset)) {
+            vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
+        }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
@@ -8078,6 +8121,7 @@ class Viz {
          * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
          * @property {Image} symbol - show an image instead in the place of points
          * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+         * @property {Placement} offset - offset to apply to the features in pixels
          * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
          * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
          * @property {object} variables - An object describing the variables used.
@@ -8090,6 +8134,7 @@ class Viz {
         vizSpec.width = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.width);
         vizSpec.strokeWidth = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.symbolPlacement);
+        vizSpec.offset = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.offset);
         vizSpec.symbol = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.symbol);
         vizSpec.filter = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.filter);
 
@@ -8125,6 +8170,9 @@ class Viz {
         }
         if (!(vizSpec.symbolPlacement instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
             throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[symbolPlacement]');
+        }
+        if (!(vizSpec.offset instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[offset]');
         }
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
@@ -10966,7 +11014,7 @@ class Dataframe {
         this.scale = scale;
         this.type = type;
         this.decodedGeom = Object(_decoder__WEBPACK_IMPORTED_MODULE_0__["decodeGeom"])(this.type, this.geom);
-        this.numVertex = type === 'point' ? size : this.decodedGeom.vertices.length / 2;
+        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
@@ -11038,21 +11086,36 @@ class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
 
-        for (let i = 0; i < vertices.length; i += 2) {
-            if (!breakpoints.length) {
-                if (i > 0) {
-                    index++;
+        if (!breakpoints.length) {
+            for (let i = 0; i < vertices.length; i += 6) {
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+
+                if (ids[i + 0] === 0) {
+                    ids[i + 0] += 1 / (1024 * 64);
                 }
-            } else {
+                if (ids[i + 1] === 0) {
+                    ids[i + 1] += 1 / (1024 * 64);
+                }
+
+                ids[i + 2] = -ids[i + 0];
+                ids[i + 3] = ids[i + 1];
+
+                ids[i + 4] = ids[i + 0];
+                ids[i + 5] = -ids[i + 1];
+                index++;
+            }
+        } else {
+            for (let i = 0; i < vertices.length; i += 2) {
                 while (i === breakpoints[index]) {
                     index++;
                 }
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
             }
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-            ids[i + 0] = ((index) % width) / (width - 1);
-            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
-
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -11083,6 +11146,15 @@ class Dataframe {
         const feature = this.getFeature(featureIndex);
         const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
+
+        if (!viz.offset.default) {
+            const offset = viz.offset.eval(feature);
+            const widthScale = this.widthScale / 2;
+            viewportAABB.minx -= offset[0] * widthScale;
+            viewportAABB.maxx -= offset[0] * widthScale;
+            viewportAABB.miny -= offset[1] * widthScale;
+            viewportAABB.maxy -= offset[1] * widthScale;
+        }
 
         switch (this.type) {
             case 'point':
@@ -11149,8 +11221,8 @@ class Dataframe {
 
     _isPointInViewport (featureIndex, viewportAABB) {
         const { minx, maxx, miny, maxy } = viewportAABB;
-        const x = this.geom[2 * featureIndex + 0];
-        const y = this.geom[2 * featureIndex + 1];
+        const x = this.geom[6 * featureIndex + 0];
+        const y = this.geom[6 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
@@ -11207,8 +11279,10 @@ class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
-        for (let i = 0; i < points.length; i += 2) {
-            const featureIndex = i / 2;
+        const widthScale = this.widthScale / 2;
+
+        for (let i = 0; i < points.length; i += 6) {
+            const featureIndex = i / 6;
             const center = {
                 x: points[i],
                 y: points[i + 1]
@@ -11222,10 +11296,15 @@ class Dataframe {
 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
-            if (!viz.symbol._default) {
-                const offset = viz.symbolPlacement.eval();
+            if (!viz.symbol.default) {
+                const offset = viz.symbolPlacement.eval(feature);
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;
+            }
+            if (!viz.offset.default) {
+                const offset = viz.offset.eval(feature);
+                center.x += offset[0] * widthScale;
+                center.y += offset[1] * widthScale;
             }
 
             const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInCircle"])(p, center, strokeWidthScale);
@@ -11239,7 +11318,7 @@ class Dataframe {
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const p = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(pos.x, pos.y, {
+        const point = Object(_client_rsys__WEBPACK_IMPORTED_MODULE_1__["wToR"])(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
         });
@@ -11253,13 +11332,21 @@ class Dataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
+        const widthScale = this.widthScale / 2;
+        let pointWithOffset;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-
-                if (!Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInRectangle"])(p, this._aabb[featureIndex]) ||
+                let offset = {x: 0, y: 0};
+                if (!viz.offset.default) {
+                    const vizOffset = viz.offset.eval(feature);
+                    offset.x = vizOffset[0] * widthScale;
+                    offset.y = vizOffset[1] * widthScale;
+                }
+                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                if (!Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInRectangle"])(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -11285,7 +11372,7 @@ class Dataframe {
                 y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
             };
 
-            const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInTriangle"])(p, v1, v2, v3);
+            const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInTriangle"])(pointWithOffset, v1, v2, v3);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -11397,21 +11484,21 @@ class Dataframe {
     }
 
     _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 126;
-        const diameter = Math.min(viz.width.eval(feature) + viz.strokeWidth.eval(feature), SATURATION_PX);
+        const SATURATION_PX = 1024;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
@@ -11650,8 +11737,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Renderer; });
 /* harmony import */ var _shaders__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./shaders */ "./src/renderer/shaders/index.js");
 /* harmony import */ var _viz_expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viz/expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
-
 
 
 
@@ -11723,12 +11808,12 @@ class Renderer {
         // Use a "big" triangle instead of a square for performance and simplicity
         this.bigTriangleVBO = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        const vertices = [
+        const vertices = new Float32Array([
             10.0, -10.0,
             0.0, 10.0,
             -10.0, -10.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, Object(_utils_util__WEBPACK_IMPORTED_MODULE_2__["getFloat32ArrayFromArray"])(vertices), gl.STATIC_DRAW);
+        ]);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
         // Create a 1x1 RGBA texture set to [0,0,0,0]
         // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
@@ -11981,21 +12066,29 @@ class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
+        if (tiles[0].type === 'line' || tiles[0].type === 'polygon') {
+            gl.clearDepth(1);
+            gl.depthRange(0, 1);
+            gl.depthFunc(gl.NOTEQUAL);
+            gl.depthMask(true);
+            gl.enable(gl.DEPTH_TEST);
+        }
+
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
             let renderer = null;
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 renderer = viz.symbolShader;
             } else if (tile.type === 'point') {
-                renderer = this.finalRendererProgram;
+                renderer = viz.pointShader;
             } else if (tile.type === 'line') {
-                renderer = this.lineRendererProgram;
+                renderer = viz.lineShader;
             } else {
-                renderer = this.triRendererProgram;
+                renderer = viz.polygonShader;
             }
             gl.useProgram(renderer.program);
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
             }
 
@@ -12009,11 +12102,7 @@ class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (scale / aspect) * (this._center.x - tile.center.x),
                 scale * (this._center.y - tile.center.y));
-            if (tile.type === 'line' || tile.type === 'polygon') {
-                gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-            } else if (tile.type === 'point') {
-                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
-            }
+            gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
 
             tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
 
@@ -12048,7 +12137,7 @@ class Renderer {
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
@@ -12072,7 +12161,7 @@ class Renderer {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-                gl.uniform1i(renderer.colorStrokeTexture, freeTexUnit);
+                gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
                 freeTexUnit++;
 
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -12081,16 +12170,30 @@ class Renderer {
                 freeTexUnit++;
             }
 
-            if (tile.type === 'line' /* || tile.type === 'polygon' */) {
-                gl.clearDepth(1);
-                gl.depthRange(0, 1);
-                gl.depthFunc(gl.NOTEQUAL);
-                gl.depthMask(true);
+            if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
-                gl.enable(gl.DEPTH_TEST);
             }
 
-            gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            if (!viz.offset.default) {
+                const textureId = renderer.textureIds.get(viz);
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
+                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+
+                freeTexUnit = drawMetadata.freeTexUnit;
+
+                Object.keys(textureId).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            }
+
+            gl.drawArrays(gl.TRIANGLES, 0, tile.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
@@ -12128,30 +12231,168 @@ class Renderer {
      * Initialize static shaders
      */
     _initShaders () {
-        this.finalRendererProgram = _shaders__WEBPACK_IMPORTED_MODULE_0__["default"].renderer.createPointShader(this.gl);
-        this.triRendererProgram = _shaders__WEBPACK_IMPORTED_MODULE_0__["default"].renderer.createTriShader(this.gl);
-        this.lineRendererProgram = _shaders__WEBPACK_IMPORTED_MODULE_0__["default"].renderer.createLineShader(this.gl);
         this._aaBlendShader = new _shaders__WEBPACK_IMPORTED_MODULE_0__["default"].AABlender(this.gl);
     }
 }
 
 function getOrderingRenderBuckets (renderLayer) {
     const orderer = renderLayer.viz.order;
+    const MAX_SIZE = 1030;
     let orderingMins = [0];
-    let orderingMaxs = [1000];
+    let orderingMaxs = [MAX_SIZE];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
     if (orderer.isA(_viz_expressions__WEBPACK_IMPORTED_MODULE_1__["Asc"])) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? MAX_SIZE : ((NUM_BUCKETS - 1) - i + 1) * 2);
     } else if (orderer.isA(_viz_expressions__WEBPACK_IMPORTED_MODULE_1__["Desc"])) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? MAX_SIZE : (i + 1) * 2);
     }
     return {
         orderingMins,
         orderingMaxs
     };
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/decoder/common.js":
+/*!****************************************!*\
+  !*** ./src/renderer/decoder/common.js ***!
+  \****************************************/
+/*! exports provided: addLineString, resizeBuffer */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "addLineString", function() { return addLineString; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "resizeBuffer", function() { return resizeBuffer; });
+/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/geometry */ "./src/utils/geometry.js");
+
+
+/**
+ * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
+ * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
+ * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
+ */
+function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
+    let prevPoint, currentPoint, nextPoint;
+    let prevNormal, nextNormal;
+    let drawLine;
+
+    // We need at least two points
+    if (lineString.length >= 4) {
+        // Initialize the first two points
+        prevPoint = [lineString[0], lineString[1]];
+        currentPoint = [lineString[2], lineString[3]];
+        prevNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__["getLineNormal"])(prevPoint, currentPoint);
+
+        for (let i = 4; i <= lineString.length; i += 2) {
+            drawLine = !(skipCallback && skipCallback(i));
+
+            if (drawLine) {
+                // First triangle
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+
+                // Second triangle
+                geomBuffer.vertices[index] = prevPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = prevPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.vertices[index] = currentPoint[0];
+                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.vertices[index] = currentPoint[1];
+                geomBuffer.normals[index++] = -prevNormal[1];
+            }
+
+            // If there is a next point, compute its properties
+            if (i <= lineString.length - 2) {
+                nextPoint = [lineString[i], lineString[i + 1]];
+            } else if (isPolygon) {
+                nextPoint = [lineString[2], lineString[3]];
+            }
+
+            if (nextPoint) {
+                nextNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__["getLineNormal"])(currentPoint, nextPoint);
+
+                if (drawLine) {
+                    // `turnLeft` indicates that the nextLine turns to the left
+                    // `joinNormal` contains the direction and size for the `miter` vertex
+                    //  If this is not defined means that the join must be `bevel`.
+                    let {turnLeft, joinNormal} = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__["getJoinNormal"])(prevNormal, nextNormal);
+
+                    let leftNormal = turnLeft ? prevNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__["neg"])(nextNormal);
+                    let rightNormal = turnLeft ? nextNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__["neg"])(prevNormal);
+
+                    // Third triangle
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = 0;
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    // Mark vertex to be stroke in PolygonShader with the
+                    // non-zero value 1e-37, so it validates the expression
+                    // `normal != vec2(0.)` without affecting the vertex position.
+                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = leftNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = leftNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = rightNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = rightNormal[1];
+
+                    if (joinNormal) {
+                        // Forth triangle
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = joinNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = joinNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = rightNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = rightNormal[1];
+                        geomBuffer.vertices[index] = currentPoint[0];
+                        geomBuffer.normals[index++] = leftNormal[0];
+                        geomBuffer.vertices[index] = currentPoint[1];
+                        geomBuffer.normals[index++] = leftNormal[1];
+                    }
+                }
+            }
+
+            // Update the variables for the next iteration
+            prevPoint = currentPoint;
+            currentPoint = nextPoint;
+            prevNormal = nextNormal;
+            nextPoint = null;
+        }
+    }
+    return index;
+}
+
+/**
+ * Resize a Float32Array buffer in an efficient way
+ */
+function resizeBuffer (oldBuffer, newSize) {
+    const newBuffer = new Float32Array(newSize);
+    newBuffer.set(oldBuffer);
+    return newBuffer;
 }
 
 
@@ -12200,116 +12441,58 @@ function decodeGeom (geomType, geom) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodeLine", function() { return decodeLine; });
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/util */ "./src/utils/util.js");
-/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/geometry */ "./src/utils/geometry.js");
-
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common */ "./src/renderer/decoder/common.js");
 
 
 // If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
 
+const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024; // 4 MB
+const MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;
+
+let index = 0;
+let geomBuffer = {
+    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),
+    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
+};
+
 function decodeLine (geometry) {
-    let vertices = [];
-    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
+    index = 0;
     for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
         for (let j = 0; j < feature.length; j++) {
-            const lineString = feature[j];
-            addLine(lineString, vertices, normals);
+            // Increase buffers size if required
+            resizeBuffers(MAX_VERTICES_COORDINATES_PER_SEGMENT * feature[j].length);
+
+            // Add line string
+            index = Object(_common__WEBPACK_IMPORTED_MODULE_0__["addLineString"])(feature[j], geomBuffer, index);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
-            ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+            ? { start: 0, end: index }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });
 
-        breakpoints.push(vertices.length);
+        breakpoints.push(index);
     }
 
     return {
-        vertices: Object(_utils_util__WEBPACK_IMPORTED_MODULE_0__["getFloat32ArrayFromArray"])(vertices),
-        normals: Object(_utils_util__WEBPACK_IMPORTED_MODULE_0__["getFloat32ArrayFromArray"])(normals),
+        vertices: geomBuffer.vertices.slice(0, index),
+        normals: geomBuffer.normals.slice(0, index),
         featureIDToVertexIndex,
         breakpoints
     };
 }
 
-/**
- * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
- * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
- */
-function addLine (lineString, vertices, normals) {
-    let prevPoint, currentPoint, nextPoint;
-    let prevNormal, nextNormal;
-
-    // We need at least two points
-    if (lineString.length >= 4) {
-        // Initialize the first two points
-        prevPoint = [lineString[0], lineString[1]];
-        currentPoint = [lineString[2], lineString[3]];
-        prevNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["getLineNormal"])(prevPoint, currentPoint);
-
-        for (let i = 4; i <= lineString.length; i += 2) {
-            // First triangle
-            addTriangle(
-                [prevPoint, prevPoint, currentPoint],
-                [Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(prevNormal), prevNormal, prevNormal]
-            );
-
-            // Second triangle
-            addTriangle(
-                [prevPoint, currentPoint, currentPoint],
-                [Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(prevNormal), prevNormal, Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(prevNormal)]
-            );
-
-            if (i <= lineString.length - 2) {
-                // If there is a next point, compute its properties
-                nextPoint = [lineString[i], lineString[i + 1]];
-                nextNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["getLineNormal"])(currentPoint, nextPoint);
-                // `turnLeft` indicates that the nextLine turns to the left
-                // `joinNormal` contains the direction and size for the `miter` vertex
-                //  If this is not defined means that the join must be `bevel`.
-                let {turnLeft, joinNormal} = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["getJoinNormal"])(prevNormal, nextNormal);
-
-                // Third triangle
-                addTriangle(
-                    [currentPoint, currentPoint, currentPoint],
-                    [[0, 0],
-                        turnLeft ? prevNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(nextNormal),
-                        turnLeft ? nextNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(prevNormal)]
-                );
-
-                if (joinNormal) {
-                    // Forth triangle
-                    addTriangle(
-                        [currentPoint, currentPoint, currentPoint],
-                        [joinNormal,
-                            turnLeft ? nextNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(prevNormal),
-                            turnLeft ? prevNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["neg"])(nextNormal)]
-                    );
-                }
-            }
-
-            // Update the variables for the next iteration
-            prevPoint = currentPoint;
-            currentPoint = nextPoint;
-            prevNormal = nextNormal;
-        }
-    }
-
-    function addTriangle (p, n) {
-        vertices.push(
-            p[0][0], p[0][1],
-            p[1][0], p[1][1],
-            p[2][0], p[2][1]
-        );
-        normals.push(
-            n[0][0], n[0][1],
-            n[1][0], n[1][1],
-            n[2][0], n[2][1]
-        );
+// Resize buffers as needed if `additionalSize` floats overflow the current buffers.
+function resizeBuffers (additionalSize) {
+    const minimumNeededSize = index + additionalSize;
+    if (minimumNeededSize > geomBuffer.vertices.length) {
+        const newSize = 2 * minimumNeededSize;
+        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_0__["resizeBuffer"])(geomBuffer.vertices, newSize);
+        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_0__["resizeBuffer"])(geomBuffer.normals, newSize);
     }
 }
 
@@ -12350,111 +12533,90 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "decodePolygon", function() { return decodePolygon; });
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! earcut */ "./node_modules/earcut/src/earcut.js");
 /* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(earcut__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils/util */ "./src/utils/util.js");
-/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils/geometry */ "./src/utils/geometry.js");
-
+/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common */ "./src/renderer/decoder/common.js");
 
 
 
 // If the geometry type is 'polygon' it will triangulate the polygon list (geom)
-//      geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
-//      Example:
-/*         let geom = [
-                {
-                    flat: [
-                        0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
-                        0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
-                    ]
-                    holes: [5]
-                }
-            ]
+// geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
+// Example:
+/*   let geom = [{
+       flat: [
+         0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square
+         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square
+       ]
+       holes: [5]
+     }]
 */
 
+const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 * 2; // 8 MB
+const VERTEX_COORDINATES_PER_TRIANGLE = 2;
+const MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;
+
+let index = 0;
+let geomBuffer = {
+    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),
+    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
+};
+
 function decodePolygon (geometry) {
-    let vertices = []; // Array of triangle vertices
-    let normals = [];
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
-    const geometryLength = geometry.length;
 
-    for (let i = 0; i < geometryLength; i++) {
+    index = 0;
+    for (let i = 0; i < geometry.length; i++) {
         const feature = geometry[i];
-        const featureLength = feature.length;
-
-        for (let j = 0; j < featureLength; j++) {
+        for (let j = 0; j < feature.length; j++) {
             const polygon = feature[j];
             const triangles = earcut__WEBPACK_IMPORTED_MODULE_0__(polygon.flat, polygon.holes);
-            const trianglesLength = triangles.length;
 
-            for (let k = 0; k < trianglesLength; k++) {
-                const index = triangles[k];
-                vertices.push(polygon.flat[2 * index], polygon.flat[2 * index + 1]);
-                normals.push(0, 0);
+            // Increase buffers size if required
+            resizeBuffers(VERTEX_COORDINATES_PER_TRIANGLE * triangles.length +
+                          MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);
+
+            // Add polygon
+            for (let k = 0; k < triangles.length; k++) {
+                addVertex(polygon.flat, 2 * triangles[k]);
             }
 
-            const lineString = polygon.flat;
-            const lineStringLength = lineString.length;
-
-            for (let l = 0; l < lineStringLength - 2; l += 2) {
-                if (polygon.holes.includes((l + 2) / 2)) {
-                    // Skip adding the line which connects two rings
-                    continue;
-                }
-
-                const a = [lineString[l + 0], lineString[l + 1]];
-                const b = [lineString[l + 2], lineString[l + 3]];
-
-                if (isClipped(polygon, l, l + 2)) {
-                    continue;
-                }
-
-                const normal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["getLineNormal"])(b, a);
-
-                if (Number.isNaN(normal[0]) || Number.isNaN(normal[1])) {
-                    // Skip when there is no normal vector
-                    continue;
-                }
-
-                // First triangle
-                addTriangle(
-                    [a, a, b],
-                    [normal, Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["neg"])(normal), normal]
-                );
-
-                // Second triangle
-                addTriangle(
-                    [a, b, b],
-                    [Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["neg"])(normal), Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["neg"])(normal), normal]
-                );
-            }
+            // Add polygon stroke
+            index = Object(_common__WEBPACK_IMPORTED_MODULE_1__["addLineString"])(polygon.flat, geomBuffer, index, true, (pointIndex) => {
+                // Skip adding the line which connects two rings OR is clipped
+                return polygon.holes.includes((pointIndex - 2) / 2) || isClipped(polygon, pointIndex - 4, pointIndex - 2);
+            });
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
-            ? { start: 0, end: vertices.length }
-            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: vertices.length });
+            ? { start: 0, end: index }
+            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });
 
-        breakpoints.push(vertices.length);
-    }
-
-    function addTriangle (p, n) {
-        vertices.push(
-            p[0][0], p[0][1],
-            p[1][0], p[1][1],
-            p[2][0], p[2][1]
-        );
-        normals.push(
-            n[0][0], n[0][1],
-            n[1][0], n[1][1],
-            n[2][0], n[2][1]
-        );
+        breakpoints.push(index);
     }
 
     return {
-        vertices: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(vertices),
-        normals: Object(_utils_util__WEBPACK_IMPORTED_MODULE_1__["getFloat32ArrayFromArray"])(normals),
+        vertices: geomBuffer.vertices.slice(0, index),
+        normals: geomBuffer.normals.slice(0, index),
         featureIDToVertexIndex,
         breakpoints
     };
+}
+
+// Resize buffers as needed if `additionalSize` floats overflow the current buffers
+function resizeBuffers (additionalSize) {
+    const minimumNeededSize = index + additionalSize;
+    if (minimumNeededSize > geomBuffer.vertices.length) {
+        const newSize = 2 * minimumNeededSize;
+        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_1__["resizeBuffer"])(geomBuffer.vertices, newSize);
+        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_1__["resizeBuffer"])(geomBuffer.normals, newSize);
+    }
+}
+
+// Add vertex in triangles.
+function addVertex (array, vertexIndex) {
+    geomBuffer.vertices[index] = array[vertexIndex];
+    geomBuffer.normals[index++] = 0;
+    geomBuffer.vertices[index] = array[vertexIndex + 1];
+    geomBuffer.normals[index++] = 0;
 }
 
 function isClipped (polygon, i, j) {
@@ -12646,43 +12808,6 @@ module.exports = "precision highp float;\nattribute vec2 vertex;\n\nvarying  vec
 
 /***/ }),
 
-/***/ "./src/renderer/shaders/geometry/line/LineShader.js":
-/*!**********************************************************!*\
-  !*** ./src/renderer/shaders/geometry/line/LineShader.js ***!
-  \**********************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return LineShader; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils */ "./src/renderer/shaders/utils.js");
-/* harmony import */ var _lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lineFragmentShader.glsl */ "./src/renderer/shaders/geometry/line/lineFragmentShader.glsl");
-/* harmony import */ var _lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./lineVertexShader.glsl */ "./src/renderer/shaders/geometry/line/lineVertexShader.glsl");
-/* harmony import */ var _lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__);
-
-
-
-
-class LineShader {
-    constructor (gl) {
-        Object.assign(this, Object(_utils__WEBPACK_IMPORTED_MODULE_0__["compileProgram"])(gl, _lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default.a, _lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default.a));
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/renderer/shaders/geometry/line/lineFragmentShader.glsl":
 /*!********************************************************************!*\
   !*** ./src/renderer/shaders/geometry/line/lineFragmentShader.glsl ***!
@@ -12701,47 +12826,7 @@ module.exports = "precision highp float;\n\nvarying lowp vec4 color;\n\nvoid mai
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\n// From [0.,1.] in exponential-like form to pixels in [0.,255.]\nfloat decodeWidth(float x){\n    float w;\n    if (x < 0.25098039215686274){ // x < 64/255\n        w = 63.75 * x; // 255 * 0.25\n    }else if (x < 0.5019607843137255){ // x < 128/255\n        w = x*255. -48.;\n    }else {\n        w = x*510. -174.;\n    }\n    return w;\n}\n\nvoid main(void) {\n    color = texture2D(colorTex, featureID);\n    float filtering = texture2D(filterTex, featureID).a;\n    color.a *= filtering;\n    color.rgb *= color.a;\n    float size = decodeWidth(texture2D(widthTex, featureID).a);\n\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);\n    // Set z range (-1, 1)\n    z = z * 2. - 1.;\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    if (size==0. || color.a==0.){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
-
-/***/ }),
-
-/***/ "./src/renderer/shaders/geometry/point/PointShader.js":
-/*!************************************************************!*\
-  !*** ./src/renderer/shaders/geometry/point/PointShader.js ***!
-  \************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return PointShader; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils */ "./src/renderer/shaders/utils.js");
-/* harmony import */ var _pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./pointFragmentShader.glsl */ "./src/renderer/shaders/geometry/point/pointFragmentShader.glsl");
-/* harmony import */ var _pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./pointVertexShader.glsl */ "./src/renderer/shaders/geometry/point/pointVertexShader.glsl");
-/* harmony import */ var _pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__);
-
-
-
-
-class PointShader {
-    constructor (gl) {
-        Object.assign(this, Object(_utils__WEBPACK_IMPORTED_MODULE_0__["compileProgram"])(gl, _pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default.a, _pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default.a));
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'colorStrokeTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.widthTexture = gl.getUniformLocation(this.program, 'widthTex');
-        this.orderMinWidth = gl.getUniformLocation(this.program, 'orderMinWidth');
-        this.orderMaxWidth = gl.getUniformLocation(this.program, 'orderMaxWidth');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.devicePixelRatio = gl.getUniformLocation(this.program, 'devicePixelRatio');
-    }
-}
-
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n    color = texture2D(colorTex, featureID);\n    float filtering = texture2D(filterTex, featureID).a;\n    color.a *= filtering;\n    color.rgb *= color.a;\n    float size = decodeWidth(texture2D(widthTex, featureID).rg);\n\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / (64.);\n\n    // Set z range (-1, 1)\n    z = z * 2. - 1.;\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy += normalScale*($offset_inline);\n    if (size==0. || color.a==0.){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -12752,7 +12837,7 @@ class PointShader {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nvarying lowp vec4 color;\nvarying lowp vec4 stroke;\nvarying highp float dp;\nvarying highp float sizeNormalizer;\nvarying highp float fillScale;\nvarying highp float strokeScale;\n\nfloat distanceAntialias(vec2 p){\n    return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));\n}\n\n\nvoid main(void) {\n    vec2 p = (2.*gl_PointCoord-vec2(1.))*sizeNormalizer;\n    vec4 c = color;\n\n    vec4 s = stroke;\n\n    c.a *= distanceAntialias(p*fillScale);\n    c.rgb*=c.a;\n\n    s.a *= distanceAntialias(p);\n    s.a *= 1.-distanceAntialias((strokeScale)*p);\n    s.rgb*=s.a;\n\n    c=s+(1.-s.a)*c;\n\n    gl_FragColor = c;\n}\n"
+module.exports = "precision highp float;\n\nvarying lowp vec4 color;\nvarying lowp vec4 stroke;\nvarying highp float dp;\nvarying highp float fillScale;\nvarying highp float strokeScale;\nvarying highp vec2 pointCoord;\n\nfloat distanceAntialias(vec2 p){\n    return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));\n}\n\nvoid main(void) {\n    vec2 p = pointCoord;\n    vec4 c = color;\n\n    vec4 s = stroke;\n\n    c.a *= distanceAntialias(p*fillScale);\n    c.rgb*=c.a;\n\n    s.a *= distanceAntialias(p);\n    s.a *= 1.-distanceAntialias((strokeScale)*p);\n    s.rgb*=s.a;\n\n    c=s+(1.-s.a)*c;\n\n    gl_FragColor = c;\n}\n"
 
 /***/ }),
 
@@ -12763,52 +12848,14 @@ module.exports = "precision highp float;\n\nvarying lowp vec4 color;\nvarying lo
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform float devicePixelRatio;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D colorStrokeTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec4 color;\nvarying highp vec4 stroke;\nvarying highp float dp;\nvarying highp float sizeNormalizer;\nvarying highp float fillScale;\nvarying highp float strokeScale;\n\n// From [0.,1.] in exponential-like form to pixels in [0.,255.]\nfloat decodeWidth(float x) {\n  float w;\n  if (x < 0.25098039215686274) { // x < 64/255\n    w = 63.75 * x; // 255 * 0.25\n  } else if (x < 0.5019607843137255) { // x < 128/255\n    w = x * 255. - 48.;\n  } else {\n    w = x * 510. - 174.;\n  }\n  return w;\n}\n\nvoid main(void) {\n  color = texture2D(colorTex, featureID);\n  stroke = texture2D(colorStrokeTex, featureID);\n  float filtering = texture2D(filterTex, featureID).a;\n  color.a *= filtering;\n  stroke.a *= filtering;\n\n  float size = decodeWidth(texture2D(widthTex, featureID).a);\n  float fillSize = size;\n  float strokeSize = decodeWidth(texture2D(strokeWidthTex, featureID).a);\n  size += strokeSize;\n  fillScale = size / fillSize;\n  strokeScale = size / max(0.001, (fillSize - strokeSize));\n  if (fillScale == strokeScale) {\n    stroke.a = 0.;\n  }\n  if (size > 126.) {\n    size = 126.;\n  }\n  gl_PointSize = size * devicePixelRatio + 2.;\n  dp = 1.0 / (size + 1.);\n  sizeNormalizer = (size + 1.) / (size);\n\n  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);\n  if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {\n    p.x = 10000.;\n  }\n  gl_Position = p;\n}\n"
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec4 color;\nvarying highp vec4 stroke;\nvarying highp float dp;\nvarying highp float fillScale;\nvarying highp float strokeScale;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n  color = texture2D(colorTex, abs(featureID));\n  stroke = texture2D(strokeColorTex, abs(featureID));\n  float filtering = texture2D(filterTex, abs(featureID)).a;\n  color.a *= filtering;\n  stroke.a *= filtering;\n  float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n  float fillSize = size;\n  float strokeSize = decodeWidth(texture2D(strokeWidthTex, abs(featureID)).rg);\n  size += strokeSize;\n  fillScale = min(size / fillSize, 1.);\n  strokeScale = size / max(0.001, (fillSize - strokeSize));\n  if (fillScale == strokeScale) {\n    stroke.a = 0.;\n  }\n  dp = 1.0 / (size + 1.);\n  float sizeNormalizer = (size +1.)/size;\n\n\n  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);\n\n  vec2 size2 = (2.*size+4.)*normalScale;\n\n  if (featureID.y<0.){\n      pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n      p.xy += size2*vec2(0.866025, -0.5);\n  }else if (featureID.x<0.){\n      pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n      p.xy += size2*vec2(-0.866025, -0.5);\n  }else{\n      pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n      p.y += size2.y;\n  }\n\n  p.xy += normalScale*($offset_inline);\n  if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {\n    p.x = 10000.;\n  }\n\n  gl_Position = p;\n}\n"
 
 /***/ }),
 
-/***/ "./src/renderer/shaders/geometry/triangle/TriangleShader.js":
-/*!******************************************************************!*\
-  !*** ./src/renderer/shaders/geometry/triangle/TriangleShader.js ***!
-  \******************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return TriangleShader; });
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils */ "./src/renderer/shaders/utils.js");
-/* harmony import */ var _triangleFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./triangleFragmentShader.glsl */ "./src/renderer/shaders/geometry/triangle/triangleFragmentShader.glsl");
-/* harmony import */ var _triangleFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_triangleFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _triangleVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./triangleVertexShader.glsl */ "./src/renderer/shaders/geometry/triangle/triangleVertexShader.glsl");
-/* harmony import */ var _triangleVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_triangleVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2__);
-
-
-
-
-class TriangleShader {
-    constructor (gl) {
-        Object.assign(this, Object(_utils__WEBPACK_IMPORTED_MODULE_0__["compileProgram"])(gl, `${_triangleVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default.a}`, `${_triangleFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default.a}`));
-        this.vertexPositionAttribute = gl.getAttribLocation(this.program, 'vertexPosition');
-        this.normalAttr = gl.getAttribLocation(this.program, 'normal');
-        this.featureIdAttr = gl.getAttribLocation(this.program, 'featureID');
-        this.vertexScaleUniformLocation = gl.getUniformLocation(this.program, 'vertexScale');
-        this.vertexOffsetUniformLocation = gl.getUniformLocation(this.program, 'vertexOffset');
-        this.colorTexture = gl.getUniformLocation(this.program, 'colorTex');
-        this.colorStrokeTexture = gl.getUniformLocation(this.program, 'strokeColorTex');
-        this.strokeWidthTexture = gl.getUniformLocation(this.program, 'strokeWidthTex');
-        this.filterTexture = gl.getUniformLocation(this.program, 'filterTex');
-        this.normalScale = gl.getUniformLocation(this.program, 'normalScale');
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/renderer/shaders/geometry/triangle/triangleFragmentShader.glsl":
-/*!****************************************************************************!*\
-  !*** ./src/renderer/shaders/geometry/triangle/triangleFragmentShader.glsl ***!
-  \****************************************************************************/
+/***/ "./src/renderer/shaders/geometry/polygon/polygonFragmentShader.glsl":
+/*!**************************************************************************!*\
+  !*** ./src/renderer/shaders/geometry/polygon/polygonFragmentShader.glsl ***!
+  \**************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
@@ -12816,14 +12863,14 @@ module.exports = "precision lowp float;\n\nvarying lowp vec4 color;\n\nvoid main
 
 /***/ }),
 
-/***/ "./src/renderer/shaders/geometry/triangle/triangleVertexShader.glsl":
-/*!**************************************************************************!*\
-  !*** ./src/renderer/shaders/geometry/triangle/triangleVertexShader.glsl ***!
-  \**************************************************************************/
+/***/ "./src/renderer/shaders/geometry/polygon/polygonVertexShader.glsl":
+/*!************************************************************************!*\
+  !*** ./src/renderer/shaders/geometry/polygon/polygonVertexShader.glsl ***!
+  \************************************************************************/
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\n// From [0.,1.] in exponential-like form to pixels in [0.,255.]\nfloat decodeWidth(float x){\n    float w;\n    if (x < 0.25098039215686274){ // x < 64/255\n        w = 63.75 * x; // 255 * 0.25\n    }else if (x < 0.5019607843137255){ // x < 128/255\n        w = x*255. -48.;\n    }else {\n        w = x*510. -174.;\n    }\n    return w;\n}\n\nvoid main(void) {\n    vec4 c;\n    if (normal == vec2(0.)){\n        c = texture2D(colorTex, featureID);\n    }else{\n        c = texture2D(strokeColorTex, featureID);\n    }\n    float filtering = texture2D(filterTex, featureID).a;\n    c.a *= filtering;\n    float size = decodeWidth(texture2D(strokeWidthTex, featureID).a);\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, 0.5, 1.);\n\n    if (c.a==0.){\n        p.x=10000.;\n    }\n    color = vec4(c.rgb*c.a, c.a);\n    gl_Position  = p;\n}\n"
+module.exports = "precision mediump float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / 64.;\n\n    vec4 c;\n    if (normal == vec2(0.)){\n        c = texture2D(colorTex, featureID);\n    }else{\n        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);\n        c = texture2D(strokeColorTex, featureID);\n    }\n    z = 2.*z - 1.;\n    float filtering = texture2D(filterTex, featureID).a;\n    c.a *= filtering;\n    float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy += normalScale*($offset_inline);\n\n    if (c.a==0.){\n        p.x=10000.;\n    }\n    color = vec4(c.rgb*c.a, c.a);\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -12831,42 +12878,28 @@ module.exports = "precision mediump float;\n\nattribute vec2 vertexPosition;\nat
 /*!***************************************!*\
   !*** ./src/renderer/shaders/index.js ***!
   \***************************************/
-/*! exports provided: renderer, styler, symbolizer, AABlender, default */
+/*! exports provided: styler, symbolizer, AABlender, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "renderer", function() { return renderer; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AABlender", function() { return AABlender; });
 /* harmony import */ var _common_antialiasing_AntiAliasingShader__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common/antialiasing/AntiAliasingShader */ "./src/renderer/shaders/common/antialiasing/AntiAliasingShader.js");
-/* harmony import */ var _geometry_line_LineShader__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./geometry/line/LineShader */ "./src/renderer/shaders/geometry/line/LineShader.js");
-/* harmony import */ var _geometry_point_PointShader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./geometry/point/PointShader */ "./src/renderer/shaders/geometry/point/PointShader.js");
-/* harmony import */ var _geometry_triangle_TriangleShader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./geometry/triangle/TriangleShader */ "./src/renderer/shaders/geometry/triangle/TriangleShader.js");
-/* harmony import */ var _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./styler/stylerShaders */ "./src/renderer/shaders/styler/stylerShaders.js");
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "styler", function() { return _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_4__; });
-/* harmony import */ var _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./symbolizer/symbolizerShaders */ "./src/renderer/shaders/symbolizer/symbolizerShaders.js");
-/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "symbolizer", function() { return _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_5__; });
-
-
-
+/* harmony import */ var _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./styler/stylerShaders */ "./src/renderer/shaders/styler/stylerShaders.js");
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "styler", function() { return _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_1__; });
+/* harmony import */ var _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./symbolizer/symbolizerShaders */ "./src/renderer/shaders/symbolizer/symbolizerShaders.js");
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "symbolizer", function() { return _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_2__; });
 
 
 
 
 const AABlender = _common_antialiasing_AntiAliasingShader__WEBPACK_IMPORTED_MODULE_0__["default"];
 
-const renderer = {
-    createPointShader: gl => new _geometry_point_PointShader__WEBPACK_IMPORTED_MODULE_2__["default"](gl),
-    createTriShader: gl => new _geometry_triangle_TriangleShader__WEBPACK_IMPORTED_MODULE_3__["default"](gl),
-    createLineShader: gl => new _geometry_line_LineShader__WEBPACK_IMPORTED_MODULE_1__["default"](gl)
-};
-
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    renderer,
-    styler: _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_4__,
-    symbolizer: _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_5__,
+    styler: _styler_stylerShaders__WEBPACK_IMPORTED_MODULE_1__,
+    symbolizer: _symbolizer_symbolizerShaders__WEBPACK_IMPORTED_MODULE_2__,
     AABlender
 });
 
@@ -12906,7 +12939,7 @@ function compileShader (gl, template, expressions, viz) {
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }
-        return `texture2D(propertyTex${tid[name]}, featureID).a`;
+        return `texture2D(propertyTex${tid[name]}, abs(featureID)).a`;
     };
 
     let codes = {};
@@ -12939,6 +12972,10 @@ function compileShader (gl, template, expressions, viz) {
 
     shader.textureIds.set(viz, tid);
 
+    // For debugging purposes
+    shader._codes = codes;
+    shader._template = template;
+
     return shader;
 }
 
@@ -12952,7 +12989,7 @@ function compileShader (gl, template, expressions, viz) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "// From pixels in [0.,255.] to [0.,1.] in exponential-like form\nfloat encodeWidth(float x) {\n    if (x<16.){\n        x = x*4.;\n    }else if (x<80.){\n        x = (x-16.)+64.;\n    }else{\n        x = (x-80.)*0.5 + 128.;\n    }\n    return x / 255.;\n}\n\n$width_preface\n"
+module.exports = "vec2 encodeWidth(float x) {\n    float high, low;\n    x = clamp(x, 0., 1023.);\n    high = floor(x/4.);\n    low = (x-high*4.)/4.;\n    return vec2(high/255., low);\n}\n\n$width_preface\n"
 
 /***/ }),
 
@@ -12963,7 +13000,7 @@ module.exports = "// From pixels in [0.,255.] to [0.,1.] in exponential-like for
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nvarying vec2 uv;\n\n$style_preface\n$propertyPreface\n\nvoid main(void) {\n    vec2 featureID = uv;\n    gl_FragColor = $style_inline;\n}\n"
+module.exports = "precision highp float;\n\nvarying vec2 uv;\n\n$style_preface\n$propertyPreface\n\nvoid main(void) {\n    vec2 featureID = abs(uv);\n    gl_FragColor = $style_inline;\n}\n"
 
 /***/ }),
 
@@ -13006,7 +13043,7 @@ const filterShaderGLSL = {
 const widthShaderGLSL = {
     vertexShader: `${_stylerVertexShader_glsl__WEBPACK_IMPORTED_MODULE_2___default.a}`,
     fragmentShader: `${_stylerFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_1___default.a}`
-        .replace('$style_inline', 'vec4(encodeWidth($width_inline))')
+        .replace('$style_inline', 'vec4(encodeWidth($width_inline), vec2(0.))')
         .replace('$style_preface', `${_stylerEncodeWidth_glsl__WEBPACK_IMPORTED_MODULE_0___default.a}`)
 };
 
@@ -13031,7 +13068,7 @@ module.exports = "precision highp float;\nattribute vec2 vertex;\n\nvarying  vec
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\n\nuniform bool overrideColor;\n\n$symbol_preface\n$propertyPreface\n\nvoid main(void) {\n    vec2 featureID = featureIDVar;\n    vec2 imageUV = gl_PointCoord.xy;\n    vec4 symbolColor = $symbol_inline;\n\n    vec4 c;\n    if (overrideColor){\n        c = color * vec4(vec3(1), symbolColor.a);\n    }else{\n        c = symbolColor;\n    }\n\n    gl_FragColor = vec4(c.rgb*c.a, c.a);\n}\n"
+module.exports = "precision highp float;\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\nvarying highp vec2 pointCoord;\n\nuniform bool overrideColor;\n\n$symbol_preface\n$propertyPreface\n\nvoid main(void) {\n    vec2 featureID = abs(featureIDVar);\n    vec2 imageUV = pointCoord*0.5+vec2(0.5);\n    vec4 symbolColor = $symbol_inline;\n\n    vec4 c;\n    if (overrideColor){\n        c = color * vec4(vec3(1), symbolColor.a);\n    }else{\n        c = symbolColor;\n    }\n    if (imageUV!=clamp(imageUV, 0.,1.)){\n        c.a = 0.;\n    }\n\n    gl_FragColor = vec4(c.rgb*c.a, c.a);\n}\n"
 
 /***/ }),
 
@@ -13067,7 +13104,7 @@ const symbolShaderGLSL = {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform float devicePixelRatio;\nuniform vec2 resolution;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\n\n// From [0.,1.] in exponential-like form to pixels in [0.,255.]\nfloat decodeWidth(float x){\n    x*=255.;\n    if (x < 64.){\n        return x*0.25;\n    }else if (x<128.){\n        return (x-64.)+16.;\n    }else{\n        return (x-127.)*2.+80.;\n    }\n}\n\n$symbolPlacement_preface\n$propertyPreface\n\nvoid main(void) {\n    featureIDVar = featureID;\n    color = texture2D(colorTex, featureID);\n    float filtering = texture2D(filterTex, featureID).a;\n    color.a *= filtering;\n\n    float size = decodeWidth(texture2D(widthTex, featureID).a);\n    float fillSize = size;\n    if (size > 126.){\n        size = 126.;\n    }\n    gl_PointSize = size * devicePixelRatio;\n\n    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);\n    p.xy += ($symbolPlacement_inline)*gl_PointSize/resolution;\n    if (size==0. || color.a==0. || size<orderMinWidth || size>=orderMaxWidth){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform float devicePixelRatio;\nuniform vec2 resolution;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$symbolPlacement_preface\n$propertyPreface\n\nvoid main(void) {\n    featureIDVar = abs(featureID);\n    color = texture2D(colorTex, abs(featureID));\n    float filtering = texture2D(filterTex, abs(featureID)).a;\n    color.a *= filtering;\n\n    float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n    float fillSize = size;\n\n    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);\n    float sizeNormalizer = (size +2.)/size;\n    vec2 size2 = (2.*size+4.)*normalScale;\n\n    if (featureID.y<0.){\n        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += size2*vec2(0.866025, -0.5);\n    }else if (featureID.x<0.){\n        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += size2*vec2(-0.866025, -0.5);\n    }else{\n        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n        p.y += size2.y;\n    }\n    pointCoord.y = -pointCoord.y;\n\n    p.xy += ($symbolPlacement_inline)*size/resolution;\n    if (size==0. || color.a==0. || size<orderMinWidth || size>=orderMaxWidth){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -13157,19 +13194,20 @@ function createShaderFromTemplate (gl, glslTemplate, codes) {
 
     const shader = compileProgram(gl, vertexShader, fragmentShader);
 
-    shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
+    shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
+
     shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
     shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
-    shader.colorStrokeTexture = gl.getUniformLocation(shader.program, 'colorStrokeTex');
+    shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
     shader.widthTexture = gl.getUniformLocation(shader.program, 'widthTex');
     shader.orderMinWidth = gl.getUniformLocation(shader.program, 'orderMinWidth');
     shader.orderMaxWidth = gl.getUniformLocation(shader.program, 'orderMaxWidth');
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
-    shader.devicePixelRatio = gl.getUniformLocation(shader.program, 'devicePixelRatio');
+    shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     shader.overrideColor = gl.getUniformLocation(shader.program, 'overrideColor');
 
@@ -22644,7 +22682,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
@@ -22664,15 +22702,6 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             });
         }
         return properties;
-    }
-
-    _getCategoryIDFromString (category) {
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _getDataframeType (type) {
@@ -22706,7 +22735,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
     _allocGeometry () {
         if (this._type === 'Point') {
-            return new Float32Array(this._features.length * 2);
+            return new Float32Array(this._features.length * 6);
         }
         return [];
     }
@@ -22722,8 +22751,12 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);
-                geometries[2 * i + 0] = point.x;
-                geometries[2 * i + 1] = point.y;
+                geometries[6 * i + 0] = point.x;
+                geometries[6 * i + 1] = point.y;
+                geometries[6 * i + 2] = point.x;
+                geometries[6 * i + 3] = point.y;
+                geometries[6 * i + 4] = point.x;
+                geometries[6 * i + 5] = point.y;
             } else if (type === 'LineString') {
                 const line = this._computeLineStringGeometry(coordinates);
                 geometries.push([line]);
@@ -22942,12 +22975,42 @@ const MVT_TO_CARTO_TYPES = {
  * @api
  */
 
+/**
+ * An MVTMetadata object declares metadata information of a a carto.Source.
+ *
+ * @typedef {object} MVTMetadata
+ * @property {MVTProperty} properties - property names, types and optionally ranges
+ * @property {string} [idProperty='cartodb_id'] - property name of the property that should be used as ID
+ *
+ * @example <caption> Creating a MVTMetadata object</caption>
+ * const metadata = {
+        properties: {
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      };
+ *
+ * @api
+ */
+
+/**
+ * MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.
+ *
+ * @typedef {object} MVTProperty
+ * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
+ * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
+ * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
+ *
+ * @api
+ */
+
 class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
     /**
      * Create a carto.source.MVT.
      *
      * @param {object} data - A MVT data object
-     * @param {object} [metadata] - A carto.source.mvt.Metadata object
+     * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
      * @example
@@ -23027,7 +23090,7 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2));
+                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
             case geometryTypes.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_2__["decodeLines"]);
             case geometryTypes.POLYGON:
@@ -23069,8 +23132,12 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                geometries[2 * numFeatures + 0] = x;
-                geometries[2 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 0] = x;
+                geometries[6 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 2] = x;
+                geometries[6 * numFeatures + 3] = y;
+                geometries[6 * numFeatures + 4] = x;
+                geometries[6 * numFeatures + 5] = y;
             }
             if (f.properties[this._metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);
@@ -23526,7 +23593,7 @@ function perpendicular ([x, y]) {
  * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise
  */
 function getLineNormal (a, b) {
-    const u = normalize(vector(b, a));
+    const u = normalize(a[0] - b[0], a[1] - b[1]);
     return [-u[1], u[0]];
 }
 
@@ -23561,18 +23628,11 @@ function neg (v) {
 }
 
 /**
- * Create a vector which goes from p1 to p2
- */
-function vector (p1, p2) {
-    return [p2[0] - p1[0], p2[1] - p1[1]];
-}
-
-/**
  * Return the vector scaled to length 1
  */
-function normalize (v) {
-    const s = Math.hypot(v[0], v[1]);
-    return [v[0] / s, v[1] / s];
+function normalize (x, y) {
+    const s = Math.hypot(x, y);
+    return [x / s, y / s];
 }
 
 // Returns true if p is inside the triangle or on a triangle's edge, false otherwise
@@ -23633,7 +23693,6 @@ function pointInRectangle (point, bbox) {
     sub,
     dot,
     perpendicular,
-    normalize,
     getLineNormal,
     getJoinNormal,
     neg,
@@ -23651,7 +23710,7 @@ function pointInRectangle (point, bbox) {
 /*!***************************!*\
   !*** ./src/utils/util.js ***!
   \***************************/
-/*! exports provided: WM_R, WM_2R, projectToWebMercator, isUndefined, isString, isNumber, isObject, getFloat32ArrayFromArray, castDate, isSetsEqual, default */
+/*! exports provided: WM_R, WM_2R, projectToWebMercator, isUndefined, isString, isNumber, isObject, castDate, isSetsEqual, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23663,7 +23722,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNumber", function() { return isNumber; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getFloat32ArrayFromArray", function() { return getFloat32ArrayFromArray; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "castDate", function() { return castDate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSetsEqual", function() { return isSetsEqual; });
 /**
@@ -23698,15 +23756,6 @@ function isNumber (value) {
 function isObject (value) {
     const type = typeof value;
     return value !== null && (type === 'object' || type === 'function');
-}
-
-function getFloat32ArrayFromArray (array) {
-    const length = array.length;
-    const float32Array = new Float32Array(length);
-    for (let i = 0; i < length; i++) {
-        float32Array[i] = array[i];
-    }
-    return float32Array;
 }
 
 /**
