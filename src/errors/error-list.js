@@ -150,6 +150,10 @@ const validation = {
             messageRegex: /nonValidExpression\[(.+)\]$/,
             friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
         },
+        'stroke-join-number-required': {
+            messageRegex: /strokeJoinNumberRequired$/,
+            friendlyMessage: '`strokeJoin` must be a number.'
+        },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
             friendlyMessage: '`resolution` must be a number.'
