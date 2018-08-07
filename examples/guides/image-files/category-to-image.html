@@ -37,7 +37,7 @@
         const source = new carto.source.Dataset('table_311_complaints');
         // Add better styles
         const viz = new carto.Viz(`
-            symbol: ramp(buckets($complaint,['Car','Bus','Building']), imageList([car,bus,house]))
+            symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
             width: 30
         `);
         // Create the layer
