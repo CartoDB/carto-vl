@@ -40,7 +40,7 @@ void main(void) {
   float fillSize = size;
   float strokeSize = decodeWidth(texture2D(strokeWidthTex, abs(featureID)).rg);
   size += strokeSize;
-  fillScale = size / fillSize;
+  fillScale = min(size / fillSize, 1.);
   strokeScale = size / max(0.001, (fillSize - strokeSize));
   if (fillScale == strokeScale) {
     stroke.a = 0.;
