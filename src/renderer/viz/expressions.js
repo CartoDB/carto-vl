@@ -240,8 +240,6 @@ import GlobalPercentile from './expressions/aggregation/global/GlobalPercentile'
 
 import ViewportFeatures from './expressions/viewportFeatures';
 
-import XYZ from './expressions/xyz';
-
 import Zoom from './expressions/zoom';
 
 import Placement from './expressions/placement';
@@ -382,8 +380,6 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
-
-export const xyz = (...args) => new XYZ(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const placement = (...args) => new Placement(...args);
