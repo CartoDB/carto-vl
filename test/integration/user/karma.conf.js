@@ -1,5 +1,9 @@
 const webpackConfig = require('../../../webpack/webpack.min.config.js');
 
+// Disable bundle warnings
+webpackConfig.performance = webpackConfig.performance || {};
+webpackConfig.performance.hints = false;
+
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
