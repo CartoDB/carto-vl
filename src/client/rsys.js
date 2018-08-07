@@ -83,7 +83,7 @@ function tileRsys (x, y, z) {
  * @return {Array} - array of TC tiles {x, y, z}
  */
 export function rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {
-    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);
+    return wRectangleTiles(0, bounds);
 }
 
 /**

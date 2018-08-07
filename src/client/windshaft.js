@@ -338,7 +338,7 @@ export default class Windshaft {
         meta.datesAsNumbers = meta.dates_as_numbers;
         const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
-        const geomType = adaptGeometryType(stats.geometryType);
+        const geomType = 'point'; adaptGeometryType(stats.geometryType);
 
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {

@@ -167,7 +167,7 @@ export default class MVT extends Base {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
+                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(129 * 2 * 3));
             case geometryTypes.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
             case geometryTypes.POLYGON:
@@ -194,16 +194,17 @@ export default class MVT extends Base {
     _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {
         let numFeatures = 0;
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
-        for (let i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            this._checkType(f, metadata.geomType);
-            const geom = f.loadGeometry();
-            if (decodeFn) {
+        const f = mvtLayer.feature(0);
+        let geom = f.loadGeometry();
+
+        for (let i = 0; i < geom[0].length; i++) {
+            // this._checkType(f, metadata.geomType);
+            if (false) {
                 const decodedPolygons = decodeFn(geom, mvtExtent);
                 geometries.push(decodedPolygons);
             } else {
-                const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;
-                const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;
+                const x = 2 * (geom[0][i].x) / mvtExtent - 1.0;
+                const y = 2 * (1.0 - (geom[0][i].y) / mvtExtent) - 1.0;
                 // Tiles may contain points in the border;
                 // we'll avoid here duplicatend points between tiles by excluding the 1-edge
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
