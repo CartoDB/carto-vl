@@ -88,7 +88,7 @@ export default class Ramp extends BaseExpression {
         input = implicitCast(input);
         palette = implicitCast(palette);
 
-        if (palette.type === paletteTypes.IMAGE_ARRAY) {
+        if (palette && palette.type === paletteTypes.IMAGE_ARRAY) {
             palette = new ImageList(palette.elems);
         }
 
