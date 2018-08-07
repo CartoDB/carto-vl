@@ -6,6 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.6.2] - 2018-08-02
+### Added
+- Benchmark tests
+
+### Changed
+- Render points with triangles. Size up to 1024
+- Top refactor: new limit to 16 buckets
+- Improve line rendering
+
+### Fixed
+- Fix GeoJSON source categories
+- Fix spikes in lines triangulation
+- Fix GeoJSON precision computing centroid
+
 ## [0.6.0] - 2018-07-27
 ### Added
 - Enable E2E on CI with dockerized Windshaft
