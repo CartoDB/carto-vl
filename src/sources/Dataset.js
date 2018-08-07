@@ -19,6 +19,8 @@ export default class Dataset extends BaseWindshaft {
      * If your server is not hosted by CARTO you must add a third parameter that includes the serverURL. This can be done {@link carto.setDefaultConfig|setting the default config} in the carto object or providing a `config`
      * object with your serverURL.
      *
+     * The combination of different type of geometries on the same source is unsupported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
      * @param {string} tableName - The name of an existing table
      * @param {object} auth
      * @param {string} auth.apiKey - API key used to authenticate against CARTO

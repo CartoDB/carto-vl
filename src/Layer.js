@@ -42,7 +42,7 @@ import Viz from './Viz';
 * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
 *
 * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
+* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
 * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source.Base} source - The source of the data

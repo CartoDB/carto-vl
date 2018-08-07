@@ -90,6 +90,8 @@ export default class MVT extends Base {
      * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
+     * The combination of different type of geometries on the same source is unsupported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
      * new carto.source.MVT("https://{server}/{z}/{x}/{y}.mvt", metadata);
