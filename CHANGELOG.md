@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Optimize decodeLine and decodePolygon time (2x)
 - Use minified bundle for CI testing
 
+### Removed
+- Removed XYZ expression
+
 ## [0.6.2] - 2018-08-02
 ### Added
 - Benchmark tests
