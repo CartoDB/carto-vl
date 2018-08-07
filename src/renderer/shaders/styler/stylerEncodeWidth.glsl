@@ -1,13 +1,9 @@
-// From pixels in [0.,255.] to [0.,1.] in exponential-like form
-float encodeWidth(float x) {
-    if (x<16.){
-        x = x*4.;
-    }else if (x<80.){
-        x = (x-16.)+64.;
-    }else{
-        x = (x-80.)*0.5 + 128.;
-    }
-    return x / 255.;
+vec2 encodeWidth(float x) {
+    float high, low;
+    x = clamp(x, 0., 1023.);
+    high = floor(x/4.);
+    low = (x-high*4.)/4.;
+    return vec2(high/255., low);
 }
 
 $width_preface

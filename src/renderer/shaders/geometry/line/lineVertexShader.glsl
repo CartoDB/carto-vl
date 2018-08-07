@@ -14,33 +14,29 @@ uniform sampler2D filterTex;
 
 varying lowp vec4 color;
 
-// From [0.,1.] in exponential-like form to pixels in [0.,255.]
-float decodeWidth(float x){
-    float w;
-    if (x < 0.25098039215686274){ // x < 64/255
-        w = 63.75 * x; // 255 * 0.25
-    }else if (x < 0.5019607843137255){ // x < 128/255
-        w = x*255. -48.;
-    }else {
-        w = x*510. -174.;
-    }
-    return w;
+float decodeWidth(vec2 enc) {
+  return enc.x*(255.*4.) + 4.*enc.y;
 }
+
+$propertyPreface
+$offset_preface
 
 void main(void) {
     color = texture2D(colorTex, featureID);
     float filtering = texture2D(filterTex, featureID).a;
     color.a *= filtering;
     color.rgb *= color.a;
-    float size = decodeWidth(texture2D(widthTex, featureID).a);
+    float size = decodeWidth(texture2D(widthTex, featureID).rg);
 
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
     // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64
-    float z = mod(featureID.y, 1./64.)*63. + featureID.x / (64.);
+    float z = featureID.y * 63. / 64. + featureID.x / (64.);
+
     // Set z range (-1, 1)
     z = z * 2. - 1.;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
+    p.xy += normalScale*($offset_inline);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }

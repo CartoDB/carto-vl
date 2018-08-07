@@ -267,7 +267,7 @@ export default class GeoJSON extends Base {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._getCategoryIDFromString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
@@ -287,15 +287,6 @@ export default class GeoJSON extends Base {
             });
         }
         return properties;
-    }
-
-    _getCategoryIDFromString (category) {
-        if (this._categoryStringToIDMap[category] !== undefined) {
-            return this._categoryStringToIDMap[category];
-        }
-        this._categoryStringToIDMap[category] = this._numCategories;
-        this._numCategories++;
-        return this._categoryStringToIDMap[category];
     }
 
     _getDataframeType (type) {
@@ -329,7 +320,7 @@ export default class GeoJSON extends Base {
 
     _allocGeometry () {
         if (this._type === 'Point') {
-            return new Float32Array(this._features.length * 2);
+            return new Float32Array(this._features.length * 6);
         }
         return [];
     }
@@ -345,8 +336,12 @@ export default class GeoJSON extends Base {
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);
-                geometries[2 * i + 0] = point.x;
-                geometries[2 * i + 1] = point.y;
+                geometries[6 * i + 0] = point.x;
+                geometries[6 * i + 1] = point.y;
+                geometries[6 * i + 2] = point.x;
+                geometries[6 * i + 3] = point.y;
+                geometries[6 * i + 4] = point.x;
+                geometries[6 * i + 5] = point.y;
             } else if (type === 'LineString') {
                 const line = this._computeLineStringGeometry(coordinates);
                 geometries.push([line]);

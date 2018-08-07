@@ -52,20 +52,6 @@ layer2.addTo(map, 'background');
 layer1.addTo(map, 'background');
 layer3.addTo(map, 'background');
 
-layer1.on('loaded', () => {
-    if (!window.loaded) {
-        window.loaded = true;
-    }
-});
-
-layer2.on('loaded', () => {
-    if (!window.loaded) {
-        window.loaded = true;
-    }
-});
-
-layer3.on('loaded', () => {
-    if (!window.loaded) {
-        window.loaded = true;
-    }
+carto.on('loaded', [layer1, layer2, layer3], () => {
+    window.loaded = true;
 });

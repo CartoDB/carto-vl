@@ -19,6 +19,6 @@ export const filterShaderGLSL = {
 export const widthShaderGLSL = {
     vertexShader: `${stylerVertexShader}`,
     fragmentShader: `${stylerFragmentShader}`
-        .replace('$style_inline', 'vec4(encodeWidth($width_inline))')
+        .replace('$style_inline', 'vec4(encodeWidth($width_inline), vec2(0.))')
         .replace('$style_preface', `${stylerEncodeWidth}`)
 };
