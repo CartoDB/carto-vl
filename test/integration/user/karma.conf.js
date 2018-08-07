@@ -1,4 +1,4 @@
-const webpackConfig = require('../../../webpack/webpack.config.js');
+const webpackConfig = require('../../../webpack/webpack.min.config.js');
 
 module.exports = function (config) {
     config.set({
