@@ -1,4 +1,6 @@
-const webpackConfig = require('../../../webpack/webpack.min.config.js');
+const webpackConfig = process.env.MIN
+    ? require('../../../webpack/webpack.min.config.js')
+    : require('../../../webpack/webpack.config.js');
 
 // Disable bundle warnings
 webpackConfig.performance = webpackConfig.performance || {};
