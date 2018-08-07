@@ -76,7 +76,7 @@ viz.width.eval();  // 10
 
 **Properties** are a way to access your data. For **Windshaft** sources (`carto.Dataset`, `carto.SQL`) the properties represent the columns of the tables in the database. For **GeoJSON** sources (`carto.GeoJSON`) the properties are exactly the ones defined in the `properties` object for each feature.
 
-We use `$` notation followed by a column/property name to refer the property in the *String API*. The expression `s.prop('name')` can also be used to refer to properties in the *JavaScript API*.
+We use `$` notation followed by a column/property name to refer the property in the *String API*. We can also use the function `prop('name')` in case our property name contains spaces, for example `prop('city name')`. The expression `s.prop('name')` can also be used to refer to properties in the *JavaScript API*.
 
 These properties cannot be immediately evaluated, they have no global meaning, but they are evaluated for each feature. Therefore, expressions containing properties should be treated as declarations or templates that will be executed and evaluated for each feature with the specific feature data.
 
@@ -89,7 +89,7 @@ Suppose you have a dataset that contains all the `world_cities` as points. The t
 ```js
 const source = new carto.Dataset('world_cities');
 const viz = new carto.Viz(`
-  width: $density
+  width: $density  // Equivalent to prop('density')
 `);
 const layer = new carto.Layer(source, viz);
 ```
