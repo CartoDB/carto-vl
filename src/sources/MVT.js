@@ -72,7 +72,7 @@ const MVT_TO_CARTO_TYPES = {
  */
 
 /**
- * MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.
+ * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
  *
  * @typedef {object} MVTProperty
  * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
@@ -90,7 +90,7 @@ export default class MVT extends Base {
      * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
-     * The combination of different type of geometries on the same source is unsupported. Valid geometry types are `points`, `lines` and `polygons`.
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
      * @example
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])

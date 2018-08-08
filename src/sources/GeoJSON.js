@@ -15,7 +15,7 @@ export default class GeoJSON extends Base {
      * @param {object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
-     * The combination of different type of geometries on the same source is unsupported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.
      *
      * @example
      * const source = new carto.source.GeoJSON({
