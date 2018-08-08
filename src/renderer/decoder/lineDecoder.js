@@ -12,7 +12,7 @@ let geomBuffer = {
     normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
 };
 
-export function decodeLine (geometry) {
+export function decodeLine (geometry, options) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
@@ -24,7 +24,7 @@ export function decodeLine (geometry) {
             resizeBuffers(MAX_VERTICES_COORDINATES_PER_SEGMENT * feature[j].length);
 
             // Add line string
-            index = addLineString(feature[j], geomBuffer, index);
+            index = addLineString(feature[j], geomBuffer, index, options);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0

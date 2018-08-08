@@ -84,8 +84,6 @@ export default class Dataframe {
     }
 
     bind (renderer) {
-
-
         const gl = renderer.gl;
         this.renderer = renderer;
         const vertices = this.decodedGeom.vertices;

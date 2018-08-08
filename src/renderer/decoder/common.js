@@ -5,7 +5,8 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
  */
-export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
+export function addLineString (lineString, geomBuffer, index, options) {
+    options = options || {};
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
@@ -18,7 +19,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
         for (let i = 4; i <= lineString.length; i += 2) {
-            drawLine = !(skipCallback && skipCallback(i));
+            drawLine = !(options.skipCallback && options.skipCallback(i));
 
             if (drawLine) {
                 // First triangle
@@ -53,7 +54,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
             // If there is a next point, compute its properties
             if (i <= lineString.length - 2) {
                 nextPoint = [lineString[i], lineString[i + 1]];
-            } else if (isPolygon) {
+            } else if (options.isPolygon) {
                 nextPoint = [lineString[2], lineString[3]];
             }
 
@@ -76,7 +77,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                     // Mark vertex to be stroke in PolygonShader with the
                     // non-zero value 1e-37, so it validates the expression
                     // `normal != vec2(0.)` without affecting the vertex position.
-                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;
+                    geomBuffer.normals[index++] = options.isPolygon ? 1e-37 : 0;
                     geomBuffer.vertices[index] = currentPoint[0];
                     geomBuffer.normals[index++] = leftNormal[0];
                     geomBuffer.vertices[index] = currentPoint[1];
