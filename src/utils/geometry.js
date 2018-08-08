@@ -51,13 +51,20 @@ export function getJoinNormal (prevNormal, nextNormal) {
     const cos = v[0] * u[0] + v[1] * u[1];
     const factor = Math.abs(sin);
     const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg
-    return {
-        turnLeft: sin > 0,
-        joinNormal: miterJoin && neg([
-            (u[0] + v[0]) / factor,
-            (u[1] + v[1]) / factor
-        ])
-    };
+    return miterJoin && neg([
+        (u[0] + v[0]) / factor,
+        (u[1] + v[1]) / factor
+    ]);
+}
+
+/**
+ * Compute the sign of the normal of the join from the lines' normals.
+ */
+export function getJoinSign (prevNormal, nextNormal) {
+    const u = [prevNormal[1], -prevNormal[0]];
+    const v = [-nextNormal[1], nextNormal[0]];
+    const sin = v[0] * u[1] - v[1] * u[0];
+    return sin > 0;
 }
 
 /**
@@ -135,6 +142,7 @@ export default {
     perpendicular,
     getLineNormal,
     getJoinNormal,
+    getJoinSign,
     neg,
     halfPlaneSign,
     pointInTriangle,

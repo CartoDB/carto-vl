@@ -1,4 +1,9 @@
-import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
+import { getJoinNormal, getLineNormal, getJoinSign, neg } from '../../utils/geometry';
+
+const JOINS = {
+    MITER: 0,
+    BEVEL: 1
+};
 
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
@@ -10,6 +15,9 @@ export function addLineString (lineString, geomBuffer, index, options) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
+    let join = options.join || JOINS.MITER;
+    let isPolygon = options.isPolygon;
+    let skipCallback = options.skipCallback;
 
     // We need at least two points
     if (lineString.length >= 4) {
@@ -19,7 +27,7 @@ export function addLineString (lineString, geomBuffer, index, options) {
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
         for (let i = 4; i <= lineString.length; i += 2) {
-            drawLine = !(options.skipCallback && options.skipCallback(i));
+            drawLine = !(skipCallback && skipCallback(i));
 
             if (drawLine) {
                 // First triangle
@@ -54,7 +62,7 @@ export function addLineString (lineString, geomBuffer, index, options) {
             // If there is a next point, compute its properties
             if (i <= lineString.length - 2) {
                 nextPoint = [lineString[i], lineString[i + 1]];
-            } else if (options.isPolygon) {
+            } else if (isPolygon) {
                 nextPoint = [lineString[2], lineString[3]];
             }
 
@@ -63,9 +71,7 @@ export function addLineString (lineString, geomBuffer, index, options) {
 
                 if (drawLine) {
                     // `turnLeft` indicates that the nextLine turns to the left
-                    // `joinNormal` contains the direction and size for the `miter` vertex
-                    //  If this is not defined means that the join must be `bevel`.
-                    let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+                    let turnLeft = getJoinSign(prevNormal, nextNormal);
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
@@ -77,7 +83,7 @@ export function addLineString (lineString, geomBuffer, index, options) {
                     // Mark vertex to be stroke in PolygonShader with the
                     // non-zero value 1e-37, so it validates the expression
                     // `normal != vec2(0.)` without affecting the vertex position.
-                    geomBuffer.normals[index++] = options.isPolygon ? 1e-37 : 0;
+                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;
                     geomBuffer.vertices[index] = currentPoint[0];
                     geomBuffer.normals[index++] = leftNormal[0];
                     geomBuffer.vertices[index] = currentPoint[1];
@@ -87,20 +93,25 @@ export function addLineString (lineString, geomBuffer, index, options) {
                     geomBuffer.vertices[index] = currentPoint[1];
                     geomBuffer.normals[index++] = rightNormal[1];
 
-                    if (joinNormal) {
-                        // Forth triangle
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = joinNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = joinNormal[1];
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = rightNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = rightNormal[1];
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = leftNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = leftNormal[1];
+                    if (join === JOINS.MITER) {
+                        // `joinNormal` contains the direction and size for the `miter` vertex
+                        //  If this is not defined means that the join must be `bevel`.
+                        let joinNormal = getJoinNormal(prevNormal, nextNormal);
+                        if (joinNormal) {
+                            // Forth triangle
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = joinNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = joinNormal[1];
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = rightNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = rightNormal[1];
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = leftNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = leftNormal[1];
+                        }
                     }
                 }
             }

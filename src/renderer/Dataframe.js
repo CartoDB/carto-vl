@@ -72,7 +72,7 @@ export default class Dataframe {
 
     decodeGeom () {
         console.log('DECODE GEOM', this.renderer);
-        this.decodedGeom = decodeGeom(this.type, this.geom);
+        this.decodedGeom = decodeGeom(this.type, this.geom, { join: 0 });
         this.numVertex = this.type === 'point' ? this.size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.type === 'point' ? this.size : this.decodedGeom.breakpoints.length || this.numVertex;
 
