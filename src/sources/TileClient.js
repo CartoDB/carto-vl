@@ -17,9 +17,9 @@ export default class TileClient {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestData (zoom, viewport, responseToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
+    requestData (zoom, viewport, geomOptions, responseToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom);
-        this._getTiles(tiles, responseToDataframeTransformer);
+        this._getTiles(tiles, geomOptions, responseToDataframeTransformer);
     }
 
     free () {
@@ -28,7 +28,8 @@ export default class TileClient {
         this._oldDataframes = [];
     }
 
-    _getTiles (tiles, responseToDataframeTransformer) {
+    _getTiles (tiles, geomOptions, responseToDataframeTransformer) {
+        geomOptions = geomOptions || {};
         this._requestGroupID++;
         let completedTiles = [];
         let needToComplete = tiles.length;
@@ -36,6 +37,14 @@ export default class TileClient {
         tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
                 dataframe => {
+                    // Force decode geometry in dataframe if required
+                    if (dataframe.diffGeomOptions &&
+                        dataframe.diffGeomOptions(geomOptions)) {
+                        if (dataframe.type === 'line' ||
+                            dataframe.type === 'polygon') {
+                            dataframe.decodeGeom(geomOptions);
+                        }
+                    }
                     dataframe.orderID = x + y / 1000;
                     if (dataframe.empty) {
                         needToComplete--;

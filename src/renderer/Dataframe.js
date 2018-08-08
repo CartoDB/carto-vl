@@ -70,8 +70,15 @@ export default class Dataframe {
         this.freeObserver = freeObserver;
     }
 
+    diffGeomOptions (geomOptions) {
+        geomOptions = geomOptions || {};
+        return this._geomOptions.strokeJoin !== geomOptions.strokeJoin;
+    }
+
     decodeGeom (geomOptions) {
-        this.decodedGeom = decodeGeom(this.type, this.geom, geomOptions);
+        this._geomOptions = JSON.parse(JSON.stringify(geomOptions));
+
+        this.decodedGeom = decodeGeom(this.type, this.geom, this._geomOptions);
         this.numVertex = this.type === 'point' ? this.size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.type === 'point' ? this.size : this.decodedGeom.breakpoints.length || this.numVertex;
 
