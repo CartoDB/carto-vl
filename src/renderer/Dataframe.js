@@ -15,7 +15,7 @@ const AABBTestResults = {
 };
 
 export default class Dataframe {
-    constructor ({ center, scale, geom, properties, type, active, size, metadata, options }) {
+    constructor ({ center, scale, geom, properties, type, active, size, metadata, geomOptions }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
@@ -24,7 +24,7 @@ export default class Dataframe {
         this.type = type;
         this.size = size;
         this.metadata = metadata;
-        this.decodeGeom(options);
+        this.decodeGeom(geomOptions);
         this.propertyTex = [];
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
@@ -70,8 +70,8 @@ export default class Dataframe {
         this.freeObserver = freeObserver;
     }
 
-    decodeGeom (options) {
-        this.decodedGeom = decodeGeom(this.type, this.geom, options);
+    decodeGeom (geomOptions) {
+        this.decodedGeom = decodeGeom(this.type, this.geom, geomOptions);
         this.numVertex = this.type === 'point' ? this.size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = this.type === 'point' ? this.size : this.decodedGeom.breakpoints.length || this.numVertex;
 

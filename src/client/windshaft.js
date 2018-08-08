@@ -93,9 +93,9 @@ export default class Windshaft {
      * viewports. If viz changes getMetadata() should be called before requesting data
      * for the new viz.
      */
-    getData (zoom, viewport) {
+    getData (zoom, viewport, geomOptions) {
         if (this._mvtClient) {
-            return this._mvtClient.requestData(zoom, viewport);// FIXME extend
+            return this._mvtClient.requestData(zoom, viewport, geomOptions);// FIXME extend
         }
     }
 
