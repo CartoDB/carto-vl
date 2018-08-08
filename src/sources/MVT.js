@@ -86,15 +86,22 @@ export default class MVT extends Base {
     /**
      * Create a carto.source.MVT.
      *
-     * @param {object} data - A MVT data object
+     * @param {string | string[]} templateURL - A string with the URL template of the MVT tiles in https://mytileserver.com/{z}/{x}/{y}.mvt format or a list of such templates. Usage of a list of templates with different domains is recommended since that allows the browser to make more requests in parallel.
      * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
-     * @example
+     * @example Usage with multiple templateURLs as recommended
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
-     * new carto.source.MVT("https://{server}/{z}/{x}/{y}.mvt", metadata);
+     * new carto.source.MVT([
+     *                       "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
+     *                      ],
+     *                      metadata
+     *                     );
      *
      * @fires CartoError
      *
