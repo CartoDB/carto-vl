@@ -1,4 +1,4 @@
-import { number, category, array } from '../expressions';
+import { number, category, array, imageList } from '../expressions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -12,7 +12,11 @@ export function implicitCast (value) {
         return category(value);
     }
     if (Array.isArray(value)) {
-        return array(value);
+        const _array = array(value);
+        if (_array && _array.type === 'image-array') {
+            return imageList(_array.elems);
+        }
+        return _array;
     }
     return value;
 }

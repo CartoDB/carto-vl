@@ -14,8 +14,7 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image',
-    IMAGE_ARRAY: 'image-array'
+    IMAGE: 'image'
 };
 
 const rampTypes = {
@@ -87,10 +86,6 @@ export default class Ramp extends BaseExpression {
     constructor (input, palette) {
         input = implicitCast(input);
         palette = implicitCast(palette);
-
-        if (palette && palette.type === paletteTypes.IMAGE_ARRAY) {
-            palette = new ImageList(palette.elems);
-        }
 
         checkExpression('ramp', 'input', 0, input);
         checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
