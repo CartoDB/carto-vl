@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Removed
 - Removed XYZ expression
+- Remove imageList expression in favor of simple array []
 
 ## [0.6.2] - 2018-08-02
 ### Added

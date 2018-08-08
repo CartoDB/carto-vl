@@ -37,8 +37,8 @@
         const source = new carto.source.Dataset('table_311_complaints');
         // Add better styles
         const viz = new carto.Viz(`
-            symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
-            color: ramp(buckets($complaint,['Car','Bus','Building']),[purple,orange,blue])
+            symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
+            color: ramp(buckets($complaint,['Car','Bus','Building']), [purple,orange,blue])
             symbolPlacement: align_bottom
             width: 30
         `);

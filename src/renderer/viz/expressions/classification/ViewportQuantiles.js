@@ -23,7 +23,7 @@ import { viewportHistogram } from '../../expressions';
  * `);
  *
  * @memberof carto.expressions
- * @name quantiles
+ * @name viewportQuantiles
  * @function
  * @api
  */
