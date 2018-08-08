@@ -42,6 +42,24 @@ const SUPPORTED_PROPERTIES = [
     'variables'
 ];
 
+/**
+ * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
+ * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
+ * @typedef {object} VizSpec
+ * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+ * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+ * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+ * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+ * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
+ * @property {Image} symbol - show an image instead in the place of points
+ * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+ * @property {Placement} offset - offset to apply to the features in pixels
+ * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+ * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ * @property {object} variables - An object describing the variables used.
+ * @api
+ */
+
 export default class Viz {
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
@@ -70,7 +88,7 @@ export default class Viz {
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
@@ -429,24 +447,6 @@ export default class Viz {
     }
 
     _checkVizSpec (vizSpec) {
-        /**
-         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
-         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
-         * @typedef {object} VizSpec
-         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
-         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
-         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
-         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {Image} symbol - show an image instead in the place of points
-         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-         * @property {Placement} offset - offset to apply to the features in pixels
-         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
-         * @property {object} variables - An object describing the variables used.
-         * @api
-         */
-
         // TODO: Check expression types ie: color is not a number expression!
 
         // Apply implicit cast to numeric style properties
