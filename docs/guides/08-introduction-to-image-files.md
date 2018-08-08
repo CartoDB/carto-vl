@@ -32,7 +32,7 @@ You can match specific images to specific categories in your data with a categor
 The example below, assigns a unique image file to each unique `complaint` type:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
+symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
 ```
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/image-files/category-to-image.html)
@@ -46,7 +46,7 @@ The color of image markers can be customized with the `color` property.
 The example below uses the `color` property to override the image fill color from the default black, to `blue`:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
+symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
 color: blue
 ```
 
@@ -57,15 +57,15 @@ color: blue
 The example below colors each category's image with a unique color:
 
 ```js
-symbol: ramp(buckets($complaint,['Car','Bus','Building']),imageList([car,bus,house]))
-color: ramp(buckets($complaint,['Car','Bus','Building']),[purple,orange,blue])
+symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
+color: ramp(buckets($complaint,['Car','Bus','Building']), [purple,orange,blue])
 ```
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/image-files/color-category-image.html)
 
 ### Image placement
 
-The placement and alignment of image markers is controlled using the `symbolPlacement` property. By default, image markers are bottom-aligned meaning the marker arrow points to the original feature's location. 
+The placement and alignment of image markers is controlled using the `symbolPlacement` property. By default, image markers are bottom-aligned meaning the marker arrow points to the original feature's location.
 
 If that is not the desired placement, you can modify with the `symbolPlacement` property which accepts one of two default constants (`align_bottom` or `align_center`) or a placement expression.
 
@@ -73,7 +73,6 @@ If that is not the desired placement, you can modify with the `symbolPlacement` 
 symbolPlacement: align_bottom
 ```
 
-The example below aligns each symbol to the center: 
+The example below aligns each symbol to the center:
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/image-files/color-category-image.html)
-
