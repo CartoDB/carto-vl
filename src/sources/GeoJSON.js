@@ -74,9 +74,11 @@ export default class GeoJSON extends Base {
     requestData (zoom, viewport, geomOptions) {
         geomOptions = geomOptions || {};
         if (this._dataframe) {
-            if (geomOptions.forceDecodeGeom) {
-                const geomType = this._dataframe.type;
-                if (geomType === 'line' || geomType === 'polygon') {
+            // Force decode geometry in dataframe if required
+            if (this._dataframe.diffGeomOptions &&
+                this._dataframe.diffGeomOptions(geomOptions)) {
+                if (this._dataframe.type === 'line' ||
+                    this._dataframe.type === 'polygon') {
                     this._dataframe.decodeGeom(geomOptions);
                 }
             }
