@@ -45,7 +45,7 @@ const SUPPORTED_PROPERTIES = [
 export default class Viz {
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
-    * displayed and processed.
+    * displayed and processed. A Viz instance can only be bound to one layer.
     *
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
