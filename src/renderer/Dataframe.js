@@ -76,6 +76,7 @@ export default class Dataframe {
     }
 
     decodeGeom (geomOptions) {
+        geomOptions = geomOptions || {};
         this._geomOptions = JSON.parse(JSON.stringify(geomOptions));
 
         this.decodedGeom = decodeGeom(this.type, this.geom, this._geomOptions);
