@@ -195,7 +195,7 @@ export default class Layer {
         }
 
         this._source = source;
-        this.requestData();
+        this.requestData(viz);
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
@@ -293,14 +293,18 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData () {
+    async requestData (viz) {
         if (!this.metadata || !this._visible) {
             return;
         }
 
-        const forceDecodeGeom = true; // strokeJoin changed
+        viz = viz || this._viz;
+        let options = {
+            forceDecodeGeom: true, // strokeJoin changed
+            strokeJoin: viz.strokeJoin
+        };
 
-        this._source.requestData(this._getZoom(), this._getViewport(), forceDecodeGeom);
+        this._source.requestData(this._getZoom(), this._getViewport(), options);
         this._fireUpdateOnNextRender = true;
     }
 

@@ -15,9 +15,9 @@ export function addLineString (lineString, geomBuffer, index, options) {
     let prevPoint, currentPoint, nextPoint;
     let prevNormal, nextNormal;
     let drawLine;
-    let join = options.join || JOINS.MITER;
     let isPolygon = options.isPolygon;
     let skipCallback = options.skipCallback;
+    let join = options.strokeJoin || JOINS.MITER;
 
     // We need at least two points
     if (lineString.length >= 4) {

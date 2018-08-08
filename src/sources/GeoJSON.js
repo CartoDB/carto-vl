@@ -71,12 +71,13 @@ export default class GeoJSON extends Base {
         return Promise.resolve(this._computeMetadata(viz));
     }
 
-    requestData (zoom, viewport, forceDecodeGeom) {
+    requestData (zoom, viewport, options) {
+        options = options || {};
         if (this._dataframe) {
-            if (forceDecodeGeom) {
+            if (options.forceDecodeGeom) {
                 const geomType = this._getDataframeType(this._type);
                 if (geomType === 'line' || geomType === 'polygon') {
-                    this._dataframe.decodeGeom();
+                    this._dataframe.decodeGeom(options);
                 }
             }
             const newProperties = this._decodeUnboundProperties();
@@ -94,7 +95,8 @@ export default class GeoJSON extends Base {
             scale: 1,
             size: this._features.length,
             type: this._getDataframeType(this._type),
-            metadata: this._metadata
+            metadata: this._metadata,
+            options: options
         });
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;

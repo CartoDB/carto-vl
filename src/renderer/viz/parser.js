@@ -75,7 +75,7 @@ function parseVizNamedExpr (vizSpec, node) {
     }
     if (name.startsWith('__cartovl_variable_')) {
         vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (name === 'resolution') {
+    } else if (name === 'resolution' || name === 'strokeJoin') {
         const value = parseNode(node.right);
         vizSpec[name] = value;
     } else {
