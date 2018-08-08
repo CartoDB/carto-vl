@@ -298,7 +298,9 @@ export default class Layer {
             return;
         }
 
-        this._source.requestData(this._getZoom(), this._getViewport());
+        const forceDecodeGeom = true; // strokeJoin changed
+
+        this._source.requestData(this._getZoom(), this._getViewport(), forceDecodeGeom);
         this._fireUpdateOnNextRender = true;
     }
 

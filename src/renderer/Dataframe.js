@@ -22,11 +22,10 @@ export default class Dataframe {
         this.properties = properties;
         this.scale = scale;
         this.type = type;
-        this.decodedGeom = decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
-        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
-        this.propertyTex = [];
+        this.size = size;
         this.metadata = metadata;
+        this.decodeGeom();
+        this.propertyTex = [];
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
         this._aabb = this._computeAABB(geom, type);
@@ -69,6 +68,19 @@ export default class Dataframe {
 
     setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
+    }
+
+    decodeGeom () {
+        console.log('DECODE GEOM', this.renderer);
+        this.decodedGeom = decodeGeom(this.type, this.geom);
+        this.numVertex = this.type === 'point' ? this.size * 3 : this.decodedGeom.vertices.length / 2;
+        this.numFeatures = this.type === 'point' ? this.size : this.decodedGeom.breakpoints.length || this.numVertex;
+
+        if (this.renderer) {
+            // If the dataframe was previously bound,
+            // bind again with the new decoded geomatry.
+            this.bind(this.renderer);
+        }
     }
 
     bind (renderer) {
