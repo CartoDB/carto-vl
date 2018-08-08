@@ -91,6 +91,10 @@ export default class Layer {
         this._isLoaded = false;
         this._visible = true;
         this._fireUpdateOnNextRender = false;
+        this._geomOptions = {
+            forceDecodeGeom: false,
+            strokeJoin: viz.strokeJoin
+        };
 
         this.update(source, viz);
     }
@@ -195,7 +199,7 @@ export default class Layer {
         }
 
         this._source = source;
-        this.requestData(viz);
+        this.requestData();
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
@@ -293,19 +297,16 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData (viz) {
+    async requestData () {
         if (!this.metadata || !this._visible) {
             return;
         }
 
-        viz = viz || this._viz;
-        let options = {
-            forceDecodeGeom: true, // strokeJoin changed
-            strokeJoin: viz.strokeJoin
-        };
-
-        this._source.requestData(this._getZoom(), this._getViewport(), options);
+        this._source.requestData(this._getZoom(), this._getViewport(), this._geomOptions);
         this._fireUpdateOnNextRender = true;
+
+        // Reset force decoding for new requests
+        this._geomOptions.forceDecodeGeom = false;
     }
 
     hasDataframes () {
@@ -478,6 +479,13 @@ export default class Layer {
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
+
+        // Setup decode options
+        // - forceDecodeGeom: flag to re decode if strokeJoin has changed
+        // - strokeJoin: current value of stroke join
+        this._geomOptions.forceDecodeGeom = this._geomOptions.strokeJoin !== viz.strokeJoin;
+        this._geomOptions.strokeJoin = viz.strokeJoin;
+
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
         this._integrator.needRefresh();
