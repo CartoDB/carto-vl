@@ -55,7 +55,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
  * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
  * @property {number} strokeJoin - stroke join of lines and polygons
- * @property {number} strokeCap - stroke cap of lines and polygons
+ * @property {number} strokeCap - stroke cap of lines
  * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
  * @property {Image} symbol - show an image instead in the place of points
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
@@ -95,7 +95,7 @@ export default class Viz {
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {number} strokeJoin - stroke join of lines and polygons
-    * @property {number} strokeCap - stroke cap of lines and polygons
+    * @property {number} strokeCap - stroke cap of lines
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
