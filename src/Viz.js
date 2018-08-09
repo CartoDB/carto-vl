@@ -139,7 +139,7 @@ export default class Viz {
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (!(propertyName in ['resolution', 'strokeJoin', 'strokeCap'])) {
+                if (!['resolution', 'strokeJoin', 'strokeCap'].includes(propertyName)) {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;

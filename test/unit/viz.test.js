@@ -6,7 +6,8 @@ const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_WIDTH_EXPRESSION = s.number(1);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
-const DEFAULT_STROKE_JOIN = 0;
+const DEFAULT_STROKE_JOIN = s.joins.MITER;
+const DEFAULT_STROKE_CAP = s.caps.BUTT;
 const DEFAULT_FILTER_EXPRESSION = s.constant(1);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();
 const DEFAULT_RESOLUTION = 1;
@@ -25,6 +26,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeJoin).toEqual(DEFAULT_STROKE_JOIN);
+                expect(actual.strokeCap).toEqual(DEFAULT_STROKE_CAP);
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
@@ -39,6 +41,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeJoin).toEqual(DEFAULT_STROKE_JOIN);
+                expect(actual.strokeCap).toEqual(DEFAULT_STROKE_CAP);
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
@@ -51,6 +54,7 @@ describe('api/viz', () => {
                     strokeColor: s.rgba(0, 0, 255, 1),
                     strokeWidth: s.number(15),
                     strokeJoin: s.joins.BEVEL,
+                    strokeCap: s.caps.SQUARE,
                     filter: s.number(0.5),
                     order: s.asc(s.width()),
                     resolution: 2
@@ -63,6 +67,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.strokeJoin).toEqual(s.joins.BEVEL);
+                expect(actual.strokeCap).toEqual(s.caps.SQUARE);
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
                 expect(actual.resolution).toEqual(2);
@@ -159,6 +164,15 @@ describe('api/viz', () => {
                 }).toThrowError('`strokeJoin` parameter has a non valid Enum value.');
             });
 
+            it('should throw an error when strokeCap has a non valid enum value', () => {
+                const vizSpec = {
+                    strokeCap: 3 // wrong Enum value!
+                };
+                expect(function () {
+                    new Viz(vizSpec);
+                }).toThrowError('`strokeCap` parameter has a non valid Enum value.');
+            });
+
             it('should throw an error when order has a non valid expression', () => {
                 const vizSpec = {
                     order: 10 // wrong type!
@@ -186,6 +200,7 @@ describe('api/viz', () => {
                     strokeColor: rgba(0, 0, 255, 1)
                     strokeWidth: number(15)
                     strokeJoin: BEVEL
+                    strokeCap: SQUARE
                     filter: 0.5
                     order: asc(width())
                     resolution: 1
@@ -198,6 +213,7 @@ describe('api/viz', () => {
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.strokeJoin).toEqual(s.joins.BEVEL);
+                expect(actual.strokeCap).toEqual(s.caps.SQUARE);
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
                 expect(actual.resolution).toEqual(1);
