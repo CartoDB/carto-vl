@@ -5,6 +5,11 @@ const JOINS = {
     BEVEL: 1
 };
 
+const CAPS = {
+    BUTT: 0,
+    SQUARE: 1
+};
+
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
@@ -13,11 +18,13 @@ const JOINS = {
 export function addLineString (lineString, geomBuffer, index, options) {
     options = options || {};
     let prevPoint, currentPoint, nextPoint;
+    let prevPointer, currentPointer;
     let prevNormal, nextNormal;
     let drawLine;
     let isPolygon = options.isPolygon;
     let skipCallback = options.skipCallback;
     let join = options.strokeJoin || JOINS.MITER;
+    let cap = options.strokeCap || CAPS.BUTT;
 
     // We need at least two points
     if (lineString.length >= 4) {
@@ -29,34 +36,47 @@ export function addLineString (lineString, geomBuffer, index, options) {
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
+            // Compute line vector for square caps
+            if (!isPolygon && (cap === CAPS.SQUARE)) {
+                // First endpoint
+                prevPointer = (i === 4)
+                    ? [prevNormal[1], -prevNormal[0]]
+                    : [0, 0];
+
+                // Last endpoint
+                currentPointer = (i === lineString.length)
+                    ? [-prevNormal[1], prevNormal[0]]
+                    : [0, 0];
+            }
+
             if (drawLine) {
                 // First triangle
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + currentPointer[1];
 
                 // Second triangle
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + currentPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + currentPointer[1];
             }
 
             // If there is a next point, compute its properties

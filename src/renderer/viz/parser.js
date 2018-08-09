@@ -45,6 +45,9 @@ lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
 lowerCaseFunctions.miter = functions.joins.MITER;
 lowerCaseFunctions.bevel = functions.joins.BEVEL;
 
+lowerCaseFunctions.butt = functions.caps.BUTT;
+lowerCaseFunctions.square = functions.caps.SQUARE;
+
 export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
@@ -78,7 +81,7 @@ function parseVizNamedExpr (vizSpec, node) {
     }
     if (name.startsWith('__cartovl_variable_')) {
         vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (name === 'resolution' || name === 'strokeJoin') {
+    } else if (['resolution', 'strokeJoin', 'strokeCap'].includes(name)) {
         const value = parseNode(node.right);
         vizSpec[name] = value;
     } else {

@@ -92,7 +92,8 @@ export default class Layer {
         this._visible = true;
         this._fireUpdateOnNextRender = false;
         this._geomOptions = {
-            strokeJoin: viz.strokeJoin
+            strokeJoin: viz.strokeJoin,
+            strokeCap: viz.strokeCap
         };
 
         this.update(source, viz);
@@ -478,6 +479,7 @@ export default class Layer {
 
         // Setup geometry options
         this._geomOptions.strokeJoin = viz.strokeJoin;
+        this._geomOptions.strokeCap = viz.strokeCap;
 
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
