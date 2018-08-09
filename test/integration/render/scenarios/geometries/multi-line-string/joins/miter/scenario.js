@@ -4,7 +4,11 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['line-joins']);
-const style = new carto.Viz('width: 20');
+const s = carto.expressions;
+const style = new carto.Viz({
+    width: 20,
+    strokeJoin: s.joins.MITER
+});
 const layer = new carto.Layer('layer', source, style);
 
 layer.addTo(map);
