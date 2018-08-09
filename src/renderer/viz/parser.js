@@ -70,23 +70,28 @@ export function parseVizDefinition (str) {
 
 function parseVizNamedExpr (vizSpec, node) {
     if (node.operator !== ':') {
-        throw new Error('Invalid syntax');
+        throw new Error('Invalid syntax.');
     }
     if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
-    const name = node.left.name;
+    let name = node.left.name;
     if (!name) {
-        throw new Error('Invalid syntax');
+        throw new Error('Invalid syntax.');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (['resolution', 'strokeJoin', 'strokeCap'].includes(name)) {
-        const value = parseNode(node.right);
-        vizSpec[name] = value;
+        name = node.left.name.substr('__cartovl_variable_'.length);
+        if (name in vizSpec.variables) {
+            throw new Error(`Variable '${name}' is already defined.`);
+        }
+        vizSpec.variables[name] = implicitCast(parseNode(node.right));
     } else {
+        if (name in vizSpec) {
+            throw new Error(`Property '${name}' is already defined.`);
+        }
         const value = parseNode(node.right);
-        vizSpec[name] = implicitCast(value);
+        const avoidCast = ['resolution', 'strokeJoin', 'strokeCap'].includes(name);
+        vizSpec[name] = avoidCast ? value : implicitCast(value);
     }
 }
 
@@ -101,7 +106,7 @@ function parseFunctionCall (node) {
     if (lowerCaseFunctions[name]) {
         return lowerCaseFunctions[name](...args);
     }
-    throw new Error(`Invalid function name '${node.callee.name}'`);
+    throw new Error(`Invalid function name '${node.callee.name}'.`);
 }
 
 function parseBinaryOperation (node) {
@@ -136,8 +141,12 @@ function parseBinaryOperation (node) {
             return functions.and(left, right);
         case 'or':
             return functions.or(left, right);
+        case 'in':
+            return functions.in(left, right);
+        case 'nin':
+            return functions.nin(left, right);
         default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
+            throw new Error(`Invalid binary operator '${node.operator}'.`);
     }
 }
 
@@ -148,7 +157,7 @@ function parseUnaryOperation (node) {
         case '+':
             return parseNode(node.argument);
         default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
+            throw new Error(`Invalid unary operator '${node.operator}'.`);
     }
 }
 
@@ -169,7 +178,7 @@ function parseIdentifier (node) {
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
     } else {
-        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
     }
 }
 
@@ -187,7 +196,7 @@ function parseNode (node) {
     } else if (node.type === 'Identifier') {
         return parseIdentifier(node);
     }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
 }
 
 function prepareJsep () {
@@ -196,6 +205,8 @@ function prepareJsep () {
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addBinaryOp('in', 13);
+    jsep.addBinaryOp('nin', 13);
     jsep.addIdentifierChar('@');
     jsep.addIdentifierChar('#');
     jsep.removeLiteral('true');
@@ -203,6 +214,8 @@ function prepareJsep () {
 }
 
 function cleanJsep () {
+    jsep.removeBinaryOp('in');
+    jsep.removeBinaryOp('nin');
     jsep.removeBinaryOp('and');
     jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
