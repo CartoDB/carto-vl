@@ -150,9 +150,9 @@ const validation = {
             messageRegex: /nonValidExpression\[(.+)\]$/,
             friendlyMessage: '`$0` parameter has a non valid Expression.'
         },
-        'stroke-join-enum-required': {
-            messageRegex: /strokeJoinEnumRequired$/,
-            friendlyMessage: '`strokeJoin` must be a valid Enum value.'
+        'non-valid-enum-required': {
+            messageRegex: /nonValidEnum\[(.+)\]$/,
+            friendlyMessage: '`$0` parameter has a non valid Enum value.'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
