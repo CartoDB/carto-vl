@@ -78,7 +78,7 @@ describe('src/renderer/viz/parser', () => {
             expect(() => parseVizDefinition(`
                 width: 1
                 width: 2
-            `)).toThrowError('Property \'width\' is already defined');
+            `)).toThrowError('Property \'width\' is already defined.');
         });
     });
 
@@ -87,7 +87,7 @@ describe('src/renderer/viz/parser', () => {
             expect(() => parseVizDefinition(`
                 @a: 1
                 @a: 2
-            `)).toThrowError('Variable \'a\' is already defined');
+            `)).toThrowError('Variable \'a\' is already defined.');
         });
     });
 
