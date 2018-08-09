@@ -16,7 +16,7 @@ import BaseExpression from './base';
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: in($type, ['metropolis', 'capital'])
+ *   filter: $type in ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
@@ -48,7 +48,7 @@ function IN_INLINE_MAKER (list) {
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: nin($type, ['metropolis', 'capital'])
+ *   filter: $type nin ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
