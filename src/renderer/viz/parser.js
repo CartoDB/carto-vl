@@ -130,6 +130,10 @@ function parseBinaryOperation (node) {
             return functions.and(left, right);
         case 'or':
             return functions.or(left, right);
+        case 'in':
+            return functions.in(left, right);
+        case 'nin':
+            return functions.nin(left, right);
         default:
             throw new Error(`Invalid binary operator '${node.operator}'`);
     }
@@ -190,6 +194,8 @@ function prepareJsep () {
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addBinaryOp('in', 13);
+    jsep.addBinaryOp('nin', 13);
     jsep.addIdentifierChar('@');
     jsep.addIdentifierChar('#');
     jsep.removeLiteral('true');
@@ -197,6 +203,8 @@ function prepareJsep () {
 }
 
 function cleanJsep () {
+    jsep.removeBinaryOp('in');
+    jsep.removeBinaryOp('nin');
     jsep.removeBinaryOp('and');
     jsep.removeBinaryOp('or');
     jsep.removeBinaryOp('^');
