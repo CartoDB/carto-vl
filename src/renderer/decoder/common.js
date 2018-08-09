@@ -36,17 +36,19 @@ export function addLineString (lineString, geomBuffer, index, options) {
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
+            prevPointer = [0, 0];
+            currentPointer = [0, 0];
+
             // Compute line vector for square caps
             if (!isPolygon && (cap === CAPS.SQUARE)) {
                 // First endpoint
-                prevPointer = (i === 4)
-                    ? [prevNormal[1], -prevNormal[0]]
-                    : [0, 0];
-
+                if (i === 4) {
+                    prevPointer = [prevNormal[1], -prevNormal[0]];
+                }
                 // Last endpoint
-                currentPointer = (i === lineString.length)
-                    ? [-prevNormal[1], prevNormal[0]]
-                    : [0, 0];
+                if (i === lineString.length) {
+                    currentPointer = [-prevNormal[1], prevNormal[0]];
+                }
             }
 
             if (drawLine) {
