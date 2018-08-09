@@ -33,14 +33,15 @@ const viz = new carto.Viz({
 
 The supported style properties are:
 
-| **Style property** | **Expression type** | **Description**              | **Geometries**          |
-|--------------------|---------------------|------------------------------|-------------------------|
-| `color`            | *Color*             | fill color                   | points, lines, polygons |
-| `width`            | *Number*            | diameter / width             | points, lines           |
-| `strokeColor`      | *Color*             | color of the stroke          | points, polygons        |
-| `strokeWidth`      | *Number*            | width of the stroke          | points, polygons        |
-| `filter`           | *Number*            | delete mismatched elements   | points, lines, polygons |
-| `resolution`       | *Number*            | size of the aggregation cell | points                  |
+| **Style property** | **Expression type** | **Description**                | **Geometries**          |
+|--------------------|---------------------|--------------------------------|-------------------------|
+| `color`            | *Color*             | fill color                     | points, lines, polygons |
+| `width`            | *Number*            | diameter / width               | points, lines           |
+| `strokeColor`      | *Color*             | color of the stroke            | points, polygons        |
+| `strokeWidth`      | *Number*            | width of the stroke            | points, polygons        |
+| `strokeJoin`       | *number*            | type of stroke joins (s.joins) | lines, polygons         |
+| `filter`           | *Number*            | delete mismatched elements     | points, lines, polygons |
+| `resolution`       | *number*            | size of the aggregation cell   | points                  |
 
 #### Example
 
