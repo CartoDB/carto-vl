@@ -484,8 +484,8 @@ export default class Viz {
         if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
         }
-        if (!util.isNumber(vizSpec.strokeJoin)) {
-            throw new CartoValidationError('viz', 'strokeJoinNumberRequired');
+        if (!(vizSpec.strokeJoin in Object.values(s.joins))) {
+            throw new CartoValidationError('viz', 'nonValidEnum[strokeJoin]');
         }
         if (!(vizSpec.order instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[order]');

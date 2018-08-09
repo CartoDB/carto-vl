@@ -42,6 +42,9 @@ lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
 lowerCaseFunctions.triangle = functions.TRIANGLE;
 lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
 
+lowerCaseFunctions.miter = functions.joins.MITER;
+lowerCaseFunctions.bevel = functions.joins.BEVEL;
+
 export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
@@ -156,9 +159,9 @@ function parseIdentifier (node) {
         return new Hex(node.name);
     } else if (node.name[0] === '$') {
         return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toUpperCase()]) {
+    } else if (node.name.toUpperCase() in functions.palettes) {
         return functions.palettes[node.name.toUpperCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+    } else if (node.name.toLowerCase() in lowerCaseFunctions) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());

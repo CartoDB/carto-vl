@@ -148,11 +148,11 @@ const validation = {
         },
         'non-valid-expression': {
             messageRegex: /nonValidExpression\[(.+)\]$/,
-            friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
+            friendlyMessage: '`$0` parameter has a non valid Expression.'
         },
-        'stroke-join-number-required': {
-            messageRegex: /strokeJoinNumberRequired$/,
-            friendlyMessage: '`strokeJoin` must be a number.'
+        'stroke-join-enum-required': {
+            messageRegex: /strokeJoinEnumRequired$/,
+            friendlyMessage: '`strokeJoin` must be a valid Enum value.'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,
