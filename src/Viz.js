@@ -18,7 +18,8 @@ const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
 const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
-const DEFAULT_STROKE_JOIN = () => 0;
+const DEFAULT_STROKE_JOIN = () => s.joins.MITER;
+const DEFAULT_STROKE_CAP = () => s.caps.BUTT;
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(s.FALSE);
@@ -35,6 +36,7 @@ const SUPPORTED_PROPERTIES = [
     'strokeColor',
     'strokeWidth',
     'strokeJoin',
+    'strokeCap',
     'order',
     'filter',
     'symbol',
@@ -52,6 +54,8 @@ const SUPPORTED_PROPERTIES = [
  * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
  * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
  * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+ * @property {number} strokeJoin - stroke join of lines and polygons
+ * @property {number} strokeCap - stroke cap of lines and polygons
  * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
  * @property {Image} symbol - show an image instead in the place of points
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
@@ -90,7 +94,8 @@ export default class Viz {
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {number} strokeJoin - stroke join of points and polygons, applicable to lines
+    * @property {number} strokeJoin - stroke join of lines and polygons
+    * @property {number} strokeCap - stroke cap of lines and polygons
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
@@ -134,7 +139,7 @@ export default class Viz {
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (propertyName !== 'resolution' && propertyName !== 'strokeJoin') {
+                if (!(propertyName in ['resolution', 'strokeJoin', 'strokeCap'])) {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
@@ -430,6 +435,9 @@ export default class Viz {
         if (util.isUndefined(vizSpec.strokeJoin)) {
             vizSpec.strokeJoin = DEFAULT_STROKE_JOIN();
         }
+        if (util.isUndefined(vizSpec.strokeCap)) {
+            vizSpec.strokeCap = DEFAULT_STROKE_CAP();
+        }
         if (util.isUndefined(vizSpec.order)) {
             vizSpec.order = DEFAULT_ORDER_EXPRESSION();
         }
@@ -486,6 +494,9 @@ export default class Viz {
         }
         if (!(vizSpec.strokeJoin in Object.values(s.joins))) {
             throw new CartoValidationError('viz', 'nonValidEnum[strokeJoin]');
+        }
+        if (!(vizSpec.strokeCap in Object.values(s.caps))) {
+            throw new CartoValidationError('viz', 'nonValidEnum[strokeCap]');
         }
         if (!(vizSpec.order instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[order]');
