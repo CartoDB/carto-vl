@@ -75,12 +75,12 @@ function parseVizNamedExpr (vizSpec, node) {
     }
     if (name.startsWith('__cartovl_variable_')) {
         vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (name === 'resolution') {
-        const value = parseNode(node.right);
-        vizSpec[name] = value;
     } else {
         const value = parseNode(node.right);
-        vizSpec[name] = implicitCast(value);
+        if (name in vizSpec) {
+            throw new Error(`Property '${name}' is already defined`);
+        }
+        vizSpec[name] = (name === 'resolution') ? value : implicitCast(value);
     }
 }
 
