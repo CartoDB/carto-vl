@@ -69,17 +69,21 @@ function parseVizNamedExpr (vizSpec, node) {
     if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
-    const name = node.left.name;
+    let name = node.left.name;
     if (!name) {
         throw new Error('Invalid syntax');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
+        name = node.left.name.substr('__cartovl_variable_'.length);
+        if (name in vizSpec.variables) {
+            throw new Error(`Variable '${name}' is already defined`);
+        }
+        vizSpec.variables[name] = implicitCast(parseNode(node.right));
     } else {
-        const value = parseNode(node.right);
         if (name in vizSpec) {
             throw new Error(`Property '${name}' is already defined`);
         }
+        const value = parseNode(node.right);
         vizSpec[name] = (name === 'resolution') ? value : implicitCast(value);
     }
 }
