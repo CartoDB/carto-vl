@@ -73,6 +73,24 @@ describe('src/renderer/viz/parser', () => {
         });
     });
 
+    describe('duplicated properties', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                width: 1
+                width: 2
+            `)).toThrowError('Property \'width\' is already defined.');
+        });
+    });
+
+    describe('duplicated variables', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                @a: 1
+                @a: 2
+            `)).toThrowError('Variable \'a\' is already defined.');
+        });
+    });
+
     describe('built in images', () => {
         it('should be defined', () => {
             const str = `
