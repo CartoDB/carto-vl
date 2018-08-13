@@ -1,4 +1,6 @@
-import { layerVisibility } from '../constants/layer';
+import {
+    layerVisibility
+} from '../constants/layer';
 /**
  * @description A simple non-interactive map.
  */
@@ -34,7 +36,7 @@ export default class Map {
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
-
+        this._firstUpdate = true;
         this._resizeCanvas(this._containerDimensions());
     }
 
@@ -53,7 +55,13 @@ export default class Map {
         if (this.lastFrame === timestamp) {
             return;
         }
+
         this.lastFrame = timestamp;
+
+        if (this._firstUpdate) {
+            this._firstUpdate = false;
+            this.update();
+        }
 
         this._drawBackground(this._background);
 
@@ -122,7 +130,7 @@ export default class Map {
                 this._gl.clear(this._gl.COLOR_BUFFER_BIT);
                 break;
             default:
-            // white
+                // white
         }
     }
 
