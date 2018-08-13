@@ -205,7 +205,6 @@ export default class Base {
         blender.notify();
     }
 
-    // returns a list with the expression children
     _getChildren () {
         return this.childrenNames.map(name => this[name]);
     }
