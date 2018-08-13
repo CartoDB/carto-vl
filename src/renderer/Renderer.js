@@ -1,6 +1,5 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
-import { getFloat32ArrayFromArray } from '../utils/util';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -70,12 +69,12 @@ export default class Renderer {
         // Use a "big" triangle instead of a square for performance and simplicity
         this.bigTriangleVBO = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
-        const vertices = [
+        const vertices = new Float32Array([
             10.0, -10.0,
             0.0, 10.0,
             -10.0, -10.0
-        ];
-        gl.bufferData(gl.ARRAY_BUFFER, getFloat32ArrayFromArray(vertices), gl.STATIC_DRAW);
+        ]);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
         // Create a 1x1 RGBA texture set to [0,0,0,0]
         // Needed because sometimes we don't really use some textures within the shader, but they are declared anyway.
@@ -313,6 +312,11 @@ export default class Renderer {
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
                 gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._AATex, 0);
 
+                const renderbuffer = gl.createRenderbuffer();
+                gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+                gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, w * antialiasingScale, h * antialiasingScale);
+                gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+
                 [this._width, this._height] = [w, h];
             }
             gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
@@ -323,21 +327,29 @@ export default class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
+        if (tiles[0].type === 'line' || tiles[0].type === 'polygon') {
+            gl.clearDepth(1);
+            gl.depthRange(0, 1);
+            gl.depthFunc(gl.NOTEQUAL);
+            gl.depthMask(true);
+            gl.enable(gl.DEPTH_TEST);
+        }
+
         const renderDrawPass = orderingIndex => tiles.forEach(tile => {
             let freeTexUnit = 0;
             let renderer = null;
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 renderer = viz.symbolShader;
             } else if (tile.type === 'point') {
-                renderer = this.finalRendererProgram;
+                renderer = viz.pointShader;
             } else if (tile.type === 'line') {
-                renderer = this.lineRendererProgram;
+                renderer = viz.lineShader;
             } else {
-                renderer = this.triRendererProgram;
+                renderer = viz.polygonShader;
             }
             gl.useProgram(renderer.program);
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
             }
 
@@ -351,11 +363,7 @@ export default class Renderer {
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
                 (scale / aspect) * (this._center.x - tile.center.x),
                 scale * (this._center.y - tile.center.y));
-            if (tile.type === 'line' || tile.type === 'polygon') {
-                gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-            } else if (tile.type === 'point') {
-                gl.uniform1f(renderer.devicePixelRatio, window.devicePixelRatio || 1);
-            }
+            gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
 
             tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
 
@@ -390,7 +398,7 @@ export default class Renderer {
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
-            if (!viz.symbol._default) {
+            if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
@@ -414,7 +422,7 @@ export default class Renderer {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
-                gl.uniform1i(renderer.colorStrokeTexture, freeTexUnit);
+                gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
                 freeTexUnit++;
 
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -423,12 +431,36 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            gl.drawArrays(tile.type === 'point' ? gl.POINTS : gl.TRIANGLES, 0, tile.numVertex);
+            if (tile.type === 'line' || tile.type === 'polygon') {
+                gl.clear(gl.DEPTH_BUFFER_BIT);
+            }
+
+            if (!viz.offset.default) {
+                const textureId = renderer.textureIds.get(viz);
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
+                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+
+                freeTexUnit = drawMetadata.freeTexUnit;
+
+                Object.keys(textureId).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            }
+
+            gl.drawArrays(gl.TRIANGLES, 0, tile.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (tile.type === 'line' || tile.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
+                gl.disable(gl.DEPTH_TEST);
             }
         });
         orderingMins.map((_, orderingIndex) => {
@@ -460,25 +492,23 @@ export default class Renderer {
      * Initialize static shaders
      */
     _initShaders () {
-        this.finalRendererProgram = shaders.renderer.createPointShader(this.gl);
-        this.triRendererProgram = shaders.renderer.createTriShader(this.gl);
-        this.lineRendererProgram = shaders.renderer.createLineShader(this.gl);
         this._aaBlendShader = new shaders.AABlender(this.gl);
     }
 }
 
 function getOrderingRenderBuckets (renderLayer) {
     const orderer = renderLayer.viz.order;
+    const MAX_SIZE = 1030;
     let orderingMins = [0];
-    let orderingMaxs = [1000];
+    let orderingMaxs = [MAX_SIZE];
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
     if (orderer.isA(Asc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? 1000 : ((NUM_BUCKETS - 1) - i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? MAX_SIZE : ((NUM_BUCKETS - 1) - i + 1) * 2);
     } else if (orderer.isA(Desc)) {
         orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? 1000 : (i + 1) * 2);
+        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? MAX_SIZE : (i + 1) * 2);
     }
     return {
         orderingMins,

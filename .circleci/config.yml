@@ -5,7 +5,7 @@
 version: 2
 
 jobs:
-  E2E:
+  test-e2e:
     docker:
       - image: circleci/node:8-browsers
       - image: carto/windshaft-cartovl-testing
@@ -20,7 +20,7 @@ jobs:
           paths:
             - ./node_modules
       - run: echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
-      - run: yarn build:dev && yarn wait-on http://localhost.localhost.lan:8181 && yarn mocha test/acceptance/e2e.test.js --timeout 10000
+      - run: yarn build:min && yarn wait-on http://localhost.localhost.lan:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 10000
 
   test-unit-lint-docs:
     docker:
@@ -36,7 +36,7 @@ jobs:
           key: dependency-cache-{{ checksum "package.json" }}
           paths:
             - ./node_modules
-      - run: yarn test:unit
+      - run: yarn test:unit:min
       - run: yarn lint
       - run: yarn docs
 
@@ -53,13 +53,13 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
       - run: yarn install
-      - run: yarn test:user
+      - run: yarn test:user:min
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-  test-integration:
+  test-render:
     docker:
       # specify the version you desire here
       - image: circleci/node:8-browsers
@@ -77,13 +77,13 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - run: xvfb-run -a yarn test:render
+      - run: xvfb-run -a yarn test:render:min
 
 workflows:
   version: 2
   build_and_test:
     jobs:
-      - E2E
+      - test-e2e
       - test-unit-lint-docs
-      - test-integration
+      - test-render
       - test-user

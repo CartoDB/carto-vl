@@ -39,7 +39,7 @@ describe('src/renderer/viz/expressions/basic/category', () => {
 
         it('should return the value from the metadata', () => {
             const categoryExpresion = s.category('cat0');
-            categoryExpresion._compile(fakeMetadata);
+            categoryExpresion._bindMetadata(fakeMetadata);
             const actual = categoryExpresion.eval();
 
             expect(actual).toEqual('cat0');

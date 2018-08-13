@@ -47,7 +47,7 @@ export default class ViewportFeatures extends BaseExpression {
         this._FeatureProxy = null;
     }
 
-    _compile () {
+    _applyToShaderSource () {
         throw new Error('viewportFeatures cannot be used in visualizations');
     }
 
@@ -63,13 +63,13 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg (metadata) {
+    _resetViewportAgg () {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
             const columns = this._getMinimumNeededSchema().columns;
-            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
+            this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
         this.expr = [];
     }

@@ -51,10 +51,6 @@ export default class Image extends Base {
 
     eval () {}
 
-    _compile (meta) {
-        super._compile(meta);
-    }
-
     _free (gl) {
         if (this.texture) {
             gl.deleteTexture(this.texture);

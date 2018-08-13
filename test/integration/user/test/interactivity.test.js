@@ -333,15 +333,7 @@ describe('Interactivity', () => {
     });
 
     function onLoaded (callback) {
-        let allLoaded = 0;
-        function loaded () {
-            allLoaded++;
-            if (allLoaded === 2) {
-                callback();
-            }
-        }
-        layer1.on('loaded', loaded);
-        layer2.on('loaded', loaded);
+        carto.on('loaded', [layer1, layer2], callback);
     }
 
     afterEach(() => {

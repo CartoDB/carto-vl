@@ -9,7 +9,8 @@
       },
       "properties": {
         "numeric": 0,
-        "cat": "A"
+        "cat": "A",
+        "cat2": "a"
       }
     },
     {
@@ -20,7 +21,8 @@
       },
       "properties": {
         "numeric": 5,
-        "cat": "B"
+        "cat": "B",
+        "cat2": "b"
       }
     },
     {
@@ -31,7 +33,8 @@
       },
       "properties": {
         "numeric": 10,
-        "cat": "C"
+        "cat": "C",
+        "cat2": "c"
       }
     }
   ]

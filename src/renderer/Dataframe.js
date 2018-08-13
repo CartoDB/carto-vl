@@ -1,4 +1,4 @@
-import decoder from './decoder';
+import { decodeGeom } from './decoder';
 import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
@@ -22,8 +22,8 @@ export default class Dataframe {
         this.properties = properties;
         this.scale = scale;
         this.type = type;
-        this.decodedGeom = decoder.decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size : this.decodedGeom.vertices.length / 2;
+        this.decodedGeom = decodeGeom(this.type, this.geom);
+        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
@@ -95,21 +95,36 @@ export default class Dataframe {
         const ids = new Float32Array(vertices.length);
         let index = 0;
 
-        for (let i = 0; i < vertices.length; i += 2) {
-            if (!breakpoints.length) {
-                if (i > 0) {
-                    index++;
+        if (!breakpoints.length) {
+            for (let i = 0; i < vertices.length; i += 6) {
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+
+                if (ids[i + 0] === 0) {
+                    ids[i + 0] += 1 / (1024 * 64);
                 }
-            } else {
+                if (ids[i + 1] === 0) {
+                    ids[i + 1] += 1 / (1024 * 64);
+                }
+
+                ids[i + 2] = -ids[i + 0];
+                ids[i + 3] = ids[i + 1];
+
+                ids[i + 4] = ids[i + 0];
+                ids[i + 5] = -ids[i + 1];
+                index++;
+            }
+        } else {
+            for (let i = 0; i < vertices.length; i += 2) {
                 while (i === breakpoints[index]) {
                     index++;
                 }
+                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
+                ids[i + 0] = ((index) % width) / (width - 1);
+                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
             }
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-            ids[i + 0] = ((index) % width) / (width - 1);
-            ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
         }
-
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -140,6 +155,15 @@ export default class Dataframe {
         const feature = this.getFeature(featureIndex);
         const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
+
+        if (!viz.offset.default) {
+            const offset = viz.offset.eval(feature);
+            const widthScale = this.widthScale / 2;
+            viewportAABB.minx -= offset[0] * widthScale;
+            viewportAABB.maxx -= offset[0] * widthScale;
+            viewportAABB.miny -= offset[1] * widthScale;
+            viewportAABB.maxy -= offset[1] * widthScale;
+        }
 
         switch (this.type) {
             case 'point':
@@ -206,8 +230,8 @@ export default class Dataframe {
 
     _isPointInViewport (featureIndex, viewportAABB) {
         const { minx, maxx, miny, maxy } = viewportAABB;
-        const x = this.geom[2 * featureIndex + 0];
-        const y = this.geom[2 * featureIndex + 1];
+        const x = this.geom[6 * featureIndex + 0];
+        const y = this.geom[6 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
@@ -264,8 +288,10 @@ export default class Dataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
-        for (let i = 0; i < points.length; i += 2) {
-            const featureIndex = i / 2;
+        const widthScale = this.widthScale / 2;
+
+        for (let i = 0; i < points.length; i += 6) {
+            const featureIndex = i / 6;
             const center = {
                 x: points[i],
                 y: points[i + 1]
@@ -279,10 +305,15 @@ export default class Dataframe {
 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
-            if (!viz.symbol._default) {
-                const offset = viz.symbolPlacement.eval();
+            if (!viz.symbol.default) {
+                const offset = viz.symbolPlacement.eval(feature);
                 center.x += offset[0] * strokeWidthScale;
                 center.y += offset[1] * strokeWidthScale;
+            }
+            if (!viz.offset.default) {
+                const offset = viz.offset.eval(feature);
+                center.x += offset[0] * widthScale;
+                center.y += offset[1] * widthScale;
             }
 
             const inside = pointInCircle(p, center, strokeWidthScale);
@@ -296,7 +327,7 @@ export default class Dataframe {
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const p = wToR(pos.x, pos.y, {
+        const point = wToR(pos.x, pos.y, {
             center: this.center,
             scale: this.scale
         });
@@ -310,13 +341,21 @@ export default class Dataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
+        const widthScale = this.widthScale / 2;
+        let pointWithOffset;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-
-                if (!pointInRectangle(p, this._aabb[featureIndex]) ||
+                let offset = {x: 0, y: 0};
+                if (!viz.offset.default) {
+                    const vizOffset = viz.offset.eval(feature);
+                    offset.x = vizOffset[0] * widthScale;
+                    offset.y = vizOffset[1] * widthScale;
+                }
+                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -342,7 +381,7 @@ export default class Dataframe {
                 y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
             };
 
-            const inside = pointInTriangle(p, v1, v2, v3);
+            const inside = pointInTriangle(pointWithOffset, v1, v2, v3);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -454,21 +493,21 @@ export default class Dataframe {
     }
 
     _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 126;
-        const diameter = Math.min(viz.width.eval(feature) + viz.strokeWidth.eval(feature), SATURATION_PX);
+        const SATURATION_PX = 1024;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;
     }
 
     _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 336;
+        const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2 * this.widthScale;

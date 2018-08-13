@@ -52,11 +52,10 @@
 
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     const viz = new carto.Viz(`
-    width: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]),[24,12,6,0])
-    color: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated Place"]),[violet,limegreen,gray])
-    symbol: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]), imageList([star,triangle,marker]))
+      width: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]), [24,12,6,0])
+      color: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated Place"]), [violet,limegreen,gray])
+      symbol: ramp(buckets($featurecla, ["Admin-0 capital","Admin-1 capital","Populated place"]), [star,triangle,marker])
     `);
-
 
     const layer = new carto.Layer('layer', source, viz);
 

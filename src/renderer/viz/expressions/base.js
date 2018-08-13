@@ -6,7 +6,7 @@ import * as schema from '../../schema';
  * Abstract expression class
  *
  * All expressions listed in  {@link carto.expressions} inherit from this class so any of them
- * they can be used where an Expression is required as long as the types match.
+ * can be used where an Expression is required as long as the types match.
  *
  * This means that you can't use a numeric expression where a color expression is expected.
  *
@@ -14,7 +14,7 @@ import * as schema from '../../schema';
  * @name Base
  * @hideconstructor
  * @abstract
- * @IGNOREapi
+ * @api
  */
 export default class Base {
     /**
@@ -34,9 +34,8 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
-    _bind (metadata) {
-        this._compile(metadata);
-        return this;
+    _bindMetadata (metadata) {
+        this._getChildren().forEach(child => child._bindMetadata(metadata));
     }
 
     _initializeChildren (children) {
@@ -105,19 +104,13 @@ export default class Base {
         this._getChildren().map(child => child._resolveAliases(aliases));
     }
 
-    _compile (metadata) {
-        this._getChildren().map(child => child._compile(metadata));
-    }
-
     _setGenericGLSL (inlineMaker, preface) {
         this.inlineMaker = inlineMaker;
         this.preface = (preface || '');
     }
 
-    /**
-     * Generate GLSL code
-     * @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
-     */
+    // Generate GLSL code
+    // @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
@@ -130,10 +123,7 @@ export default class Base {
         };
     }
 
-    /**
-     * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
-     * @param {*} program
-     */
+    // Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
     _postShaderCompile (program, gl) {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
@@ -145,43 +135,34 @@ export default class Base {
         return this._shaderBindings.get(shader);
     }
 
-    _resetViewportAgg () {
-        this._getChildren().forEach(child => child._resetViewportAgg());
+    _resetViewportAgg (metadata) {
+        this._getChildren().forEach(child => child._resetViewportAgg(metadata));
     }
 
     accumViewportAgg (feature) {
         this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
 
-    /**
-     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
-     * @param {number} timestamp
-     */
+    // Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+    // @param {number} timestamp
     _setTimestamp (timestamp) {
         this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
     }
 
-    /**
-     * Pre-rendering routine. Should establish related WebGL state as needed.
-     * @param {*} l
-     */
+    // Pre-rendering routine. Should establish related WebGL state as needed.
     _preDraw (...args) {
         this.childrenNames.forEach(name => this[name]._preDraw(...args));
     }
 
     /**
-     * @jsapi
-     * @returns true if the evaluation of the function at styling time won't be the same every time.
+     * @api
+     * @returns true if the evaluation of the expression may change without external action.
      */
     isAnimated () {
         return this._getChildren().some(child => child.isAnimated());
     }
 
-    /**
-     * Replace child *toReplace* by *replacer*
-     * @param {*} toReplace
-     * @param {*} replacer
-     */
+    // Replace child *toReplace* by *replacer*
     replaceChild (toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] === toReplace);
         this[name] = replacer;
@@ -197,7 +178,7 @@ export default class Base {
      * Linear interpolation between this and finalValue with the specified duration
      * @api
      * @param {Expression} final
-     * @param {Expression} duration
+     * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
      * @memberof carto.expressions.Base
      * @instance
@@ -224,9 +205,7 @@ export default class Base {
         blender.notify();
     }
 
-    /**
-     * @returns a list with the expression children
-     */
+    // returns a list with the expression children
     _getChildren () {
         return this.childrenNames.map(name => this[name]);
     }
@@ -236,6 +215,38 @@ export default class Base {
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
     // eslint-disable-next-line no-unused-vars
+    /**
+     * Evaluate the expression providing a feature.
+     * This is particularly useful for making legends.
+     *
+     * @api
+     * @param {object} feature
+     * @returns {*} result - result of evaluating the expression for the input feature
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: red
+     *      width: sqrt($amount)
+     * `);
+     *
+     * const r = viz.width.eval({
+     *      amount: 16
+     * });
+     *
+     * // `r` value is `4`
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: ramp(linear($amount), Emrld)
+     * `);
+     *
+     * const color = viz.color.eval({
+     *      amount: 123
+     * });
+     *
+     * // `color` will have the same color as the features with an amount of 123
+     *
+     */
     eval (feature) {
         throw new Error('Unimplemented');
     }

@@ -25,6 +25,8 @@ import { number } from '../expressions';
 export default class Now extends BaseExpression {
     constructor () {
         super({ now: number(0) });
+        this.type = 'number';
+        super.inlineMaker = inline => inline.now;
     }
 
     eval () {

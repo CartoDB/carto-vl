@@ -52,17 +52,56 @@ const MVT_TO_CARTO_TYPES = {
  * @api
  */
 
+/**
+ * An MVTMetadata object declares metadata information of a a carto.Source.
+ *
+ * @typedef {object} MVTMetadata
+ * @property {MVTProperty} properties - property names, types and optionally ranges
+ * @property {string} [idProperty='cartodb_id'] - property name of the property that should be used as ID
+ *
+ * @example <caption> Creating a MVTMetadata object</caption>
+ * const metadata = {
+        properties: {
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      };
+ *
+ * @api
+ */
+
+/**
+ * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
+ *
+ * @typedef {object} MVTProperty
+ * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
+ * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
+ * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
+ *
+ * @api
+ */
+
 export default class MVT extends Base {
     /**
      * Create a carto.source.MVT.
      *
-     * @param {object} data - A MVT data object
-     * @param {object} [metadata] - A carto.source.mvt.Metadata object
+     * @param {string | string[]} templateURL - A string with the URL template of the MVT tiles in https://mytileserver.com/{z}/{x}/{y}.mvt format or a list of such templates. Usage of a list of templates with different domains is recommended since that allows the browser to make more requests in parallel.
+     * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
-     * @example
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
+     * @example Usage with multiple templateURLs as recommended
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
-     * new carto.source.MVT("https://{server}/{z}/{x}/{y}.mvt", metadata);
+     * new carto.source.MVT([
+     *                       "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
+     *                      ],
+     *                      metadata
+     *                     );
      *
      * @fires CartoError
      *
@@ -137,7 +176,7 @@ export default class MVT extends Base {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2));
+                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
             case geometryTypes.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
             case geometryTypes.POLYGON:
@@ -179,8 +218,12 @@ export default class MVT extends Base {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                geometries[2 * numFeatures + 0] = x;
-                geometries[2 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 0] = x;
+                geometries[6 * numFeatures + 1] = y;
+                geometries[6 * numFeatures + 2] = x;
+                geometries[6 * numFeatures + 3] = y;
+                geometries[6 * numFeatures + 4] = x;
+                geometries[6 * numFeatures + 5] = y;
             }
             if (f.properties[this._metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);

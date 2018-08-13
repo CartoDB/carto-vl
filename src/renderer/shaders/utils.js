@@ -72,19 +72,20 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
 
     const shader = compileProgram(gl, vertexShader, fragmentShader);
 
-    shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
+    shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
+
     shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
     shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
-    shader.colorStrokeTexture = gl.getUniformLocation(shader.program, 'colorStrokeTex');
+    shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
     shader.widthTexture = gl.getUniformLocation(shader.program, 'widthTex');
     shader.orderMinWidth = gl.getUniformLocation(shader.program, 'orderMinWidth');
     shader.orderMaxWidth = gl.getUniformLocation(shader.program, 'orderMaxWidth');
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
-    shader.devicePixelRatio = gl.getUniformLocation(shader.program, 'devicePixelRatio');
+    shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     shader.overrideColor = gl.getUniformLocation(shader.program, 'overrideColor');
 

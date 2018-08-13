@@ -38,7 +38,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has one breakpoint', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Murcia']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -69,7 +69,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Murcia', 'Madrid']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -108,7 +108,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has more than two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Pontevedra', 'Murcia', 'Madrid']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -162,7 +162,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has one breakpoint', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($price, [10]);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input in the first category when is lower than the breakpoint', () => {
@@ -193,7 +193,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($price, [10, 20]);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input in the first category when is lower than the first breakpoint', () => {
