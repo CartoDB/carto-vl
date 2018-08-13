@@ -36,7 +36,6 @@ export default class Map {
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
-        this._firstUpdate = true;
         this._resizeCanvas(this._containerDimensions());
     }
 
@@ -57,11 +56,6 @@ export default class Map {
         }
 
         this.lastFrame = timestamp;
-
-        if (this._firstUpdate) {
-            this._firstUpdate = false;
-            this.update();
-        }
 
         this._drawBackground(this._background);
 
