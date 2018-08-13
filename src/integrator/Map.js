@@ -1,6 +1,4 @@
-import {
-    layerVisibility
-} from '../constants/layer';
+import { layerVisibility } from '../constants/layer';
 /**
  * @description A simple non-interactive map.
  */

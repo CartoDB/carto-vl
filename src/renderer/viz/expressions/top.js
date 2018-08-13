@@ -58,22 +58,29 @@ export default class Top extends BaseExpression {
         });
         return ret;
     }
+
     _bindMetadata (metadata) {
         checkFeatureIndependent('top', 'buckets', 1, this.buckets);
+
         super._bindMetadata(metadata);
+
         checkType('top', 'property', 0, 'category', this.property);
         checkType('top', 'buckets', 1, 'number', this.buckets);
+
         this._meta = metadata;
         this._textureBuckets = null;
     }
+
     get numCategories () {
         return this.numBuckets + 1;
     }
     get numBuckets () {
         let buckets = Math.round(this.buckets.eval());
+
         if (buckets > this.property.numCategories) {
             buckets = this.property.numCategories;
         }
+
         if (buckets > MAX_TOP_BUCKETS) {
             // setTimeout is used here because throwing within the renderer stack leaves the state in an invalid state,
             // making this error an unrecoverable error, within the setTimeout the error is recoverable
@@ -83,8 +90,10 @@ export default class Top extends BaseExpression {
             });
             buckets = 0;
         }
+
         return buckets;
     }
+
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = {};
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
@@ -131,7 +140,6 @@ export default class Top extends BaseExpression {
         };
     }
     _preDraw (program, drawMetadata, gl) {
-        super._preDraw(program, drawMetadata, gl);
         const buckets = this.numBuckets;
         const metaColumn = this._meta.properties[this.property.name];
 
@@ -148,6 +156,7 @@ export default class Top extends BaseExpression {
                 this[`_top${i}`].expr = (i + 1);
             }
         });
+
+        super._preDraw(program, drawMetadata, gl);
     }
-    // TODO _free
 }
