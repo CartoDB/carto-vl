@@ -117,15 +117,7 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        try {
-            if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
-                this.palette.floats = this.palette.eval(feature);
-            } else if (this.palette.type === paletteTypes.COLOR_ARRAY) {
-                this.palette.colors = this.palette.eval(feature);
-            }
-        } catch (error) {
-            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-        }
+        this.palette = this._calcPaletteValues(this.palette);
 
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
@@ -246,8 +238,14 @@ export default class Ramp extends BaseExpression {
         return this._cachedTexturePixels;
     }
 
+    _calcPaletteValues (palette) {
+        return _calcPaletteValues(palette);
+    }
+
     _computeColorRampTexture () {
-        this.palette = _calcPaletteValues(this.palette);
+        if (this.isAnimated()) {
+            this.palette = this._calcPaletteValues(this.palette);
+        }
 
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
@@ -288,24 +286,27 @@ export default class Ramp extends BaseExpression {
 
         if (this._GLtexCategories !== this.input.numCategories || this.isAnimated()) {
             this._GLtexCategories = this.input.numCategories;
-
             this.texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-            if (this.type === rampTypes.COLOR) {
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            this._bindGLTexture(gl, texturePixels);
         }
+    }
+
+    _bindGLTexture (gl, texturePixels) {
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+        if (this.type === rampTypes.COLOR) {
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        } else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
 
     _preDraw (program, drawMetadata, gl) {
