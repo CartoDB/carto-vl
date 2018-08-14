@@ -1,4 +1,4 @@
-export default class Base {
+export default class BaseSource {
     /**
      * Base data source object.
      *

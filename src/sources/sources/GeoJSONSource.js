@@ -2,12 +2,12 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
 import CartoValidationError from '../errors/carto-validation-error';
+import BaseSource from './BaseSource';
 import util from '../utils/util';
-import Base from './Base';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
-export default class GeoJSON extends Base {
+export default class GeoJSONSource extends BaseSource {
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
@@ -103,7 +103,7 @@ export default class GeoJSON extends Base {
     }
 
     _clone () {
-        return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
+        return new GeoJSONSource(this._data, { dateColumns: Array.from(this._providedDateColumns) });
     }
 
     _checkData (data) {

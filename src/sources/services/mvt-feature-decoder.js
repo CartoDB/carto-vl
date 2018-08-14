@@ -1,4 +1,5 @@
-import geometryUtils from '../../utils/geometry';
+import geometryUtils from '../../../utils/geometry';
+
 export class Polygon {
     constructor () {
         this.flat = [];

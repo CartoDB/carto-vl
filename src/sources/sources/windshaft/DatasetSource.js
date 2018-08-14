@@ -1,8 +1,8 @@
 import CartoValidationError from '../errors/carto-validation-error';
+import WindshaftSource from '../WindshaftSource';
 import util from '../utils/util';
-import BaseWindshaft from './BaseWindshaft';
 
-export default class Dataset extends BaseWindshaft {
+export default class DatasetSource extends WindshaftSource {
     /**
      * A dataset defines the data that will be displayed in a layer and is equivalent
      * to a table in the server.
@@ -49,7 +49,7 @@ export default class Dataset extends BaseWindshaft {
     }
 
     _clone () {
-        return new Dataset(this._tableName, this._auth, this._config);
+        return new DatasetSource(this._tableName, this._auth, this._config);
     }
 
     _checkTableName (tableName) {

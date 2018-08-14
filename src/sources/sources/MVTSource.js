@@ -5,7 +5,7 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
 import { RTT_WIDTH } from '../renderer/Renderer';
-import Base from './Base';
+import BaseSource from './BaseSource';
 import TileClient from './TileClient';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
@@ -82,7 +82,7 @@ const MVT_TO_CARTO_TYPES = {
  * @api
  */
 
-export default class MVT extends Base {
+export default class MVTSource extends BaseSource {
     /**
      * Create a carto.source.MVT.
      *
@@ -123,7 +123,7 @@ export default class MVT extends Base {
     }
 
     _clone () {
-        return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
+        return new MVTSource(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -145,9 +145,11 @@ export default class MVT extends Base {
     async responseToDataframeTransformer (response, x, y, z) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
+
         if (arrayBuffer.byteLength === 0 || response === 'null') {
             return { empty: true };
         }
+
         const tile = new VectorTile(new Protobuf(arrayBuffer));
 
         if (Object.keys(tile.layers).length > 1 && !this._options.layerID) {

@@ -1,14 +1,14 @@
-import Base from './Base';
-import Windshaft from '../client/windshaft';
+import BaseSource from './BaseSource';
+import WindshaftClient from '../client/WindshaftClient';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
 const DEFAULT_SERVER_URL_TEMPLATE = 'https://{user}.carto.com';
 
-export default class BaseWindshaft extends Base {
+export default class WindshaftSource extends BaseSource {
     constructor () {
         super();
-        this._client = new Windshaft(this);
+        this._client = new WindshaftClient(this);
     }
 
     initialize (auth, config) {

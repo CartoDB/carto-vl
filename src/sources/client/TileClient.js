@@ -1,4 +1,4 @@
-import DataframeCache from './DataframeCache';
+import DataframeCache from '../../DataframeCache';
 import { rTiles } from '../client/rsys';
 
 export default class TileClient {
@@ -33,6 +33,7 @@ export default class TileClient {
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
+
         tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
                 dataframe => {
@@ -58,7 +59,10 @@ export default class TileClient {
 
     _getTileUrl (x, y, z) {
         const subdomainIndex = this._getSubdomainIndex(x, y);
-        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
+        return this._templateURLs[subdomainIndex]
+            .replace('{x}', x)
+            .replace('{y}', y)
+            .replace('{z}', z);
     }
 
     _getSubdomainIndex (x, y) {
@@ -69,9 +73,11 @@ export default class TileClient {
     async _requestDataframe (x, y, z, responseToDataframeTransformer) {
         const response = await fetch(this._getTileUrl(x, y, z));
         const dataframe = await responseToDataframeTransformer(response, x, y, z);
+
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }
+
         return dataframe;
     }
 }
