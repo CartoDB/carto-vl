@@ -96,15 +96,7 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        try {
-            if (palette.type === paletteTypes.NUMBER_ARRAY) {
-                palette.floats = palette.eval();
-            } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-                palette.colors = palette.eval();
-            }
-        } catch (error) {
-            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-        }
+        palette = _calcPaletteValues(palette);
 
         super({ input, palette });
 
@@ -188,12 +180,6 @@ export default class Ramp extends BaseExpression {
         this._GLtexCategories = null;
     }
 
-    _free (gl) {
-        if (this.texture) {
-            gl.deleteTexture(this.texture);
-        }
-    }
-
     _applyToShaderSource (getGLSLforProperty) {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
 
@@ -243,9 +229,10 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureIfNeeded () {
-        if (this._cachedTexturePixels) {
+        if (this._cachedTexturePixels && !this.isAnimated()) {
             return this._cachedTexturePixels;
         }
+
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
@@ -260,6 +247,8 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeColorRampTexture () {
+        this.palette = _calcPaletteValues(this.palette);
+
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
@@ -297,7 +286,7 @@ export default class Ramp extends BaseExpression {
     _computeGLTextureIfNeeded (gl) {
         const texturePixels = this._computeTextureIfNeeded();
 
-        if (this._GLtexCategories !== this.input.numCategories) {
+        if (this._GLtexCategories !== this.input.numCategories || this.isAnimated()) {
             this._GLtexCategories = this.input.numCategories;
 
             this.texture = gl.createTexture();
@@ -447,4 +436,18 @@ function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) 
     }
 
     return colorArray;
+}
+
+function _calcPaletteValues (palette) {
+    try {
+        if (palette.type === paletteTypes.NUMBER_ARRAY) {
+            palette.floats = palette.eval();
+        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
+            palette.colors = palette.eval();
+        }
+    } catch (error) {
+        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+    }
+
+    return palette;
 }
