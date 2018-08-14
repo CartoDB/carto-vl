@@ -33,7 +33,7 @@ import { checkString, parseSpaces } from '../utils';
 export default class Property extends BaseExpression {
     constructor (name) {
         checkString('property', 'name', 0, name);
-        
+
         if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
