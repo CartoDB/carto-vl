@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, parseSpaces } from '../utils';
 
 /**
  * Evaluates the value of a column for every row in the dataset.
@@ -33,11 +33,14 @@ import { checkString } from '../utils';
 export default class Property extends BaseExpression {
     constructor (name) {
         checkString('property', 'name', 0, name);
+        
         if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
+
         super({});
-        this.name = name;
+        this.originalName = name;
+        this.name = parseSpaces(name);
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -59,7 +62,7 @@ export default class Property extends BaseExpression {
     _bindMetadata (meta) {
         const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
+            throw new Error(`Property '${this.originalName}' does not exist`);
         }
         this.type = metaColumn.type;
 
