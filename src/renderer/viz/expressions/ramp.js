@@ -9,7 +9,6 @@ import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
-import { isUndefined } from '../../../utils/util';
 
 const paletteTypes = {
     PALETTE: 'palette',
