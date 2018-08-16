@@ -5,7 +5,7 @@ import CartoMap from './integrator/Map';
 import getMGLIntegrator from './integrator/mapbox-gl';
 import RenderLayer from './renderer/RenderLayer';
 import { cubic } from './renderer/viz/expressions';
-import SourceBase from './sources/Base';
+import SourceBase from './api/sources/BaseSource';
 import util from './utils/util';
 import { layerVisibility } from './constants/layer';
 import Viz from './Viz';

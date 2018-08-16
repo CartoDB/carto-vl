@@ -26,10 +26,10 @@ import Map from './integrator/Map';
 import Interactivity from './interactivity/Interactivity';
 import Layer from './Layer';
 import * as expressions from './renderer/viz/expressions';
-import Dataset from './sources/Dataset';
-import GeoJSON from './sources/GeoJSON';
-import MVT from './sources/MVT';
-import SQL from './sources/SQL';
+import GeoJSON from './api/sources/GeoJSONSource';
+import MVT from './api/sources/MVTSource';
+import Dataset from './api/sources/windshaft/DatasetSource';
+import SQL from './api/sources/windshaft/SQLSource';
 import { on, off } from './apiUtils';
 
 /**

@@ -1,5 +1,5 @@
 import { decodeGeom } from './decoder';
-import { wToR } from '../client/rsys';
+import { wToR } from '../api/services/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 
