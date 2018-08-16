@@ -6,6 +6,8 @@ const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_WIDTH_EXPRESSION = s.number(1);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
+const DEFAULT_STROKE_JOIN = s.joins.MITER;
+const DEFAULT_STROKE_CAP = s.caps.BUTT;
 const DEFAULT_FILTER_EXPRESSION = s.constant(1);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();
 const DEFAULT_RESOLUTION = 1;
@@ -23,6 +25,8 @@ describe('api/viz', () => {
                 expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeJoin).toEqual(DEFAULT_STROKE_JOIN);
+                expect(actual.strokeCap).toEqual(DEFAULT_STROKE_CAP);
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
@@ -36,6 +40,8 @@ describe('api/viz', () => {
                 expect(actual.width.eval()).toEqual(DEFAULT_WIDTH_EXPRESSION.eval());
                 expect(actual.strokeColor.eval()).toEqual(DEFAULT_STROKE_COLOR_EXPRESSION.eval());
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
+                expect(actual.strokeJoin).toEqual(DEFAULT_STROKE_JOIN);
+                expect(actual.strokeCap).toEqual(DEFAULT_STROKE_CAP);
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
                 expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
@@ -47,6 +53,8 @@ describe('api/viz', () => {
                     width: s.number(10),
                     strokeColor: s.rgba(0, 0, 255, 1),
                     strokeWidth: s.number(15),
+                    strokeJoin: s.joins.BEVEL,
+                    strokeCap: s.caps.SQUARE,
                     filter: s.number(0.5),
                     order: s.asc(s.width()),
                     resolution: 2
@@ -58,6 +66,8 @@ describe('api/viz', () => {
                 expect(actual.width.eval()).toEqual(s.number(10).eval());
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.strokeJoin).toEqual(s.joins.BEVEL);
+                expect(actual.strokeCap).toEqual(s.caps.SQUARE);
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
                 expect(actual.resolution).toEqual(2);
@@ -109,49 +119,67 @@ describe('api/viz', () => {
                 }).toThrowError('`resolution` must be less than 256.');
             });
 
-            it('should throw an error when color is not a valid expression', () => {
+            it('should throw an error when color has a non valid expression', () => {
                 const vizSpec = {
                     color: 'red' // wrong type!
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`color` parameter is not a valid viz Expresion.');
+                }).toThrowError('`color` parameter has a non valid Expression.');
             });
 
-            it('should throw an error when width is not a valid expression', () => {
+            it('should throw an error when width has a non valid expression', () => {
                 const vizSpec = {
                     width: true // wrong type!
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`width` parameter is not a valid viz Expresion.');
+                }).toThrowError('`width` parameter has a non valid Expression.');
             });
 
-            it('should throw an error when strokeColor is not a valid expression', () => {
+            it('should throw an error when strokeColor has a non valid expression', () => {
                 const vizSpec = {
                     strokeColor: 'red' // wrong type!
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeColor` parameter is not a valid viz Expresion.');
+                }).toThrowError('`strokeColor` parameter has a non valid Expression.');
             });
 
-            it('should throw an error when strokeWidth is not a valid expression', () => {
+            it('should throw an error when strokeWidth has a non valid expression', () => {
                 const vizSpec = {
                     strokeWidth: true // wrong type!
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeWidth` parameter is not a valid viz Expresion.');
+                }).toThrowError('`strokeWidth` parameter has a non valid Expression.');
             });
 
-            it('should throw an error when order is not a valid expression', () => {
+            it('should throw an error when strokeJoin has a non valid enum value', () => {
+                const vizSpec = {
+                    strokeJoin: 3 // wrong Enum value!
+                };
+                expect(function () {
+                    new Viz(vizSpec);
+                }).toThrowError('`strokeJoin` parameter has a non valid Enum value.');
+            });
+
+            it('should throw an error when strokeCap has a non valid enum value', () => {
+                const vizSpec = {
+                    strokeCap: 3 // wrong Enum value!
+                };
+                expect(function () {
+                    new Viz(vizSpec);
+                }).toThrowError('`strokeCap` parameter has a non valid Enum value.');
+            });
+
+            it('should throw an error when order has a non valid expression', () => {
                 const vizSpec = {
                     order: 10 // wrong type!
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`order` parameter is not a valid viz Expresion.');
+                }).toThrowError('`order` parameter has a non valid Expression.');
             });
 
             it('should add a console.warn when non supported properties are included', () => {
@@ -171,6 +199,8 @@ describe('api/viz', () => {
                     width: number(10)
                     strokeColor: rgba(0, 0, 255, 1)
                     strokeWidth: number(15)
+                    strokeJoin: BEVEL
+                    strokeCap: SQUARE
                     filter: 0.5
                     order: asc(width())
                     resolution: 1
@@ -182,6 +212,8 @@ describe('api/viz', () => {
                 expect(actual.width.eval()).toEqual(s.number(10).eval());
                 expect(actual.strokeColor.eval()).toEqual(s.rgba(0, 0, 255, 1).eval());
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
+                expect(actual.strokeJoin).toEqual(s.joins.BEVEL);
+                expect(actual.strokeCap).toEqual(s.caps.SQUARE);
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
                 expect(actual.resolution).toEqual(1);

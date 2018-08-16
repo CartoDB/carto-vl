@@ -1,14 +1,30 @@
-import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
+import { getJoinNormal, getLineNormal, getJoinSign, neg } from '../../utils/geometry';
+
+const JOINS = {
+    MITER: 0,
+    BEVEL: 1
+};
+
+const CAPS = {
+    BUTT: 0,
+    SQUARE: 1
+};
 
 /**
  * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list
  * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.
  * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
  */
-export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
+export function addLineString (lineString, geomBuffer, index, options) {
+    options = options || {};
     let prevPoint, currentPoint, nextPoint;
+    let prevPointer, currentPointer;
     let prevNormal, nextNormal;
     let drawLine;
+    let isPolygon = options.isPolygon;
+    let skipCallback = options.skipCallback;
+    let join = options.strokeJoin || JOINS.MITER;
+    let cap = options.strokeCap || CAPS.BUTT;
 
     // We need at least two points
     if (lineString.length >= 4) {
@@ -20,34 +36,49 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
+            prevPointer = [0, 0];
+            currentPointer = [0, 0];
+
+            // Compute line vector for square caps
+            if (!isPolygon && (cap === CAPS.SQUARE)) {
+                // First endpoint
+                if (i === 4) {
+                    prevPointer = [prevNormal[1], -prevNormal[0]];
+                }
+                // Last endpoint
+                if (i === lineString.length) {
+                    currentPointer = [-prevNormal[1], prevNormal[0]];
+                }
+            }
+
             if (drawLine) {
                 // First triangle
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + currentPointer[1];
 
                 // Second triangle
                 geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + prevPointer[0];
                 geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + prevPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
+                geomBuffer.normals[index++] = prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+                geomBuffer.normals[index++] = prevNormal[1] + currentPointer[1];
                 geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
+                geomBuffer.normals[index++] = -prevNormal[0] + currentPointer[0];
                 geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
+                geomBuffer.normals[index++] = -prevNormal[1] + currentPointer[1];
             }
 
             // If there is a next point, compute its properties
@@ -62,9 +93,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
 
                 if (drawLine) {
                     // `turnLeft` indicates that the nextLine turns to the left
-                    // `joinNormal` contains the direction and size for the `miter` vertex
-                    //  If this is not defined means that the join must be `bevel`.
-                    let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+                    let turnLeft = getJoinSign(prevNormal, nextNormal);
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
@@ -86,20 +115,25 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                     geomBuffer.vertices[index] = currentPoint[1];
                     geomBuffer.normals[index++] = rightNormal[1];
 
-                    if (joinNormal) {
-                        // Forth triangle
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = joinNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = joinNormal[1];
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = rightNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = rightNormal[1];
-                        geomBuffer.vertices[index] = currentPoint[0];
-                        geomBuffer.normals[index++] = leftNormal[0];
-                        geomBuffer.vertices[index] = currentPoint[1];
-                        geomBuffer.normals[index++] = leftNormal[1];
+                    if (join === JOINS.MITER) {
+                        // `joinNormal` contains the direction and size for the `miter` vertex
+                        //  If this is not defined means that the join must be `bevel`.
+                        let joinNormal = getJoinNormal(prevNormal, nextNormal);
+                        if (joinNormal) {
+                            // Forth triangle
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = joinNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = joinNormal[1];
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = rightNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = rightNormal[1];
+                            geomBuffer.vertices[index] = currentPoint[0];
+                            geomBuffer.normals[index++] = leftNormal[0];
+                            geomBuffer.vertices[index] = currentPoint[1];
+                            geomBuffer.normals[index++] = leftNormal[1];
+                        }
                     }
                 }
             }

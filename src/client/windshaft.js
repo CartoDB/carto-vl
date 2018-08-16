@@ -93,9 +93,9 @@ export default class Windshaft {
      * viewports. If viz changes getMetadata() should be called before requesting data
      * for the new viz.
      */
-    getData (zoom, viewport) {
+    getData (zoom, viewport, geomOptions) {
         if (this._mvtClient) {
-            return this._mvtClient.requestData(zoom, viewport);// FIXME extend
+            return this._mvtClient.requestData(zoom, viewport, geomOptions);// FIXME extend
         }
     }
 
@@ -203,11 +203,12 @@ export default class Windshaft {
         this._checkLayerMeta(MNS);
     }
     async _instantiate (MNS, resolution, filters, choices, metadata) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
+        const id = this._getInstantiationID(MNS, resolution, filters, choices);
+        if (this.inProgressInstantiations[id]) {
+            return this.inProgressInstantiations[id];
         }
         const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices, metadata);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)] = instantiationPromise;
+        this.inProgressInstantiations[id] = instantiationPromise;
         return instantiationPromise;
     }
 

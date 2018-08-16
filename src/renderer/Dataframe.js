@@ -15,18 +15,17 @@ const AABBTestResults = {
 };
 
 export default class Dataframe {
-    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
+    constructor ({ center, scale, geom, properties, type, active, size, metadata, geomOptions }) {
         this.active = active;
         this.center = center;
         this.geom = geom;
         this.properties = properties;
         this.scale = scale;
         this.type = type;
-        this.decodedGeom = decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
-        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
-        this.propertyTex = [];
+        this.size = size;
         this.metadata = metadata;
+        this.decodeGeom(geomOptions);
+        this.propertyTex = [];
         this.propertyID = {}; // Name => PID
         this.propertyCount = 0;
         this._aabb = this._computeAABB(geom, type);
@@ -71,6 +70,27 @@ export default class Dataframe {
         this.freeObserver = freeObserver;
     }
 
+    diffGeomOptions (geomOptions) {
+        geomOptions = geomOptions || {};
+        return this._geomOptions.strokeJoin !== geomOptions.strokeJoin ||
+               this._geomOptions.strokeCap !== geomOptions.strokeCap;
+    }
+
+    decodeGeom (geomOptions) {
+        geomOptions = geomOptions || {};
+        this._geomOptions = JSON.parse(JSON.stringify(geomOptions));
+
+        this.decodedGeom = decodeGeom(this.type, this.geom, this._geomOptions);
+        this.numVertex = this.type === 'point' ? this.size * 3 : this.decodedGeom.vertices.length / 2;
+        this.numFeatures = this.type === 'point' ? this.size : this.decodedGeom.breakpoints.length || this.numVertex;
+
+        if (this.renderer) {
+            // If the dataframe was previously bound,
+            // bind again with the new decoded geomatry.
+            this.bind(this.renderer);
+        }
+    }
+
     bind (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -93,19 +113,28 @@ export default class Dataframe {
         this.texFilter = this._createStyleTileTexture(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
+        const inc = 1 / (1024 * 64);
         let index = 0;
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < this.numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
 
                 if (ids[i + 0] === 0) {
-                    ids[i + 0] += 1 / (1024 * 64);
+                    ids[i + 0] += inc;
                 }
                 if (ids[i + 1] === 0) {
-                    ids[i + 1] += 1 / (1024 * 64);
+                    ids[i + 1] += inc;
                 }
 
                 ids[i + 2] = -ids[i + 0];
@@ -120,11 +149,11 @@ export default class Dataframe {
                 while (i === breakpoints[index]) {
                     index++;
                 }
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
             }
         }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 

@@ -148,7 +148,11 @@ const validation = {
         },
         'non-valid-expression': {
             messageRegex: /nonValidExpression\[(.+)\]$/,
-            friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
+            friendlyMessage: '`$0` parameter has a non valid Expression.'
+        },
+        'non-valid-enum-required': {
+            messageRegex: /nonValidEnum\[(.+)\]$/,
+            friendlyMessage: '`$0` parameter has a non valid Enum value.'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,

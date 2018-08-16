@@ -42,6 +42,12 @@ lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
 lowerCaseFunctions.triangle = functions.TRIANGLE;
 lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
 
+lowerCaseFunctions.miter = functions.joins.MITER;
+lowerCaseFunctions.bevel = functions.joins.BEVEL;
+
+lowerCaseFunctions.butt = functions.caps.BUTT;
+lowerCaseFunctions.square = functions.caps.SQUARE;
+
 export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
@@ -84,7 +90,8 @@ function parseVizNamedExpr (vizSpec, node) {
             throw new Error(`Property '${name}' is already defined.`);
         }
         const value = parseNode(node.right);
-        vizSpec[name] = (name === 'resolution') ? value : implicitCast(value);
+        const avoidCast = ['resolution', 'strokeJoin', 'strokeCap'].includes(name);
+        vizSpec[name] = avoidCast ? value : implicitCast(value);
     }
 }
 
@@ -164,9 +171,9 @@ function parseIdentifier (node) {
         return new Hex(node.name);
     } else if (node.name[0] === '$') {
         return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toUpperCase()]) {
+    } else if (node.name.toUpperCase() in functions.palettes) {
         return functions.palettes[node.name.toUpperCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
+    } else if (node.name.toLowerCase() in lowerCaseFunctions) {
         return lowerCaseFunctions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());

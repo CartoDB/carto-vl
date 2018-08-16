@@ -91,6 +91,10 @@ export default class Layer {
         this._isLoaded = false;
         this._visible = true;
         this._fireUpdateOnNextRender = false;
+        this._geomOptions = {
+            strokeJoin: viz.strokeJoin,
+            strokeCap: viz.strokeCap
+        };
 
         this.update(source, viz);
     }
@@ -298,7 +302,7 @@ export default class Layer {
             return;
         }
 
-        this._source.requestData(this._getZoom(), this._getViewport());
+        this._source.requestData(this._getZoom(), this._getViewport(), this._geomOptions);
         this._fireUpdateOnNextRender = true;
     }
 
@@ -472,6 +476,11 @@ export default class Layer {
         if (this._source !== source) {
             throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
+
+        // Setup geometry options
+        this._geomOptions.strokeJoin = viz.strokeJoin;
+        this._geomOptions.strokeCap = viz.strokeCap;
+
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
         this._integrator.needRefresh();

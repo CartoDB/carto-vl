@@ -64,8 +64,8 @@ export default class GeoJSON extends Base {
         this._setCoordinatesCenter();
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
-        this._addDataframe = addDataframe;
+    bindLayer (dataframeAddedCallback, dataLoadedCallback) {
+        this._dataframeAddedCallback = dataframeAddedCallback;
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
@@ -73,8 +73,17 @@ export default class GeoJSON extends Base {
         return Promise.resolve(this._computeMetadata(viz));
     }
 
-    requestData () {
+    requestData (zoom, viewport, geomOptions) {
+        geomOptions = geomOptions || {};
         if (this._dataframe) {
+            // Force decode geometry in dataframe if required
+            if (this._dataframe.diffGeomOptions &&
+                this._dataframe.diffGeomOptions(geomOptions)) {
+                if (this._dataframe.type === 'line' ||
+                    this._dataframe.type === 'polygon') {
+                    this._dataframe.decodeGeom(geomOptions);
+                }
+            }
             const newProperties = this._decodeUnboundProperties();
             this._dataframe.addProperties(newProperties);
             Object.keys(newProperties).forEach(propertyName => {
@@ -90,11 +99,12 @@ export default class GeoJSON extends Base {
             scale: 1,
             size: this._features.length,
             type: this._getDataframeType(this._type),
-            metadata: this._metadata
+            metadata: this._metadata,
+            geomOptions: geomOptions
         });
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
-        this._addDataframe(dataframe);
+        this._dataframeAddedCallback(dataframe);
         this._dataLoadedCallback();
     }
 

@@ -134,8 +134,9 @@ export default class MVT extends Base {
         return this._metadata;
     }
 
-    requestData (zoom, viewport) {
-        return this._tileClient.requestData(zoom, viewport, this.responseToDataframeTransformer.bind(this),
+    requestData (zoom, viewport, geomOptions) {
+        this._geomOptions = geomOptions;
+        return this._tileClient.requestData(zoom, viewport, geomOptions, this.responseToDataframeTransformer.bind(this),
             zoom => this._options.maxZoom === undefined
                 ? this._options.viewportZoomToSourceZoom(zoom)
                 : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
@@ -302,7 +303,8 @@ export default class MVT extends Base {
             scale: rs.scale,
             size: size,
             type: type,
-            metadata: this._metadata
+            metadata: this._metadata,
+            geomOptions: this._geomOptions
         });
     }
 

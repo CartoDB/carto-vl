@@ -33,8 +33,8 @@ export default class BaseWindshaft extends Base {
         return this._client.getMetadata(viz);
     }
 
-    requestData (zoom, viewport) {
-        return this._client.getData(zoom, viewport);
+    requestData (zoom, viewport, geomOptions) {
+        return this._client.getData(zoom, viewport, geomOptions);
     }
 
     free () {

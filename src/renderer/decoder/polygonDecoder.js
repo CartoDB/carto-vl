@@ -23,7 +23,7 @@ let geomBuffer = {
     normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)
 };
 
-export function decodePolygon (geometry) {
+export function decodePolygon (geometry, options) {
     let breakpoints = []; // Array of indices (to vertexArray) that separate each feature
     let featureIDToVertexIndex = new Map();
 
@@ -44,10 +44,12 @@ export function decodePolygon (geometry) {
             }
 
             // Add polygon stroke
-            index = addLineString(polygon.flat, geomBuffer, index, true, (pointIndex) => {
+            options.isPolygon = true;
+            options.skipCallback = (pointIndex) => {
                 // Skip adding the line which connects two rings OR is clipped
                 return polygon.holes.includes((pointIndex - 2) / 2) || isClipped(polygon, pointIndex - 4, pointIndex - 2);
-            });
+            };
+            index = addLineString(polygon.flat, geomBuffer, index, options);
         }
 
         featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0
