@@ -69,9 +69,15 @@ export default class Linear extends BaseExpression {
             const smax = (max - inputMin) / inputDiff;
             return (input - smin) / (smax - smin);
         }
+
         const v = this.input.eval(feature);
         const min = this.min.eval(feature);
         const max = this.max.eval(feature);
+
+        if (max === min) {
+            return 0;
+        }
+
         return (v - min) / (max - min);
     }
 
