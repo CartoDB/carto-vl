@@ -180,7 +180,7 @@ export default class Viz {
     }
 
     isAnimated () {
-        return this._getRootStyleExpressions().some(expr => expr.isAnimated);
+        return this._getRootStyleExpressions().some(expr => expr.isAnimated());
     }
 
     onChange (callback) {
