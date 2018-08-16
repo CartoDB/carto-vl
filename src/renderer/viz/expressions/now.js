@@ -29,26 +29,12 @@ export default class Now extends BaseExpression {
         super.inlineMaker = inline => inline.now;
     }
 
-    get value () {
-        return this.now.expr;
-    }
-
     eval () {
-        return this.value;
+        return this.now.expr;
     }
 
     isAnimated () {
         return true;
-    }
-
-    _compile (metadata) {
-        super._compile(metadata);
-        this.type = 'number';
-        super.inlineMaker = inline => inline.now;
-    }
-
-    _preDraw (...args) {
-        this.now._preDraw(...args);
     }
 
     _setTimestamp (timestamp) {

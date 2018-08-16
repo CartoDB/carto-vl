@@ -34,8 +34,16 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
+    get value () {
+        return this._eval();
+    }
+
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
+    }
+
+    _eval () {
+        return null;
     }
 
     _initializeChildren (children) {

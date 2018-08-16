@@ -221,7 +221,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureIfNeeded () {
-        if (this._cachedTexturePixels && !this.isAnimated()) {
+        if (this._cachedTexturePixels && !this.palette.isAnimated()) {
             return this._cachedTexturePixels;
         }
 
@@ -243,7 +243,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeColorRampTexture () {
-        if (this.isAnimated()) {
+        if (this.palette.isAnimated()) {
             this.palette = this._calcPaletteValues(this.palette);
         }
 
@@ -283,8 +283,9 @@ export default class Ramp extends BaseExpression {
 
     _computeGLTextureIfNeeded (gl) {
         const texturePixels = this._computeTextureIfNeeded();
+        const isAnimatedPalette = this.palette.isAnimated();
 
-        if (this._GLtexCategories !== this.input.numCategories || this.isAnimated()) {
+        if (this._GLtexCategories !== this.input.numCategories || isAnimatedPalette) {
             this._GLtexCategories = this.input.numCategories;
             this.texture = gl.createTexture();
             this._bindGLTexture(gl, texturePixels);

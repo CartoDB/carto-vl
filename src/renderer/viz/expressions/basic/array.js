@@ -69,10 +69,6 @@ export default class BaseArray extends BaseExpression {
         this.elems.map(c => c._resolveAliases(aliases));
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
-    }
-
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
