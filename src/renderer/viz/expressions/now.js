@@ -29,6 +29,10 @@ export default class Now extends BaseExpression {
         super.inlineMaker = inline => inline.now;
     }
 
+    get value () {
+        return this.eval();
+    }
+
     eval () {
         return this.now.expr;
     }
