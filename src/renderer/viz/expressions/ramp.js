@@ -30,6 +30,22 @@ const inputTypes = {
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
 
+const HASH_TEXTURE_PIXELS = new Float32Array(256 * 256);
+for (let i = 0; i < 256 * 256; i++) {
+    HASH_TEXTURE_PIXELS[i] = (fnv1a(i) & 0xFFFF) / (256 * 256);
+}
+
+// https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
+function fnv1a (x) {
+    let hash = 2166136261;
+    hash = hash ^ (x & 0xFF);
+    hash = (hash * 16777619) & 0xFFFFFFFF;
+    x = x >> 8;
+    hash = hash ^ (x & 0xFF);
+    hash = (hash * 16777619) & 0xFFFFFFFF;
+    return hash;
+}
+
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
 *
@@ -196,16 +212,31 @@ export default class Ramp extends BaseExpression {
             };
         }
 
+        let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
+        if (this.input.type === 'category') {
+            inline = `texture2D(texRamp${this._uid}, vec2(ramp_hash${this._uid}(${input.inline}), 0.5))`;
+        }
+
         return {
             preface: this._prefaceCode(input.preface + `
                 uniform sampler2D texRamp${this._uid};
+                uniform sampler2D texRampHash${this._uid};
                 uniform float keyMin${this._uid};
-                uniform float keyWidth${this._uid};`
+                uniform float keyWidth${this._uid};
+
+                float ramp_hash${this._uid}(float s){
+                    vec2 v;
+                    v.x = floor(s/256.);
+                    v.y = s - v.x*256.;
+                    return texture2D(texRampHash${this._uid}, v/256.).a;
+                }
+
+                `
             ),
 
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
-                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
+                ? `(${inline}.a)`
+                : `(${inline}.rgba)`
         };
     }
 
@@ -228,6 +259,7 @@ export default class Ramp extends BaseExpression {
 
         this.input._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).texHashLoc = gl.getUniformLocation(program, `texRampHash${this._uid}`);
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
@@ -324,6 +356,23 @@ export default class Ramp extends BaseExpression {
         gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
         gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
+
+        if (this.input.type === 'category') {
+            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+            if (!this._hashTexture) {
+                this._hashTexture = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, this._hashTexture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, 256, 256, 0, gl.ALPHA, gl.FLOAT, HASH_TEXTURE_PIXELS);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            } else {
+                gl.bindTexture(gl.TEXTURE_2D, this._hashTexture);
+            }
+            gl.uniform1i(this._getBinding(program).texHashLoc, drawMetadata.freeTexUnit);
+            drawMetadata.freeTexUnit++;
+        }
     }
 }
 
@@ -398,9 +447,9 @@ function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, 
         case numCategories < colors.length:
             return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
         case numCategories > colors.length:
-            return _addothersColorToColors(colors, defaultOthersColor);
+            return _addOthersColorToColors(colors, defaultOthersColor);
         default:
-            colors = _addothersColorToColors(colors, defaultOthersColor);
+            colors = _addOthersColorToColors(colors, defaultOthersColor);
             return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
     }
 }
@@ -421,7 +470,7 @@ function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
     return colors;
 }
 
-function _addothersColorToColors (colors, othersColor) {
+function _addOthersColorToColors (colors, othersColor) {
     return [...colors, othersColor];
 }
 
