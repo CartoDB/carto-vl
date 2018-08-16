@@ -9,6 +9,7 @@ import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
+import { isUndefined } from '../../../utils/util';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -125,9 +126,13 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
+        if (Number.isNaN(input) || isUndefined(input)) {
+            return null;
+        }
+
+        const texturePixels = this._computeTextureIfNeeded();
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
