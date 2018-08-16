@@ -126,11 +126,7 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        const input = this.input.eval(feature);
-
-        if (Number.isNaN(input) || isUndefined(input)) {
-            return null;
-        }
+        let input = this.input.eval(feature);
 
         const texturePixels = this._computeTextureIfNeeded();
         const numValues = texturePixels.length - 1;
@@ -154,7 +150,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorValue (texturePixels, m) {
-        const index = Math.round(m * MAX_BYTE_VALUE);
+        const index = Number.isNaN(m) ? 0 : Math.round(m * MAX_BYTE_VALUE);
 
         return {
             r: Math.round(texturePixels[index * 4 + 0]),
