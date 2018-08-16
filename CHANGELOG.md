@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Throw error for duplicated properties and variables
+- Add `strokeJoin` property: MITER, BEVEL
+- Add `strokeCap` property: BUTT, SQUARE
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)

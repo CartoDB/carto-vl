@@ -45,6 +45,9 @@ lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
 lowerCaseFunctions.miter = functions.joins.MITER;
 lowerCaseFunctions.bevel = functions.joins.BEVEL;
 
+lowerCaseFunctions.butt = functions.caps.BUTT;
+lowerCaseFunctions.square = functions.caps.SQUARE;
+
 export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
@@ -87,7 +90,7 @@ function parseVizNamedExpr (vizSpec, node) {
             throw new Error(`Property '${name}' is already defined.`);
         }
         const value = parseNode(node.right);
-        const avoidCast = ['resolution', 'strokeJoin'].includes(name);
+        const avoidCast = ['resolution', 'strokeJoin', 'strokeCap'].includes(name);
         vizSpec[name] = avoidCast ? value : implicitCast(value);
     }
 }

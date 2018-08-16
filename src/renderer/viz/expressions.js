@@ -424,13 +424,13 @@ export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));
  * @example <caption>Using a bevel join.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   strokeWidth: 5,
+ *   width: 5,
  *   strokeJoin: s.joins.BEVEL
  * });
  *
  * @example <caption>Using a bevel join. (String)</caption>
  * const viz = new carto.Viz(`
- *   strokeWidth: 5
+ *   width: 5
  *   strokeJoin: BEVEL
  * `);
  *
@@ -441,6 +441,37 @@ export const ALIGN_BOTTOM = new Placement(constant(0), constant(1));
 export const joins = {
     MITER: 0,
     BEVEL: 1
+};
+
+/**
+ * Stroke caps.
+ *
+ * The following joins are available in the namespace {@link carto.expressions.caps|carto.expressions.caps}.
+ *
+ *  ```
+ *  BUTT, SQUARE
+ *  ```
+ *
+ * @example <caption>Using a square cap.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: 5,
+ *   strokeCap: s.caps.SQUARE
+ * });
+ *
+ * @example <caption>Using a square cap. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: 5
+ *   strokeCap: SQUARE
+ * `);
+ *
+ * @name carto.expressions.caps
+ * @memberof carto.expressions
+ * @api
+ */
+export const caps = {
+    BUTT: 0,
+    SQUARE: 1
 };
 
 export { palettes, Asc, Desc };

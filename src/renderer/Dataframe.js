@@ -72,7 +72,8 @@ export default class Dataframe {
 
     diffGeomOptions (geomOptions) {
         geomOptions = geomOptions || {};
-        return this._geomOptions.strokeJoin !== geomOptions.strokeJoin;
+        return this._geomOptions.strokeJoin !== geomOptions.strokeJoin ||
+               this._geomOptions.strokeCap !== geomOptions.strokeCap;
     }
 
     decodeGeom (geomOptions) {
