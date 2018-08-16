@@ -75,7 +75,7 @@ export default class Linear extends BaseExpression {
         const max = this.max.eval(feature);
 
         if (max === min) {
-            return 0;
+            return v;
         }
 
         return (v - min) / (max - min);
