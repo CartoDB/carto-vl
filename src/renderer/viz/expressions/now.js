@@ -25,21 +25,22 @@ import { number } from '../expressions';
 export default class Now extends BaseExpression {
     constructor () {
         super({ now: number(0) });
-    }
-    eval () {
-        return this.now.expr;
-    }
-    isAnimated () {
-        return true;
-    }
-    _compile (metadata) {
-        super._compile(metadata);
         this.type = 'number';
         super.inlineMaker = inline => inline.now;
     }
-    _preDraw (...args) {
-        this.now._preDraw(...args);
+
+    get value () {
+        return this.eval();
     }
+
+    eval () {
+        return this.now.expr;
+    }
+
+    isAnimated () {
+        return true;
+    }
+
     _setTimestamp (timestamp) {
         this.now.expr = timestamp;
     }

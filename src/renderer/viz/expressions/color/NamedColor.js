@@ -33,7 +33,8 @@ export default class NamedColor extends BaseExpression {
         super({});
         this.type = 'color';
         this.name = colorName;
-        this.color = this._nameToRGBA();
+        this.color = _nameToRGBA(this.name);
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
     get value () {
         return this.eval();
@@ -41,21 +42,25 @@ export default class NamedColor extends BaseExpression {
     eval () {
         return this.color;
     }
-    _compile (meta) {
-        super._compile(meta);
-        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
+}
+
+const nameToRGBACache = {};
+
+function _nameToRGBA (name) {
+    if (nameToRGBACache[name]) {
+        return nameToRGBACache[name];
     }
+    const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
+    const fakeDiv = document.createElement('div');
+    fakeDiv.style.backgroundColor = name;
+    document.body.appendChild(fakeDiv);
+    const rgbSring = getComputedStyle(fakeDiv).backgroundColor;
+    document.body.removeChild(fakeDiv);
 
-    _nameToRGBA () {
-        const colorRegex = /^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)$/;
-        const fakeDiv = document.createElement('div');
-        fakeDiv.style.backgroundColor = this.name;
-        document.body.appendChild(fakeDiv);
-        const rgbSring = getComputedStyle(fakeDiv).backgroundColor;
-        document.body.removeChild(fakeDiv);
+    const match = colorRegex.exec(rgbSring);
 
-        const match = colorRegex.exec(rgbSring);
+    const color = { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
 
-        return { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
-    }
+    nameToRGBACache[name] = color;
+    return color;
 }

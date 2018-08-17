@@ -6,6 +6,6 @@ $style_preface
 $propertyPreface
 
 void main(void) {
-    vec2 featureID = uv;
+    vec2 featureID = abs(uv);
     gl_FragColor = $style_inline;
 }

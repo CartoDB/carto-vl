@@ -88,10 +88,11 @@ async function testSST (file, template, browser) {
 }
 
 function writeTemplate (file, template) {
+    const bundle = process.env.MIN ? 'carto-vl.min' : 'carto-vl';
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
-        cartovl: `http://localhost:${PORT}/dist/carto-vl.js`,
+        cartovl: `http://localhost:${PORT}/dist/${bundle}.js`,
         mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
         mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
     }));
@@ -109,7 +110,7 @@ function loadGeoJSONSources () {
 }
 
 function getLocalhostURL (file) {
-    return file.substr(file.indexOf('test/') + 'test/'.length).replace('scenario.js', '');
+    return file.substr(file.indexOf('test/') + 'test/'.length).replace('/scenario.js', '');
 }
 function getHTML (file) {
     return file.replace(testFile, 'scenario.html');

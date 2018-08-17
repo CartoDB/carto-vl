@@ -5,7 +5,7 @@ import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
-import { Classifier } from './classifier';
+import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
@@ -96,21 +96,15 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        super({ input: input });
+        palette = _calcPaletteValues(palette);
+
+        super({ input, palette });
+
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-
-        try {
-            if (palette.type === paletteTypes.NUMBER_ARRAY) {
-                this.palette.floats = this.palette.eval();
-            } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-                this.palette.colors = this.palette.eval();
-            }
-        } catch (error) {
-            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-        }
+        this.defaultOthersColor = new NamedColor('gray');
     }
 
     loadImages () {
@@ -123,6 +117,8 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
+        this.palette = this._calcPaletteValues(this.palette);
+
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
@@ -157,12 +153,12 @@ export default class Ramp extends BaseExpression {
         };
     }
 
-    _compile (metadata) {
-        super._compile(metadata);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
 
         if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
             this.input = new Linear(this.input);
-            this.input._compile(metadata);
+            this.input._bindMetadata(metadata);
         }
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
@@ -174,12 +170,6 @@ export default class Ramp extends BaseExpression {
 
         this._texCategories = null;
         this._GLtexCategories = null;
-    }
-
-    _free (gl) {
-        if (this.texture) {
-            gl.deleteTexture(this.texture);
-        }
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -212,11 +202,9 @@ export default class Ramp extends BaseExpression {
             return palette.colors;
         }
 
-        const defaultOthersColor = new NamedColor('gray');
-
         return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, defaultOthersColor.eval());
+            ? _getColorsFromPaletteType(input, palette, this.maxKey, this.defaultOthersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.maxKey, this.defaultOthersColor.eval());
     }
 
     _postShaderCompile (program, gl) {
@@ -233,18 +221,32 @@ export default class Ramp extends BaseExpression {
     }
 
     _computeTextureIfNeeded () {
+        if (this._cachedTexturePixels && !this.palette.isAnimated()) {
+            return this._cachedTexturePixels;
+        }
+
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
             this.maxKey = this.input.numCategories - 1;
         }
 
-        return this.type === rampTypes.COLOR
+        this._cachedTexturePixels = this.type === rampTypes.COLOR
             ? this._computeColorRampTexture()
             : this._computeNumericRampTexture();
+
+        return this._cachedTexturePixels;
+    }
+
+    _calcPaletteValues (palette) {
+        return _calcPaletteValues(palette);
     }
 
     _computeColorRampTexture () {
+        if (this.palette.isAnimated()) {
+            this.palette = this._calcPaletteValues(this.palette);
+        }
+
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
@@ -281,27 +283,31 @@ export default class Ramp extends BaseExpression {
 
     _computeGLTextureIfNeeded (gl) {
         const texturePixels = this._computeTextureIfNeeded();
+        const isAnimatedPalette = this.palette.isAnimated();
 
-        if (this._GLtexCategories !== this.input.numCategories) {
+        if (this._GLtexCategories !== this.input.numCategories || isAnimatedPalette) {
             this._GLtexCategories = this.input.numCategories;
-
             this.texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-            if (this.type === rampTypes.COLOR) {
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            this._bindGLTexture(gl, texturePixels);
         }
+    }
+
+    _bindGLTexture (gl, texturePixels) {
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+        if (this.type === rampTypes.COLOR) {
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        } else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
 
     _preDraw (program, drawMetadata, gl) {
@@ -432,4 +438,18 @@ function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) 
     }
 
     return colorArray;
+}
+
+function _calcPaletteValues (palette) {
+    try {
+        if (palette.type === paletteTypes.NUMBER_ARRAY) {
+            palette.floats = palette.eval();
+        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
+            palette.colors = palette.eval();
+        }
+    } catch (error) {
+        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+    }
+
+    return palette;
 }

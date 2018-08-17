@@ -72,4 +72,49 @@ describe('src/renderer/viz/parser', () => {
             expect(() => parseVizDefinition('width: wadus')).toThrow();
         });
     });
+
+    describe('duplicated properties', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                width: 1
+                width: 2
+            `)).toThrowError('Property \'width\' is already defined.');
+        });
+    });
+
+    describe('duplicated variables', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                @a: 1
+                @a: 2
+            `)).toThrowError('Variable \'a\' is already defined.');
+        });
+    });
+
+    describe('built in images', () => {
+        it('should be defined', () => {
+            const str = `
+                @1: bicycle
+                @2: building
+                @3: bus
+                @4: car
+                @5: circle
+                @6: circleOutline
+                @7: cross
+                @8: flag
+                @9: house
+                @10: marker
+                @11: markerOutline
+                @12: plus
+                @13: square
+                @14: squareOutline
+                @15: star
+                @16: starOutline
+                @17: triangle
+                @18: triangleOutline
+            `;
+
+            expect(() => parseVizDefinition(str)).not.toThrow();
+        });
+    });
 });

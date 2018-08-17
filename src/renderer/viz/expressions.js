@@ -122,8 +122,6 @@
  * @api
  */
 
-import { showDeprecationWarning } from './utils/warning';
-
 import Transition from './expressions/transition';
 
 import BaseArray from './expressions/basic/array';
@@ -156,11 +154,11 @@ import BaseCategory from './expressions/basic/category';
 
 import CIELab from './expressions/color/CIELab';
 
-import { ClusterAvg } from './expressions/aggregation/clusterAggregation';
-import { ClusterMax } from './expressions/aggregation/clusterAggregation';
-import { ClusterMin } from './expressions/aggregation/clusterAggregation';
-import { ClusterMode } from './expressions/aggregation/clusterAggregation';
-import { ClusterSum } from './expressions/aggregation/clusterAggregation';
+import ClusterAvg from './expressions/aggregation/cluster/ClusterAvg';
+import ClusterMax from './expressions/aggregation/cluster/ClusterMax';
+import ClusterMin from './expressions/aggregation/cluster/ClusterMin';
+import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
+import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 
 import Constant from './expressions/basic/constant';
 
@@ -195,7 +193,10 @@ import Reverse from './expressions/color/palettes/Reverse';
 
 import Property from './expressions/basic/property';
 
-import { ViewportQuantiles, GlobalQuantiles, GlobalEqIntervals, ViewportEqIntervals } from './expressions/classifier';
+import GlobalEqIntervals from './expressions/classification/GlobalEqIntervals';
+import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
+import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
+import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
 
 import Ramp from './expressions/ramp';
 
@@ -222,11 +223,22 @@ import { Ceil } from './expressions/unary';
 
 import variableFn from './expressions/basic/variable';
 
-import { ViewportAvg, ViewportMax, ViewportMin, ViewportSum, ViewportCount, ViewportPercentile, ViewportHistogram } from './expressions/aggregation/viewportAggregation';
-import { GlobalAvg, GlobalMax, GlobalMin, GlobalSum, GlobalCount, GlobalPercentile } from './expressions/aggregation/globalAggregation';
-import ViewportFeatures from './expressions/viewportFeatures';
+import ViewportAvg from './expressions/aggregation/viewport/ViewportAvg';
+import ViewportMax from './expressions/aggregation/viewport/ViewportMax';
+import ViewportMin from './expressions/aggregation/viewport/ViewportMin';
+import ViewportSum from './expressions/aggregation/viewport/ViewportSum';
+import ViewportCount from './expressions/aggregation/viewport/ViewportCount';
+import ViewportPercentile from './expressions/aggregation/viewport/ViewportPercentile';
+import ViewportHistogram from './expressions/aggregation/viewport/ViewportHistogram';
 
-import XYZ from './expressions/xyz';
+import GlobalAvg from './expressions/aggregation/global/GlobalAvg';
+import GlobalCount from './expressions/aggregation/global/GlobalCount';
+import GlobalMax from './expressions/aggregation/global/GlobalMax';
+import GlobalMin from './expressions/aggregation/global/GlobalMin';
+import GlobalSum from './expressions/aggregation/global/GlobalSum';
+import GlobalPercentile from './expressions/aggregation/global/GlobalPercentile';
+
+import ViewportFeatures from './expressions/viewportFeatures';
 
 import Zoom from './expressions/zoom';
 
@@ -286,8 +298,6 @@ export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
 export const imageList = (...args) => new ImageList(...args);
-export const sprite = (...args) => showDeprecationWarning(args, Image, 'sprite', 'image');
-export const sprites = (...args) => showDeprecationWarning(args, ImageList, 'sprites', 'imageList');
 
 export const svg = (...args) => new SVG(...args);
 
@@ -341,7 +351,6 @@ export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
 export const animation = (...args) => new Animation(...args);
-export const torque = (...args) => showDeprecationWarning(args, Animation, 'torque', 'animation');
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
@@ -372,8 +381,6 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
-
-export const xyz = (...args) => new XYZ(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const scale = (...args) => new Scale(...args);

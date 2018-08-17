@@ -26,13 +26,10 @@ export default class Zoom extends BaseExpression {
     constructor () {
         super({ zoom: number(0) });
         this.type = 'number';
+        super.inlineMaker = inline => inline.zoom;
     }
     eval () {
         return this.zoom.expr;
-    }
-    _compile (metadata) {
-        super._compile(metadata);
-        super.inlineMaker = inline => inline.zoom;
     }
     _preDraw (program, drawMetadata, gl) {
         this.zoom.expr = drawMetadata.zoom;

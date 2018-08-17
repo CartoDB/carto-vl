@@ -35,6 +35,10 @@
               <input type="radio" name="style" onclick="setRampLinear()" id="linear">
               <label for="linear">Interpolate</label>
             </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampEqualIntervals()" id="equalintervals">
+              <label for="equalintervals">Equal intervals</label>
+            </li>
           </ul>
         </div>
       </section>
@@ -78,6 +82,10 @@
       color: ramp(linear($total_pop, 10000, 500000), sunsetdark)
       strokeWidth: 0
     `);
+    const rampEqualIntervalsViz = new carto.Viz(`
+      color: ramp(viewportEqIntervals($total_pop, 5), sunsetdark)
+      strokeWidth: 0
+    `);
 
     // Define layer
     const source = new carto.source.Dataset('us_county_points');
@@ -94,6 +102,9 @@
     }
     function setRampLinear() {
       layer.blendToViz(rampLinearViz);
+    }
+    function setRampEqualIntervals() {
+      layer.blendToViz(rampEqualIntervalsViz);
     }
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';

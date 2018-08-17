@@ -21,6 +21,8 @@ export default class Metadata {
             property.categories = property.categories || [];
             property.categories.map(category => this.categorizeString(category.name));
         });
+
+        this.propertyKeys = Object.keys(this.properties);
     }
     categorizeString (category) {
         if (category === undefined) {

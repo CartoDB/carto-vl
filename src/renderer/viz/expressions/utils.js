@@ -1,4 +1,4 @@
-import { number, category, array } from '../expressions';
+import { number, category, array, imageList } from '../expressions';
 import BaseExpression from './base';
 
 export const DEFAULT = undefined;
@@ -12,7 +12,11 @@ export function implicitCast (value) {
         return category(value);
     }
     if (Array.isArray(value)) {
-        return array(value);
+        const _array = array(value);
+        if (_array && _array.type === 'image-array') {
+            return imageList(_array.elems);
+        }
+        return _array;
     }
     return value;
 }
@@ -90,7 +94,7 @@ export function throwInvalidInstance (expressionName, parameterName, parameterIn
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${number}' is not a number`);
+    type of '${number}' is ${typeof number}, 'number' was expected`);
 }
 
 export function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {

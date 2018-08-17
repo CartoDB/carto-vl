@@ -333,15 +333,7 @@ describe('Interactivity', () => {
     });
 
     function onLoaded (callback) {
-        let allLoaded = 0;
-        function loaded () {
-            allLoaded++;
-            if (allLoaded === 2) {
-                callback();
-            }
-        }
-        layer1.on('loaded', loaded);
-        layer2.on('loaded', loaded);
+        carto.on('loaded', [layer1, layer2], callback);
     }
 
     afterEach(() => {
@@ -396,6 +388,45 @@ describe('Cursor', () => {
         });
     });
 
+    describe('when layer visibility changes to hidden', () => {
+        it('should not fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    describe('when layer visibility changes to visible', () => {
+        it('should fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                layer1.show();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('pointer');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
     afterEach(() => {
         map.remove();
         document.body.removeChild(setup.div);
@@ -444,6 +475,7 @@ describe('regression with a category filter', () => {
         interactivity = new carto.Interactivity([layer1]);
         layer1.addTo(map);
     });
+
     it('should fire a featureClick event with the feature 1 when it is clicked', done => {
         interactivity.on('featureClick', event => {
             expect(event.features.length).toBe(1);
@@ -457,6 +489,7 @@ describe('regression with a category filter', () => {
             util.simulateClick({ lng: 5, lat: 5 });
         });
     });
+
     afterEach(() => {
         map.remove();
         document.body.removeChild(setup.div);

@@ -277,6 +277,7 @@ function genUnaryOp (name, jsFn, glsl) {
             checkLooseType(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
+            this.inlineMaker = inlines => glsl(inlines.a);
         }
         get value () {
             return this.eval();
@@ -284,13 +285,12 @@ function genUnaryOp (name, jsFn, glsl) {
         eval (feature) {
             return jsFn(this.a.eval(feature));
         }
-        _compile (meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             checkType(name, 'x', 0, 'number', this.a);
             if (this.a.type !== 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
-            this.inlineMaker = inlines => glsl(inlines.a);
         }
     };
 }
