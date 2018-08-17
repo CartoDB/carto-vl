@@ -2,30 +2,28 @@ import BaseExpression from './base';
 import { pow, blend, linear, zoom, sub } from '../expressions';
 import { implicitCast, checkType } from './utils';
 
-// /**
-//  * Scale a width value to keep feature width constant in real space (meters).
-//  * This will change the width in pixels at different zoom levels to enforce the previous condition.
-//  *
-//  * @param {Number} width - pixel width at zoom level `zoomlevel`
-//  * @param {Number} [zoomlevel=0] - zoomlevel at which `width` is relative to
-//  * @return {Number}
-//  *
-//  * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7.</caption>
-//  * const s = carto.expressions;
-//  * const viz = new carto.Viz({
-//  *   width: s.scale(25, 7)
-//  * });
-//  *
-//  * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7. (String)</caption>
-//  * const viz = new carto.Viz(`
-//  *   width: s.scale(25, 7)
-//  * `);
-//  *
-//  * @memberof carto.expressions
-//  * @name zoomrange
-//  * @function
-//  * @api
-//  */
+/**
+ * Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).
+ *
+ * @param {Number[]} zoomBreakpointList - list of zoom breakpoints with at least two elements
+ * @return {Number}
+ *
+ * @example <caption>Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.ramp(s.zoomrange([7, 10]), [1, 20])
+ * });
+ *
+ * @example <caption>Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: width: ramp(zoomrange([7, 10]), [1, 20])
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name zoomrange
+ * @function
+ * @api
+ */
 export default class Zoomrange extends BaseExpression {
     constructor (zoomBreakpointList) {
         zoomBreakpointList = implicitCast(zoomBreakpointList);
