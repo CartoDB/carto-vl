@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
-import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
+import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
@@ -67,6 +67,8 @@ let waitingForOthers = new Set();
  */
 export class Animation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
+        checkMaxArguments(arguments, 3, 'animation');
+
         duration = implicitCast(duration);
         input = implicitCast(input);
         const originalInput = input;
@@ -81,7 +83,6 @@ export class Animation extends BaseExpression {
         checkLooseType('animation', 'fade', 2, 'fade', fade);
 
         const progress = number(0);
-
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
         this.type = 'number';

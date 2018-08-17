@@ -1,5 +1,5 @@
 import { number } from '../expressions';
-import { implicitCast } from './utils';
+import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
@@ -446,6 +446,8 @@ export const And = genBinaryOp('and',
 function genBinaryOp (name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends BaseExpression {
         constructor (a, b) {
+            checkMaxArguments(arguments, 2, name);
+
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return number(jsFn(a, b));
             }

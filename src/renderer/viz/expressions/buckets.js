@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkMaxArguments } from './utils';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -66,6 +66,8 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  */
 export default class Buckets extends BaseExpression {
     constructor (input, list) {
+        checkMaxArguments(arguments, 2, 'buckets');
+
         input = implicitCast(input);
         list = implicitCast(list);
 

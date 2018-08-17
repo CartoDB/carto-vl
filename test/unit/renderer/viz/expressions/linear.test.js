@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 import GlobalMin from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMin';
 import GlobalMax from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMax';
 
@@ -11,6 +11,7 @@ describe('src/renderer/viz/expressions/linear', () => {
         validateStaticTypeErrors('linear', ['number', 'color', 'number']);
         validateDynamicTypeErrors('linear', ['category', 'number', 'number']);
         validateDynamicTypeErrors('linear', ['number', 'number', 'category']);
+        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {

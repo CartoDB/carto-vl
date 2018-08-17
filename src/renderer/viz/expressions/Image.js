@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkString } from './utils';
+import { checkString, checkMaxArguments } from './utils';
 
 /**
  * Image. Load an image and use it as a symbol.
@@ -26,7 +26,9 @@ import { checkString } from './utils';
 
 export default class Image extends Base {
     constructor (url) {
+        checkMaxArguments(arguments, 1, 'image');
         checkString('image', 'url', 0, url);
+
         super({});
         this.type = 'image';
         this.canvas = null;

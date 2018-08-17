@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/clusterAggregation', () => {
     const fakeFeature = {
@@ -23,6 +23,11 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         validateStaticTypeErrors('clusterMax', [0]);
         validateDynamicTypeErrors('clusterMax', ['category']);
         validateDynamicTypeErrors('clusterMode', ['number']);
+        validateMaxArgumentsError('clusterMax', ['number', 'number']);
+        validateMaxArgumentsError('clusterMin', ['number', 'number']);
+        validateMaxArgumentsError('clusterSum', ['number', 'number']);
+        validateMaxArgumentsError('clusterAvg', ['number', 'number']);
+        validateMaxArgumentsError('clusterMode', ['number', 'number']);
     });
 
     describe('type', () => {

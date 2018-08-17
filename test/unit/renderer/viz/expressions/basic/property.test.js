@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticTypeErrors } from '../utils';
+import { validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/property', () => {
     describe('error control', () => {
@@ -7,6 +7,7 @@ describe('src/renderer/viz/expressions/basic/property', () => {
         validateStaticTypeErrors('property', [undefined]);
         validateStaticTypeErrors('property', [123]);
         validateStaticTypeErrors('property', ['number']);
+        validateMaxArgumentsError('property', ['number', 'number']);
     });
 
     describe('.eval', () => {

@@ -1,5 +1,5 @@
 import ClusterAggregation from './ClusterAggregation';
-
+import { checkMaxArguments } from '../../utils';
 /**
  * Aggregate using the minimum. This operation disables the access to the property
  * except within other cluster aggregate functions.
@@ -27,6 +27,7 @@ import ClusterAggregation from './ClusterAggregation';
  */
 export default class ClusterMin extends ClusterAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'clusterMin');
         super({ property, expressionName: 'clusterMin', aggName: 'min', aggType: 'number' });
     }
 }

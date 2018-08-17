@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkExpression, checkLooseType, implicitCast, checkType } from './utils';
+import { checkExpression, checkLooseType, implicitCast, checkType, checkMaxArguments } from './utils';
 import { globalMin, globalMax } from '../expressions';
 
 /**
@@ -29,6 +29,8 @@ import { globalMin, globalMax } from '../expressions';
 */
 export default class Linear extends BaseExpression {
     constructor (input, min, max) {
+        checkMaxArguments(arguments, 3, 'linear');
+
         input = implicitCast(input);
 
         if (min === undefined && max === undefined) {

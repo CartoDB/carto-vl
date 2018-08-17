@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkNumber, getStringErrorPreface } from './utils';
+import { checkNumber, checkMaxArguments, getStringErrorPreface } from './utils';
 
 /**
  * Transition returns a number from zero to one based on the elapsed number of milliseconds since the viz was instantiated.
@@ -16,6 +16,7 @@ import { checkNumber, getStringErrorPreface } from './utils';
 // TODO refactor to use uniformfloat class
 export default class Transition extends BaseExpression {
     constructor (duration) {
+        checkMaxArguments(arguments, 1, 'transition');
         checkNumber('transition', 'duration', 0, duration);
         if (duration < 0) {
             throw new Error(getStringErrorPreface('transition', 'duration', 0) + 'duration must be greater than or equal to 0');

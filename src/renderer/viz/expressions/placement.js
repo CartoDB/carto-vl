@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkLooseType, checkType, implicitCast } from './utils';
+import { checkLooseType, checkType, implicitCast, checkMaxArguments } from './utils';
 
 /**
  * Placement. Define an image offset relative to its size. Where:
@@ -35,6 +35,8 @@ import { checkLooseType, checkType, implicitCast } from './utils';
 
 export default class Placement extends BaseExpression {
     constructor (x, y) {
+        checkMaxArguments(arguments, 2, 'placement');
+
         x = implicitCast(x);
         y = implicitCast(y);
         checkLooseType('placement', 'x', 0, 'number', x);
