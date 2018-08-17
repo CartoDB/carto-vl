@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 import { namedColor } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/core/viz/expressions/NamedColor', () => {
@@ -10,6 +10,7 @@ describe('src/core/viz/expressions/NamedColor', () => {
         validateStaticType('namedColor', ['blue'], 'color');
         validateStaticType('namedColor', ['AliceBlue'], 'color');
         validateStaticType('namedColor', ['BLACK'], 'color');
+        validateMaxArgumentsError('namedColor', ['blue', 'red']);
     });
 
     describe('.value', () => {

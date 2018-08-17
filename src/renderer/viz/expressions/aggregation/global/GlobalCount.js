@@ -29,7 +29,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalCount extends GlobalAggregation {
     constructor (property) {
-        checkMaxArguments(arguments, 1, 'count');
+        checkMaxArguments(arguments, 1, 'globalCount');
 
         super({ property, name: 'count', type: 'number' });
     }

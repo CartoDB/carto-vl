@@ -26,7 +26,7 @@ import { checkString, checkMaxArguments } from './utils';
 
 export default class Image extends Base {
     constructor (url) {
-        checkMaxArguments(arguments, 2, 'image');
+        checkMaxArguments(arguments, 1, 'image');
         checkString('image', 'url', 0, url);
 
         super({});

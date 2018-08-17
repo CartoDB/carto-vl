@@ -29,7 +29,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalAvg extends GlobalAggregation {
     constructor (property) {
-        checkMaxArguments(property, 1, 'avg');
+        checkMaxArguments(arguments, 1, 'globalAvg');
 
         super({ property, name: 'avg', type: 'number' });
     }

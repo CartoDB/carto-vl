@@ -2,7 +2,8 @@ import {
     validateDynamicTypeErrors,
     validateStaticType,
     validateStaticTypeErrors,
-    validateCompileTypeError
+    validateCompileTypeError,
+    validateMaxArgumentsError
 } from './utils';
 
 import {
@@ -22,24 +23,28 @@ describe('src/renderer/viz/expressions/classifier', () => {
         validateCompileTypeError('viewportQuantiles', ['category', 2]);
         validateCompileTypeError('viewportQuantiles', ['color', 2]);
         validateCompileTypeError('viewportQuantiles', ['number', 'color']);
+        validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
 
         validateCompileTypeError('viewportEqIntervals', []);
         validateCompileTypeError('viewportEqIntervals', ['number', 'category']);
         validateCompileTypeError('viewportEqIntervals', ['category', 2]);
         validateCompileTypeError('viewportEqIntervals', ['color', 2]);
         validateCompileTypeError('viewportEqIntervals', ['number', 'color']);
+        validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
         validateStaticTypeErrors('globalQuantiles', []);
         validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
         validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
         validateStaticTypeErrors('globalQuantiles', ['color', 2]);
         validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
+        validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
         validateStaticTypeErrors('globalEqIntervals', []);
         validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
         validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
         validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
         validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
+        validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
     });
 
     describe('type', () => {

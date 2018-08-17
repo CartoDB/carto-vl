@@ -29,7 +29,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalSum extends GlobalAggregation {
     constructor (property) {
-        checkMaxArguments(arguments, 1, 'sum');
+        checkMaxArguments(arguments, 1, 'globalSum');
 
         super({ property, name: 'sum' });
     }

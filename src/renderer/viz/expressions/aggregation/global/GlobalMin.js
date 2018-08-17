@@ -28,7 +28,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalMin extends GlobalAggregation {
     constructor (property) {
-        checkMaxArguments(arguments, 1, 'min');
+        checkMaxArguments(arguments, 1, 'globalMin');
 
         super({ property, name: 'min', type: 'number' });
     }

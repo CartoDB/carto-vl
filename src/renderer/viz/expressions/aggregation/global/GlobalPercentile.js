@@ -29,7 +29,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalPercentile extends BaseExpression {
     constructor (property, percentile) {
-        checkMaxArguments(arguments, 2, 'percentile');
+        checkMaxArguments(arguments, 2, 'globalPercentile');
 
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');

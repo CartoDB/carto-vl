@@ -29,7 +29,7 @@ import { checkNumber, checkType, checkMaxArguments } from '../utils';
  */
 export default class ViewportEqIntervals extends Classifier {
     constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'viewportEqualIntervals');
+        checkMaxArguments(arguments, 2, 'viewportEqIntervals');
         checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
 
         const children = { input, _min: viewportMin(input), _max: viewportMax(input) };

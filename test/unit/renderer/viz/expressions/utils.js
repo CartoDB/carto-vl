@@ -84,6 +84,14 @@ export function validateCompileTypeError (expressionName, argTypes) {
     _validateCompileTimeTypeError(expressionName, simpleArgs);
 }
 
+export function validateMaxArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*accepts.*arguments[\\s\\S]*passed[\\s\\S]*`, 'g'));
+    });
+}
+
 function equalArgs (argsA, argsB) {
     if (argsA.length !== argsB.length) {
         return false;

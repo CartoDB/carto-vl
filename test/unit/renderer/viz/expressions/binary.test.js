@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType, validateMaxArgumentsError } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -10,8 +10,8 @@ describe('src/renderer/viz/expressions/binary', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
             validateDynamicTypeErrors('mul', ['number', 'category']);
             validateDynamicTypeErrors('mul', ['category', 'number']);
-
             validateDynamicTypeErrors('mul', ['category', 'category']);
+            validateMaxArgumentsError('mul', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
@@ -22,6 +22,8 @@ describe('src/renderer/viz/expressions/binary', () => {
 
             validateDynamicTypeErrors('add', ['number', 'color']);
             validateDynamicTypeErrors('add', ['color', 'number']);
+
+            validateMaxArgumentsError('add', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER', () => {
@@ -34,6 +36,8 @@ describe('src/renderer/viz/expressions/binary', () => {
             validateDynamicTypeErrors('mod', ['color', 'number']);
 
             validateStaticTypeErrors('mod', ['color', 'color']);
+
+            validateMaxArgumentsError('mod', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
@@ -44,6 +48,8 @@ describe('src/renderer/viz/expressions/binary', () => {
             validateDynamicTypeErrors('equals', ['color', 'number']);
 
             validateStaticTypeErrors('equals', ['color', 'color']);
+
+            validateMaxArgumentsError('equals', ['number', 'number', 'number']);
         });
     });
 

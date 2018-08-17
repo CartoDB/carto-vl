@@ -34,12 +34,15 @@ export default class Time extends BaseExpression {
         this.date = util.castDate(date);
         this.inlineMaker = () => undefined;
     }
+
     get value () {
         return this.eval();
     }
+
     eval () {
         return this.date;
     }
+
     isAnimated () {
         return false;
     }

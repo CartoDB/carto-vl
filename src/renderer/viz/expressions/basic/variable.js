@@ -29,7 +29,6 @@ import { checkString, checkMaxArguments } from '../utils';
  */
 export class Variable extends BaseExpression {
     constructor () {
-        checkMaxArguments(arguments, 0, variable);
         super({});
     }
 }
@@ -39,7 +38,9 @@ function isFunction (functionToCheck) {
 }
 
 export default function variable (name) {
+    checkMaxArguments(arguments, 1, 'variable');
     checkString('variable', 'name', 0, name);
+
     if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }

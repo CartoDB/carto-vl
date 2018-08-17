@@ -28,7 +28,7 @@ import { checkMaxArguments } from '../../utils';
  */
 export default class GlobalMax extends GlobalAggregation {
     constructor (property) {
-        checkMaxArguments(arguments, 1, 'max');
+        checkMaxArguments(arguments, 1, 'globalMax');
 
         super({ property, name: 'max', type: 'number' });
     }

@@ -1,4 +1,4 @@
-import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/top', () => {
@@ -6,7 +6,9 @@ describe('src/renderer/viz/expressions/top', () => {
         validateFeatureDependentErrors('top', ['category-property', 'dependent']);
         validateTypeErrors('top', ['number', 10]);
         validateTypeErrors('top', ['color', 10]);
+        validateMaxArgumentsError('top', ['category', 10, 'number']);
     });
+
     describe('type', () => {
         validateStaticType('top', ['category-property', 5], 'category');
     });
