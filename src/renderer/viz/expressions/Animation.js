@@ -21,6 +21,14 @@ let waitingForOthers = new Set();
  * @param {Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {Number}
  *
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
@@ -28,25 +36,19 @@ let waitingForOthers = new Set();
  *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
  *
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
- *
- * @example <caption>Using the `getProgressValue` method to get the animation current value</caption>
- * const s = carto.expressions;
- * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
- * const animationStyle = {
- *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
- *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
- *   filter: animationExpr
- * };
- * layer.on('updated', () => {
- *   let currTime = Math.floor(animationExpr.getProgressValue());
- *   document.getElementById('timestamp').innerHTML = currTime;
- * });
  *
  * @memberof carto.expressions
  * @name animation
@@ -190,11 +192,25 @@ export class Animation extends BaseExpression {
     /**
      * Get the current time stamp of the animation
      *
-     * @api
      * @returns {Number|Date} Current time stamp of the animation. If the animation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
+     *
+     * @example <caption>Using the `getProgressValue` method to get the animation current value.</caption>
+     * const s = carto.expressions;
+     * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+     * const animationStyle = {
+     *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
+     *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
+     *   filter: animationExpr
+     * };
+     * layer.on('updated', () => {
+     *   let currTime = Math.floor(animationExpr.getProgressValue());
+     *   document.getElementById('timestamp').innerHTML = currTime;
+     * });
+     *
      * @memberof carto.expressions.Animation
-     * @instance
      * @name getProgressValue
+     * @instance
+     * @api
      */
     getProgressValue () {
         const progress = this.progress.eval(); // from 0 to 1

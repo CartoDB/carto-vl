@@ -13,13 +13,13 @@ import { checkString, checkMaxArguments } from '../utils';
  *   variables: {
  *     sum_price: s.clusterSum(s.prop('price'))
  *   }
- *  filter: s.neq(s.var('sum_price'), 'london'),
+ *  filter: s.neq(s.var('sum_price'), 'london')
  * });
  *
  * @example <caption>(String)</caption>
  * const viz = new carto.Viz(`
- *   @sum_price: clusterSum($price)
- *   filter: @sum_price !== 'london'
+ *   \@sum_price: clusterSum($price)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions

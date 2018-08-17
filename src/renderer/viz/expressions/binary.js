@@ -326,7 +326,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price === 30  // Equivalent to eq($price, 30)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -357,7 +357,7 @@ export const Equals = genBinaryOp('equals',
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price !== 30  // Equivalent to neq($price, 30)
+ *   filter: $price != 30  // Equivalent to neq($price, 30)
  * `);
  *
  * @memberof carto.expressions

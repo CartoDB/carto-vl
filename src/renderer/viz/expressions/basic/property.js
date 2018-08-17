@@ -22,7 +22,7 @@ import { checkString, checkMaxArguments } from '../utils';
  * `);
  *
  * const viz = new carto.Viz(`
- *   filter: $name !== 'london'
+ *   filter: $name != 'london'
  * `);
  *
  * @memberof carto.expressions
