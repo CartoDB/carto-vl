@@ -82,6 +82,7 @@ export function getOrdinalFromIndex (index) {
 export function getStringErrorPreface (expressionName, parameterName, parameterIndex) {
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
+
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
 expected type was '${expectedType}', actual type was '${actualType}'`);
@@ -196,6 +197,25 @@ export function clamp (x, min, max) {
 
 export function mix (x, y, a) {
     return x * (1 - a) + y * a;
+}
+
+export function parseQuerySpaces (query) {
+    const BETWEEN_QUOTES_REGEX = /"(.*?)"/g;
+    const ANY_SPACE_REGEX = /\s/g;
+    const UNDERSCORE = '_';
+
+    query.match(BETWEEN_QUOTES_REGEX).forEach((text) => {
+        query = query.replace(text, text.replace(ANY_SPACE_REGEX, UNDERSCORE));
+    });
+
+    return query;
+}
+
+export function parseSpaces (text) {
+    const ANY_SPACE_REGEX = /\s/g;
+    const UNDERSCORE = '_';
+
+    return text.replace(ANY_SPACE_REGEX, UNDERSCORE);
 }
 
 function _isNumber (value) {
