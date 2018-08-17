@@ -21,12 +21,27 @@ let waitingForOthers = new Set();
  * @param {Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {Number}
  *
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
+ *
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 40, s.fade(0.1, 0.3))
+ * });
  *
  * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
