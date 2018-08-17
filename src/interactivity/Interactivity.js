@@ -66,6 +66,8 @@ const EVENTS = [
     'featureLeave'
 ];
 
+const BATCH_UPDATE_CALLS = 10;
+
 export default class Interactivity {
     /**
     *
@@ -142,8 +144,10 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
+        this._updateCalls = 0;
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
+            this._subscribeToLayerEvents(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         }).then(() => {
             if (options.autoChangePointer) {
@@ -167,13 +171,34 @@ export default class Interactivity {
         });
     }
 
+    _subscribeToLayerEvents (layers) {
+        let animatedLayers = layers.filter(layer => layer && layer.isAnimated());
+        if (animatedLayers.length) {
+            animatedLayers[0].on('updated', this._onLayerUpdated.bind(this));
+        }
+    }
+
     _subscribeToIntegratorEvents (integrator) {
         integrator.on('mousemove', this._onMouseMove.bind(this));
         integrator.on('click', this._onClick.bind(this));
     }
 
+    _onLayerUpdated () {
+        this._updateCalls++;
+        // Debounce calls to fire the events
+        if (this._updateCalls > BATCH_UPDATE_CALLS) {
+            this._updateCalls = 0;
+            this._onMouseMove(this._mouseEvent);
+        }
+    }
+
     _onMouseMove (event) {
-        if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
+        this._mouseEvent = event;
+
+        if (!this._mouseEvent ||
+            (!this._numListeners['featureEnter'] &&
+             !this._numListeners['featureHover'] &&
+             !this._numListeners['featureLeave'])) {
             return;
         }
 
@@ -207,7 +232,8 @@ export default class Interactivity {
     }
 
     _onClick (event) {
-        if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
+        if (!this._numListeners['featureClick'] &&
+            !this._numListeners['featureClickOut']) {
             return;
         }
 
