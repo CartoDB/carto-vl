@@ -142,7 +142,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorValue (texturePixels, m) {
-        const index = Number.isInteger(m) ? Math.round(m * MAX_BYTE_VALUE) : 0;
+        const index = !Number.isFinite(m) || Number.isNaN(m) ? 0 : Math.round(m * MAX_BYTE_VALUE);
 
         return {
             r: Math.round(texturePixels[index * 4 + 0]),
