@@ -39,10 +39,10 @@ export default class Scale extends BaseExpression {
     eval () {
         return this.scale.eval();
     }
-    _compile (metadata) {
+    _bindMetadata (metadata) {
         checkType('scale', 'width', 0, 'number', this.scale.a.a);
         checkType('scale', 'zoomlevel', 1, 'number', this.scale.b);
-        super._compile(metadata);
+        super._bindMetadata(metadata);
     }
     _preDraw (program, drawMetadata, gl) {
         this.scale.a.b.expr = drawMetadata.scale;
