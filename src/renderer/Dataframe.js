@@ -93,19 +93,28 @@ export default class Dataframe {
         this.texFilter = this._createStyleTileTexture(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
+        const inc = 1 / (1024 * 64);
         let index = 0;
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < this.numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
 
                 if (ids[i + 0] === 0) {
-                    ids[i + 0] += 1 / (1024 * 64);
+                    ids[i + 0] += inc;
                 }
                 if (ids[i + 1] === 0) {
-                    ids[i + 1] += 1 / (1024 * 64);
+                    ids[i + 1] += inc;
                 }
 
                 ids[i + 2] = -ids[i + 0];
@@ -120,11 +129,11 @@ export default class Dataframe {
                 while (i === breakpoints[index]) {
                     index++;
                 }
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
             }
         }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
