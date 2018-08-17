@@ -7,14 +7,6 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
  * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
  *
- *           |1
- *           |
- *           |
- * -1 -------+------- 1
- *           |
- *           |
- *         -1|
- *
  * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
  * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
  * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
@@ -24,8 +16,17 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * @return {Placement} Numeric expression
  *
  * @example <caption>Setting the aligment to the top corner of the image.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.image('./marker.svg').
+ *   symbolPlacement: s.placement(1, 0)
+ * });
+ *
+ * @example <caption>Setting the aligment to the top corner of the image. (String)</caption>
+ * const viz = new carto.Viz(`
  *   symbol: image('./marker.svg')
  *   symbolPlacement: placement(1, 0)
+ * `);
  *
  * @memberof carto.expressions
  * @name placement
