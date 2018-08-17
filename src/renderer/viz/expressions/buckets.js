@@ -7,7 +7,7 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  * This returns a number or category expression depending on the input values.
  *
  * @param {Number|Category} property - The property to be evaluated and interpolated
- * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
+ * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
  * @return {Number|Category}
  *
  * @example <caption>Display a traffic dataset is 3 colors depending on the numeric speed.</caption>
