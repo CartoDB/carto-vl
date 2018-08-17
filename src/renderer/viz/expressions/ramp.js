@@ -32,12 +32,15 @@ const MAX_BYTE_VALUE = 255;
 
 const HASH_TEXTURE_PIXELS = new Float32Array(256 * 256);
 for (let i = 0; i < 256 * 256; i++) {
-    HASH_TEXTURE_PIXELS[i] = (fnv1a(i) & 0xFFFF) / (256 * 256);
+    HASH_TEXTURE_PIXELS[i] = (fnv1a(i + i * 7) & 0xFFFF) / (256 * 256);
 }
 
 // https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function#FNV-1_hash
 function fnv1a (x) {
     let hash = 2166136261;
+    hash = hash ^ (x & 0xFF);
+    hash = (hash * 16777619) & 0xFFFFFFFF;
+    x = x >> 8;
     hash = hash ^ (x & 0xFF);
     hash = (hash * 16777619) & 0xFFFFFFFF;
     x = x >> 8;
@@ -363,11 +366,12 @@ export default class Ramp extends BaseExpression {
             if (!this._hashTexture) {
                 this._hashTexture = gl.createTexture();
                 gl.bindTexture(gl.TEXTURE_2D, this._hashTexture);
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
                 gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, 256, 256, 0, gl.ALPHA, gl.FLOAT, HASH_TEXTURE_PIXELS);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
             } else {
                 gl.bindTexture(gl.TEXTURE_2D, this._hashTexture);
             }
