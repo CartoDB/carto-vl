@@ -176,6 +176,17 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
+ * @example <caption>isNaN.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.not(s.isNaN(s.prop('numeric')))
+ * });
+ *
+ * @example <caption>isNaN. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: not(isNaN($numeric))
+ * `);
+ *
  * @param {Number} x - Numeric expression to check
  * @return {Number}
  *
