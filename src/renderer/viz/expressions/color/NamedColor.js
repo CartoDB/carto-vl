@@ -15,9 +15,9 @@ import { CSS_COLOR_NAMES } from './cssColorNames';
  * });
  *
  * @example <caption>Display blue points. (String)</caption>
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   color: blue  // Equivalent to namedColor('blue')
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name namedColor
