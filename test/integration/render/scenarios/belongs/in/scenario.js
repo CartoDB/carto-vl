@@ -6,7 +6,7 @@ const map = new carto.Map({
 const source = new carto.source.GeoJSON(sources['points']);
 const viz = new carto.Viz(`
     width: 20,
-    filter: in($cat, ['1', '2'])
+    filter: $cat in ['1', '2']
 `);
 const layer = new carto.Layer('layer', source, viz);
 
