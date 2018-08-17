@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { mul, pow, div, blend, linear, zoom, sub } from '../expressions';
+import { pow, blend, linear, zoom, sub } from '../expressions';
 import { implicitCast, checkType } from './utils';
 
 // /**
@@ -29,9 +29,22 @@ import { implicitCast, checkType } from './utils';
 export default class Zoomrange extends BaseExpression {
     constructor (zoomBreakpointList) {
         zoomBreakpointList = implicitCast(zoomBreakpointList);
-        let impostor = null;
-        // TODO var compatible
-        // TODO check length > 1
+
+        super({});
+        this.zoomBreakpointList = zoomBreakpointList;
+        this.type = 'number';
+        this.inlineMaker = inline => inline._impostor;
+    }
+    eval () {
+        return this._impostor.eval();
+    }
+    _bindMetadata (metadata) {
+        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
+        if (this.zoomBreakpointList.elems.length < 2) {
+            setTimeout(() => {
+                throw new Error('zoomrange() function must receive a list with at least two elements');
+            });
+        }
         function genImpostor (list, numerator, denominator) {
             if (list.length === 1) {
                 return 1;
@@ -44,19 +57,8 @@ export default class Zoomrange extends BaseExpression {
                 linear(zoom(), pow(2, sub(a, 1)), pow(2, sub(b, 1)))
             );
         }
-        impostor = genImpostor(zoomBreakpointList.elems, 0, zoomBreakpointList.elems.length - 1);
-        super({
-            _impostor: impostor
-        });
-        this.zoomBreakpointList = zoomBreakpointList;
-        this.type = 'number';
-        this.inlineMaker = inline => inline._impostor;
-    }
-    eval () {
-        return this._impostor.eval();
-    }
-    _bindMetadata (metadata) {
-        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
+        this._impostor = genImpostor(this.zoomBreakpointList.elems, 0, this.zoomBreakpointList.elems.length - 1);
+        this.childrenNames.push('_impostor');
         super._bindMetadata(metadata);
     }
 }
