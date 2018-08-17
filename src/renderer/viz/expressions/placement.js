@@ -7,6 +7,16 @@ import { checkLooseType, checkType, implicitCast } from './utils';
  * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
  * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
  *
+ * ```
+ *           |1
+ *           |
+ *           |
+ * -1 -------+------- 1
+ *           |
+ *           |
+ *         -1|
+ * ```
+ *
  * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
  * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
  * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
