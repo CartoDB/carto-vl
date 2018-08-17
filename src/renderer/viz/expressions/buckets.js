@@ -4,60 +4,39 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
- * Imagine a traffic dataset with a speed property. We want to divide the roads in
- * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
- *
- * We´ll need:
- *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
- *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
- *
- * ```javascript
- *  const s = carto.expressions;
- *  const $speed = s.prop('speed');
- *  const viz = new carto.Viz({
- *    color: s.ramp(
- *      s.buckets($speed, [30, 80, 120]),
- *      s.palettes.PRISM
- *    )
- * });
- * ```
- *
- * ```javascript
- *  const viz = new carto.Viz(`
- *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
- * `);
- * ```
- *
- * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
- *  - From 0 to 29
- *  - From 30 to 79
- *  - From 80 to 120
- *
- * Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
- *
- * This expression can be used for categorical properties, imagine the previous example with the data already
- * procesed in a new categorical `procesedSpeed` column:
- *
- * ```javascript
- *  const s = carto.expressions;
- *  const $procesedSpeed = s.prop('procesedSpeed');
- *  const viz = new carto.Viz({
- *    color: s.ramp(
- *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
- *      s.palettes.PRISM)
- *    )
- * });
- * ```
- *
- * ```javascript
- *  const viz = new carto.Viz(`
- *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
- * `);
- * ```
+ * This returns a number or category expression depending on the input values.
  *
  * @param {Number|Category} property - The property to be evaluated and interpolated
  * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
  * @return {Number|Category}
+ *
+ * @example <caption>Display a traffic dataset is 3 colors depending on the numeric speed.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *    color: s.ramp(
+ *      s.buckets(s.prop('speed'), [30, 80, 120]),
+ *      s.palettes.PRISM
+ *    )
+ * });
+ *
+ * @example <caption>Display a traffic dataset is 3 colors depending on the numeric speed. (String)</caption>
+ * const viz = new carto.Viz(`
+ *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+ * `);
+ *
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(
+ *     s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high']),
+ *     s.palettes.PRISM)
+ *   )
+ * });
+ *
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed. (String)</caption>
+ * const viz = new carto.Viz(`
+ *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+ * `);
  *
  * @memberof carto.expressions
  * @name buckets
