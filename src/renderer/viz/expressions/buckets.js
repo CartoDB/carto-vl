@@ -10,12 +10,13 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
  * @return {Number|Category}
  *
- * @example <caption>Display a traffic dataset is 3 colors depending on the numeric speed.</caption>
- * // Using the buckets `expression` we divide the dataset into 3 buckets according to the speed
- * // - From 0 to 29
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed.</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
  * // - From 30 to 79
- * // - From 80 to 120
- * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *    color: s.ramp(
@@ -24,12 +25,13 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  *    )
  * });
  *
- * @example <caption>Display a traffic dataset is 3 colors depending on the numeric speed. (String)</caption>
- * // Using the buckets `expression` we divide the dataset into 3 buckets according to the speed
- * // - From 0 to 29
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed. (String)</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
  * // - From 30 to 79
- * // - From 80 to 120
- * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
  * const viz = new carto.Viz(`
  *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
  * `);
