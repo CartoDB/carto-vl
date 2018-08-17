@@ -172,10 +172,11 @@ export default class Interactivity {
     }
 
     _subscribeToLayerEvents (layers) {
-        let animatedLayers = layers.filter(layer => layer && layer.isAnimated());
-        if (animatedLayers.length) {
-            animatedLayers[0].on('updated', this._onLayerUpdated.bind(this));
-        }
+        layers.forEach(layer => {
+            layer.on('updated', () => {
+                this._onLayerUpdated(layer.isAnimated());
+            });
+        });
     }
 
     _subscribeToIntegratorEvents (integrator) {
@@ -183,17 +184,21 @@ export default class Interactivity {
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onLayerUpdated () {
-        this._updateCalls++;
-        // Debounce calls to fire the events
-        if (this._updateCalls > BATCH_UPDATE_CALLS) {
-            this._updateCalls = 0;
-            this._onMouseMove(this._mouseEvent);
+    _onLayerUpdated (isAnimated) {
+        if (isAnimated) {
+            this._updateCalls++;
+            // Debounce calls to fire the events
+            if (this._updateCalls > BATCH_UPDATE_CALLS) {
+                this._updateCalls = 0;
+                this._onMouseMove(this._mouseEvent);
+            }
         }
     }
 
     _onMouseMove (event) {
-        this._mouseEvent = event;
+        if (event) {
+            this._mouseEvent = event;
+        }
 
         if (!this._mouseEvent ||
             (!this._numListeners['featureEnter'] &&
