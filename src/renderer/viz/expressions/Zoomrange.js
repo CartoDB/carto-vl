@@ -55,7 +55,7 @@ export default class Zoomrange extends BaseExpression {
                 linear(zoom(), pow(2, sub(a, 1)), pow(2, sub(b, 1)))
             );
         }
-        this._impostor = genImpostor(this.zoomBreakpointList.elems, 0, this.zoomBreakpointList.elems.length - 1);
+        this._impostor = genImpostor([...this.zoomBreakpointList.elems], 0, this.zoomBreakpointList.elems.length - 1);
         this.childrenNames.push('_impostor');
         super._bindMetadata(metadata);
     }
