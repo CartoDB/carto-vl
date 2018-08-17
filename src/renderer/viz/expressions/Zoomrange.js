@@ -33,8 +33,8 @@ export default class Zoomrange extends BaseExpression {
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
     }
-    eval () {
-        return this._impostor.eval();
+    eval (feature) {
+        return this._impostor.eval(feature);
     }
     _bindMetadata (metadata) {
         checkType('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
