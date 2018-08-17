@@ -1,5 +1,5 @@
 import Classifier from './Classifier';
-import { checkNumber, checkType } from '../utils';
+import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
 
 /**
@@ -29,6 +29,7 @@ import { viewportHistogram } from '../../expressions';
  */
 export default class ViewportQuantiles extends Classifier {
     constructor (input, buckets) {
+        checkMaxArguments(arguments, 2, 'viewportQuantiles');
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
         const children = { input, _histogram: viewportHistogram(input) };

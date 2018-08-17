@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Alias to a named variable defined in the Viz.
@@ -29,12 +29,15 @@ import { checkString } from '../utils';
  */
 export class Variable extends BaseExpression {
     constructor () {
+        checkMaxArguments(arguments, 0, variable);
         super({});
     }
 }
+
 function isFunction (functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
+
 export default function variable (name) {
     checkString('variable', 'name', 0, name);
     if (name === '') {

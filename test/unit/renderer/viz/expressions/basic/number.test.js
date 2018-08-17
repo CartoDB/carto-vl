@@ -5,7 +5,6 @@ describe('src/renderer/viz/expressions/basic/number', () => {
     describe('error control', () => {
         validateStaticTypeErrors('number', [undefined]);
         validateStaticTypeErrors('number', ['123']);
-        validateStaticTypeErrors('number', ['color', 'number']);
     });
 
     describe('type', () => {

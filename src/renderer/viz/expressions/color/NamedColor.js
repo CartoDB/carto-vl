@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString, getStringErrorPreface } from '../utils';
+import { checkString, checkMaxArguments, getStringErrorPreface } from '../utils';
 import { CSS_COLOR_NAMES } from './cssColorNames';
 
 /**
@@ -26,7 +26,9 @@ import { CSS_COLOR_NAMES } from './cssColorNames';
  */
 export default class NamedColor extends BaseExpression {
     constructor (colorName) {
+        checkMaxArguments(arguments, 1, 'namedColor');
         checkString('namedColor', 'colorName', 0, colorName);
+
         if (!CSS_COLOR_NAMES.includes(colorName.toLowerCase())) {
             throw new Error(getStringErrorPreface('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
         }
@@ -36,9 +38,11 @@ export default class NamedColor extends BaseExpression {
         this.color = _nameToRGBA(this.name);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
+
     get value () {
         return this.eval();
     }
+
     eval () {
         return this.color;
     }

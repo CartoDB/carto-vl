@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkType } from './utils';
+import { implicitCast, checkLooseType, checkType, checkMaxArguments } from './utils';
 
 /**
  * Check if a given value is contained within an inclusive range (including the limits).
@@ -29,6 +29,8 @@ import { implicitCast, checkLooseType, checkType } from './utils';
  */
 export default class Between extends BaseExpression {
     constructor (value, lowerLimit, upperLimit) {
+        checkMaxArguments(arguments, 3, 'between');
+
         value = implicitCast(value);
         lowerLimit = implicitCast(lowerLimit);
         upperLimit = implicitCast(upperLimit);

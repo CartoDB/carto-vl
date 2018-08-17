@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
-import { checkLooseType, checkType } from '../utils';
+import { checkLooseType, checkType, checkMaxArguments } from '../utils';
 
 /**
  * Override the input color opacity.
@@ -32,6 +32,8 @@ export default class Opacity extends BaseExpression {
      * @param {*} alpha new opacity
      */
     constructor (color, alpha) {
+        checkMaxArguments(arguments, 2, 'opacity');
+
         if (Number.isFinite(alpha)) {
             alpha = number(alpha);
         }

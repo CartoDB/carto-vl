@@ -1,4 +1,4 @@
-import { implicitCast, checkLooseType, checkType } from './utils';
+import { implicitCast, checkLooseType, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -273,6 +273,8 @@ export const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 function genUnaryOp (name, jsFn, glsl) {
     return class UnaryOperation extends BaseExpression {
         constructor (a) {
+            checkMaxArguments(arguments, 1, name);
+
             a = implicitCast(a);
             checkLooseType(name, 'x', 0, 'number', a);
             super({ a });

@@ -1,4 +1,5 @@
 import GlobalAggregation from './GlobalAggregation';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Return the feature count for the entire source data.
@@ -28,6 +29,8 @@ import GlobalAggregation from './GlobalAggregation';
  */
 export default class GlobalCount extends GlobalAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'count');
+
         super({ property, name: 'count', type: 'number' });
     }
 }

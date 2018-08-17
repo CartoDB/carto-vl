@@ -1,4 +1,4 @@
-import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -68,6 +68,8 @@ function NIN_INLINE_MAKER (list) {
 function generateBelongsExpression (name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
         constructor (value, list) {
+            checkMaxArguments(arguments, 2, name);
+
             value = implicitCast(value);
             list = implicitCast(list);
 

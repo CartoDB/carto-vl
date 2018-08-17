@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType } from './utils';
+import { implicitCast, checkLooseType, checkMaxArguments } from './utils';
 
 /**
  * Create a FadeIn/FadeOut configuration. See `animation` for more details.
@@ -52,6 +52,8 @@ const DEFAULT_PARAM = undefined;
 
 export class Fade extends BaseExpression {
     constructor (param1 = DEFAULT_PARAM, param2 = DEFAULT_PARAM) {
+        checkMaxArguments(arguments, 2, 'fade');
+
         let fadeIn = param1 === DEFAULT_PARAM
             ? implicitCast(DEFAULT_FADE)
             : implicitCast(param1);

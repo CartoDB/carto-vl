@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Wrapper around category names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
@@ -14,7 +14,9 @@ import { checkString } from '../utils';
  */
 export default class BaseCategory extends BaseExpression {
     constructor (categoryName) {
+        checkMaxArguments(arguments, 1, 'category');
         checkString('category', 'categoryName', 0, categoryName);
+
         super({});
         this.expr = categoryName;
         this.type = 'category';

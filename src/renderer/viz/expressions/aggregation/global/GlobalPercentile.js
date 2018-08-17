@@ -1,7 +1,7 @@
 import BaseExpression from '../../base';
 import * as schema from '../../../../schema';
 import { number } from '../../../expressions';
-
+import { checkMaxArguments } from '../../utils';
 /**
  * Return the Nth percentile of an numeric property for the entire source data.
  *
@@ -29,6 +29,8 @@ import { number } from '../../../expressions';
  */
 export default class GlobalPercentile extends BaseExpression {
     constructor (property, percentile) {
+        checkMaxArguments(arguments, 2, 'percentile');
+
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');
         }

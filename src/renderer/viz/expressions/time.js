@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import * as util from '../../../utils/util';
+import { checkMaxArguments } from './utils';
 
 /**
  * Time contant expression
@@ -25,6 +26,8 @@ import * as util from '../../../utils/util';
  */
 export default class Time extends BaseExpression {
     constructor (date) {
+        checkMaxArguments(arguments, 1, 'time');
+
         super({});
         // TODO improve type check
         this.type = 'time';
