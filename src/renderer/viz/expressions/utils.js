@@ -5,7 +5,7 @@ export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} where passed.`);
+        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
