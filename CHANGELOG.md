@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Throw error for duplicated properties and variables
+- Throw error extra arguments are passed to any expression.
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
