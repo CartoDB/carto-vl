@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve polygon stroke rendering (+ joins)
 - Optimize decodeLine and decodePolygon time (2x)
 - Use minified bundle for CI testing
+- ramp($category) implementation is fixed when using multiple categories
 
 ### Removed
 - Removed XYZ expression
