@@ -1,23 +1,24 @@
 import BaseExpression from './base';
-import { number, mul } from '../expressions';
+import { mul, pow, div } from '../expressions';
 import { implicitCast, checkType } from './utils';
 
 /**
  * Scale a width value to keep feature width constant in real space (meters).
  * This will change the width in pixels at different zoom levels to enforce the previous condition.
  *
- * @param {Number} input - pixel width at zoom level 0
+ * @param {Number} width - pixel width at zoom level `zoomlevel`
+ * @param {Number} [zoomlevel=0] - zoomlevel at which `width` is relative to
  * @return {Number}
  *
- * @example <caption>Keep feature width in meters constant.</caption>
+ * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.scale(0.1)
+ *   width: s.scale(25, 7)
  * });
  *
- * @example <caption>Keep feature width in meters constant. (String)</caption>
+ * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: s.scale(0.1)
+ *   width: s.scale(25, 7)
  * `);
  *
  * @memberof carto.expressions
@@ -26,23 +27,25 @@ import { implicitCast, checkType } from './utils';
  * @api
  */
 export default class Scale extends BaseExpression {
-    constructor (input) {
-        input = implicitCast(input);
+    constructor (width, zoomlevel = 0) {
+        width = implicitCast(width);
+        zoomlevel = implicitCast(zoomlevel);
         super({
-            scale: mul(input, number(0))
+            scale: div(mul(width, 0), pow(2, zoomlevel))
         });
         this.type = 'number';
+        this.inlineMaker = inline => inline.scale;
     }
     eval () {
         return this.scale.eval();
     }
     _compile (metadata) {
-        checkType('scale', 'input', 0, 'number', this.scale.a);
+        checkType('scale', 'width', 0, 'number', this.scale.a.a);
+        checkType('scale', 'zoomlevel', 1, 'number', this.scale.b);
         super._compile(metadata);
-        super.inlineMaker = inline => inline.scale;
     }
     _preDraw (program, drawMetadata, gl) {
-        this.scale.b.expr = drawMetadata.scale;
+        this.scale.a.b.expr = drawMetadata.scale;
         super._preDraw(program, drawMetadata, gl);
     }
 }
