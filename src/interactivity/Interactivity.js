@@ -188,11 +188,10 @@ export default class Interactivity {
     }
 
     _onMouseMove (event, force) {
-        if (event) {
-            this._mouseEvent = event;
-        }
+        // Store mouse event to be used in `onLayerUpdated`
+        this._mouseEvent = event;
 
-        if (!this._mouseEvent ||
+        if (!event ||
             (!this._numListeners['featureEnter'] &&
              !this._numListeners['featureHover'] &&
              !this._numListeners['featureLeave'])) {
