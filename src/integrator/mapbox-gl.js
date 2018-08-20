@@ -80,8 +80,7 @@ class MGLIntegrator {
             this._paintedLayers++;
 
             // Last layer has been painted
-            const isAnimated = this._layers.some(layer =>
-                layer.getViz() && layer.getViz().isAnimated());
+            const isAnimated = this._layers.some(layer => layer.isAnimated());
             // Checking this.map.repaint is needed, because MGL repaint is a setter and it has the strange quite buggy side-effect of doing a "final" repaint after being disabled
             // if we disable it every frame, MGL will do a "final" repaint every frame, which will not disabled it in practice
             if (!isAnimated && this.map.repaint) {

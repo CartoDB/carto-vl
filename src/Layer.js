@@ -172,6 +172,7 @@ export default class Layer {
     async update (source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
+
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
         const uid = this._atomicChangeUID;
@@ -328,6 +329,10 @@ export default class Layer {
             : [];
     }
 
+    isAnimated () {
+        return this._viz && this._viz.isAnimated();
+    }
+
     /**
      * Change layer visibility to visible
      *
@@ -460,6 +465,7 @@ export default class Layer {
         if (!this._source) {
             throw new Error('A source is required before changing the viz');
         }
+
         const source = this._source;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
