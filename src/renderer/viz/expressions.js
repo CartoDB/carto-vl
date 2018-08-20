@@ -9,7 +9,7 @@
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
- *  - **resolution**: resolution, from 1 to 255, of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ *  - **resolution**: resolution of the property-aggregation functions. It is 1 by default. Must be greater than 0 and lower than 256. A value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  *
  * For example the point diameter could be using the `add` expression:
  *
