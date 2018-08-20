@@ -2,7 +2,6 @@ import mitt from 'mitt';
 import Layer from '../Layer';
 import { WM_R, projectToWebMercator } from '../utils/util';
 import { wToR } from '../client/rsys';
-import * as _ from 'lodash';
 
 /**
  *
@@ -171,10 +170,7 @@ export default class Interactivity {
 
     _subscribeToLayerEvents (layers) {
         layers.forEach(layer => {
-            // Debounce `updated` event calls
-            // - Delay: 60 ms
-            // - Maximum delay: 100 ms
-            layer.on('updated', _.debounce(this._onLayerUpdated.bind(this), 60, { maxWait: 100 }));
+            layer.on('updated', this._onLayerUpdated.bind(this));
         });
     }
 
