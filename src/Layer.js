@@ -64,7 +64,6 @@ export default class Layer {
         this._checkViz(viz);
         this._oldDataframes = new Set();
         this._isInitialized = false;
-        this._isAnimated = false;
         this._init(id, source, viz);
     }
 
@@ -173,8 +172,6 @@ export default class Layer {
     async update (source, viz) {
         this._checkSource(source);
         this._checkViz(viz);
-
-        this._isAnimated = viz.isAnimated();
 
         source = source._clone();
         this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
@@ -337,7 +334,7 @@ export default class Layer {
     }
 
     isAnimated () {
-        return this._isAnimated;
+        return this._viz && this._viz.isAnimated();
     }
 
     /**
@@ -472,8 +469,6 @@ export default class Layer {
         if (!this._source) {
             throw new Error('A source is required before changing the viz');
         }
-
-        this._isAnimated = viz.isAnimated();
 
         const source = this._source;
         const loadImagesPromise = viz.loadImages();
