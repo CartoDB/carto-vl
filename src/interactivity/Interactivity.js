@@ -2,6 +2,7 @@ import mitt from 'mitt';
 import Layer from '../Layer';
 import { WM_R, projectToWebMercator } from '../utils/util';
 import { wToR } from '../client/rsys';
+import * as _ from 'lodash';
 
 /**
  *
@@ -65,8 +66,6 @@ const EVENTS = [
     'featureHover',
     'featureLeave'
 ];
-
-const BATCH_UPDATE_CALLS = 10;
 
 export default class Interactivity {
     /**
@@ -173,9 +172,12 @@ export default class Interactivity {
 
     _subscribeToLayerEvents (layers) {
         layers.forEach(layer => {
-            layer.on('updated', () => {
-                this._onLayerUpdated(layer.isAnimated());
-            });
+            // Debounce `updated` event calls
+            // - Delay: 60 ms
+            // - Maximum delay: 100 ms
+            layer.on('updated', _.debounce(() => {
+                this._onLayerUpdated(layer);
+            }, 60, { maxWait: 100 }));
         });
     }
 
@@ -184,14 +186,9 @@ export default class Interactivity {
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onLayerUpdated (isAnimated) {
-        if (isAnimated) {
-            this._updateCalls++;
-            // Debounce calls to fire the events
-            if (this._updateCalls > BATCH_UPDATE_CALLS) {
-                this._updateCalls = 0;
-                this._onMouseMove(this._mouseEvent);
-            }
+    _onLayerUpdated (layer) {
+        if (layer.isAnimated()) {
+            this._onMouseMove(this._mouseEvent);
         }
     }
 
