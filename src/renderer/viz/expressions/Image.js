@@ -32,7 +32,7 @@ export default class Image extends Base {
         super({});
         this.type = 'image';
         this.canvas = null;
-        this._url = url;
+        this.url = url;
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
@@ -42,7 +42,7 @@ export default class Image extends Base {
             };
             this.image.onerror = reject;
             this.image.crossOrigin = 'anonymous';
-            this.image.src = this._url;
+            this.image.src = this.url;
         });
     }
 

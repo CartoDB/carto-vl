@@ -133,7 +133,26 @@ export default class Ramp extends BaseExpression {
         return color;
     }
 
-    getValue (index) {
+    getLegend () {
+        if (this.input.type === inputTypes.CATEGORY) {
+            return this.input.categories.map(this._getLegendCategoryValue);
+        }
+    }
+
+    _getLegendCategoryValue (category, index) {
+        return {
+            name: this._getCategoryName(category),
+            value: this._getRampValueByIndex(index)
+        };
+    }
+
+    _getRampValueByIndex (index) {
+        if (this.palette.type === paletteTypes.IMAGE) {
+            return this.palette[`image${index}`]
+                ? this.palette[`image${index}`].url
+                : null;
+        }
+
         this.palette = this._calcPaletteValues(this.palette);
 
         const texturePixels = this._computeTextureIfNeeded();
@@ -148,14 +167,9 @@ export default class Ramp extends BaseExpression {
         return color;
     }
 
-    getLegend () {
-        if (this.input.type === inputTypes.CATEGORY) {
-            const legend = this.input.categories.map((category, index) => {
-                return { name: category.name, color: this.getValue(index) };
-            });
-
-            return legend;
-        }
+    _getCategoryName (category) {
+        const DEFAULT_OTHERS_NAME = 'Others';
+        return category.name ? category.name : DEFAULT_OTHERS_NAME;
     }
 
     _getPaletteValues () {
