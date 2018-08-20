@@ -143,7 +143,6 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
-        this._updateCalls = 0;
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToLayerEvents(layerList);
