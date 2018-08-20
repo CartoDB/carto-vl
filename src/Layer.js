@@ -236,42 +236,38 @@ export default class Layer {
      * @api
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
-        try {
-            this._checkViz(viz);
-            viz.setDefaultsIfRequired(this.metadata.geomType);
-            if (this._viz && !this._source.requiresNewMetadata(viz)) {
-                Object.keys(this._viz.variables).map(varName => {
-                    // If an existing variable is not re-declared we add it to the new viz
-                    if (!viz.variables[varName]) {
-                        viz.variables[varName] = this._viz.variables[varName];
-                    }
-                });
-
-                Object.keys(viz.variables).map(varName => {
-                    // If the variable existed, we need to blend it, nothing to do if not
-                    if (this._viz.variables[varName]) {
-                        viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
-                    }
-                });
-
-                viz.color._blendFrom(this._viz.color, ms, interpolator);
-                viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
-                viz.width._blendFrom(this._viz.width, ms, interpolator);
-                viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
-                viz.filter._blendFrom(this._viz.filter, ms, interpolator);
-            }
-
-            return this._vizChanged(viz).then(() => {
-                if (this._viz) {
-                    this._viz.onChange(null);
+        this._checkViz(viz);
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+        if (this._viz && !this._source.requiresNewMetadata(viz)) {
+            Object.keys(this._viz.variables).map(varName => {
+                // If an existing variable is not re-declared we add it to the new viz
+                if (!viz.variables[varName]) {
+                    viz.variables[varName] = this._viz.variables[varName];
                 }
-                viz.setDefaultsIfRequired(this._renderLayer.type);
-                this._viz = viz;
-                this._viz.onChange(this._vizChanged.bind(this));
             });
-        } catch (error) {
-            return Promise.reject(error);
+
+            Object.keys(viz.variables).map(varName => {
+                // If the variable existed, we need to blend it, nothing to do if not
+                if (this._viz.variables[varName]) {
+                    viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
+                }
+            });
+
+            viz.color._blendFrom(this._viz.color, ms, interpolator);
+            viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
+            viz.width._blendFrom(this._viz.width, ms, interpolator);
+            viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
+            viz.filter._blendFrom(this._viz.filter, ms, interpolator);
         }
+
+        return this._vizChanged(viz).then(() => {
+            if (this._viz) {
+                this._viz.onChange(null);
+            }
+            viz.setDefaultsIfRequired(this._renderLayer.type);
+            this._viz = viz;
+            this._viz.onChange(this._vizChanged.bind(this));
+        });
     }
 
     // The integrator will call this method once the webgl context is ready.
