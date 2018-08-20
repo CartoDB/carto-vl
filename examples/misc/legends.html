@@ -57,12 +57,19 @@
     const viz = new carto.Viz(`
       color: ramp($adm0_a3, PRISM)
     `);
+    
     // Create the layer
     const layer = new carto.Layer('layer', source, viz);
+    
     layer.addTo(map, 'watername_ocean');
+
+
     layer.on('loaded', () => {
       hideLoader();
+
+      // Get the legend
       const colorLegend = layer.getViz().color.getLegend();
+      
       let colorLegendList = '';
 
       colorLegend.forEach((category) => {
@@ -71,6 +78,7 @@
           `<li><span class="color-mark" style="background-color:${colorHex};"></span> <span>${category.name}</span></li>\n`;
       });
 
+      // Update the information
       document.getElementById('content').innerHTML = colorLegendList;
     });
 
@@ -81,7 +89,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 
