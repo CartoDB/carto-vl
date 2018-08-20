@@ -183,7 +183,7 @@ export default class Interactivity {
         this._onMouseMove(this._mouseEvent, true);
     }
 
-    _onMouseMove (event, force) {
+    _onMouseMove (event, emulated) {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
@@ -221,7 +221,7 @@ export default class Interactivity {
 
         // If the event comes from a real mouse move, trigger always (because coordinates and position have changed)
         // If the event comes from an animated event, trigger only when features have changed (because position is the same)
-        if (!force || (force && (featuresLeft.length || featuresEntered.length))) {
+        if (!emulated || (emulated && (featuresLeft.length || featuresEntered.length))) {
             // Launch hover event
             this._fireEvent('featureHover', featureEvent);
         }
