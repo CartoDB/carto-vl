@@ -121,7 +121,7 @@ export default class Ramp extends BaseExpression {
     eval (feature) {
         this.palette = this._calcPaletteValues(this.palette);
 
-        const texturePixels = this._computeTextureIfNeeded(); 
+        const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
