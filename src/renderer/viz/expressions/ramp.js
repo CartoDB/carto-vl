@@ -134,8 +134,12 @@ export default class Ramp extends BaseExpression {
     }
 
     getLegend () {
+        if (this.input.isA(Linear)) {
+            return this._computeTextureIfNeeded();
+        }
+
         if (this.input.type === inputTypes.CATEGORY) {
-            return this.input.categories.map(this._getLegendCategoryValue);
+            return this.input.getCategories().map(this._getLegendCategoryValue.bind(this));
         }
     }
 
@@ -170,15 +174,6 @@ export default class Ramp extends BaseExpression {
     _getCategoryName (category) {
         const DEFAULT_OTHERS_NAME = 'Others';
         return category.name ? category.name : DEFAULT_OTHERS_NAME;
-    }
-
-    _getPaletteValues () {
-        switch (this.palette.type) {
-            case paletteTypes.PALETTE:
-                return _getSubPalettes(this.palette, this.input.numCategories);
-            default:
-                return this.palette.colors;
-        }
     }
 
     _getValue (texturePixels, numValues, m) {

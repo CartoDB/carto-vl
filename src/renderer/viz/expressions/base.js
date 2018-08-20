@@ -99,6 +99,12 @@ export default class Base {
         return this instanceof expressionClass;
     }
 
+    getCategories () {
+        if (this.input) {
+            return this.input.getCategories();
+        }
+    }
+
     notify () {
         this.parent.notify();
     }
