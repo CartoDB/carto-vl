@@ -63,10 +63,12 @@ export default class Property extends BaseExpression {
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
+
         this.type = metaColumn.type;
 
         if (this.type === 'category') {
             this.numCategories = metaColumn.categories.length;
+            this.categories = metaColumn.categories;
         }
     }
 

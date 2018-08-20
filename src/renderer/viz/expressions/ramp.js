@@ -121,9 +121,8 @@ export default class Ramp extends BaseExpression {
     eval (feature) {
         this.palette = this._calcPaletteValues(this.palette);
 
-        const texturePixels = this._computeTextureIfNeeded();
+        const texturePixels = this._computeTextureIfNeeded(); 
         const input = this.input.eval(feature);
-
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
@@ -132,6 +131,40 @@ export default class Ramp extends BaseExpression {
             : this._getColorValue(texturePixels, m);
 
         return color;
+    }
+
+    getValue (index) {
+        this.palette = this._calcPaletteValues(this.palette);
+
+        const texturePixels = this._computeTextureIfNeeded();
+        const input = index;
+        const numValues = texturePixels.length - 1;
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+
+        const color = this.type === rampTypes.NUMBER
+            ? this._getValue(texturePixels, numValues, m)
+            : this._getColorValue(texturePixels, m);
+
+        return color;
+    }
+
+    getLegend () {
+        if (this.input.type === inputTypes.CATEGORY) {
+            const legend = this.input.categories.map((category, index) => {
+                return { name: category.name, color: this.getValue(index) };
+            });
+
+            return legend;
+        }
+    }
+
+    _getPaletteValues () {
+        switch (this.palette.type) {
+            case paletteTypes.PALETTE:
+                return _getSubPalettes(this.palette, this.input.numCategories);
+            default:
+                return this.palette.colors;
+        }
     }
 
     _getValue (texturePixels, numValues, m) {
@@ -170,6 +203,7 @@ export default class Ramp extends BaseExpression {
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
 
+        this._properties = metadata.properties;
         this._texCategories = null;
         this._GLtexCategories = null;
     }
