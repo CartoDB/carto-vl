@@ -1,6 +1,5 @@
 import * as carto from '../../../../src';
 import * as util from '../../util';
-import * as _ from 'lodash';
 
 // More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
 
@@ -200,10 +199,11 @@ describe('Interactivity', () => {
         });
     });
 
-    describe('when the user move the mouse on the map', () => {
+    describe('when the user moves the mouse on the map', () => {
         describe('and the mouse enters in a feature', () => {
             it('should fire a featureHover event with a features list containing the entered feature', done => {
                 interactivity.on('featureHover', event => {
+                    expect(event.features.length).toBe(1);
                     expect(event.features[0].id).toEqual(-0);
                     expect(event.features[0].layerId).toEqual('layer1');
                     done();
@@ -216,6 +216,7 @@ describe('Interactivity', () => {
 
             it('should fire a featureEnter event with a features list containing the entered feature', done => {
                 interactivity.on('featureEnter', event => {
+                    expect(event.features.length).toBe(1);
                     expect(event.features[0].id).toEqual(-0);
                     expect(event.features[0].layerId).toEqual('layer1');
                     done();
@@ -243,28 +244,16 @@ describe('Interactivity', () => {
         });
 
         describe('and the mouse leaves a feature', () => {
-            it('should fire a featureHover event with an empty features list', done => {
+            it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
                 onLoaded(() => {
                     // Move mouse inside a feature 1
                     util.simulateMove({ lng: 5, lat: 5 });
-                    interactivity.on('featureHover', event => {
-                        expect(event.features.length).toEqual(0);
-                        done();
-                    });
-                    // Move mouse outside any feature (over a feature 1 hole)
-                    util.simulateMove({ lng: 15, lat: 15 });
-                });
-            });
-
-            it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
-                onLoaded(() => {
                     interactivity.on('featureLeave', event => {
+                        expect(event.features.length).toBe(1);
                         expect(event.features[0].id).toEqual(-0);
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
                     });
-                    // Move mouse inside a feature 1
-                    util.simulateMove({ lng: 5, lat: 5 });
                     // Move mouse outside any feature
                     util.simulateMove({ lng: -5, lat: -5 });
                 });
@@ -280,14 +269,14 @@ describe('Interactivity', () => {
                         expect(featureLeaveSpy).not.toHaveBeenCalled();
                         done();
                     });
-                    // Move mouse outside any feature
-                    util.simulateMove({ lng: -10, lat: -10 });
+                    // Move mouse outside any feature (over a feature 1 hole)
+                    util.simulateMove({ lng: 15, lat: 15 });
                 });
             });
         });
     });
 
-    describe('when there is an animated layer', () => {
+    describe('when the layer changes', () => {
         describe('and appears a feature below the mouse', () => {
             it('should fire a featureHover event with the feature 1', done => {
                 onLoaded(() => {
@@ -298,17 +287,14 @@ describe('Interactivity', () => {
 
                     // Register event after move to be called by layer `updated`
                     interactivity.on('featureHover', event => {
-                        // Restore filter
-                        viz1.filter = 1;
-
                         expect(event.features.length).toBe(1);
                         expect(event.features[0].id).toEqual(-0);
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
                     });
 
-                    // Animate layer: show feature
-                    viz1.filter = carto.expressions.now();
+                    // Show feature
+                    viz1.filter = 1;
                 });
             });
         });

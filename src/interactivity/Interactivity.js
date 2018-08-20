@@ -175,9 +175,7 @@ export default class Interactivity {
             // Debounce `updated` event calls
             // - Delay: 60 ms
             // - Maximum delay: 100 ms
-            layer.on('updated', _.debounce(() => {
-                this._onLayerUpdated(layer.isAnimated());
-            }, 60, { maxWait: 100 }));
+            layer.on('updated', _.debounce(this._onLayerUpdated.bind(this), 60, { maxWait: 100 }));
         });
     }
 
@@ -186,10 +184,8 @@ export default class Interactivity {
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onLayerUpdated (isAnimated) {
-        if (isAnimated) {
-            this._onMouseMove(this._mouseEvent, true);
-        }
+    _onLayerUpdated () {
+        this._onMouseMove(this._mouseEvent, true);
     }
 
     _onMouseMove (event, force) {
