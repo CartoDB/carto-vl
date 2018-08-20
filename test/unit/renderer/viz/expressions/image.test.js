@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/image', () => {
     describe('error control', () => {
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/image', () => {
         validateStaticTypeErrors('image', ['color']);
         validateStaticTypeErrors('image', ['category-property']);
         validateStaticTypeErrors('image', ['color-array']);
+        validateMaxArgumentsError('image', ['number', 'number']);
     });
 
     describe('type', () => {

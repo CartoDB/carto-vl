@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { number } from '../expressions';
+import { checkMaxArguments } from './utils';
 
 /**
  * Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.
@@ -24,6 +25,8 @@ import { number } from '../expressions';
  */
 export default class Zoom extends BaseExpression {
     constructor () {
+        checkMaxArguments(arguments, 0, 'zoom');
+
         super({ zoom: number(0) });
         this.type = 'number';
         super.inlineMaker = inline => inline.zoom;

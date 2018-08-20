@@ -1,4 +1,4 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 import { rgb, rgba } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/rgb', () => {
@@ -10,6 +10,7 @@ describe('src/renderer/viz/expressions/rgb', () => {
         validateStaticTypeErrors('rgb', []);
         validateStaticTypeErrors('rgb', ['number', 'number']);
         validateDynamicTypeErrors('rgb', ['number', 'number', 'category']);
+        validateMaxArgumentsError('rgb', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {

@@ -1,10 +1,11 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateTypeErrors, validateStaticType } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/Fade', () => {
     describe('error control', () => {
         validateTypeErrors('fade', ['color']);
         validateTypeErrors('fade', [undefined, 'color']);
+        validateMaxArgumentsError('fade', ['number', 'number', 'number']);
     });
 
     describe('type', () => {

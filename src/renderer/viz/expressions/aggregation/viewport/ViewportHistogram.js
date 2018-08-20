@@ -1,5 +1,6 @@
 import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Generates an histogram.
@@ -37,6 +38,8 @@ import { implicitCast } from '../../utils';
  */
 export default class ViewportHistogram extends BaseExpression {
     constructor (x, weight = 1, size = 1000) {
+        checkMaxArguments(arguments, 3, 'viewportHistogram');
+
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 
         this.type = 'histogram';

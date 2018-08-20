@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from '../utils';
+import { implicitCast, checkExpression, checkLooseType, checkType, checkMaxArguments, clamp } from '../utils';
 
 /**
  * Evaluates to a hsl color.
@@ -57,6 +57,8 @@ export const HSLA = genHSL('hsla', true);
 function genHSL (name, alpha) {
     return class HSLA extends BaseExpression {
         constructor (h, s, l, a) {
+            checkMaxArguments(arguments, 4, 'hsla');
+
             [h, s, l, a] = [h, s, l, a].map(implicitCast);
 
             const children = { h, s, l };

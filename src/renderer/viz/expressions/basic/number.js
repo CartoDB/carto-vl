@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkNumber } from '../utils';
+import { checkNumber, checkMaxArguments } from '../utils';
 
 /**
  * Wraps a number. Explicit usage is unnecessary since CARTO VL will wrap implicitly all numbers using this function.
@@ -25,7 +25,9 @@ import { checkNumber } from '../utils';
  */
 export default class BaseNumber extends BaseExpression {
     constructor (x) {
+        checkMaxArguments(arguments, 1, 'number');
         checkNumber('number', 'x', 0, x);
+
         super({});
         this.expr = x;
         this.type = 'number';

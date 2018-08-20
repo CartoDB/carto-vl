@@ -1,6 +1,6 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
@@ -12,6 +12,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         validateStaticTypeErrors('ramp', ['number']);
         validateStaticTypeErrors('ramp', ['category']);
         validateDynamicTypeErrors('ramp', ['number', 'image-array']);
+        validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
     });
 
     describe('type', () => {
@@ -947,6 +948,133 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         expect(actual).not.toEqual(expected);
                     });
                 });
+            });
+        });
+    });
+
+    describe('when the color ramp has an animated expression', () => {
+        const METADATA = new Metadata({
+            properties: {
+                price: { type: 'number', min: 0, max: 5 }
+            },
+            sample: [
+                { price: 0 },
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 }
+            ]
+        });
+
+        let r;
+
+        beforeEach(() => {
+            r = ramp(buckets('A', ['A', 'B', 'C']), [ rgb(0, 0, sin(now())) ]);
+            r._bindMetadata(METADATA);
+            r.eval({ price: 1 });
+        });
+
+        describe('._computeColorRampTexture', () => {
+            it('should recalculate palette values', () => {
+                spyOn(r, '_calcPaletteValues').and.callThrough();
+
+                r._computeColorRampTexture();
+                expect(r._calcPaletteValues).toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeTextureIfNeeded', () => {
+            it('should calculate texture pixels', () => {
+                spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                r._computeTextureIfNeeded();
+                expect(r._computeColorRampTexture).toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeGLTextureIfNeeded', () => {
+            it('should create a new texture', () => {
+                const gl = { createTexture () {} };
+                spyOn(gl, 'createTexture');
+                spyOn(r, '_bindGLTexture');
+
+                r._computeGLTextureIfNeeded(gl);
+
+                expect(gl.createTexture).toHaveBeenCalled();
+                expect(r._bindGLTexture).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('when the color ramp does not have an animated expression', () => {
+        const METADATA = new Metadata({
+            properties: {
+                price: { type: 'number', min: 0, max: 5 }
+            },
+            sample: [
+                { price: 0 },
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 }
+            ]
+        });
+
+        let r;
+
+        beforeEach(() => {
+            r = ramp(buckets('A', ['A', 'B', 'C']), [ rgb(0, 0, 0) ]);
+            r._bindMetadata(METADATA);
+            r.eval({ price: 1 });
+        });
+
+        describe('._computeColorRampTexture', () => {
+            it('should not recalculate palette values', () => {
+                spyOn(r, '_calcPaletteValues').and.callThrough();
+
+                r._computeColorRampTexture();
+
+                expect(r._calcPaletteValues).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeTextureIfNeeded', () => {
+            describe('and it has not calculated yet texture pixels', () => {
+                it('should calculate texture pixels', () => {
+                    spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                    r._cachedTexturePixels = null;
+                    r._computeTextureIfNeeded();
+
+                    expect(r._computeColorRampTexture).toHaveBeenCalled();
+                });
+            });
+
+            describe('and it has already calculated texture pixels', () => {
+                it('should not calculate texture pixels', () => {
+                    spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                    r._computeTextureIfNeeded();
+                    r._computeTextureIfNeeded();
+
+                    expect(r._computeColorRampTexture).not.toHaveBeenCalled();
+                });
+            });
+        });
+
+        describe('._computeGLTextureIfNeeded', () => {
+            it('should not create a new texture', () => {
+                const gl = { createTexture () {} };
+                spyOn(gl, 'createTexture');
+                spyOn(r, '_bindGLTexture');
+
+                r._computeGLTextureIfNeeded(gl);
+                r._computeGLTextureIfNeeded(gl);
+
+                expect(gl.createTexture).toHaveBeenCalledTimes(1);
+                expect(r._bindGLTexture).toHaveBeenCalledTimes(1);
             });
         });
     });

@@ -24,15 +24,87 @@ export default class Base {
      * @param {*} preface
      */
     constructor (children) {
-        this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => {
-            this[name] = implicitCast(children[name]);
-        });
-        this._getChildren().map(child => {
-            child.parent = this;
-        });
+        this._initializeChildren(children);
+        this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    /**
+     * Evaluate the expression providing a feature.
+     * This is particularly useful for making legends.
+     *
+     * @api
+     * @param {object} feature
+     * @returns {*} result - result of evaluating the expression for the input feature
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: red
+     *      width: sqrt($amount)
+     * `);
+     *
+     * const r = viz.width.eval({
+     *      amount: 16
+     * });
+     *
+     * // `r` value is `4`
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: ramp(linear($amount), Emrld)
+     * `);
+     *
+     * const color = viz.color.eval({
+     *      amount: 123
+     * });
+     *
+     * // `color` will have the same color as the features with an amount of 123
+     *
+     */
+    eval (feature) {
+        throw new Error('Unimplemented');
+    }
+
+    /**
+     * @api
+     * @returns true if the evaluation of the expression may change without external action.
+     */
+    isAnimated () {
+        return this._getChildren().some(child => child.isAnimated());
+    }
+
+    /**
+     * Linear interpolation between this and finalValue with the specified duration
+     * @api
+     * @param {Expression} final
+     * @param {Expression} duration - duration of the transition in milliseconds
+     * @param {Expression} blendFunc
+     * @memberof carto.expressions.Base
+     * @instance
+     * @name blendTo
+     */
+    blendTo (final, duration = 500) {
+        // TODO blendFunc = 'linear'
+        final = implicitCast(final);
+        const parent = this.parent;
+        const blender = blend(this, final, transition(duration));
+        parent.replaceChild(this, blender);
+        blender.notify();
+        return final;
+    }
+
+    isA (expressionClass) {
+        return this instanceof expressionClass;
+    }
+
+    notify () {
+        this.parent.notify();
+    }
+
+    accumViewportAgg (feature) {
+        this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
 
     loadImages () {
@@ -41,6 +113,46 @@ export default class Base {
 
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
+    }
+
+    _initializeChildren (children) {
+        if (Array.isArray(children)) {
+            this._initializeChildrenArray(children);
+        } else {
+            this._initializeChildrenObject(children);
+        }
+    }
+
+    _initializeChildrenArray (children) {
+        if (this.maxParameters && this.maxParameters < children.length) {
+            throw new Error('Extra parameters');
+        }
+
+        this.childrenNames = [];
+
+        children.map((child, index) => {
+            const childName = `${child.type}-${index}`;
+            this.childrenNames.push(childName);
+            this[childName] = implicitCast(child);
+        });
+    }
+
+    _initializeChildrenObject (children) {
+        this.childrenNames = Object.keys(children);
+
+        if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
+            throw new Error('Extra parameters');
+        }
+
+        Object.keys(children).map(name => {
+            this[name] = implicitCast(children[name]);
+        });
+    }
+
+    _addParentToChildren () {
+        this._getChildren().map(child => {
+            child.parent = this;
+        });
     }
 
     _setUID (idGenerator) {
@@ -113,10 +225,6 @@ export default class Base {
         this._getChildren().forEach(child => child._resetViewportAgg(metadata));
     }
 
-    accumViewportAgg (feature) {
-        this._getChildren().forEach(child => child.accumViewportAgg(feature));
-    }
-
     // Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
     // @param {number} timestamp
     _setTimestamp (timestamp) {
@@ -128,44 +236,12 @@ export default class Base {
         this.childrenNames.forEach(name => this[name]._preDraw(...args));
     }
 
-    /**
-     * @api
-     * @returns true if the evaluation of the expression may change without external action.
-     */
-    isAnimated () {
-        return this._getChildren().some(child => child.isAnimated());
-    }
-
     // Replace child *toReplace* by *replacer*
     replaceChild (toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] === toReplace);
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
-    }
-
-    notify () {
-        this.parent.notify();
-    }
-
-    /**
-     * Linear interpolation between this and finalValue with the specified duration
-     * @api
-     * @param {Expression} final
-     * @param {Expression} duration - duration of the transition in milliseconds
-     * @param {Expression} blendFunc
-     * @memberof carto.expressions.Base
-     * @instance
-     * @name blendTo
-     */
-    blendTo (final, duration = 500) {
-        // TODO blendFunc = 'linear'
-        final = implicitCast(final);
-        const parent = this.parent;
-        const blender = blend(this, final, transition(duration));
-        parent.replaceChild(this, blender);
-        blender.notify();
-        return final;
     }
 
     _blendFrom (final, duration = 500, interpolator = null) {
@@ -179,7 +255,6 @@ export default class Base {
         blender.notify();
     }
 
-    // returns a list with the expression children
     _getChildren () {
         return this.childrenNames.map(name => this[name]);
     }
@@ -187,45 +262,5 @@ export default class Base {
     _getMinimumNeededSchema () {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
-    }
-    // eslint-disable-next-line no-unused-vars
-    /**
-     * Evaluate the expression providing a feature.
-     * This is particularly useful for making legends.
-     *
-     * @api
-     * @param {object} feature
-     * @returns {*} result - result of evaluating the expression for the input feature
-     *
-     * @example
-     * const viz = new carto.Viz(`
-     *      color: red
-     *      width: sqrt($amount)
-     * `);
-     *
-     * const r = viz.width.eval({
-     *      amount: 16
-     * });
-     *
-     * // `r` value is `4`
-     *
-     * @example
-     * const viz = new carto.Viz(`
-     *      color: ramp(linear($amount), Emrld)
-     * `);
-     *
-     * const color = viz.color.eval({
-     *      amount: 123
-     * });
-     *
-     * // `color` will have the same color as the features with an amount of 123
-     *
-     */
-    eval (feature) {
-        throw new Error('Unimplemented');
-    }
-
-    isA (expressionClass) {
-        return this instanceof expressionClass;
     }
 }

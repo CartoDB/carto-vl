@@ -1,4 +1,5 @@
 import ViewportAggregation from './ViewportAggregation';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -26,6 +27,8 @@ import ViewportAggregation from './ViewportAggregation';
  */
 export default class ViewportAvg extends ViewportAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'viewportAvg');
+
         super({ property });
         this._sum = 0;
         this._count = 0;
