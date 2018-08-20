@@ -37,15 +37,16 @@
   </div>
 
   <script>
-    const map = new mapboxgl.Map({
-      container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-122.424335, 37.771521],
-      zoom: 13,
-      dragRotate: false,
-    });
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+        center: [-122.424335, 37.771521],
+        zoom: 13,
+        dragRotate: false,
+      });
     map.touchZoomRotate.disableRotation();
-    // Autenticate the client
+
+    // Authenticate the client
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
@@ -54,11 +55,10 @@
     // Define the source
     const source = new carto.source.Dataset('trees_sf');
 
-    // Define the visualization
+    // Define visualization
     const viz = new carto.Viz(`
-      color: ramp($common_species, bold)
-      width: 5
-      strokeWidth: 0
+      color: ramp(top($common_species,5), bold)
+      strokeWidth: 1
     `);
     
     // Create the layer
@@ -68,7 +68,7 @@
     layer.on('loaded', () => {
       hideLoader();
 
-    // Get the information for legend
+    // Get the legend
     const colorLegend = layer.getViz().color.getLegend();
     
     let colorLegendList = '';
@@ -77,8 +77,7 @@
       colorLegendList +=
         `<li><span class="color-mark" style="background-color:${colorHex};"></span> <span>${category.name}</span></li>\n`;
     });
-    
-    // Update the legend with the legend information
+      // Update the information
       document.getElementById('content').innerHTML = colorLegendList;
     });
     function hideLoader() {
