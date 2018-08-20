@@ -100,8 +100,9 @@ export default class Base {
     }
 
     getCategories () {
-        if (this.input) {
-            return this.input.getCategories();
+        const children = this._getChildren();
+        if (children) {
+            return children[0].getCategories();
         }
     }
 
