@@ -176,7 +176,7 @@ export default class Interactivity {
             // - Delay: 60 ms
             // - Maximum delay: 100 ms
             layer.on('updated', _.debounce(() => {
-                this._onLayerUpdated(layer);
+                this._onLayerUpdated(layer.isAnimated());
             }, 60, { maxWait: 100 }));
         });
     }
@@ -186,13 +186,13 @@ export default class Interactivity {
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onLayerUpdated (layer) {
-        if (layer.isAnimated()) {
-            this._onMouseMove(this._mouseEvent);
+    _onLayerUpdated (isAnimated) {
+        if (isAnimated) {
+            this._onMouseMove(this._mouseEvent, true);
         }
     }
 
-    _onMouseMove (event) {
+    _onMouseMove (event, force) {
         if (event) {
             this._mouseEvent = event;
         }
@@ -227,10 +227,14 @@ export default class Interactivity {
             });
         }
 
-        this._prevHoverFeatures = featureEvent.features;
+        this._prevHoverFeatures = currentFeatures;
 
-        // Launch hover event
-        this._fireEvent('featureHover', featureEvent);
+        // If the event comes from a real mouse move, trigger always (because coordinates and position have changed)
+        // If the event comes from an animated event, trigger only when features have changed (because position is the same)
+        if (!force || (force && (featuresLeft.length || featuresEntered.length))) {
+            // Launch hover event
+            this._fireEvent('featureHover', featureEvent);
+        }
     }
 
     _onClick (event) {

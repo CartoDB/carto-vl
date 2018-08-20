@@ -1,5 +1,6 @@
 import * as carto from '../../../../src';
 import * as util from '../../util';
+import * as _ from 'lodash';
 
 // More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
 
@@ -290,22 +291,24 @@ describe('Interactivity', () => {
         describe('and appears a feature below the mouse', () => {
             it('should fire a featureHover event with the feature 1', done => {
                 onLoaded(() => {
+                    // Hide feature
+                    viz1.filter = 0;
                     // Setup initial mouse position
                     util.simulateMove({ lng: 5, lat: 5 });
 
-                    // Animate layer
-                    viz1.width = carto.expressions.now();
-
                     // Register event after move to be called by layer `updated`
                     interactivity.on('featureHover', event => {
-                        // Restore static layer
-                        viz1.width = 0;
+                        // Restore filter
+                        viz1.filter = 1;
 
                         expect(event.features.length).toBe(1);
                         expect(event.features[0].id).toEqual(-0);
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
                     });
+
+                    // Animate layer: show feature
+                    viz1.filter = carto.expressions.now();
                 });
             });
         });
