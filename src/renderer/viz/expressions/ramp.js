@@ -204,7 +204,7 @@ export default class Ramp extends BaseExpression {
         }
 
         let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
-        if (this.input.type === 'category') {
+        if (this.input.type === 'category' && this.input.isA(Property)) {
             inline = `texture2D(texRamp${this._uid}, vec2(ramp_hash${this._uid}(${input.inline}), 0.5))`;
         }
 
@@ -219,7 +219,7 @@ export default class Ramp extends BaseExpression {
                     vec2 v;
                     v.x = floor(s/256.);
                     v.y = s - v.x*256.;
-                    return texture2D(texRampHash${this._uid}, v/256.).a;
+                    return texture2D(texRampHash${this._uid}, v.yx/256.).a;
                 }
 
                 `
