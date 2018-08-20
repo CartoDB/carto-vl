@@ -345,7 +345,8 @@ export default class Ramp extends BaseExpression {
 
         if (this.input.type === 'category' && this.input.isA(Property)) {
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-            if (!this._translateTexture) {
+            if (this._translatedIds !== this._metadata.properties[this.input.name].categories.length) {
+                this._translatedIds = this._metadata.properties[this.input.name].categories.length;
                 this._translateTexture = gl.createTexture();
                 const translatorPixels = new Float32Array(256 * 256);
                 for (let i = 0; i < this._metadata.properties[this.input.name].categories.length; i++) {
