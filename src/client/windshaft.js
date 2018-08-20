@@ -269,7 +269,7 @@ export default class Windshaft {
 
     _buildSelectClause (MNS) {
         const columns = MNS.columns.map(name => schema.column.getBase(name))
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+            .concat(['the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
