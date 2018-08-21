@@ -15,7 +15,7 @@ const FILTERING_THRESHOLD = 0.5;
  */
 
 /**
- * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
+ * @description The Render To Texture Width limits the maximum number of features per dataframe: *maxFeatureCount = RTT_WIDTH^2*
  *
  * Large RTT_WIDTH values are unsupported by hardware. Limits vary on each machine.
  * Support starts to drop from 2048, with a drastic reduction in support for more than 4096 pixels.
@@ -236,7 +236,7 @@ export default class Renderer {
     }
 
     renderLayer (renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
+        const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this.getAspect();
@@ -246,7 +246,7 @@ export default class Renderer {
 
         this._runViewportAggregations(renderLayer);
 
-        if (!tiles.length) {
+        if (!dataframes.length) {
             return;
         }
         viz._getRootExpressions().map(expr => expr._dataReady());
@@ -258,11 +258,11 @@ export default class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
+        const styleDataframe = (dataframe, dataframeTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);
 
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
+            gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
@@ -273,7 +273,7 @@ export default class Renderer {
 
             Object.keys(textureId).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
                 gl.uniform1i(textureId[name], i);
             });
 
@@ -285,11 +285,11 @@ export default class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
-        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
-        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
-        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.filter));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorShader, viz.color));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthShader, viz.width));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterShader, viz.filter));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -327,7 +327,7 @@ export default class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
-        if (tiles[0].type === 'line' || tiles[0].type === 'polygon') {
+        if (dataframes[0].type === 'line' || dataframes[0].type === 'polygon') {
             gl.clearDepth(1);
             gl.depthRange(0, 1);
             gl.depthFunc(gl.NOTEQUAL);
@@ -335,7 +335,7 @@ export default class Renderer {
             gl.enable(gl.DEPTH_TEST);
         }
 
-        const renderDrawPass = orderingIndex => tiles.forEach(tile => {
+        const renderDrawPass = orderingIndex => dataframes.forEach(tile => {
             let freeTexUnit = 0;
             let renderer = null;
             if (!viz.symbol.default) {
