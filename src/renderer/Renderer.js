@@ -244,6 +244,8 @@ export default class Renderer {
             zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)) // Used by zoom expression
         };
 
+        this._runViewportAggregations(renderLayer);
+
         if (!tiles.length) {
             return;
         }
@@ -255,8 +257,6 @@ export default class Renderer {
         gl.disable(gl.STENCIL_TEST);
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
-
-        this._runViewportAggregations(renderLayer);
 
         const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);

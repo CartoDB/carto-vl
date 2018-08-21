@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance } from './utils';
+import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
 
@@ -31,6 +31,8 @@ const MAX_TOP_BUCKETS = 16;
  */
 export default class Top extends BaseExpression {
     constructor (property, buckets) {
+        checkMaxArguments(arguments, 2, 'top');
+
         buckets = implicitCast(buckets);
         checkInstance('top', 'property', 0, Property, property);
         checkLooseType('top', 'buckets', 1, 'number', buckets);

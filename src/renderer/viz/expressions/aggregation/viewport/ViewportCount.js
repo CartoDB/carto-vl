@@ -1,5 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -27,6 +28,8 @@ import { number } from '../../../expressions';
  */
 export default class ViewportCount extends ViewportAggregation {
     constructor () {
+        checkMaxArguments(arguments, 1, 'viewportCount');
+
         super({ property: number(0) });
         this._value = 0;
     }

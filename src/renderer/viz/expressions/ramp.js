@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
@@ -85,6 +85,8 @@ const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 */
 export default class Ramp extends BaseExpression {
     constructor (input, palette) {
+        checkMaxArguments(arguments, 2, 'ramp');
+
         input = implicitCast(input);
         palette = implicitCast(palette);
 

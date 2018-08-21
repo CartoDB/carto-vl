@@ -12,18 +12,35 @@ import { implicitCast } from './utils';
  * @param {...Property} properties - properties that will appear in the feature list
  * @return {ViewportFeatures} ViewportFeatures
  *
+ * @example <caption>Define and use a list of features.</caption>
+ * const source = carto.source.Dataset('data');
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *     list: s.viewportFeatures(s.prop('value'), s.prop('category'))
+ *   }
+ * });
+ * const layer = carto.Layer('layer', source, viz);
+ * ...
+
+ * layer.on('updated', () => {
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
+ * });
+ *
  * @example <caption>Define and use a list of features. (String)</caption>
  * const source = carto.source.Dataset('data');
  * const viz = new carto.Viz(`
- *          \@list: viewportFeatures($value, $category)
+ *   \@list: viewportFeatures($value, $category)
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
- *
+
  * layer.on('updated', () => {
- *     viz.variables.list.value.forEach(feature => {
- *         console.log('value:', feature.value, 'category:', feature.category);
- *     });
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
  * });
  *
  * @memberof carto.expressions

@@ -3,6 +3,12 @@ import BaseExpression from './base';
 
 export const DEFAULT = undefined;
 
+export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
+    if (constructorArguments.length > maxArguments) {
+        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 export function implicitCast (value) {
     if (_isNumber(value)) {

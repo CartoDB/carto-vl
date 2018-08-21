@@ -144,6 +144,7 @@ export default class Interactivity {
         this._numListeners = {};
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
+            this._subscribeToLayerEvents(layerList);
             this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         }).then(() => {
             if (options.autoChangePointer) {
@@ -167,13 +168,29 @@ export default class Interactivity {
         });
     }
 
+    _subscribeToLayerEvents (layers) {
+        layers.forEach(layer => {
+            layer.on('updated', this._onLayerUpdated.bind(this));
+        });
+    }
+
     _subscribeToIntegratorEvents (integrator) {
         integrator.on('mousemove', this._onMouseMove.bind(this));
         integrator.on('click', this._onClick.bind(this));
     }
 
-    _onMouseMove (event) {
-        if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
+    _onLayerUpdated () {
+        this._onMouseMove(this._mouseEvent, true);
+    }
+
+    _onMouseMove (event, emulated) {
+        // Store mouse event to be used in `onLayerUpdated`
+        this._mouseEvent = event;
+
+        if (!event ||
+            (!this._numListeners['featureEnter'] &&
+             !this._numListeners['featureHover'] &&
+             !this._numListeners['featureLeave'])) {
             return;
         }
 
@@ -200,14 +217,19 @@ export default class Interactivity {
             });
         }
 
-        this._prevHoverFeatures = featureEvent.features;
+        this._prevHoverFeatures = currentFeatures;
 
-        // Launch hover event
-        this._fireEvent('featureHover', featureEvent);
+        // If the event comes from a real mouse move, trigger always (because coordinates and position have changed)
+        // If the event comes from an animated event, trigger only when features have changed (because position is the same)
+        if (!emulated || (emulated && (featuresLeft.length || featuresEntered.length))) {
+            // Launch hover event
+            this._fireEvent('featureHover', featureEvent);
+        }
     }
 
     _onClick (event) {
-        if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
+        if (!this._numListeners['featureClick'] &&
+            !this._numListeners['featureClickOut']) {
             return;
         }
 

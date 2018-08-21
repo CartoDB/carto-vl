@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/Animation', () => {
     describe('error control', () => {
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/Animation', () => {
         validateTypeErrors('animation', ['number', 10, 'color']);
         validateTypeErrors('animation', ['color', 10]);
         validateTypeErrors('animation', ['number', 'color']);
+        validateMaxArgumentsError('animation', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
