@@ -21,6 +21,8 @@ export default class CustomLayer {
         this.map = map;
         this.gl = gl;
         this.renderer._initGL(gl);
+        this._setCenter();
+        this._setZoom();
         this.initialize();
     }
 
