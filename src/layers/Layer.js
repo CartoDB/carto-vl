@@ -1,14 +1,14 @@
 import mitt from 'mitt';
-import CartoValidationError from './errors/carto-validation-error';
-import getCMIntegrator from './integrator/carto';
-import CartoMap from './integrator/Map';
-import getMGLIntegrator from './integrator/mapbox-gl';
-import RenderLayer from './renderer/RenderLayer';
-import { cubic } from './renderer/viz/expressions';
-import SourceBase from './sources/Base';
-import util from './utils/util';
-import { layerVisibility } from './constants/layer';
-import Viz from './Viz';
+import CartoValidationError from '../errors/carto-validation-error';
+import getCMIntegrator from '../integrator/carto';
+import CartoMap from '../integrator/Map';
+import RenderLayer from '../renderer/RenderLayer';
+import { cubic } from '../renderer/viz/expressions';
+import SourceBase from '../sources/Base';
+import util from '../utils/util';
+import { layerVisibility } from '../constants/layer';
+import Viz from '../Viz';
+import CustomLayer from './CustomLayer';
 
 /**
  *
@@ -57,13 +57,13 @@ import Viz from './Viz';
 * @memberof carto
 * @api
 */
-export default class Layer {
+export default class Layer extends CustomLayer {
     constructor (id, source, viz) {
+        super(id);
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
         this._oldDataframes = new Set();
-        this._isInitialized = false;
         this._init(id, source, viz);
     }
 
@@ -75,7 +75,6 @@ export default class Layer {
         this._emitter = mitt();
         this._lastViewport = null;
         this._lastMNS = null;
-        this._integrator = null;
 
         this._context = new Promise((resolve) => {
             this._contextInitialize = resolve;
@@ -150,7 +149,7 @@ export default class Layer {
         if (this._isCartoMap(map)) {
             this._addToCartoMap(map, beforeLayerID);
         } else if (this._isMGLMap(map)) {
-            this._addToMGLMap(map, beforeLayerID);
+            map.addLayer(this, beforeLayerID);
         } else {
             throw new CartoValidationError('layer', 'nonValidMap');
         }
@@ -178,7 +177,7 @@ export default class Layer {
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
-        await this._integratorPromise;
+        // await this._integratorPromise;
         await loadImagesPromise;
 
         await this._context;
@@ -273,13 +272,10 @@ export default class Layer {
 
     // The integrator will call this method once the webgl context is ready.
     initialize () {
-        if (!this._isInitialized) {
-            this._isInitialized = true;
-            this._renderLayer.renderer = this._integrator.renderer;
-            this._contextInitialize();
-            this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
-            this.requestMetadata();
-        }
+        this._renderLayer.renderer = this.renderer;
+        this._contextInitialize();
+        this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
+        this.requestMetadata();
     }
 
     async requestMetadata (viz) {
@@ -344,7 +340,7 @@ export default class Layer {
      */
     show () {
         this._visible = true;
-        this._integrator.changeVisibility(this);
+        // this._integrator.changeVisibility(this);
         this.requestData();
         this._fire('updated');
     }
@@ -360,15 +356,42 @@ export default class Layer {
      */
     hide () {
         this._visible = false;
-        this._integrator.changeVisibility(this);
+        // this._integrator.changeVisibility(this);
         this._fire('updated');
     }
 
-    $paintCallback () {
+    render (gl) {
+        this._setCenter();
+        this._setZoom();
+        this._paintLayer();
+
+        // Checking this.map.repaint is needed, because MGL repaint is a setter and
+        // it has the strange quite buggy side-effect of doing a "final" repaint after
+        // being disabled if we disable it every frame, MGL will do a "final" repaint
+        // every frame, which will not disabled it in practice
+        if (!this.isAnimated && this.map.repaint) {
+            this.map.repaint = false;
+        }
+    }
+
+    _setZoom () {
+        const b = this.map.getBounds();
+        const nw = b.getNorthWest();
+        const sw = b.getSouthWest();
+        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+        this.renderer.setZoom(z);
+    }
+
+    _setCenter () {
+        const c = this.map.getCenter();
+        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
+    }
+
+    _paintLayer () {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.viz = this._viz;
-            this._integrator.renderer.renderLayer(this._renderLayer);
-            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            this.renderer.renderLayer(this._renderLayer);
+            if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
@@ -394,16 +417,18 @@ export default class Layer {
      */
     _onDataframeAdded (dataframe) {
         dataframe.setFreeObserver(() => {
-            this._integrator.invalidateWebGLState();
-            this._integrator.needRefresh();
+            this._needRefresh();
         });
         this._renderLayer.addDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._integrator.needRefresh();
+        this._needRefresh();
         this._fireUpdateOnNextRender = true;
+    }
+
+    _needRefresh () {
+        this.map.repaint = true;
     }
 
     /**
@@ -411,7 +436,7 @@ export default class Layer {
      */
     _onDataLoaded () {
         this.state = 'dataLoaded';
-        this._integrator.needRefresh();
+        this._needRefresh();
     }
 
     _addLayerIdToFeature (feature) {
@@ -434,30 +459,8 @@ export default class Layer {
         this._integratorCallback(this._integrator);
     }
 
-    _addToMGLMap (map, beforeLayerID) {
-        const STYLE_ERROR_REGEX = /Style is not done loading/;
-
-        try {
-            this._onMapLoaded(map, beforeLayerID);
-        } catch (error) {
-            if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
-            }
-
-            map.on('load', () => {
-                this._onMapLoaded(map, beforeLayerID);
-            });
-        }
-    }
-
-    _onMapLoaded (map, beforeLayerID) {
-        this._integrator = getMGLIntegrator(map);
-        this._integrator.addLayer(this, beforeLayerID);
-        this._integratorCallback(this._integrator);
-    }
-
     _compileShaders (viz, metadata) {
-        viz.compileShaders(this._integrator.renderer.gl, metadata);
+        viz.compileShaders(this.renderer.gl, metadata);
     }
 
     async _vizChanged (viz) {
@@ -476,7 +479,7 @@ export default class Layer {
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
-        this._integrator.needRefresh();
+        this._needRefresh();
         return this.requestData();
     }
 
@@ -514,14 +517,10 @@ export default class Layer {
     }
 
     _getViewport () {
-        if (this._integrator) {
-            return this._integrator.renderer.getBounds();
-        }
+        return this.renderer.getBounds();
     }
     _getZoom () {
-        if (this._integrator) {
-            return this._integrator.getZoomLevel();
-        }
+        return this.map.getZoom();
     }
 
     _freeSource () {

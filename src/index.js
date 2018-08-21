@@ -24,7 +24,7 @@ import { setDefaultConfig } from './setup/config-service';
 import Viz from './Viz';
 import Map from './integrator/Map';
 import Interactivity from './interactivity/Interactivity';
-import Layer from './Layer';
+import Layer from './layers/Layer';
 import * as expressions from './renderer/viz/expressions';
 import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';

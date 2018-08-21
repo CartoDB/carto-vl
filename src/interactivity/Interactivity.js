@@ -1,5 +1,5 @@
 import mitt from 'mitt';
-import Layer from '../Layer';
+import Layer from '../layers/Layer';
 import { WM_R, projectToWebMercator } from '../utils/util';
 import { wToR } from '../client/rsys';
 

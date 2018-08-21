@@ -37,10 +37,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [0, 30],
-      zoom: 2,
-      scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+      zoom: 2
     });
 
     // Define user
@@ -54,7 +51,10 @@
     const viz = new carto.Viz();
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
+    map.on('load', () => {
+      layer.addTo(map, 'watername_ocean');
+    });
+
     layer.on('loaded', hideLoader);
 
     function hideLoader() {
