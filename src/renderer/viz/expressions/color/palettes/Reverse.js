@@ -1,4 +1,6 @@
 import Palette from './Palette';
+import Base from '../../base';
+import { implicitCast } from '../../utils';
 
 /**
  * Reverse the provided Palette.
@@ -23,7 +25,33 @@ import Palette from './Palette';
  * @api
  */
 
-export default class Reverse extends Palette {
+export default function reverse (x) {
+    x = implicitCast(x);
+    if (x.type === 'palette') {
+        return new ReversePalette(x);
+    }
+    return new ReverseArray(x);
+}
+
+class ReverseArray extends Base {
+    constructor (array) {
+        super({
+            array
+        });
+        this.type = array.type;
+    }
+    get elems () {
+        return [...this.array.elems].reverse();
+    }
+    get value () {
+        return this.elems.map(c => c.value);
+    }
+    eval (feature) {
+        return this.elems.map(c => c.eval(feature));
+    }
+}
+
+class ReversePalette extends Palette {
     constructor (palette) {
         super(palette.name, palette.subPalettes);
         this.type = 'palette';
