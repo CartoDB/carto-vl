@@ -211,13 +211,24 @@ export default class Ramp extends BaseExpression {
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
-            return this.input.getCategories().map(this._getLegendCategoryValue.bind(this));
+            if (this.input.list) {
+                return this.input.list.elems.map(this._getLegendItemValue.bind(this));
+            } else {
+                return this.input.getCategories().map(this._getLegendCategoryValue.bind(this));
+            }
         }
+    }
+
+    _getLegendItemValue (category, index) {
+        return {
+            name: this._getCategoryName(category.expr),
+            value: this._getRampValueByIndex(index)
+        };
     }
 
     _getLegendCategoryValue (category, index) {
         return {
-            name: this._getCategoryName(category),
+            name: this._getCategoryName(category.name),
             value: this._getRampValueByIndex(index)
         };
     }
@@ -232,9 +243,8 @@ export default class Ramp extends BaseExpression {
         this.palette = this._calcPaletteValues(this.palette);
 
         const texturePixels = this._computeTextureIfNeeded();
-        const input = index;
         const numValues = texturePixels.length - 1;
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+        const m = (index - this.minKey) / (this.maxKey - this.minKey);
 
         const color = this.type === rampTypes.NUMBER
             ? this._getValue(texturePixels, numValues, m)
@@ -243,9 +253,13 @@ export default class Ramp extends BaseExpression {
         return color;
     }
 
-    _getCategoryName (category) {
+    _getCategoryName (name) {
         const DEFAULT_OTHERS_NAME = 'Others';
-        return category.name ? category.name : DEFAULT_OTHERS_NAME;
+        if (!name) {
+            return DEFAULT_OTHERS_NAME;
+        }
+
+        return name;
     }
 
     _getValue (texturePixels, numValues, m) {
