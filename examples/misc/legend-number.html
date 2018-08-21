@@ -45,7 +45,8 @@
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
-    // Autenticate the client
+
+    // Authenticate the client
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
@@ -56,7 +57,7 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      color: ramp($common_species, bold)
+      color: ramp($latitude, sunset)
       width: 5
       strokeWidth: 0
     `);
