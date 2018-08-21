@@ -211,26 +211,48 @@ export default class Ramp extends BaseExpression {
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
-            if (this.input.list) {
-                return this.input.list.elems.map(this._getLegendItemValue.bind(this));
-            } else {
-                return this.input.getCategories().map(this._getLegendCategoryValue.bind(this));
-            }
+            return this.input.list
+                ? this._getLegendList()
+                : this._getLeyendCategories();
         }
     }
 
+    _getLegendList () {
+        return this.input.list.elems
+            .map(this._getLegendItemValue.bind(this))
+            .filter(legend => legend !== null);
+    }
+
+    _getLeyendCategories () {
+        return this.input.getCategories()
+            .map(this._getLegendCategoryValue.bind(this))
+            .filter(legend => legend !== null);
+    }
+
     _getLegendItemValue (category, index) {
-        return {
-            name: this._getCategoryName(category.expr),
-            value: this._getRampValueByIndex(index)
-        };
+        const value = this._getRampValueByIndex(index);
+
+        if (value) {
+            return {
+                name: this._getCategoryName(category.expr),
+                value
+            };
+        }
+
+        return null;
     }
 
     _getLegendCategoryValue (category, index) {
-        return {
-            name: this._getCategoryName(category.name),
-            value: this._getRampValueByIndex(index)
-        };
+        const value = this._getRampValueByIndex(index);
+
+        if (value) {
+            return {
+                name: this._getCategoryName(category.name),
+                value
+            };
+        }
+
+        return null;
     }
 
     _getRampValueByIndex (index) {
@@ -249,6 +271,13 @@ export default class Ramp extends BaseExpression {
         const color = this.type === rampTypes.NUMBER
             ? this._getValue(texturePixels, numValues, m)
             : this._getColorValue(texturePixels, m);
+
+        if (Number.isNaN(color.r) ||
+            Number.isNaN(color.g) ||
+            Number.isNaN(color.b) ||
+            Number.isNaN(color.a)) {
+            return null;
+        }
 
         return color;
     }
