@@ -128,7 +128,7 @@ export default class Layer extends CustomLayer {
     }
 
     /**
-     * Add this layer to a map.
+     * Add this layer to a map. It waits for the map to be loaded.
      *
      * @param {mapboxgl.Map} map - The map on which to add the layer
      * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before. If this values is not passed the layer will be added on the top of the existing layers.
@@ -137,9 +137,29 @@ export default class Layer extends CustomLayer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        map.addLayer(this, beforeLayerID);
+        const STYLE_ERROR_REGEX = /Style is not done loading/;
+
+        try {
+            map.addLayer(this, beforeLayerID);
+        } catch (error) {
+            if (!STYLE_ERROR_REGEX.test(error)) {
+                throw new Error(error);
+            }
+
+            map.on('load', () => {
+                map.addLayer(this, beforeLayerID);
+            });
+        }
     }
 
+    /**
+     * Remove this layer from a map.
+     *
+     * @param {mapboxgl.Map} map - The map on which to remove the layer
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
     removeFrom (map) {
         map.removeLayer(this);
     }
@@ -151,7 +171,7 @@ export default class Layer extends CustomLayer {
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
      * If the promise is rejected the layer's source and viz won't be changed.
      * @param {carto.source.Base} source - The new Source object
-     * @param {carto.Viz} viz - Optional. The new Viz object
+     * @param {carto.Viz?} viz - Optional. The new Viz object
      * @memberof carto.Layer
      * @instance
      * @async
