@@ -73,8 +73,8 @@
 
       let symbolLegendList = '';
 
-      symbolLegend.forEach((category, index) => {
-        const colorHex = rgbToHex(colorLegend[index].value);
+      symbolLegend.forEach((legend, index) => {
+        const colorHex = rgbToHex(colorLegend[index].values[0]);
         symbolLegendList +=
           `
           <li>
@@ -82,10 +82,10 @@
                 class="image-mark"
                 style="
                   background-color: ${colorHex};
-                  mask-image:url(${category.value});
-                  -webkit-mask-image:url(${category.value})
+                  mask-image:url(${legend.values[0]});
+                  -webkit-mask-image:url(${legend.values[0]})
               "></span>
-              <span>${category.name}</span>
+              <span>${legend.name}</span>
           </li>
         `
       });

@@ -18,7 +18,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Tree Species in San Francisco</h1>
+        <h1>Latitudes</h1>
       </header>
       <section>
         <div id="controls">
@@ -40,8 +40,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-122.424335, 37.771521],
-      zoom: 13,
+      center: [0, 43],
+      zoom: 1,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
@@ -53,11 +53,11 @@
     });
 
     // Define the source
-    const source = new carto.source.Dataset('trees_sf');
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 
     // Define the visualization
     const viz = new carto.Viz(`
-      color: ramp($latitude, sunset)
+      color: ramp(linear($latitude), sunset)
       width: 5
       strokeWidth: 0
     `);
@@ -73,10 +73,11 @@
     const colorLegend = layer.getViz().color.getLegend();
     
     let colorLegendList = '';
-    colorLegend.forEach((category) => {
-      const colorHex = rgbToHex(category.value);
+    colorLegend.forEach((legend) => {
+      const value = legend.value[0];
+      const colorHex = rgbToHex(legend.value[1]);
       colorLegendList +=
-        `<li><span class="color-mark" style="background-color:${colorHex};"></span> <span>${category.name}</span></li>\n`;
+        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}: ${value}</span></li>\n`;
     });
     
     // Update the legend with the legend information

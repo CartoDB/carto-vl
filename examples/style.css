@@ -513,13 +513,14 @@ aside.toolbox {
   border-right: 1px solid rgba(22, 39, 69, 0.2);
 }
 
-.color-mark {
+.point-mark {
   min-width: 10px;
   min-height: 10px;
   align-self: center;
   border-radius: 50%;
   margin-right: 12px;
   box-sizing: border-box;
+  background-color: red;
 }
 
 .image-mark {
@@ -528,4 +529,26 @@ aside.toolbox {
   min-width: 20px;
   min-height: 20px;
   box-sizing: border-box;
+}
+
+.polygon-mark {
+  width: 10px;
+  height: 10px;
+  min-width: 10px;
+  min-height: 10px;
+  align-self: center;
+  margin-right: 12px;
+  box-sizing: border-box;
+  background-color: red;
+  transform: rotate(45deg);
+}
+
+.line-mark {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  border-left: 3px solid;
+  border-color: red;
+  transform: rotate(45deg) translate(5px, 4px);
 }

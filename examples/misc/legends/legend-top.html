@@ -72,10 +72,10 @@
     const colorLegend = layer.getViz().color.getLegend();
     
     let colorLegendList = '';
-    colorLegend.forEach((category) => {
-      const colorHex = rgbToHex(category.value);
+    colorLegend.forEach((legend) => {
+      const colorHex = rgbToHex(legend.values[0]);
       colorLegendList +=
-        `<li><span class="color-mark" style="background-color:${colorHex};"></span> <span>${category.name}</span></li>\n`;
+        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}: ${legend.values[1]}</span></li>\n`;
     });
       // Update the information
       document.getElementById('content').innerHTML = colorLegendList;
