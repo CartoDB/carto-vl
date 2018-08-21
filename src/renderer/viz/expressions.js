@@ -189,7 +189,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import reverseFn from './expressions/color/palettes/Reverse';
+import reverseFn from './expressions/reverse/reverse';
 
 import Property from './expressions/basic/property';
 

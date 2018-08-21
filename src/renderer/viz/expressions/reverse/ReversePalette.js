@@ -1,11 +1,9 @@
-import Palette from './Palette';
-import Base from '../../base';
-import { implicitCast, checkMaxArguments, checkType } from '../../utils';
+import Palette from '../color/palettes/Palette';
 
 /**
  * Reverse the provided Palette.
  *
- * @param {Palette} palette - Numeric expression to compute the natural logarithm
+ * @param {Palette} palette - Color palette
  * @return {Palette}
  *
  * @example <caption>Invert a Palette.</caption>
@@ -24,37 +22,7 @@ import { implicitCast, checkMaxArguments, checkType } from '../../utils';
  * @function
  * @api
  */
-
-export default function reverse (x) {
-    checkMaxArguments(arguments, 1, 'reverse');
-    x = implicitCast(x);
-    checkType('reverse', 'x', 0, ['palette', 'number-array', 'category-array', 'color-array', 'time-array', 'image-array'], x);
-    if (x.type === 'palette') {
-        return new ReversePalette(x);
-    } else {
-        return new ReverseArray(x);
-    }
-}
-
-class ReverseArray extends Base {
-    constructor (array) {
-        super({
-            array
-        });
-        this.type = array.type;
-    }
-    get elems () {
-        return [...this.array.elems].reverse();
-    }
-    get value () {
-        return this.elems.map(c => c.value);
-    }
-    eval (feature) {
-        return this.elems.map(c => c.eval(feature));
-    }
-}
-
-class ReversePalette extends Palette {
+export default class ReversePalette extends Palette {
     constructor (palette) {
         super(palette.name, palette.subPalettes);
         this.type = 'palette';
