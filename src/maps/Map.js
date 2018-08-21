@@ -71,7 +71,7 @@ export default class Map {
     getBounds () {
         return {
             getNorthWest: () => ({ lat: 85, lng: -180 }),
-            getSouthWest: () => ({ lat: -85, lng: -180 })
+            getSouthWest: () => ({ lat: -85.1, lng: -180 })
         };
     }
 
