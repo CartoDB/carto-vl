@@ -3,7 +3,7 @@
 
 <head>
   <!-- Include CARTO VL JS -->
-  <script src="../../dist/carto-vl.js"></script>
+  <script src="../../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
@@ -37,16 +37,15 @@
   </div>
 
   <script>
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: [-122.424335, 37.771521],
-        zoom: 13,
-        dragRotate: false,
-      });
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-122.424335, 37.771521],
+      zoom: 13,
+      dragRotate: false,
+    });
     map.touchZoomRotate.disableRotation();
-
-    // Authenticate the client
+    // Autenticate the client
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
@@ -55,10 +54,11 @@
     // Define the source
     const source = new carto.source.Dataset('trees_sf');
 
-    // Define visualization
+    // Define the visualization
     const viz = new carto.Viz(`
-      color: ramp(top($common_species,5), bold)
-      strokeWidth: 1
+      color: ramp($common_species, bold)
+      width: 5
+      strokeWidth: 0
     `);
     
     // Create the layer
@@ -68,7 +68,7 @@
     layer.on('loaded', () => {
       hideLoader();
 
-    // Get the legend
+    // Get the information for legend
     const colorLegend = layer.getViz().color.getLegend();
     
     let colorLegendList = '';
@@ -77,7 +77,8 @@
       colorLegendList +=
         `<li><span class="color-mark" style="background-color:${colorHex};"></span> <span>${category.name}</span></li>\n`;
     });
-      // Update the information
+    
+    // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
     });
     function hideLoader() {
