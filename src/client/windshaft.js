@@ -187,7 +187,7 @@ export default class Windshaft {
                     return n;
                 }
                 case 'category':
-                    return this.metadata.categorizeString(propertyValue);
+                    return this.metadata.categorizeString(basename, propertyValue);
                 case 'number':
                     return propertyValue;
                 default:
