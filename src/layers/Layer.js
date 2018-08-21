@@ -67,7 +67,6 @@ export default class Layer extends CustomLayer {
 
     _init (id, source, viz) {
         viz._boundLayer = this;
-        this.state = 'init';
         this._id = id;
 
         this._emitter = mitt();
@@ -78,13 +77,8 @@ export default class Layer extends CustomLayer {
             this._contextInitialize = resolve;
         });
 
-        this._integratorPromise = new Promise((resolve) => {
-            this._integratorCallback = resolve;
-        });
-
         this.metadata = null;
         this._renderLayer = new RenderLayer();
-        this.state = 'init';
         this._visible = true;
         this._fireUpdateOnNextRender = false;
 
@@ -146,20 +140,28 @@ export default class Layer extends CustomLayer {
         map.addLayer(this, beforeLayerID);
     }
 
+    removeFrom (map) {
+        map.removeLayer(this);
+    }
+
     /**
      * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.: the viz will be changed with the source, not before it.
      * This method will return a promise that will be resolved once the source and the visualization are validated.
      * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
      * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source.Base} source - the new Source object
-     * @param {carto.Viz} viz - the new Viz object
+     * @param {carto.source.Base} source - The new Source object
+     * @param {carto.Viz} viz - Optional. The new Viz object
      * @memberof carto.Layer
-     * @async
      * @instance
+     * @async
      * @api
      */
     async update (source, viz) {
+        if (viz === undefined) {
+            // Use current viz
+            viz = this._viz;
+        }
         this._checkSource(source);
         this._checkViz(viz);
 
@@ -168,7 +170,6 @@ export default class Layer extends CustomLayer {
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
-        // await this._integratorPromise;
         await loadImagesPromise;
 
         await this._context;
@@ -224,6 +225,7 @@ export default class Layer extends CustomLayer {
      *
      * @memberof carto.Layer
      * @instance
+     * @async
      * @api
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
@@ -261,7 +263,38 @@ export default class Layer extends CustomLayer {
         });
     }
 
-    // The integrator will call this method once the webgl context is ready.
+    /**
+     * Change layer visibility to visible
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    show () {
+        this.map.setLayoutProperty(this.id, 'visibility', 'visible');
+        this._visible = true;
+        this.requestData();
+        this._fire('updated');
+    }
+
+    /**
+     * Change layer visibility to hidden
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     *
+     * @fires updated
+     */
+    hide () {
+        this.map.setLayoutProperty(this.id, 'visibility', 'none');
+        this._visible = false;
+        this._fire('updated');
+    }
+
+    // The onAdd method will call this method once the webgl context is ready.
     initialize () {
         this._renderLayer.renderer = this.renderer;
         this._contextInitialize();
@@ -290,24 +323,8 @@ export default class Layer extends CustomLayer {
         return this._renderLayer.hasDataframes();
     }
 
-    getId () {
-        return this._id;
-    }
-
-    getSource () {
-        return this._source;
-    }
-
-    getViz () {
-        return this._viz;
-    }
-
     getNumFeatures () {
         return this._renderLayer.getNumFeatures();
-    }
-
-    getIntegrator () {
-        return this._integrator;
     }
 
     getFeaturesAtPosition (pos) {
@@ -318,37 +335,6 @@ export default class Layer extends CustomLayer {
 
     isAnimated () {
         return this._viz && this._viz.isAnimated();
-    }
-
-    /**
-     * Change layer visibility to visible
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    show () {
-        this._visible = true;
-        // this._integrator.changeVisibility(this);
-        this.requestData();
-        this._fire('updated');
-    }
-
-    /**
-     * Change layer visibility to hidden
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    hide () {
-        this._visible = false;
-        // this._integrator.changeVisibility(this);
-        this._fire('updated');
     }
 
     render (gl) {
@@ -422,7 +408,6 @@ export default class Layer extends CustomLayer {
      * Callback executed when the client finishes loading data
      */
     _onDataLoaded () {
-        this.state = 'dataLoaded';
         this._fire('loaded');
         this._needRefresh();
     }
@@ -433,7 +418,7 @@ export default class Layer extends CustomLayer {
     }
 
     _compileShaders (viz, metadata) {
-        viz.compileShaders(this.renderer.gl, metadata);
+        viz.compileShaders(this.gl, metadata);
     }
 
     async _vizChanged (viz) {
@@ -492,6 +477,7 @@ export default class Layer extends CustomLayer {
     _getViewport () {
         return this.renderer.getBounds();
     }
+
     _getZoom () {
         return this.map.getZoom();
     }

@@ -70,7 +70,7 @@
 
     function updateSource() {
       reset('#sql');
-      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')), populatedPlacesLayer.getViz())
+      populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')))
         // .catch(cartoError => {
         //   error('#sql', cartoError);
         // });

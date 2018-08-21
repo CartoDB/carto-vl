@@ -17,10 +17,10 @@ describe('api/layer', () => {
     describe('constructor', () => {
         it('should build a new Layer with (id, source, viz)', () => {
             const layer = new Layer('layer0', source, viz);
-            expect(layer.getId()).toEqual('layer0');
-            expect(layer.getSource()).toEqual(source);
+            expect(layer._id).toEqual('layer0');
+            expect(layer._source).toEqual(source);
             pending('Layer constructor can fail asynchronously, therefore, we must have some way to detect load event');
-            expect(layer.getViz()).toEqual(viz);
+            expect(layer._viz).toEqual(viz);
         });
 
         it('should throw an error if id is not valid', () => {
@@ -68,7 +68,7 @@ describe('api/layer', () => {
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());
-            expect(layer.getSource()).not.toBe(source);
+            expect(layer._source).not.toBe(source);
         });
         it('should be done with SQL sources', () => {
             const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
@@ -76,7 +76,7 @@ describe('api/layer', () => {
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());
-            expect(layer.getSource()).not.toBe(source);
+            expect(layer._source).not.toBe(source);
         });
         it('should be done with GeoJSON sources', () => {
             const source = new GeoJSON({
@@ -88,7 +88,7 @@ describe('api/layer', () => {
                 properties: {}
             });
             const layer = new Layer('layer0', source, new Viz());
-            expect(layer.getSource()).not.toBe(source);
+            expect(layer._source).not.toBe(source);
         });
     });
 
