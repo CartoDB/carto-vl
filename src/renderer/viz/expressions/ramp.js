@@ -29,6 +29,7 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
+const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -199,9 +200,9 @@ export default class Ramp extends BaseExpression {
 
                 float ramp_translate${this._uid}(float s){
                     vec2 v;
-                    v.y = floor(s/256.);
-                    v.x = s - v.y*256.;
-                    return texture2D(texRampTranslate${this._uid}, v/256.).a;
+                    v.y = floor(s/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)});
+                    v.x = s - v.y*${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)};
+                    return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
                 }
 
                 `
@@ -348,19 +349,19 @@ export default class Ramp extends BaseExpression {
             if (this._translatedIds !== this._metadata.properties[this.input.name].categories.length) {
                 this._translatedIds = this._metadata.properties[this.input.name].categories.length;
                 this._translateTexture = gl.createTexture();
-                const translatorPixels = new Float32Array(256 * 256);
+                const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
                 for (let i = 0; i < this._metadata.properties[this.input.name].categories.length; i++) {
                     const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
                     const value = i / (this._metadata.properties[this.input.name].categories.length - 1);
                     const vec2Id = {
-                        x: id % 256,
-                        y: Math.floor(id / 256)
+                        x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
+                        y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
                     };
-                    translatorPixels[256 * vec2Id.y + vec2Id.x] = value;
+                    translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
                 }
                 gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
                 gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, 256, 256, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
