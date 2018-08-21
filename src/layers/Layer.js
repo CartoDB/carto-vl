@@ -1,7 +1,5 @@
 import mitt from 'mitt';
 import CartoValidationError from '../errors/carto-validation-error';
-import getCMIntegrator from '../integrator/carto';
-import CartoMap from '../integrator/Map';
 import RenderLayer from '../renderer/RenderLayer';
 import { cubic } from '../renderer/viz/expressions';
 import SourceBase from '../sources/Base';
@@ -146,13 +144,7 @@ export default class Layer extends CustomLayer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        if (this._isCartoMap(map)) {
-            this._addToCartoMap(map, beforeLayerID);
-        } else if (this._isMGLMap(map)) {
-            map.addLayer(this, beforeLayerID);
-        } else {
-            throw new CartoValidationError('layer', 'nonValidMap');
-        }
+        map.addLayer(this, beforeLayerID);
     }
 
     /**
@@ -442,21 +434,6 @@ export default class Layer extends CustomLayer {
     _addLayerIdToFeature (feature) {
         feature.layerId = this._id;
         return feature;
-    }
-
-    _isCartoMap (map) {
-        return map instanceof CartoMap;
-    }
-
-    _isMGLMap () {
-        // TODO: implement this
-        return true;
-    }
-
-    _addToCartoMap (map, beforeLayerID) {
-        this._integrator = getCMIntegrator(map);
-        this._integrator.addLayer(this, beforeLayerID);
-        this._integratorCallback(this._integrator);
     }
 
     _compileShaders (viz, metadata) {
