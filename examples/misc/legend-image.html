@@ -55,7 +55,7 @@
     const viz = new carto.Viz(
       `
             symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
-            color: ramp(buckets($complaint,['Car','Bus','Building']), [purple,orange,blue])
+            color: ramp(buckets($complaint,['Car','Bus','Building']), [#59ca22,#009fff,#f51ac4])
             symbolPlacement: align_bottom
             width: 30
         `
@@ -70,7 +70,7 @@
 
       const symbolLegend = layer.getViz().symbol.getLegend();
       const colorLegend = layer.getViz().color.getLegend();
-      const symbolSize = 20;
+
       let symbolLegendList = '';
 
       symbolLegend.forEach((category, index) => {
@@ -78,11 +78,13 @@
         symbolLegendList +=
           `
           <li>
-              <span class="image-mark">
-                <svgwidth="${symbolSize}" height="${symbolSize}" fill="${colorHex}">       
-                  <image xlink:href="${category.value}" src="${category.value}" width="${symbolSize}" height="${symbolSize}"  stroke="${colorHex}"/>    
-                </svg>
-              </span>
+              <span 
+                class="image-mark"
+                style="
+                  background-color: ${colorHex};
+                  mask-image:url(${category.value});
+                  -webkit-mask-image:url(${category.value})
+              "></span>
               <span>${category.name}</span>
           </li>
         `

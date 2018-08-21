@@ -525,5 +525,7 @@ aside.toolbox {
 .image-mark {
   align-self: center;
   margin-right: 12px;
+  min-width: 20px;
+  min-height: 20px;
   box-sizing: border-box;
 }
