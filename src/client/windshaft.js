@@ -268,7 +268,7 @@ export default class Windshaft {
     }
 
     _buildQuery (select, filters) {
-        const columns = select.join();
+        const columns = select.map(column => `"${column}"`).join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
