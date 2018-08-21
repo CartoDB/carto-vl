@@ -64,12 +64,13 @@ export default class Property extends BaseExpression {
             : [];
     }
 
-    _bindMetadata (meta) {
-        const metaColumn = meta.properties[this.name];
+    _bindMetadata (metadata) {
+        const metaColumn = metadata.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
 
+        this._metadata = metadata;
         this.type = metaColumn.type;
 
         if (this.type === 'category') {

@@ -10,6 +10,8 @@ import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
 
+const DEFAULT_OTHERS_NAME = 'Others';
+
 const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
@@ -205,54 +207,67 @@ export default class Ramp extends BaseExpression {
      * @instance
      * @api
      */
-    getLegend () {
+    getLegend (options = {}) {
         if (this.input.isA(Linear)) {
-            return this._computeTextureIfNeeded();
+            return this._getLegendLinear(options);
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
             return this.input.list
                 ? this._getLegendList()
-                : this._getLeyendCategories();
+                : this._getLeyendCategories(options);
         }
+    }
+
+    _getLegendLinear () {
+        const name = this.input.input.name;
+        const feature = {};
+
+        return this._metadata.sample
+            .map(sample => sample[name])
+            .sort((a, b) => { return a - b; })
+            .map((value) => {
+                feature[name] = value;
+                return { name, values: [ value, this.eval(feature) ]
+                };
+            });
     }
 
     _getLegendList () {
         return this.input.list.elems
             .map(this._getLegendItemValue.bind(this))
-            .filter(legend => legend !== null);
+            .filter(legend => legend.values !== null);
     }
 
-    _getLeyendCategories () {
+    _getLeyendCategories (options) {
         return this.input.getCategories()
-            .map(this._getLegendCategoryValue.bind(this))
-            .filter(legend => legend !== null);
+            .map((category, index) => { return this._getLegendCategoryValue(category, index, options); })
+            .filter(legend => legend.values !== null);
     }
 
     _getLegendItemValue (category, index) {
         const value = this._getRampValueByIndex(index);
 
-        if (value) {
-            return {
-                name: this._getCategoryName(category.expr),
-                value
-            };
-        }
-
-        return null;
+        return {
+            name: this._getCategoryName(category.expr),
+            values: value ? [ value ] : null
+        };
     }
 
-    _getLegendCategoryValue (category, index) {
+    _getLegendCategoryValue (category, index, options) {
         const value = this._getRampValueByIndex(index);
 
-        if (value) {
+        if (this.input.isA(Top) && this.input.numBuckets === index) {
             return {
-                name: this._getCategoryName(category.name),
-                value
+                name: options.defaultOthers || DEFAULT_OTHERS_NAME,
+                values: value ? [ value ] : null
             };
         }
 
-        return null;
+        return {
+            name: this._getCategoryName(category.name),
+            values: value ? [ value ] : null
+        };
     }
 
     _getRampValueByIndex (index) {
@@ -283,7 +298,6 @@ export default class Ramp extends BaseExpression {
     }
 
     _getCategoryName (name) {
-        const DEFAULT_OTHERS_NAME = 'Others';
         if (!name) {
             return DEFAULT_OTHERS_NAME;
         }
@@ -327,6 +341,7 @@ export default class Ramp extends BaseExpression {
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
 
+        this._metadata = metadata;
         this._properties = metadata.properties;
         this._texCategories = null;
         this._GLtexCategories = null;
