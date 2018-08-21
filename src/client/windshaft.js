@@ -9,12 +9,6 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
-// Get dataframes <- MVT <- Windshaft
-// Get metadata
-// Instantiate map Windshaft
-// Requrest SQL API (temp)
-// Cache dataframe
-
 export default class Windshaft {
     constructor (source) {
         this._source = source;
