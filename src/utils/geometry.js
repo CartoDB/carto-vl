@@ -120,6 +120,9 @@ export function pointInCircle (p, center, scale) {
 }
 
 export function pointInRectangle (point, bbox) {
+    if (bbox === null) {
+        return false;
+    }
     const p = {
         x: point.x.toFixed(2),
         y: point.y.toFixed(2)
