@@ -85,7 +85,6 @@ export default class Layer extends CustomLayer {
         this.metadata = null;
         this._renderLayer = new RenderLayer();
         this.state = 'init';
-        this._isLoaded = false;
         this._visible = true;
         this._fireUpdateOnNextRender = false;
 
@@ -388,10 +387,6 @@ export default class Layer extends CustomLayer {
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-            if (!this._isLoaded && this.state === 'dataLoaded') {
-                this._isLoaded = true;
-                this._fire('loaded');
-            }
         }
     }
 
@@ -428,6 +423,7 @@ export default class Layer extends CustomLayer {
      */
     _onDataLoaded () {
         this.state = 'dataLoaded';
+        this._fire('loaded');
         this._needRefresh();
     }
 
