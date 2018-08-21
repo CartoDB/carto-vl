@@ -10,7 +10,7 @@ const featureData = {
     properties: {}
 };
 
-describe('api utils', () => {
+describe('events', () => {
     let div, map, layer1, layer2;
 
     beforeEach(() => {
