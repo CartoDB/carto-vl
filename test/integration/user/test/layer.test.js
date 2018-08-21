@@ -51,7 +51,7 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(new carto.source.GeoJSON(featureData), viz);
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
             });
@@ -62,7 +62,7 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(source, new carto.Viz('color: blue'));
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
             });
@@ -73,7 +73,7 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', () => {
                 layer._onDataframeAdded(layer._source._dataframe);
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
             });
@@ -84,9 +84,9 @@ describe('Layer', () => {
             await layer.update(source, new carto.Viz('width: now()'));
             layer.on('updated', update);
             layer.on('loaded', () => {
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(3);
                 done();
             });

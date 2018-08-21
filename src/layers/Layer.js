@@ -67,19 +67,17 @@ export default class Layer extends CustomLayer {
 
     _init (id, source, viz) {
         viz._boundLayer = this;
-        this._id = id;
-
-        this._emitter = mitt();
-        this._lastViewport = null;
-        this._lastMNS = null;
 
         this._context = new Promise((resolve) => {
             this._contextInitialize = resolve;
         });
 
         this.metadata = null;
+        this._emitter = mitt();
         this._renderLayer = new RenderLayer();
         this._visible = true;
+        this._isLoaded = false;
+        this._status = 'init';
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
@@ -393,6 +391,11 @@ export default class Layer extends CustomLayer {
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
+
+            if (!this._isLoaded && this._status === 'dataLoaded') {
+                this._isLoaded = true;
+                this._fire('loaded');
+            }
         }
     }
 
@@ -428,12 +431,12 @@ export default class Layer extends CustomLayer {
      * Callback executed when the client finishes loading data
      */
     _onDataLoaded () {
-        this._fire('loaded');
+        this._status = 'dataLoaded';
         this._needRefresh();
     }
 
     _addLayerIdToFeature (feature) {
-        feature.layerId = this._id;
+        feature.layerId = this.id;
         return feature;
     }
 

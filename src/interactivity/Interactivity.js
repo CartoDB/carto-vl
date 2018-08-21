@@ -145,7 +145,6 @@ export default class Interactivity {
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToLayerEvents(layerList);
-            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
         }).then(() => {
             if (options.autoChangePointer) {
                 this._setInteractiveCursor();
@@ -154,7 +153,7 @@ export default class Interactivity {
     }
 
     _setInteractiveCursor () {
-        const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
+        const map = this._layerList[0].map; // All layers belong to the same map
         if (!map.__carto_interacivities) {
             map.__carto_interacivities = new Set();
         }
@@ -172,11 +171,8 @@ export default class Interactivity {
         layers.forEach(layer => {
             layer.on('updated', this._onLayerUpdated.bind(this));
         });
-    }
-
-    _subscribeToIntegratorEvents (integrator) {
-        integrator.on('mousemove', this._onMouseMove.bind(this));
-        integrator.on('click', this._onClick.bind(this));
+        layers[0].map.on('mousemove', this._onMouseMove.bind(this));
+        layers[0].map.on('click', this._onClick.bind(this));
     }
 
     _onLayerUpdated () {
@@ -298,7 +294,7 @@ function preCheckLayerList (layerList) {
     }
 }
 function postCheckLayerList (layerList) {
-    if (!layerList.every(layer => layer.getIntegrator() === layerList[0].getIntegrator())) {
+    if (!layerList.every(layer => layer.map === layerList[0].map)) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }
