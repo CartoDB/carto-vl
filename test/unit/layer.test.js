@@ -126,30 +126,24 @@ describe('api/layer', () => {
     });
 
     describe('.addTo', () => {
-        describe('._addToMGLMap', () => {
-            let layer;
-
-            const loadEvent = {};
-
+        it('should call onMapLoaded when the map is loaded', () => {
+            const layer = new Layer('layer0', source, viz);
             const mapMock = {
-                isStyleLoaded: jasmine.createSpy('isStyleLoaded').and.returnValue(true),
-                on: (id, callback) => {
-                    if (id === 'load') {
-                        callback.call(layer, loadEvent);
-                    }
-                }
+                addLayer: jasmine.createSpy('addLayer')
             };
+            layer.addTo(mapMock, 'beforeLayer');
+            expect(mapMock.addLayer).toHaveBeenCalledWith(layer, 'beforeLayer');
+        });
+    });
 
-            beforeEach(() => {
-                layer = new Layer('layer0', source, viz);
-                layer._onMapLoaded = () => {};
-                spyOn(layer, '_onMapLoaded');
-            });
-
-            it('should call onMapLoaded when the map is loaded', () => {
-                layer._addToMGLMap(mapMock);
-                expect(layer._onMapLoaded).toHaveBeenCalled();
-            });
+    describe('.removeFrom', () => {
+        it('should call onMapLoaded when the map is loaded', () => {
+            const layer = new Layer('layer0', source, viz);
+            const mapMock = {
+                removeLayer: jasmine.createSpy('removeLayer')
+            };
+            layer.removeFrom(mapMock);
+            expect(mapMock.removeLayer).toHaveBeenCalledWith(layer);
         });
     });
 
