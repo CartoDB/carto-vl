@@ -9,7 +9,7 @@ import Palette from '../color/palettes/Palette';
  * @example <caption>Invert a Palette.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ *   color: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
  * });
  *
  * @example <caption>Invert a Palette. (String)</caption>

@@ -1,21 +1,20 @@
 import Base from '../base';
 
 /**
- * TODO UPDATE DOC !!
  * Reverse the provided Array.
  *
- * @param {Palette} palette - Numeric expression to compute the natural logarithm
- * @return {Palette}
+ * @param {BaseArray} array - Array to be reversed
+ * @return {BaseArray}
  *
- * @example <caption>Invert a Palette.</caption>
+ * @example <caption>Invert a Color Array.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ *   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
  * });
  *
- * @example <caption>Invert a Palette. (String)</caption>
+ * @example <caption>Invert a Color Array (String).</caption>
  * const viz = new carto.Viz(`
- *   color: ramp($type, reverse(PRISM))
+ *   color: ramp($count, reverse([red, blue]))
  * `);
  *
  * @memberof carto.expressions
