@@ -1,6 +1,6 @@
 import Palette from './Palette';
 import Base from '../../base';
-import { implicitCast } from '../../utils';
+import { implicitCast, checkMaxArguments } from '../../utils';
 
 /**
  * Reverse the provided Palette.
@@ -26,6 +26,7 @@ import { implicitCast } from '../../utils';
  */
 
 export default function reverse (x) {
+    checkMaxArguments(arguments, 1, 'reverse');
     x = implicitCast(x);
     if (x.type === 'palette') {
         return new ReversePalette(x);
