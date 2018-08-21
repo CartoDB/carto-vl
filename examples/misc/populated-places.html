@@ -41,50 +41,39 @@
       touchZoomRotate: false,
     });
 
-    // carto.setDefaultAuth({
-    //   user: 'cartovl',
-    //   apiKey: 'default_public'
-    // });
-
-    const source = new carto.source.SQL('SELECT *, 99 as "best mooo" FROM ne_10m_populated_places_simple', {
-        apiKey: 'default_public',
-        user: 'cartovl'
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
     });
 
-    const viz = new carto.Viz(`width: prop('best mooo')`);
-    const layer = new carto.Layer('layer', source, viz);
+    const populatedPlacesSource = new carto.source.Dataset(`
+      ne_10m_populated_places_simple
+    `);
+    const allPlacesViz = new carto.Viz(`
+      width: 6
+      color: rgb(237, 76, 89)
+      strokeWidth: 1
+      strokeColor: rgb(255, 255,255)
+      filter: $pop_max >= 0
+    `);
+    const veryPopulatedViz = new carto.Viz(`
+      width: 11
+      color: rgb(105, 181, 158)
+      strokeWidth: 1
+      strokeColor: rgb(255, 255, 255)
+      filter: $pop_max > 5000000
+    `);
+    const lessPopulatedViz = new carto.Viz(`
+      width: 11
+      color: rgb(242, 87, 66)
+      strokeWidth: 1
+      strokeColor: rgb(255, 255, 255)
+      filter: $pop_max < 100
+    `);
 
-    layer.addTo(map, 'watername_ocean');
+    const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesViz);
 
-
-    // const populatedPlacesSource = new carto.source.Dataset(`
-    //   ne_10m_populated_places_simple
-    // `);
-    // const allPlacesViz = new carto.Viz(`
-    //   width: 6
-    //   color: rgb(237, 76, 89)
-    //   strokeWidth: 1
-    //   strokeColor: rgb(255, 255,255)
-    //   filter: $pop_max >= 0
-    // `);
-    // const veryPopulatedViz = new carto.Viz(`
-    //   width: 11
-    //   color: rgb(105, 181, 158)
-    //   strokeWidth: 1
-    //   strokeColor: rgb(255, 255, 255)
-    //   filter: $pop_max > 5000000
-    // `);
-    // const lessPopulatedViz = new carto.Viz(`
-    //   width: 11
-    //   color: rgb(242, 87, 66)
-    //   strokeWidth: 1
-    //   strokeColor: rgb(255, 255, 255)
-    //   filter: $pop_max < 100
-    // `);
-    //
-    // const populatedPlacesLayer = new carto.Layer('populatedPlacesLayer', populatedPlacesSource, allPlacesViz);
-
-    // populatedPlacesLayer.addTo(map, 'watername_ocean');
+    populatedPlacesLayer.addTo(map, 'watername_ocean');
 
     function setAll() {
       populatedPlacesLayer.blendToViz(allPlacesViz);
