@@ -199,9 +199,10 @@ export default class Ramp extends BaseExpression {
                 uniform float keyWidth${this._uid};
 
                 float ramp_translate${this._uid}(float s){
-                    vec2 v;
-                    v.y = floor(s/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)});
-                    v.x = s - v.y*${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)};
+                    vec2 v = vec2(
+                        mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
+                        floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
+                    );
                     return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
                 }
 
