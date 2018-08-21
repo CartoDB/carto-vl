@@ -346,13 +346,14 @@ export default class Ramp extends BaseExpression {
 
         if (this.input.type === 'category' && this.input.isA(Property)) {
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-            if (this._translatedIds !== this._metadata.properties[this.input.name].categories.length) {
-                this._translatedIds = this._metadata.properties[this.input.name].categories.length;
+            const catIDs = this._metadata.properties[this.input.name].categories.length;
+            if (this._translatedIds !== catIDs) {
+                this._translatedIds = catIDs;
                 this._translateTexture = gl.createTexture();
                 const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
-                for (let i = 0; i < this._metadata.properties[this.input.name].categories.length; i++) {
+                for (let i = 0; i < catIDs; i++) {
                     const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
-                    const value = i / (this._metadata.properties[this.input.name].categories.length - 1);
+                    const value = i / (catIDs - 1);
                     const vec2Id = {
                         x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
                         y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
