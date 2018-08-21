@@ -118,6 +118,10 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
+    get geometryType () {
+        return this._geomType;
+    }
+
     loadImages () {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
     }
