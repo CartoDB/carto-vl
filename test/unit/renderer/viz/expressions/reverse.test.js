@@ -1,4 +1,4 @@
-import { validateStaticType, validateMaxArgumentsError } from './utils';
+import { validateStaticType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
 
 describe('src/renderer/viz/expressions/reverse', () => {
     describe('type', () => {
@@ -6,6 +6,9 @@ describe('src/renderer/viz/expressions/reverse', () => {
         validateStaticType('reverse', [['A', 'B']], 'category-array');
         validateStaticType('reverse', ['color-array'], 'color-array');
         validateStaticType('reverse', ['palette'], 'palette');
+    });
+    describe('error control', () => {
+        validateCompileTypeError('reverse', ['number']);
         validateMaxArgumentsError('reverse', [[1, 2], 0]);
         validateMaxArgumentsError('reverse', ['palette', 0]);
     });

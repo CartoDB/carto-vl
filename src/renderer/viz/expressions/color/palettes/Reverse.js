@@ -1,6 +1,6 @@
 import Palette from './Palette';
 import Base from '../../base';
-import { implicitCast, checkMaxArguments } from '../../utils';
+import { implicitCast, checkMaxArguments, checkType } from '../../utils';
 
 /**
  * Reverse the provided Palette.
@@ -28,10 +28,12 @@ import { implicitCast, checkMaxArguments } from '../../utils';
 export default function reverse (x) {
     checkMaxArguments(arguments, 1, 'reverse');
     x = implicitCast(x);
+    checkType('reverse', 'x', 0, ['palette', 'number-array', 'category-array', 'color-array', 'time-array', 'image-array'], x);
     if (x.type === 'palette') {
         return new ReversePalette(x);
+    } else {
+        return new ReverseArray(x);
     }
-    return new ReverseArray(x);
 }
 
 class ReverseArray extends Base {
