@@ -1018,7 +1018,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 r._bindMetadata(METADATA);
 
                 actual = r.getLegend().length;
-                expected = 1024;
+                expected = 13;
 
                 expect(actual).toEqual(expected);
             });
@@ -1051,13 +1051,13 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 expected = [
                     {
                         name: 'A',
-                        value: BICYCLE.url
+                        values: [ BICYCLE.url ]
                     }, {
                         name: 'B',
-                        value: CAR.url
+                        values: [ CAR.url ]
                     }, {
                         name: 'C',
-                        value: BUILDING.url
+                        values: [ BUILDING.url ]
                     }
                 ];
 
@@ -1096,13 +1096,13 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 expected = [
                     {
                         name: 'A',
-                        value: red.color
+                        values: [ red.color ]
                     }, {
                         name: 'B',
-                        value: blue.color
+                        values: [ blue.color ]
                     }, {
                         name: 'C',
-                        value: yellow.color
+                        values: [ yellow.color ]
                     }
                 ];
 

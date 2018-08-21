@@ -149,10 +149,10 @@ export default class Ramp extends BaseExpression {
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
      *   // legend = [
-     *   //   { name: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //   { name: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } }
-     *   //   { name: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } }
-     *   //   { name: 'Others', value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
+     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
+     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
+     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
      *   // ]
      * });
      *
@@ -165,10 +165,10 @@ export default class Ramp extends BaseExpression {
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
      *   // legend = [
-     *   //   { name: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //   { name: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } }
-     *   //   { name: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } }
-     *   //   { name: 'Others', value: { r: 15, g: 133, b: 84, a: 1 } }
+     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
+     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
+     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
+     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
      *   // ]
      * });
      *
@@ -181,9 +181,9 @@ export default class Ramp extends BaseExpression {
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
      *   // legend = [
-     *   //   { name: 'Bicycle', value: bicycleImageUrl },
-     *   //   { name: 'Car', value: carImageUrl }
-     *   //   { name: 'Bus', value: busImageUrl }
+     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
+     *   //   { name: 'Car', values: [carImageUrl] }
+     *   //   { name: 'Bus', values: [busImageUrl] }
      *   // ]
      * });
      *
@@ -196,9 +196,9 @@ export default class Ramp extends BaseExpression {
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
      *   // legend = [
-     *   //   { name: 'Bicycle', value: bicycleImageUrl },
-     *   //   { name: 'Car', value: carImageUrl }
-     *   //   { name: 'Bus', value: busImageUrl }
+     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
+     *   //   { name: 'Car', values: [carImageUrl] }
+     *   //   { name: 'Bus', values: [busImageUrl] }
      *   // ]
      * });
      *
