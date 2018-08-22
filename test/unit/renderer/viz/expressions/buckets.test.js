@@ -65,6 +65,11 @@ describe('src/renderer/viz/expressions/buckets', () => {
 
                     expect(response).toEqual(expected);
                 });
+
+                it('should throw an error when not using an array for the breakpoint', () => {
+                    expect(() => s.buckets($cities, 'Murcia'))
+                        .toThrowError(/invalid second parameter 'list'/);
+                });
             });
 
             describe('and it has two breakpoints', () => {
@@ -188,6 +193,11 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     const actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
+                });
+
+                it('should throw an error when not using an array for the breakpoint', () => {
+                    expect(() => s.buckets($price, 10))
+                        .toThrowError(/invalid second parameter 'list'/);
                 });
             });
 

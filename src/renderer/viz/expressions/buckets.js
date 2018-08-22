@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex, checkMaxArguments } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -70,6 +70,8 @@ export default class Buckets extends BaseExpression {
             }
             looseType = input.type;
         }
+
+        checkType('buckets', 'list', 1, ['number-array', 'category-array'], list);
 
         list.elems.map((item, index) => {
             if (item.type) {
