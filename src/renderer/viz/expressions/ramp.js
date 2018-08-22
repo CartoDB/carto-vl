@@ -265,7 +265,7 @@ export default class Ramp extends BaseExpression {
      *   //   { name: 'numeric', values: [// rgba color, [ 75, 100 ] }
      *   // ]
      * });
-     * 
+     *
      * @example <caption>Get 4 samples for a linear color ramp (String)</caption>
      * const viz = new carto.Viz(`
      *   color: ramp(linear($numeric, 1, 100), PRISM)
