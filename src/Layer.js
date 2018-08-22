@@ -1,37 +1,25 @@
 import mitt from 'mitt';
-import CartoValidationError from '../errors/carto-validation-error';
-import RenderLayer from '../renderer/RenderLayer';
-import { cubic } from '../renderer/viz/expressions';
-import SourceBase from '../sources/Base';
-import util from '../utils/util';
-import { layerVisibility } from '../constants/layer';
-import Viz from '../Viz';
-import CustomLayer from './CustomLayer';
+import util from './utils/util';
+import Viz from './Viz';
+import SourceBase from './sources/Base';
+import Renderer from './renderer/Renderer';
+import RenderLayer from './renderer/RenderLayer';
+import CartoValidationError from './errors/carto-validation-error';
+import { cubic } from './renderer/viz/expressions';
+import { layerVisibility } from './constants/layer';
 
-/**
- *
- * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
- *
- * @typedef {object} LayerEvent
- * @api
- */
+// There is one renderer per map, so the layers added to the same map
+// use the same renderer with each renderLayer
+const renderers = new WeakMap();
 
-/**
- * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
- *
- * @event loaded
- * @type {LayerEvent}
- * @api
- */
-
-/**
- * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
- * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
- *
- * @event updated
- * @type {LayerEvent}
- * @api
-*/
+function getRenderer (map, gl) {
+    if (!renderers.get(map)) {
+        const renderer = new Renderer();
+        renderer.initialize(map, gl);
+        renderers.set(map, renderer);
+    }
+    return renderers.get(map);
+}
 
 /**
 *
@@ -55,30 +43,30 @@ import CustomLayer from './CustomLayer';
 * @memberof carto
 * @api
 */
-export default class Layer extends CustomLayer {
+export default class Layer {
     constructor (id, source, viz) {
-        super(id);
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
-        this._oldDataframes = new Set();
         this._init(id, source, viz);
     }
 
     _init (id, source, viz) {
         viz._boundLayer = this;
-
         this._context = new Promise((resolve) => {
             this._contextInitialize = resolve;
         });
 
+        this.id = id;
+        this.type = 'custom';
         this.metadata = null;
-        this._emitter = mitt();
-        this._renderLayer = new RenderLayer();
+        this._state = 'init';
         this._visible = true;
         this._isLoaded = false;
-        this._state = 'init';
         this._fireUpdateOnNextRender = false;
+        this._emitter = mitt();
+        this._oldDataframes = new Set();
+        this._renderLayer = new RenderLayer();
 
         this.update(source, viz);
     }
@@ -312,14 +300,6 @@ export default class Layer extends CustomLayer {
         this._fire('updated');
     }
 
-    // The onAdd method will call this method once the webgl context is ready.
-    initialize () {
-        this._renderLayer.renderer = this.renderer;
-        this._contextInitialize();
-        this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
-        this.requestMetadata();
-    }
-
     async requestMetadata (viz) {
         viz = viz || this._viz;
         if (!viz) {
@@ -355,6 +335,29 @@ export default class Layer extends CustomLayer {
         return this._viz && this._viz.isAnimated();
     }
 
+    /**
+     * Custom Layer API: `onAdd` function
+     */
+    onAdd (map, gl) {
+        this.gl = gl;
+        this.map = map;
+        this.renderer = getRenderer(map, gl);
+
+        this._renderLayer.renderer = this.renderer;
+        this._contextInitialize();
+        this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
+        this.requestMetadata();
+    }
+
+    /**
+     * Custom Layer API: `onRemove` function
+     */
+    onRemove (map, gl) {
+    }
+
+    /**
+     * Custom Layer API: `render` function
+     */
     render (gl, matrix) {
         this._setZoomCenter(matrix);
         this._paintLayer();
@@ -513,3 +516,28 @@ export default class Layer extends CustomLayer {
         this._renderLayer.freeDataframes();
     }
 }
+
+/**
+ *
+ * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
+ *
+ * @typedef {object} LayerEvent
+ * @api
+ */
+
+/**
+ * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
+ *
+ * @event loaded
+ * @type {LayerEvent}
+ * @api
+ */
+
+/**
+ * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+ * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
+ *
+ * @event updated
+ * @type {LayerEvent}
+ * @api
+*/
