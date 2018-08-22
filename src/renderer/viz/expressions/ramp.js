@@ -12,7 +12,12 @@ import Linear from './linear';
 import Top from './top';
 
 const DEFAULT_OTHERS_NAME = 'Others';
-
+const MAX_SAMPLES = 100;
+const DEFAULT_SAMPLES = 10;
+const DEFAULT_OPTIONS = {
+    defaultOthers: DEFAULT_OTHERS_NAME,
+    samples: DEFAULT_SAMPLES
+};
 const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
@@ -244,39 +249,48 @@ export default class Ramp extends BaseExpression {
      * @api
      */
 
-    getLegend (options = {}) {
+    getLegend (options) {
+        const config = Object.assign(DEFAULT_OPTIONS, options);
+
+        if (config.samples > MAX_SAMPLES) {
+            throw new Error(`The maximum number of samples for a legend is ${MAX_SAMPLES}`);
+        }
+
         if (this.input.isA(Linear)) {
-            return this._getLegendLinear(this.input, options);
+            return this._getLegendLinear(this.input, config);
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
             return this.input.list
                 ? this._getLegendList()
-                : this._getLeyendCategories(options);
+                : this._getLeyendCategories(config);
         }
     }
 
-    _getLegendLinear (input, options) {
+    _getLegendLinear (input, config) {
         const firstChild = input[input.childrenNames[0]];
         return firstChild.isA(Property)
-            ? this._getLegendLinearProperty(firstChild, options)
-            : this._getLegendLinear(firstChild, options);
+            ? this._getLegendLinearProperty(firstChild, config)
+            : this._getLegendLinear(firstChild, config);
     }
 
-    _getLegendLinearProperty (property) {
+    _getLegendLinearProperty (property, config) {
         const name = property.name;
         const feature = {};
 
-        return this._metadata.sample
+        const samples = this._metadata.sample
             .map(sample => sample[name])
             .sort(arrayUtils.sortAsc)
-            .filter(arrayUtils.removeDuplicates)
-            .map((value) => {
-                feature[name] = value;
-                const values = [ this.eval(feature), value ];
+            .filter(arrayUtils.removeDuplicates);
 
-                return { name, values };
-            });
+        const breakpoints = _getBreakpoints(samples, config.samples);
+
+        return breakpoints.map((value) => {
+            feature[name] = value[1];
+            const values = [ this.eval(feature), value ];
+
+            return { name, values };
+        });
     }
 
     _getLegendList () {
@@ -285,9 +299,9 @@ export default class Ramp extends BaseExpression {
             .filter(legend => legend.values !== null);
     }
 
-    _getLeyendCategories (options) {
+    _getLeyendCategories (config) {
         return this.input.getCategories()
-            .map((category, index) => { return this._getLegendCategoryValue(category, index, options); })
+            .map((category, index) => { return this._getLegendCategoryValue(category, index, config); })
             .filter(legend => legend.values !== null);
     }
 
@@ -300,12 +314,12 @@ export default class Ramp extends BaseExpression {
         };
     }
 
-    _getLegendCategoryValue (category, index, options) {
+    _getLegendCategoryValue (category, index, config) {
         const value = this._getRampValueByIndex(index);
 
         if (this.input.isA(Top) && this.input.numBuckets === index) {
             return {
-                name: options.defaultOthers || DEFAULT_OTHERS_NAME,
+                name: config.defaultOthers || DEFAULT_OTHERS_NAME,
                 values: value ? [ value ] : null
             };
         }
@@ -673,4 +687,17 @@ function _calcPaletteValues (palette) {
     }
 
     return palette;
+}
+
+function _getBreakpoints (samples, numSamples) {
+    const breakpoints = [];
+    const inc = Math.round(samples.length / numSamples);
+
+    for (let i = 0; i < samples.length; i += inc) {
+        if (samples[i + inc]) {
+            breakpoints.push([samples[i], samples[i + inc]]);
+        }
+    }
+
+    return breakpoints;
 }

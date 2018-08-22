@@ -18,7 +18,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>New York</h1>
+        <h1>Number of floors</h1>
       </header>
       <section>
         <div id="controls">
@@ -64,19 +64,22 @@
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
+
     layer.on('loaded', () => {
       hideLoader();
 
-      // Get the information for legend
       const colorLegend = layer.getViz().color.getLegend({
-        defaultOthers: 'Default'
+        defaultOthers: 'Default',
+        samples: 10
       });
 
       let colorLegendList = '';
+
       colorLegend.forEach((legend) => {
         const colorHex = rgbToHex(legend.values[0]);
         if (colorHex) {
-          colorLegendList += `<li><span class="${viz.geometryType}-mark" style="background-color:${colorHex};"></span> <span>${legend.name}: ${legend.values[1]}</span></li>\n`;
+          colorLegendList +=
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${colorHex};"></span> <span>[ ${legend.values[1][0]}, ${legend.values[1][1]} ]</span></li>\n`;
         }
       });
 
@@ -91,6 +94,7 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
+
   </script>
 </body>
 
