@@ -369,8 +369,9 @@ export default class Layer extends CustomLayer {
     }
 
     _setZoomCenter (matrix) {
-        // Compute the center from the matrix
-        // This is a solution to avoid subscribing to map events
+        // Compute the zoom and center from the matrix.
+        // This is a solution to avoid subscribing to map events and
+        // make a better and efficient use of the Custom Layers interface.
         // TODO: the best solution is to use the matrix at the shader
         // level and remove the aspect and scale logic from the renderer
         this.renderer.setCenter(

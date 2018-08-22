@@ -33,6 +33,7 @@ export default class Map {
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl');
+        this._matrix = this._createMatrix();
         this._resizeCanvas(this._containerDimensions());
     }
 
@@ -118,7 +119,7 @@ export default class Map {
             const hasAnimation = layer.isAnimated();
 
             if (hasData || hasAnimation) {
-                layer.render();
+                layer.render(this._gl, this._matrix);
             }
 
             loaded = loaded && hasData;
@@ -183,5 +184,16 @@ export default class Map {
 
         this._canvas.style.width = `${size.width}px`;
         this._canvas.style.height = `${size.height}px`;
+    }
+
+    _createMatrix () {
+        // This matrix generates proper values of zoom and _center
+        const m = new Array(16);
+        m[0] = -2;
+        m[5] = -2;
+        m[12] = 1;
+        m[13] = 1;
+        m[15] = 1;
+        return m;
     }
 }
