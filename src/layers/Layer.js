@@ -77,7 +77,7 @@ export default class Layer extends CustomLayer {
         this._renderLayer = new RenderLayer();
         this._visible = true;
         this._isLoaded = false;
-        this._status = 'init';
+        this._state = 'init';
         this._fireUpdateOnNextRender = false;
 
         this.update(source, viz);
@@ -355,9 +355,8 @@ export default class Layer extends CustomLayer {
         return this._viz && this._viz.isAnimated();
     }
 
-    render (gl) {
-        this._setCenter();
-        this._setZoom();
+    render (gl, matrix) {
+        this._setZoomCenter(matrix);
         this._paintLayer();
 
         // Checking this.map.repaint is needed, because MGL repaint is a setter and
@@ -369,17 +368,18 @@ export default class Layer extends CustomLayer {
         }
     }
 
-    _setZoom () {
-        const b = this.map.getBounds();
-        const nw = b.getNorthWest();
-        const sw = b.getSouthWest();
-        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
-        this.renderer.setZoom(z);
-    }
-
-    _setCenter () {
-        const c = this.map.getCenter();
-        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
+    _setZoomCenter (matrix) {
+        // Compute the center from the matrix
+        // This is a solution to avoid subscribing to map events
+        // TODO: the best solution is to use the matrix at the shader
+        // level and remove the aspect and scale logic from the renderer
+        this.renderer.setCenter(
+            -(1 + 2 * matrix[12] / matrix[0]),
+            +(1 + 2 * matrix[13] / matrix[5])
+        );
+        this.renderer.setZoom(
+            -(2 * matrix[15] / matrix[5])
+        );
     }
 
     _paintLayer () {
@@ -392,7 +392,7 @@ export default class Layer extends CustomLayer {
                 this._fire('updated');
             }
 
-            if (!this._isLoaded && this._status === 'dataLoaded') {
+            if (!this._isLoaded && this._state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
             }
@@ -431,7 +431,7 @@ export default class Layer extends CustomLayer {
      * Callback executed when the client finishes loading data
      */
     _onDataLoaded () {
-        this._status = 'dataLoaded';
+        this._state = 'dataLoaded';
         this._needRefresh();
     }
 

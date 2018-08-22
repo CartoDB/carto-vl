@@ -1,5 +1,16 @@
 import Renderer from '../renderer/Renderer';
 
+// There is one renderer per map, so the layers added to the same map
+// use the same renderer with each renderLayer
+
+// const renderers = new WeakMap();
+// export default function getRenderer (map) {
+//     if (!renderers.get(map)) {
+//         renderers.set(map, new Renderer(map));
+//     }
+//     return renderers.get(map);
+// }
+
 export default class CustomLayer {
     constructor (id) {
         this.id = id;
@@ -20,13 +31,13 @@ export default class CustomLayer {
     onAdd (map, gl) {
         this.map = map;
         this.gl = gl;
-        this.renderer._initGL(gl);
-        this._setCenter();
-        this._setZoom();
+        this.renderer.initialize(map, gl);
         this.initialize();
     }
 
     onRemove (map) {
+        this.map = null;
+        this.gl = null;
     }
 
     initialize () {
