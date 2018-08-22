@@ -145,7 +145,10 @@ export default class Ramp extends BaseExpression {
     /**
      * Get the value associated with each category
      *
-     * @return {Array} Array of objects with the format { name, values }
+     * @param {object} config - Optional configuration
+     * @param {string} config.defaultOthers - Name for other category values. Defaults to 'Others'.
+     * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
+     * @return {Array} Array of { name, values }. Values is an array. Its length depend on the expression (if it is categorical or numerical). There is more information about values in the examples.
      *
      * @example <caption>Get the color associated with each category</caption>
      * const s = carto.expressions;
@@ -227,9 +230,9 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * @example <caption>Get the top 3 categories and set default category name (String)</caption>
-     * const viz = new carto.Viz({
+     * const viz = new carto.Viz(`
      *   color: ramp(top($vehicles, 5), PRISM)
-     * });
+     * `);
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend({
@@ -244,6 +247,42 @@ export default class Ramp extends BaseExpression {
      *   // ]
      * });
      *
+     * @example <caption>Get 4 samples for a linear color ramp</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear(s.prop('numeric'), 1, 100), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.getViz().color.getLegend({
+     *       samples: 4
+     *   });
+     *
+     *   // legend = [
+     *   //   { name: 'numeric', values: [// rgba color, [ 0, 25 ]] },
+     *   //   { name: 'numeric', values: [// rgba color, [ 25, 50 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [ 50, 75 ] }
+     *   //   { name: 'numeric', values: [// rgba color, [ 75, 100 ] }
+     *   // ]
+     * });
+     * 
+     * @example <caption>Get 4 samples for a linear color ramp (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($numeric, 1, 100), PRISM)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.getViz().color.getLegend({
+     *       samples: 4
+     *   });
+     *
+     *   // legend = [
+     *   //   { name: 'numeric', values: [// rgba color, [ 0, 25 ]] },
+     *   //   { name: 'numeric', values: [// rgba color, [ 25, 50 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [ 50, 75 ] }
+     *   //   { name: 'numeric', values: [// rgba color, [ 75, 100 ] }
+     *   // ]
+     * });
      * @memberof carto.expressions.Ramp
      * @name getLegend
      * @instance
