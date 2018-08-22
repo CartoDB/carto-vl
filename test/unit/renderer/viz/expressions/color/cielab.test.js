@@ -1,4 +1,4 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/cielab', () => {
     describe('error control', () => {
@@ -10,6 +10,8 @@ describe('src/renderer/viz/expressions/cielab', () => {
 
         validateStaticTypeErrors('cielab', ['number', 'number', 'color']);
         validateStaticTypeErrors('cielab', ['color', 'number', 'number']);
+
+        validateMaxArgumentsError('cielab', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {

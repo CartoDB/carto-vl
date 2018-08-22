@@ -1,4 +1,5 @@
 import GlobalAggregation from './GlobalAggregation';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Return the average of the feature property for the entire source data.
@@ -28,6 +29,8 @@ import GlobalAggregation from './GlobalAggregation';
  */
 export default class GlobalAvg extends GlobalAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'globalAvg');
+
         super({ property, name: 'avg', type: 'number' });
     }
 }

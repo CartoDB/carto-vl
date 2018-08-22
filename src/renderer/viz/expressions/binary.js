@@ -1,5 +1,5 @@
 import { number } from '../expressions';
-import { implicitCast } from './utils';
+import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
@@ -326,7 +326,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price === 30  // Equivalent to eq($price, 30)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -357,7 +357,7 @@ export const Equals = genBinaryOp('equals',
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price !== 30  // Equivalent to neq($price, 30)
+ *   filter: $price != 30  // Equivalent to neq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -446,6 +446,8 @@ export const And = genBinaryOp('and',
 function genBinaryOp (name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends BaseExpression {
         constructor (a, b) {
+            checkMaxArguments(arguments, 2, name);
+
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return number(jsFn(a, b));
             }

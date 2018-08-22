@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString, hexToRgb, getStringErrorPreface } from '../utils';
+import { checkString, hexToRgb, getStringErrorPreface, checkMaxArguments } from '../utils';
 
 /**
  * Create a color from its hexadecimal description.
@@ -25,7 +25,9 @@ import { checkString, hexToRgb, getStringErrorPreface } from '../utils';
  */
 export default class Hex extends BaseExpression {
     constructor (hexadecimalColor) {
+        checkMaxArguments(arguments, 1, 'hex');
         checkString('hex', 'hexadecimalColor', 0, hexadecimalColor);
+
         super({});
         this.type = 'color';
         try {

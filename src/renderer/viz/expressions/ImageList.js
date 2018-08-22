@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkArray, checkLooseType } from './utils';
+import { checkArray, checkLooseType, checkMaxArguments } from './utils';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.
@@ -10,7 +10,9 @@ import { checkArray, checkLooseType } from './utils';
  */
 export default class ImageList extends Base {
     constructor (imageArray) {
+        checkMaxArguments(arguments, 1, 'imageList');
         checkArray('imageArray', 'imageArray', 0, imageArray);
+
         imageArray.forEach((image, i) => checkLooseType('imageArray', `imageArray[${i}]`, 0, 'image', image));
 
         const children = {};

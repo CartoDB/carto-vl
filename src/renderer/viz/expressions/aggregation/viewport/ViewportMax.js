@@ -1,5 +1,5 @@
 import ViewportAggregation from './ViewportAggregation';
-
+import { checkMaxArguments } from '../../utils';
 /**
  * Return the maximum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
@@ -26,6 +26,7 @@ import ViewportAggregation from './ViewportAggregation';
  */
 export default class ViewportMax extends ViewportAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'viewportMax');
         super({ property });
         this._value = Number.NEGATIVE_INFINITY;
     }

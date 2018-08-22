@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/transition', () => {
     describe('error control', () => {
@@ -9,6 +9,7 @@ describe('src/renderer/viz/expressions/transition', () => {
         validateStaticTypeErrors('transition', ['number']);
         validateStaticTypeErrors('transition', ['color']);
         validateStaticTypeErrors('transition', ['category']);
+        validateMaxArgumentsError('transition', ['number', 'number']);
     });
 
     describe('type', () => {

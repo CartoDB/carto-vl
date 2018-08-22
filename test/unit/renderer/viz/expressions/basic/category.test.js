@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/basic/category', () => {
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/basic/category', () => {
         validateStaticTypeErrors('category', [undefined]);
         validateStaticTypeErrors('category', [123]);
         validateStaticTypeErrors('category', ['number']);
+        validateMaxArgumentsError('category', ['number', 'number']);
     });
 
     describe('type', () => {

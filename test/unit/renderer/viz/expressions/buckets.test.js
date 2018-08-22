@@ -1,4 +1,4 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
 
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
         validateDynamicTypeErrors('buckets', ['category', 'number-array']);
         validateStaticTypeErrors('buckets', ['color', 'number-array']);
         validateStaticTypeErrors('buckets', ['number', 'color-array']);
+        validateMaxArgumentsError('buckets', ['number', 'number-array', 'number']);
     });
 
     describe('type', () => {

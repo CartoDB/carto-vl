@@ -1,11 +1,12 @@
-import { implicitCast } from './utils';
+import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 // TODO type checking
 
-export class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+export class ILinear extends genInterpolator('iLinear', inner => inner, undefined, inner => inner) { }
 
 export class Cubic extends genInterpolator(
+    'cubic',
     inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
@@ -24,6 +25,7 @@ export class Cubic extends genInterpolator(
 ) { }
 
 export class BounceEaseIn extends genInterpolator(
+    'bounceEaseIn',
     inner => `BounceEaseIn(${inner})`,
     `
     #ifndef BOUNCE_EASE_IN
@@ -58,9 +60,11 @@ export class BounceEaseIn extends genInterpolator(
 ) { }
 
 // Interpolators
-function genInterpolator (inlineMaker, preface, jsEval) {
+function genInterpolator (name, inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends BaseExpression {
         constructor (m) {
+            checkMaxArguments(arguments, 1, name);
+
             m = implicitCast(m);
             super({ m });
         }

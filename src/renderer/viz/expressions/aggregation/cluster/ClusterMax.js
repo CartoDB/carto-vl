@@ -1,4 +1,5 @@
 import ClusterAggregation from './ClusterAggregation';
+import { checkMaxArguments } from '../../utils';
 
 /**
  * Aggregate using the maximum. This operation disables the access to the property
@@ -27,6 +28,7 @@ import ClusterAggregation from './ClusterAggregation';
  */
 export default class ClusterMax extends ClusterAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'clusterMax');
         super({ property, expressionName: 'clusterMax', aggName: 'max', aggType: 'number' });
     }
 }

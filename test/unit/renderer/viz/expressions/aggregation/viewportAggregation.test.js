@@ -1,7 +1,18 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../../src/renderer/Metadata';
+import { validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/viewportAggregation', () => {
+    describe('error control', () => {
+        validateMaxArgumentsError('viewportMax', ['number', 'number']);
+        validateMaxArgumentsError('viewportMin', ['number', 'number']);
+        validateMaxArgumentsError('viewportSum', ['number', 'number']);
+        validateMaxArgumentsError('viewportAvg', ['number', 'number']);
+        validateMaxArgumentsError('viewportCount', ['number', 'number']);
+        validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
+        validateMaxArgumentsError('viewportHistogram', ['number', 'number', 'number', 'number']);
+    });
+
     const $price = s.property('price');
     const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');
