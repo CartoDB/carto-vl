@@ -1,5 +1,5 @@
-import Base from './base';
-import { checkString, checkMaxArguments } from './utils';
+import Base from '../base';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Image. Load an image and use it as a symbol.

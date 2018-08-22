@@ -1,0 +1,21 @@
+import SVG from './SVG';
+import svgs from '../../defaultSVGs';
+
+export const BICYCLE = new SVG(svgs.bicycle);
+export const BUILDING = new SVG(svgs.building);
+export const BUS = new SVG(svgs.bus);
+export const CAR = new SVG(svgs.car);
+export const CIRCLE = new SVG(svgs.circle);
+export const CIRCLE_OUTLINE = new SVG(svgs.circleOutline);
+export const CROSS = new SVG(svgs.cross);
+export const FLAG = new SVG(svgs.flag);
+export const HOUSE = new SVG(svgs.house);
+export const MARKER = new SVG(svgs.marker);
+export const MARKER_OUTLINE = new SVG(svgs.markerOutline);
+export const PLUS = new SVG(svgs.plus);
+export const SQUARE = new SVG(svgs.square);
+export const SQUARE_OUTLINE = new SVG(svgs.squareOutline);
+export const STAR = new SVG(svgs.star);
+export const STAR_OUTLINE = new SVG(svgs.starOutline);
+export const TRIANGLE = new SVG(svgs.triangle);
+export const TRIANGLE_OUTLINE = new SVG(svgs.triangleOutline);

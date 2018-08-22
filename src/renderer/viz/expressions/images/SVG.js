@@ -1,5 +1,5 @@
 import Image from './Image';
-import { checkMaxArguments } from './utils';
+import { checkMaxArguments } from '../utils';
 
 export default class SVG extends Image {
     constructor (svg) {
