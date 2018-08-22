@@ -90,11 +90,11 @@ export default class Dataframe {
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
 
-        this.texColor = this._createStyleTileTexture(this.numFeatures);
-        this.texWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texFilter = this._createStyleTileTexture(this.numFeatures);
+        this.texColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texFilter = this._createStyleDataframeTexture(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
         const inc = 1 / (1024 * 64);
@@ -491,7 +491,7 @@ export default class Dataframe {
         this._genFeatureClass();
     }
 
-    _createStyleTileTexture (numFeatures) {
+    _createStyleDataframeTexture (numFeatures) {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this.renderer.gl;
