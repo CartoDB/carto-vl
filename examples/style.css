@@ -520,7 +520,6 @@ aside.toolbox {
   border-radius: 50%;
   margin-right: 12px;
   box-sizing: border-box;
-  background-color: red;
 }
 
 .image-mark {
@@ -539,7 +538,6 @@ aside.toolbox {
   align-self: center;
   margin-right: 12px;
   box-sizing: border-box;
-  background-color: red;
   transform: rotate(45deg);
 }
 
@@ -549,6 +547,5 @@ aside.toolbox {
   min-width: 18px;
   min-height: 18px;
   border-left: 3px solid;
-  border-color: red;
   transform: rotate(45deg) translate(5px, 4px);
 }

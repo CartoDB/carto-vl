@@ -103,7 +103,7 @@ export default class Base {
         const children = this._getChildren();
 
         if (children) {
-            return children[0].categories();
+            return children[0].categories;
         }
     }
 
