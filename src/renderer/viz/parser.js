@@ -172,6 +172,12 @@ function parseIdentifier (node) {
         return expressions.property(node.name.substring(1));
     } else if (expressions.palettes[node.name.toUpperCase()]) {
         return expressions.palettes[node.name.toUpperCase()];
+    } else if (expressions.images[node.name.toUpperCase()]) {
+        return expressions.images[node.name.toUpperCase()];
+    } else if (expressions.constants[node.name.toUpperCase()]) {
+        return expressions.constants[node.name.toUpperCase()];
+    } else if (expressions.placements[node.name.toUpperCase()]) {
+        return expressions.placements[node.name.toUpperCase()];
     } else if (lowerCaseExpressions[node.name.toLowerCase()]) {
         return lowerCaseExpressions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {

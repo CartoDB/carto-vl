@@ -261,7 +261,7 @@ describe('api/viz', () => {
         it('should work with numeric expressions', () => {
             let viz = new Viz('@a: sin(PI / (1 + log(E)))');
             expect(viz.variables.a.value).toEqual(1);
-            viz = new Viz({ variables: { a: s.sin(s.div(s.PI, s.add(1, s.log(s.E)))) } });
+            viz = new Viz({ variables: { a: s.sin(s.div(s.constants.PI, s.add(1, s.log(s.constants.E)))) } });
             expect(viz.variables.a.value).toEqual(1);
         });
 
