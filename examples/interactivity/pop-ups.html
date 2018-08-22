@@ -84,27 +84,25 @@
     const delay = 50;
     let clickedFeatureId = null;
     interactivity.on('featureEnter', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
+      event.features.forEach(feature => {
         if (feature.id !== clickedFeatureId) {
           feature.color.blendTo('opacity(DeepPink, 0.5)', delay)
           feature.strokeWidth.blendTo('4', delay);
           feature.strokeColor.blendTo('opacity(DeepPink, 0.8)', delay);
         }
-      }
+      });
     });
     interactivity.on('featureLeave', event => {
-      if (event.features.length > 0) {
-        const feature = event.features[0];
+      event.features.forEach(feature => {
         if (feature.id !== clickedFeatureId) {
           feature.color.reset(delay);
           feature.strokeWidth.reset(delay);
           feature.strokeColor.reset(delay);
         }
-      }
+      });
     });
     interactivity.on('featureClick', event => {
-      if (event.features.length > 0) {
+      if (event.features.length) {
         const feature = event.features[0];
         clickedFeatureId = feature.id;
         feature.color.blendTo('opacity(LimeGreen, 0.5)', delay)
@@ -113,8 +111,9 @@
       }
     });
     interactivity.on('featureClickOut', event => {
-      if (event.features.length > 0) {
+      if (event.features.length) {
         const feature = event.features[0];
+        clickedFeatureId = '';
         feature.color.reset(delay);
         feature.strokeWidth.reset(delay);
         feature.strokeColor.reset(delay);
