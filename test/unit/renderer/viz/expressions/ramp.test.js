@@ -1018,7 +1018,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 r._bindMetadata(METADATA);
 
                 actual = r.getLegend().length;
-                expected = 13;
+                expected = 12;
 
                 expect(actual).toEqual(expected);
             });
