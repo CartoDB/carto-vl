@@ -145,6 +145,7 @@ export default class Interactivity {
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
             this._subscribeToLayerEvents(layerList);
+            this._subscribeToMapEvents(layerList[0].map);
         }).then(() => {
             if (options.autoChangePointer) {
                 this._setInteractiveCursor();
@@ -167,12 +168,15 @@ export default class Interactivity {
         });
     }
 
+    _subscribeToMapEvents (map) {
+        map.on('mousemove', this._onMouseMove.bind(this));
+        map.on('click', this._onClick.bind(this));
+    }
+
     _subscribeToLayerEvents (layers) {
         layers.forEach(layer => {
             layer.on('updated', this._onLayerUpdated.bind(this));
         });
-        layers[0].map.on('mousemove', this._onMouseMove.bind(this));
-        layers[0].map.on('click', this._onClick.bind(this));
     }
 
     _onLayerUpdated () {
