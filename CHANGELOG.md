@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression.
+- Add reverse expression to arrays, besides palettes
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
