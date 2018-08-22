@@ -8,6 +8,28 @@ import ReverseArray from './ReverseArray';
  * @param {Palette|BaseArray} x - item to be reversed
  * @return {Palette|BaseArray}
  *
+ * @example <caption>Invert a Palette.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ * });
+ *
+ * @example <caption>Invert a Palette (String).</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($type, reverse(PRISM))
+ * `);
+ *
+ * @example <caption>Invert a Color Array.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
+ * });
+ *
+ * @example <caption>Invert a Color Array (String).</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($count, reverse([red, blue]))
+ * `);
+ *
  * @memberof carto.expressions
  * @name reverse
  * @function

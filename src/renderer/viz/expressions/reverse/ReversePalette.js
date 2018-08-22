@@ -1,27 +1,5 @@
 import Palette from '../color/palettes/Palette';
 
-/**
- * Reverse the provided Palette.
- *
- * @param {Palette} palette - Color palette
- * @return {Palette}
- *
- * @example <caption>Invert a Palette.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
- * });
- *
- * @example <caption>Invert a Palette. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp($type, reverse(PRISM))
- * `);
- *
- * @memberof carto.expressions
- * @name reverse
- * @function
- * @api
- */
 export default class ReversePalette extends Palette {
     constructor (palette) {
         super(palette.name, palette.subPalettes);
