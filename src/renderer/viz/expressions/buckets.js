@@ -71,28 +71,30 @@ export default class Buckets extends BaseExpression {
             looseType = input.type;
         }
 
-        checkType('buckets', 'list', 1, ['number-array', 'category-array'], list);
-
-        list.elems.map((item, index) => {
-            if (item.type) {
-                if (looseType && looseType !== item.type) {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                } else if (item.type !== 'number' && item.type !== 'category') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
-                }
-            }
-        });
-
         let children = {
             input
         };
 
-        list.elems.map((item, index) => {
-            children[`arg${index}`] = item;
-        });
+        let numCategories;
+        if (list.elems) {
+            list.elems.map((item, index) => {
+                if (item.type) {
+                    if (looseType && looseType !== item.type) {
+                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                    } else if (item.type !== 'number' && item.type !== 'category') {
+                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
+                    }
+                }
+
+                children[`arg${index}`] = item;
+            });
+            numCategories = list.elems.length + 1;
+        }
+
         super(children);
-        this.numCategories = list.elems.length + 1;
+        this.numCategories = numCategories;
+
         this.list = list;
         this.type = 'category';
     }
@@ -126,6 +128,8 @@ export default class Buckets extends BaseExpression {
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
+
+        checkType('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
