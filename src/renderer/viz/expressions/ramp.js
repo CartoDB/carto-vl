@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
+import * as arrayUtils from '../utils/array';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
@@ -245,7 +246,7 @@ export default class Ramp extends BaseExpression {
 
     getLegend (options = {}) {
         if (this.input.isA(Linear)) {
-            return this._getLegendLinear(options);
+            return this._getLegendLinear(this.input, options);
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
@@ -255,17 +256,26 @@ export default class Ramp extends BaseExpression {
         }
     }
 
-    _getLegendLinear () {
-        const name = this.input.input.name;
+    _getLegendLinear (input, options) {
+        const firstChild = input[input.childrenNames[0]];
+        return firstChild.isA(Property)
+            ? this._getLegendLinearProperty(firstChild, options)
+            : this._getLegendLinear(firstChild, options);
+    }
+
+    _getLegendLinearProperty (property) {
+        const name = property.name;
         const feature = {};
 
         return this._metadata.sample
             .map(sample => sample[name])
-            .sort((a, b) => { return a - b; })
+            .sort(arrayUtils.sortAsc)
+            .filter(arrayUtils.removeDuplicates)
             .map((value) => {
                 feature[name] = value;
-                return { name, values: [ value, this.eval(feature) ]
-                };
+                const values = [ this.eval(feature), value ];
+
+                return { name, values };
             });
     }
 
