@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression.
+- New method `ramp.getLegend`
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
