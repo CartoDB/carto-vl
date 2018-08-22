@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { div, globalMax, opacity } from '../expressions';
-import { checkMaxArguments, checkType, implicitCast, checkInstance, checkExpression } from './utils';
+import { checkMaxArguments, checkType, checkInstance, checkExpression } from './utils';
 import Property from './basic/property';
 
 /**
