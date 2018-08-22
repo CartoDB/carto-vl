@@ -1,8 +1,8 @@
 import { validateStaticType } from './utils';
 
-describe('src/renderer/viz/expressions/scale', () => {
+describe('src/renderer/viz/expressions/Scaled', () => {
     describe('type', () => {
-        validateStaticType('scale', [1], 'number');
+        validateStaticType('scaled', [1], 'number');
     });
 
     describe('error control', () => {

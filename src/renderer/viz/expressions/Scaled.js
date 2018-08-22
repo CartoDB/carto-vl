@@ -13,12 +13,12 @@ import { implicitCast, checkType } from './utils';
  * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.scale(25, 7)
+ *   width: s.scaled(25, 7)
  * });
  *
  * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: s.scale(25, 7)
+ *   width: s.scaled(25, 7)
  * `);
  *
  * @memberof carto.expressions
@@ -26,7 +26,7 @@ import { implicitCast, checkType } from './utils';
  * @function
  * @api
  */
-export default class Scale extends BaseExpression {
+export default class Scaled extends BaseExpression {
     constructor (width, zoomlevel = 0) {
         width = implicitCast(width);
         zoomlevel = implicitCast(zoomlevel);
@@ -40,8 +40,8 @@ export default class Scale extends BaseExpression {
         return this.scale.eval();
     }
     _bindMetadata (metadata) {
-        checkType('scale', 'width', 0, 'number', this.scale.a.a);
-        checkType('scale', 'zoomlevel', 1, 'number', this.scale.b);
+        checkType('scaled', 'width', 0, 'number', this.scale.a.a);
+        checkType('scaled', 'zoomlevel', 1, 'number', this.scale.b);
         super._bindMetadata(metadata);
     }
     _preDraw (program, drawMetadata, gl) {

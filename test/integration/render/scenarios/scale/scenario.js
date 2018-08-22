@@ -6,7 +6,7 @@ const map = new mapboxgl.Map({
 });
 
 const points = new carto.source.GeoJSON(sources['points']);
-const viz = new carto.Viz('width: scale(20, 0.25), strokeWidth: 0');
+const viz = new carto.Viz('width: scaled(20, 0.25), strokeWidth: 0');
 const layer = new carto.Layer('layer1', points, viz);
 
 layer.addTo(map);

@@ -247,8 +247,8 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
-import Scale from './expressions/Scale';
 import Zoomrange from './expressions/Zoomrange';
+import Scaled from './expressions/Scaled';
 
 /* Expose classes as constructor functions */
 
@@ -384,7 +384,7 @@ export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
 
 export const zoom = (...args) => new Zoom(...args);
-export const scale = (...args) => new Scale(...args);
+export const scaled = (...args) => new Scaled(...args);
 export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
