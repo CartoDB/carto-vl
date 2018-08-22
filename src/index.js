@@ -44,6 +44,23 @@ import { version } from '../package.json';
 
 // Namespaces
 
-const source = { Dataset, SQL, GeoJSON, MVT };
+const source = {
+    Dataset,
+    SQL,
+    GeoJSON,
+    MVT
+};
 
-export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export {
+    version,
+    on,
+    off,
+    setDefaultAuth,
+    setDefaultConfig,
+    source,
+    expressions,
+    Layer,
+    Viz,
+    Map,
+    Interactivity
+};

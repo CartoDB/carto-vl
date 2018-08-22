@@ -6,7 +6,7 @@ import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
 import Classifier from './classification/Classifier';
-import ImageList from './ImageList';
+import ImageList from './images/ImageList';
 import Linear from './linear';
 import Top from './top';
 

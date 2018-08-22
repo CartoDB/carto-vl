@@ -1,5 +1,5 @@
-import Base from './base';
-import { checkArray, checkLooseType, checkMaxArguments } from './utils';
+import Base from '../base';
+import { checkArray, checkLooseType, checkMaxArguments } from '../utils';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.

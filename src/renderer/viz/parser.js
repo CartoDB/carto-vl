@@ -1,6 +1,6 @@
 
 import jsep from 'jsep';
-import * as functions from './expressions';
+import * as expressions from './expressions';
 import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES } from './expressions/color/cssColorNames';
 import NamedColor from './expressions/color/NamedColor';
@@ -10,37 +10,43 @@ import Hex from './expressions/color/hex';
 
 const aggFns = [];
 
-const lowerCaseFunctions = {};
-Object.keys(functions)
-    .filter(name => name[0] === name[0].toLowerCase()) // Only get functions starting with lowercase
-    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
-lowerCaseFunctions.true = functions.TRUE;
-lowerCaseFunctions.false = functions.FALSE;
-lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
-lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
+const lowerCaseExpressions = {
+    constants: {},
+    placements: {},
+    images: {}
+};
 
-lowerCaseFunctions.pi = functions.PI;
-lowerCaseFunctions.e = functions.E;
-lowerCaseFunctions.hold = functions.HOLD;
+Object.keys(expressions)
+    .filter(name => name[0] === name[0].toLowerCase()) // Only get expressions starting with lowercase
+    .map(name => { lowerCaseExpressions[name.toLocaleLowerCase()] = expressions[name]; });
 
-lowerCaseFunctions.bicycle = functions.BICYCLE;
-lowerCaseFunctions.building = functions.BUILDING;
-lowerCaseFunctions.bus = functions.BUS;
-lowerCaseFunctions.car = functions.CAR;
-lowerCaseFunctions.circle = functions.CIRCLE;
-lowerCaseFunctions.circleoutline = functions.CIRCLE_OUTLINE;
-lowerCaseFunctions.cross = functions.CROSS;
-lowerCaseFunctions.flag = functions.FLAG;
-lowerCaseFunctions.house = functions.HOUSE;
-lowerCaseFunctions.marker = functions.MARKER;
-lowerCaseFunctions.markeroutline = functions.MARKER_OUTLINE;
-lowerCaseFunctions.plus = functions.PLUS;
-lowerCaseFunctions.square = functions.SQUARE;
-lowerCaseFunctions.squareoutline = functions.SQUARE_OUTLINE;
-lowerCaseFunctions.star = functions.STAR;
-lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
-lowerCaseFunctions.triangle = functions.TRIANGLE;
-lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
+lowerCaseExpressions.constants.true = expressions.constants.TRUE;
+lowerCaseExpressions.constants.false = expressions.constants.FALSE;
+lowerCaseExpressions.placements.align_center = expressions.placements.ALIGN_CENTER;
+lowerCaseExpressions.placements.align_bottom = expressions.placements.ALIGN_BOTTOM;
+
+lowerCaseExpressions.constants.pi = expressions.constants.PI;
+lowerCaseExpressions.constants.e = expressions.constants.E;
+lowerCaseExpressions.constants.hold = expressions.constants.HOLD;
+
+lowerCaseExpressions.images.bicycle = expressions.images.BICYCLE;
+lowerCaseExpressions.images.building = expressions.images.BUILDING;
+lowerCaseExpressions.images.bus = expressions.images.BUS;
+lowerCaseExpressions.images.car = expressions.images.CAR;
+lowerCaseExpressions.images.circle = expressions.images.CIRCLE;
+lowerCaseExpressions.images.circle_outline = expressions.images.CIRCLE_OUTLINE;
+lowerCaseExpressions.images.cross = expressions.images.CROSS;
+lowerCaseExpressions.images.flag = expressions.images.FLAG;
+lowerCaseExpressions.images.house = expressions.images.HOUSE;
+lowerCaseExpressions.images.marker = expressions.images.MARKER;
+lowerCaseExpressions.images.markero_utline = expressions.images.MARKER_OUTLINE;
+lowerCaseExpressions.images.plus = expressions.images.PLUS;
+lowerCaseExpressions.images.square = expressions.images.SQUARE;
+lowerCaseExpressions.images.square_outline = expressions.images.SQUARE_OUTLINE;
+lowerCaseExpressions.images.star = expressions.images.STAR;
+lowerCaseExpressions.images.star_outline = expressions.images.STAR_OUTLINE;
+lowerCaseExpressions.images.triangle = expressions.images.TRIANGLE;
+lowerCaseExpressions.images.triangle_outline = expressions.images.TRIANGLE_OUTLINE;
 
 export function parseVizExpression (str) {
     prepareJsep();
@@ -96,8 +102,8 @@ function parseFunctionCall (node) {
         return args[0];
     }
     const args = node.arguments.map(arg => parseNode(arg));
-    if (lowerCaseFunctions[name]) {
-        return lowerCaseFunctions[name](...args);
+    if (lowerCaseExpressions[name]) {
+        return lowerCaseExpressions[name](...args);
     }
     throw new Error(`Invalid function name '${node.callee.name}'.`);
 }
@@ -107,37 +113,37 @@ function parseBinaryOperation (node) {
     const right = parseNode(node.right);
     switch (node.operator) {
         case '*':
-            return functions.mul(left, right);
+            return expressions.mul(left, right);
         case '/':
-            return functions.div(left, right);
+            return expressions.div(left, right);
         case '+':
-            return functions.add(left, right);
+            return expressions.add(left, right);
         case '-':
-            return functions.sub(left, right);
+            return expressions.sub(left, right);
         case '%':
-            return functions.mod(left, right);
+            return expressions.mod(left, right);
         case '^':
-            return functions.pow(left, right);
+            return expressions.pow(left, right);
         case '>':
-            return functions.greaterThan(left, right);
+            return expressions.greaterThan(left, right);
         case '>=':
-            return functions.greaterThanOrEqualTo(left, right);
+            return expressions.greaterThanOrEqualTo(left, right);
         case '<':
-            return functions.lessThan(left, right);
+            return expressions.lessThan(left, right);
         case '<=':
-            return functions.lessThanOrEqualTo(left, right);
+            return expressions.lessThanOrEqualTo(left, right);
         case '==':
-            return functions.equals(left, right);
+            return expressions.equals(left, right);
         case '!=':
-            return functions.notEquals(left, right);
+            return expressions.notEquals(left, right);
         case 'and':
-            return functions.and(left, right);
+            return expressions.and(left, right);
         case 'or':
-            return functions.or(left, right);
+            return expressions.or(left, right);
         case 'in':
-            return functions.in(left, right);
+            return expressions.in(left, right);
         case 'nin':
-            return functions.nin(left, right);
+            return expressions.nin(left, right);
         default:
             throw new Error(`Invalid binary operator '${node.operator}'.`);
     }
@@ -146,7 +152,7 @@ function parseBinaryOperation (node) {
 function parseUnaryOperation (node) {
     switch (node.operator) {
         case '-':
-            return functions.mul(-1, parseNode(node.argument));
+            return expressions.mul(-1, parseNode(node.argument));
         case '+':
             return parseNode(node.argument);
         default:
@@ -159,15 +165,21 @@ function parseIdentifier (node) {
         node.name = '__cartovl_variable_' + node.name.substr(1);
     }
     if (node.name.startsWith('__cartovl_variable_')) {
-        return functions.variable(node.name.substr('__cartovl_variable_'.length));
+        return expressions.variable(node.name.substr('__cartovl_variable_'.length));
     } else if (node.name[0] === '#') {
         return new Hex(node.name);
     } else if (node.name[0] === '$') {
-        return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toUpperCase()]) {
-        return functions.palettes[node.name.toUpperCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-        return lowerCaseFunctions[node.name.toLowerCase()];
+        return expressions.property(node.name.substring(1));
+    } else if (expressions.palettes[node.name.toUpperCase()]) {
+        return expressions.palettes[node.name.toUpperCase()];
+    } else if (expressions.images[node.name.toUpperCase()]) {
+        return expressions.images[node.name.toUpperCase()];
+    } else if (expressions.constants[node.name.toUpperCase()]) {
+        return expressions.constants[node.name.toUpperCase()];
+    } else if (expressions.placements[node.name.toUpperCase()]) {
+        return expressions.placements[node.name.toUpperCase()];
+    } else if (lowerCaseExpressions[node.name.toLowerCase()]) {
+        return lowerCaseExpressions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
     } else {

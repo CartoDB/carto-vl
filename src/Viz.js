@@ -20,8 +20,8 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
-const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(s.FALSE);
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(s.ALIGN_BOTTOM);
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(s.constants.FALSE);
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(s.placements.ALIGN_BOTTOM);
 const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
 const DEFAULT_RESOLUTION = () => 1;
 

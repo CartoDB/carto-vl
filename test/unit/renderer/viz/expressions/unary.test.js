@@ -2,8 +2,8 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 // Add custom toString function to improve test output.
-s.TRUE.toString = () => 's.TRUE';
-s.FALSE.toString = () => 's.FALSE';
+s.constants.TRUE.toString = () => 's.constants.TRUE';
+s.constants.FALSE.toString = () => 's.constants.FALSE';
 
 describe('src/renderer/viz/expressions/unary', () => {
     describe('error control', () => {
@@ -76,15 +76,15 @@ describe('src/renderer/viz/expressions/unary', () => {
     describe('not', () => {
         test('not', 0, 1);
         test('not', 1, 0);
-        test('not', s.TRUE, 0);
-        test('not', s.FALSE, 1);
+        test('not', s.constants.TRUE, 0);
+        test('not', s.constants.FALSE, 1);
     });
 
     describe('isNaN', () => {
         test('isNaN', 0, 0);
         test('isNaN', 1.23, 0);
-        test('isNaN', s.TRUE, 0);
-        test('isNaN', s.FALSE, 0);
+        test('isNaN', s.constants.TRUE, 0);
+        test('isNaN', s.constants.FALSE, 0);
         test('isNaN', Number.NaN, 1);
     });
 
