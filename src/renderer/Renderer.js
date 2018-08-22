@@ -52,10 +52,45 @@ export default class Renderer {
         this.dataframes = [];
     }
 
+    /**
+     * Initialize renderer:
+     * - WebGL context
+     * - Map zoom and center
+     * @param {Map} map
+     * @param {WebGLRenderingContext} gl
+     */
     initialize (map, gl) {
         this._initGL(gl);
         this._initZoom(map);
         this._initCenter(map);
+    }
+
+    /**
+     * Set Renderer visualization center
+     * @param {number} x
+     * @param {number} y
+     */
+    setCenter (x, y) {
+        this._center.x = x;
+        this._center.y = y;
+    }
+
+    /**
+     * Set Renderer visualization zoom
+     * @param {number} zoom
+     */
+    setZoom (zoom) {
+        this._zoom = zoom;
+    }
+
+    /**
+     * Get Renderer visualization bounds
+     * @return {*}
+     */
+    getBounds () {
+        const sx = this._zoom * this._getAspect();
+        const sy = this._zoom;
+        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
     }
 
     _initGL (gl) {
@@ -113,34 +148,6 @@ export default class Renderer {
     _initCenter (map) {
         const c = map.getCenter();
         this.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
-    }
-
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (x, y) {
-        this._center.x = x;
-        this._center.y = y;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const sx = this._zoom * this._getAspect();
-        const sy = this._zoom;
-        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
     }
 
     _getAspect () {
