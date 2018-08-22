@@ -181,7 +181,7 @@ import Now from './expressions/now';
 
 import BaseNumber from './expressions/basic/number';
 
-import Opacity from './expressions/color/opacity';
+import Opacity from './expressions/color/Opacity';
 
 import { Asc } from './expressions/ordering';
 import { Desc } from './expressions/ordering';
