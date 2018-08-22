@@ -63,6 +63,7 @@ export default class Layer {
         this._state = 'init';
         this._visible = true;
         this._isLoaded = false;
+        this._matrix = null;
         this._fireUpdateOnNextRender = false;
         this._emitter = mitt();
         this._oldDataframes = new Set();
@@ -343,9 +344,16 @@ export default class Layer {
         this.map = map;
         this.renderer = getRenderer(map, gl);
 
+        // Register map events to request data tiles
+        // map.on('movestart', this.requestData.bind(this));
+        // map.on('move', this.requestData.bind(this));
+        // map.on('moveend', this.requestData.bind(this));
+        // map.on('resize', this.requestData.bind(this));
+
+        // Initialize render layer
         this._renderLayer.renderer = this.renderer;
-        this._contextInitialize();
         this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
+        this._contextInitialize();
         this.requestMetadata();
     }
 
@@ -353,13 +361,22 @@ export default class Layer {
      * Custom Layer API: `onRemove` function
      */
     onRemove (map, gl) {
+        // Unregister map events
+        // map.off('movestart');
+        // map.off('move');
+        // map.off('moveend');
+        // map.off('resize');
     }
 
     /**
      * Custom Layer API: `render` function
      */
     render (gl, matrix) {
-        this._setZoomCenter(matrix);
+        if (!util.equalArrays(this._matrix, matrix)) {
+            this._matrix = matrix;
+            this._setZoomCenter(matrix);
+            this.requestData();
+        }
         this._paintLayer();
 
         // Checking this.map.repaint is needed, because MGL repaint is a setter and
