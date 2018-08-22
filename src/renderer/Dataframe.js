@@ -60,6 +60,10 @@ export default class Dataframe {
                         aabb = _updateAABBForGeometry(feature[j], aabb, type);
                     }
 
+                    if (aabb.minx === Number.POSITIVE_INFINITY) {
+                        aabb = null;
+                    }
+
                     aabbList.push(aabb);
                 }
 
@@ -259,6 +263,10 @@ export default class Dataframe {
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
+        if (featureAABB === null) {
+            return AABBTestResults.OUTSIDE;
+        }
+
         const featureStrokeAABB = {
             minx: featureAABB.minx - stroke,
             miny: featureAABB.miny - stroke,
@@ -357,13 +365,13 @@ export default class Dataframe {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                let offset = {x: 0, y: 0};
+                let offset = { x: 0, y: 0 };
                 if (!viz.offset.default) {
                     const vizOffset = viz.offset.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
-                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
                 if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
@@ -547,7 +555,7 @@ function _updateAABBLine (line, aabb) {
 }
 
 function _updateAABBPolygon (polygon, aabb) {
-    const [ vertices, numVertices ] = [ polygon.flat, polygon.holes[0] || polygon.flat.length / 2 ];
+    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
 
     for (let i = 0; i < numVertices; i++) {
         aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
@@ -561,12 +569,12 @@ function _updateAABBPolygon (polygon, aabb) {
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
-            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
+        featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
-            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+        featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
 function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {

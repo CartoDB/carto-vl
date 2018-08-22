@@ -62,7 +62,7 @@ export default class Map {
 
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
-            const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
+            const hasAnimation = layer.isAnimated();
 
             if (hasData || hasAnimation) {
                 layer.$paintCallback();

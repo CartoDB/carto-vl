@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Optimize decodeLine and decodePolygon time (2x)
 - Use minified bundle for CI testing
 - Improve featureIDBuffer generation by 20%
+- Trigger feature events (hover, enter, leave) when layers are updated
 
 ### Removed
 - Removed XYZ expression
