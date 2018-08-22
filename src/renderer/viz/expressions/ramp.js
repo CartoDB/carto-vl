@@ -138,7 +138,7 @@ export default class Ramp extends BaseExpression {
     /**
      * Get the value associated with each category
      *
-     * @returns {Array} Array of { name, value } objects
+     * @return {Array} Array of objects with the format { name, values }
      *
      * @example <caption>Get the color associated with each category</caption>
      * const s = carto.expressions;
@@ -157,7 +157,6 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * @example <caption>Get the color associated with each category (String)</caption>
-     * const s = carto.expressions;
      * const viz = new carto.Viz(`
      *   color: ramp($vehicles, PRISM)
      * ´);
@@ -188,7 +187,6 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * @example <caption>Get the image url associated with each category (String)</caption>
-     * const s = carto.expressions;
      * const viz = new carto.Viz(`
      *   symbol: ramp('$vehicles'), imageList([BICYCLE, CAR, BUS]))
      * `);
@@ -202,11 +200,49 @@ export default class Ramp extends BaseExpression {
      *   // ]
      * });
      *
+     * @example <caption>Get the top 3 categories and set default category name</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.top(s.prop('vehicles')), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.getViz().color.getLegend({
+     *      defaultOthers: 'Other Vehicles'
+     *   });
+     *
+     *   // legend = [
+     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
+     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
+     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
+     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
+     *   // ]
+     * });
+     *
+     * @example <caption>Get the top 3 categories and set default category name (String)</caption>
+     * const viz = new carto.Viz({
+     *   color: ramp(top($vehicles, 5), PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.getViz().color.getLegend({
+     *      defaultOthers: 'Other Vehicles'
+     *   });
+     *
+     *   // legend = [
+     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
+     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
+     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
+     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
+     *   // ]
+     * });
+     *
      * @memberof carto.expressions.Ramp
      * @name getLegend
      * @instance
      * @api
      */
+
     getLegend (options = {}) {
         if (this.input.isA(Linear)) {
             return this._getLegendLinear(options);
