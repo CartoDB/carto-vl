@@ -1,6 +1,7 @@
 import BaseExpression from './base';
-import { number, div, globalMax, opacity } from '../expressions';
-import { checkMaxArguments } from './utils';
+import { div, globalMax, opacity } from '../expressions';
+import { checkMaxArguments, checkType, implicitCast, checkInstance, checkExpression } from './utils';
+import Property from './basic/property';
 
 /**
  * Override the opacity (alpha channel) of a color to normalize the input color by a normalizer property.
@@ -37,10 +38,23 @@ import { checkMaxArguments } from './utils';
 export default class AlphaNormalize extends BaseExpression {
     constructor (input, normalizer) {
         checkMaxArguments(arguments, 2, 'alphaNormalize');
+        checkExpression('alphaNormalize', 'input', 0, input);
+        checkExpression('alphaNormalize', 'normalizer', 1, normalizer);
 
         super({ _impostor: opacity(input, div(normalizer, globalMax(normalizer))) });
+        this._input = input;
+        this._normalizer = normalizer;
         this.type = 'color';
         this.inlineMaker = inline => inline._impostor;
+    }
+
+    _bindMetadata (meta) {
+        this._input._bindMetadata(meta);
+        this._normalizer._bindMetadata(meta);
+        checkType('alphaNormalize', 'input', 0, 'color', this._input);
+        checkType('alphaNormalize', 'normalizer', 1, 'number', this._normalizer);
+        checkInstance('alphaNormalize', 'normalizer', 1, Property, this._normalizer);
+        super._bindMetadata(meta);
     }
 
     get value () {

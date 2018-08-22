@@ -455,11 +455,6 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             b = implicitCast(b);
 
             const signature = getSignatureLoose(a, b);
-            if (signature !== undefined) {
-                if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                    throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
-                }
-            }
 
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
