@@ -75,7 +75,7 @@
     colorLegend.forEach((legend) => {
       const colorHex = rgbToHex(legend.values[0]);
       colorLegendList +=
-        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}: ${legend.values[1]}</span></li>\n`;
+        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}</span></li>\n`;
     });
       // Update the information
       document.getElementById('content').innerHTML = colorLegendList;
