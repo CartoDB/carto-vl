@@ -65,7 +65,7 @@ export default class Property extends BaseExpression {
         }
         this.type = metaColumn.type;
 
-        if (this.type === 'category' && this.numCategories !== undefined) {
+        if (this.type === 'category' && this.numCategories === undefined) {
             Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
         }
     }
