@@ -2,8 +2,8 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
 
 // Add custom toString function to improve test output.
-s.TRUE.toString = () => 's.TRUE';
-s.FALSE.toString = () => 's.FALSE';
+s.constants.TRUE.toString = () => 's.TRUE';
+s.constants.FALSE.toString = () => 's.FALSE';
 
 describe('src/renderer/viz/expressions/binary', () => {
     describe('error control', () => {
@@ -77,10 +77,10 @@ describe('src/renderer/viz/expressions/binary', () => {
 
     describe('eval', () => {
         describe('and', () => {
-            test('and', s.TRUE, s.TRUE, 1);
-            test('and', s.TRUE, s.FALSE, 0);
-            test('and', s.FALSE, s.FALSE, 0);
-            test('and', 0.5, s.TRUE, 0.5);
+            test('and', s.constants.TRUE, s.constants.TRUE, 1);
+            test('and', s.constants.TRUE, s.constants.FALSE, 0);
+            test('and', s.constants.FALSE, s.constants.FALSE, 0);
+            test('and', 0.5, s.constants.TRUE, 0.5);
             test('and', 0.5, 0.5, 0.25);
         });
 

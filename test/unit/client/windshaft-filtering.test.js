@@ -403,7 +403,7 @@ describe('src/client/windshaft-filtering', () => {
                 };
                 const actual = preFilters(f,
                     s.blend(
-                        s.FALSE,
+                        s.constants.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
                         s.transition(100)
                     )
@@ -415,7 +415,7 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = preFilters(f,
                     s.blend(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.FALSE,
+                        s.constants.FALSE,
                         0.5
                     )
                 );
@@ -429,7 +429,7 @@ describe('src/client/windshaft-filtering', () => {
             });
 
             it('with the `filter: true`', () => {
-                expect(preFilters(f, s.TRUE)).toBeNull();
+                expect(preFilters(f, s.constants.TRUE)).toBeNull();
             });
 
             it('with the `filter: $property<now()', () => {
@@ -768,7 +768,7 @@ describe('src/client/windshaft-filtering', () => {
                 };
                 const actual = aggrFilters(f,
                     s.blend(
-                        s.FALSE,
+                        s.constants.FALSE,
                         s.between(s.property('numericProperty'), 10, 20),
                         s.transition(100)
                     )
@@ -780,7 +780,7 @@ describe('src/client/windshaft-filtering', () => {
                 const actual = aggrFilters(f,
                     s.blend(
                         s.between(s.property('numericProperty'), 10, 20),
-                        s.FALSE,
+                        s.constants.FALSE,
                         0.5
                     )
                 );
@@ -833,7 +833,7 @@ describe('src/client/windshaft-filtering', () => {
             });
 
             it('with the `filter: true`', () => {
-                expect(aggrFilters(f, s.TRUE)).toEqual({});
+                expect(aggrFilters(f, s.constants.TRUE)).toEqual({});
             });
 
             it('with the `filter: $property<now()', () => {
