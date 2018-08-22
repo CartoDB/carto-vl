@@ -269,7 +269,7 @@ export default class GeoJSON extends Base {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {

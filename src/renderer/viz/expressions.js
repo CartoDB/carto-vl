@@ -247,6 +247,7 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
+import AlphaNormalize from './expressions/AlphaNormalize';
 
 /* Expose classes as constructor functions */
 
@@ -383,6 +384,7 @@ export const globalPercentile = (...args) => new GlobalPercentile(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const placement = (...args) => new Placement(...args);
+export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);
 export const TRUE = new Constant(1);

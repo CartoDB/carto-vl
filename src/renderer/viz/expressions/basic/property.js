@@ -58,9 +58,9 @@ export default class Property extends BaseExpression {
         return feature[this.name];
     }
 
-    getCategories () {
+    get categories () {
         return this.type === 'category'
-            ? this.categories
+            ? this._categories
             : [];
     }
 
@@ -71,12 +71,8 @@ export default class Property extends BaseExpression {
         }
 
         this._metadata = metadata;
+        this._categories = metaColumn.categories;
         this.type = metaColumn.type;
-
-        if (this.type === 'category') {
-            this.numCategories = metaColumn.categories.length;
-            this.categories = metaColumn.categories;
-        }
     }
 
     _applyToShaderSource (getGLSLforProperty) {

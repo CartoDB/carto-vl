@@ -99,10 +99,11 @@ export default class Base {
         return this instanceof expressionClass;
     }
 
-    getCategories () {
+    get categories () {
         const children = this._getChildren();
+
         if (children) {
-            return children[0].getCategories();
+            return children[0].categories();
         }
     }
 

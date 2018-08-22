@@ -37,6 +37,7 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
+const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -300,7 +301,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getLeyendCategories (config) {
-        return this.input.getCategories()
+        return this.input.categories
             .map((category, index) => { return this._getLegendCategoryValue(category, index, config); })
             .filter(legend => legend.values !== null);
     }
@@ -405,6 +406,7 @@ export default class Ramp extends BaseExpression {
         this._properties = metadata.properties;
         this._texCategories = null;
         this._GLtexCategories = null;
+        this._metadata = metadata;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -419,16 +421,32 @@ export default class Ramp extends BaseExpression {
             };
         }
 
+        let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
+        if (this.input.type === 'category' && this.input.isA(Property)) {
+            inline = `texture2D(texRamp${this._uid}, vec2(ramp_translate${this._uid}(${input.inline}), 0.5))`;
+        }
+
         return {
             preface: this._prefaceCode(input.preface + `
                 uniform sampler2D texRamp${this._uid};
+                uniform sampler2D texRampTranslate${this._uid};
                 uniform float keyMin${this._uid};
-                uniform float keyWidth${this._uid};`
+                uniform float keyWidth${this._uid};
+
+                float ramp_translate${this._uid}(float s){
+                    vec2 v = vec2(
+                        mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
+                        floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
+                    );
+                    return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
+                }
+
+                `
             ),
 
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
-                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
+                ? `(${inline}.a)`
+                : `(${inline}.rgba)`
         };
     }
 
@@ -451,6 +469,7 @@ export default class Ramp extends BaseExpression {
 
         this.input._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
@@ -560,6 +579,36 @@ export default class Ramp extends BaseExpression {
         gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
         gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
+
+        if (this.input.type === 'category' && this.input.isA(Property)) {
+            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+            const catIDs = this._metadata.properties[this.input.name].categories.length;
+            if (this._translatedIds !== catIDs) {
+                this._translatedIds = catIDs;
+                this._translateTexture = gl.createTexture();
+                const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
+                for (let i = 0; i < catIDs; i++) {
+                    const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
+                    const value = i / (catIDs - 1);
+                    const vec2Id = {
+                        x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
+                        y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
+                    };
+                    translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
+                }
+                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            } else {
+                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+            }
+            gl.uniform1i(this._getBinding(program).texRampTranslateLoc, drawMetadata.freeTexUnit);
+            drawMetadata.freeTexUnit++;
+        }
     }
 }
 
@@ -634,9 +683,9 @@ function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, 
         case numCategories < colors.length:
             return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
         case numCategories > colors.length:
-            return _addothersColorToColors(colors, defaultOthersColor);
+            return _addOthersColorToColors(colors, defaultOthersColor);
         default:
-            colors = _addothersColorToColors(colors, defaultOthersColor);
+            colors = _addOthersColorToColors(colors, defaultOthersColor);
             return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
     }
 }
@@ -657,7 +706,7 @@ function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
     return colors;
 }
 
-function _addothersColorToColors (colors, othersColor) {
+function _addOthersColorToColors (colors, othersColor) {
     return [...colors, othersColor];
 }
 

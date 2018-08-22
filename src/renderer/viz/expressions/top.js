@@ -44,6 +44,7 @@ export default class Top extends BaseExpression {
         super(children);
         this.type = 'category';
     }
+
     eval (feature) {
         const catID = this._meta.categoryToID.get(this.property.eval(feature));
         const buckets = this.numBuckets;
@@ -76,6 +77,7 @@ export default class Top extends BaseExpression {
     get numCategories () {
         return this.numBuckets + 1;
     }
+
     get numBuckets () {
         let buckets = Math.round(this.buckets.eval());
 
