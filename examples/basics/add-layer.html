@@ -48,13 +48,10 @@
 
     // Define layer
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const viz = new carto.Viz('');
+    const viz = new carto.Viz();
     const layer = new carto.Layer('layer', source, viz);
 
-    map.on('load', () => {
-      layer.addTo(map, 'watername_ocean');
-    });
-
+    layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
     function hideLoader() {
