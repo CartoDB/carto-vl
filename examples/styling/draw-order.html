@@ -17,23 +17,23 @@
     <aside class="toolbox">
       <div class="box">
         <header>
-          <h1>Color schemes</h1>
+          <h1>Draw Order</h1>
         </header>
         <section>
-          <p class="description open-sans">How to use CARTOcolors and custom color schemes</p>
+          <p class="description open-sans">How to use CARTO ordering style property</p>
           <div id="controls">
             <ul>
               <li>
-                <input type="radio" name="style" onclick="setAscOrder()" id="Cartocolor" checked>
+                <input type="radio" name="style" onclick="setAscOrder()" checked>
                 <label for="Asc">Asc</label>
               </li>
               <li>
-                <input type="radio" name="style" onclick="setDescOrder()" id="CartocolorReverse">
+                <input type="radio" name="style" onclick="setDescOrder()">
                 <label for="Desc">Desc</label>
               </li>
               <li>
-                <input type="radio" name="style" onclick="setDefaultOrder()" id="CustomColors">
-                <label for="Default">Default</label>
+                <input type="radio" name="style" onclick="setDefaultOrder()">
+                <label for="Default">Default / No order</label>
               </li>
             </ul>
           </div>
