@@ -1,9 +1,12 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError, validateCompileTypeError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
+        validateCompileTypeError('buckets', ['number', 'number']);
+        validateCompileTypeError('buckets', ['category', 'category']);
+
         validateDynamicTypeErrors('buckets', ['number', 'category-array']);
         validateDynamicTypeErrors('buckets', ['category', 'number-array']);
         validateStaticTypeErrors('buckets', ['color', 'number-array']);
@@ -64,11 +67,6 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     response = bucketExpression.eval(feature);
 
                     expect(response).toEqual(expected);
-                });
-
-                it('should throw an error when not using an array for the breakpoint', () => {
-                    expect(() => s.buckets($cities, 'Murcia'))
-                        .toThrowError(/invalid second parameter 'list'/);
                 });
             });
 
@@ -193,11 +191,6 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     const actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
-                });
-
-                it('should throw an error when not using an array for the breakpoint', () => {
-                    expect(() => s.buckets($price, 10))
-                        .toThrowError(/invalid second parameter 'list'/);
                 });
             });
 
