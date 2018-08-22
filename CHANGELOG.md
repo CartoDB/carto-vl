@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve featureIDBuffer generation by 20%
 - Trigger feature events (hover, enter, leave) when layers are updated
 - ramp($category, ...) implementation is fixed when using multiple categorical properties
+- Use undescore in image constants.
 
 ### Removed
 - Removed XYZ expression
