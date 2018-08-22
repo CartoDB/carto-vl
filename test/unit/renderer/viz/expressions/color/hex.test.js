@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 import { hex } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/hex', () => {
@@ -7,6 +7,7 @@ describe('src/renderer/viz/expressions/hex', () => {
         validateStaticTypeErrors('hex', ['number']);
         validateStaticTypeErrors('hex', ['category']);
         validateStaticTypeErrors('hex', ['#Z08080']);
+        validateMaxArgumentsError('hex', ['#Z08080', 'extraParam']);
     });
 
     describe('type', () => {

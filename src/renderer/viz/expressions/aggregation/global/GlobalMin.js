@@ -1,4 +1,5 @@
 import GlobalAggregation from './GlobalAggregation';
+import { checkMaxArguments } from '../../utils';
 /**
  * Return the minimum of the feature property for the entire source data.
  *
@@ -27,6 +28,8 @@ import GlobalAggregation from './GlobalAggregation';
  */
 export default class GlobalMin extends GlobalAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'globalMin');
+
         super({ property, name: 'min', type: 'number' });
     }
 }

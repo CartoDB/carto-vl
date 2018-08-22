@@ -1,6 +1,16 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
+import { validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/globalAggregation', () => {
+    describe('error control', () => {
+        validateMaxArgumentsError('globalMax', ['number', 'number']);
+        validateMaxArgumentsError('globalMin', ['number', 'number']);
+        validateMaxArgumentsError('globalSum', ['number', 'number']);
+        validateMaxArgumentsError('globalAvg', ['number', 'number']);
+        validateMaxArgumentsError('globalCount', ['number', 'number']);
+        validateMaxArgumentsError('globalPercentile', ['number', 'number', 'number']);
+    });
+
     const $price = s.property('price');
     describe('global filtering', () => {
         const fakeMetadata = {

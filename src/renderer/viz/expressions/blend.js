@@ -1,4 +1,4 @@
-import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression } from './utils';
+import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression, checkMaxArguments } from './utils';
 import Transition from './transition';
 import BaseExpression from './base';
 
@@ -34,6 +34,7 @@ import BaseExpression from './base';
  */
 export default class Blend extends BaseExpression {
     constructor (a, b, mix, interpolator) {
+        checkMaxArguments(arguments, 4, 'blend');
         a = implicitCast(a);
         b = implicitCast(b);
         mix = implicitCast(mix);

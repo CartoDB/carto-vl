@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -10,6 +10,19 @@ describe('src/renderer/viz/expressions/unary', () => {
         describe('Signature NUMBERS_TO_NUMBER', () => {
             validateDynamicTypeErrors('sin', ['category']);
             validateStaticTypeErrors('sin', ['color']);
+
+            validateMaxArgumentsError('sin', ['number', 'number']);
+            validateMaxArgumentsError('ceil', ['number', 'number']);
+            validateMaxArgumentsError('log', ['number', 'number']);
+            validateMaxArgumentsError('cos', ['number', 'number']);
+            validateMaxArgumentsError('sqrt', ['number', 'number']);
+            validateMaxArgumentsError('tan', ['number', 'number']);
+            validateMaxArgumentsError('sign', ['number', 'number']);
+            validateMaxArgumentsError('abs', ['number', 'number']);
+            validateMaxArgumentsError('isNaN', ['number', 'number']);
+            validateMaxArgumentsError('not', ['number', 'number']);
+            validateMaxArgumentsError('floor', ['number', 'number']);
+            validateMaxArgumentsError('isNaN', ['number', 'number']);
         });
     });
 

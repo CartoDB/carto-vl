@@ -249,6 +249,7 @@ import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
+import AlphaNormalize from './expressions/AlphaNormalize';
 
 /* Expose classes as constructor functions */
 
@@ -388,6 +389,7 @@ export const scaled = (...args) => new Scaled(...args);
 export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
+export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);
 export const TRUE = new Constant(1);

@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Alias to a named variable defined in the Viz.
@@ -13,13 +13,13 @@ import { checkString } from '../utils';
  *   variables: {
  *     sum_price: s.clusterSum(s.prop('price'))
  *   }
- *  filter: s.neq(s.var('sum_price'), 'london'),
+ *  filter: s.neq(s.var('sum_price'), 'london')
  * });
  *
  * @example <caption>(String)</caption>
  * const viz = new carto.Viz(`
- *   @sum_price: clusterSum($price)
- *   filter: @sum_price !== 'london'
+ *   \@sum_price: clusterSum($price)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -32,11 +32,15 @@ export class Variable extends BaseExpression {
         super({});
     }
 }
+
 function isFunction (functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
+
 export default function variable (name) {
+    checkMaxArguments(arguments, 1, 'variable');
     checkString('variable', 'name', 0, name);
+
     if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }

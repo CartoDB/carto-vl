@@ -7,12 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Throw error for duplicated properties and variables
+- Throw error extra arguments are passed to any expression.
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
 - Optimize decodeLine and decodePolygon time (2x)
 - Use minified bundle for CI testing
 - Improve featureIDBuffer generation by 20%
+- Trigger feature events (hover, enter, leave) when layers are updated
+- ramp($category, ...) implementation is fixed when using multiple categorical properties
 
 ### Removed
 - Removed XYZ expression

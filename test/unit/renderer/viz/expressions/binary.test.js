@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
+import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -8,42 +8,48 @@ s.FALSE.toString = () => 's.FALSE';
 describe('src/renderer/viz/expressions/binary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('mul', ['number', 'category']);
-            validateDynamicTypeErrors('mul', ['category', 'number']);
-
-            validateDynamicTypeErrors('mul', ['category', 'category']);
+            validateCompileTypeError('mul', ['number', 'category']);
+            validateCompileTypeError('mul', ['category', 'number']);
+            validateCompileTypeError('mul', ['category', 'category']);
+            validateMaxArgumentsError('mul', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('add', ['number', 'category']);
-            validateDynamicTypeErrors('add', ['category', 'number']);
+            validateCompileTypeError('add', ['number', 'category']);
+            validateCompileTypeError('add', ['category', 'number']);
 
-            validateDynamicTypeErrors('add', ['category', 'category']);
+            validateCompileTypeError('add', ['category', 'category']);
 
-            validateDynamicTypeErrors('add', ['number', 'color']);
-            validateDynamicTypeErrors('add', ['color', 'number']);
+            validateCompileTypeError('add', ['number', 'color']);
+            validateCompileTypeError('add', ['color', 'number']);
+
+            validateMaxArgumentsError('add', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER', () => {
-            validateDynamicTypeErrors('mod', ['number', 'category']);
-            validateDynamicTypeErrors('mod', ['category', 'number']);
+            validateCompileTypeError('mod', ['number', 'category']);
+            validateCompileTypeError('mod', ['category', 'number']);
 
-            validateDynamicTypeErrors('mod', ['category', 'category']);
+            validateCompileTypeError('mod', ['category', 'category']);
 
-            validateDynamicTypeErrors('mod', ['number', 'color']);
-            validateDynamicTypeErrors('mod', ['color', 'number']);
+            validateCompileTypeError('mod', ['number', 'color']);
+            validateCompileTypeError('mod', ['color', 'number']);
 
-            validateStaticTypeErrors('mod', ['color', 'color']);
+            validateCompileTypeError('mod', ['color', 'color']);
+
+            validateMaxArgumentsError('mod', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
-            validateDynamicTypeErrors('equals', ['number', 'category']);
-            validateDynamicTypeErrors('equals', ['category', 'number']);
+            validateCompileTypeError('equals', ['number', 'category']);
+            validateCompileTypeError('equals', ['category', 'number']);
 
-            validateDynamicTypeErrors('equals', ['number', 'color']);
-            validateDynamicTypeErrors('equals', ['color', 'number']);
+            validateCompileTypeError('equals', ['number', 'color']);
+            validateCompileTypeError('equals', ['color', 'number']);
 
-            validateStaticTypeErrors('equals', ['color', 'color']);
+            validateCompileTypeError('equals', ['color', 'color']);
+
+            validateMaxArgumentsError('equals', ['number', 'number', 'number']);
         });
     });
 

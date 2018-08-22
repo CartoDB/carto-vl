@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkExpression, implicitCast, getOrdinalFromIndex } from '../utils';
+import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
@@ -14,6 +14,8 @@ import { checkExpression, implicitCast, getOrdinalFromIndex } from '../utils';
  */
 export default class BaseArray extends BaseExpression {
     constructor (elems) {
+        checkMaxArguments(arguments, 1, 'array');
+
         elems = elems || [];
 
         if (!Array.isArray(elems)) {

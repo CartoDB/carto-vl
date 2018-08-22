@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Evaluates the value of a column for every row in the dataset.
@@ -22,7 +22,7 @@ import { checkString } from '../utils';
  * `);
  *
  * const viz = new carto.Viz(`
- *   filter: $name !== 'london'
+ *   filter: $name != 'london'
  * `);
  *
  * @memberof carto.expressions
@@ -32,7 +32,9 @@ import { checkString } from '../utils';
  */
 export default class Property extends BaseExpression {
     constructor (name) {
+        checkMaxArguments(arguments, 1, 'property');
         checkString('property', 'name', 0, name);
+
         if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
@@ -63,8 +65,8 @@ export default class Property extends BaseExpression {
         }
         this.type = metaColumn.type;
 
-        if (this.type === 'category') {
-            this.numCategories = metaColumn.categories.length;
+        if (this.type === 'category' && !this.numCategories) {
+            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
         }
     }
 

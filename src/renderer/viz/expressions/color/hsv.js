@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkExpression, checkLooseType, checkType, clamp } from '../utils';
+import { implicitCast, checkExpression, checkLooseType, checkType, checkMaxArguments, clamp } from '../utils';
 
 /**
  * Evaluates to a hsv color.
@@ -57,6 +57,8 @@ export const HSVA = genHSV('hsva', true);
 function genHSV (name, alpha) {
     return class extends BaseExpression {
         constructor (h, s, v, a) {
+            checkMaxArguments(arguments, 4, 'hsva');
+
             h = implicitCast(h);
             s = implicitCast(s);
             v = implicitCast(v);

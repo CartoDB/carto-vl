@@ -9,12 +9,6 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
-// Get dataframes <- MVT <- Windshaft
-// Get metadata
-// Instantiate map Windshaft
-// Requrest SQL API (temp)
-// Cache dataframe
-
 export default class Windshaft {
     constructor (source) {
         this._source = source;
@@ -187,7 +181,7 @@ export default class Windshaft {
                     return n;
                 }
                 case 'category':
-                    return this.metadata.categorizeString(propertyValue);
+                    return this.metadata.categorizeString(basename, propertyValue);
                 case 'number':
                     return propertyValue;
                 default:
@@ -269,12 +263,12 @@ export default class Windshaft {
 
     _buildSelectClause (MNS) {
         const columns = MNS.columns.map(name => schema.column.getBase(name))
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+            .concat(['the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
     _buildQuery (select, filters) {
-        const columns = select.join();
+        const columns = select.map(column => `"${column}"`).join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;

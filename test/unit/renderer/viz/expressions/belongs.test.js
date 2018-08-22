@@ -1,6 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/belongs', () => {
     const fakeMetadata = new Metadata({
@@ -26,6 +26,8 @@ describe('src/renderer/viz/expressions/belongs', () => {
         validateStaticTypeErrors('in', ['color']);
         validateDynamicTypeErrors('in', ['number', 'category-array']);
         validateDynamicTypeErrors('in', ['category', 'number-array']);
+        validateMaxArgumentsError('in', ['category', 'category-array', 'number']);
+        validateMaxArgumentsError('nin', ['category', 'category-array', 'number']);
     });
 
     describe('type', () => {

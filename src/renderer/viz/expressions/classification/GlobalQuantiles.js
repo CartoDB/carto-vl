@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
-import { checkInstance, checkType, checkExpression, checkNumber } from '../utils';
+import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArguments } from '../utils';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -29,6 +29,7 @@ import { checkInstance, checkType, checkExpression, checkNumber } from '../utils
  */
 export default class GlobalQuantiles extends Classifier {
     constructor (input, buckets) {
+        checkMaxArguments(arguments, 2, 'globalQuantiles');
         checkInstance('globalQuantiles', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalQuantiles', 'buckets', 1, buckets);
         super({ input }, buckets);

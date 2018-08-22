@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/blend', () => {
     describe('error control', () => {
@@ -11,6 +11,7 @@ describe('src/renderer/viz/expressions/blend', () => {
         validateDynamicTypeErrors('blend', ['category', 'number', 'number']);
         validateDynamicTypeErrors('blend', ['number', 'category', 'number']);
         validateDynamicTypeErrors('blend', ['number', 'number', 'category']);
+        validateMaxArgumentsError('blend', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
