@@ -73,6 +73,15 @@ export default class Property extends BaseExpression {
         this._metadata = metadata;
         this._categories = metaColumn.categories;
         this.type = metaColumn.type;
+
+        // FIXME
+        if (this.type === 'category' && !this.numCategories) {
+            Object.defineProperty(this, 'numCategories', {
+                get: function () {
+                    return metaColumn.categories.length;
+                }
+            });
+        }
     }
 
     _applyToShaderSource (getGLSLforProperty) {
