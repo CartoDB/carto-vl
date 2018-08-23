@@ -56,11 +56,12 @@ export function isSetsEqual (a, b) {
 
 export function equalArrays (m1, m2) {
     if (m1 && m2 && m1.length === m2.length) {
-        let ret = true;
         for (let i = 0; i < m1.length; i++) {
-            ret &= m1[i] === m2[i];
+            if (m1[i] !== m2[i]) {
+                return false;
+            }
         }
-        return ret;
+        return true;
     }
 }
 
