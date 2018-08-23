@@ -42,8 +42,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-122.424335, 37.771521],
-      zoom: 13,
+      center: [ 2.212774913887074, 41.416951606921714],
+      zoom: 11.5,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
@@ -56,13 +56,13 @@
     const ctx = document.getElementById('histogram').getContext('2d');
 
     // Define the source
-    const source = new carto.source.Dataset('trees_sf');
+    const source = new carto.source.Dataset('spend_data');
 
     // Define the visualization
     const viz = new carto.Viz(
       `
-      @histogram: viewportHistogram($common_species)
-      color: ramp($common_species, bold)
+      @histogram: viewportHistogram($category)
+      color: ramp($category, bold)
       width: 5
       strokeWidth: 0
     `
