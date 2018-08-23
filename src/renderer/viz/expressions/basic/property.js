@@ -65,7 +65,10 @@ export default class Property extends BaseExpression {
     }
 
     _bindMetadata (metadata) {
-        const metaColumn = metadata.properties[this.name];
+        const metaColumn = metadata.properties
+            ? metadata.properties[this.name]
+            : null;
+
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
