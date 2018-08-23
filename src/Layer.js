@@ -369,6 +369,7 @@ export default class Layer {
      */
     render (gl, matrix) {
         if (!util.equalArrays(this._matrix, matrix)) {
+            // Call request data if the matrix has changed
             this._matrix = matrix;
             this.requestData(matrix);
         }
