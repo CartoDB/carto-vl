@@ -354,8 +354,7 @@ export default class Layer {
         this._setRendererCenter();
 
         // Initialize render layer
-        this._renderLayer.renderer = this.renderer;
-        this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
+        this._renderLayer.setRenderer(this.renderer);
         this._contextInitialize();
         this.requestMetadata();
         this.requestData();
@@ -404,7 +403,7 @@ export default class Layer {
 
     _paintLayer () {
         if (this._viz && this._viz.colorShader) {
-            this._renderLayer.viz = this._viz;
+            this._renderLayer.setViz(this._viz);
             this.renderer.renderLayer(this._renderLayer);
             if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
