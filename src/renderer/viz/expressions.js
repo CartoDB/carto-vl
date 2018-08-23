@@ -9,6 +9,7 @@
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
+ *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
  *  - **resolution**: - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  *
  * For example the point diameter could be using the `add` expression:
@@ -181,7 +182,7 @@ import Now from './expressions/now';
 
 import BaseNumber from './expressions/basic/number';
 
-import Opacity from './expressions/color/opacity';
+import Opacity from './expressions/color/Opacity';
 
 import { Asc } from './expressions/ordering';
 import { Desc } from './expressions/ordering';
@@ -189,7 +190,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import Reverse from './expressions/color/palettes/Reverse';
+import reverseFn from './expressions/reverse/reverse';
 
 import Property from './expressions/basic/property';
 
@@ -247,6 +248,9 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
+import Zoomrange from './expressions/Zoomrange';
+import Scaled from './expressions/Scaled';
+import AlphaNormalize from './expressions/AlphaNormalize';
 
 /* Expose classes as constructor functions */
 
@@ -326,7 +330,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = (...args) => new Reverse(...args);
+export const reverse = reverseFn;
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
@@ -382,7 +386,11 @@ export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
 
 export const zoom = (...args) => new Zoom(...args);
+export const scaled = (...args) => new Scaled(...args);
+export const zoomrange = (...args) => new Zoomrange(...args);
+
 export const placement = (...args) => new Placement(...args);
+export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);
 export const TRUE = new Constant(1);
