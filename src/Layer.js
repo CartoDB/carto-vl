@@ -120,7 +120,7 @@ export default class Layer {
     }
 
     /**
-     * Add this layer to a map. It waits for the map to be loaded.
+     * Add this layer to a map. If the map's style is not loaded yet it will wait for it to add the layer as soon as possible.
      *
      * @param {mapboxgl.Map} map - The map on which to add the layer
      * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before. If this values is not passed the layer will be added on the top of the existing layers.
