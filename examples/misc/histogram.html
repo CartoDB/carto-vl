@@ -42,8 +42,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.1766987651545833, 41.39966562481163],
-      zoom: 12,
+      center: [-122.424335, 37.771521],
+      zoom: 13,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
@@ -56,22 +56,27 @@
     const ctx = document.getElementById('histogram').getContext('2d');
 
     // Define the source
-    const source = new carto.source.Dataset('spend_data');
+    const source = new carto.source.Dataset('trees_sf');
 
     // Define the visualization
-    const viz = new carto.Viz(`
-      @histogram: viewportHistogram($category)
-      color: ramp($category, vivid)
+    const viz = new carto.Viz(
+      `
+      @histogram: viewportHistogram($common_species)
+      color: ramp($common_species, bold)
       width: 5
       strokeWidth: 0
-    `);
+    `
+    );
 
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
+
     layer.on('loaded', () => {
       hideLoader();
+    });
 
+    layer.on('updated', () => {
       const histogram = layer.getViz().variables.histogram.eval();
       const colorRamp = layer.getViz().color;
       const labels = histogram.map(value => value.x);
@@ -82,7 +87,7 @@
         type: 'horizontalBar',
         options: {
           legend: {
-          display: false
+            display: false
           }
         },
         data: {
