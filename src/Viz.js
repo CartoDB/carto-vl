@@ -55,7 +55,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
  * @property {Placement} offset - offset to apply to the features in pixels
  * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
- * @property {number} resolution - resolution of the property-aggregation functions. It is 1 by default. Must be greater than 0 and lower than 256. A value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ * @property {number} resolution - resolution of the property-aggregation functions. It is only applicable to points. It is 1 by default, and must be greater than 0 and lower than 256. A value of N means to produce aggregation on grid cells of NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  * @property {object} variables - An object describing the variables used.
  * @api
  */
@@ -93,7 +93,7 @@ export default class Viz {
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-    * @property {number} resolution - resolution of the property-aggregation functions. It is 1 by default. Must be greater than 0 and lower than 256. A value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+    * @property {number} resolution - resolution of the property-aggregation functions. It is only applicable to points. It is 1 by default, and must be greater than 0 and lower than 256. A value of N means to produce aggregation on grid cells of NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
     * @property {object} variables - An object describing the variables used.
     *
     */
