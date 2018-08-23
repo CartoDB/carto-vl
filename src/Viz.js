@@ -54,7 +54,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Image} symbol - show an image instead in the place of points
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
  * @property {Placement} offset - offset to apply to the features in pixels
- * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+ * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
  * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
  * @property {object} variables - An object describing the variables used.
  * @api
@@ -92,7 +92,7 @@ export default class Viz {
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
-    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+    * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *
