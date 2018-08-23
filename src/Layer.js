@@ -73,6 +73,7 @@ export default class Layer {
         this._emitter = mitt();
         this._oldDataframes = new Set();
         this._renderLayer = new RenderLayer();
+        this._atomicChangeUID = 0;
 
         this.update(source, viz);
     }
@@ -178,7 +179,7 @@ export default class Layer {
         this._checkViz(viz);
 
         source = source._clone();
-        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        this._atomicChangeUID++;
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
@@ -314,7 +315,10 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData () {
+    async requestData (matrix) {
+        // Set renderer zoom and center
+        this._setZoomCenter(matrix);
+
         if (!this.metadata || !this._visible) {
             return;
         }
@@ -349,15 +353,9 @@ export default class Layer {
         this.map = map;
         this.renderer = getRenderer(map, gl);
 
-        // Initialize renderer zoom and center
-        this._setRendererZoom();
-        this._setRendererCenter();
-
         // Initialize render layer
         this._renderLayer.setRenderer(this.renderer);
         this._contextInitialize();
-        this.requestMetadata();
-        this.requestData();
     }
 
     /**
@@ -372,8 +370,7 @@ export default class Layer {
     render (gl, matrix) {
         if (!util.equalArrays(this._matrix, matrix)) {
             this._matrix = matrix;
-            this._setZoomCenter(matrix);
-            this.requestData();
+            this.requestData(matrix);
         }
         this._paintLayer();
 
@@ -384,21 +381,6 @@ export default class Layer {
         if (!this.isAnimated() && this.map.repaint) {
             this.map.repaint = false;
         }
-    }
-
-    _setZoomCenter (matrix) {
-        // Compute the zoom and center from the matrix.
-        // This is a solution to avoid subscribing to map events and
-        // make a better and efficient use of the Custom Layers interface.
-        // TODO: the best solution is to use the matrix at the shader
-        // level and remove the aspect and scale logic from the renderer
-        this.renderer.setCenter(
-            -(1 + 2 * matrix[12] / matrix[0]),
-            +(1 + 2 * matrix[13] / matrix[5])
-        );
-        this.renderer.setZoom(
-            -(2 * matrix[15] / matrix[5])
-        );
     }
 
     _paintLayer () {
@@ -513,6 +495,26 @@ export default class Layer {
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
             throw new CartoValidationError('layer', 'sharedViz');
+        }
+    }
+
+    _setZoomCenter (matrix) {
+        if (matrix) {
+            // Compute the zoom and center from the matrix.
+            // This is a solution to avoid subscribing to map events and
+            // make a better and efficient use of the Custom Layers interface.
+            // TODO: the best solution is to use the matrix at the shader
+            // level and remove the aspect and scale logic from the renderer
+            this.renderer.setCenter(
+                -(1 + 2 * matrix[12] / matrix[0]),
+                +(1 + 2 * matrix[13] / matrix[5])
+            );
+            this.renderer.setZoom(
+                -(2 * matrix[15] / matrix[5])
+            );
+        } else {
+            this._setRendererZoom();
+            this._setRendererCenter();
         }
     }
 
