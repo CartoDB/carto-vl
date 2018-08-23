@@ -344,9 +344,6 @@ export default class Layer {
         this.map = map;
         this.renderer = getRenderer(map, gl);
 
-        // Register map event to request data tiles
-        // map.on('move', this.requestData.bind(this));
-
         // Initialize render layer
         this._renderLayer.renderer = this.renderer;
         this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
@@ -358,8 +355,6 @@ export default class Layer {
      * Custom Layer API: `onRemove` function
      */
     onRemove (map, gl) {
-        // Unregister map event
-        // map.off('move');
     }
 
     /**
