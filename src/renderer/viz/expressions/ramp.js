@@ -2,7 +2,6 @@ import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
-import * as arrayUtils from '../utils/array';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
@@ -11,7 +10,7 @@ import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
 
-const DEFAULT_OTHERS_NAME = 'Others';
+const DEFAULT_OTHERS_NAME = 'CARTOVL_TOP_OTHERS_BUCKET';
 const MAX_SAMPLES = 100;
 const DEFAULT_SAMPLES = 10;
 
@@ -774,7 +773,7 @@ function _getBreakpoints (property, numSamples) {
     const breakpoints = [];
     const INC = (property.max - property.min) / numSamples;
 
-    for (let i = property.min; i < property.max; i += INC) {
+    for (let i = property.min; i + INC < property.max; i += INC) {
         breakpoints.push([ i, i + INC ]);
     }
 

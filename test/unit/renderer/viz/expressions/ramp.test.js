@@ -1012,14 +1012,23 @@ describe('src/renderer/viz/expressions/ramp', () => {
             let actual;
             let expected;
 
-            it('should return the 1024 interpolated colors', () => {
+            it('should return the value in ranges', () => {
                 const r = ramp(linear($price), [red, blue, yellow]);
 
                 r._bindMetadata(METADATA);
 
                 actual = r.getLegend().length;
-                expected = 12;
+                expected = 10;
+                expect(actual).toEqual(expected);
+            });
 
+            it('should return the value in ranges with custom configuration', () => {
+                const r = ramp(linear($price), [red, blue, yellow]);
+
+                r._bindMetadata(METADATA);
+
+                actual = r.getLegend({ samples: 20 }).length;
+                expected = 20;
                 expect(actual).toEqual(expected);
             });
         });
