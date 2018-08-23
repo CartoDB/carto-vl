@@ -3,7 +3,7 @@ const { Dataset } = source;
 
 describe('api/interactivity', () => {
     describe('constructor', () => {
-        let source, viz, layer, mockIntegrator;
+        let source, viz, layer, mockMap;
 
         beforeEach(() => {
             source = new Dataset('ne_10m_populated_places_simple', {
@@ -12,8 +12,8 @@ describe('api/interactivity', () => {
             });
             viz = new Viz();
             layer = new Layer('layer', source, viz);
-            mockIntegrator = { on: () => { } };
-            layer.getIntegrator = () => mockIntegrator;
+            mockMap = { on: () => { } };
+            layer.map = mockMap;
         });
 
         it('should build a new Interactivity object with (layer)', () => {
@@ -30,9 +30,9 @@ describe('api/interactivity', () => {
             expect(interactivity._layerList).toEqual([layer]);
         });
 
-        it('should build a new Interactivity object with two layers with the same integrator', () => {
+        it('should build a new Interactivity object with two layers with the same map', () => {
             const layer2 = new Layer('layer2', source, new Viz());
-            layer2.getIntegrator = () => mockIntegrator;
+            layer2.map = mockMap;
             const interactivity = new Interactivity([layer, layer2]);
 
             expect(interactivity).toBeDefined();
@@ -51,10 +51,10 @@ describe('api/interactivity', () => {
             expect(() => new Interactivity(['wadus'])).toThrowError('Invalid layer, layer must be an instance of carto.Layer');
         });
 
-        xit('should throw an error when the layers have different integrator', () => {
+        xit('should throw an error when the layers have different map', () => {
             const layer2 = new Layer('layer2', source, viz);
-            const mockIntegrator2 = { on: () => { } };
-            layer2.getIntegrator = () => mockIntegrator2;
+            const mockMap2 = { on: () => { } };
+            layer2.map = mockMap2;
 
             expect(() => new Interactivity([layer, layer2])).toThrowError('Invalid argument, all layers must belong to the same map');
         });

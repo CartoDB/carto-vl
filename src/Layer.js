@@ -57,8 +57,13 @@ export default class Layer {
             this._contextInitialize = resolve;
         });
 
+        /* Custom Layer API attributes:
+          - id: string
+          - type: "custom"
+        */
         this.id = id;
         this.type = 'custom';
+
         this.metadata = null;
         this._state = 'init';
         this._visible = true;

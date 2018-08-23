@@ -50,7 +50,7 @@ describe('Layer', () => {
             let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
-                await layer.update(new carto.source.GeoJSON(featureData), viz);
+                await layer.update(new carto.source.GeoJSON(featureData));
                 layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
