@@ -89,7 +89,7 @@ const sourceTypes = {
 
 let index = 0; // current debug step
 
-let basemap = DEFAULT_BASEMAP;
+let basemap = '';
 let mapboxgl = window.mapboxgl;
 let map = new mapboxgl.Map({
     container: 'map',
@@ -263,8 +263,9 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
 
+    setupMap(opts);
+
     if (!layer) {
-        setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
             saveConfig();
@@ -273,9 +274,10 @@ const superRefresh = (opts) => {
         });
         layer.addTo(map, 'watername_ocean');
     } else {
+        layer.hide();
         layer.update(source, viz)
             .then(() => {
-                setupMap(opts);
+                layer.show();
                 saveConfig();
                 document.getElementById('feedback').style.display = 'none';
                 hideLoader();
@@ -333,15 +335,17 @@ function createBasemapElements () {
 }
 
 function setBasemap (id) {
-    basemap = id;
-    map.setStyle(BASEMAPS[basemap]);
-    let added = false;
-    map.on('sourcedata', () => {
-        if (map.isStyleLoaded() && !added) {
-            layer.addTo(map, 'watername_ocean');
-            added = true;
-        }
-    });
+    if (basemap !== id) {
+        basemap = id;
+        map.setStyle(BASEMAPS[basemap]);
+        let added = false;
+        map.on('sourcedata', () => {
+            if (map.isStyleLoaded() && !added) {
+                layer.addTo(map, 'watername_ocean');
+                added = true;
+            }
+        });
+    }
 }
 
 const $map = document.getElementById('map');
