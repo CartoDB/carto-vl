@@ -15,7 +15,7 @@ const renderers = new WeakMap();
 function getRenderer (map, gl) {
     if (!renderers.get(map)) {
         const renderer = new Renderer();
-        renderer.initialize(map, gl);
+        renderer.initialize(gl);
         renderers.set(map, renderer);
     }
     return renderers.get(map);
@@ -349,11 +349,16 @@ export default class Layer {
         this.map = map;
         this.renderer = getRenderer(map, gl);
 
+        // Initialize renderer zoom and center
+        this._setRendererZoom();
+        this._setRendererCenter();
+
         // Initialize render layer
         this._renderLayer.renderer = this.renderer;
         this._renderLayer.dataframes.forEach(d => d.bind(this.renderer));
         this._contextInitialize();
         this.requestMetadata();
+        this.requestData();
     }
 
     /**
@@ -510,6 +515,19 @@ export default class Layer {
         if (viz._boundLayer && viz._boundLayer !== this) {
             throw new CartoValidationError('layer', 'sharedViz');
         }
+    }
+
+    _setRendererZoom () {
+        const b = this.map.getBounds();
+        const nw = b.getNorthWest();
+        const sw = b.getSouthWest();
+        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+        this.renderer.setZoom(z);
+    }
+
+    _setRendererCenter () {
+        const c = this.map.getCenter();
+        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
     }
 
     _getViewport () {

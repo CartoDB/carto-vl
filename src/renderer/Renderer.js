@@ -1,5 +1,4 @@
 import shaders from './shaders';
-import util from '../utils/util';
 import { Asc, Desc } from './viz/expressions';
 
 const INITIAL_TIMESTAMP = Date.now();
@@ -53,16 +52,11 @@ export default class Renderer {
     }
 
     /**
-     * Initialize renderer:
-     * - WebGL context
-     * - Map zoom and center
-     * @param {Map} map
-     * @param {WebGLRenderingContext} gl
+     * Initialize renderer
+     * @param {WebGLRenderingContext} gl - WebGL context
      */
-    initialize (map, gl) {
+    initialize (gl) {
         this._initGL(gl);
-        this._initZoom(map);
-        this._initCenter(map);
     }
 
     /**
@@ -135,19 +129,6 @@ export default class Renderer {
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
-    }
-
-    _initZoom (map) {
-        const b = map.getBounds();
-        const nw = b.getNorthWest();
-        const sw = b.getSouthWest();
-        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
-        this.setZoom(z);
-    }
-
-    _initCenter (map) {
-        const c = map.getCenter();
-        this.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
     }
 
     _getAspect () {
