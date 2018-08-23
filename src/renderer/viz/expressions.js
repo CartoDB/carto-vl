@@ -9,7 +9,7 @@
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
- *  - **resolution**: - resolution of the property-aggregation functions. It is only applicable to points. It is 1 by default, and must be greater than 0 and lower than 256. A value of N means to produce aggregation on grid cells of NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+ *  - **resolution**: - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  *
  * For example the point diameter could be using the `add` expression:
  *
