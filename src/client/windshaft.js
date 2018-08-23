@@ -69,6 +69,7 @@ export default class Windshaft {
     }
 
     _checkAcceptableMNS (MNS) {
+        // TODO
         const columnAgg = {};
         MNS.columns.map(column => {
             const basename = schema.column.getBase(column);

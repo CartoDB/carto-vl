@@ -24,9 +24,21 @@ const schema = {
 // The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
 // to null. In this case the function will throw an exception.
 export function union (a, b) {
-    const t = a.columns.concat(b.columns);
+    const set = new Set(a.columns.concat(b.columns));
+    const result = [];
+    const bases = [];
+    const only = [];
+    for (let column of set) {
+        if (column.isMetadataOnly(column)) {
+            only.push(column);
+        } else {
+            result.push(column);
+            bases.add(getBase(column));
+        }
+    }
+    result = result.concat(only.filter(c => !bases.has(only)));
     return {
-        columns: t.filter((item, pos) => t.indexOf(item) === pos)
+        columns: result
     };
 }
 
@@ -39,6 +51,7 @@ export function equals (a, b) {
 
 const AGG_PREFIX = '_cdb_agg_';
 const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
+const METADATA_ONLY = '_cdb_metadata_only';
 
 // column information functions
 export const column = {
@@ -54,6 +67,9 @@ export const column = {
     },
     aggColumn (name, aggFN) {
         return `${AGG_PREFIX}${aggFN}_${name}`;
+    },
+    metadataOnlyColumn (name) {
+        return `${AGG_PREFIX}${METADATA_ONLY}_${name}`;
     }
 };
 
