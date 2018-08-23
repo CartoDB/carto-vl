@@ -14,10 +14,12 @@ import Top from './top';
 const DEFAULT_OTHERS_NAME = 'Others';
 const MAX_SAMPLES = 100;
 const DEFAULT_SAMPLES = 10;
+
 const DEFAULT_OPTIONS = {
     defaultOthers: DEFAULT_OTHERS_NAME,
     samples: DEFAULT_SAMPLES
 };
+
 const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
@@ -259,10 +261,10 @@ export default class Ramp extends BaseExpression {
      *   });
      *
      *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [ 0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [ 25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [ 50, 75 ] }
-     *   //   { name: 'numeric', values: [// rgba color, [ 75, 100 ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 0, to: 25 } ] },
+     *   //   { name: 'numeric', values: [// rgba color, { from: 25, to: 50 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 50, to: 75 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 75, to: 100 } ] }
      *   // ]
      * });
      *
@@ -277,10 +279,10 @@ export default class Ramp extends BaseExpression {
      *   });
      *
      *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [ 0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [ 25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [ 50, 75 ] }
-     *   //   { name: 'numeric', values: [// rgba color, [ 75, 100 ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 0, to: 25 } ] },
+     *   //   { name: 'numeric', values: [// rgba color, { from: 25, to: 50 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 50, to: 75 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, { from: 75, to: 100 } ] }
      *   // ]
      * });
      * @memberof carto.expressions.Ramp
@@ -288,7 +290,6 @@ export default class Ramp extends BaseExpression {
      * @instance
      * @api
      */
-
     getLegend (options) {
         const config = Object.assign(DEFAULT_OPTIONS, options);
 
@@ -302,7 +303,7 @@ export default class Ramp extends BaseExpression {
 
         if (this.input.type === inputTypes.CATEGORY) {
             return this.input.list
-                ? this._getLegendList()
+                ? this._getLegendList(config)
                 : this._getLeyendCategories(config);
         }
     }
@@ -325,15 +326,15 @@ export default class Ramp extends BaseExpression {
 
         const breakpoints = _getBreakpoints(samples, config.samples);
 
-        return breakpoints.map((value) => {
-            feature[name] = value[1];
-            const values = [ this.eval(feature), value ];
+        return breakpoints.map((breakpoint) => {
+            feature[name] = breakpoint.to;
+            const values = [ this.eval(feature), breakpoint ];
 
             return { name, values };
         });
     }
 
-    _getLegendList () {
+    _getLegendList (config) {
         return this.input.list.elems
             .map(this._getLegendItemValue.bind(this))
             .filter(legend => legend.values !== null);
@@ -370,7 +371,7 @@ export default class Ramp extends BaseExpression {
         };
     }
 
-    _getRampValueByIndex (index) {
+    _getRampValueByIndex (index, config) {
         if (this.palette.type === paletteTypes.IMAGE) {
             return this.palette[`image${index}`]
                 ? this.palette[`image${index}`].url
@@ -479,7 +480,6 @@ export default class Ramp extends BaseExpression {
                     );
                     return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
                 }
-
                 `
             ),
 
@@ -779,11 +779,12 @@ function _calcPaletteValues (palette) {
 
 function _getBreakpoints (samples, numSamples) {
     const breakpoints = [];
-    const inc = Math.round(samples.length / numSamples);
+    const INC = Math.round(samples.length / numSamples);
+    const SAMPLES_LENGTH = samples.length;
 
-    for (let i = 0; i < samples.length; i += inc) {
-        if (samples[i + inc]) {
-            breakpoints.push([samples[i], samples[i + inc]]);
+    for (let i = 0; i < SAMPLES_LENGTH; i += INC) {
+        if (samples[i + INC]) {
+            breakpoints.push({ from: samples[i], to: samples[i + INC] });
         }
     }
 

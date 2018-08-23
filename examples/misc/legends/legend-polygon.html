@@ -77,9 +77,11 @@
 
       colorLegend.forEach((legend) => {
         const colorHex = rgbToHex(legend.values[0]);
+        const value = legend.values[1];
+
         if (colorHex) {
           colorLegendList +=
-            `<li><span class="${viz.geometryType}-mark" style="background-color:${colorHex};"></span> <span>[ ${legend.values[1][0]}, ${legend.values[1][1]} ]</span></li>\n`;
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${colorHex};"></span> <span>[ ${value.from}, ${value.to} ]</span></li>\n`;
         }
       });
 
