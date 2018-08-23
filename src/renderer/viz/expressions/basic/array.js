@@ -4,7 +4,7 @@ import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments }
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
- * @param {Number[]|Category[]|Color[]|Date[]} elements
+ * @param {Number[]|Category[]|Color[]|Date[]|Image[]} elements
  * @returns {Array}
  *
  * @memberof carto.expressions

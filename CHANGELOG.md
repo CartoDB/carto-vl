@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression.
 - New method `ramp.getLegend`
+- Add reverse expression to arrays, besides palettes
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Trigger feature events (hover, enter, leave) when layers are updated
 - Improve error message when creating buckets without an array
 - ramp($category, ...) implementation is fixed when using multiple categorical properties
+- Use undescore in image constants.
 
 ### Removed
 - Removed XYZ expression
