@@ -318,23 +318,17 @@ export default class Ramp extends BaseExpression {
     _getLegendLinearProperty (property, config) {
         const name = property.name;
         const feature = {};
-
-        const samples = this._metadata.sample
-            .map(sample => sample[name])
-            .sort(arrayUtils.sortAsc)
-            .filter(arrayUtils.removeDuplicates);
-
-        const breakpoints = _getBreakpoints(samples, config.samples);
+        const breakpoints = _getBreakpoints(this._metadata.properties[name], config.samples);
 
         return breakpoints.map((breakpoint) => {
-            feature[name] = breakpoint.to;
+            feature[name] = breakpoint[0];
             const values = [ this.eval(feature), breakpoint ];
 
             return { name, values };
         });
     }
 
-    _getLegendList (config) {
+    _getLegendList () {
         return this.input.list.elems
             .map(this._getLegendItemValue.bind(this))
             .filter(legend => legend.values !== null);
@@ -442,7 +436,6 @@ export default class Ramp extends BaseExpression {
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
 
-        this._metadata = metadata;
         this._properties = metadata.properties;
         this._texCategories = null;
         this._GLtexCategories = null;
@@ -777,15 +770,12 @@ function _calcPaletteValues (palette) {
     return palette;
 }
 
-function _getBreakpoints (samples, numSamples) {
+function _getBreakpoints (property, numSamples) {
     const breakpoints = [];
-    const INC = Math.round(samples.length / numSamples);
-    const SAMPLES_LENGTH = samples.length;
+    const INC = (property.max - property.min) / numSamples;
 
-    for (let i = 0; i < SAMPLES_LENGTH; i += INC) {
-        if (samples[i + INC]) {
-            breakpoints.push({ from: samples[i], to: samples[i + INC] });
-        }
+    for (let i = property.min; i < property.max; i += INC) {
+        breakpoints.push([ i, i + INC ]);
     }
 
     return breakpoints;

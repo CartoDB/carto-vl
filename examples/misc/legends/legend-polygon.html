@@ -41,7 +41,7 @@
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
       center: [-73.98076101209858, 40.751681063],
-      zoom: 13.6,
+      zoom: 13,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
@@ -70,18 +70,21 @@
 
       const colorLegend = layer.getViz().color.getLegend({
         defaultOthers: 'Default',
-        samples: 10
+        samples: 20
       });
 
       let colorLegendList = '';
 
       colorLegend.forEach((legend) => {
-        const colorHex = rgbToHex(legend.values[0]);
+        const color = legend.values[0]
+          ? rgbToHex(legend.values[0])
+          : 'white'
+
         const value = legend.values[1];
 
-        if (colorHex) {
+        if (color) {
           colorLegendList +=
-            `<li><span class="${viz.geometryType}-mark" style="background-color:${colorHex};"></span> <span>[ ${value.from}, ${value.to} ]</span></li>\n`;
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>[ ${value[0].toFixed(2)}, ${value[1].toFixed(2)} ]</span></li>\n`;
         }
       });
 

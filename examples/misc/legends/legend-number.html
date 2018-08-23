@@ -77,7 +77,7 @@
       const value = legend.values[1];
       const colorHex = rgbToHex(legend.values[0]);
       colorLegendList +=
-        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${value.from.toFixed(2)}, ${value.to.toFixed(2)}</span></li>\n`;
+        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${value[0].toFixed(2)}, ${value[1].toFixed(2)}</span></li>\n`;
     });
     
     // Update the legend with the legend information
