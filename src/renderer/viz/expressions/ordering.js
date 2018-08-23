@@ -21,7 +21,7 @@ import { checkInstance, checkMaxArguments } from './utils';
  * @memberof carto.expressions
  * @name asc
  * @function
- * @IGNOREapi
+ * @api
  */
 export class Asc extends BaseExpression {
     constructor (by) {
@@ -53,7 +53,7 @@ export class Asc extends BaseExpression {
  * @memberof carto.expressions
  * @name desc
  * @function
- * @IGNOREapi
+ * @api
  */
 export class Desc extends BaseExpression {
     constructor (by) {
@@ -84,7 +84,7 @@ export class Desc extends BaseExpression {
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @IGNOREapi
+ * @api
  */
 export class NoOrder extends BaseExpression {
     constructor () {
