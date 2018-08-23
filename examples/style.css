@@ -80,6 +80,17 @@ aside.toolbox {
   z-index: 2;
 }
 
+aside.chart-toolbox {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  bottom: 24px;
+  overflow: scroll;
+  min-width: 450px;
+  max-width: 450px;
+  z-index: 2;
+}
+
 /* UTILITIES */
 
 .mt-16 {

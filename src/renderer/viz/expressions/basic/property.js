@@ -65,25 +65,25 @@ export default class Property extends BaseExpression {
     }
 
     _bindMetadata (metadata) {
-        const metaColumn = metadata.properties
-            ? metadata.properties[this.name]
-            : null;
+        if (metadata.properties) {
+            const metaColumn = metadata.properties[this.name];
 
-        if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
-        }
+            if (!metaColumn) {
+                throw new Error(`Property '${this.name}' does not exist`);
+            }
 
-        this._metadata = metadata;
-        this._categories = metaColumn.categories;
-        this.type = metaColumn.type;
+            this._metadata = metadata;
+            this._categories = metaColumn.categories;
+            this.type = metaColumn.type;
 
-        // FIXME
-        if (this.type === 'category' && !this.numCategories) {
-            Object.defineProperty(this, 'numCategories', {
-                get: function () {
-                    return metaColumn.categories.length;
-                }
-            });
+            // FIXME
+            if (this.type === 'category' && !this.numCategories) {
+                Object.defineProperty(this, 'numCategories', {
+                    get: function () {
+                        return metaColumn.categories.length;
+                    }
+                });
+            }
         }
     }
 
