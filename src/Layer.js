@@ -377,7 +377,7 @@ export default class Layer {
         // it has the strange quite buggy side-effect of doing a "final" repaint after
         // being disabled if we disable it every frame, MGL will do a "final" repaint
         // every frame, which will not disabled it in practice
-        if (!this.isAnimated && this.map.repaint) {
+        if (!this.isAnimated() && this.map.repaint) {
             this.map.repaint = false;
         }
     }
