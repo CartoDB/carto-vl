@@ -55,6 +55,7 @@ export default class Property extends BaseExpression {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
+
         return feature[this.name];
     }
 

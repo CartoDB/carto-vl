@@ -130,10 +130,11 @@ export default class Ramp extends BaseExpression {
 
     eval (feature) {
         this.palette = this._calcPaletteValues(this.palette);
+
         let index = this.input.eval(feature);
 
         if (this.palette.type === paletteTypes.IMAGE) {
-            return this.palette[`image${index}`].url;
+            return this.palette[`image${index}`].eval();
         }
 
         const { min, max } = this._getMinMax(feature);
@@ -368,9 +369,9 @@ export default class Ramp extends BaseExpression {
         const categories = this._metadata.properties[name].categories;
 
         return categories
-            .map((category) => {
+            .map((category, index) => {
                 let feature = {};
-                feature[name] = category.name;
+                feature[name] = this.input.isA(Property) ? index : category.name;
                 const key = category.name;
                 const value = this.eval(feature);
                 return { key, value };
