@@ -3,14 +3,11 @@ export const IDENTITY = {};
 
 /*
 const mns = {
-  price:  new Set(['avg', 'max]),
-  amount: new Set(['unaggregated']),
-  other:  new Set([]),
+    price:  [{type: 'unaggregated'}],
+    amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}]
 };
 
 */
-
-// TODO
 
 export function union (a, b) {
     const result = {};
