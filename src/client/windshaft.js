@@ -32,7 +32,7 @@ export default class Windshaft {
 
     _getInstantiationID (MNS, resolution, filtering, choices) {
         return JSON.stringify({
-            MNS,
+            MNS: schema.simplify(MNS),
             resolution,
             filtering: choices.backendFilters ? filtering : null,
             options: choices
@@ -56,7 +56,6 @@ export default class Windshaft {
             MNS['cartodb_id'] = [{type: 'id'}];
         }
         if (this._needToInstantiate(MNS, resolution, filtering)) {
-            console.log('instatn');
             const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
@@ -107,7 +106,6 @@ export default class Windshaft {
      *  - When the filter conditions changed and the dataset should be server-filtered.
      */
     _needToInstantiate (MNS, resolution, filtering) {
-        console.log(MNS, this._MNS, schema.equals(this._MNS, MNS));
         return !schema.equals(this._MNS, MNS) ||
             resolution !== this.resolution ||
             (
@@ -159,17 +157,17 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { url, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
+        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
-        return { MNS, resolution, filters, metadata, urlTemplate: url };
+        return { MNS, resolution, filters, metadata, urlTemplates };
     }
 
-    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplate }) {
+    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplates }) {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(this._URLTemplates);
+        this._mvtClient = new MVT(urlTemplates);
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = getBase(propertyName);
@@ -195,7 +193,7 @@ export default class Windshaft {
                     throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
             }
         };
-        this.urlTemplate = urlTemplate;
+        this.urlTemplates = urlTemplates;
         this.metadata = metadata;
         this._mvtClient._metadata = metadata;
         this._MNS = MNS;
@@ -331,9 +329,8 @@ export default class Windshaft {
         if (!response.ok) {
             throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
         }
-        this._URLTemplates = layergroup.metadata.tilejson.vector.tiles;
         return {
-            url: getLayerUrl(layergroup, LAYER_INDEX, conf),
+            urlTemplates: layergroup.metadata.tilejson.vector.tiles,
             metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
         };
     }

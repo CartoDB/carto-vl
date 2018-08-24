@@ -50,6 +50,19 @@ export function equals (a, b) {
     });
 }
 
+function simplify (MNS) {
+    const result = {};
+    const propertyNames = Object.keys(MNS).sort();
+    propertyNames.forEach(propertyName => {
+        // Stringify and Set to remove duplicates
+        let usage = [...new Set(MNS[propertyName].map(u => JSON.stringify(u)))];
+        usage.sort();
+        usage = usage.map(u => JSON.parse(u));
+        result[propertyName] = usage;
+    });
+    return result;
+}
+
 const AGG_PREFIX = '_cdb_agg_';
 const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
 
@@ -70,4 +83,4 @@ export const column = {
     }
 };
 
-export default { column, equals, union, IDENTITY };
+export default { column, equals, union, IDENTITY, simplify };
