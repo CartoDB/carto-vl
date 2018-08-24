@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.7.0] - 2018-08-24
 ### Added
 - Use the new Custom Layer interface with MGL (v0.48.0-carto1)
 - Add `layer.remove()` API function
@@ -24,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use underscore in image constants
 - Use local basemaps for testing
 
-## Fixed
+### Fixed
 - Fix animation example
 - Fix interactivity examples
 
@@ -62,7 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve GeoJSON source
 - Improve viewport feature collision
 
-## Removed
+### Removed
 - Remove deprecated expressions: torque and sprites
 
 ### Fixed

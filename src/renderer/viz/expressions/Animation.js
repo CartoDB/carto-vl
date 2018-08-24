@@ -61,6 +61,7 @@ let waitingForOthers = new Set();
  * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
  * @memberof carto.expressions
+ * @extends carto.source.Base
  * @name Animation
  * @abstract
  * @hideconstructor
