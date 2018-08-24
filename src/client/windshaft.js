@@ -434,15 +434,6 @@ function getMapRequest (conf, mapConfig) {
     });
 }
 
-function getLayerUrl (layergroup, layerIndex, conf) {
-    const params = [encodeParameter('api_key', conf.apiKey)];
-    if (layergroup.cdn_url && layergroup.cdn_url.templates) {
-        const urlTemplates = layergroup.cdn_url.templates.https;
-        return generateUrl(`${urlTemplates.url}/${conf.username}/api/v1/map/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`, params);
-    }
-    return generateUrl(generateMapsApiUrl(conf, `/${layergroup.layergroupid}/${layerIndex}/{z}/{x}/{y}.mvt`), params);
-}
-
 function encodeParameter (name, value) {
     return `${name}=${encodeURIComponent(value)}`;
 }
