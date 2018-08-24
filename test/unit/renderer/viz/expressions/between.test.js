@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/between', () => {
     describe('error control', () => {
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/between', () => {
         validateDynamicTypeErrors('between', ['number', 'number', 'category']);
         validateStaticTypeErrors('between', ['number', 'number', 'color']);
         validateStaticTypeErrors('between', ['color', 'number', 'color']);
+        validateMaxArgumentsError('between', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {

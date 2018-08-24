@@ -30,52 +30,50 @@ export default class Map {
         this._layers = new Set();
         this._hiddenLayers = new Set();
         this._repaint = true;
-        this.invalidateWebGLState = () => {};
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
-        this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
-
+        this._gl = this._canvas.getContext('webgl');
+        this._matrix = this._createMatrix();
         this._resizeCanvas(this._containerDimensions());
     }
 
-    addLayer (layer, beforeLayerID) {
-        layer.initialize();
+    on (event, callback) {
+        if (event === 'load') {
+            callback && callback();
+        }
+    }
 
+    addLayer (layer, beforeLayerID) {
         if (!this._layers.has(layer)) {
             this._layers.add(layer);
         }
 
-        window.requestAnimationFrame(this.update.bind(this));
+        layer.onAdd(this, this._gl);
+
+        window.requestAnimationFrame(this._update.bind(this));
     }
 
-    update (timestamp) {
-        // Don't re-render more than once per animation frame
-        if (this.lastFrame === timestamp) {
-            return;
+    removeLayer (layer) {
+        if (this._layers.has(layer)) {
+            this._layers.remove(layer);
         }
-        this.lastFrame = timestamp;
 
-        this._drawBackground(this._background);
+        layer.onRemove(this);
+    }
 
-        let loaded = true;
-        let animated = false;
+    getZoom () {
+        return 0;
+    }
 
-        this._layers.forEach((layer) => {
-            const hasData = layer.hasDataframes();
-            const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
+    getCenter () {
+        return { lat: 0, lng: 0 };
+    }
 
-            if (hasData || hasAnimation) {
-                layer.$paintCallback();
-            }
-
-            loaded = loaded && hasData;
-            animated = animated || hasAnimation;
-        });
-
-        // Update until all layers are loaded or there is an animation
-        if (!loaded || animated) {
-            window.requestAnimationFrame(this.update.bind(this));
-        }
+    getBounds () {
+        return {
+            getNorthWest: () => ({ lat: 85, lng: -180 }),
+            getSouthWest: () => ({ lat: -85.1, lng: -180 })
+        };
     }
 
     changeVisibility (layer) {
@@ -103,6 +101,37 @@ export default class Map {
         }
     }
 
+    _update (timestamp) {
+        // Don't re-render more than once per animation frame
+        if (this.lastFrame === timestamp) {
+            return;
+        }
+
+        this.lastFrame = timestamp;
+
+        this._drawBackground(this._background);
+
+        let loaded = true;
+        let animated = false;
+
+        this._layers.forEach((layer) => {
+            const hasData = layer.hasDataframes();
+            const hasAnimation = layer.isAnimated();
+
+            if (hasData || hasAnimation) {
+                layer.render(this._gl, this._matrix);
+            }
+
+            loaded = loaded && hasData;
+            animated = animated || hasAnimation;
+        });
+
+        // Update until all layers are loaded or there is an animation
+        if (!loaded || animated) {
+            window.requestAnimationFrame(this._update.bind(this));
+        }
+    }
+
     _drawBackground (color) {
         switch (color) {
             case 'black':
@@ -122,7 +151,7 @@ export default class Map {
                 this._gl.clear(this._gl.COLOR_BUFFER_BIT);
                 break;
             default:
-            // white
+                // white
         }
     }
 
@@ -155,5 +184,16 @@ export default class Map {
 
         this._canvas.style.width = `${size.width}px`;
         this._canvas.style.height = `${size.height}px`;
+    }
+
+    _createMatrix () {
+        // This matrix generates proper values of zoom and _center
+        const m = new Array(16);
+        m[0] = -2;
+        m[5] = -2;
+        m[12] = 1;
+        m[13] = 1;
+        m[15] = 1;
+        return m;
     }
 }

@@ -1,4 +1,4 @@
-import { implicitCast, checkType, checkLooseType, checkExpression } from './utils';
+import { implicitCast, checkType, checkLooseType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -16,7 +16,7 @@ import BaseExpression from './base';
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: in($type, ['metropolis', 'capital'])
+ *   filter: $type in ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
@@ -30,7 +30,7 @@ function IN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '0.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    return inline => `((${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.)`;
 }
 
 /**
@@ -48,7 +48,7 @@ function IN_INLINE_MAKER (list) {
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: nin($type, ['metropolis', 'capital'])
+ *   filter: $type nin ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
@@ -62,12 +62,14 @@ function NIN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '1.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `((${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.)`;
 }
 
 function generateBelongsExpression (name, inlineMaker, jsEval) {
     return class BelongExpression extends BaseExpression {
         constructor (value, list) {
+            checkMaxArguments(arguments, 2, name);
+
             value = implicitCast(value);
             list = implicitCast(list);
 

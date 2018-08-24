@@ -84,6 +84,14 @@ export function validateCompileTypeError (expressionName, argTypes) {
     _validateCompileTimeTypeError(expressionName, simpleArgs);
 }
 
+export function validateMaxArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*accepts.*arguments[\\s\\S]*passed[\\s\\S]*`, 'g'));
+    });
+}
+
 function equalArgs (argsA, argsB) {
     if (argsA.length !== argsB.length) {
         return false;
@@ -163,8 +171,6 @@ function getSimpleArg (type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-list':
-            return [s.imageList([s.image('wadus.svg')]), 'imageList([image(\'wadus\')])'];
         case 'image-array':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
@@ -191,8 +197,6 @@ function getPropertyArg (type) {
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-list':
-            return [s.imageList([s.image('wadus.svg')]), 'imageList([image(\'wadus\')])'];
         case 'image-array':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:

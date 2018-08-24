@@ -1,5 +1,5 @@
 import GlobalAggregation from './GlobalAggregation';
-
+import { checkMaxArguments } from '../../utils';
 /**
  * Return the maximum of the feature property for the entire source data.
  *
@@ -28,6 +28,8 @@ import GlobalAggregation from './GlobalAggregation';
  */
 export default class GlobalMax extends GlobalAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'globalMax');
+
         super({ property, name: 'max', type: 'number' });
     }
 }

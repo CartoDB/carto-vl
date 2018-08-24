@@ -1,35 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Draw order | CARTO</title>
+  <title>Draw order  | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <ul>
-      <li>
-        <input type="radio" name="style" onclick="setDefaultOrder()" id="default" checked>
-        <label for="default">Default</label>
-      </li>
-      <li>
-        <input type="radio" name="style" onclick="setAscOrder()" id="asc">
-        <label for="asc">Ascending</label>
-      </li>
-      <li>
-        <input type="radio" name="style" onclick="setDescOrder()" id="des">
-        <label for="des">Descending</label>
-      </li>
-    </ul>
-  </div>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Draw Order</h1>
+        </header>
+        <section>
+          <p class="description open-sans">How to use CARTO ordering style property</p>
+          <div id="controls">
+            <ul>
+              <li>
+                <input type="radio" name="style" onclick="setAscOrder()" id="Asc" checked>
+                <label for="Asc">Asc</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setDescOrder()" id="Desc">
+                <label for="Desc">Desc</label>
+              </li>
+              <li>
+                <input type="radio" name="style" onclick="setDefaultOrder()" id="Default">
+                <label for="Default">Default / No order</label>
+              </li>
+            </ul>
+          </div>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
+    </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -59,6 +77,7 @@
         color: s.ramp(s.prop('category'), s.palettes.PRISM),
         strokeColor: s.rgba(255, 255, 255, 0.5),
         strokeWidth: 1,
+        order: s.asc(s.width())
     });
     const layer = new carto.Layer('layer', source, viz);
 
@@ -91,6 +110,11 @@
           strokeWidth: 1,
           order: s.desc(s.width())
       }));
+    }
+
+    layer.on('loaded', hideLoader);
+    function hideLoader() {
+          document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>

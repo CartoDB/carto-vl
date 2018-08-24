@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkLooseType, checkType } from '../utils';
+import { implicitCast, checkLooseType, checkType, checkMaxArguments } from '../utils';
 
 /**
  * Evaluates to a rgb color.
@@ -59,6 +59,8 @@ export const RGBA = genRGB('rgba', true);
 function genRGB (name, alpha) {
     return class RGBA extends BaseExpression {
         constructor (r, g, b, a) {
+            checkMaxArguments(arguments, 4, 'rgba');
+
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
             checkLooseType(name, 'r', 0, 'number', r);
             checkLooseType(name, 'g', 1, 'number', g);

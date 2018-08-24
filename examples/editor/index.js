@@ -70,7 +70,7 @@ const examples = [
     ['SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiIiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcCgkc3RfdHlwZSwgcHJpc20pIFxud2lkdGg6IDEuNSIsImYiOnsibG5nIjotMTIyLjQ0NDA4NDg2ODYxMTkyLCJsYXQiOjM3Ljc3MzcwNjczNjE0OTcwNX0sImciOjExLjY2NDMxMDgwMjg2NjgwNSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
     ['Gecat', 'eyJhIjoic2VsZWN0ICosIDEgYXMgY28gZnJvbSBnZWNhdF9nZW9kYXRhX2NvcHkiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIobG9nKGNsdXN0ZXJBdmcoJHNwZWVkKSksIDAsIDQpLCBHZXlzZXIpLCBjbHVzdGVyU3VtKCRjbykqem9vbSgpLzEwMDAwMCoxLjgqNClcbndpZHRoOiAyXG5zdHJva2VXaWR0aDogMFxucmVzb2x1dGlvbjogMC4yNSIsImYiOnsibG5nIjoyLjE3LCJsYXQiOjQxLjM4fSwiZyI6MTMsImgiOiJEYXJrTWF0dGVyIiwiaSI6InF1ZXJ5In0='],
     ['BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KGNsdXN0ZXJTdW0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjVcbmNvbG9yOiByYW1wKGNsdXN0ZXJNb2RlKCRjYXRlZ29yeSksIFByaXNtKVxuc3Ryb2tlQ29sb3I6IG9wYWNpdHkod2hpdGUsIDAuNSlcbmZpbHRlcjogaW4oY2x1c3Rlck1vZGUoJGNhdGVnb3J5KSwgW1wiVHJhbnNwb3J0ZXNcIiwgXCJTYWx1ZFwiXSkiLCJmIjp7ImxuZyI6Mi4xNzgxNzMwMjI4ODkwNDEsImxhdCI6NDEuMzk5MzA1OTE0MDc5MDR9LCJnIjoxMS44ODI5MTkwNDI3MTc0MzIsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Crazy images', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAkY291bnQvMiArOFxuY29sb3I6IG9wYWNpdHkoIHJhbXAobGluZWFyKCRjb3VudCwgMCwxMjApLCBSZWRPciksICRjb3VudC8yMCswLjQpXG5zeW1ib2xQbGFjZW1lbnQ6IHBsYWNlbWVudChzaW4oMC4xKiRjb3VudCpub3coKSkgLCBjb3MoMC4xKiRjb3VudCpub3coKSkpXG5zeW1ib2w6IHJhbXAoYnVja2V0cygxMDAqKDAuMSpub3coKSUxID4wLjUpLCAgWzUwXSksIGltYWdlTGlzdChbXG4gICAgaW1hZ2UoJy4uL3N0eWxpbmcvbWFya2VyLnN2ZycpLFxuICAgIGltYWdlKCcuLi9zdHlsaW5nL3N0YXIuc3ZnJylcbl0pKSBcbiAiLCJmIjp7ImxuZyI6LTEwNS4wMTM4NzY1MDIwMTgyNiwibGF0IjozOS43MzEyNzYwMjcxMjQ5NX0sImciOjEyLjc0MDQ2MDA2ODg5MzEwMiwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
+    ['Crazy images', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogJGNvdW50LzIgKzhcbmNvbG9yOiBvcGFjaXR5KCByYW1wKGxpbmVhcigkY291bnQsIDAsMTIwKSwgUmVkT3IpLCAkY291bnQvMjArMC40KVxuc3ltYm9sUGxhY2VtZW50OiBwbGFjZW1lbnQoc2luKDAuMSokY291bnQqbm93KCkpICwgY29zKDAuMSokY291bnQqbm93KCkpKVxuc3ltYm9sOiByYW1wKGJ1Y2tldHMoMTAwKigwLjEqbm93KCklMSA+MC41KSwgIFs1MF0pLCBbXG4gICAgaW1hZ2UoJy4uL3N0eWxpbmcvbWFya2VyLnN2ZycpLFxuICAgIGltYWdlKCcuLi9zdHlsaW5nL3N0YXIuc3ZnJylcbl0pXG4gIiwiZiI6eyJsbmciOi0xMDQuOTYyNjA1NDMxMjU4MjgsImxhdCI6MzkuNzI5MzYwMjIwMTUzNDk1fSwiZyI6MTIuNDg5NjU1NDg5ODk4OTkzLCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
     ['Flower image', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMzAwMCAgICAgICAgICAgICAgICAgICBcbnN5bWJvbDogcmFtcChsaW5lYXIoJGNhdXNlLCAxLDE0KSwgUHJpc20pICogaW1hZ2UoJy4uL3N0eWxpbmcvZmxvd2VyLnN2ZycpIiwiZiI6eyJsbmciOi0xMTkuNDU0OTIyODYwNjI3MTYsImxhdCI6MzguMDQ0NDg4NTUzMTIyOTZ9LCJnIjo1LjQ1MDQ4NzM0MDMyMjUxMDUsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ==']
 ];
 
@@ -89,7 +89,7 @@ const sourceTypes = {
 
 let index = 0; // current debug step
 
-let basemap = DEFAULT_BASEMAP;
+let basemap = '';
 let mapboxgl = window.mapboxgl;
 let map = new mapboxgl.Map({
     container: 'map',
@@ -263,8 +263,9 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
 
+    setupMap(opts);
+
     if (!layer) {
-        setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
             saveConfig();
@@ -273,9 +274,10 @@ const superRefresh = (opts) => {
         });
         layer.addTo(map, 'watername_ocean');
     } else {
+        layer.hide();
         layer.update(source, viz)
             .then(() => {
-                setupMap(opts);
+                layer.show();
                 saveConfig();
                 document.getElementById('feedback').style.display = 'none';
                 hideLoader();
@@ -333,15 +335,17 @@ function createBasemapElements () {
 }
 
 function setBasemap (id) {
-    basemap = id;
-    map.setStyle(BASEMAPS[basemap]);
-    let added = false;
-    map.on('sourcedata', () => {
-        if (map.isStyleLoaded() && !added) {
-            layer.addTo(map, 'watername_ocean');
-            added = true;
-        }
-    });
+    if (basemap !== id) {
+        basemap = id;
+        map.setStyle(BASEMAPS[basemap]);
+        let added = false;
+        map.on('sourcedata', () => {
+            if (map.isStyleLoaded() && !added) {
+                layer.addTo(map, 'watername_ocean');
+                added = true;
+            }
+        });
+    }
 }
 
 const $map = document.getElementById('map');
@@ -431,9 +435,9 @@ function generateSnippet (config) {
         <!-- Include CARTO VL JS -->
         <script src="http://libs.cartocdn.com/carto-vl/v${carto.version}/carto-vl.js"></script>
         <!-- Include Mapbox GL JS -->
-        <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
         <!-- Include Mapbox GL CSS -->
-        <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
         <style>
            html, body {
                margin: 0;

@@ -1,4 +1,5 @@
 import ClusterAggregation from './ClusterAggregation';
+import { checkMaxArguments } from '../../utils';
 /**
  * Aggregate using the mode. This operation disables the access to the property
  * except within other cluster aggregate functions.
@@ -26,6 +27,7 @@ import ClusterAggregation from './ClusterAggregation';
  */
 export default class ClusterMode extends ClusterAggregation {
     constructor (property) {
+        checkMaxArguments(arguments, 1, 'clusterMode');
         super({ property, expressionName: 'clusterMode', aggName: 'mode', aggType: 'category' });
     }
 }

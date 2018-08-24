@@ -73,6 +73,24 @@ describe('src/renderer/viz/parser', () => {
         });
     });
 
+    describe('duplicated properties', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                width: 1
+                width: 2
+            `)).toThrowError('Property \'width\' is already defined.');
+        });
+    });
+
+    describe('duplicated variables', () => {
+        it('should throw an error', () => {
+            expect(() => parseVizDefinition(`
+                @a: 1
+                @a: 2
+            `)).toThrowError('Variable \'a\' is already defined.');
+        });
+    });
+
     describe('built in images', () => {
         it('should be defined', () => {
             const str = `
@@ -81,19 +99,19 @@ describe('src/renderer/viz/parser', () => {
                 @3: bus
                 @4: car
                 @5: circle
-                @6: circleOutline
+                @6: circle_outline
                 @7: cross
                 @8: flag
                 @9: house
                 @10: marker
-                @11: markerOutline
+                @11: marker_outline
                 @12: plus
                 @13: square
-                @14: squareOutline
+                @14: square_outline
                 @15: star
-                @16: starOutline
+                @16: star_outline
                 @17: triangle
-                @18: triangleOutline
+                @18: triangle_outline
             `;
 
             expect(() => parseVizDefinition(str)).not.toThrow();

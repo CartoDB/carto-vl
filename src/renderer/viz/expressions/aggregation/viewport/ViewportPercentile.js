@@ -1,7 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
-import { implicitCast, clamp } from '../../utils';
-
+import { implicitCast, clamp, checkMaxArguments } from '../../utils';
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
@@ -33,6 +32,8 @@ export default class ViewportPercentile extends ViewportAggregation {
      * @param {*} percentile
      */
     constructor (property, percentile) {
+        checkMaxArguments(arguments, 2, 'viewportPercentile');
+
         super({ property, _impostor: number(0) });
 
         this._isViewport = true;

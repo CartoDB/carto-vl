@@ -72,7 +72,7 @@ const MVT_TO_CARTO_TYPES = {
  */
 
 /**
- * MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.
+ * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
  *
  * @typedef {object} MVTProperty
  * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
@@ -86,13 +86,22 @@ export default class MVT extends Base {
     /**
      * Create a carto.source.MVT.
      *
-     * @param {object} data - A MVT data object
+     * @param {string | string[]} templateURL - A string with the URL template of the MVT tiles in https://mytileserver.com/{z}/{x}/{y}.mvt format or a list of such templates. Usage of a list of templates with different domains is recommended since that allows the browser to make more requests in parallel.
      * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
-     * @example
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
+     * @example Usage with multiple templateURLs as recommended
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
-     * new carto.source.MVT("https://{server}/{z}/{x}/{y}.mvt", metadata);
+     * new carto.source.MVT([
+     *                       "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
+     *                      ],
+     *                      metadata
+     *                     );
      *
      * @fires CartoError
      *
@@ -101,7 +110,7 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor (templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new Metadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -148,7 +157,7 @@ export default class MVT extends Base {
         const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
 
         if (!mvtLayer) {
-            throw new Error(`LayerID '${this._options.layerID}' doesn't exist on the MVT tile`);
+            return { empty: true };
         }
 
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
@@ -271,7 +280,7 @@ export default class MVT extends Base {
             if (this._metadata.properties[propertyName].type !== 'category') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
             }
-            return this._metadata.categorizeString(propertyValue);
+            return this._metadata.categorizeString(propertyName, propertyValue);
         } else if (typeof propertyValue === 'number') {
             if (this._metadata.properties[propertyName].type !== 'number') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);

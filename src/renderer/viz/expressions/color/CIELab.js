@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkLooseType, checkType, checkExpression } from '../utils';
+import { implicitCast, checkLooseType, checkType, checkExpression, checkMaxArguments } from '../utils';
 
 /**
  * Evaluates to a CIELab color.
@@ -27,6 +27,7 @@ import { implicitCast, checkLooseType, checkType, checkExpression } from '../uti
  */
 export default class CIELab extends BaseExpression {
     constructor (l, a, b) {
+        checkMaxArguments(arguments, 3, 'cielab');
         l = implicitCast(l);
         a = implicitCast(a);
         b = implicitCast(b);

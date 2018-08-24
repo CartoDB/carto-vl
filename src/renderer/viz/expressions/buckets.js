@@ -1,63 +1,54 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
- * Imagine a traffic dataset with a speed property. We want to divide the roads in
- * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
+ * This returns a number or category expression depending on the input values.
  *
- * We´ll need:
- *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
- *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
+ * @param {Number|Category} property - The property to be evaluated and interpolated
+ * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
+ * @return {Number|Category}
  *
- * ```javascript
- *  const s = carto.expressions;
- *  const $speed = s.prop('speed');
- *  const viz = new carto.Viz({
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed.</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
+ * // - From 30 to 79
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, [30, 80, 120]),
+ *      s.buckets(s.prop('speed'), [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
- * ```
  *
- * ```javascript
- *  const viz = new carto.Viz(`
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed. (String)</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
+ * // - From 30 to 79
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+ * const viz = new carto.Viz(`
  *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
  * `);
- * ```
  *
- * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
- *  - From 0 to 29
- *  - From 30 to 79
- *  - From 80 to 120
- *
- * Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
- *
- * This expression can be used for categorical properties, imagine the previous example with the data already
- * procesed in a new categorical `procesedSpeed` column:
- *
- * ```javascript
- *  const s = carto.expressions;
- *  const $procesedSpeed = s.prop('procesedSpeed');
- *  const viz = new carto.Viz({
- *    color: s.ramp(
- *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
- *      s.palettes.PRISM)
- *    )
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(
+ *     s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high']),
+ *     s.palettes.PRISM)
+ *   )
  * });
- * ```
  *
- * ```javascript
- *  const viz = new carto.Viz(`
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed. (String)</caption>
+ * const viz = new carto.Viz(`
  *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
  * `);
- * ```
- *
- * @param {Number|Category} property - The property to be evaluated and interpolated
- * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
- * @return {Number|Category}
  *
  * @memberof carto.expressions
  * @name buckets
@@ -66,6 +57,8 @@ import { implicitCast, getOrdinalFromIndex } from './utils';
  */
 export default class Buckets extends BaseExpression {
     constructor (input, list) {
+        checkMaxArguments(arguments, 2, 'buckets');
+
         input = implicitCast(input);
         list = implicitCast(list);
 
@@ -78,26 +71,30 @@ export default class Buckets extends BaseExpression {
             looseType = input.type;
         }
 
-        list.elems.map((item, index) => {
-            if (item.type) {
-                if (looseType && looseType !== item.type) {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                } else if (item.type !== 'number' && item.type !== 'category') {
-                    throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
-                }
-            }
-        });
-
         let children = {
             input
         };
 
-        list.elems.map((item, index) => {
-            children[`arg${index}`] = item;
-        });
+        let numCategories;
+        if (list.elems) {
+            list.elems.map((item, index) => {
+                if (item.type) {
+                    if (looseType && looseType !== item.type) {
+                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                    } else if (item.type !== 'number' && item.type !== 'category') {
+                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
+                    }
+                }
+
+                children[`arg${index}`] = item;
+            });
+            numCategories = list.elems.length + 1;
+        }
+
         super(children);
-        this.numCategories = list.elems.length + 1;
+        this.numCategories = numCategories;
+
         this.list = list;
         this.type = 'category';
     }
@@ -131,6 +128,8 @@ export default class Buckets extends BaseExpression {
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
+
+        checkType('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {

@@ -1,11 +1,11 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/number', () => {
     describe('error control', () => {
         validateStaticTypeErrors('number', [undefined]);
         validateStaticTypeErrors('number', ['123']);
-        validateStaticTypeErrors('number', ['color', 'number']);
+        validateMaxArgumentsError('number', ['123', '123']);
     });
 
     describe('type', () => {

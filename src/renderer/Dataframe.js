@@ -60,6 +60,10 @@ export default class Dataframe {
                         aabb = _updateAABBForGeometry(feature[j], aabb, type);
                     }
 
+                    if (aabb.minx === Number.POSITIVE_INFINITY) {
+                        aabb = null;
+                    }
+
                     aabbList.push(aabb);
                 }
 
@@ -86,26 +90,35 @@ export default class Dataframe {
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
 
-        this.texColor = this._createStyleTileTexture(this.numFeatures);
-        this.texWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texFilter = this._createStyleTileTexture(this.numFeatures);
+        this.texColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texFilter = this._createStyleDataframeTexture(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
+        const inc = 1 / (1024 * 64);
         let index = 0;
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < this.numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
 
                 if (ids[i + 0] === 0) {
-                    ids[i + 0] += 1 / (1024 * 64);
+                    ids[i + 0] += inc;
                 }
                 if (ids[i + 1] === 0) {
-                    ids[i + 1] += 1 / (1024 * 64);
+                    ids[i + 1] += inc;
                 }
 
                 ids[i + 2] = -ids[i + 0];
@@ -120,11 +133,11 @@ export default class Dataframe {
                 while (i === breakpoints[index]) {
                     index++;
                 }
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
             }
         }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -250,6 +263,10 @@ export default class Dataframe {
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
+        if (featureAABB === null) {
+            return AABBTestResults.OUTSIDE;
+        }
+
         const featureStrokeAABB = {
             minx: featureAABB.minx - stroke,
             miny: featureAABB.miny - stroke,
@@ -348,13 +365,13 @@ export default class Dataframe {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                let offset = {x: 0, y: 0};
+                let offset = { x: 0, y: 0 };
                 if (!viz.offset.default) {
                     const vizOffset = viz.offset.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
-                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
                 if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
@@ -474,7 +491,7 @@ export default class Dataframe {
         this._genFeatureClass();
     }
 
-    _createStyleTileTexture (numFeatures) {
+    _createStyleDataframeTexture (numFeatures) {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this.renderer.gl;
@@ -538,7 +555,7 @@ function _updateAABBLine (line, aabb) {
 }
 
 function _updateAABBPolygon (polygon, aabb) {
-    const [ vertices, numVertices ] = [ polygon.flat, polygon.holes[0] || polygon.flat.length / 2 ];
+    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
 
     for (let i = 0; i < numVertices; i++) {
         aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
@@ -552,12 +569,12 @@ function _updateAABBPolygon (polygon, aabb) {
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
-            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
+        featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
-            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+        featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
 function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {

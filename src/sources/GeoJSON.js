@@ -15,6 +15,8 @@ export default class GeoJSON extends Base {
      * @param {object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.
+     *
      * @example
      * const source = new carto.source.GeoJSON({
      *   "type": "Feature",
@@ -267,7 +269,7 @@ export default class GeoJSON extends Base {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {

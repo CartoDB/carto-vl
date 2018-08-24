@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
-import { checkLooseType, checkType } from '../utils';
+import { checkType, checkMaxArguments, checkExpression } from '../utils';
 
 /**
  * Override the input color opacity.
@@ -32,11 +32,13 @@ export default class Opacity extends BaseExpression {
      * @param {*} alpha new opacity
      */
     constructor (color, alpha) {
+        checkMaxArguments(arguments, 2, 'opacity');
+
         if (Number.isFinite(alpha)) {
             alpha = number(alpha);
         }
-        checkLooseType('opacity', 'color', 0, 'color', color);
-        checkLooseType('opacity', 'alpha', 1, 'number', alpha);
+        checkExpression('opacity', 'color', 0, color);
+        checkExpression('opacity', 'alpha', 1, alpha);
         super({ color, alpha });
         this.type = 'color';
         this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;

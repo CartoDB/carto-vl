@@ -43,5 +43,17 @@ describe('sources/SQL', () => {
                 new SQL('ABC');
             }).toThrowError('`query` property must be a SQL query.');
         });
+
+        it('should build a new Source with query having the_geom_webmercator', () => {
+            const source = new SQL(`
+                SELECT
+                1 as cartodb_id,
+                ST_Transform(ST_SetSRID(ST_MakePoint(1, 0), 4326), 3857) as the_geom_webmercator
+            `, auth);
+            expect(source._username).toEqual('test');
+            expect(source._apiKey).toEqual('1234567890');
+            expect(source._serverURL).toEqual('https://test.carto.com');
+            expect(source._client).toBeDefined();
+        });
     });
 });

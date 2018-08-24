@@ -1,6 +1,6 @@
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    style: 'http://localhost:5000/test/common/basemaps/positron-gl-style.json',
     center: [-122.42, 37.77],
     zoom: 12
 });

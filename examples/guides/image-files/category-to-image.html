@@ -4,9 +4,9 @@
     <!-- Include CARTO VL JS -->
     <script src="../../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <!-- Make the map visible -->
     <style>
         #map {
@@ -37,7 +37,7 @@
         const source = new carto.source.Dataset('table_311_complaints');
         // Add better styles
         const viz = new carto.Viz(`
-            symbol: ramp(buckets($complaint,['Car','Bus','Building']), imageList([car,bus,house]))
+            symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
             width: 30
         `);
         // Create the layer
