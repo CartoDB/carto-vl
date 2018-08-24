@@ -357,14 +357,20 @@ export default class Layer {
     }
 
     /**
-     * Custom Layer API: `render` function
+     * Custom Layer API: `prerender` function
      */
-    render (gl, matrix) {
+    prerender (gl, matrix) {
+        // Call request data if the matrix has changed
         if (!util.equalArrays(this._matrix, matrix)) {
-            // Call request data if the matrix has changed
             this._matrix = matrix;
             this.requestData(matrix);
         }
+    }
+
+    /**
+     * Custom Layer API: `render` function
+     */
+    render (gl, matrix) {
         this._paintLayer();
 
         // Checking this.map.repaint is needed, because MGL repaint is a setter and
