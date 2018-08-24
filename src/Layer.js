@@ -500,23 +500,11 @@ export default class Layer {
             // make a better and efficient use of the Custom Layers interface.
             // TODO: the best solution is to use the matrix at the shader
             // level and remove the aspect and scale logic from the renderer
-            zoom = -(2 * matrix[15] / matrix[5]);
-            center = {
-                x: -(1 + 2 * matrix[12] / matrix[0]),
-                y: +(1 + 2 * matrix[13] / matrix[5])
-            };
+            zoom = util.computeMatrixZoom(matrix);
+            center = util.computeMatrixCenter(matrix);
         } else {
-            const b = this.map.getBounds();
-            const nw = b.getNorthWest();
-            const sw = b.getSouthWest();
-            zoom = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
-
-            const c = this.map.getCenter();
-            const coords = util.projectToWebMercator(c);
-            center = {
-                x: coords.x / util.WM_R,
-                y: coords.y / util.WM_R
-            };
+            zoom = util.computeMapZoom(this.map);
+            center = util.computeMapCenter(this.map);
         }
 
         this.renderer.setZoom(zoom);
