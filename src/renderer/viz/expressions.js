@@ -181,7 +181,7 @@ import Now from './expressions/now';
 
 import BaseNumber from './expressions/basic/number';
 
-import Opacity from './expressions/color/opacity';
+import Opacity from './expressions/color/Opacity';
 
 import { Asc } from './expressions/ordering';
 import { Desc } from './expressions/ordering';
@@ -189,7 +189,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import Reverse from './expressions/color/palettes/Reverse';
+import reverseFn from './expressions/reverse/reverse';
 
 import Property from './expressions/basic/property';
 
@@ -247,6 +247,9 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
+import Zoomrange from './expressions/Zoomrange';
+import Scaled from './expressions/Scaled';
+import AlphaNormalize from './expressions/AlphaNormalize';
 
 /* Expose classes as constructor functions */
 
@@ -326,7 +329,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = (...args) => new Reverse(...args);
+export const reverse = reverseFn;
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
@@ -382,7 +385,11 @@ export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
 
 export const zoom = (...args) => new Zoom(...args);
+export const scaled = (...args) => new Scaled(...args);
+export const zoomrange = (...args) => new Zoomrange(...args);
+
 export const placement = (...args) => new Placement(...args);
+export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);
 export const TRUE = new Constant(1);

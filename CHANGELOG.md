@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Use the new Custom Layer interface with MGL (v0.48.0-carto1)
 - Add `layer.removeFrom(map)` API function
-- Add viz optional in `layer.update(source, viz?)` API function
+- Make viz optional in `layer.update(source, viz?)` API function
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression
-- Use local basemaps for testing
+- Add reverse expression to arrays, besides palettes
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use minified bundle for CI testing
 - Improve featureIDBuffer generation by 20%
 - Trigger feature events (hover, enter, leave) when layers are updated
+- Improve error message when creating buckets without an array
+- ramp($category, ...) implementation is fixed when using multiple categorical properties
+- Use underscore in image constants
+- Use local basemaps for testing
 
 ## Fixed
 - Fix animation example

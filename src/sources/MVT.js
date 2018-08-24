@@ -110,7 +110,7 @@ export default class MVT extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor (templateURL, metadata = new Metadata(), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new Metadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
@@ -157,7 +157,7 @@ export default class MVT extends Base {
         const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
 
         if (!mvtLayer) {
-            throw new Error(`LayerID '${this._options.layerID}' doesn't exist on the MVT tile`);
+            return { empty: true };
         }
 
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
@@ -280,7 +280,7 @@ export default class MVT extends Base {
             if (this._metadata.properties[propertyName].type !== 'category') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
             }
-            return this._metadata.categorizeString(propertyValue);
+            return this._metadata.categorizeString(propertyName, propertyValue);
         } else if (typeof propertyValue === 'number') {
             if (this._metadata.properties[propertyName].type !== 'number') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);

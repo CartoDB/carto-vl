@@ -78,6 +78,10 @@
                 {
                     "title": "External Image",
                     "file": "styling/image-external.html"
+                },
+                {
+                    "title": "Draw Order",
+                    "file": "styling/draw-order.html"
                 }
             ]
         },
