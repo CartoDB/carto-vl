@@ -491,36 +491,36 @@ export default class Layer {
     }
 
     _setZoomCenter (matrix) {
+        let zoom;
+        let center;
+
         if (matrix) {
             // Compute the zoom and center from the matrix.
             // This is a solution to avoid subscribing to map events and
             // make a better and efficient use of the Custom Layers interface.
             // TODO: the best solution is to use the matrix at the shader
             // level and remove the aspect and scale logic from the renderer
-            this.renderer.setCenter(
-                -(1 + 2 * matrix[12] / matrix[0]),
-                +(1 + 2 * matrix[13] / matrix[5])
-            );
-            this.renderer.setZoom(
-                -(2 * matrix[15] / matrix[5])
-            );
+            zoom = -(2 * matrix[15] / matrix[5]);
+            center = {
+                x: -(1 + 2 * matrix[12] / matrix[0]),
+                y: +(1 + 2 * matrix[13] / matrix[5])
+            };
         } else {
-            this._setRendererZoom();
-            this._setRendererCenter();
+            const b = this.map.getBounds();
+            const nw = b.getNorthWest();
+            const sw = b.getSouthWest();
+            zoom = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
+
+            const c = this.map.getCenter();
+            const coords = util.projectToWebMercator(c);
+            center = {
+                x: coords.x / util.WM_R,
+                y: coords.y / util.WM_R
+            };
         }
-    }
 
-    _setRendererZoom () {
-        const b = this.map.getBounds();
-        const nw = b.getNorthWest();
-        const sw = b.getSouthWest();
-        const z = (util.projectToWebMercator(nw).y - util.projectToWebMercator(sw).y) / util.WM_2R;
-        this.renderer.setZoom(z);
-    }
-
-    _setRendererCenter () {
-        const c = this.map.getCenter();
-        this.renderer.setCenter(c.lng / 180.0, util.projectToWebMercator(c).y / util.WM_R);
+        this.renderer.setZoom(zoom);
+        this.renderer.setCenter(center);
     }
 
     _getViewport () {

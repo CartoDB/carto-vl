@@ -64,9 +64,9 @@ export default class Renderer {
      * @param {number} x
      * @param {number} y
      */
-    setCenter (x, y) {
-        this._center.x = x;
-        this._center.y = y;
+    setCenter (center) {
+        this._center.x = center.x;
+        this._center.y = center.y;
     }
 
     /**
