@@ -456,14 +456,13 @@ function _calcPaletteValues (palette) {
 }
 
 function _calcColorValueIndex (m) {
-    switch (m) {
-        case Number.isNaN(m):
-            return 0;
-        case m === Infinity:
-            return (COLOR_ARRAY_LENGTH - 4) / 4;
-        case m === -Infinity:
-            return 0;
-        default:
-            return Math.round(m * MAX_BYTE_VALUE);
+    if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
+        return 0;
     }
+
+    if (m === Number.POSITIVE_INFINITY || m > 1) {
+        return COLOR_ARRAY_LENGTH - 1;
+    }
+
+    return Math.round(m * MAX_BYTE_VALUE);
 }
