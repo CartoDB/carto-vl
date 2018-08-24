@@ -54,7 +54,7 @@
 <p>To create a layer a <a href="carto.source.Base.html">source</a> and <a href="carto.Viz.html">viz</a> are required:</p>
 <ul>
 <li>The <a href="carto.source.Base.html">source</a> is used to know <strong>what</strong> data will be displayed in the Layer.</li>
-<li>The <a href="carto.Viz.html">viz</a> is used to know <strong>how</strong> to draw the data in the Layer.</li>
+<li>The <a href="carto.Viz.html">viz</a> is used to know <strong>how</strong> to draw the data in the Layer, Viz instances can only be bound to one single layer.</li>
 </ul>
 </div>
 
@@ -261,7 +261,7 @@
 
 
 <div class="description">
-    <p>Add this layer to a map.</p>
+    <p>Add this layer to a map. If the map's style is not loaded yet it will wait for it to add the layer as soon as possible.</p>
 </div>
 
 
@@ -1019,6 +1019,87 @@ layer.blendToViz(viz1, 500);</code></pre>
     
 
     
+    <h4 class="name" id="remove"><span class="type-signature"></span>remove<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Remove this layer from the map. It should be called after the layer is loaded. Otherwise, it will not delete the layer.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id="show"><span class="type-signature"></span>show<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
@@ -1105,7 +1186,7 @@ layer.blendToViz(viz1, 500);</code></pre>
     
 
     
-    <h4 class="name" id="update"><span class="type-signature">(async) </span>update<span class="signature">(source, viz)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="update"><span class="type-signature">(async) </span>update<span class="signature">(source, viz<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1141,6 +1222,8 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -1166,10 +1249,18 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"><p>the new Source object</p></td>
+            <td class="description last"><p>The new Source object</p></td>
         </tr>
 
     
@@ -1189,10 +1280,20 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last"><p>the new Viz object</p></td>
+            <td class="description last"><p>Optional. The new Viz object</p></td>
         </tr>
 
     
@@ -1272,13 +1373,13 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 07 2018 13:15:54 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 24 2018 16:17:33 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

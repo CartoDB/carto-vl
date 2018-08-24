@@ -134,6 +134,9 @@ type of their parameters.</p>
         <dl>
             <dt><a href="carto.expressions.Animation.html">Animation</a></dt>
             <dd></dd>
+        
+            <dt><a href="carto.expressions.Base.html">Base</a></dt>
+            <dd></dd>
         </dl>
     
 
@@ -604,6 +607,201 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".alphaNormalize"><span class="type-signature">(static) </span>alphaNormalize<span class="signature">(input, normalizer)</span><span class="type-signature"> &rarr; {<a href="global.html#Color">Color</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Override the opacity (alpha channel) of a color to normalize the input color by a normalizer property.</p>
+<p>This is implemented as `opacity(input, normalizer/globalMax(normalizer))</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Color">Color</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>input color to normalize</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>normalizer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric property that will be used to normalize the input color</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Color">Color</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Normalize an input property ($winner_party) by a second property ($voters).</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.alphaNormalize(
+             s.ramp(s.prop('winner_party'), [red, blue]),
+             s.prop('voters')
+         )
+});</code></pre>
+
+        <p class="code-caption">Normalize an input property ($winner_party) by a second property ($voters). (String)</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: alphaNormalize(
+             ramp($winner_party, [red, blue]),
+             $voters
+         )
+});</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".and"><span class="type-signature">(static) </span>and<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -994,6 +1192,15 @@ If <code>input</code> is NULL or NaN the filter won't be passed at any moment of
 
     <h5>Examples</h5>
     
+        <p class="code-caption">Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  width: 2,
+  color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+  filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
+});</code></pre>
+
         <p class="code-caption">Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
@@ -1002,6 +1209,14 @@ If <code>input</code> is NULL or NaN the filter won't be passed at any moment of
   filter: animation($day, 40, fade(0.1, 0.3))
 `);</code></pre>
 
+        <p class="code-caption">Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz({
+  width: 2,
+  color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+  filter: s.animation(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 40, s.fade(0.1, 0.3))
+});</code></pre>
+
         <p class="code-caption">Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
@@ -1009,20 +1224,6 @@ If <code>input</code> is NULL or NaN the filter won't be passed at any moment of
   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
 `);</code></pre>
-
-        <p class="code-caption">Using the `getProgressValue` method to get the animation current value</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
-const animationStyle = {
-  color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
-  width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
-  filter: animationExpr
-};
-layer.on('updated', () => {
-  let currTime = Math.floor(animationExpr.getProgressValue());
-  document.getElementById('timestamp').innerHTML = currTime;
-});</code></pre>
 
 
 
@@ -1092,6 +1293,9 @@ layer.on('updated', () => {
 |
 
 <span class="param-type">Array.&lt;<a href="global.html#Date">Date</a>></span>
+|
+
+<span class="param-type">Array.&lt;Image></span>
 
 
             
@@ -1180,6 +1384,170 @@ layer.on('updated', () => {
     
 
 
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".asc"><span class="type-signature">(static) </span>asc<span class="signature">(by)</span><span class="type-signature"> &rarr; {Order}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Order ascending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>by</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">carto.expressions.Width</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>must be <code>width()</code></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Order</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Ascending order based on width.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  order: s.asc(s.width())
+});</code></pre>
+
+        <p class="code-caption">Ascending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: asc(width())
+`);</code></pre>
 
 
 
@@ -1642,41 +2010,7 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Given a property create &quot;sub-groups&quot; based on the given breakpoints.</p>
-<p>Imagine a traffic dataset with a speed property. We want to divide the roads in
-3 buckets (slow, medium, fast) based on the speed using a different color each bucket.</p>
-<p>We´ll need:</p>
-<ul>
-<li>A <a href="carto.expressions.html#.ramp">ramp</a> to add a color for every bucket.</li>
-<li>A <a href="carto.expressions.html#.palettes">colorPalette</a> to define de color scheme.</li>
-</ul>
-<pre class="prettyprint source lang-javascript"><code> const s = carto.expressions;
- const $speed = s.prop('speed');
- const viz = new carto.Viz({
-   color: s.ramp(
-     s.buckets($speed, [30, 80, 120]),
-     s.palettes.PRISM
-   )
-});</code></pre><pre class="prettyprint source lang-javascript"><code> const viz = new carto.Viz(`
-   color: ramp(buckets($speed, [30, 80, 120]), PRISM)
-`);</code></pre><p>Using the buckets <code>expression</code> we divide the dataset in 3 buckets according to the speed:</p>
-<ul>
-<li>From 0 to 29</li>
-<li>From 30 to 79</li>
-<li>From 80 to 120</li>
-</ul>
-<p>Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.</p>
-<p>This expression can be used for categorical properties, imagine the previous example with the data already
-procesed in a new categorical <code>procesedSpeed</code> column:</p>
-<pre class="prettyprint source lang-javascript"><code> const s = carto.expressions;
- const $procesedSpeed = s.prop('procesedSpeed');
- const viz = new carto.Viz({
-   color: s.ramp(
-     s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
-     s.palettes.PRISM)
-   )
-});</code></pre><pre class="prettyprint source lang-javascript"><code> const viz = new carto.Viz(`
-   color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
-`);</code></pre>
+<p>This returns a number or category expression depending on the input values.</p>
 </div>
 
 
@@ -1757,7 +2091,7 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
 
             
 
-            <td class="description last"><p>Numeric expression containing the different breakpoints.</p></td>
+            <td class="description last"><p>Expression containing the different breakpoints.</p></td>
         </tr>
 
     
@@ -1839,6 +2173,53 @@ procesed in a new categorical <code>procesedSpeed</code> column:</p>
     
 
 
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Display a traffic dataset in 4 colors depending on the numeric speed.</p>
+    
+    <pre class="prettyprint"><code>// Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+// - From -inf to 29
+// - From 30 to 79
+// - From 80 to 119
+// - From 120 to +inf
+// Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+const s = carto.expressions;
+const viz = new carto.Viz({
+   color: s.ramp(
+     s.buckets(s.prop('speed'), [30, 80, 120]),
+     s.palettes.PRISM
+   )
+});</code></pre>
+
+        <p class="code-caption">Display a traffic dataset in 4 colors depending on the numeric speed. (String)</p>
+    
+    <pre class="prettyprint"><code>// Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+// - From -inf to 29
+// - From 30 to 79
+// - From 80 to 119
+// - From 120 to +inf
+// Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+const viz = new carto.Viz(`
+   color: ramp(buckets($speed, [30, 80, 120]), PRISM)
+`);</code></pre>
+
+        <p class="code-caption">Display a traffic dataset is 3 colors depending on the category procesedSpeed.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(
+    s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high']),
+    s.palettes.PRISM)
+  )
+});</code></pre>
+
+        <p class="code-caption">Display a traffic dataset is 3 colors depending on the category procesedSpeed. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+`);</code></pre>
 
 
 
@@ -3409,6 +3790,170 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".desc"><span class="type-signature">(static) </span>desc<span class="signature">(by)</span><span class="type-signature"> &rarr; {Order}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Order descending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>by</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">carto.expressions.Width</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>must be <code>width()</code></p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Order</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Descending order based on width.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  order: s.desc(s.width())
+});</code></pre>
+
+        <p class="code-caption">Descending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: desc(width())
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".div"><span class="type-signature">(static) </span>div<span class="signature">(numerator, denominator)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
     
 
@@ -3796,7 +4341,7 @@ const viz = new carto.Viz({
         <p class="code-caption">Compare two numbers to show only elements with price equal to 30. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: $price === 30  // Equivalent to eq($price, 30)
+  filter: $price == 30  // Equivalent to eq($price, 30)
 `);</code></pre>
 
 
@@ -5037,6 +5582,199 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   @g_min: globalMin($amount)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".globalPercentile"><span class="type-signature">(static) </span>globalPercentile<span class="signature">(property, percentile)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Return the Nth percentile of an numeric property for the entire source data.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>numeric property</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>percentile</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Numeric expression in the [0, 100] range</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Result of the aggregation</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Assign the 90th percentile of the `amount` property for the entire dataset to a variable.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  variables: {
+     v_percentile: s.globalPercentile(s.prop('amount'), 90)
+  }
+});</code></pre>
+
+        <p class="code-caption">Assign the 90th percentile of the `amount` property for the entire dataset to a variable. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  @v_percentile: globalPercentile($amount, 90)
 `);</code></pre>
 
 
@@ -6987,153 +7725,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".imageList"><span class="type-signature">(static) </span>imageList<span class="signature">(imageList)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>ImageList. Load an array of images and use them as a symbols.</p>
-<p>Note: images RGB color will be overridden if the viz <code>color</code> property is set.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>imageList</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;Image></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Array of images</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Match different images to the different categories generated by buckets.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  symbol: s.ramp(s.buckets(s.prop('pop_max'), [10]), s.imageList([s.image('./marker.svg'), s.image('./marker2.svg')]))
-});</code></pre>
-
-        <p class="code-caption">Match different images to the different categories generated by buckets. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-   symbol: ramp(buckets($pop_max, [10]), imageList([image('./marker.svg'), image('./marker2.svg')]))
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -7314,7 +7905,7 @@ const viz = new carto.Viz({
         <p class="code-caption">Display only cities where $type is 'metropolis' or 'capital'. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: in($type, ['metropolis', 'capital'])
+  filter: $type in ['metropolis', 'capital']
 `);</code></pre>
 
 
@@ -7465,6 +8056,22 @@ const viz = new carto.Viz({
     
 
 
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Filter NaN values of the `numeric` property.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  filter: s.not(s.isNaN(s.prop('numeric')))
+});</code></pre>
+
+        <p class="code-caption">Filter NaN values of the `numeric` property. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  filter: not(isNaN($numeric))
+`);</code></pre>
 
 
 
@@ -8836,9 +9443,9 @@ const viz = new carto.Viz({
 
         <p class="code-caption">Display blue points. (String)</p>
     
-    <pre class="prettyprint"><code>const viz = new carto.Viz({
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: blue  // Equivalent to namedColor('blue')
-});</code></pre>
+`);</code></pre>
 
 
 
@@ -9035,7 +9642,7 @@ const viz = new carto.Viz({
         <p class="code-caption">Compare two numbers to show only elements with price not equal to 30. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: $price !== 30  // Equivalent to neq($price, 30)
+  filter: $price != 30  // Equivalent to neq($price, 30)
 `);</code></pre>
 
 
@@ -9226,7 +9833,122 @@ const viz = new carto.Viz({
         <p class="code-caption">Display only cities where $type is not 'metropolis' or 'capital'. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: nin($type, ['metropolis', 'capital'])
+  filter: $type nin ['metropolis', 'capital']
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".noOrder"><span class="type-signature">(static) </span>noOrder<span class="signature">()</span><span class="type-signature"> &rarr; {Order}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>No order expression.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Order</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">No order.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  order: s.noOrder()
+});</code></pre>
+
+        <p class="code-caption">No order. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: noOrder()
 `);</code></pre>
 
 
@@ -9917,15 +10639,15 @@ const viz = new carto.Viz({
 <ul>
 <li><code>symbolPlacement: placement(1,1)</code> means to align the bottom left corner of the image with the point center.</li>
 <li><code>symbolPlacement: placement(0,0)</code> means to align the center of the image with the point center.</li>
-<li><p><code>symbolPlacement: placement(-1,-1)</code> means to align the top right corner of the image with the point center.</p>
-<pre class="prettyprint source"><code>    |1
-    |
-    |</code></pre><p>-1 -------+------- 1</p>
-<pre class="prettyprint source"><code>    |
-    |
-  -1|</code></pre></li>
+<li><code>symbolPlacement: placement(-1,-1)</code> means to align the top right corner of the image with the point center.</li>
 </ul>
-<p>You can also use <code>align_center</code> and <code>align_bottom</code> to set the simbol placement as follows:</p>
+<pre class="prettyprint source"><code>          |1
+          |
+          |
+-1 -------+------- 1
+          |
+          |
+        -1|</code></pre><p>You can also use <code>align_center</code> and <code>align_bottom</code> to set the simbol placement as follows:</p>
 <ul>
 <li><code>symbolPlacement: align_bottom</code> is equivalent to <code>symbolPlacement: placement(0, 1)</code></li>
 <li><code>symbolPlacement: align_center</code> is equivalent to <code>symbolPlacement: placement(0, 0)</code></li>
@@ -10089,12 +10811,22 @@ const viz = new carto.Viz({
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
         <p class="code-caption">Setting the aligment to the top corner of the image.</p>
     
-    <pre class="prettyprint"><code>  symbol: image('./marker.svg')
-  symbolPlacement: placement(1, 0)</code></pre>
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.image('./marker.svg').
+  symbolPlacement: s.placement(1, 0)
+});</code></pre>
+
+        <p class="code-caption">Setting the aligment to the top corner of the image. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  symbol: image('./marker.svg')
+  symbolPlacement: placement(1, 0)
+`);</code></pre>
 
 
 
@@ -10461,195 +11193,7 @@ const viz = new carto.Viz({
 `);
 
 const viz = new carto.Viz(`
-  filter: $name !== 'london'
-`);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".quantiles"><span class="type-signature">(static) </span>quantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Classify <code>input</code> by using the quantiles method with <code>n</code> buckets.</p>
-<p>It will classify the input based on the filtered dataset, filtering by viewport and by <code>filter</code>.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="global.html#Number">Number</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>The input expression used in the quantiles</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>n</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>Number of buckets to be returned</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type"><a href="global.html#Category">Category</a></span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-    <h5>Examples</h5>
-    
-        <p class="code-caption">Use viewportQuantiles to define a color ramp.</p>
-    
-    <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz({
-  color: s.ramp(s.viewportQuantiles(s.prop('density'), 5), s.palettes.PRISM)
-});</code></pre>
-
-        <p class="code-caption">Use viewportQuantiles to define a color ramp. (String)</p>
-    
-    <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  color: ramp(viewportQuantiles($density, 5), PRISM)
+  filter: $name != 'london'
 `);</code></pre>
 
 
@@ -10885,7 +11429,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(palette)</span><span class="type-signature"> &rarr; {<a href="global.html#Palette">Palette</a>}</span></h4>
+    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Palette">Palette</a>|BaseArray}</span></h4>
     
 
     
@@ -10893,7 +11437,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Reverse the provided Palette.</p>
+    <p>Reverse the provided item.</p>
 </div>
 
 
@@ -10929,13 +11473,16 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>palette</code></td>
+                <td class="name"><code>x</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type"><a href="global.html#Palette">Palette</a></span>
+|
+
+<span class="param-type">BaseArray</span>
 
 
             
@@ -10945,7 +11492,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression to compute the natural logarithm</p></td>
+            <td class="description last"><p>item to be reversed</p></td>
         </tr>
 
     
@@ -11016,6 +11563,9 @@ const viz = new carto.Viz({
     <dd>
         
 <span class="param-type"><a href="global.html#Palette">Palette</a></span>
+|
+
+<span class="param-type">BaseArray</span>
 
 
     </dd>
@@ -11032,13 +11582,26 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+  color: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
 });</code></pre>
 
-        <p class="code-caption">Invert a Palette. (String)</p>
+        <p class="code-caption">Invert a Palette (String).</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp($type, reverse(PRISM))
+`);</code></pre>
+
+        <p class="code-caption">Invert a Color Array.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
+});</code></pre>
+
+        <p class="code-caption">Invert a Color Array (String).</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp($count, reverse([red, blue]))
 `);</code></pre>
 
 
@@ -11482,6 +12045,226 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: rgba(0, 0, 255, 1)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".scale"><span class="type-signature">(static) </span>scale<span class="signature">(width, zoomlevel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Scale a width value to keep feature width constant in real space (meters).
+This will change the width in pixels at different zoom levels to enforce the previous condition.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>pixel width at zoom level <code>zoomlevel</code></p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>zoomlevel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
+
+            <td class="description last"><p>zoomlevel at which <code>width</code> is relative to</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Keep feature width in meters constant with 25 pixels at zoom level 7.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  width: s.scaled(25, 7)
+});</code></pre>
+
+        <p class="code-caption">Keep feature width in meters constant with 25 pixels at zoom level 7. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: s.scaled(25, 7)
 `);</code></pre>
 
 
@@ -12329,7 +13112,7 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Tan</p>
+        <p class="code-caption">Tan.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
@@ -13011,13 +13794,15 @@ const viz = new carto.Viz({
   variables: {
     sum_price: s.clusterSum(s.prop('price'))
   }
- filter: s.neq(s.var('sum_price'), 'london'),
+ filter: s.neq(s.var('sum_price'), 'london')
 });</code></pre>
 
         <p class="code-caption">(String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  </code></pre>
+  @sum_price: clusterSum($price)
+  filter: $price == 30  // Equivalent to eq($price, 30)
+`);</code></pre>
 
 
 
@@ -13715,21 +14500,37 @@ This expression cannot be used for rendering, it can only be used in JavaScript 
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
+        <p class="code-caption">Define and use a list of features.</p>
+    
+    <pre class="prettyprint"><code>const source = carto.source.Dataset('data');
+const s = carto.expressions;
+const viz = new carto.Viz({
+  variables: {
+    list: s.viewportFeatures(s.prop('value'), s.prop('category'))
+  }
+});
+const layer = carto.Layer('layer', source, viz);
+...
+layer.on('updated', () => {
+  viz.variables.list.value.forEach(feature => {
+    console.log('value:', feature.value, 'category:', feature.category);
+  });
+});</code></pre>
+
         <p class="code-caption">Define and use a list of features. (String)</p>
     
     <pre class="prettyprint"><code>const source = carto.source.Dataset('data');
 const viz = new carto.Viz(`
-         @list: viewportFeatures($value, $category)
+  @list: viewportFeatures($value, $category)
 `);
 const layer = carto.Layer('layer', source, viz);
 ...
-
 layer.on('updated', () => {
-    viz.variables.list.value.forEach(feature => {
-        console.log('value:', feature.value, 'category:', feature.category);
-    });
+  viz.variables.list.value.forEach(feature => {
+    console.log('value:', feature.value, 'category:', feature.category);
+  });
 });</code></pre>
 
 
@@ -14494,6 +15295,194 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".viewportQuantiles"><span class="type-signature">(static) </span>viewportQuantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Classify <code>input</code> by using the quantiles method with <code>n</code> buckets.</p>
+<p>It will classify the input based on the filtered dataset, filtering by viewport and by <code>filter</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The input expression used in the quantiles</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Number of buckets to be returned</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use viewportQuantiles to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.viewportQuantiles(s.prop('density'), 5), s.palettes.PRISM)
+});</code></pre>
+
+        <p class="code-caption">Use viewportQuantiles to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(viewportQuantiles($density, 5), PRISM)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".viewportSum"><span class="type-signature">(static) </span>viewportSum<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -14774,6 +15763,170 @@ const viz = new carto.Viz({
 
 
         
+            
+
+    
+
+    
+    <h4 class="name" id=".zoomrange"><span class="type-signature">(static) </span>zoomrange<span class="signature">(zoomBreakpointList)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>zoomBreakpointList</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>list of zoom breakpoints with at least two elements</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  width: s.ramp(s.zoomrange([7, 10]), [1, 20])
+});</code></pre>
+
+        <p class="code-caption">Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: width: ramp(zoomrange([7, 10]), [1, 20])
+`);</code></pre>
+
+
+
+        
     
 
     
@@ -14789,13 +15942,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Aug 07 2018 13:15:54 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 24 2018 16:17:33 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,6 +1,6 @@
 /*!
  * CARTO VL js https://carto.com/
- * Version: 0.6.2
+ * Version: 0.7.0
  * 
  */
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -7088,7 +7088,7 @@ module.exports = g;
 /*! exports provided: name, version, sideEffects, description, repository, author, contributors, license, files, dependencies, devDependencies, module, main, scripts, default */
 /***/ (function(module) {
 
-module.exports = {"name":"@carto/carto-vl","version":"0.6.2","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","karma-carto-benchmark-reporter":"^0.0.0","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.45.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","uglifyjs-webpack-plugin":"^1.2.7","wait-on":"^2.1.0","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 5000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
+module.exports = {"name":"@carto/carto-vl","version":"0.7.0","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@mapbox/vector-tile":"^1.3.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.48.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","wait-on":"^2.1.0","webpack":"^4.0.0","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:unit:min":"MIN=1 yarn test:unit","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:min":"MIN=1 yarn test:user","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000","test:render:min":"yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
 
 /***/ }),
 
@@ -7103,16 +7103,14 @@ module.exports = {"name":"@carto/carto-vl","version":"0.6.2","sideEffects":false
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Layer; });
 /* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.es.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
-/* harmony import */ var _integrator_carto__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./integrator/carto */ "./src/integrator/carto.js");
-/* harmony import */ var _integrator_Map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./integrator/Map */ "./src/integrator/Map.js");
-/* harmony import */ var _integrator_mapbox_gl__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./integrator/mapbox-gl */ "./src/integrator/mapbox-gl.js");
+/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils/util */ "./src/utils/util.js");
+/* harmony import */ var _Viz__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Viz */ "./src/Viz.js");
+/* harmony import */ var _sources_Base__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sources/Base */ "./src/sources/Base.js");
+/* harmony import */ var _renderer_Renderer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./renderer/Renderer */ "./src/renderer/Renderer.js");
 /* harmony import */ var _renderer_RenderLayer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./renderer/RenderLayer */ "./src/renderer/RenderLayer.js");
-/* harmony import */ var _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./renderer/viz/expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _sources_Base__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./sources/Base */ "./src/sources/Base.js");
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./utils/util */ "./src/utils/util.js");
-/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./constants/layer */ "./src/constants/layer.js");
-/* harmony import */ var _Viz__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./Viz */ "./src/Viz.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./renderer/viz/expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./constants/layer */ "./src/constants/layer.js");
 
 
 
@@ -7123,32 +7121,9 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-/**
- *
- * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
- *
- * @typedef {object} LayerEvent
- * @api
- */
-
-/**
- * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
- *
- * @event loaded
- * @type {LayerEvent}
- * @api
- */
-
-/**
- * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
- * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
- *
- * @event updated
- * @type {LayerEvent}
- * @api
-*/
+// There is one renderer per map, so the layers added to the same map
+// use the same renderer with each renderLayer
+const renderers = new WeakMap();
 
 /**
 *
@@ -7157,7 +7132,7 @@ __webpack_require__.r(__webpack_exports__);
 * To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
 *
 * - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
-* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer.
+* - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
 * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source.Base} source - The source of the data
@@ -7177,35 +7152,32 @@ class Layer {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
-        this._oldDataframes = new Set();
-        this._isInitialized = false;
         this._init(id, source, viz);
     }
 
     _init (id, source, viz) {
         viz._boundLayer = this;
-        this.state = 'init';
-        this._id = id;
-
-        this._emitter = Object(mitt__WEBPACK_IMPORTED_MODULE_0__["default"])();
-        this._lastViewport = null;
-        this._lastMNS = null;
-        this._integrator = null;
-
         this._context = new Promise((resolve) => {
             this._contextInitialize = resolve;
         });
 
-        this._integratorPromise = new Promise((resolve) => {
-            this._integratorCallback = resolve;
-        });
+        /* Custom Layer API attributes:
+          - id: string
+          - type: "custom"
+        */
+        this.id = id;
+        this.type = 'custom';
 
         this.metadata = null;
-        this._renderLayer = new _renderer_RenderLayer__WEBPACK_IMPORTED_MODULE_5__["default"]();
-        this.state = 'init';
-        this._isLoaded = false;
+        this._state = 'init';
         this._visible = true;
+        this._isLoaded = false;
+        this._matrix = null;
         this._fireUpdateOnNextRender = false;
+        this._emitter = Object(mitt__WEBPACK_IMPORTED_MODULE_0__["default"])();
+        this._oldDataframes = new Set();
+        this._renderLayer = new _renderer_RenderLayer__WEBPACK_IMPORTED_MODULE_5__["default"]();
+        this._atomicChangeUID = 0;
 
         this.update(source, viz);
     }
@@ -7215,7 +7187,7 @@ class Layer {
      * @readonly
      */
     get visibility () {
-        return this._visible ? _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].VISIBLE : _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].HIDDEN;
+        return this._visible ? _constants_layer__WEBPACK_IMPORTED_MODULE_8__["layerVisibility"].VISIBLE : _constants_layer__WEBPACK_IMPORTED_MODULE_8__["layerVisibility"].HIDDEN;
     }
 
     /**
@@ -7253,7 +7225,7 @@ class Layer {
     }
 
     /**
-     * Add this layer to a map.
+     * Add this layer to a map. If the map's style is not loaded yet it will wait for it to add the layer as soon as possible.
      *
      * @param {mapboxgl.Map} map - The map on which to add the layer
      * @param {string?} beforeLayerID - The ID of an existing layer to insert the new layer before. If this values is not passed the layer will be added on the top of the existing layers.
@@ -7262,12 +7234,31 @@ class Layer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        if (this._isCartoMap(map)) {
-            this._addToCartoMap(map, beforeLayerID);
-        } else if (this._isMGLMap(map)) {
-            this._addToMGLMap(map, beforeLayerID);
-        } else {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'nonValidMap');
+        const STYLE_ERROR_REGEX = /Style is not done loading/;
+
+        try {
+            map.addLayer(this, beforeLayerID);
+        } catch (error) {
+            if (!STYLE_ERROR_REGEX.test(error)) {
+                throw new Error(error);
+            }
+
+            map.on('load', () => {
+                map.addLayer(this, beforeLayerID);
+            });
+        }
+    }
+
+    /**
+     * Remove this layer from the map. It should be called after the layer is loaded. Otherwise, it will not delete the layer.
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     */
+    remove () {
+        if (this.map) {
+            this.map.removeLayer(this.id);
         }
     }
 
@@ -7277,22 +7268,26 @@ class Layer {
      * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
      * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source.Base} source - the new Source object
-     * @param {carto.Viz} viz - the new Viz object
+     * @param {carto.source.Base} source - The new Source object
+     * @param {carto.Viz?} viz - Optional. The new Viz object
      * @memberof carto.Layer
-     * @async
      * @instance
+     * @async
      * @api
      */
     async update (source, viz) {
+        if (viz === undefined) {
+            // Use current viz
+            viz = this._viz;
+        }
         this._checkSource(source);
         this._checkViz(viz);
+
         source = source._clone();
-        this._atomicChangeUID = this._atomicChangeUID + 1 || 1;
+        this._atomicChangeUID++;
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
-        await this._integratorPromise;
         await loadImagesPromise;
 
         await this._context;
@@ -7348,103 +7343,42 @@ class Layer {
      *
      * @memberof carto.Layer
      * @instance
+     * @async
      * @api
      */
-    async blendToViz (viz, ms = 400, interpolator = _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_6__["cubic"]) {
-        try {
-            this._checkViz(viz);
-            viz.setDefaultsIfRequired(this.metadata.geomType);
-            if (this._viz && !this._source.requiresNewMetadata(viz)) {
-                Object.keys(this._viz.variables).map(varName => {
-                    // If an existing variable is not re-declared we add it to the new viz
-                    if (!viz.variables[varName]) {
-                        viz.variables[varName] = this._viz.variables[varName];
-                    }
-                });
-
-                Object.keys(viz.variables).map(varName => {
-                    // If the variable existed, we need to blend it, nothing to do if not
-                    if (this._viz.variables[varName]) {
-                        viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
-                    }
-                });
-
-                viz.color._blendFrom(this._viz.color, ms, interpolator);
-                viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
-                viz.width._blendFrom(this._viz.width, ms, interpolator);
-                viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
-                viz.filter._blendFrom(this._viz.filter, ms, interpolator);
-            }
-
-            return this._vizChanged(viz).then(() => {
-                if (this._viz) {
-                    this._viz.onChange(null);
+    async blendToViz (viz, ms = 400, interpolator = _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_7__["cubic"]) {
+        this._checkViz(viz);
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+        if (this._viz && !this._source.requiresNewMetadata(viz)) {
+            Object.keys(this._viz.variables).map(varName => {
+                // If an existing variable is not re-declared we add it to the new viz
+                if (!viz.variables[varName]) {
+                    viz.variables[varName] = this._viz.variables[varName];
                 }
-                viz.setDefaultsIfRequired(this._renderLayer.type);
-                this._viz = viz;
-                this._viz.onChange(this._vizChanged.bind(this));
             });
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
 
-    // The integrator will call this method once the webgl context is ready.
-    initialize () {
-        if (!this._isInitialized) {
-            this._isInitialized = true;
-            this._renderLayer.renderer = this._integrator.renderer;
-            this._contextInitialize();
-            this._renderLayer.dataframes.forEach(d => d.bind(this._integrator.renderer));
-            this.requestMetadata();
-        }
-    }
+            Object.keys(viz.variables).map(varName => {
+                // If the variable existed, we need to blend it, nothing to do if not
+                if (this._viz.variables[varName]) {
+                    viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
+                }
+            });
 
-    async requestMetadata (viz) {
-        viz = viz || this._viz;
-        if (!viz) {
-            return;
-        }
-        return this._source.requestMetadata(viz);
-    }
-
-    async requestData () {
-        if (!this.metadata || !this._visible) {
-            return;
+            viz.color._blendFrom(this._viz.color, ms, interpolator);
+            viz.strokeColor._blendFrom(this._viz.strokeColor, ms, interpolator);
+            viz.width._blendFrom(this._viz.width, ms, interpolator);
+            viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
+            viz.filter._blendFrom(this._viz.filter, ms, interpolator);
         }
 
-        this._source.requestData(this._getZoom(), this._getViewport());
-        this._fireUpdateOnNextRender = true;
-    }
-
-    hasDataframes () {
-        return this._renderLayer.hasDataframes();
-    }
-
-    getId () {
-        return this._id;
-    }
-
-    getSource () {
-        return this._source;
-    }
-
-    getViz () {
-        return this._viz;
-    }
-
-    getNumFeatures () {
-        return this._renderLayer.getNumFeatures();
-    }
-
-    getIntegrator () {
-        return this._integrator;
-    }
-
-    getFeaturesAtPosition (pos) {
-        return this._visible
-            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
-            : [];
+        return this._vizChanged(viz).then(() => {
+            if (this._viz) {
+                this._viz.onChange(null);
+            }
+            viz.setDefaultsIfRequired(this._renderLayer.type);
+            this._viz = viz;
+            this._viz.onChange(this._vizChanged.bind(this));
+        });
     }
 
     /**
@@ -7457,8 +7391,8 @@ class Layer {
      * @fires updated
      */
     show () {
+        this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
-        this._integrator.changeVisibility(this);
         this.requestData();
         this._fire('updated');
     }
@@ -7473,21 +7407,105 @@ class Layer {
      * @fires updated
      */
     hide () {
+        this.map.setLayoutProperty(this.id, 'visibility', 'none');
         this._visible = false;
-        this._integrator.changeVisibility(this);
         this._fire('updated');
     }
 
-    $paintCallback () {
+    async requestMetadata (viz) {
+        viz = viz || this._viz;
+        if (!viz) {
+            return;
+        }
+        return this._source.requestMetadata(viz);
+    }
+
+    async requestData (matrix) {
+        // Set renderer zoom and center
+        this._setZoomCenter(matrix);
+
+        if (!this.metadata || !this._visible) {
+            return;
+        }
+
+        this._source.requestData(this._getZoom(), this._getViewport());
+        this._fireUpdateOnNextRender = true;
+    }
+
+    hasDataframes () {
+        return this._renderLayer.hasDataframes();
+    }
+
+    getNumFeatures () {
+        return this._renderLayer.getNumFeatures();
+    }
+
+    getFeaturesAtPosition (pos) {
+        return this._visible
+            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+            : [];
+    }
+
+    isAnimated () {
+        return this._viz && this._viz.isAnimated();
+    }
+
+    /**
+     * Custom Layer API: `onAdd` function
+     */
+    onAdd (map, gl) {
+        this.gl = gl;
+        this.map = map;
+        this.renderer = _getRenderer(map, gl);
+
+        // Initialize render layer
+        this._renderLayer.setRenderer(this.renderer);
+        this._contextInitialize();
+    }
+
+    /**
+     * Custom Layer API: `onRemove` function
+     */
+    onRemove (map, gl) {
+    }
+
+    /**
+     * Custom Layer API: `prerender` function
+     */
+    prerender (gl, matrix) {
+        // Call request data if the matrix has changed
+        if (!_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].equalArrays(this._matrix, matrix)) {
+            this._matrix = matrix;
+            this.requestData(matrix);
+        }
+    }
+
+    /**
+     * Custom Layer API: `render` function
+     */
+    render (gl, matrix) {
+        this._paintLayer();
+
+        // Checking this.map.repaint is needed, because MGL repaint is a setter and
+        // it has the strange quite buggy side-effect of doing a "final" repaint after
+        // being disabled if we disable it every frame, MGL will do a "final" repaint
+        // every frame, which will not disabled it in practice
+        if (!this.isAnimated() && this.map.repaint) {
+            this.map.repaint = false;
+        }
+    }
+
+    _paintLayer () {
         if (this._viz && this._viz.colorShader) {
-            this._renderLayer.viz = this._viz;
-            this._integrator.renderer.renderLayer(this._renderLayer);
-            if (this._viz.isAnimated() || this._fireUpdateOnNextRender || !_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            this._renderLayer.setViz(this._viz);
+            this.renderer.renderLayer(this._renderLayer);
+            if (this.isAnimated() || this._fireUpdateOnNextRender || !_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-            if (!this._isLoaded && this.state === 'dataLoaded') {
+
+            if (!this._isLoaded && this._state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
             }
@@ -7508,70 +7526,35 @@ class Layer {
      */
     _onDataframeAdded (dataframe) {
         dataframe.setFreeObserver(() => {
-            this._integrator.invalidateWebGLState();
-            this._integrator.needRefresh();
+            this._needRefresh();
         });
         this._renderLayer.addDataframe(dataframe);
-        this._integrator.invalidateWebGLState();
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._integrator.needRefresh();
+        this._needRefresh();
         this._fireUpdateOnNextRender = true;
+    }
+
+    _needRefresh () {
+        this.map.repaint = true;
     }
 
     /**
      * Callback executed when the client finishes loading data
      */
     _onDataLoaded () {
-        this.state = 'dataLoaded';
-        this._integrator.needRefresh();
+        this._state = 'dataLoaded';
+        this._needRefresh();
     }
 
     _addLayerIdToFeature (feature) {
-        feature.layerId = this._id;
+        feature.layerId = this.id;
         return feature;
     }
 
-    _isCartoMap (map) {
-        return map instanceof _integrator_Map__WEBPACK_IMPORTED_MODULE_3__["default"];
-    }
-
-    _isMGLMap () {
-        // TODO: implement this
-        return true;
-    }
-
-    _addToCartoMap (map, beforeLayerID) {
-        this._integrator = Object(_integrator_carto__WEBPACK_IMPORTED_MODULE_2__["default"])(map);
-        this._integrator.addLayer(this, beforeLayerID);
-        this._integratorCallback(this._integrator);
-    }
-
-    _addToMGLMap (map, beforeLayerID) {
-        const STYLE_ERROR_REGEX = /Style is not done loading/;
-
-        try {
-            this._onMapLoaded(map, beforeLayerID);
-        } catch (error) {
-            if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
-            }
-
-            map.on('load', () => {
-                this._onMapLoaded(map, beforeLayerID);
-            });
-        }
-    }
-
-    _onMapLoaded (map, beforeLayerID) {
-        this._integrator = Object(_integrator_mapbox_gl__WEBPACK_IMPORTED_MODULE_4__["default"])(map);
-        this._integrator.addLayer(this, beforeLayerID);
-        this._integratorCallback(this._integrator);
-    }
-
     _compileShaders (viz, metadata) {
-        viz.compileShaders(this._integrator.renderer.gl, metadata);
+        viz.compileShaders(this.gl, metadata);
     }
 
     async _vizChanged (viz) {
@@ -7579,6 +7562,7 @@ class Layer {
         if (!this._source) {
             throw new Error('A source is required before changing the viz');
         }
+
         const source = this._source;
         const loadImagesPromise = viz.loadImages();
         const metadata = await source.requestMetadata(viz);
@@ -7589,52 +7573,70 @@ class Layer {
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
-        this._integrator.needRefresh();
+        this._needRefresh();
         return this.requestData();
     }
 
     _checkId (id) {
-        if (_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isUndefined(id)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'idRequired');
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(id)) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'idRequired');
         }
-        if (!_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isString(id)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'idStringRequired');
+        if (!_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isString(id)) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'idStringRequired');
         }
         if (id === '') {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'nonValidId');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidId');
         }
     }
 
     _checkSource (source) {
-        if (_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isUndefined(source)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'sourceRequired');
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(source)) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'sourceRequired');
         }
-        if (!(source instanceof _sources_Base__WEBPACK_IMPORTED_MODULE_7__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'nonValidSource');
+        if (!(source instanceof _sources_Base__WEBPACK_IMPORTED_MODULE_3__["default"])) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidSource');
         }
     }
 
     _checkViz (viz) {
-        if (_utils_util__WEBPACK_IMPORTED_MODULE_8__["default"].isUndefined(viz)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'vizRequired');
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(viz)) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'vizRequired');
         }
-        if (!(viz instanceof _Viz__WEBPACK_IMPORTED_MODULE_10__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'nonValidViz');
+        if (!(viz instanceof _Viz__WEBPACK_IMPORTED_MODULE_2__["default"])) {
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidViz');
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('layer', 'sharedViz');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'sharedViz');
         }
     }
 
-    _getViewport () {
-        if (this._integrator) {
-            return this._integrator.renderer.getBounds();
+    _setZoomCenter (matrix) {
+        let zoom;
+        let center;
+
+        if (matrix) {
+            // Compute the zoom and center from the matrix.
+            // This is a solution to avoid subscribing to map events and
+            // make a better and efficient use of the Custom Layers interface.
+            // TODO: the best solution is to use the matrix at the shader
+            // level and remove the aspect and scale logic from the renderer
+            zoom = _utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].computeMatrixZoom(matrix);
+            center = _utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].computeMatrixCenter(matrix);
+        } else {
+            zoom = _utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].computeMapZoom(this.map);
+            center = _utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].computeMapCenter(this.map);
         }
+
+        this.renderer.setZoom(zoom);
+        this.renderer.setCenter(center);
     }
+
+    _getViewport () {
+        return this.renderer.getBounds();
+    }
+
     _getZoom () {
-        if (this._integrator) {
-            return this._integrator.getZoomLevel();
-        }
+        return this.map.getZoom();
     }
 
     _freeSource () {
@@ -7644,6 +7646,40 @@ class Layer {
         this._renderLayer.freeDataframes();
     }
 }
+
+function _getRenderer (map, gl) {
+    if (!renderers.get(map)) {
+        const renderer = new _renderer_Renderer__WEBPACK_IMPORTED_MODULE_4__["default"]();
+        renderer.initialize(gl);
+        renderers.set(map, renderer);
+    }
+    return renderers.get(map);
+}
+
+/**
+ *
+ * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
+ *
+ * @typedef {object} LayerEvent
+ * @api
+ */
+
+/**
+ * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
+ *
+ * @event loaded
+ * @type {LayerEvent}
+ * @api
+ */
+
+/**
+ * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
+ * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
+ *
+ * @event updated
+ * @type {LayerEvent}
+ * @api
+*/
 
 
 /***/ }),
@@ -7723,10 +7759,28 @@ const SUPPORTED_PROPERTIES = [
     'variables'
 ];
 
+/**
+ * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
+ * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
+ * @typedef {object} VizSpec
+ * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+ * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+ * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+ * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+ * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
+ * @property {Image} symbol - show an image instead in the place of points
+ * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+ * @property {Placement} offset - offset to apply to the features in pixels
+ * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+ * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ * @property {object} variables - An object describing the variables used.
+ * @api
+ */
+
 class Viz {
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
-    * displayed and processed.
+    * displayed and processed. A Viz instance can only be bound to one layer.
     *
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -7751,11 +7805,11 @@ class Viz {
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
-    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
+    * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
     * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
     * @property {object} variables - An object describing the variables used.
     *
@@ -7843,7 +7897,7 @@ class Viz {
     }
 
     isAnimated () {
-        return this._getRootStyleExpressions().some(expr => expr.isAnimated);
+        return this._getRootStyleExpressions().some(expr => expr.isAnimated());
     }
 
     onChange (callback) {
@@ -8110,24 +8164,6 @@ class Viz {
     }
 
     _checkVizSpec (vizSpec) {
-        /**
-         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
-         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
-         * @typedef {object} VizSpec
-         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
-         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
-         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
-         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {Image} symbol - show an image instead in the place of points
-         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-         * @property {Placement} offset - offset to apply to the features in pixels
-         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
-         * @property {object} variables - An object describing the variables used.
-         * @api
-         */
-
         // TODO: Check expression types ie: color is not a number expression!
 
         // Apply implicit cast to numeric style properties
@@ -8189,107 +8225,6 @@ class Viz {
 function _markDefault (expression) {
     expression.default = true;
     return expression;
-}
-
-
-/***/ }),
-
-/***/ "./src/apiUtils.js":
-/*!*************************!*\
-  !*** ./src/apiUtils.js ***!
-  \*************************/
-/*! exports provided: on, off */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "on", function() { return on; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "off", function() { return off; });
-
-let registeredHandlers = [];
-
-/**
- * Register an event handler for the given event name and for the given list of layers. Valid names are: `loaded`, `updated`.
- *
- * The 'loaded' event will be fired when all the layers are loaded (and their 'loaded' events are fired).
- *
- * The 'updated' event will be fired whenever one of the layers fired an 'updated' event,
- * but throttled by requestAnimationFrame to return a maximum of one event per frame.
- *
- * @param {string} eventName - Supported event names are 'loaded' and 'updated'
- * @param {carto.Layer[]} layerList - List of layers
- *
- * @memberof carto
- * @api
- */
-function on (eventName, layerList, callback) {
-    let internalCallbacks = [];
-    if (eventName === 'loaded') {
-        const waitingGroup = new Set(layerList);
-        layerList.forEach(layer => {
-            const internalCallback = () => {
-                waitingGroup.delete(layer);
-                if (waitingGroup.size === 0) {
-                    callback();
-                }
-            };
-            layer.on('loaded', internalCallback);
-            internalCallbacks.push(internalCallback);
-        });
-    } else if (eventName === 'updated') {
-        let scheduledRAF = false;
-        layerList.forEach(layer => {
-            const internalCallback = () => {
-                if (!scheduledRAF) {
-                    window.requestAnimationFrame(() => {
-                        scheduledRAF = false;
-                        callback();
-                    });
-                }
-            };
-            layer.on('updated', internalCallback);
-            internalCallbacks.push(internalCallback);
-        });
-    } else {
-        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
-    }
-    registeredHandlers.push({
-        eventName,
-        layerList,
-        callback,
-        internalCallbacks
-    });
-}
-
-/**
-* Remove an event handler for the given event name, layer list and callback.
-*
-* @param {string} eventName - event
-* @param {carto.Layer} layerList - List of layers
-* @param {function} callback - Handler function to unregister
-*
-* @memberof carto
-* @api
-*/
-function off (eventName, layerList, callback) {
-    registeredHandlers.forEach(register => {
-        if (register.eventName === eventName &&
-            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
-            register.callback === callback) {
-            register.layerList.forEach(layer => {
-                register.internalCallbacks.forEach(internalCallback => {
-                    layer.off(eventName, internalCallback);
-                });
-            });
-        }
-    });
-    registeredHandlers = registeredHandlers.filter(register =>
-        !(
-            register.eventName === eventName &&
-            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
-            register.callback === callback
-        )
-    );
 }
 
 
@@ -9283,12 +9218,6 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
-// Get dataframes <- MVT <- Windshaft
-// Get metadata
-// Instantiate map Windshaft
-// Requrest SQL API (temp)
-// Cache dataframe
-
 class Windshaft {
     constructor (source) {
         this._source = source;
@@ -9461,7 +9390,7 @@ class Windshaft {
                     return n;
                 }
                 case 'category':
-                    return this.metadata.categorizeString(propertyValue);
+                    return this.metadata.categorizeString(basename, propertyValue);
                 case 'number':
                     return propertyValue;
                 default:
@@ -9477,11 +9406,12 @@ class Windshaft {
         this._checkLayerMeta(MNS);
     }
     async _instantiate (MNS, resolution, filters, choices, metadata) {
-        if (this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)]) {
-            return this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)];
+        const id = this._getInstantiationID(MNS, resolution, filters, choices);
+        if (this.inProgressInstantiations[id]) {
+            return this.inProgressInstantiations[id];
         }
         const instantiationPromise = this._instantiateUncached(MNS, resolution, filters, choices, metadata);
-        this.inProgressInstantiations[this._getInstantiationID(MNS, resolution, filters, choices)] = instantiationPromise;
+        this.inProgressInstantiations[id] = instantiationPromise;
         return instantiationPromise;
     }
 
@@ -9542,12 +9472,12 @@ class Windshaft {
 
     _buildSelectClause (MNS) {
         const columns = MNS.columns.map(name => _renderer_schema__WEBPACK_IMPORTED_MODULE_3__["default"].column.getBase(name))
-            .concat(['the_geom', 'the_geom_webmercator', 'cartodb_id']);
+            .concat(['the_geom_webmercator', 'cartodb_id']);
         return columns.filter((item, pos) => columns.indexOf(item) === pos); // get unique values
     }
 
     _buildQuery (select, filters) {
-        const columns = select.join();
+        const columns = select.map(column => `"${column}"`).join();
         const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? _windshaft_filtering__WEBPACK_IMPORTED_MODULE_5__["getSQLWhere"](filters) : '';
         return `SELECT ${columns} FROM ${relation} ${condition}`;
@@ -10085,8 +10015,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Viz__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Viz */ "./src/Viz.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Viz", function() { return _Viz__WEBPACK_IMPORTED_MODULE_2__["default"]; });
 
-/* harmony import */ var _integrator_Map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./integrator/Map */ "./src/integrator/Map.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return _integrator_Map__WEBPACK_IMPORTED_MODULE_3__["default"]; });
+/* harmony import */ var _maps_Map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./maps/Map */ "./src/maps/Map.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Map", function() { return _maps_Map__WEBPACK_IMPORTED_MODULE_3__["default"]; });
 
 /* harmony import */ var _interactivity_Interactivity__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./interactivity/Interactivity */ "./src/interactivity/Interactivity.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Interactivity", function() { return _interactivity_Interactivity__WEBPACK_IMPORTED_MODULE_4__["default"]; });
@@ -10100,10 +10030,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sources_GeoJSON__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./sources/GeoJSON */ "./src/sources/GeoJSON.js");
 /* harmony import */ var _sources_MVT__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./sources/MVT */ "./src/sources/MVT.js");
 /* harmony import */ var _sources_SQL__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./sources/SQL */ "./src/sources/SQL.js");
-/* harmony import */ var _apiUtils__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./apiUtils */ "./src/apiUtils.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "on", function() { return _apiUtils__WEBPACK_IMPORTED_MODULE_11__["on"]; });
+/* harmony import */ var _utils_events__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./utils/events */ "./src/utils/events.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "on", function() { return _utils_events__WEBPACK_IMPORTED_MODULE_11__["on"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "off", function() { return _apiUtils__WEBPACK_IMPORTED_MODULE_11__["off"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "off", function() { return _utils_events__WEBPACK_IMPORTED_MODULE_11__["off"]; });
 
 /* harmony import */ var _package_json__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../package.json */ "./package.json");
 var _package_json__WEBPACK_IMPORTED_MODULE_12___namespace = /*#__PURE__*/__webpack_require__.t(/*! ../package.json */ "./package.json", 1);
@@ -10158,376 +10088,6 @@ var _package_json__WEBPACK_IMPORTED_MODULE_12___namespace = /*#__PURE__*/__webpa
 const source = { Dataset: _sources_Dataset__WEBPACK_IMPORTED_MODULE_7__["default"], SQL: _sources_SQL__WEBPACK_IMPORTED_MODULE_10__["default"], GeoJSON: _sources_GeoJSON__WEBPACK_IMPORTED_MODULE_8__["default"], MVT: _sources_MVT__WEBPACK_IMPORTED_MODULE_9__["default"] };
 
 
-
-
-/***/ }),
-
-/***/ "./src/integrator/Map.js":
-/*!*******************************!*\
-  !*** ./src/integrator/Map.js ***!
-  \*******************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Map; });
-/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/layer */ "./src/constants/layer.js");
-
-/**
- * @description A simple non-interactive map.
- */
-
-class Map {
-    /**
-     * Create a simple carto.Map by specifying a container `id`.
-     *
-     * @param  {object} options
-     * @param  {string} options.container The element's string `id`.
-     *
-     * @constructor Map
-     * @memberof carto
-     */
-    constructor (options) {
-        options = options || {};
-
-        if (typeof options.container === 'string') {
-            const container = window.document.getElementById(options.container);
-            if (!container) {
-                throw new Error(`Container '${options.container}' not found.`);
-            } else {
-                this._container = container;
-            }
-        }
-
-        this._background = options.background || '';
-
-        this._layers = new Set();
-        this._hiddenLayers = new Set();
-        this._repaint = true;
-        this.invalidateWebGLState = () => {};
-        this._canvas = this._createCanvas();
-        this._container.appendChild(this._canvas);
-        this._gl = this._canvas.getContext('webgl') || this._canvas.getContext('experimental-webgl');
-
-        this._resizeCanvas(this._containerDimensions());
-    }
-
-    addLayer (layer, beforeLayerID) {
-        layer.initialize();
-
-        if (!this._layers.has(layer)) {
-            this._layers.add(layer);
-        }
-
-        window.requestAnimationFrame(this.update.bind(this));
-    }
-
-    update (timestamp) {
-        // Don't re-render more than once per animation frame
-        if (this.lastFrame === timestamp) {
-            return;
-        }
-        this.lastFrame = timestamp;
-
-        this._drawBackground(this._background);
-
-        let loaded = true;
-        let animated = false;
-
-        this._layers.forEach((layer) => {
-            const hasData = layer.hasDataframes();
-            const hasAnimation = layer.getViz() && layer.getViz().isAnimated();
-
-            if (hasData || hasAnimation) {
-                layer.$paintCallback();
-            }
-
-            loaded = loaded && hasData;
-            animated = animated || hasAnimation;
-        });
-
-        // Update until all layers are loaded or there is an animation
-        if (!loaded || animated) {
-            window.requestAnimationFrame(this.update.bind(this));
-        }
-    }
-
-    changeVisibility (layer) {
-        switch (layer.visibility) {
-            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].VISIBLE:
-                this.show(layer);
-                break;
-            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].HIDDEN:
-                this.hide(layer);
-                break;
-        }
-    }
-
-    hide (layer) {
-        if (this._layers.has(layer)) {
-            this._layers.delete(layer);
-            this._hiddenLayers.add(layer);
-        }
-    }
-
-    show (layer) {
-        if (this._hiddenLayers.has(layer)) {
-            this._hiddenLayers.delete(layer);
-            this._layers.add(layer);
-        }
-    }
-
-    _drawBackground (color) {
-        switch (color) {
-            case 'black':
-                this._gl.clearColor(0, 0, 0, 1);
-                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-                break;
-            case 'red':
-                this._gl.clearColor(1, 0, 0, 1);
-                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-                break;
-            case 'green':
-                this._gl.clearColor(0, 1, 0, 1);
-                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-                break;
-            case 'blue':
-                this._gl.clearColor(0, 0, 1, 1);
-                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
-                break;
-            default:
-            // white
-        }
-    }
-
-    _createCanvas () {
-        const canvas = window.document.createElement('canvas');
-
-        canvas.className = 'canvas';
-        canvas.style.position = 'absolute';
-
-        return canvas;
-    }
-
-    _containerDimensions () {
-        let width = 0;
-        let height = 0;
-
-        if (this._container) {
-            width = this._container.offsetWidth || 400;
-            height = this._container.offsetHeight || 300;
-        }
-
-        return { width, height };
-    }
-
-    _resizeCanvas (size) {
-        const pixelRatio = window.devicePixelRatio || 1;
-
-        this._canvas.width = pixelRatio * size.width;
-        this._canvas.height = pixelRatio * size.height;
-
-        this._canvas.style.width = `${size.width}px`;
-        this._canvas.style.height = `${size.height}px`;
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/integrator/carto.js":
-/*!*********************************!*\
-  !*** ./src/integrator/carto.js ***!
-  \*********************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return getCartoMapIntegrator; });
-/* harmony import */ var _renderer_Renderer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../renderer/Renderer */ "./src/renderer/Renderer.js");
-
-
-let integrator = null;
-function getCartoMapIntegrator (map) {
-    if (!integrator) {
-        integrator = new CartoMapIntegrator(map);
-    }
-    return integrator;
-}
-
-class CartoMapIntegrator {
-    constructor (map) {
-        this.map = map;
-        this.renderer = new _renderer_Renderer__WEBPACK_IMPORTED_MODULE_0__["default"]();
-        this.renderer._initGL(this.map._gl);
-        this.invalidateWebGLState = () => { };
-    }
-
-    addLayer (layerId, layer) {
-        this.map.addLayer(layerId, layer);
-    }
-    needRefresh () {
-    }
-
-    getZoomLevel () {
-        return 0;
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/integrator/mapbox-gl.js":
-/*!*************************************!*\
-  !*** ./src/integrator/mapbox-gl.js ***!
-  \*************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return getMGLIntegrator; });
-/* harmony import */ var mitt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mitt */ "./node_modules/mitt/dist/mitt.es.js");
-/* harmony import */ var _renderer_Renderer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../renderer/Renderer */ "./src/renderer/Renderer.js");
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
-
-
-
-
-let uid = 0;
-
-// TODO This needs to be separated by each mgl map to support multi map pages
-const integrators = new WeakMap();
-function getMGLIntegrator (map) {
-    if (!integrators.get(map)) {
-        integrators.set(map, new MGLIntegrator(map));
-    }
-    return integrators.get(map);
-}
-
-/**
- * Responsabilities, keep all MGL integration state and functionality that lies outside Layer
- */
-class MGLIntegrator {
-    constructor (map) {
-        this.renderer = new _renderer_Renderer__WEBPACK_IMPORTED_MODULE_1__["default"]();
-        this.map = map;
-        this.invalidateWebGLState = null;
-        this.moveObservers = {};
-
-        this._emitter = Object(mitt__WEBPACK_IMPORTED_MODULE_0__["default"])();
-        this._layers = [];
-        this._paintedLayers = 0;
-        this._isRendererInitialized = false;
-
-        this._suscribeToMapEvents(map);
-        this.invalidateWebGLState = () => { };
-    }
-
-    on (name, cb) {
-        return this._emitter.on(name, cb);
-    }
-
-    off (name, cb) {
-        return this._emitter.off(name, cb);
-    }
-
-    _suscribeToMapEvents (map) {
-        map.on('movestart', this.move.bind(this));
-        map.on('move', this.move.bind(this));
-        map.on('moveend', this.move.bind(this));
-        map.on('resize', this.move.bind(this));
-
-        map.on('mousemove', data => {
-            this._emitter.emit('mousemove', data);
-        });
-        map.on('click', data => {
-            this._emitter.emit('click', data);
-        });
-    }
-
-    _registerMoveObserver (observerName, observerCallback) {
-        this.moveObservers[observerName] = observerCallback;
-    }
-
-    _unregisterMoveObserver (observerName) {
-        delete this.moveObservers[observerName];
-    }
-
-    addLayer (layer, beforeLayerID) {
-        const callbackID = `_cartovl_${uid++}`;
-        const layerId = layer.getId();
-
-        this._registerMoveObserver(callbackID, layer.requestData.bind(layer));
-        this.map.setCustomWebGLDrawCallback(layerId, (gl, invalidate) => {
-            if (!this._isRendererInitialized) {
-                this._isRendererInitialized = true;
-                this.invalidateWebGLState = invalidate;
-                this.notifyObservers();
-                this.renderer._initGL(gl);
-            }
-
-            layer.initialize();
-            layer.$paintCallback();
-            this._paintedLayers++;
-
-            // Last layer has been painted
-            const isAnimated = this._layers.some(layer =>
-                layer.getViz() && layer.getViz().isAnimated());
-            // Checking this.map.repaint is needed, because MGL repaint is a setter and it has the strange quite buggy side-effect of doing a "final" repaint after being disabled
-            // if we disable it every frame, MGL will do a "final" repaint every frame, which will not disabled it in practice
-            if (!isAnimated && this.map.repaint) {
-                this.map.repaint = false;
-            }
-
-            invalidate();
-        });
-
-        this.map.addLayer({
-            id: layerId,
-            type: 'custom-webgl'
-        }, beforeLayerID);
-
-        this._layers.push(layer);
-        this.move();
-    }
-
-    needRefresh () {
-        this.map.repaint = true;
-    }
-
-    move () {
-        const c = this.map.getCenter();
-        // TODO create getCenter method
-        this.renderer.setCenter(c.lng / 180.0, _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].projectToWebMercator(c).y / _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].WM_R);
-        this.renderer.setZoom(this.getZoom());
-        this.notifyObservers();
-    }
-
-    notifyObservers () {
-        Object.keys(this.moveObservers).map(id => this.moveObservers[id]());
-    }
-
-    getZoom () {
-        const b = this.map.getBounds();
-        const c = this.map.getCenter();
-        const nw = b.getNorthWest();
-        const sw = b.getSouthWest();
-        const z = (_utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].projectToWebMercator(nw).y - _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].projectToWebMercator(sw).y) / _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].WM_2R;
-        this.renderer.setCenter(c.lng / 180.0, _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].projectToWebMercator(c).y / _utils_util__WEBPACK_IMPORTED_MODULE_2__["default"].WM_R);
-        return z;
-    }
-
-    getZoomLevel () {
-        return this.map.getZoom();
-    }
-
-    changeVisibility (layer) {
-        this.map.setLayoutProperty(layer.getId(), 'visibility', layer.visibility);
-    }
-}
 
 
 /***/ }),
@@ -10692,7 +10252,8 @@ class Interactivity {
         this._numListeners = {};
         return Promise.all(layerList.map(layer => layer._context)).then(() => {
             postCheckLayerList(layerList);
-            this._subscribeToIntegratorEvents(layerList[0].getIntegrator());
+            this._subscribeToLayerEvents(layerList);
+            this._subscribeToMapEvents(layerList[0].map);
         }).then(() => {
             if (options.autoChangePointer) {
                 this._setInteractiveCursor();
@@ -10701,7 +10262,7 @@ class Interactivity {
     }
 
     _setInteractiveCursor () {
-        const map = this._layerList[0].getIntegrator().map; // All layers belong to the same map
+        const map = this._layerList[0].map; // All layers belong to the same map
         if (!map.__carto_interacivities) {
             map.__carto_interacivities = new Set();
         }
@@ -10715,13 +10276,29 @@ class Interactivity {
         });
     }
 
-    _subscribeToIntegratorEvents (integrator) {
-        integrator.on('mousemove', this._onMouseMove.bind(this));
-        integrator.on('click', this._onClick.bind(this));
+    _subscribeToMapEvents (map) {
+        map.on('mousemove', this._onMouseMove.bind(this));
+        map.on('click', this._onClick.bind(this));
     }
 
-    _onMouseMove (event) {
-        if (!this._numListeners['featureEnter'] && !this._numListeners['featureHover'] && !this._numListeners['featureLeave']) {
+    _subscribeToLayerEvents (layers) {
+        layers.forEach(layer => {
+            layer.on('updated', this._onLayerUpdated.bind(this));
+        });
+    }
+
+    _onLayerUpdated () {
+        this._onMouseMove(this._mouseEvent, true);
+    }
+
+    _onMouseMove (event, emulated) {
+        // Store mouse event to be used in `onLayerUpdated`
+        this._mouseEvent = event;
+
+        if (!event ||
+            (!this._numListeners['featureEnter'] &&
+             !this._numListeners['featureHover'] &&
+             !this._numListeners['featureLeave'])) {
             return;
         }
 
@@ -10748,14 +10325,19 @@ class Interactivity {
             });
         }
 
-        this._prevHoverFeatures = featureEvent.features;
+        this._prevHoverFeatures = currentFeatures;
 
-        // Launch hover event
-        this._fireEvent('featureHover', featureEvent);
+        // If the event comes from a real mouse move, trigger always (because coordinates and position have changed)
+        // If the event comes from an animated event, trigger only when features have changed (because position is the same)
+        if (!emulated || (emulated && (featuresLeft.length || featuresEntered.length))) {
+            // Launch hover event
+            this._fireEvent('featureHover', featureEvent);
+        }
     }
 
     _onClick (event) {
-        if (!this._numListeners['featureClick'] && !this._numListeners['featureClickOut']) {
+        if (!this._numListeners['featureClick'] &&
+            !this._numListeners['featureClickOut']) {
             return;
         }
 
@@ -10824,7 +10406,7 @@ function preCheckLayerList (layerList) {
     }
 }
 function postCheckLayerList (layerList) {
-    if (!layerList.every(layer => layer.getIntegrator() === layerList[0].getIntegrator())) {
+    if (!layerList.every(layer => layer.map === layerList[0].map)) {
         throw new Error('Invalid argument, all layers must belong to the same map');
     }
 }
@@ -10975,6 +10557,220 @@ function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, tr
 
 /***/ }),
 
+/***/ "./src/maps/Map.js":
+/*!*************************!*\
+  !*** ./src/maps/Map.js ***!
+  \*************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Map; });
+/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/layer */ "./src/constants/layer.js");
+
+/**
+ * @description A simple non-interactive map.
+ */
+
+class Map {
+    /**
+     * Create a simple carto.Map by specifying a container `id`.
+     *
+     * @param  {object} options
+     * @param  {string} options.container The element's string `id`.
+     *
+     * @constructor Map
+     * @memberof carto
+     */
+    constructor (options) {
+        options = options || {};
+
+        if (typeof options.container === 'string') {
+            const container = window.document.getElementById(options.container);
+            if (!container) {
+                throw new Error(`Container '${options.container}' not found.`);
+            } else {
+                this._container = container;
+            }
+        }
+
+        this._background = options.background || '';
+
+        this._layers = new Set();
+        this._hiddenLayers = new Set();
+        this._repaint = true;
+        this._canvas = this._createCanvas();
+        this._container.appendChild(this._canvas);
+        this._gl = this._canvas.getContext('webgl');
+        this._matrix = this._createMatrix();
+        this._resizeCanvas(this._containerDimensions());
+    }
+
+    on (event, callback) {
+        if (event === 'load') {
+            callback && callback();
+        }
+    }
+
+    addLayer (layer, beforeLayerID) {
+        if (!this._layers.has(layer)) {
+            this._layers.add(layer);
+        }
+
+        layer.onAdd(this, this._gl);
+
+        window.requestAnimationFrame(this._update.bind(this));
+    }
+
+    removeLayer (layer) {
+        if (this._layers.has(layer)) {
+            this._layers.remove(layer);
+        }
+
+        layer.onRemove(this);
+    }
+
+    getZoom () {
+        return 0;
+    }
+
+    getCenter () {
+        return { lat: 0, lng: 0 };
+    }
+
+    getBounds () {
+        return {
+            getNorthWest: () => ({ lat: 85, lng: -180 }),
+            getSouthWest: () => ({ lat: -85.1, lng: -180 })
+        };
+    }
+
+    changeVisibility (layer) {
+        switch (layer.visibility) {
+            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].VISIBLE:
+                this.show(layer);
+                break;
+            case _constants_layer__WEBPACK_IMPORTED_MODULE_0__["layerVisibility"].HIDDEN:
+                this.hide(layer);
+                break;
+        }
+    }
+
+    hide (layer) {
+        if (this._layers.has(layer)) {
+            this._layers.delete(layer);
+            this._hiddenLayers.add(layer);
+        }
+    }
+
+    show (layer) {
+        if (this._hiddenLayers.has(layer)) {
+            this._hiddenLayers.delete(layer);
+            this._layers.add(layer);
+        }
+    }
+
+    _update (timestamp) {
+        // Don't re-render more than once per animation frame
+        if (this.lastFrame === timestamp) {
+            return;
+        }
+
+        this.lastFrame = timestamp;
+
+        this._drawBackground(this._background);
+
+        let loaded = true;
+        let animated = false;
+
+        this._layers.forEach((layer) => {
+            const hasData = layer.hasDataframes();
+            const hasAnimation = layer.isAnimated();
+
+            if (hasData || hasAnimation) {
+                layer.render(this._gl, this._matrix);
+            }
+
+            loaded = loaded && hasData;
+            animated = animated || hasAnimation;
+        });
+
+        // Update until all layers are loaded or there is an animation
+        if (!loaded || animated) {
+            window.requestAnimationFrame(this._update.bind(this));
+        }
+    }
+
+    _drawBackground (color) {
+        switch (color) {
+            case 'black':
+                this._gl.clearColor(0, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'red':
+                this._gl.clearColor(1, 0, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'green':
+                this._gl.clearColor(0, 1, 0, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            case 'blue':
+                this._gl.clearColor(0, 0, 1, 1);
+                this._gl.clear(this._gl.COLOR_BUFFER_BIT);
+                break;
+            default:
+                // white
+        }
+    }
+
+    _createCanvas () {
+        const canvas = window.document.createElement('canvas');
+
+        canvas.className = 'canvas';
+        canvas.style.position = 'absolute';
+
+        return canvas;
+    }
+
+    _containerDimensions () {
+        let width = 0;
+        let height = 0;
+
+        if (this._container) {
+            width = this._container.offsetWidth || 400;
+            height = this._container.offsetHeight || 300;
+        }
+
+        return { width, height };
+    }
+
+    _resizeCanvas (size) {
+        const pixelRatio = window.devicePixelRatio || 1;
+
+        this._canvas.width = pixelRatio * size.width;
+        this._canvas.height = pixelRatio * size.height;
+
+        this._canvas.style.width = `${size.width}px`;
+        this._canvas.style.height = `${size.height}px`;
+    }
+
+    _createMatrix () {
+        // This matrix generates proper values of zoom and _center
+        const m = new Array(16);
+        m[0] = -2;
+        m[5] = -2;
+        m[12] = 1;
+        m[13] = 1;
+        m[15] = 1;
+        return m;
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/renderer/Dataframe.js":
 /*!***********************************!*\
   !*** ./src/renderer/Dataframe.js ***!
@@ -11051,6 +10847,10 @@ class Dataframe {
                         aabb = _updateAABBForGeometry(feature[j], aabb, type);
                     }
 
+                    if (aabb.minx === Number.POSITIVE_INFINITY) {
+                        aabb = null;
+                    }
+
                     aabbList.push(aabb);
                 }
 
@@ -11077,26 +10877,35 @@ class Dataframe {
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
 
-        this.texColor = this._createStyleTileTexture(this.numFeatures);
-        this.texWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleTileTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleTileTexture(this.numFeatures);
-        this.texFilter = this._createStyleTileTexture(this.numFeatures);
+        this.texColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeColor = this._createStyleDataframeTexture(this.numFeatures);
+        this.texStrokeWidth = this._createStyleDataframeTexture(this.numFeatures);
+        this.texFilter = this._createStyleDataframeTexture(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
+        const inc = 1 / (1024 * 64);
         let index = 0;
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < this.numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
 
                 if (ids[i + 0] === 0) {
-                    ids[i + 0] += 1 / (1024 * 64);
+                    ids[i + 0] += inc;
                 }
                 if (ids[i + 1] === 0) {
-                    ids[i + 1] += 1 / (1024 * 64);
+                    ids[i + 1] += inc;
                 }
 
                 ids[i + 2] = -ids[i + 0];
@@ -11111,11 +10920,11 @@ class Dataframe {
                 while (i === breakpoints[index]) {
                     index++;
                 }
-                // Transform integer ID into a `vec2` to overcome WebGL 1 limitations, output IDs will be in the `vec2([0,1], [0,1])` range
-                ids[i + 0] = ((index) % width) / (width - 1);
-                ids[i + 1] = height > 1 ? Math.floor((index) / width) / (height - 1) : 0.5;
+                ids[i + 0] = tableX[index];
+                ids[i + 1] = tableY[index];
             }
         }
+
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
@@ -11241,6 +11050,10 @@ class Dataframe {
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
+        if (featureAABB === null) {
+            return AABBTestResults.OUTSIDE;
+        }
+
         const featureStrokeAABB = {
             minx: featureAABB.minx - stroke,
             miny: featureAABB.miny - stroke,
@@ -11339,13 +11152,13 @@ class Dataframe {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                let offset = {x: 0, y: 0};
+                let offset = { x: 0, y: 0 };
                 if (!viz.offset.default) {
                     const vizOffset = viz.offset.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
-                pointWithOffset = {x: point.x - offset.x, y: point.y - offset.y};
+                pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
                 if (!Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_2__["pointInRectangle"])(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
@@ -11465,7 +11278,7 @@ class Dataframe {
         this._genFeatureClass();
     }
 
-    _createStyleTileTexture (numFeatures) {
+    _createStyleDataframeTexture (numFeatures) {
         // TODO we are wasting 75% of the memory for the scalar attributes (width, strokeWidth),
         // since RGB components are discarded
         const gl = this.renderer.gl;
@@ -11529,7 +11342,7 @@ function _updateAABBLine (line, aabb) {
 }
 
 function _updateAABBPolygon (polygon, aabb) {
-    const [ vertices, numVertices ] = [ polygon.flat, polygon.holes[0] || polygon.flat.length / 2 ];
+    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
 
     for (let i = 0; i < numVertices; i++) {
         aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
@@ -11543,12 +11356,12 @@ function _updateAABBPolygon (polygon, aabb) {
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx >= viewportAABB.minx && featureAABB.maxx <= viewportAABB.maxx &&
-            featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
+        featureAABB.miny >= viewportAABB.miny && featureAABB.maxy <= viewportAABB.maxy);
 }
 
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
-            featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+        featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
 function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
@@ -11610,17 +11423,23 @@ class Metadata {
 
         Object.values(properties).map(property => {
             property.categories = property.categories || [];
-            property.categories.map(category => this.categorizeString(category.name));
+            property.categories.map(category => this.categorizeString(property, category.name, true));
         });
 
         this.propertyKeys = Object.keys(this.properties);
     }
-    categorizeString (category) {
+    categorizeString (propertyName, category, init = false) {
         if (category === undefined) {
             category = null;
         }
         if (this.categoryToID.has(category)) {
             return this.categoryToID.get(category);
+        }
+        if (!init) {
+            this.properties[propertyName].categories.push({
+                name: category,
+                frequency: Number.NaN
+            });
         }
         this.categoryToID.set(category, this.numCategories);
         this.IDToCategory.set(this.numCategories, category);
@@ -11673,6 +11492,15 @@ class RenderLayer {
         }
         this.dataframes.push(dataframe);
         this.idProperty = dataframe.metadata.idProperty;
+    }
+
+    setRenderer (renderer) {
+        this.renderer = renderer;
+        this.dataframes.forEach(d => d.bind(renderer));
+    }
+
+    setViz (viz) {
+        this.viz = viz;
     }
 
     getActiveDataframes () {
@@ -11754,7 +11582,7 @@ const FILTERING_THRESHOLD = 0.5;
  */
 
 /**
- * @description The Render To Texture Width limits the maximum number of features per tile: *maxFeatureCount = RTT_WIDTH^2*
+ * @description The Render To Texture Width limits the maximum number of features per dataframe: *maxFeatureCount = RTT_WIDTH^2*
  *
  * Large RTT_WIDTH values are unsupported by hardware. Limits vary on each machine.
  * Support starts to drop from 2048, with a drastic reduction in support for more than 4096 pixels.
@@ -11788,6 +11616,42 @@ class Renderer {
         this._zoom = 1;
         this.RTT_WIDTH = RTT_WIDTH;
         this.dataframes = [];
+    }
+
+    /**
+     * Initialize renderer
+     * @param {WebGLRenderingContext} gl - WebGL context
+     */
+    initialize (gl) {
+        this._initGL(gl);
+    }
+
+    /**
+     * Set Renderer visualization center
+     * @param {number} x
+     * @param {number} y
+     */
+    setCenter (center) {
+        this._center.x = center.x;
+        this._center.y = center.y;
+    }
+
+    /**
+     * Set Renderer visualization zoom
+     * @param {number} zoom
+     */
+    setZoom (zoom) {
+        this._zoom = zoom;
+    }
+
+    /**
+     * Get Renderer visualization bounds
+     * @return {*}
+     */
+    getBounds () {
+        const sx = this._zoom * this._getAspect();
+        const sy = this._zoom;
+        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
     }
 
     _initGL (gl) {
@@ -11834,52 +11698,7 @@ class Renderer {
         gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
     }
 
-    /**
-    * Get Renderer visualization center
-    * @return {RPoint}
-    */
-    getCenter () {
-        return { x: this._center.x, y: this._center.y };
-    }
-
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (x, y) {
-        this._center.x = x;
-        this._center.y = y;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const center = this.getCenter();
-        const sx = this.getZoom() * this.getAspect();
-        const sy = this.getZoom();
-        return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
-    }
-
-    /**
-     * Get Renderer visualization zoom
-     * @return {number}
-     */
-    getZoom () {
-        return this._zoom;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    getAspect () {
+    _getAspect () {
         if (this.gl) {
             return this.gl.canvas.width / this.gl.canvas.height;
         }
@@ -11975,15 +11794,18 @@ class Renderer {
     }
 
     renderLayer (renderLayer) {
-        const tiles = renderLayer.getActiveDataframes();
+        const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
-        const aspect = this.getAspect();
+        const aspect = this._getAspect();
         const drawMetadata = {
-            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)) // Used by zoom expression
+            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)),
+            scale: gl.drawingBufferHeight / (this._zoom * 512 * (window.devicePixelRatio || 1))
         };
 
-        if (!tiles.length) {
+        this._runViewportAggregations(renderLayer);
+
+        if (!dataframes.length) {
             return;
         }
         viz._getRootExpressions().map(expr => expr._dataReady());
@@ -11995,13 +11817,11 @@ class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        this._runViewportAggregations(renderLayer);
-
-        const styleDataframe = (tile, tileTexture, shader, vizExpr) => {
+        const styleDataframe = (dataframe, dataframeTexture, shader, vizExpr) => {
             const textureId = shader.textureIds.get(viz);
 
-            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tileTexture, 0);
-            gl.viewport(0, 0, RTT_WIDTH, tile.height);
+            gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
+            gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
             gl.clear(gl.COLOR_BUFFER_BIT);
 
             gl.useProgram(shader.program);
@@ -12012,7 +11832,7 @@ class Renderer {
 
             Object.keys(textureId).forEach((name, i) => {
                 gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
                 gl.uniform1i(textureId[name], i);
             });
 
@@ -12024,11 +11844,11 @@ class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
-        tiles.map(tile => styleDataframe(tile, tile.texColor, viz.colorShader, viz.color));
-        tiles.map(tile => styleDataframe(tile, tile.texWidth, viz.widthShader, viz.width));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
-        tiles.map(tile => styleDataframe(tile, tile.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
-        tiles.map(tile => styleDataframe(tile, tile.texFilter, viz.filterShader, viz.filter));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorShader, viz.color));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthShader, viz.width));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterShader, viz.filter));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -12066,7 +11886,7 @@ class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
-        if (tiles[0].type === 'line' || tiles[0].type === 'polygon') {
+        if (dataframes[0].type === 'line' || dataframes[0].type === 'polygon') {
             gl.clearDepth(1);
             gl.depthRange(0, 1);
             gl.depthFunc(gl.NOTEQUAL);
@@ -12074,14 +11894,14 @@ class Renderer {
             gl.enable(gl.DEPTH_TEST);
         }
 
-        const renderDrawPass = orderingIndex => tiles.forEach(tile => {
+        const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
             let renderer = null;
             if (!viz.symbol.default) {
                 renderer = viz.symbolShader;
-            } else if (tile.type === 'point') {
+            } else if (dataframe.type === 'point') {
                 renderer = viz.pointShader;
-            } else if (tile.type === 'line') {
+            } else if (dataframe.type === 'line') {
                 renderer = viz.lineShader;
             } else {
                 renderer = viz.polygonShader;
@@ -12097,43 +11917,43 @@ class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (scale / aspect) * tile.scale,
-                scale * tile.scale);
+                (scale / aspect) * dataframe.scale,
+                scale * dataframe.scale);
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (scale / aspect) * (this._center.x - tile.center.x),
-                scale * (this._center.y - tile.center.y));
+                (scale / aspect) * (this._center.x - dataframe.center.x),
+                scale * (this._center.y - dataframe.center.y));
             gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
 
-            tile.vertexScale = [(scale / aspect) * tile.scale, scale * tile.scale];
+            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
 
-            tile.vertexOffset = [(scale / aspect) * (this._center.x - tile.center.x), scale * (this._center.y - tile.center.y)];
+            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.vertexBuffer);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
             gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
 
             gl.enableVertexAttribArray(renderer.featureIdAttr);
-            gl.bindBuffer(gl.ARRAY_BUFFER, tile.featureIDBuffer);
+            gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (tile.type === 'line' || tile.type === 'polygon') {
+            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
                 gl.enableVertexAttribArray(renderer.normalAttr);
-                gl.bindBuffer(gl.ARRAY_BUFFER, tile.normalBuffer);
+                gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
             }
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texColor);
+            gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
             gl.uniform1i(renderer.colorTexture, freeTexUnit);
             freeTexUnit++;
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texWidth);
+            gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
             gl.uniform1i(renderer.widthTexture, freeTexUnit);
             freeTexUnit++;
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, tile.texFilter);
+            gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
@@ -12151,26 +11971,26 @@ class Renderer {
 
                 Object.keys(textureId).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
-            } else if (tile.type !== 'line') {
+            } else if (dataframe.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeColor);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeColor);
                 gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
                 freeTexUnit++;
 
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                gl.bindTexture(gl.TEXTURE_2D, tile.texStrokeWidth);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeWidth);
                 gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
                 freeTexUnit++;
             }
 
-            if (tile.type === 'line' || tile.type === 'polygon') {
+            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
             }
 
@@ -12185,7 +12005,7 @@ class Renderer {
 
                 Object.keys(textureId).forEach(name => {
                     gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                    gl.bindTexture(gl.TEXTURE_2D, tile.getPropertyTexture(name));
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
@@ -12193,11 +12013,11 @@ class Renderer {
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
 
-            gl.drawArrays(gl.TRIANGLES, 0, tile.numVertex);
+            gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (tile.type === 'line' || tile.type === 'polygon') {
+            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
             }
@@ -12989,7 +12809,7 @@ function compileShader (gl, template, expressions, viz) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "vec2 encodeWidth(float x) {\n    float high, low;\n    x = clamp(x, 0., 1023.);\n    high = floor(x/4.);\n    low = (x-high*4.)/4.;\n    return vec2(high/255., low);\n}\n\n$width_preface\n"
+module.exports = "vec2 encodeWidth(float x) {\n    if (!(x<=0. || x>=0.) ){\n        // Convert NaN widths to `0`\n        // Do not remove this, some GPUs will convert NaN floats to 1. when\n        // packing the shader output to a RGBA UNSIGNED BYTE textures\n        x = 0.;\n    }\n    float high, low;\n    x = clamp(x, 0., 1023.);\n    high = floor(x/4.);\n    low = (x-high*4.)/4.;\n    return vec2(high/255., low);\n}\n\n$width_preface\n"
 
 /***/ }),
 
@@ -13464,7 +13284,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*****************************************!*\
   !*** ./src/renderer/viz/expressions.js ***!
   \*****************************************/
-/*! exports provided: transition, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, image, imageList, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, xyz, zoom, placement, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
+/*! exports provided: transition, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, constant, image, imageList, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, viewportQuantiles, globalQuantiles, globalEqIntervals, viewportEqIntervals, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, zoom, scaled, zoomrange, placement, alphaNormalize, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13565,9 +13385,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "globalSum", function() { return globalSum; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "globalCount", function() { return globalCount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "globalPercentile", function() { return globalPercentile; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "xyz", function() { return xyz; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoom", function() { return zoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scaled", function() { return scaled; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoomrange", function() { return zoomrange; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placement", function() { return placement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "alphaNormalize", function() { return alphaNormalize; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOLD", function() { return HOLD; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TRUE", function() { return TRUE; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FALSE", function() { return FALSE; });
@@ -13616,7 +13438,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
 /* harmony import */ var _expressions_now__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./expressions/now */ "./src/renderer/viz/expressions/now.js");
 /* harmony import */ var _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
-/* harmony import */ var _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/color/opacity */ "./src/renderer/viz/expressions/color/opacity.js");
+/* harmony import */ var _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/color/Opacity */ "./src/renderer/viz/expressions/color/Opacity.js");
 /* harmony import */ var _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./expressions/ordering */ "./src/renderer/viz/expressions/ordering.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"]; });
 
@@ -13625,7 +13447,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./expressions/color/palettes */ "./src/renderer/viz/expressions/color/palettes.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__["default"]; });
 
-/* harmony import */ var _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/color/palettes/Reverse */ "./src/renderer/viz/expressions/color/palettes/Reverse.js");
+/* harmony import */ var _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/reverse/reverse */ "./src/renderer/viz/expressions/reverse/reverse.js");
 /* harmony import */ var _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./expressions/basic/property */ "./src/renderer/viz/expressions/basic/property.js");
 /* harmony import */ var _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./expressions/classification/GlobalEqIntervals */ "./src/renderer/viz/expressions/classification/GlobalEqIntervals.js");
 /* harmony import */ var _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./expressions/classification/GlobalQuantiles */ "./src/renderer/viz/expressions/classification/GlobalQuantiles.js");
@@ -13653,13 +13475,15 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
 /* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
 /* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
-/* harmony import */ var _expressions_xyz__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/xyz */ "./src/renderer/viz/expressions/xyz.js");
-/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
-/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
-/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
-/* harmony import */ var _expressions_ImageList__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/ImageList */ "./src/renderer/viz/expressions/ImageList.js");
-/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
-/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
+/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
+/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
+/* harmony import */ var _expressions_ImageList__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/ImageList */ "./src/renderer/viz/expressions/ImageList.js");
+/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./expressions/Zoomrange */ "./src/renderer/viz/expressions/Zoomrange.js");
+/* harmony import */ var _expressions_Scaled__WEBPACK_IMPORTED_MODULE_61__ = __webpack_require__(/*! ./expressions/Scaled */ "./src/renderer/viz/expressions/Scaled.js");
+/* harmony import */ var _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_62__ = __webpack_require__(/*! ./expressions/AlphaNormalize */ "./src/renderer/viz/expressions/AlphaNormalize.js");
 /**
  *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
  *  A viz has the following properties:
@@ -13912,6 +13736,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 /* Expose classes as constructor functions */
 
 const transition = (...args) => new _expressions_transition__WEBPACK_IMPORTED_MODULE_0__["default"](...args);
@@ -13959,10 +13784,10 @@ const clusterSum = (...args) => new _expressions_aggregation_cluster_ClusterSum_
 
 const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](...args);
 
-const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
-const imageList = (...args) => new _expressions_ImageList__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
+const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
+const imageList = (...args) => new _expressions_ImageList__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
 
-const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
+const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
 
 const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__["default"](...args);
 
@@ -13983,14 +13808,14 @@ const now = (...args) => new _expressions_now__WEBPACK_IMPORTED_MODULE_21__["def
 
 const number = (...args) => new _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__["default"](...args);
 
-const opacity = (...args) => new _expressions_color_opacity__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
+const opacity = (...args) => new _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
 
 const asc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"](...args);
 const desc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Desc"](...args);
 const noOrder = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["NoOrder"](...args);
 const width = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Width"](...args);
 
-const reverse = (...args) => new _expressions_color_palettes_Reverse__WEBPACK_IMPORTED_MODULE_26__["default"](...args);
+const reverse = _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_26__["default"];
 
 const property = (...args) => new _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__["default"](...args);
 
@@ -14045,10 +13870,12 @@ const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WE
 const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
 const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
 
-const xyz = (...args) => new _expressions_xyz__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+const scaled = (...args) => new _expressions_Scaled__WEBPACK_IMPORTED_MODULE_61__["default"](...args);
+const zoomrange = (...args) => new _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_60__["default"](...args);
 
-const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
-const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
+const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
+const alphaNormalize = (...args) => new _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_62__["default"](...args);
 
 const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Number.MAX_SAFE_INTEGER);
 const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](1);
@@ -14056,29 +13883,114 @@ const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["def
 const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.PI);
 const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.E);
 
-const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bicycle);
-const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].building);
-const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bus);
-const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].car);
-const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circle);
-const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circleOutline);
-const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].cross);
-const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].flag);
-const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].house);
-const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].marker);
-const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].markerOutline);
-const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].plus);
-const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].square);
-const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].squareOutline);
-const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].star);
-const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].starOutline);
-const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangle);
-const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangleOutline);
+const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].bicycle);
+const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].building);
+const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].bus);
+const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].car);
+const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].circle);
+const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].circleOutline);
+const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].cross);
+const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].flag);
+const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].house);
+const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].marker);
+const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].markerOutline);
+const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].plus);
+const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].square);
+const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].squareOutline);
+const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].star);
+const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].starOutline);
+const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].triangle);
+const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_58__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_59__["default"].triangleOutline);
 
-const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](constant(0), constant(0));
-const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_56__["default"](constant(0), constant(1));
+const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_55__["default"](constant(0), constant(0));
+const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_55__["default"](constant(0), constant(1));
 
 
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/AlphaNormalize.js":
+/*!********************************************************!*\
+  !*** ./src/renderer/viz/expressions/AlphaNormalize.js ***!
+  \********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return AlphaNormalize; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+
+
+
+
+
+/**
+ * Override the opacity (alpha channel) of a color to normalize the input color by a normalizer property.
+ *
+ * This is implemented as `opacity(input, normalizer/globalMax(normalizer))
+ *
+ * @param {Color} input - input color to normalize
+ * @param {Number} normalizer - numeric property that will be used to normalize the input color
+ * @return {Color}
+ *
+ * @example <caption>Normalize an input property ($winner_party) by a second property ($voters).</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.alphaNormalize(
+ *              s.ramp(s.prop('winner_party'), [red, blue]),
+ *              s.prop('voters')
+ *          )
+ * });
+ *
+ * @example <caption>Normalize an input property ($winner_party) by a second property ($voters). (String)</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: alphaNormalize(
+ *              ramp($winner_party, [red, blue]),
+ *              $voters
+ *          )
+ * });
+ *
+ * @memberof carto.expressions
+ * @name alphaNormalize
+ * @function
+ * @api
+ */
+class AlphaNormalize extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (input, normalizer) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'alphaNormalize');
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('alphaNormalize', 'input', 0, input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('alphaNormalize', 'normalizer', 1, normalizer);
+
+        super({ _impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["opacity"])(input, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["div"])(normalizer, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["globalMax"])(normalizer))) });
+        this._input = input;
+        this._normalizer = normalizer;
+        this.type = 'color';
+        this.inlineMaker = inline => inline._impostor;
+    }
+
+    _bindMetadata (meta) {
+        this._input._bindMetadata(meta);
+        this._normalizer._bindMetadata(meta);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('alphaNormalize', 'input', 0, 'color', this._input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('alphaNormalize', 'normalizer', 1, 'number', this._normalizer);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('alphaNormalize', 'normalizer', 1, _basic_property__WEBPACK_IMPORTED_MODULE_3__["default"], this._normalizer);
+        super._bindMetadata(meta);
+    }
+
+    get value () {
+        return this.eval();
+    }
+
+    eval (f) {
+        return this._impostor.eval(f);
+    }
+}
 
 
 /***/ }),
@@ -14122,6 +14034,14 @@ let waitingForOthers = new Set();
  * @param {Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {Number}
  *
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
@@ -14129,25 +14049,19 @@ let waitingForOthers = new Set();
  *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
  *
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
- *
- * @example <caption>Using the `getProgressValue` method to get the animation current value</caption>
- * const s = carto.expressions;
- * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
- * const animationStyle = {
- *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
- *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
- *   filter: animationExpr
- * };
- * layer.on('updated', () => {
- *   let currTime = Math.floor(animationExpr.getProgressValue());
- *   document.getElementById('timestamp').innerHTML = currTime;
- * });
  *
  * @memberof carto.expressions
  * @name animation
@@ -14160,6 +14074,7 @@ let waitingForOthers = new Set();
  * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
  * @memberof carto.expressions
+ * @extends carto.source.Base
  * @name Animation
  * @abstract
  * @hideconstructor
@@ -14168,6 +14083,8 @@ let waitingForOthers = new Set();
  */
 class Animation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, duration = 10, fade = new _Fade__WEBPACK_IMPORTED_MODULE_1__["Fade"]()) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 3, 'animation');
+
         duration = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(duration);
         input = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(input);
         const originalInput = input;
@@ -14182,7 +14099,6 @@ class Animation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkLooseType"])('animation', 'fade', 2, 'fade', fade);
 
         const progress = Object(_expressions__WEBPACK_IMPORTED_MODULE_3__["number"])(0);
-
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
         this.type = 'number';
@@ -14290,11 +14206,25 @@ class Animation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     /**
      * Get the current time stamp of the animation
      *
-     * @api
      * @returns {Number|Date} Current time stamp of the animation. If the animation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
+     *
+     * @example <caption>Using the `getProgressValue` method to get the animation current value.</caption>
+     * const s = carto.expressions;
+     * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+     * const animationStyle = {
+     *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
+     *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
+     *   filter: animationExpr
+     * };
+     * layer.on('updated', () => {
+     *   let currTime = Math.floor(animationExpr.getProgressValue());
+     *   document.getElementById('timestamp').innerHTML = currTime;
+     * });
+     *
      * @memberof carto.expressions.Animation
-     * @instance
      * @name getProgressValue
+     * @instance
+     * @api
      */
     getProgressValue () {
         const progress = this.progress.eval(); // from 0 to 1
@@ -14486,6 +14416,8 @@ const DEFAULT_PARAM = undefined;
 
 class Fade extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (param1 = DEFAULT_PARAM, param2 = DEFAULT_PARAM) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'fade');
+
         let fadeIn = param1 === DEFAULT_PARAM
             ? Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(DEFAULT_FADE)
             : Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(param1);
@@ -14552,7 +14484,9 @@ __webpack_require__.r(__webpack_exports__);
 
 class Image extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (url) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'image');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('image', 'url', 0, url);
+
         super({});
         this.type = 'image';
         this.canvas = null;
@@ -14659,37 +14593,22 @@ __webpack_require__.r(__webpack_exports__);
  *
  * Note: images RGB color will be overridden if the viz `color` property is set.
  *
- * @param {Image[]} imageList - Array of images
- *
- * @example <caption>Match different images to the different categories generated by buckets.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   symbol: s.ramp(s.buckets(s.prop('pop_max'), [10]), s.imageList([s.image('./marker.svg'), s.image('./marker2.svg')]))
- * });
- *
- * @example <caption>Match different images to the different categories generated by buckets. (String)</caption>
- * const viz = new carto.Viz(`
- *    symbol: ramp(buckets($pop_max, [10]), imageList([image('./marker.svg'), image('./marker2.svg')]))
- * `);
- *
- * @memberof carto.expressions
- * @name imageList
- * @function
- * @api
-*/
-
+ * @internal
+ */
 class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (imageList) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkArray"])('imageList', 'imageList', 0, imageList);
-        imageList.forEach((image, i) => Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('imageList', `imageList[${i}]`, 0, 'image', image));
+    constructor (imageArray) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'imageList');
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkArray"])('imageArray', 'imageArray', 0, imageArray);
+
+        imageArray.forEach((image, i) => Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('imageArray', `imageArray[${i}]`, 0, 'image', image));
 
         const children = {};
 
-        imageList.forEach((image, i) => {
+        imageArray.forEach((image, i) => {
             children[`image${i}`] = image;
         });
         super(children);
-        this.numImages = imageList.length;
+        this.numImages = imageArray.length;
         this.type = 'image';
     }
 
@@ -14773,11 +14692,159 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SVG; });
 /* harmony import */ var _Image__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Image */ "./src/renderer/viz/expressions/Image.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 class SVG extends _Image__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (svg) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'svg');
         super(`data:image/svg+xml,${encodeURIComponent(svg)}`);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/Scaled.js":
+/*!************************************************!*\
+  !*** ./src/renderer/viz/expressions/Scaled.js ***!
+  \************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Scaled; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Scale a width value to keep feature width constant in real space (meters).
+ * This will change the width in pixels at different zoom levels to enforce the previous condition.
+ *
+ * @param {Number} width - pixel width at zoom level `zoomlevel`
+ * @param {Number} [zoomlevel=0] - zoomlevel at which `width` is relative to
+ * @return {Number}
+ *
+ * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.scaled(25, 7)
+ * });
+ *
+ * @example <caption>Keep feature width in meters constant with 25 pixels at zoom level 7. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: s.scaled(25, 7)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name scale
+ * @function
+ * @api
+ */
+class Scaled extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (width, zoomlevel = 0) {
+        width = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(width);
+        zoomlevel = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(zoomlevel);
+        super({
+            scale: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["div"])(Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["mul"])(width, 0), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, zoomlevel))
+        });
+        this.type = 'number';
+        this.inlineMaker = inline => inline.scale;
+    }
+    eval () {
+        return this.scale.eval();
+    }
+    _bindMetadata (metadata) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('scaled', 'width', 0, 'number', this.scale.a.a);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('scaled', 'zoomlevel', 1, 'number', this.scale.b);
+        super._bindMetadata(metadata);
+    }
+    _preDraw (program, drawMetadata, gl) {
+        this.scale.a.b.expr = drawMetadata.scale;
+        super._preDraw(program, drawMetadata, gl);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/Zoomrange.js":
+/*!***************************************************!*\
+  !*** ./src/renderer/viz/expressions/Zoomrange.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Zoomrange; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).
+ *
+ * @param {Number[]} zoomBreakpointList - list of zoom breakpoints with at least two elements
+ * @return {Number}
+ *
+ * @example <caption>Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.ramp(s.zoomrange([7, 10]), [1, 20])
+ * });
+ *
+ * @example <caption>Set the width to 1 at zoom levels < 7, set the width at 20 at zoom levels > 10, interpolate between 1 and 20 at zoom levels in the [7,10] range. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: width: ramp(zoomrange([7, 10]), [1, 20])
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name zoomrange
+ * @function
+ * @api
+ */
+class Zoomrange extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (zoomBreakpointList) {
+        zoomBreakpointList = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(zoomBreakpointList);
+
+        super({});
+        this.zoomBreakpointList = zoomBreakpointList;
+        this.type = 'number';
+        this.inlineMaker = inline => inline._impostor;
+    }
+    eval (feature) {
+        return this._impostor.eval(feature);
+    }
+    _bindMetadata (metadata) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
+        if (this.zoomBreakpointList.elems.length < 2) {
+            throw new Error('zoomrange() function must receive a list with at least two elements');
+        }
+        function genImpostor (list, numerator, denominator) {
+            if (list.length === 1) {
+                return 1;
+            }
+            const a = list[0];
+            const b = list[1];
+            list.shift();
+            return Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["blend"])(numerator / denominator,
+                genImpostor(list, numerator + 1, denominator),
+                Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["linear"])(Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["zoom"])(), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["sub"])(a, 1)), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["sub"])(b, 1)))
+            );
+        }
+        this._impostor = genImpostor([...this.zoomBreakpointList.elems], 0, this.zoomBreakpointList.elems.length - 1);
+        this.childrenNames.push('_impostor');
+        super._bindMetadata(metadata);
     }
 }
 
@@ -14867,6 +14934,8 @@ class ClusterAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterAvg; });
 /* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 /**
  * Aggregate using the average. This operation disables the access to the property
@@ -14895,6 +14964,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ClusterAvg extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'clusterAvg');
         super({ property, expressionName: 'clusterAvg', aggName: 'avg', aggType: 'number' });
     }
 }
@@ -14913,6 +14983,8 @@ class ClusterAvg extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["defau
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMax; });
 /* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -14942,6 +15014,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ClusterMax extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'clusterMax');
         super({ property, expressionName: 'clusterMax', aggName: 'max', aggType: 'number' });
     }
 }
@@ -14960,6 +15033,7 @@ class ClusterMax extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["defau
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMin; });
 /* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 /**
@@ -14989,6 +15063,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ClusterMin extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'clusterMin');
         super({ property, expressionName: 'clusterMin', aggName: 'min', aggType: 'number' });
     }
 }
@@ -15007,6 +15082,8 @@ class ClusterMin extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["defau
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterMode; });
 /* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 /**
  * Aggregate using the mode. This operation disables the access to the property
@@ -15035,6 +15112,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ClusterMode extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'clusterMode');
         super({ property, expressionName: 'clusterMode', aggName: 'mode', aggType: 'category' });
     }
 }
@@ -15053,6 +15131,7 @@ class ClusterMode extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["defa
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ClusterSum; });
 /* harmony import */ var _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ClusterAggregation */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 /**
@@ -15082,6 +15161,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ClusterSum extends _ClusterAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'clusterSum');
         super({ property, expressionName: 'clusterSum', aggName: 'sum', aggType: 'number' });
     }
 }
@@ -15169,6 +15249,8 @@ class GlobalAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalAvg; });
 /* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -15199,6 +15281,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalAvg extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'globalAvg');
+
         super({ property, name: 'avg', type: 'number' });
     }
 }
@@ -15217,6 +15301,8 @@ class GlobalAvg extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalCount; });
 /* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -15247,6 +15333,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalCount extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'globalCount');
+
         super({ property, name: 'count', type: 'number' });
     }
 }
@@ -15265,6 +15353,7 @@ class GlobalCount extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["defau
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalMax; });
 /* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 /**
@@ -15295,6 +15384,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalMax extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'globalMax');
+
         super({ property, name: 'max', type: 'number' });
     }
 }
@@ -15313,6 +15404,8 @@ class GlobalMax extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalMin; });
 /* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 /**
  * Return the minimum of the feature property for the entire source data.
@@ -15342,6 +15435,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalMin extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'globalMin');
+
         super({ property, name: 'min', type: 'number' });
     }
 }
@@ -15362,12 +15457,40 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../../schema */ "./src/renderer/schema.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 
 
+/**
+ * Return the Nth percentile of an numeric property for the entire source data.
+ *
+ * @param {Number} property - numeric property
+ * @param {Number} percentile - Numeric expression in the [0, 100] range
+ * @return {Number} Result of the aggregation
+ *
+ * @example <caption>Assign the 90th percentile of the `amount` property for the entire dataset to a variable.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *      v_percentile: s.globalPercentile(s.prop('amount'), 90)
+ *   }
+ * });
+ *
+ * @example <caption>Assign the 90th percentile of the `amount` property for the entire dataset to a variable. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   \@v_percentile: globalPercentile($amount, 90)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name globalPercentile
+ * @function
+ * @api
+ */
 class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property, percentile) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_3__["checkMaxArguments"])(arguments, 2, 'globalPercentile');
+
         if (!Number.isFinite(percentile)) {
             throw new Error('Percentile must be a fixed literal number');
         }
@@ -15423,6 +15546,8 @@ class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return GlobalSum; });
 /* harmony import */ var _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./GlobalAggregation */ "./src/renderer/viz/expressions/aggregation/global/GlobalAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -15453,6 +15578,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalSum extends _GlobalAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'globalSum');
+
         super({ property, name: 'sum' });
     }
 }
@@ -15521,6 +15648,8 @@ class ViewportAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportAvg; });
 /* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -15549,6 +15678,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportAvg extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'viewportAvg');
+
         super({ property });
         this._sum = 0;
         this._count = 0;
@@ -15592,6 +15723,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportCount; });
 /* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 
@@ -15621,6 +15754,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportCount extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor () {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 1, 'viewportCount');
+
         super({ property: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
         this._value = 0;
     }
@@ -15660,6 +15795,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 /**
  * Generates an histogram.
  *
@@ -15696,6 +15832,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportHistogram extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (x, weight = 1, size = 1000) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'viewportHistogram');
+
         super({ x: Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x), weight: Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(weight) });
 
         this.type = 'histogram';
@@ -15808,6 +15946,7 @@ function _sortFirstNumerically (a, b) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportMax; });
 /* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 /**
@@ -15836,6 +15975,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportMax extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'viewportMax');
         super({ property });
         this._value = Number.NEGATIVE_INFINITY;
     }
@@ -15875,6 +16015,8 @@ class ViewportMax extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["def
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportMin; });
 /* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -15903,6 +16045,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportMin extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'viewportMin');
+
         super({ property });
         this._value = Number.POSITIVE_INFINITY;
     }
@@ -15947,7 +16091,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
@@ -15979,6 +16122,8 @@ class ViewportPercentile extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0
      * @param {*} percentile
      */
     constructor (property, percentile) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'viewportPercentile');
+
         super({ property, _impostor: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
 
         this._isViewport = true;
@@ -16041,6 +16186,8 @@ function _getPercentile (value, length) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ViewportSum; });
 /* harmony import */ var _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ViewportAggregation */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAggregation.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 /**
@@ -16069,6 +16216,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportSum extends _ViewportAggregation__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'viewportSum');
+
         super({ property });
         this._value = 0;
     }
@@ -16118,15 +16267,16 @@ __webpack_require__.r(__webpack_exports__);
  * Abstract expression class
  *
  * All expressions listed in  {@link carto.expressions} inherit from this class so any of them
- * they can be used where an Expression is required as long as the types match.
+ * can be used where an Expression is required as long as the types match.
  *
  * This means that you can't use a numeric expression where a color expression is expected.
  *
  * @memberof carto.expressions
  * @name Base
- * @hideconstructor
  * @abstract
- * @IGNOREapi
+ * @hideconstructor
+ * @class
+ * @api
  */
 class Base {
     /**
@@ -16136,15 +16286,89 @@ class Base {
      * @param {*} preface
      */
     constructor (children) {
-        this.childrenNames = Object.keys(children);
-        Object.keys(children).map(name => {
-            this[name] = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(children[name]);
-        });
-        this._getChildren().map(child => {
-            child.parent = this;
-        });
+        this._initializeChildren(children);
+        this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    /**
+     * Evaluate the expression providing a feature.
+     * This is particularly useful for making legends.
+     *
+     * @api
+     * @memberof carto.expressions.Base
+     * @param {object} feature
+     * @returns {*} result - result of evaluating the expression for the input feature
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: red
+     *      width: sqrt($amount)
+     * `);
+     *
+     * const r = viz.width.eval({
+     *      amount: 16
+     * });
+     *
+     * // `r` value is `4`
+     *
+     * @example
+     * const viz = new carto.Viz(`
+     *      color: ramp(linear($amount), Emrld)
+     * `);
+     *
+     * const color = viz.color.eval({
+     *      amount: 123
+     * });
+     *
+     * // `color` will have the same color as the features with an amount of 123
+     *
+     */
+    eval (feature) {
+        throw new Error('Unimplemented');
+    }
+
+    /**
+     * @api
+     * @memberof carto.expressions.Base
+     * @returns true if the evaluation of the expression may change without external action.
+     */
+    isAnimated () {
+        return this._getChildren().some(child => child.isAnimated());
+    }
+
+    /**
+     * Linear interpolation between this and finalValue with the specified duration
+     * @api
+     * @param {Expression} final
+     * @param {Expression} duration - duration of the transition in milliseconds
+     * @param {Expression} blendFunc
+     * @memberof carto.expressions.Base
+     * @instance
+     * @name blendTo
+     */
+    blendTo (final, duration = 500) {
+        // TODO blendFunc = 'linear'
+        final = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(final);
+        const parent = this.parent;
+        const blender = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["blend"])(this, final, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["transition"])(duration));
+        parent.replaceChild(this, blender);
+        blender.notify();
+        return final;
+    }
+
+    isA (expressionClass) {
+        return this instanceof expressionClass;
+    }
+
+    notify () {
+        this.parent.notify();
+    }
+
+    accumViewportAgg (feature) {
+        this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
 
     loadImages () {
@@ -16153,6 +16377,46 @@ class Base {
 
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
+    }
+
+    _initializeChildren (children) {
+        if (Array.isArray(children)) {
+            this._initializeChildrenArray(children);
+        } else {
+            this._initializeChildrenObject(children);
+        }
+    }
+
+    _initializeChildrenArray (children) {
+        if (this.maxParameters && this.maxParameters < children.length) {
+            throw new Error('Extra parameters');
+        }
+
+        this.childrenNames = [];
+
+        children.map((child, index) => {
+            const childName = `${child.type}-${index}`;
+            this.childrenNames.push(childName);
+            this[childName] = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(child);
+        });
+    }
+
+    _initializeChildrenObject (children) {
+        this.childrenNames = Object.keys(children);
+
+        if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
+            throw new Error('Extra parameters');
+        }
+
+        Object.keys(children).map(name => {
+            this[name] = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(children[name]);
+        });
+    }
+
+    _addParentToChildren () {
+        this._getChildren().map(child => {
+            child.parent = this;
+        });
     }
 
     _setUID (idGenerator) {
@@ -16195,10 +16459,8 @@ class Base {
         this.preface = (preface || '');
     }
 
-    /**
-     * Generate GLSL code
-     * @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
-     */
+    // Generate GLSL code
+    // @param {*} getGLSLforProperty  fn to get property IDs and inform of used properties
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
         let childInlines = {};
@@ -16211,10 +16473,7 @@ class Base {
         };
     }
 
-    /**
-     * Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
-     * @param {*} program
-     */
+    // Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
     _postShaderCompile (program, gl) {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
@@ -16230,68 +16489,23 @@ class Base {
         this._getChildren().forEach(child => child._resetViewportAgg(metadata));
     }
 
-    accumViewportAgg (feature) {
-        this._getChildren().forEach(child => child.accumViewportAgg(feature));
-    }
-
-    /**
-     * Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
-     * @param {number} timestamp
-     */
+    // Pre-rendering routine. Should establish the current timestamp in seconds since an arbitrary point in time as needed.
+    // @param {number} timestamp
     _setTimestamp (timestamp) {
         this.childrenNames.forEach(name => this[name]._setTimestamp(timestamp));
     }
 
-    /**
-     * Pre-rendering routine. Should establish related WebGL state as needed.
-     * @param {*} l
-     */
+    // Pre-rendering routine. Should establish related WebGL state as needed.
     _preDraw (...args) {
         this.childrenNames.forEach(name => this[name]._preDraw(...args));
     }
 
-    /**
-     * @jsapi
-     * @returns true if the evaluation of the function at styling time won't be the same every time.
-     */
-    isAnimated () {
-        return this._getChildren().some(child => child.isAnimated());
-    }
-
-    /**
-     * Replace child *toReplace* by *replacer*
-     * @param {*} toReplace
-     * @param {*} replacer
-     */
+    // Replace child *toReplace* by *replacer*
     replaceChild (toReplace, replacer) {
         const name = this.childrenNames.find(name => this[name] === toReplace);
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
-    }
-
-    notify () {
-        this.parent.notify();
-    }
-
-    /**
-     * Linear interpolation between this and finalValue with the specified duration
-     * @api
-     * @param {Expression} final
-     * @param {Expression} duration
-     * @param {Expression} blendFunc
-     * @memberof carto.expressions.Base
-     * @instance
-     * @name blendTo
-     */
-    blendTo (final, duration = 500) {
-        // TODO blendFunc = 'linear'
-        final = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(final);
-        const parent = this.parent;
-        const blender = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["blend"])(this, final, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["transition"])(duration));
-        parent.replaceChild(this, blender);
-        blender.notify();
-        return final;
     }
 
     _blendFrom (final, duration = 500, interpolator = null) {
@@ -16305,9 +16519,6 @@ class Base {
         blender.notify();
     }
 
-    /**
-     * @returns a list with the expression children
-     */
     _getChildren () {
         return this.childrenNames.map(name => this[name]);
     }
@@ -16315,14 +16526,6 @@ class Base {
     _getMinimumNeededSchema () {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(_schema__WEBPACK_IMPORTED_MODULE_2__["union"], _schema__WEBPACK_IMPORTED_MODULE_2__["IDENTITY"]);
-    }
-    // eslint-disable-next-line no-unused-vars
-    eval (feature) {
-        throw new Error('Unimplemented');
-    }
-
-    isA (expressionClass) {
-        return this instanceof expressionClass;
     }
 }
 
@@ -16347,7 +16550,7 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
- * @param {Number[]|Category[]|Color[]|Date[]} elements
+ * @param {Number[]|Category[]|Color[]|Date[]|Image[]} elements
  * @returns {Array}
  *
  * @memberof carto.expressions
@@ -16357,45 +16560,59 @@ __webpack_require__.r(__webpack_exports__);
  */
 class BaseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (elems) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'array');
+
         elems = elems || [];
+
         if (!Array.isArray(elems)) {
             elems = [elems];
         }
+
         elems = elems.map(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"]);
         if (!elems.length) {
             throw new Error('array(): invalid parameters: must receive at least one argument');
         }
+
         let type = '';
+
         for (let elem of elems) {
             type = elem.type;
             if (elem.type !== undefined) {
                 break;
             }
         }
-        if (['number', 'category', 'color', 'time', undefined].indexOf(type) === -1) {
+
+        if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
+
         elems.map((item, index) => {
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('array', `item[${index}]`, index, item);
             if (item.type !== type && item.type !== undefined) {
                 throw new Error(`array(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type, invalid argument type combination`);
             }
         });
-        super({});
-        this.type = type + '-array';
+
+        super(elems);
+
+        this.type = `${type}-array`;
         this.elems = elems;
+
         try {
-            this.elems.map(c => c.value);
+            this.elems.map(elem => elem.value);
         } catch (error) {
             throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
         }
     }
+
     get value () {
         return this.elems.map(c => c.value);
     }
-    eval () {
-        return this.elems.map(c => c.eval());
+
+    eval (feature) {
+        return this.elems.map(c => c.eval(feature));
     }
+
     _resolveAliases (aliases) {
         this.elems.map(c => c._resolveAliases(aliases));
     }
@@ -16404,7 +16621,7 @@ class BaseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super._bindMetadata(metadata);
 
         const type = this.elems[0].type;
-        if (['number', 'category', 'color', 'time'].indexOf(type) === -1) {
+        if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
             throw new Error(`array(): invalid parameters type: ${type}`);
         }
         this.elems.map((item, index) => {
@@ -16447,7 +16664,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class BaseCategory extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (categoryName) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'category');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('category', 'categoryName', 0, categoryName);
+
         super({});
         this.expr = categoryName;
         this.type = 'category';
@@ -16529,7 +16748,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Constant extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (x) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'constant');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('constant', 'x', 0, x);
+
         super({});
         this.expr = x;
         this.type = 'number';
@@ -16585,7 +16806,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class BaseNumber extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (x) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'number');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('number', 'x', 0, x);
+
         super({});
         this.expr = x;
         this.type = 'number';
@@ -16652,7 +16875,7 @@ __webpack_require__.r(__webpack_exports__);
  * `);
  *
  * const viz = new carto.Viz(`
- *   filter: $name !== 'london'
+ *   filter: $name != 'london'
  * `);
  *
  * @memberof carto.expressions
@@ -16662,7 +16885,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (name) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'property');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('property', 'name', 0, name);
+
         if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
@@ -16693,8 +16918,8 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         }
         this.type = metaColumn.type;
 
-        if (this.type === 'category') {
-            this.numCategories = metaColumn.categories.length;
+        if (this.type === 'category' && this.numCategories === undefined) {
+            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
         }
     }
 
@@ -16745,13 +16970,13 @@ __webpack_require__.r(__webpack_exports__);
  *   variables: {
  *     sum_price: s.clusterSum(s.prop('price'))
  *   }
- *  filter: s.neq(s.var('sum_price'), 'london'),
+ *  filter: s.neq(s.var('sum_price'), 'london')
  * });
  *
  * @example <caption>(String)</caption>
  * const viz = new carto.Viz(`
- *   @sum_price: clusterSum($price)
- *   filter: @sum_price !== 'london'
+ *   \@sum_price: clusterSum($price)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -16764,11 +16989,15 @@ class Variable extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super({});
     }
 }
+
 function isFunction (functionToCheck) {
     return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
 }
+
 function variable (name) {
+    Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'variable');
     Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('variable', 'name', 0, name);
+
     if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }
@@ -16856,7 +17085,7 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @example <caption>Display only cities where $type is 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: in($type, ['metropolis', 'capital'])
+ *   filter: $type in ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
@@ -16870,7 +17099,7 @@ function IN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '0.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.`;
+    return inline => `((${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.)`;
 }
 
 /**
@@ -16888,7 +17117,7 @@ function IN_INLINE_MAKER (list) {
  *
  * @example <caption>Display only cities where $type is not 'metropolis' or 'capital'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: nin($type, ['metropolis', 'capital'])
+ *   filter: $type nin ['metropolis', 'capital']
  * `);
  *
  * @memberof carto.expressions
@@ -16902,12 +17131,14 @@ function NIN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '1.';
     }
-    return inline => `(${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.`;
+    return inline => `((${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.)`;
 }
 
 function generateBelongsExpression (name, inlineMaker, jsEval) {
     return class BelongExpression extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
         constructor (value, list) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 2, name);
+
             value = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(value);
             list = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(list);
 
@@ -16983,6 +17214,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Between extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (value, lowerLimit, upperLimit) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'between');
+
         value = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(value);
         lowerLimit = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(lowerLimit);
         upperLimit = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(upperLimit);
@@ -17367,7 +17600,7 @@ const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  *
  * @example <caption>Compare two numbers to show only elements with price equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price === 30  // Equivalent to eq($price, 30)
+ *   filter: $price == 30  // Equivalent to eq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -17398,7 +17631,7 @@ const Equals = genBinaryOp('equals',
  *
  * @example <caption>Compare two numbers to show only elements with price not equal to 30. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price !== 30  // Equivalent to neq($price, 30)
+ *   filter: $price != 30  // Equivalent to neq($price, 30)
  * `);
  *
  * @memberof carto.expressions
@@ -17487,6 +17720,8 @@ const And = genBinaryOp('and',
 function genBinaryOp (name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends _base__WEBPACK_IMPORTED_MODULE_2__["default"] {
         constructor (a, b) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, name);
+
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["number"])(jsFn(a, b));
             }
@@ -17494,11 +17729,6 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             b = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(b);
 
             const signature = getSignatureLoose(a, b);
-            if (signature !== undefined) {
-                if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                    throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
-                }
-            }
 
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
@@ -17644,6 +17874,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Blend extends _base__WEBPACK_IMPORTED_MODULE_2__["default"] {
     constructor (a, b, mix, interpolator) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 4, 'blend');
         a = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(a);
         b = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(b);
         mix = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(mix);
@@ -17725,60 +17956,51 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
- * Imagine a traffic dataset with a speed property. We want to divide the roads in
- * 3 buckets (slow, medium, fast) based on the speed using a different color each bucket.
+ * This returns a number or category expression depending on the input values.
  *
- * We´ll need:
- *  - A {@link carto.expressions.ramp|ramp} to add a color for every bucket.
- *  - A {@link carto.expressions.palettes|colorPalette} to define de color scheme.
+ * @param {Number|Category} property - The property to be evaluated and interpolated
+ * @param {Number[]|Category[]} breakpoints - Expression containing the different breakpoints.
+ * @return {Number|Category}
  *
- * ```javascript
- *  const s = carto.expressions;
- *  const $speed = s.prop('speed');
- *  const viz = new carto.Viz({
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed.</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
+ * // - From 30 to 79
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
  *    color: s.ramp(
- *      s.buckets($speed, [30, 80, 120]),
+ *      s.buckets(s.prop('speed'), [30, 80, 120]),
  *      s.palettes.PRISM
  *    )
  * });
- * ```
  *
- * ```javascript
- *  const viz = new carto.Viz(`
+ * @example <caption>Display a traffic dataset in 4 colors depending on the numeric speed. (String)</caption>
+ * // Using the buckets `expression` we divide the dataset into 4 buckets according to the speed
+ * // - From -inf to 29
+ * // - From 30 to 79
+ * // - From 80 to 119
+ * // - From 120 to +inf
+ * // Values lower than 0 will be in the first bucket and values higher than 120 will be in the last one.
+ * const viz = new carto.Viz(`
  *    color: ramp(buckets($speed, [30, 80, 120]), PRISM)
  * `);
- * ```
  *
- * Using the buckets `expression` we divide the dataset in 3 buckets according to the speed:
- *  - From 0 to 29
- *  - From 30 to 79
- *  - From 80 to 120
- *
- * Values lower than 0 will be in the first bucket and values higher than 120 will be in the third one.
- *
- * This expression can be used for categorical properties, imagine the previous example with the data already
- * procesed in a new categorical `procesedSpeed` column:
- *
- * ```javascript
- *  const s = carto.expressions;
- *  const $procesedSpeed = s.prop('procesedSpeed');
- *  const viz = new carto.Viz({
- *    color: s.ramp(
- *      s.buckets($procesedSpeed, ['slow', 'medium', 'high']),
- *      s.palettes.PRISM)
- *    )
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(
+ *     s.buckets(s.prop('procesedSpeed'), ['slow', 'medium', 'high']),
+ *     s.palettes.PRISM)
+ *   )
  * });
- * ```
  *
- * ```javascript
- *  const viz = new carto.Viz(`
+ * @example <caption>Display a traffic dataset is 3 colors depending on the category procesedSpeed. (String)</caption>
+ * const viz = new carto.Viz(`
  *    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
  * `);
- * ```
- *
- * @param {Number|Category} property - The property to be evaluated and interpolated
- * @param {Number[]|Category[]} breakpoints - Numeric expression containing the different breakpoints.
- * @return {Number|Category}
  *
  * @memberof carto.expressions
  * @name buckets
@@ -17787,6 +18009,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, list) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'buckets');
+
         input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
         list = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(list);
 
@@ -17799,26 +18023,30 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             looseType = input.type;
         }
 
-        list.elems.map((item, index) => {
-            if (item.type) {
-                if (looseType && looseType !== item.type) {
-                    throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type` +
-                        `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                } else if (item.type !== 'number' && item.type !== 'category') {
-                    throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`);
-                }
-            }
-        });
-
         let children = {
             input
         };
 
-        list.elems.map((item, index) => {
-            children[`arg${index}`] = item;
-        });
+        let numCategories;
+        if (list.elems) {
+            list.elems.map((item, index) => {
+                if (item.type) {
+                    if (looseType && looseType !== item.type) {
+                        throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type` +
+                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                    } else if (item.type !== 'number' && item.type !== 'category') {
+                        throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`);
+                    }
+                }
+
+                children[`arg${index}`] = item;
+            });
+            numCategories = list.elems.length + 1;
+        }
+
         super(children);
-        this.numCategories = list.elems.length + 1;
+        this.numCategories = numCategories;
+
         this.list = list;
         this.type = 'category';
     }
@@ -17852,6 +18080,8 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         if (this.input.type !== 'number' && this.input.type !== 'category') {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
@@ -18034,6 +18264,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'globalEqIntervals');
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalEqIntervals', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_1__["default"], input && (input.property || input));
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalEqIntervals', 'buckets', 1, buckets);
 
@@ -18101,6 +18332,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class GlobalQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'globalQuantiles');
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkInstance"])('globalQuantiles', 'input', 0, _basic_property__WEBPACK_IMPORTED_MODULE_1__["default"], input && (input.property || input));
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('globalQuantiles', 'buckets', 1, buckets);
         super({ input }, buckets);
@@ -18169,6 +18401,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class ViewportEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'viewportEqIntervals');
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkNumber"])('viewportEqIntervals', 'buckets', 1, buckets);
 
         const children = { input, _min: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMin"])(input), _max: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["viewportMax"])(input) };
@@ -18232,12 +18465,13 @@ __webpack_require__.r(__webpack_exports__);
  * `);
  *
  * @memberof carto.expressions
- * @name quantiles
+ * @name viewportQuantiles
  * @function
  * @api
  */
 class ViewportQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'viewportQuantiles');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('viewportQuantiles', 'buckets', 1, buckets);
 
         const children = { input, _histogram: Object(_expressions__WEBPACK_IMPORTED_MODULE_2__["viewportHistogram"])(input) };
@@ -18323,6 +18557,7 @@ __webpack_require__.r(__webpack_exports__);
  */
 class CIELab extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (l, a, b) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'cielab');
         l = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(l);
         a = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(a);
         b = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(b);
@@ -18429,9 +18664,9 @@ __webpack_require__.r(__webpack_exports__);
  * });
  *
  * @example <caption>Display blue points. (String)</caption>
- * const viz = new carto.Viz({
+ * const viz = new carto.Viz(`
  *   color: blue  // Equivalent to namedColor('blue')
- * });
+ * `);
  *
  * @memberof carto.expressions
  * @name namedColor
@@ -18440,7 +18675,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (colorName) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'namedColor');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('namedColor', 'colorName', 0, colorName);
+
         if (!_cssColorNames__WEBPACK_IMPORTED_MODULE_2__["CSS_COLOR_NAMES"].includes(colorName.toLowerCase())) {
             throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
         }
@@ -18450,9 +18687,11 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.color = _nameToRGBA(this.name);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
+
     get value () {
         return this.eval();
     }
+
     eval () {
         return this.color;
     }
@@ -18477,6 +18716,83 @@ function _nameToRGBA (name) {
 
     nameToRGBACache[name] = color;
     return color;
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/color/Opacity.js":
+/*!*******************************************************!*\
+  !*** ./src/renderer/viz/expressions/color/Opacity.js ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Opacity; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+
+/**
+ * Override the input color opacity.
+ *
+ * @param {Color} color - Color expression to apply the opacity
+ * @param {Number} alpha - Number expression with the alpha (transparency) value
+ * @return {Color}
+ *
+ * @example <caption>Display blue points with 50% opacity.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.opacity(s.rgb(0,0,255), 0.5)  // Equivalent to `s.rgba(0,0,255,0.5)`
+ * });
+ *
+ * @example <caption>Display blue points with 50% opacity. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   color: opacity(rgb(0,0,255), 0.5) // Equivalent to `rgba(0,0,255,0.5)`
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name opacity
+ * @function
+ * @api
+ */
+class Opacity extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    /**
+     * @description Override the input color opacity
+     * @param {*} color input color
+     * @param {*} alpha new opacity
+     */
+    constructor (color, alpha) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'opacity');
+
+        if (Number.isFinite(alpha)) {
+            alpha = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(alpha);
+        }
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('opacity', 'color', 0, color);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('opacity', 'alpha', 1, alpha);
+        super({ color, alpha });
+        this.type = 'color';
+        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
+    }
+    get value () {
+        return this.eval();
+    }
+    eval (f) {
+        const color = this.color.eval(f);
+        const alpha = this.alpha.eval(f);
+        color.a = alpha;
+        return color;
+    }
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('opacity', 'color', 0, 'color', this.color);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('opacity', 'alpha', 1, 'number', this.alpha);
+    }
 }
 
 
@@ -18685,7 +19001,9 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Hex extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (hexadecimalColor) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'hex');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('hex', 'hexadecimalColor', 0, hexadecimalColor);
+
         super({});
         this.type = 'color';
         try {
@@ -18778,6 +19096,8 @@ const HSLA = genHSL('hsla', true);
 function genHSL (name, alpha) {
     return class HSLA extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         constructor (h, s, l, a) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 4, 'hsla');
+
             [h, s, l, a] = [h, s, l, a].map(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"]);
 
             const children = { h, s, l };
@@ -18951,6 +19271,8 @@ const HSVA = genHSV('hsva', true);
 function genHSV (name, alpha) {
     return class extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         constructor (h, s, v, a) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 4, 'hsva');
+
             h = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(h);
             s = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(s);
             v = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(v);
@@ -19043,81 +19365,6 @@ function genHSV (name, alpha) {
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
             throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
-    }
-}
-
-
-/***/ }),
-
-/***/ "./src/renderer/viz/expressions/color/opacity.js":
-/*!*******************************************************!*\
-  !*** ./src/renderer/viz/expressions/color/opacity.js ***!
-  \*******************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Opacity; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
-
-
-
-
-/**
- * Override the input color opacity.
- *
- * @param {Color} color - Color expression to apply the opacity
- * @param {Number} alpha - Number expression with the alpha (transparency) value
- * @return {Color}
- *
- * @example <caption>Display blue points with 50% opacity.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   color: s.opacity(s.rgb(0,0,255), 0.5)  // Equivalent to `s.rgba(0,0,255,0.5)`
- * });
- *
- * @example <caption>Display blue points with 50% opacity. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: opacity(rgb(0,0,255), 0.5) // Equivalent to `rgba(0,0,255,0.5)`
- * `);
- *
- * @memberof carto.expressions
- * @name opacity
- * @function
- * @api
- */
-class Opacity extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    /**
-     * @description Override the input color opacity
-     * @param {*} color input color
-     * @param {*} alpha new opacity
-     */
-    constructor (color, alpha) {
-        if (Number.isFinite(alpha)) {
-            alpha = Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(alpha);
-        }
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkLooseType"])('opacity', 'color', 0, 'color', color);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkLooseType"])('opacity', 'alpha', 1, 'number', alpha);
-        super({ color, alpha });
-        this.type = 'color';
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
-    }
-    get value () {
-        return this.eval();
-    }
-    eval (f) {
-        const color = this.color.eval(f);
-        const alpha = this.alpha.eval(f);
-        color.a = alpha;
-        return color;
-    }
-    _bindMetadata (meta) {
-        super._bindMetadata(meta);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('opacity', 'color', 0, 'color', this.color);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('opacity', 'alpha', 1, 'number', this.alpha);
     }
 }
 
@@ -19236,76 +19483,6 @@ class Palette extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/color/palettes/Reverse.js":
-/*!****************************************************************!*\
-  !*** ./src/renderer/viz/expressions/color/palettes/Reverse.js ***!
-  \****************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Reverse; });
-/* harmony import */ var _Palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Palette */ "./src/renderer/viz/expressions/color/palettes/Palette.js");
-
-
-/**
- * Reverse the provided Palette.
- *
- * @param {Palette} palette - Numeric expression to compute the natural logarithm
- * @return {Palette}
- *
- * @example <caption>Invert a Palette.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   filter: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
- * });
- *
- * @example <caption>Invert a Palette. (String)</caption>
- * const viz = new carto.Viz(`
- *   color: ramp($type, reverse(PRISM))
- * `);
- *
- * @memberof carto.expressions
- * @name reverse
- * @function
- * @api
- */
-
-class Reverse extends _Palette__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (palette) {
-        super(palette.name, palette.subPalettes);
-        this.type = 'palette';
-        this._originalPalette = palette;
-        this.tags = palette.tags;
-        this.subPalettes = new Proxy(palette.subPalettes, {
-            get: (target, name) => {
-                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
-                    return this._reversePalette(target[name]);
-                }
-                return target[name];
-            }
-        });
-    }
-
-    getLongestSubPalette () {
-        return this._reversePalette(this._originalPalette.getLongestSubPalette());
-    }
-
-    _reversePalette (palette) {
-        if (this.isQualitative()) {
-            // Last color is 'others', therefore, we shouldn't change the order of that one
-            const copy = [...palette];
-            const others = copy.pop();
-            return [...copy.reverse(), others];
-        }
-        return [...palette].reverse();
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/renderer/viz/expressions/color/rgb.js":
 /*!***************************************************!*\
   !*** ./src/renderer/viz/expressions/color/rgb.js ***!
@@ -19380,6 +19557,8 @@ const RGBA = genRGB('rgba', true);
 function genRGB (name, alpha) {
     return class RGBA extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         constructor (r, g, b, a) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 4, 'rgba');
+
             [r, g, b, a] = [r, g, b, a].map(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"]);
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])(name, 'r', 0, 'number', r);
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])(name, 'g', 1, 'number', g);
@@ -19439,9 +19618,10 @@ __webpack_require__.r(__webpack_exports__);
 
 // TODO type checking
 
-class ILinear extends genInterpolator(inner => inner, undefined, inner => inner) { }
+class ILinear extends genInterpolator('iLinear', inner => inner, undefined, inner => inner) { }
 
 class Cubic extends genInterpolator(
+    'cubic',
     inner => `cubicEaseInOut(${inner})`,
     `
     #ifndef CUBIC
@@ -19460,6 +19640,7 @@ class Cubic extends genInterpolator(
 ) { }
 
 class BounceEaseIn extends genInterpolator(
+    'bounceEaseIn',
     inner => `BounceEaseIn(${inner})`,
     `
     #ifndef BOUNCE_EASE_IN
@@ -19494,9 +19675,11 @@ class BounceEaseIn extends genInterpolator(
 ) { }
 
 // Interpolators
-function genInterpolator (inlineMaker, preface, jsEval) {
+function genInterpolator (name, inlineMaker, preface, jsEval) {
     const fn = class Interpolator extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
         constructor (m) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 1, name);
+
             m = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(m);
             super({ m });
         }
@@ -19563,6 +19746,8 @@ __webpack_require__.r(__webpack_exports__);
 */
 class Linear extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, min, max) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'linear');
+
         input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
 
         if (min === undefined && max === undefined) {
@@ -19649,6 +19834,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Now; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 
@@ -19675,16 +19862,25 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Now extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor () {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 0, 'now');
+
         super({ now: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
         this.type = 'number';
         super.inlineMaker = inline => inline.now;
     }
+
+    get value () {
+        return this.eval();
+    }
+
     eval () {
         return this.now.expr;
     }
+
     isAnimated () {
         return true;
     }
+
     _setTimestamp (timestamp) {
         this.now.expr = timestamp;
     }
@@ -19731,10 +19927,12 @@ __webpack_require__.r(__webpack_exports__);
  * @memberof carto.expressions
  * @name asc
  * @function
- * @IGNOREapi
+ * @api
  */
 class Asc extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (by) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'asc');
+
         super({});
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkInstance"])('asc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -19761,10 +19959,12 @@ class Asc extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
  * @memberof carto.expressions
  * @name desc
  * @function
- * @IGNOREapi
+ * @api
  */
 class Desc extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (by) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'desc');
+
         super({});
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkInstance"])('desc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -19790,10 +19990,12 @@ class Desc extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @IGNOREapi
+ * @api
  */
 class NoOrder extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor () {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 0, 'noOrder');
+
         super({});
         this.type = 'orderer';
     }
@@ -19822,6 +20024,8 @@ class NoOrder extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
  */
 class Width extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor () {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'width');
+
         super({});
         this.type = 'propertyReference';
     }
@@ -19851,6 +20055,7 @@ __webpack_require__.r(__webpack_exports__);
  * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
  * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
  *
+ * ```
  *           |1
  *           |
  *           |
@@ -19858,6 +20063,7 @@ __webpack_require__.r(__webpack_exports__);
  *           |
  *           |
  *         -1|
+ * ```
  *
  * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
  * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
@@ -19868,8 +20074,17 @@ __webpack_require__.r(__webpack_exports__);
  * @return {Placement} Numeric expression
  *
  * @example <caption>Setting the aligment to the top corner of the image.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.image('./marker.svg').
+ *   symbolPlacement: s.placement(1, 0)
+ * });
+ *
+ * @example <caption>Setting the aligment to the top corner of the image. (String)</caption>
+ * const viz = new carto.Viz(`
  *   symbol: image('./marker.svg')
  *   symbolPlacement: placement(1, 0)
+ * `);
  *
  * @memberof carto.expressions
  * @name placement
@@ -19879,6 +20094,8 @@ __webpack_require__.r(__webpack_exports__);
 
 class Placement extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (x, y) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'placement');
+
         x = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x);
         y = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(y);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('placement', 'x', 0, 'number', x);
@@ -19951,6 +20168,7 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
+const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -20006,6 +20224,8 @@ const MAX_BYTE_VALUE = 255;
 */
 class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (input, palette) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'ramp');
+
         input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
         palette = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(palette);
 
@@ -20018,22 +20238,14 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        super({ input: input });
+        palette = _calcPaletteValues(palette);
+
+        super({ input, palette });
+
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-
-        try {
-            if (palette.type === paletteTypes.NUMBER_ARRAY) {
-                this.palette.floats = this.palette.eval();
-            } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-                this.palette.colors = this.palette.eval();
-            }
-        } catch (error) {
-            throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-        }
-
         this.defaultOthersColor = new _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__["default"]('gray');
     }
 
@@ -20047,6 +20259,8 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
 
     eval (feature) {
+        this.palette = this._calcPaletteValues(this.palette);
+
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
 
@@ -20098,12 +20312,7 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
         this._texCategories = null;
         this._GLtexCategories = null;
-    }
-
-    _free (gl) {
-        if (this.texture) {
-            gl.deleteTexture(this.texture);
-        }
+        this._metadata = metadata;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -20118,16 +20327,32 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             };
         }
 
+        let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
+        if (this.input.type === 'category' && this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"])) {
+            inline = `texture2D(texRamp${this._uid}, vec2(ramp_translate${this._uid}(${input.inline}), 0.5))`;
+        }
+
         return {
             preface: this._prefaceCode(input.preface + `
                 uniform sampler2D texRamp${this._uid};
+                uniform sampler2D texRampTranslate${this._uid};
                 uniform float keyMin${this._uid};
-                uniform float keyWidth${this._uid};`
+                uniform float keyWidth${this._uid};
+
+                float ramp_translate${this._uid}(float s){
+                    vec2 v = vec2(
+                        mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
+                        floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
+                    );
+                    return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
+                }
+
+                `
             ),
 
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? `(texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).a)`
-                : `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5)).rgba`
+                ? `(${inline}.a)`
+                : `(${inline}.rgba)`
         };
     }
 
@@ -20150,14 +20375,16 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
         this.input._postShaderCompile(program, gl);
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
+        this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
         this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
         this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
     }
 
     _computeTextureIfNeeded () {
-        if (this._cachedTexturePixels) {
+        if (this._cachedTexturePixels && !this.palette.isAnimated()) {
             return this._cachedTexturePixels;
         }
+
         this._texCategories = this.input.numCategories;
 
         if (this.input.type === inputTypes.CATEGORY) {
@@ -20171,7 +20398,15 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         return this._cachedTexturePixels;
     }
 
+    _calcPaletteValues (palette) {
+        return _calcPaletteValues(palette);
+    }
+
     _computeColorRampTexture () {
+        if (this.palette.isAnimated()) {
+            this.palette = this._calcPaletteValues(this.palette);
+        }
+
         const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
         const colors = this._getColorsFromPalette(this.input, this.palette);
 
@@ -20208,27 +20443,31 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     _computeGLTextureIfNeeded (gl) {
         const texturePixels = this._computeTextureIfNeeded();
+        const isAnimatedPalette = this.palette.isAnimated();
 
-        if (this._GLtexCategories !== this.input.numCategories) {
+        if (this._GLtexCategories !== this.input.numCategories || isAnimatedPalette) {
             this._GLtexCategories = this.input.numCategories;
-
             this.texture = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-            if (this.type === rampTypes.COLOR) {
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            } else {
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            }
-
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            this._bindGLTexture(gl, texturePixels);
         }
+    }
+
+    _bindGLTexture (gl, texturePixels) {
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+        if (this.type === rampTypes.COLOR) {
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        } else {
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        }
+
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
     }
 
     _preDraw (program, drawMetadata, gl) {
@@ -20246,6 +20485,36 @@ class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
         gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
         drawMetadata.freeTexUnit++;
+
+        if (this.input.type === 'category' && this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"])) {
+            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+            const catIDs = this._metadata.properties[this.input.name].categories.length;
+            if (this._translatedIds !== catIDs) {
+                this._translatedIds = catIDs;
+                this._translateTexture = gl.createTexture();
+                const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
+                for (let i = 0; i < catIDs; i++) {
+                    const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
+                    const value = i / (catIDs - 1);
+                    const vec2Id = {
+                        x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
+                        y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
+                    };
+                    translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
+                }
+                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            } else {
+                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+            }
+            gl.uniform1i(this._getBinding(program).texRampTranslateLoc, drawMetadata.freeTexUnit);
+            drawMetadata.freeTexUnit++;
+        }
     }
 }
 
@@ -20320,9 +20589,9 @@ function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, 
         case numCategories < colors.length:
             return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
         case numCategories > colors.length:
-            return _addothersColorToColors(colors, defaultOthersColor);
+            return _addOthersColorToColors(colors, defaultOthersColor);
         default:
-            colors = _addothersColorToColors(colors, defaultOthersColor);
+            colors = _addOthersColorToColors(colors, defaultOthersColor);
             return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
     }
 }
@@ -20343,7 +20612,7 @@ function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
     return colors;
 }
 
-function _addothersColorToColors (colors, othersColor) {
+function _addOthersColorToColors (colors, othersColor) {
     return [...colors, othersColor];
 }
 
@@ -20361,6 +20630,165 @@ function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) 
     return colorArray;
 }
 
+function _calcPaletteValues (palette) {
+    try {
+        if (palette.type === paletteTypes.NUMBER_ARRAY) {
+            palette.floats = palette.eval();
+        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
+            palette.colors = palette.eval();
+        }
+    } catch (error) {
+        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+    }
+
+    return palette;
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/reverse/ReverseArray.js":
+/*!**************************************************************!*\
+  !*** ./src/renderer/viz/expressions/reverse/ReverseArray.js ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReverseArray; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+
+
+class ReverseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (array) {
+        super({
+            array
+        });
+        this.type = array.type;
+    }
+    get elems () {
+        return [...this.array.elems].reverse();
+    }
+    get value () {
+        return this.elems.map(c => c.value);
+    }
+    eval (feature) {
+        return this.elems.map(c => c.eval(feature));
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/reverse/ReversePalette.js":
+/*!****************************************************************!*\
+  !*** ./src/renderer/viz/expressions/reverse/ReversePalette.js ***!
+  \****************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReversePalette; });
+/* harmony import */ var _color_palettes_Palette__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../color/palettes/Palette */ "./src/renderer/viz/expressions/color/palettes/Palette.js");
+
+
+class ReversePalette extends _color_palettes_Palette__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (palette) {
+        super(palette.name, palette.subPalettes);
+        this.type = 'palette';
+        this._originalPalette = palette;
+        this.tags = palette.tags;
+        this.subPalettes = new Proxy(palette.subPalettes, {
+            get: (target, name) => {
+                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                    return this._reversePalette(target[name]);
+                }
+                return target[name];
+            }
+        });
+    }
+
+    getLongestSubPalette () {
+        return this._reversePalette(this._originalPalette.getLongestSubPalette());
+    }
+
+    _reversePalette (palette) {
+        if (this.isQualitative()) {
+            // Last color is 'others', therefore, we shouldn't change the order of that one
+            const copy = [...palette];
+            const others = copy.pop();
+            return [...copy.reverse(), others];
+        }
+        return [...palette].reverse();
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/reverse/reverse.js":
+/*!*********************************************************!*\
+  !*** ./src/renderer/viz/expressions/reverse/reverse.js ***!
+  \*********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return reverse; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _ReversePalette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReversePalette */ "./src/renderer/viz/expressions/reverse/ReversePalette.js");
+/* harmony import */ var _ReverseArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReverseArray */ "./src/renderer/viz/expressions/reverse/ReverseArray.js");
+
+
+
+
+/**
+ * Reverse the provided item.
+ *
+ * @param {Palette|BaseArray} x - item to be reversed
+ * @return {Palette|BaseArray}
+ *
+ * @example <caption>Invert a Palette.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.prop('type'), s.reverse(s.palettes.PRISM));
+ * });
+ *
+ * @example <caption>Invert a Palette (String).</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($type, reverse(PRISM))
+ * `);
+ *
+ * @example <caption>Invert a Color Array.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
+ * });
+ *
+ * @example <caption>Invert a Color Array (String).</caption>
+ * const viz = new carto.Viz(`
+ *   color: ramp($count, reverse([red, blue]))
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name reverse
+ * @function
+ * @api
+ */
+function reverse (x) {
+    Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 1, 'reverse');
+    x = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(x);
+    Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])('reverse', 'x', 0, ['palette', 'number-array', 'category-array', 'color-array', 'time-array', 'image-array'], x);
+    if (x.type === 'palette') {
+        return new _ReversePalette__WEBPACK_IMPORTED_MODULE_1__["default"](x);
+    } else {
+        return new _ReverseArray__WEBPACK_IMPORTED_MODULE_2__["default"](x);
+    }
+}
+
 
 /***/ }),
 
@@ -20376,6 +20804,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Time; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../utils/util */ "./src/utils/util.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 
@@ -20403,18 +20833,23 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Time extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (date) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 1, 'time');
+
         super({});
         // TODO improve type check
         this.type = 'time';
         this.date = _utils_util__WEBPACK_IMPORTED_MODULE_1__["castDate"](date);
         this.inlineMaker = () => undefined;
     }
+
     get value () {
         return this.eval();
     }
+
     eval () {
         return this.date;
     }
+
     isAnimated () {
         return false;
     }
@@ -20470,6 +20905,8 @@ const MAX_TOP_BUCKETS = 16;
  */
 class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (property, buckets) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'top');
+
         buckets = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(buckets);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkInstance"])('top', 'property', 0, _basic_property__WEBPACK_IMPORTED_MODULE_2__["default"], property);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkLooseType"])('top', 'buckets', 1, 'number', buckets);
@@ -20497,22 +20934,29 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         });
         return ret;
     }
+
     _bindMetadata (metadata) {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkFeatureIndependent"])('top', 'buckets', 1, this.buckets);
+
         super._bindMetadata(metadata);
+
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('top', 'property', 0, 'category', this.property);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('top', 'buckets', 1, 'number', this.buckets);
+
         this._meta = metadata;
         this._textureBuckets = null;
     }
+
     get numCategories () {
         return this.numBuckets + 1;
     }
     get numBuckets () {
         let buckets = Math.round(this.buckets.eval());
+
         if (buckets > this.property.numCategories) {
             buckets = this.property.numCategories;
         }
+
         if (buckets > MAX_TOP_BUCKETS) {
             // setTimeout is used here because throwing within the renderer stack leaves the state in an invalid state,
             // making this error an unrecoverable error, within the setTimeout the error is recoverable
@@ -20522,8 +20966,10 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             });
             buckets = 0;
         }
+
         return buckets;
     }
+
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = {};
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
@@ -20570,7 +21016,6 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         };
     }
     _preDraw (program, drawMetadata, gl) {
-        super._preDraw(program, drawMetadata, gl);
         const buckets = this.numBuckets;
         const metaColumn = this._meta.properties[this.property.name];
 
@@ -20587,8 +21032,9 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                 this[`_top${i}`].expr = (i + 1);
             }
         });
+
+        super._preDraw(program, drawMetadata, gl);
     }
-    // TODO _free
 }
 
 
@@ -20624,6 +21070,7 @@ __webpack_require__.r(__webpack_exports__);
 // TODO refactor to use uniformfloat class
 class Transition extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (duration) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'transition');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('transition', 'duration', 0, duration);
         if (duration < 0) {
             throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('transition', 'duration', 0) + 'duration must be greater than or equal to 0');
@@ -20791,7 +21238,7 @@ const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
  * @param {Number} x - Numeric expression to compute the tangent in radians
  * @return {Number}
  *
- * @example <caption>Tan</caption>
+ * @example <caption>Tan.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.tan(0)  // 0
@@ -20863,6 +21310,17 @@ const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * Check if a numeric expression is NaN.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @example <caption>Filter NaN values of the `numeric` property.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.not(s.isNaN(s.prop('numeric')))
+ * });
+ *
+ * @example <caption>Filter NaN values of the `numeric` property. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: not(isNaN($numeric))
+ * `);
  *
  * @param {Number} x - Numeric expression to check
  * @return {Number}
@@ -20961,6 +21419,8 @@ const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 function genUnaryOp (name, jsFn, glsl) {
     return class UnaryOperation extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
         constructor (a) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 1, name);
+
             a = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(a);
             Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkLooseType"])(name, 'x', 0, 'number', a);
             super({ a });
@@ -20990,12 +21450,13 @@ function genUnaryOp (name, jsFn, glsl) {
 /*!***********************************************!*\
   !*** ./src/renderer/viz/expressions/utils.js ***!
   \***********************************************/
-/*! exports provided: DEFAULT, implicitCast, hexToRgb, getOrdinalFromIndex, getStringErrorPreface, throwInvalidType, throwInvalidInstance, throwInvalidNumber, throwInvalidArray, throwInvalidString, checkLooseType, isArgConstructorTimeTyped, checkExpression, checkType, checkInstance, checkNumber, checkString, checkArray, checkFeatureIndependent, clamp, mix */
+/*! exports provided: DEFAULT, checkMaxArguments, implicitCast, hexToRgb, getOrdinalFromIndex, getStringErrorPreface, throwInvalidType, throwInvalidInstance, throwInvalidNumber, throwInvalidArray, throwInvalidString, checkLooseType, isArgConstructorTimeTyped, checkExpression, checkType, checkInstance, checkNumber, checkString, checkArray, checkFeatureIndependent, clamp, mix */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEFAULT", function() { return DEFAULT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkMaxArguments", function() { return checkMaxArguments; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "implicitCast", function() { return implicitCast; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hexToRgb", function() { return hexToRgb; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getOrdinalFromIndex", function() { return getOrdinalFromIndex; });
@@ -21023,6 +21484,12 @@ __webpack_require__.r(__webpack_exports__);
 
 const DEFAULT = undefined;
 
+function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
+    if (constructorArguments.length > maxArguments) {
+        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
 // To support literals (string and numeric) out of the box we need to cast them implicitly on constructors
 function implicitCast (value) {
     if (_isNumber(value)) {
@@ -21032,7 +21499,11 @@ function implicitCast (value) {
         return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["category"])(value);
     }
     if (Array.isArray(value)) {
-        return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["array"])(value);
+        const _array = Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["array"])(value);
+        if (_array && _array.type === 'image-array') {
+            return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["imageList"])(_array.elems);
+        }
+        return _array;
     }
     return value;
 }
@@ -21248,18 +21719,35 @@ __webpack_require__.r(__webpack_exports__);
  * @param {...Property} properties - properties that will appear in the feature list
  * @return {ViewportFeatures} ViewportFeatures
  *
+ * @example <caption>Define and use a list of features.</caption>
+ * const source = carto.source.Dataset('data');
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *     list: s.viewportFeatures(s.prop('value'), s.prop('category'))
+ *   }
+ * });
+ * const layer = carto.Layer('layer', source, viz);
+ * ...
+
+ * layer.on('updated', () => {
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
+ * });
+ *
  * @example <caption>Define and use a list of features. (String)</caption>
  * const source = carto.source.Dataset('data');
  * const viz = new carto.Viz(`
- *          \@list: viewportFeatures($value, $category)
+ *   \@list: viewportFeatures($value, $category)
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
- *
+
  * layer.on('updated', () => {
- *     viz.variables.list.value.forEach(feature => {
- *         console.log('value:', feature.value, 'category:', feature.category);
- *     });
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
  * });
  *
  * @memberof carto.expressions
@@ -21343,95 +21831,6 @@ function _childrenFromProperties (properties) {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/xyz.js":
-/*!*********************************************!*\
-  !*** ./src/renderer/viz/expressions/xyz.js ***!
-  \*********************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return XYZ; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
-
-
-
-// TODO should this expression be removed?
-class XYZ extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (x, y, z) {
-        x = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x);
-        y = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(y);
-        z = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(z);
-        super({ x: x, y: y, z: z });
-        // TODO improve type check
-    }
-    _bindMetadata (meta) {
-        super._bindMetadata(meta);
-        if (this.x.type !== 'number' || this.y.type !== 'number' || this.z.type !== 'number') {
-            throw new Error('XYZ() invalid parameters');
-        }
-        this.type = 'color';
-        this._setGenericGLSL(inline =>
-            `vec4(xyztosrgb((
-                vec3(
-                    clamp(${inline.x}, -100000., 10000.),
-                    clamp(${inline.y}, -12800., 12800.),
-                    clamp(${inline.z}, -12800., 12800.)
-                )
-            )), 1)`
-            , `
-        #ifndef cielabtoxyz_fn
-        #define cielabtoxyz_fn
-
-        const mat3 XYZ_2_RGB = (mat3(
-            3.2404542,-1.5371385,-0.4985314,
-           -0.9692660, 1.8760108, 0.0415560,
-            0.0556434,-0.2040259, 1.0572252
-       ));
-       const mat3 XYZ_2_RGB_T = (mat3(
-        3.2404542,-0.9692660,0.0556434,
-        -1.5371385, 1.8760108, -0.2040259,
-        -0.4985314,0.0415560, 1.0572252
-   ));
-       const float SRGB_GAMMA = 1.0 / 2.2;
-
-       vec3 rgb_to_srgb_approx(vec3 rgb) {
-        return pow(rgb, vec3(SRGB_GAMMA));
-    }
-        float f1(float t){
-            const float sigma = 6./29.;
-            if (t>sigma){
-                return t*t*t;
-            }else{
-                return 3.*sigma*sigma*(t-4./29.);
-            }
-        }
-        vec3 cielabtoxyz(vec3 c) {
-            const float xn = 95.047;
-            const float yn = 100.;
-            const float zn = 108.883;
-            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
-                        yn*f1((c.x+16.)/116.),
-                        zn*f1((c.x+16.)/116.  - c.z/200. )
-                    );
-        }
-        vec3 xyztorgb(vec3 c){
-            return c * XYZ_2_RGB;
-        }
-
-        vec3 xyztosrgb(vec3 c) {
-            return rgb_to_srgb_approx(xyztorgb(c));
-        }
-        #endif
-        `);
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/renderer/viz/expressions/zoom.js":
 /*!**********************************************!*\
   !*** ./src/renderer/viz/expressions/zoom.js ***!
@@ -21444,6 +21843,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Zoom; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 
@@ -21470,6 +21871,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Zoom extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor () {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 0, 'zoom');
+
         super({ zoom: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
         this.type = 'number';
         super.inlineMaker = inline => inline.zoom;
@@ -21517,37 +21920,38 @@ __webpack_require__.r(__webpack_exports__);
 
 const aggFns = [];
 
-const lowerCaseFunctions = {};
+const lowerCaseExpressions = {};
 Object.keys(_expressions__WEBPACK_IMPORTED_MODULE_1__)
-    .filter(name => name[0] === name[0].toLowerCase()) // Only get functions starting with lowercase
-    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = _expressions__WEBPACK_IMPORTED_MODULE_1__[name]; });
-lowerCaseFunctions.true = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRUE"];
-lowerCaseFunctions.false = _expressions__WEBPACK_IMPORTED_MODULE_1__["FALSE"];
-lowerCaseFunctions.align_center = _expressions__WEBPACK_IMPORTED_MODULE_1__["ALIGN_CENTER"];
-lowerCaseFunctions.align_bottom = _expressions__WEBPACK_IMPORTED_MODULE_1__["ALIGN_BOTTOM"];
+    .filter(name => name[0] === name[0].toLowerCase()) // Only get expressions starting with lowercase
+    .map(name => { lowerCaseExpressions[name.toLocaleLowerCase()] = _expressions__WEBPACK_IMPORTED_MODULE_1__[name]; });
 
-lowerCaseFunctions.pi = _expressions__WEBPACK_IMPORTED_MODULE_1__["PI"];
-lowerCaseFunctions.e = _expressions__WEBPACK_IMPORTED_MODULE_1__["E"];
-lowerCaseFunctions.hold = _expressions__WEBPACK_IMPORTED_MODULE_1__["HOLD"];
+lowerCaseExpressions.true = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRUE"];
+lowerCaseExpressions.false = _expressions__WEBPACK_IMPORTED_MODULE_1__["FALSE"];
+lowerCaseExpressions.align_center = _expressions__WEBPACK_IMPORTED_MODULE_1__["ALIGN_CENTER"];
+lowerCaseExpressions.align_bottom = _expressions__WEBPACK_IMPORTED_MODULE_1__["ALIGN_BOTTOM"];
 
-lowerCaseFunctions.bicycle = _expressions__WEBPACK_IMPORTED_MODULE_1__["BICYCLE"];
-lowerCaseFunctions.building = _expressions__WEBPACK_IMPORTED_MODULE_1__["BUILDING"];
-lowerCaseFunctions.bus = _expressions__WEBPACK_IMPORTED_MODULE_1__["BUS"];
-lowerCaseFunctions.car = _expressions__WEBPACK_IMPORTED_MODULE_1__["CAR"];
-lowerCaseFunctions.circle = _expressions__WEBPACK_IMPORTED_MODULE_1__["CIRCLE"];
-lowerCaseFunctions.circleoutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["CIRCLE_OUTLINE"];
-lowerCaseFunctions.cross = _expressions__WEBPACK_IMPORTED_MODULE_1__["CROSS"];
-lowerCaseFunctions.flag = _expressions__WEBPACK_IMPORTED_MODULE_1__["FLAG"];
-lowerCaseFunctions.house = _expressions__WEBPACK_IMPORTED_MODULE_1__["HOUSE"];
-lowerCaseFunctions.marker = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER"];
-lowerCaseFunctions.markeroutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER_OUTLINE"];
-lowerCaseFunctions.plus = _expressions__WEBPACK_IMPORTED_MODULE_1__["PLUS"];
-lowerCaseFunctions.square = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE"];
-lowerCaseFunctions.squareoutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE_OUTLINE"];
-lowerCaseFunctions.star = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR"];
-lowerCaseFunctions.staroutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR_OUTLINE"];
-lowerCaseFunctions.triangle = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRIANGLE"];
-lowerCaseFunctions.triangleoutline = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRIANGLE_OUTLINE"];
+lowerCaseExpressions.pi = _expressions__WEBPACK_IMPORTED_MODULE_1__["PI"];
+lowerCaseExpressions.e = _expressions__WEBPACK_IMPORTED_MODULE_1__["E"];
+lowerCaseExpressions.hold = _expressions__WEBPACK_IMPORTED_MODULE_1__["HOLD"];
+
+lowerCaseExpressions.bicycle = _expressions__WEBPACK_IMPORTED_MODULE_1__["BICYCLE"];
+lowerCaseExpressions.building = _expressions__WEBPACK_IMPORTED_MODULE_1__["BUILDING"];
+lowerCaseExpressions.bus = _expressions__WEBPACK_IMPORTED_MODULE_1__["BUS"];
+lowerCaseExpressions.car = _expressions__WEBPACK_IMPORTED_MODULE_1__["CAR"];
+lowerCaseExpressions.circle = _expressions__WEBPACK_IMPORTED_MODULE_1__["CIRCLE"];
+lowerCaseExpressions.circle_outline = _expressions__WEBPACK_IMPORTED_MODULE_1__["CIRCLE_OUTLINE"];
+lowerCaseExpressions.cross = _expressions__WEBPACK_IMPORTED_MODULE_1__["CROSS"];
+lowerCaseExpressions.flag = _expressions__WEBPACK_IMPORTED_MODULE_1__["FLAG"];
+lowerCaseExpressions.house = _expressions__WEBPACK_IMPORTED_MODULE_1__["HOUSE"];
+lowerCaseExpressions.marker = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER"];
+lowerCaseExpressions.marker_outline = _expressions__WEBPACK_IMPORTED_MODULE_1__["MARKER_OUTLINE"];
+lowerCaseExpressions.plus = _expressions__WEBPACK_IMPORTED_MODULE_1__["PLUS"];
+lowerCaseExpressions.square = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE"];
+lowerCaseExpressions.square_outline = _expressions__WEBPACK_IMPORTED_MODULE_1__["SQUARE_OUTLINE"];
+lowerCaseExpressions.star = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR"];
+lowerCaseExpressions.star_outline = _expressions__WEBPACK_IMPORTED_MODULE_1__["STAR_OUTLINE"];
+lowerCaseExpressions.triangle = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRIANGLE"];
+lowerCaseExpressions.triangle_outline = _expressions__WEBPACK_IMPORTED_MODULE_1__["TRIANGLE_OUTLINE"];
 
 function parseVizExpression (str) {
     prepareJsep();
@@ -21571,23 +21975,27 @@ function parseVizDefinition (str) {
 
 function parseVizNamedExpr (vizSpec, node) {
     if (node.operator !== ':') {
-        throw new Error('Invalid syntax');
+        throw new Error('Invalid syntax.');
     }
     if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
-    const name = node.left.name;
+    let name = node.left.name;
     if (!name) {
-        throw new Error('Invalid syntax');
+        throw new Error('Invalid syntax.');
     }
     if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(parseNode(node.right));
-    } else if (name === 'resolution') {
-        const value = parseNode(node.right);
-        vizSpec[name] = value;
+        name = node.left.name.substr('__cartovl_variable_'.length);
+        if (name in vizSpec.variables) {
+            throw new Error(`Variable '${name}' is already defined.`);
+        }
+        vizSpec.variables[name] = Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(parseNode(node.right));
     } else {
+        if (name in vizSpec) {
+            throw new Error(`Property '${name}' is already defined.`);
+        }
         const value = parseNode(node.right);
-        vizSpec[name] = Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(value);
+        vizSpec[name] = (name === 'resolution') ? value : Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(value);
     }
 }
 
@@ -21599,10 +22007,10 @@ function parseFunctionCall (node) {
         return args[0];
     }
     const args = node.arguments.map(arg => parseNode(arg));
-    if (lowerCaseFunctions[name]) {
-        return lowerCaseFunctions[name](...args);
+    if (lowerCaseExpressions[name]) {
+        return lowerCaseExpressions[name](...args);
     }
-    throw new Error(`Invalid function name '${node.callee.name}'`);
+    throw new Error(`Invalid function name '${node.callee.name}'.`);
 }
 
 function parseBinaryOperation (node) {
@@ -21637,8 +22045,12 @@ function parseBinaryOperation (node) {
             return _expressions__WEBPACK_IMPORTED_MODULE_1__["and"](left, right);
         case 'or':
             return _expressions__WEBPACK_IMPORTED_MODULE_1__["or"](left, right);
+        case 'in':
+            return _expressions__WEBPACK_IMPORTED_MODULE_1__["in"](left, right);
+        case 'nin':
+            return _expressions__WEBPACK_IMPORTED_MODULE_1__["nin"](left, right);
         default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
+            throw new Error(`Invalid binary operator '${node.operator}'.`);
     }
 }
 
@@ -21649,7 +22061,7 @@ function parseUnaryOperation (node) {
         case '+':
             return parseNode(node.argument);
         default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
+            throw new Error(`Invalid unary operator '${node.operator}'.`);
     }
 }
 
@@ -21665,12 +22077,12 @@ function parseIdentifier (node) {
         return _expressions__WEBPACK_IMPORTED_MODULE_1__["property"](node.name.substring(1));
     } else if (_expressions__WEBPACK_IMPORTED_MODULE_1__["palettes"][node.name.toUpperCase()]) {
         return _expressions__WEBPACK_IMPORTED_MODULE_1__["palettes"][node.name.toUpperCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-        return lowerCaseFunctions[node.name.toLowerCase()];
+    } else if (lowerCaseExpressions[node.name.toLowerCase()]) {
+        return lowerCaseExpressions[node.name.toLowerCase()];
     } else if (_expressions_color_cssColorNames__WEBPACK_IMPORTED_MODULE_3__["CSS_COLOR_NAMES"].includes(node.name.toLowerCase())) {
         return new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_4__["default"](node.name.toLowerCase());
     } else {
-        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
     }
 }
 
@@ -21688,7 +22100,7 @@ function parseNode (node) {
     } else if (node.type === 'Identifier') {
         return parseIdentifier(node);
     }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
 }
 
 function prepareJsep () {
@@ -21697,6 +22109,8 @@ function prepareJsep () {
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addBinaryOp('^', 11);
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addBinaryOp('or', 1);
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addBinaryOp('and', 2);
+    jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addBinaryOp('in', 13);
+    jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addBinaryOp('nin', 13);
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addIdentifierChar('@');
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.addIdentifierChar('#');
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeLiteral('true');
@@ -21704,6 +22118,8 @@ function prepareJsep () {
 }
 
 function cleanJsep () {
+    jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeBinaryOp('in');
+    jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeBinaryOp('nin');
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeBinaryOp('and');
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeBinaryOp('or');
     jsep__WEBPACK_IMPORTED_MODULE_0___default.a.removeBinaryOp('^');
@@ -22350,6 +22766,8 @@ class Dataset extends _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__["default"] {
      * If your server is not hosted by CARTO you must add a third parameter that includes the serverURL. This can be done {@link carto.setDefaultConfig|setting the default config} in the carto object or providing a `config`
      * object with your serverURL.
      *
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
      * @param {string} tableName - The name of an existing table
      * @param {object} auth
      * @param {string} auth.apiKey - API key used to authenticate against CARTO
@@ -22429,6 +22847,8 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
      * @param {object} data - A GeoJSON data object
      * @param {object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
+     *
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.
      *
      * @example
      * const source = new carto.source.GeoJSON({
@@ -22682,7 +23102,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             const f = this._features[i];
 
             catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(f.properties[name]);
+                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
             });
             numFields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
@@ -22995,7 +23415,7 @@ const MVT_TO_CARTO_TYPES = {
  */
 
 /**
- * MVTProperty objects declare a property type and, optoinally, additional information like numeric ranges.
+ * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
  *
  * @typedef {object} MVTProperty
  * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
@@ -23009,13 +23429,22 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
     /**
      * Create a carto.source.MVT.
      *
-     * @param {object} data - A MVT data object
+     * @param {string | string[]} templateURL - A string with the URL template of the MVT tiles in https://mytileserver.com/{z}/{x}/{y}.mvt format or a list of such templates. Usage of a list of templates with different domains is recommended since that allows the browser to make more requests in parallel.
      * @param {MVTMetadata} [metadata] - Metadata of the source, declaring property name, types and optionally ranges.
      * @param {MVTOptions} [options] - MVT source configuration, the default value will be valid for regular URL templates if the tiles are composed of only one layer
      *
-     * @example
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
+     *
+     * @example Usage with multiple templateURLs as recommended
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
-     * new carto.source.MVT("https://{server}/{z}/{x}/{y}.mvt", metadata);
+     * new carto.source.MVT([
+     *                       "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
+     *                       "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
+     *                      ],
+     *                      metadata
+     *                     );
      *
      * @fires CartoError
      *
@@ -23024,7 +23453,7 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
      * @memberof carto.source
      * @api
      */
-    constructor (templateURL, metadata = new _renderer_Metadata__WEBPACK_IMPORTED_MODULE_5__["default"](), options = { layerId: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new _renderer_Metadata__WEBPACK_IMPORTED_MODULE_5__["default"](), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof _renderer_Metadata__WEBPACK_IMPORTED_MODULE_5__["default"])) {
@@ -23071,7 +23500,7 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
         const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
 
         if (!mvtLayer) {
-            throw new Error(`LayerID '${this._options.layerID}' doesn't exist on the MVT tile`);
+            return { empty: true };
         }
 
         const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
@@ -23194,7 +23623,7 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_7__["default"] {
             if (this._metadata.properties[propertyName].type !== 'category') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
             }
-            return this._metadata.categorizeString(propertyValue);
+            return this._metadata.categorizeString(propertyName, propertyValue);
         } else if (typeof propertyValue === 'number') {
             if (this._metadata.properties[propertyName].type !== 'number') {
                 throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
@@ -23268,6 +23697,8 @@ class SQL extends _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__["default"] {
      *
      * If your server is not hosted by CARTO you must add a third parameter that includes the serverURL. This can be done {@link carto.setDefaultConfig|setting the default config} in the carto object or providing a `config`
      * object with your serverURL.
+     *
+     * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
      * @param {string} query - A SQL query containing a SELECT statement
      * @param {object} auth
@@ -23537,6 +23968,107 @@ function _triangleLineSeparatesViewport (triangle, viewport) {
 
 /***/ }),
 
+/***/ "./src/utils/events.js":
+/*!*****************************!*\
+  !*** ./src/utils/events.js ***!
+  \*****************************/
+/*! exports provided: on, off */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "on", function() { return on; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "off", function() { return off; });
+
+let registeredHandlers = [];
+
+/**
+ * Register an event handler for the given event name and for the given list of layers. Valid names are: `loaded`, `updated`.
+ *
+ * The 'loaded' event will be fired when all the layers are loaded (and their 'loaded' events are fired).
+ *
+ * The 'updated' event will be fired whenever one of the layers fired an 'updated' event,
+ * but throttled by requestAnimationFrame to return a maximum of one event per frame.
+ *
+ * @param {string} eventName - Supported event names are 'loaded' and 'updated'
+ * @param {carto.Layer[]} layerList - List of layers
+ *
+ * @memberof carto
+ * @api
+ */
+function on (eventName, layerList, callback) {
+    let internalCallbacks = [];
+    if (eventName === 'loaded') {
+        const waitingGroup = new Set(layerList);
+        layerList.forEach(layer => {
+            const internalCallback = () => {
+                waitingGroup.delete(layer);
+                if (waitingGroup.size === 0) {
+                    callback();
+                }
+            };
+            layer.on('loaded', internalCallback);
+            internalCallbacks.push(internalCallback);
+        });
+    } else if (eventName === 'updated') {
+        let scheduledRAF = false;
+        layerList.forEach(layer => {
+            const internalCallback = () => {
+                if (!scheduledRAF) {
+                    window.requestAnimationFrame(() => {
+                        scheduledRAF = false;
+                        callback();
+                    });
+                }
+            };
+            layer.on('updated', internalCallback);
+            internalCallbacks.push(internalCallback);
+        });
+    } else {
+        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
+    }
+    registeredHandlers.push({
+        eventName,
+        layerList,
+        callback,
+        internalCallbacks
+    });
+}
+
+/**
+* Remove an event handler for the given event name, layer list and callback.
+*
+* @param {string} eventName - event
+* @param {carto.Layer} layerList - List of layers
+* @param {function} callback - Handler function to unregister
+*
+* @memberof carto
+* @api
+*/
+function off (eventName, layerList, callback) {
+    registeredHandlers.forEach(register => {
+        if (register.eventName === eventName &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
+            register.callback === callback) {
+            register.layerList.forEach(layer => {
+                register.internalCallbacks.forEach(internalCallback => {
+                    layer.off(eventName, internalCallback);
+                });
+            });
+        }
+    });
+    registeredHandlers = registeredHandlers.filter(register =>
+        !(
+            register.eventName === eventName &&
+            register.layerList.every(registeredLayer => layerList.includes(registeredLayer)) &&
+            register.callback === callback
+        )
+    );
+}
+
+
+/***/ }),
+
 /***/ "./src/utils/geometry.js":
 /*!*******************************!*\
   !*** ./src/utils/geometry.js ***!
@@ -23680,6 +24212,9 @@ function pointInCircle (p, center, scale) {
 }
 
 function pointInRectangle (point, bbox) {
+    if (bbox === null) {
+        return false;
+    }
     const p = {
         x: point.x.toFixed(2),
         y: point.y.toFixed(2)
@@ -23710,20 +24245,25 @@ function pointInRectangle (point, bbox) {
 /*!***************************!*\
   !*** ./src/utils/util.js ***!
   \***************************/
-/*! exports provided: WM_R, WM_2R, projectToWebMercator, isUndefined, isString, isNumber, isObject, castDate, isSetsEqual, default */
+/*! exports provided: WM_R, WM_2R, isUndefined, isString, isNumber, isObject, castDate, isSetsEqual, equalArrays, projectToWebMercator, computeMapZoom, computeMapCenter, computeMatrixZoom, computeMatrixCenter, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WM_R", function() { return WM_R; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WM_2R", function() { return WM_2R; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "projectToWebMercator", function() { return projectToWebMercator; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isUndefined", function() { return isUndefined; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNumber", function() { return isNumber; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "castDate", function() { return castDate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSetsEqual", function() { return isSetsEqual; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equalArrays", function() { return equalArrays; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "projectToWebMercator", function() { return projectToWebMercator; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeMapZoom", function() { return computeMapZoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeMapCenter", function() { return computeMapCenter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeMatrixZoom", function() { return computeMatrixZoom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "computeMatrixCenter", function() { return computeMatrixCenter; });
 /**
  * Export util functions
  */
@@ -23732,14 +24272,6 @@ const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
 const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
-
-function projectToWebMercator (latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x, y };
-}
 
 function isUndefined (value) {
     return value === undefined;
@@ -23780,16 +24312,70 @@ function isSetsEqual (a, b) {
     return a.size === b.size && [...a].every(value => b.has(value));
 }
 
+function equalArrays (a, b) {
+    if (a && b && a.length === b.length) {
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+function projectToWebMercator (latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    return {
+        x: lng * EARTH_RADIUS,
+        y: Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS
+    };
+}
+
+function computeMapZoom (map) {
+    const bounds = map.getBounds();
+    const nw = bounds.getNorthWest();
+    const sw = bounds.getSouthWest();
+    return (projectToWebMercator(nw).y - projectToWebMercator(sw).y) / WM_2R;
+}
+
+function computeMapCenter (map) {
+    const center = map.getCenter();
+    const coords = projectToWebMercator(center);
+    return {
+        x: coords.x / WM_R,
+        y: coords.y / WM_R
+    };
+}
+
+function computeMatrixZoom (matrix) {
+    // The matrix projects spherical mercator coordinates to gl coordinates
+    return -(2 * matrix[15] / matrix[5]);
+}
+
+function computeMatrixCenter (matrix) {
+    // The matrix projects spherical mercator coordinates to gl coordinates
+    return {
+        x: -(1 + 2 * matrix[12] / matrix[0]),
+        y: +(1 + 2 * matrix[13] / matrix[5])
+    };
+}
+
 /* harmony default export */ __webpack_exports__["default"] = ({
     WM_R,
     WM_2R,
-    projectToWebMercator,
     isUndefined,
     isString,
     isNumber,
     isObject,
     castDate,
-    isSetsEqual
+    isSetsEqual,
+    equalArrays,
+    projectToWebMercator,
+    computeMapZoom,
+    computeMapCenter,
+    computeMatrixZoom,
+    computeMatrixCenter
 });
 
 
