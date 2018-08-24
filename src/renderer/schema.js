@@ -1,40 +1,53 @@
-// The IDENTITY schema contains zero columns, and it has two interesting properties:
-//      union(a,IDENTITY)=union(IDENTITY, a)=a
-//      contains(x, IDENTITY)=true  (for x = valid schema)
-export const IDENTITY = {
-    columns: []
-};
+
+export const IDENTITY = {};
 
 /*
-const schema = {
-    columns: ['temp', 'cat']
-}; */
+const mns = {
+  price:  new Set(['avg', 'max]),
+  amount: new Set(['unaggregated']),
+  other:  new Set([]),
+};
+
+*/
 
 // TODO
-// Returns true if subsetSchema is a contained by supersetSchema
-// A schema A is contained by the schema B when all columns of A are present in B and
-// all aggregations in A are present in B, if a column is not aggregated in A, it must
-// be not aggregated in B
-// export function contains(supersetSchema, subsetSchema) {
-// }
 
-// Returns the union of a and b schemas
-// The union of two schemas is a schema with all the properties in both schemas and with their
-// aggregtions set to the union of both aggregation sets, or null if a property aggregation is null in both schemas
-// The union is not defined when one schema set the aggregation of one column and the other schema left the aggregation
-// to null. In this case the function will throw an exception.
 export function union (a, b) {
-    const t = a.columns.concat(b.columns);
-    return {
-        columns: t.filter((item, pos) => t.indexOf(item) === pos)
-    };
+    const result = {};
+    const propertyNames = new Set(Object.keys(a).concat(Object.keys(b)));
+    propertyNames.forEach(propertyName => {
+        const aUsages = a[propertyName] || [];
+        const bUsages = b[propertyName] || [];
+        const combinedUsage = [...aUsages, ...bUsages];
+        result[propertyName] = combinedUsage;
+    });
+    return result;
 }
 
 export function equals (a, b) {
     if (!a || !b) {
         return false;
     }
-    return a.columns.length === b.columns.length && a.columns.every(v => b.columns.includes(v));
+    const aKeys = Object.keys(a);
+    const bKeys = Object.keys(b);
+
+    return [...new Set(aKeys.concat(bKeys))].every(propertyName => {
+        const aUsages = a[propertyName];
+        const bUsages = b[propertyName];
+        if (!aUsages || !bUsages) {
+            return false;
+        }
+
+        function cmp (a, b) {
+            return a.type === b.type && a.op === b.op;
+        }
+        return aUsages.every(a =>
+            bUsages.find(b => cmp(a, b))
+        ) &&
+            bUsages.every(b =>
+                aUsages.find(a => cmp(a, b))
+            );
+    });
 }
 
 const AGG_PREFIX = '_cdb_agg_';
