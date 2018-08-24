@@ -149,7 +149,7 @@ export default class Ramp extends BaseExpression {
      * @param {object} config - Optional configuration
      * @param {string} config.defaultOthers - Name for other category values. Defaults to 'Others'.
      * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
-     * @return {Array} Array of { name, values }. Values is an array. Its length depend on the expression (if it is categorical or numerical). There is more information about values in the examples.
+     * @return {Array} Array of { name, values }. Values is an array. Its length depend on the expression (if it is categorical or numerical). The first element in the array is always the result evaluated by the ramp. There is more information about values in the examples.
      *
      * @example <caption>Get the color associated with each category</caption>
      * const s = carto.expressions;
@@ -260,10 +260,10 @@ export default class Ramp extends BaseExpression {
      *   });
      *
      *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, { from: 0, to: 25 } ] },
-     *   //   { name: 'numeric', values: [// rgba color, { from: 25, to: 50 } ] }
-     *   //   { name: 'numeric', values: [// rgba color, { from: 50, to: 75 } ] }
-     *   //   { name: 'numeric', values: [// rgba color, { from: 75, to: 100 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
+     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
      *   // ]
      * });
      *
@@ -278,10 +278,10 @@ export default class Ramp extends BaseExpression {
      *   });
      *
      *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, { from: 0, to: 25 } ] },
-     *   //   { name: 'numeric', values: [// rgba color, { from: 25, to: 50 } ] }
-     *   //   { name: 'numeric', values: [// rgba color, { from: 50, to: 75 } ] }
-     *   //   { name: 'numeric', values: [// rgba color, { from: 75, to: 100 } ] }
+     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
+     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
+     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
      *   // ]
      * });
      * @memberof carto.expressions.Ramp
