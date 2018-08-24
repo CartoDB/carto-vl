@@ -7,14 +7,6 @@ const EARTH_RADIUS = 6378137;
 export const WM_R = EARTH_RADIUS * Math.PI; // Webmercator *radius*: half length Earth's circumference
 export const WM_2R = WM_R * 2; // Webmercator coordinate range (Earth's circumference)
 
-export function projectToWebMercator (latLng) {
-    let lat = latLng.lat * DEG2RAD;
-    let lng = latLng.lng * DEG2RAD;
-    let x = lng * EARTH_RADIUS;
-    let y = Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS;
-    return { x, y };
-}
-
 export function isUndefined (value) {
     return value === undefined;
 }
@@ -54,14 +46,68 @@ export function isSetsEqual (a, b) {
     return a.size === b.size && [...a].every(value => b.has(value));
 }
 
+export function equalArrays (a, b) {
+    if (a && b && a.length === b.length) {
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+export function projectToWebMercator (latLng) {
+    let lat = latLng.lat * DEG2RAD;
+    let lng = latLng.lng * DEG2RAD;
+    return {
+        x: lng * EARTH_RADIUS,
+        y: Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS
+    };
+}
+
+export function computeMapZoom (map) {
+    const bounds = map.getBounds();
+    const nw = bounds.getNorthWest();
+    const sw = bounds.getSouthWest();
+    return (projectToWebMercator(nw).y - projectToWebMercator(sw).y) / WM_2R;
+}
+
+export function computeMapCenter (map) {
+    const center = map.getCenter();
+    const coords = projectToWebMercator(center);
+    return {
+        x: coords.x / WM_R,
+        y: coords.y / WM_R
+    };
+}
+
+export function computeMatrixZoom (matrix) {
+    // The matrix projects spherical mercator coordinates to gl coordinates
+    return -(2 * matrix[15] / matrix[5]);
+}
+
+export function computeMatrixCenter (matrix) {
+    // The matrix projects spherical mercator coordinates to gl coordinates
+    return {
+        x: -(1 + 2 * matrix[12] / matrix[0]),
+        y: +(1 + 2 * matrix[13] / matrix[5])
+    };
+}
+
 export default {
     WM_R,
     WM_2R,
-    projectToWebMercator,
     isUndefined,
     isString,
     isNumber,
     isObject,
     castDate,
-    isSetsEqual
+    isSetsEqual,
+    equalArrays,
+    projectToWebMercator,
+    computeMapZoom,
+    computeMapCenter,
+    computeMatrixZoom,
+    computeMatrixCenter
 };

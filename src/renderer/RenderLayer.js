@@ -23,6 +23,15 @@ export default class RenderLayer {
         this.idProperty = dataframe.metadata.idProperty;
     }
 
+    setRenderer (renderer) {
+        this.renderer = renderer;
+        this.dataframes.forEach(d => d.bind(renderer));
+    }
+
+    setViz (viz) {
+        this.viz = viz;
+    }
+
     getActiveDataframes () {
         this.dataframes = this.dataframes.filter(df => !df.freed);
         let active = this.dataframes.filter(df => df.active && df.numVertex);
