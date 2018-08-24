@@ -137,15 +137,16 @@ export default class Layer {
     }
 
     /**
-     * Remove this layer from a map.
+     * Remove this layer from the map. It should be called after the layer is loaded. Otherwise, it will not delete the layer.
      *
-     * @param {mapboxgl.Map} map - The map on which to remove the layer
      * @memberof carto.Layer
      * @instance
      * @api
      */
-    removeFrom (map) {
-        map.removeLayer(this);
+    remove () {
+        if (this.map) {
+            this.map.removeLayer(this.id);
+        }
     }
 
     /**

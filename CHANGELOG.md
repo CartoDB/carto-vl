@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Use the new Custom Layer interface with MGL (v0.48.0-carto1)
-- Add `layer.removeFrom(map)` API function
+- Add `layer.remove()` API function
 - Make viz optional in `layer.update(source, viz?)` API function
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression

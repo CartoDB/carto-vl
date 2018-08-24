@@ -136,14 +136,17 @@ describe('api/layer', () => {
         });
     });
 
-    describe('.removeFrom', () => {
+    describe('.remove', () => {
         it('should call onMapLoaded when the map is loaded', () => {
             const layer = new Layer('layer0', source, viz);
+            layer.onAdd = (map) => { layer.map = map; };
             const mapMock = {
+                addLayer: (layer) => { layer.onAdd(mapMock); },
                 removeLayer: jasmine.createSpy('removeLayer')
             };
-            layer.removeFrom(mapMock);
-            expect(mapMock.removeLayer).toHaveBeenCalledWith(layer);
+            layer.addTo(mapMock);
+            layer.remove();
+            expect(mapMock.removeLayer).toHaveBeenCalledWith(layer.id);
         });
     });
 
