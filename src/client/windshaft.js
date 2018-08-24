@@ -8,11 +8,6 @@ import * as windshaftFiltering from './windshaft-filtering';
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-const AGG_PREFIX = '_cdb_agg_';
-const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
-function getBase (name) {
-    return name.replace(AGG_PATTERN, '');
-}
 
 export default class Windshaft {
     constructor (source) {
@@ -170,7 +165,7 @@ export default class Windshaft {
         this._mvtClient = new MVT(urlTemplates);
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const basename = getBase(propertyName);
+            const basename = schema.column.getBase(propertyName);
             const column = this.metadata.properties[basename];
             if (!column) {
                 return;
@@ -255,7 +250,7 @@ export default class Windshaft {
                     const usageList = MNS[propertyName];
                     usageList.forEach(usage => {
                         if (usage.type === 'aggregated') {
-                            aggregation.columns[`${AGG_PREFIX}${usage.op}_${propertyName}`] = {
+                            aggregation.columns[schema.column.aggColumn(propertyName, usage.op)] = {
                                 aggregate_function: usage.op,
                                 aggregated_column: propertyName
                             };
