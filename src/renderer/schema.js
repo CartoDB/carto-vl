@@ -28,26 +28,7 @@ export function equals (a, b) {
     if (!a || !b) {
         return false;
     }
-    const aKeys = Object.keys(a);
-    const bKeys = Object.keys(b);
-
-    return [...new Set(aKeys.concat(bKeys))].every(propertyName => {
-        const aUsages = a[propertyName];
-        const bUsages = b[propertyName];
-        if (!aUsages || !bUsages) {
-            return false;
-        }
-
-        function cmp (a, b) {
-            return a.type === b.type && a.op === b.op;
-        }
-        return aUsages.every(a =>
-            bUsages.find(b => cmp(a, b))
-        ) &&
-            bUsages.every(b =>
-                aUsages.find(a => cmp(a, b))
-            );
-    });
+    return JSON.stringify(simplify(a)) === JSON.stringify(simplify(b));
 }
 
 function simplify (MNS) {
