@@ -60,8 +60,12 @@ export default class Property extends BaseExpression {
 
     get categories () {
         return this.type === 'category'
-            ? this._categories
-            : [];
+            ? this._metadata.properties[this.name].categories
+            : undefined;
+    }
+
+    getPropertyName () {
+        return this.name;
     }
 
     _bindMetadata (metadata) {
@@ -71,10 +75,8 @@ export default class Property extends BaseExpression {
         }
 
         this._metadata = metadata;
-        this._categories = metaColumn.categories;
         this.type = metaColumn.type;
 
-        // FIXME
         if (this.type === 'category' && !this.numCategories) {
             Object.defineProperty(this, 'numCategories', {
                 get: function () {

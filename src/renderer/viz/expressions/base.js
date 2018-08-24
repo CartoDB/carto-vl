@@ -99,14 +99,6 @@ export default class Base {
         return this instanceof expressionClass;
     }
 
-    get categories () {
-        const children = this._getChildren();
-
-        if (children) {
-            return children[0].categories;
-        }
-    }
-
     notify () {
         this.parent.notify();
     }
@@ -117,6 +109,10 @@ export default class Base {
 
     loadImages () {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
+    }
+
+    getPropertyName () {
+        return this._getChildren()[0].getPropertyName();
     }
 
     _bindMetadata (metadata) {

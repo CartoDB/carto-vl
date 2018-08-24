@@ -75,16 +75,14 @@
 
       let colorLegendList = '';
 
-      colorLegend.forEach((legend) => {
-        const color = legend.values[0]
-          ? rgbToHex(legend.values[0])
+      colorLegend.data.forEach((legend) => {
+        const color = legend.value
+          ? rgbToHex(legend.value)
           : 'white'
-
-        const value = legend.values[1];
 
         if (color) {
           colorLegendList +=
-            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>[ ${value[0].toFixed(2)}, ${value[1].toFixed(2)} ]</span></li>\n`;
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.toFixed(2)}</span></li>\n`;
         }
       });
 

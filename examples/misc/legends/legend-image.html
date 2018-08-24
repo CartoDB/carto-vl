@@ -52,14 +52,13 @@
     // Create the source
     const source = new carto.source.Dataset('table_311_complaints');
     // Add better styles
-    const viz = new carto.Viz(
-      `
-            symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
-            color: ramp(buckets($complaint,['Car','Bus','Building']), [#59ca22,#009fff,#f51ac4])
-            symbolPlacement: align_bottom
-            width: 30
-        `
-    );
+    const viz = new carto.Viz(`
+      symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
+      color: ramp(buckets($complaint,['Car','Bus','Building']), [#59ca22,#009fff,#f51ac4])
+      symbolPlacement: align_bottom
+      width: 30
+    `);
+
     // Create the layer
     const layer = new carto.Layer('layer', source, viz);
     // Add the layer to the map
@@ -73,8 +72,8 @@
 
       let symbolLegendList = '';
 
-      symbolLegend.forEach((legend, index) => {
-        const colorHex = rgbToHex(colorLegend[index].values[0]);
+      symbolLegend.data.forEach((legend, index) => {
+        const colorHex = rgbToHex(colorLegend.data[index].value);
         symbolLegendList +=
           `
           <li>
@@ -82,10 +81,10 @@
                 class="image-mark"
                 style="
                   background-color: ${colorHex};
-                  mask-image:url(${legend.values[0]});
-                  -webkit-mask-image:url(${legend.values[0]})
+                  mask-image:url(${legend.value});
+                  -webkit-mask-image:url(${legend.value})
               "></span>
-              <span>${legend.name}</span>
+              <span>${legend.key}</span>
           </li>
         `
       });

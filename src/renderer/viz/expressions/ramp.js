@@ -130,26 +130,62 @@ export default class Ramp extends BaseExpression {
 
     eval (feature) {
         this.palette = this._calcPaletteValues(this.palette);
+        let index = this.input.eval(feature);
+
+        if (this.palette.type === paletteTypes.IMAGE) {
+            return this.palette[`image${index}`].url;
+        }
+
+        const { min, max } = this._getMinMax(feature);
+        const m = (index - min) / (max - min);
 
         const texturePixels = this._computeTextureIfNeeded();
-        const input = this.input.eval(feature);
         const numValues = texturePixels.length - 1;
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
         const color = this.type === rampTypes.NUMBER
             ? this._getValue(texturePixels, numValues, m)
             : this._getColorValue(texturePixels, m);
 
+        if (Number.isNaN(color.r) ||
+            Number.isNaN(color.g) ||
+            Number.isNaN(color.b) ||
+            Number.isNaN(color.a)) {
+            return null;
+        }
+
         return color;
     }
 
+    _getFeatureIndex (feature) {
+        return this.input.eval(feature);
+    }
+
+    _getMinMax (feature) {
+        if (this.input.min && this.input.max) {
+            const featureName = Object.keys(feature)[0];
+            const minFeature = {};
+            const maxFeature = {};
+            minFeature[featureName] = this.input.min.eval();
+            maxFeature[featureName] = this.input.max.eval();
+
+            return {
+                min: this.input.eval(minFeature),
+                max: this.input.eval(maxFeature)
+            };
+        } else {
+            return {
+                min: this.minKey,
+                max: this.maxKey
+            };
+        }
+    }
     /**
      * Get the value associated with each category
      *
      * @param {object} config - Optional configuration
      * @param {string} config.defaultOthers - Name for other category values. Defaults to 'Others'.
      * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
-     * @return {Array} Array of { name, values }. Values is an array. Its length depend on the expression (if it is categorical or numerical). The first element in the array is always the result evaluated by the ramp. There is more information about values in the examples.
+     * @return {object} - { type, data }. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
      *
      * @example <caption>Get the color associated with each category</caption>
      * const s = carto.expressions;
@@ -291,112 +327,55 @@ export default class Ramp extends BaseExpression {
      */
     getLegend (options) {
         const config = Object.assign(DEFAULT_OPTIONS, options);
+        const type = this.input.type;
 
         if (config.samples > MAX_SAMPLES) {
             throw new Error(`The maximum number of samples for a legend is ${MAX_SAMPLES}`);
         }
 
-        if (this.input.isA(Linear)) {
-            return this._getLegendLinear(this.input, config);
+        if (this.input.type === inputTypes.NUMBER) {
+            const { data, min, max } = this._getLegendNumeric(config);
+            return { type, min, max, data };
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
-            return this.input.list
-                ? this._getLegendList(config)
-                : this._getLeyendCategories(config);
+            const data = this._getLeyendCategories(config);
+            return { type, data };
         }
     }
 
-    _getLegendLinear (input, config) {
-        const firstChild = input[input.childrenNames[0]];
-        return firstChild.isA(Property)
-            ? this._getLegendLinearProperty(firstChild, config)
-            : this._getLegendLinear(firstChild, config);
-    }
-
-    _getLegendLinearProperty (property, config) {
-        const name = property.name;
+    _getLegendNumeric (config) {
+        const name = this.input.getPropertyName();
+        const min = this.input.min.eval();
+        const max = this.input.max.eval();
+        const INC = (max - min) / config.samples;
         const feature = {};
-        const breakpoints = _getBreakpoints(this._metadata.properties[name], config.samples);
+        const data = [];
 
-        return breakpoints.map((breakpoint) => {
-            feature[name] = breakpoint[0];
-            const values = [ this.eval(feature), breakpoint ];
+        for (let i = min; i < max; i += INC) {
+            feature[name] = i;
+            const key = i;
+            const value = this.eval(feature);
 
-            return { name, values };
-        });
-    }
-
-    _getLegendList () {
-        return this.input.list.elems
-            .map(this._getLegendItemValue.bind(this))
-            .filter(legend => legend.values !== null);
-    }
-
-    _getLeyendCategories (config) {
-        return this.input.categories
-            .map((category, index) => { return this._getLegendCategoryValue(category, index, config); })
-            .filter(legend => legend.values !== null);
-    }
-
-    _getLegendItemValue (category, index) {
-        const value = this._getRampValueByIndex(index);
-
-        return {
-            name: this._getCategoryName(category.expr),
-            values: value ? [ value ] : null
-        };
-    }
-
-    _getLegendCategoryValue (category, index, config) {
-        const value = this._getRampValueByIndex(index);
-
-        if (this.input.isA(Top) && this.input.numBuckets === index) {
-            return {
-                name: config.defaultOthers || DEFAULT_OTHERS_NAME,
-                values: value ? [ value ] : null
-            };
+            data.push({ key, value });
         }
 
-        return {
-            name: this._getCategoryName(category.name),
-            values: value ? [ value ] : null
-        };
+        return { data, min, max };
     }
 
-    _getRampValueByIndex (index, config) {
-        if (this.palette.type === paletteTypes.IMAGE) {
-            return this.palette[`image${index}`]
-                ? this.palette[`image${index}`].url
-                : null;
-        }
+    _getLeyendCategories () {
+        const name = this.input.getPropertyName();
+        const categories = this._metadata.properties[name].categories;
 
-        this.palette = this._calcPaletteValues(this.palette);
-
-        const texturePixels = this._computeTextureIfNeeded();
-        const numValues = texturePixels.length - 1;
-        const m = (index - this.minKey) / (this.maxKey - this.minKey);
-
-        const color = this.type === rampTypes.NUMBER
-            ? this._getValue(texturePixels, numValues, m)
-            : this._getColorValue(texturePixels, m);
-
-        if (Number.isNaN(color.r) ||
-            Number.isNaN(color.g) ||
-            Number.isNaN(color.b) ||
-            Number.isNaN(color.a)) {
-            return null;
-        }
-
-        return color;
-    }
-
-    _getCategoryName (name) {
-        if (!name) {
-            return DEFAULT_OTHERS_NAME;
-        }
-
-        return name;
+        return categories
+            .map((category) => {
+                let feature = {};
+                feature[name] = category.name;
+                const key = category.name;
+                const value = this.eval(feature);
+                return { key, value };
+            })
+            .filter(legend => legend.value !== null);
     }
 
     _getValue (texturePixels, numValues, m) {
@@ -483,7 +462,7 @@ export default class Ramp extends BaseExpression {
 
     _getColorsFromPalette (input, palette) {
         if (palette.type === paletteTypes.IMAGE) {
-            return palette.colors;
+            return palette.eval();
         }
 
         return palette.type === paletteTypes.PALETTE
@@ -767,15 +746,4 @@ function _calcPaletteValues (palette) {
     }
 
     return palette;
-}
-
-function _getBreakpoints (property, numSamples) {
-    const breakpoints = [];
-    const INC = (property.max - property.min) / numSamples;
-
-    for (let i = property.min; i + INC < property.max; i += INC) {
-        breakpoints.push([ i, i + INC ]);
-    }
-
-    return breakpoints;
 }

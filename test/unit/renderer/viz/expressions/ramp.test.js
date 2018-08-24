@@ -1017,8 +1017,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend().length;
-                expected = 10;
+                actual = r.getLegend().data.length;
+                expected = 11;
                 expect(actual).toEqual(expected);
             });
 
@@ -1027,8 +1027,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend({ samples: 20 }).length;
-                expected = 20;
+                actual = r.getLegend({ samples: 20 }).data.length;
+                expected = 21;
                 expect(actual).toEqual(expected);
             });
         });
@@ -1056,17 +1056,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend();
+                actual = r.getLegend().data;
                 expected = [
                     {
-                        name: 'A',
-                        values: [ BICYCLE.url ]
+                        key: 'A',
+                        value: BICYCLE.url
                     }, {
-                        name: 'B',
-                        values: [ CAR.url ]
+                        key: 'B',
+                        value: CAR.url
                     }, {
-                        name: 'C',
-                        values: [ BUILDING.url ]
+                        key: 'C',
+                        value: BUILDING.url
                     }
                 ];
 
@@ -1101,17 +1101,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend();
+                actual = r.getLegend().data;
                 expected = [
                     {
-                        name: 'A',
-                        values: [ red.color ]
+                        key: 'A',
+                        value: red.color
                     }, {
-                        name: 'B',
-                        values: [ blue.color ]
+                        key: 'B',
+                        value: blue.color
                     }, {
-                        name: 'C',
-                        values: [ yellow.color ]
+                        key: 'C',
+                        value: yellow.color
                     }
                 ];
 
