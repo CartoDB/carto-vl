@@ -26,7 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use underscore in image constants
 - Use local basemaps for testing
 
-## Fixed
+### Fixed
 - Fix animation example
 - Fix interactivity examples
 
@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve GeoJSON source
 - Improve viewport feature collision
 
-## Removed
+### Removed
 - Remove deprecated expressions: torque and sprites
 
 ### Fixed
