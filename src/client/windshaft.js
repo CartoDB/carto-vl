@@ -291,7 +291,6 @@ export default class Windshaft {
     }
 
     async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata = null) {
-        const LAYER_INDEX = 0;
         const mapConfigAgg = {
             buffersize: {
                 mvt: 1
