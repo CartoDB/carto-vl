@@ -12,15 +12,6 @@ import { layerVisibility } from './constants/layer';
 // use the same renderer with each renderLayer
 const renderers = new WeakMap();
 
-function getRenderer (map, gl) {
-    if (!renderers.get(map)) {
-        const renderer = new Renderer();
-        renderer.initialize(gl);
-        renderers.set(map, renderer);
-    }
-    return renderers.get(map);
-}
-
 /**
 *
 * A Layer is the primary way to visualize geospatial data.
@@ -351,7 +342,7 @@ export default class Layer {
     onAdd (map, gl) {
         this.gl = gl;
         this.map = map;
-        this.renderer = getRenderer(map, gl);
+        this.renderer = _getRenderer(map, gl);
 
         // Initialize render layer
         this._renderLayer.setRenderer(this.renderer);
@@ -546,6 +537,15 @@ export default class Layer {
         }
         this._renderLayer.freeDataframes();
     }
+}
+
+function _getRenderer (map, gl) {
+    if (!renderers.get(map)) {
+        const renderer = new Renderer();
+        renderer.initialize(gl);
+        renderers.set(map, renderer);
+    }
+    return renderers.get(map);
 }
 
 /**
