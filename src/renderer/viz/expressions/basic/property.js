@@ -69,6 +69,14 @@ export default class Property extends BaseExpression {
         return this.name;
     }
 
+    getPropertyId (feature) {
+        const value = this.eval(feature);
+
+        return this.type === 'category'
+            ? this._metadata.categoryToID.get(value)
+            : this.eval(value);
+    }
+
     _bindMetadata (metadata) {
         const metaColumn = metadata.properties[this.name];
         if (!metaColumn) {

@@ -46,7 +46,22 @@ export default class Top extends BaseExpression {
     }
 
     eval (feature) {
-        return this._meta.categoryToID.get(this.property.eval(feature));
+        const catID = this._meta.categoryToID.get(this.property.eval(feature));
+        const buckets = this.numBuckets;
+        const metaColumn = this._meta.properties[this.property.name];
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
+
+        let ret;
+
+        orderedCategoryNames.map((name, i) => {
+            if (i === catID) {
+                ret = i < buckets ? this._meta.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
+            }
+        });
+
+        return ret;
     }
 
     _bindMetadata (metadata) {

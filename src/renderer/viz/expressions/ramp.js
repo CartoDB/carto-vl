@@ -10,7 +10,7 @@ import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
 
-const DEFAULT_OTHERS_NAME = 'CARTOVL_TOP_OTHERS_BUCKET';
+const DEFAULT_OTHERS_NAME = 'CARTOVL_OTHERS';
 const MAX_SAMPLES = 100;
 const DEFAULT_SAMPLES = 10;
 
@@ -113,7 +113,10 @@ export default class Ramp extends BaseExpression {
         super({ input, palette });
 
         this.minKey = 0;
-        this.maxKey = 1;
+        this.maxKey = this.input.type === inputTypes.CATEGORY
+            ? this.input.numCategories - 1
+            : 1;
+
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
@@ -129,18 +132,18 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        this.palette = this._calcPaletteValues(this.palette);
-
-        let index = this.input.eval(feature);
+        const index = this._getIndex(feature);
 
         if (this.palette.type === paletteTypes.IMAGE) {
             return this.palette[`image${index}`].eval();
         }
 
-        const { min, max } = this._getMinMax(feature);
-        const m = (index - min) / (max - min);
-
         const texturePixels = this._computeTextureIfNeeded();
+        const { min, max } = this._getMinMax(feature);
+
+        this.palette = this._calcPaletteValues(this.palette);
+
+        const m = (index - min) / (max - min);
         const numValues = texturePixels.length - 1;
 
         const color = this.type === rampTypes.NUMBER
@@ -162,23 +165,33 @@ export default class Ramp extends BaseExpression {
     }
 
     _getMinMax (feature) {
-        if (this.input.min && this.input.max) {
-            const featureName = Object.keys(feature)[0];
-            const minFeature = {};
-            const maxFeature = {};
-            minFeature[featureName] = this.input.min.eval();
-            maxFeature[featureName] = this.input.max.eval();
+        if (this.input.isA(Linear)) {
+            const name = Object.keys(feature)[0];
+            const featureMin = _buildFeature(name, this.input.min.eval());
+            const featureMax = _buildFeature(name, this.input.max.eval());
 
             return {
-                min: this.input.eval(minFeature),
-                max: this.input.eval(maxFeature)
-            };
-        } else {
-            return {
-                min: this.minKey,
-                max: this.maxKey
+                min: this.input.eval(featureMin),
+                max: this.input.eval(featureMax)
             };
         }
+
+        return {
+            min: this.minKey,
+            max: this.maxKey
+        };
+    }
+
+    _getIndex (feature) {
+        if (this.input.isA(Property)) {
+            return this.input.getPropertyId(feature);
+        }
+
+        if (this.input.isA(Top)) {
+            return this.input.property.getPropertyId(feature);
+        }
+
+        return this.input.eval(feature);
     }
     /**
      * Get the value associated with each category
@@ -327,7 +340,7 @@ export default class Ramp extends BaseExpression {
      * @api
      */
     getLegend (options) {
-        const config = Object.assign(DEFAULT_OPTIONS, options);
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
 
         if (config.samples > MAX_SAMPLES) {
@@ -350,11 +363,10 @@ export default class Ramp extends BaseExpression {
         const min = this.input.min.eval();
         const max = this.input.max.eval();
         const INC = (max - min) / config.samples;
-        const feature = {};
         const data = [];
 
         for (let i = min; i < max; i += INC) {
-            feature[name] = i;
+            const feature = _buildFeature(name, i);
             const key = i;
             const value = this.eval(feature);
 
@@ -364,15 +376,20 @@ export default class Ramp extends BaseExpression {
         return { data, min, max };
     }
 
-    _getLeyendCategories () {
+    _getLeyendCategories (config) {
         const name = this.input.getPropertyName();
         const categories = this._metadata.properties[name].categories;
 
         return categories
             .map((category, index) => {
-                let feature = {};
-                feature[name] = this.input.isA(Property) ? index : category.name;
-                const key = category.name;
+                const feature = Object.defineProperty({},
+                    name,
+                    { value: category.name }
+                );
+                const key = category.name && index < this.maxKey
+                    ? category.name
+                    : config.defaultOthers;
+
                 const value = this.eval(feature);
                 return { key, value };
             })
@@ -491,10 +508,9 @@ export default class Ramp extends BaseExpression {
         }
 
         this._texCategories = this.input.numCategories;
-
-        if (this.input.type === inputTypes.CATEGORY) {
-            this.maxKey = this.input.numCategories - 1;
-        }
+        this.maxKey = this.input.type === inputTypes.CATEGORY
+            ? this.input.numCategories - 1
+            : 1;
 
         this._cachedTexturePixels = this.type === rampTypes.COLOR
             ? this._computeColorRampTexture()
@@ -747,4 +763,10 @@ function _calcPaletteValues (palette) {
     }
 
     return palette;
+}
+
+function _buildFeature (name, value) {
+    const enumerable = true;
+
+    return Object.defineProperty({}, name, { value, enumerable });
 }
