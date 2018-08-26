@@ -4,7 +4,7 @@
 <head>
   <!-- Include CARTO VL JS -->
   <script src="../../../dist/carto-vl.js"></script>
-  <!-- Include Mapbox Chart JS -->
+  <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
@@ -42,12 +42,12 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [ 2.212774913887074, 41.416951606921714],
+      center: [2.212774913887074, 41.416951606921714],
       zoom: 11.5,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
-    // Autenticate the client
+
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
@@ -81,7 +81,10 @@
       const colorRamp = layer.getViz().color;
       const labels = histogram.map(value => value.x);
       const data = histogram.map(value => value.y);
-      const backgroundColor = colorRamp.getLegend().map(legend => computeColor(legend.values[0]));
+      const backgroundColor = colorRamp
+        .getLegend()
+        .data
+        .map(legend => computeColor(legend.value));
 
       var myChart = new Chart(ctx, {
         type: 'horizontalBar',
