@@ -51,7 +51,9 @@ export default class Image extends Base {
         return this._promise;
     }
 
-    eval () {}
+    eval () {
+        return this.url;
+    }
 
     _free (gl) {
         if (this.texture) {

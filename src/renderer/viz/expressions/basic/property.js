@@ -55,13 +55,26 @@ export default class Property extends BaseExpression {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
+
         return feature[this.name];
     }
 
     get categories () {
         return this.type === 'category'
-            ? this._categories
-            : [];
+            ? this._metadata.properties[this.name].categories
+            : undefined;
+    }
+
+    getPropertyName () {
+        return this.name;
+    }
+
+    getPropertyId (feature) {
+        const value = this.eval(feature);
+
+        return this.type === 'category'
+            ? this._metadata.categoryToID.get(value)
+            : this.eval(value);
     }
 
     _bindMetadata (metadata) {
@@ -73,10 +86,8 @@ export default class Property extends BaseExpression {
             }
 
             this._metadata = metadata;
-            this._categories = metaColumn.categories;
             this.type = metaColumn.type;
 
-            // FIXME
             if (this.type === 'category' && !this.numCategories) {
                 Object.defineProperty(this, 'numCategories', {
                     get: function () {

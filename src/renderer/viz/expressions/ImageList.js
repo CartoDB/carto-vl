@@ -20,8 +20,10 @@ export default class ImageList extends Base {
         imageArray.forEach((image, i) => {
             children[`image${i}`] = image;
         });
+
         super(children);
         this.numImages = imageArray.length;
+        this._images = imageArray;
         this.type = 'image';
     }
 

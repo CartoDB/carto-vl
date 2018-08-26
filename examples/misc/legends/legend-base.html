@@ -68,17 +68,17 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      // Get the information for legend
-      const colorLegend = layer.getViz().color.getLegend();
-
-      let colorLegendList = '';
-      colorLegend.forEach((legend) => {
-        const colorHex = rgbToHex(legend.values[0]);
-        colorLegendList +=
-          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}</span></li>\n`;
-      });
-
-      // Update the legend with the legend information
+    // Get the information for legend
+    const colorLegend = layer.getViz().color.getLegend();
+    
+    let colorLegendList = '';
+    colorLegend.data.forEach((legend) => {
+      const colorHex = rgbToHex(legend.value);
+      colorLegendList +=
+        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+    });
+    
+    // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
     });
 

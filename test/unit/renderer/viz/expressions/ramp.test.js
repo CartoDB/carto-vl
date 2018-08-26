@@ -31,10 +31,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         type: 'category',
                         categories: [
                             { name: 'A' },
-                            { name: 'B' },
-                            { name: 'C' },
-                            { name: 'D' },
-                            { name: 'E' }
+                            { name: 'B' }
                         ]
                     }
                 }
@@ -46,20 +43,20 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 let expected;
 
                 it('should get the first value', () => {
-                    const r = ramp(0, values);
+                    const r = ramp(property('grade'), values);
 
                     r._bindMetadata(METADATA);
-                    actual = r.eval();
+                    actual = r.eval({ grade: 'A' });
                     expected = values[0];
 
                     expect(actual).toEqual(expected);
                 });
 
                 it('should be able to get the second value', () => {
-                    const r = ramp(1, values);
+                    const r = ramp(property('grade'), values);
 
                     r._bindMetadata(METADATA);
-                    actual = r.eval();
+                    actual = r.eval({ grade: 'B' });
                     expected = values[1];
 
                     expect(actual).toEqual(expected);
@@ -73,20 +70,20 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 let expected;
 
                 it('should get the first value', () => {
-                    const r = ramp(0, [firstColor, secondColor]);
+                    const r = ramp(property('grade'), [firstColor, secondColor]);
 
                     r._bindMetadata(METADATA);
-                    actual = r.eval();
+                    actual = r.eval({ grade: 'A' });
                     expected = firstColor.color;
 
                     expect(actual).toEqual(expected);
                 });
 
                 it('should get the second value', () => {
-                    const r = ramp(1, [firstColor, secondColor]);
+                    const r = ramp(property('grade'), [firstColor, secondColor]);
 
                     r._bindMetadata(METADATA);
-                    actual = r.eval();
+                    actual = r.eval({ grade: 'B' });
                     expected = secondColor.color;
 
                     expect(actual).toEqual(expected);
@@ -122,32 +119,32 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 let actual;
                 let expected;
+                const $grade = property('grade');
 
                 describe('and there are less categories than colors', () => {
                     describe('and not all categories in the dataset have a bucket defined', () => {
                         it('should not show interpolation', () => {
                             let r;
-
-                            r = ramp(buckets('A', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.eval({ grade: 'A' });
                             expected = red.color;
 
                             expect(actual).toEqual(expected);
 
-                            r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.eval({ grade: 'B' });
                             expected = blue.color;
 
                             expect(actual).toEqual(expected);
 
-                            r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
+                            r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval();
+                            actual = r.eval({ grade: 'C' });
                             expected = yellow.color;
 
                             expect(actual).toEqual(expected);
@@ -1017,8 +1014,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend().length;
-                expected = 10;
+                actual = r.getLegend().data.length;
+                expected = 11;
                 expect(actual).toEqual(expected);
             });
 
@@ -1027,8 +1024,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend({ samples: 20 }).length;
-                expected = 20;
+                actual = r.getLegend({ samples: 20 }).data.length;
+                expected = 21;
                 expect(actual).toEqual(expected);
             });
         });
@@ -1056,17 +1053,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend();
+                actual = r.getLegend().data;
                 expected = [
                     {
-                        name: 'A',
-                        values: [ BICYCLE.url ]
+                        key: 'A',
+                        value: BICYCLE.url
                     }, {
-                        name: 'B',
-                        values: [ CAR.url ]
+                        key: 'B',
+                        value: CAR.url
                     }, {
-                        name: 'C',
-                        values: [ BUILDING.url ]
+                        key: 'C',
+                        value: BUILDING.url
                     }
                 ];
 
@@ -1101,17 +1098,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 r._bindMetadata(METADATA);
 
-                actual = r.getLegend();
+                actual = r.getLegend().data;
                 expected = [
                     {
-                        name: 'A',
-                        values: [ red.color ]
+                        key: 'A',
+                        value: red.color
                     }, {
-                        name: 'B',
-                        values: [ blue.color ]
+                        key: 'B',
+                        value: blue.color
                     }, {
-                        name: 'C',
-                        values: [ yellow.color ]
+                        key: 'C',
+                        value: yellow.color
                     }
                 ];
 

@@ -44,6 +44,7 @@
       zoom: 11.2,
       dragRotate: false,
     });
+
     map.touchZoomRotate.disableRotation();
     // Autenticate the client
     carto.setDefaultAuth({
@@ -73,10 +74,10 @@
       });
 
       let colorLegendList = '';
-      colorLegend.forEach((legend) => {
-        const colorHex = rgbToHex(legend.values[0]);
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
         colorLegendList +=
-          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.name}</span></li>\n`;
+          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
       });
 
       // Update the legend with the legend information

@@ -37,13 +37,13 @@
   </div>
 
   <script>
-      const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-        center: [-122.424335, 37.771521],
-        zoom: 13,
-        dragRotate: false,
-      });
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-122.424335, 37.771521],
+      zoom: 13,
+      dragRotate: false,
+    });
     map.touchZoomRotate.disableRotation();
 
     // Authenticate the client
@@ -60,32 +60,35 @@
       color: ramp(top($common_species,5), bold)
       strokeWidth: 1
     `);
-    
+
     // Create the layer
     const layer = new carto.Layer('layer', source, viz);
-    
+
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
-    // Get the legend
-    const colorLegend = layer.getViz().color.getLegend();
-    
-    let colorLegendList = '';
-    colorLegend.forEach((legend) => {
-      const colorHex = rgbToHex(legend.values[0]);
-      colorLegendList +=
-        `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.name}</span></li>\n`;
-    });
+      // Get the legend
+      const colorLegend = layer.getViz().color.getLegend();
+
+      let colorLegendList = '';
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        colorLegendList +=
+          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+      });
       // Update the information
       document.getElementById('content').innerHTML = colorLegendList;
     });
+
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
+
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
+
   </script>
 </body>
 

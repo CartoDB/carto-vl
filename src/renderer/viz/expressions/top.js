@@ -54,11 +54,13 @@ export default class Top extends BaseExpression {
         );
 
         let ret;
+
         orderedCategoryNames.map((name, i) => {
             if (i === catID) {
                 ret = i < buckets ? this._meta.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
             }
         });
+
         return ret;
     }
 
