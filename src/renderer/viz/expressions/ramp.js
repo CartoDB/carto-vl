@@ -209,12 +209,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Others', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the color associated with each category (String)</caption>
@@ -224,12 +227,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Others', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the image url associated with each category</caption>
@@ -240,11 +246,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
-     *   //   { name: 'Car', values: [carImageUrl] }
-     *   //   { name: 'Bus', values: [busImageUrl] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: bicycleImageUrl },
+     *   //       { key: 'Others', value:  ''}
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the image url associated with each category (String)</caption>
@@ -254,11 +264,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
-     *   //   { name: 'Car', values: [carImageUrl] }
-     *   //   { name: 'Bus', values: [busImageUrl] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: bicycleImageUrl },
+     *   //       { key: 'Others', value:  ''}
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the top 3 categories and set default category name</caption>
@@ -272,12 +286,15 @@ export default class Ramp extends BaseExpression {
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the top 3 categories and set default category name (String)</caption>
@@ -290,18 +307,21 @@ export default class Ramp extends BaseExpression {
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get 4 samples for a linear color ramp</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   color: s.ramp(s.linear(s.prop('numeric'), 1, 100), s.palettes.PRISM)
+     *   color: s.ramp(s.linear(s.prop('numvehicles'), 1, 100), s.palettes.PRISM)
      * });
      *
      * layer.on('loaded', () => {
@@ -309,17 +329,21 @@ export default class Ramp extends BaseExpression {
      *       samples: 4
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'numvehicles',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get 4 samples for a linear color ramp (String)</caption>
      * const viz = new carto.Viz(`
-     *   color: ramp(linear($numeric, 1, 100), PRISM)
+     *   color: ramp(linear($numvehicles, 1, 100), PRISM)
      * `);
      *
      * layer.on('loaded', () => {
@@ -327,13 +351,18 @@ export default class Ramp extends BaseExpression {
      *       samples: 4
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'numvehicles',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
+     *
      * @memberof carto.expressions.Ramp
      * @name getLegend
      * @instance
