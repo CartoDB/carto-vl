@@ -29,15 +29,13 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         validateMaxArgumentsError('clusterSum', ['number', 'number']);
         validateMaxArgumentsError('clusterAvg', ['number', 'number']);
         validateMaxArgumentsError('clusterMode', ['number', 'number']);
-
-        // validateMaxArgumentsError('clusterCount', ['number']);
+        validateMaxArgumentsError('clusterCount', [0]);
     });
 
     describe('type', () => {
         validateStaticType('clusterMax', ['number-property'], 'number');
         validateStaticType('clusterMode', ['category-property'], 'category');
-
-        // validateStaticType('clusterCount', [], 'number');
+        validateStaticType('clusterCount', [], 'number');
     });
 
     describe('eval', () => {
@@ -66,9 +64,17 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
             expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
         });
 
-        // it('clusterCount() should return fakeFeature._cdb_feature_count', () => {
-        //     const actual = s.clusterCount().eval(fakeFeature);
-        //     expect(actual).toEqual(fakeFeature._cdb_feature_count);
-        // });
+        it('clusterCount() should return fakeFeature._cdb_feature_count if defined', () => {
+            const actual = s.clusterCount().eval(fakeFeature);
+            expect(actual).toEqual(fakeFeature._cdb_feature_count);
+        });
+
+        it('clusterCount() should return 1 if _cdb_feature_count is undefined in the feature', () => {
+            const aFeature = Object.assign({}, fakeFeature);
+            delete aFeature._cdb_feature_count;
+
+            const actual = s.clusterCount().eval(aFeature);
+            expect(actual).toEqual(1);
+        });
     });
 });
