@@ -50,10 +50,13 @@
     };
 
     let vizSpec = `color: ramp(linear($attr_0, 0, 1000), temps)`;
+    let names=[];
     for (let i = 0; i < 600; i++) {
       metadata.properties['attr_' + i] = { type: 'number' };
       vizSpec += `@A${i}: $attr_${i}\n`;
+      names.push(`$attr_${i}`);
     }
+    vizSpec+= `@f: viewportFeatures(${names.join()})`;
 
     const source = new carto.source.MVT('./test.mvt', metadata);
     const viz = new carto.Viz(vizSpec);
