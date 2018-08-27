@@ -79,7 +79,7 @@
       });
 
       const viz = new carto.Viz(`
-      color: ramp(linear($numfloors 0, 20), temps)
+      color: ramp(linear($numfloors, 0, 20), temps)
       strokeWidth: 0
       `);
       const layer = new carto.Layer('layer', source, viz);
