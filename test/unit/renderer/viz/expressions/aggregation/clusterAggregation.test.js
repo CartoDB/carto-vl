@@ -7,7 +7,8 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         _cdb_agg_min_price: 2,
         _cdb_agg_avg_price: 3,
         _cdb_agg_sum_price: 4,
-        _cdb_agg_mode_price: 5
+        _cdb_agg_mode_price: 5,
+        _cdb_feature_count: 1
     };
 
     let $price = null;
@@ -28,11 +29,15 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         validateMaxArgumentsError('clusterSum', ['number', 'number']);
         validateMaxArgumentsError('clusterAvg', ['number', 'number']);
         validateMaxArgumentsError('clusterMode', ['number', 'number']);
+
+        // validateMaxArgumentsError('clusterCount', ['number']);
     });
 
     describe('type', () => {
         validateStaticType('clusterMax', ['number-property'], 'number');
         validateStaticType('clusterMode', ['category-property'], 'category');
+
+        // validateStaticType('clusterCount', [], 'number');
     });
 
     describe('eval', () => {
@@ -60,5 +65,10 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
             const actual = s.clusterSum($price).eval(fakeFeature);
             expect(actual).toEqual(fakeFeature._cdb_agg_sum_price);
         });
+
+        // it('clusterCount() should return fakeFeature._cdb_feature_count', () => {
+        //     const actual = s.clusterCount().eval(fakeFeature);
+        //     expect(actual).toEqual(fakeFeature._cdb_feature_count);
+        // });
     });
 });
