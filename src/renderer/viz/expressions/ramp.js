@@ -124,7 +124,6 @@ export default class Ramp extends BaseExpression {
 
         const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
-
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
@@ -146,7 +145,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorValue (texturePixels, m) {
-        const index = Math.round(m * MAX_BYTE_VALUE);
+        const index = _calcColorValueIndex(m);
 
         return {
             r: Math.round(texturePixels[index * 4 + 0]),
@@ -503,4 +502,16 @@ function _calcPaletteValues (palette) {
     }
 
     return palette;
+}
+
+function _calcColorValueIndex (m) {
+    if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
+        return 0;
+    }
+
+    if (m === Number.POSITIVE_INFINITY || m > 1) {
+        return COLOR_ARRAY_LENGTH - 1;
+    }
+
+    return Math.round(m * MAX_BYTE_VALUE);
 }

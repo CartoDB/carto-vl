@@ -1078,4 +1078,70 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
         });
     });
+
+    describe('._getColorValue', () => {
+        const firstColor = namedColor('red');
+        const secondColor = namedColor('blue');
+        const thirdColor = namedColor('green');
+        let actual;
+        let expected;
+
+        it('should get the first element if m is NaN', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, NaN);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is Positive Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.POSITIVE_INFINITY);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the first element if m is Negative Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.NEGATIVE_INFINITY);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is a positive number greater than 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 100);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the current element if m is between 0 and 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 0.5);
+            expected = firstColor.color;
+
+            expect(actual.r).not.toEqual(NaN);
+            expect(actual.g).not.toEqual(NaN);
+            expect(actual.b).not.toEqual(NaN);
+            expect(actual.a).not.toEqual(NaN);
+        });
+    });
 });
