@@ -99,7 +99,9 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        palette = _calcPaletteValues(palette);
+        if (palette.type !== 'number-array') {
+            palette = _calcPaletteValues(palette);
+        }
 
         super({ input, palette });
 
@@ -191,6 +193,37 @@ export default class Ramp extends BaseExpression {
         if (this.input.type === 'category' && this.input.isA(Property)) {
             inline = `texture2D(texRamp${this._uid}, vec2(ramp_translate${this._uid}(${input.inline}), 0.5))`;
         }
+        let numPreface = '';
+        if (this.palette.type === 'number-array') {
+            // TODO categories can also use this path
+            const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+            const makeInline = (list, numerator, denominator) => {
+                let b;
+
+                if (numerator + 1 === denominator) {
+                    b = list[numerator + 1].inline;
+                } else {
+                    b = makeInline(list, numerator + 1, denominator);
+                }
+
+                return `
+
+                mix(${list[numerator].inline}, ${b},
+                    clamp(
+                        (
+                         (${input.inline}-keyMin${this._uid})/keyWidth${this._uid}-
+                         ${(numerator / denominator).toFixed(20)})
+                         /${(1 / denominator).toFixed(20)}
+
+                        ,0.,1.
+                    )
+                )
+                `;
+            };
+            inline = makeInline(nums, 0, this.palette.elems.length - 1);
+            console.log(inline);
+            numPreface = nums.map(n => n.preface).join('\n');
+        }
 
         return {
             preface: this._prefaceCode(input.preface + `
@@ -206,12 +239,12 @@ export default class Ramp extends BaseExpression {
                     );
                     return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
                 }
-
+                ${numPreface}
                 `
             ),
 
             inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? `(${inline}.a)`
+                ? inline
                 : `(${inline}.rgba)`
         };
     }
@@ -231,6 +264,9 @@ export default class Ramp extends BaseExpression {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
+        }
+        if (this.palette.type === 'number-array') {
+            this.palette.elems.forEach(e => e._postShaderCompile(program, gl));
         }
 
         this.input._postShaderCompile(program, gl);
@@ -336,6 +372,12 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
+        } else if (this.palette.type === 'number-array') {
+            this.palette.elems.forEach(e => e._preDraw(program, drawMetadata, gl));
+            gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
+            gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
+            gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
+            return super._preDraw(program, drawMetadata, gl);
         }
 
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);

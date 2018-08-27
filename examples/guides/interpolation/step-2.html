@@ -39,7 +39,9 @@
         const source = new carto.source.Dataset('tx_0125_copy_copy');
         // Add better styles
         const viz = new carto.Viz(`
-            width: blend(1, sqrt($amount), linear(zoom(), 2^10, 2^14))
+            width: ramp(zoomrange([9, 10, 12]),
+                        [1,41, 2])
+            //blend(1, sqrt($amount), linear(zoom(), 2^10, 2^14))
             color: ramp(linear($amount, 10, 1000), emrld)
             strokeWidth: 0
         `);
