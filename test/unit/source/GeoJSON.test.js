@@ -3,7 +3,11 @@ import GeoJSON from '../../../src/sources/GeoJSON';
 describe('sources/GeoJSON', () => {
     const createVizMock = (columns = []) => {
         return {
-            getMinimumNeededSchema: () => { return { columns }; }
+            getMinimumNeededSchema: () => {
+                const mns = {};
+                columns.forEach(column => { mns[column] = [{type: 'unaggregated'}]; });
+                return mns;
+            }
         };
     };
 
