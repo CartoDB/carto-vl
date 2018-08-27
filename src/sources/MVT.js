@@ -214,7 +214,7 @@ export default class MVT extends Base {
                 const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;
                 const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;
                 // Tiles may contain points in the border;
-                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
+                // we'll avoid here duplicated points between tiles by excluding the 1-edge
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
@@ -245,7 +245,12 @@ export default class MVT extends Base {
     }
 
     _initializePropertyArrays (metadata, length) {
-        const properties = {};
+        const propertyNames = this._getPropertyNamesFrom(metadata);
+        const properties = this._getPropertiesFor(propertyNames, length);
+        return { propertyNames, properties };
+    }
+
+    _getPropertyNamesFrom (metadata) {
         const propertyNames = [];
         for (let i = 0; i < metadata.propertyKeys.length; i++) {
             const propertyName = metadata.propertyKeys[i];
@@ -254,7 +259,11 @@ export default class MVT extends Base {
             }
             propertyNames.push(...metadata.propertyNames(propertyName));
         }
+        return propertyNames;
+    }
 
+    _getPropertiesFor (propertyNames, length) {
+        const properties = {};
         const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
 
         const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
@@ -263,7 +272,7 @@ export default class MVT extends Base {
             properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
         }
 
-        return { properties, propertyNames };
+        return properties;
     }
 
     _decodeProperties (propertyNames, properties, feature, i) {
