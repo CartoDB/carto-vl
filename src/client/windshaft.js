@@ -232,7 +232,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(usage => usage.some(u => u.type === 'aggregated'));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === 'aggregated'));
     }
 
     _generateAggregation (MNS, resolution) {
@@ -247,8 +247,8 @@ export default class Windshaft {
         Object.keys(MNS)
             .forEach(propertyName => {
                 if (propertyName !== 'cartodb_id') {
-                    const usageList = MNS[propertyName];
-                    usageList.forEach(usage => {
+                    const propertyUsages = MNS[propertyName];
+                    propertyUsages.forEach(usage => {
                         if (usage.type === 'aggregated') {
                             aggregation.columns[schema.column.aggColumn(propertyName, usage.op)] = {
                                 aggregate_function: usage.op,
