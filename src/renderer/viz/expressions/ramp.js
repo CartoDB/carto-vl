@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
@@ -122,10 +122,24 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        this.palette = this._calcPaletteValues(this.palette);
-
-        const texturePixels = this._computeTextureIfNeeded();
         const input = this.input.eval(feature);
+        if (this.palette.type === 'number-array') {
+            const m = (input - this.minKey) / (this.maxKey - this.minKey);
+            for (let i = 0; i < this.palette.elems.length - 1; i++) {
+                const rangeMin = i / (this.palette.elems.length - 1);
+                const rangeMax = (i + 1) / (this.palette.elems.length - 1);
+                if (m > rangeMax) {
+                    continue;
+                }
+                const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
+                const a = this.palette.elems[i].eval(feature);
+                const b = this.palette.elems[i + 1].eval(feature);
+                return mix(a, b, clamp(rangeM, 0, 1));
+            }
+        }
+
+        this.palette = this._calcPaletteValues(this.palette);
+        const texturePixels = this._computeTextureIfNeeded();
         const numValues = texturePixels.length - 1;
         const m = (input - this.minKey) / (this.maxKey - this.minKey);
 
@@ -182,20 +196,37 @@ export default class Ramp extends BaseExpression {
 
         if (this.palette.type === paletteTypes.IMAGE) {
             const images = this.palette._applyToShaderSource(getGLSLforProperty);
-
             return {
                 preface: input.preface + images.preface,
                 inline: `${images.inline}(imageUV, ${input.inline})`
             };
         }
 
-        let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
+        let inline = '';
+        let preface = `
+        uniform float keyMin${this._uid};
+        uniform float keyWidth${this._uid};
+        `;
+
+        let inputGLSL = `((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
         if (this.input.type === 'category' && this.input.isA(Property)) {
-            inline = `texture2D(texRamp${this._uid}, vec2(ramp_translate${this._uid}(${input.inline}), 0.5))`;
+            // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
+            inputGLSL = `ramp_translate${this._uid}(${input.inline})`;
+            preface +=
+            `
+            uniform sampler2D texRampTranslate${this._uid};
+            float ramp_translate${this._uid}(float s){
+                vec2 v = vec2(
+                    mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
+                    floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
+                );
+                return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
+            }
+            `;
         }
-        let numPreface = '';
+
         if (this.palette.type === 'number-array') {
-            // TODO categories can also use this path
+            // With numeric arrays we use a combination of `mix` to allow for property-dependant values
             const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
             const genBlend = (list, numerator, denominator) => {
                 let b;
@@ -217,36 +248,24 @@ export default class Ramp extends BaseExpression {
                 )
                 `;
             };
-            inline = `ramp_num${this._uid}((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
-            numPreface = `${nums.map(n => n.preface).join('\n')}
+            inline = `ramp_num${this._uid}(${inputGLSL})`;
+            preface += `${nums.map(n => n.preface).join('\n')}
             
             float ramp_num${this._uid}(float x){
                 return ${genBlend(nums, 0, this.palette.elems.length - 1)};
             }
             `;
+        } else {
+            // With color arrays we use a fast texture lookup, but this makes property-dependant values impossible
+            inline = `texture2D(texRamp${this._uid}, vec2(${inputGLSL}, 0.5)).rgba`;
+            preface += `
+                uniform sampler2D texRamp${this._uid};
+                `;
         }
 
         return {
-            preface: this._prefaceCode(input.preface + `
-                uniform sampler2D texRamp${this._uid};
-                uniform sampler2D texRampTranslate${this._uid};
-                uniform float keyMin${this._uid};
-                uniform float keyWidth${this._uid};
-
-                float ramp_translate${this._uid}(float s){
-                    vec2 v = vec2(
-                        mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
-                        floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
-                    );
-                    return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
-                }
-                ${numPreface}
-                `
-            ),
-
-            inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? inline
-                : `(${inline}.rgba)`
+            preface: this._prefaceCode(input.preface + preface),
+            inline
         };
     }
 
