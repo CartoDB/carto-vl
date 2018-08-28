@@ -321,7 +321,12 @@ export default class Windshaft {
         const response = await fetch(getMapRequest(conf, mapConfigAgg));
         const layergroup = await response.json();
         if (!response.ok) {
-            throw new Error(`Maps API error: ${JSON.stringify(layergroup)}`);
+            if (response.status === 401) {
+                throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
+            } else if (response.status === 403) {
+                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested datasets and tables`);
+            }
+            throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
