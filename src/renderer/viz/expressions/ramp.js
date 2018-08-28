@@ -197,32 +197,33 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type === 'number-array') {
             // TODO categories can also use this path
             const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
-            const makeInline = (list, numerator, denominator) => {
+            const genBlend = (list, numerator, denominator) => {
                 let b;
 
                 if (numerator + 1 === denominator) {
                     b = list[numerator + 1].inline;
                 } else {
-                    b = makeInline(list, numerator + 1, denominator);
+                    b = genBlend(list, numerator + 1, denominator);
                 }
 
                 return `
 
                 mix(${list[numerator].inline}, ${b},
                     clamp(
-                        (
-                         (${input.inline}-keyMin${this._uid})/keyWidth${this._uid}-
-                         ${(numerator / denominator).toFixed(20)})
-                         /${(1 / denominator).toFixed(20)}
-
+                         (x-${(numerator / denominator).toFixed(20)})
+                             /${(1 / denominator).toFixed(20)}
                         ,0.,1.
-                    )
+                        )
                 )
                 `;
             };
-            inline = makeInline(nums, 0, this.palette.elems.length - 1);
-            console.log(inline);
-            numPreface = nums.map(n => n.preface).join('\n');
+            inline = `ramp_num${this._uid}((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
+            numPreface = `${nums.map(n => n.preface).join('\n')}
+            
+            float ramp_num${this._uid}(float x){
+                return ${genBlend(nums, 0, this.palette.elems.length - 1)};
+            }
+            `;
         }
 
         return {
