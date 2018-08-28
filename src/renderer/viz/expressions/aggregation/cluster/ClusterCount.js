@@ -1,6 +1,6 @@
 import BaseExpression from '../../base';
 import { checkMaxArguments } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../../client/windshaft';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 
 /**
  * Count of features per cluster.
@@ -9,13 +9,13 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../../client/windshaft';
  *
  * @return {Number} Cluster feature count
  *
- * @example <caption>Use cluster count as width.</caption>
+ * @example <caption>Use cluster count for width.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.clusterCount() / 50
  * });
  *
- * @example <caption>Use cluster cluster count as width. (String)</caption>
+ * @example <caption>Use cluster count for width. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: clusterCount() / 50
  * `);
@@ -30,7 +30,6 @@ export default class ClusterCount extends BaseExpression {
         checkMaxArguments(arguments, 0, 'clusterCount');
         super({});
         this.type = 'number';
-        this._expressionName = 'clusterCount';
         this._hasClusterFeatureCount = false;
     }
 
@@ -46,7 +45,7 @@ export default class ClusterCount extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: `${this._hasClusterFeatureCount ? getGLSLforProperty(CLUSTER_FEATURE_COUNT) : '1.'}`
+            inline: this._hasClusterFeatureCount ? getGLSLforProperty(CLUSTER_FEATURE_COUNT) : '1.'
         };
     }
 }

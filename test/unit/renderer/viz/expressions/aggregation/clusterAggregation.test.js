@@ -70,10 +70,7 @@ describe('src/renderer/viz/expressions/clusterAggregation', () => {
         });
 
         it('clusterCount() should return 1 if _cdb_feature_count is undefined in the feature', () => {
-            const aFeature = Object.assign({}, fakeFeature);
-            delete aFeature._cdb_feature_count;
-
-            const actual = s.clusterCount().eval(aFeature);
+            const actual = s.clusterCount().eval({});
             expect(actual).toEqual(1);
         });
     });

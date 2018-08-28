@@ -4,12 +4,11 @@ import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
+import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-
-export const CLUSTER_FEATURE_COUNT = '_cdb_feature_count';
 
 export default class Windshaft {
     constructor (source) {
