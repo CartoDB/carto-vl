@@ -2,6 +2,29 @@ import BaseExpression from '../../base';
 import { checkMaxArguments } from '../../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../../client/windshaft';
 
+/**
+ * Count of features per cluster.
+ *
+ * Note: `clusterCount` has no input parameters and if data is not aggregated, it always returns 1
+ *
+ * @return {Number} Cluster feature count
+ *
+ * @example <caption>Use cluster count as width.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: s.clusterCount() / 50
+ * });
+ *
+ * @example <caption>Use cluster cluster count as width. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   width: clusterCount() / 50
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name clusterCount
+ * @function
+ * @api
+ */
 export default class ClusterCount extends BaseExpression {
     constructor () {
         checkMaxArguments(arguments, 0, 'clusterCount');
