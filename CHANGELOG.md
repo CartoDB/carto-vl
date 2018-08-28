@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Add new `clusterCount()` expression
 
+### Fixed
+- Add default export to allow `import carto from '@carto/carto-vl';`
 
 ## [0.7.0] - 2018-08-24
 ### Added
