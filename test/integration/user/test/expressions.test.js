@@ -1,4 +1,4 @@
-import * as carto from '../../../../src/index';
+import carto from '../../../../src/index';
 import * as util from '../../util';
 
 const featureData = {
