@@ -193,19 +193,12 @@ export default class Windshaft {
             }
         };
         this.urlTemplates = urlTemplates;
-
-        this._addClusterCountPropertyTo(metadata);
         this.metadata = metadata;
         this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
-    }
-
-    _addClusterCountPropertyTo (metadata) {
-        metadata.propertyKeys.push(CLUSTER_FEATURE_COUNT);
-        metadata.properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
     }
 
     async _instantiate (MNS, resolution, filters, choices, metadata) {
@@ -376,6 +369,10 @@ export default class Windshaft {
                 });
             }
         });
+
+        if (geomType === 'point') {
+            properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
+        }
 
         const idProperty = 'cartodb_id';
 
