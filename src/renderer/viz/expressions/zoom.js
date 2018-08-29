@@ -35,7 +35,7 @@ export default class Zoom extends BaseExpression {
         return this.zoom.expr;
     }
     _preDraw (program, drawMetadata, gl) {
-        this.zoom.expr = drawMetadata.zoom;
+        this.zoom.expr = drawMetadata.zoomLevel;
         this.zoom._preDraw(program, drawMetadata, gl);
     }
 }

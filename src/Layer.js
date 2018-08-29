@@ -399,7 +399,9 @@ export default class Layer {
     _paintLayer () {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.setViz(this._viz);
-            this.renderer.renderLayer(this._renderLayer);
+            this.renderer.renderLayer(this._renderLayer, {
+                zoomLevel: this.map.getZoom()
+            });
             if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;

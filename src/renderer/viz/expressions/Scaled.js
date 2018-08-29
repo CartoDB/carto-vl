@@ -45,7 +45,7 @@ export default class Scaled extends BaseExpression {
         super._bindMetadata(metadata);
     }
     _preDraw (program, drawMetadata, gl) {
-        this.scale.a.b.expr = drawMetadata.scale;
+        this.scale.a.b.expr = Math.pow(2, drawMetadata.zoomLevel);
         super._preDraw(program, drawMetadata, gl);
     }
 }
