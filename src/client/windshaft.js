@@ -318,13 +318,18 @@ export default class Windshaft {
                 }
             };
         }
-        const response = await fetch(getMapRequest(conf, mapConfigAgg));
+        let response;
+        try {
+            response = await fetch(getMapRequest(conf, mapConfigAgg));
+        } catch (error) {
+            throw new Error(`Failed to connect to Maps API with your user('${this._source._username}')`);
+        }
         const layergroup = await response.json();
         if (!response.ok) {
             if (response.status === 401) {
                 throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
             } else if (response.status === 403) {
-                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested datasets and tables`);
+                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`);
             }
             throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
         }
