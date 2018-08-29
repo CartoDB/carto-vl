@@ -106,42 +106,53 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 price: 5
             });
         }
-        it('globalQuantiles($price, 2)', () => {
-            const q = globalQuantiles($price, 2);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([3]);
-        });
-        it('viewportQuantiles($price, 2)', () => {
-            const q = viewportQuantiles($price, 2);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([3]);
-        });
-        it('globalEqIntervals($price, 2)', () => {
-            const q = globalEqIntervals($price, 2);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([2.5]);
-        });
-        it('viewportEqIntervals($price, 2)', () => {
-            const q = viewportEqIntervals($price, 2);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([2.5]);
+
+        describe('global', () => {
+            // globalQuantiles ---
+            it('globalQuantiles($price, 2)', () => {
+                const q = globalQuantiles($price, 2);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([3]);
+            });
+            it('globalQuantiles($price, 3)', () => {
+                const q = globalQuantiles($price, 3);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2, 4]);
+            });
+
+            // globalEqIntervals ---
+            it('globalEqIntervals($price, 2)', () => {
+                const q = globalEqIntervals($price, 2);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2.5]);
+            });
         });
 
-        it('globalQuantiles($price, 3)', () => {
-            const q = globalQuantiles($price, 3);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([2, 4]);
-        });
-        it('viewportQuantiles($price, 3)', () => {
-            const q = viewportQuantiles($price, 3);
-            prepare(q);
-            expect(q.getBreakpointList()).toEqual([2, 4]);
-        });
-        it('viewportEqIntervals($price, 3)', () => {
-            const q = viewportEqIntervals($price, 3);
-            prepare(q);
-            expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
-            expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+        describe('viewport', () => {
+            // viewportQuantiles ---
+            it('viewportQuantiles($price, 2)', () => {
+                const q = viewportQuantiles($price, 2);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([3]);
+            });
+            it('viewportQuantiles($price, 3)', () => {
+                const q = viewportQuantiles($price, 3);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2, 4]);
+            });
+
+            // viewportEqIntervals ---
+            it('viewportEqIntervals($price, 2)', () => {
+                const q = viewportEqIntervals($price, 2);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2.5]);
+            });
+            it('viewportEqIntervals($price, 3)', () => {
+                const q = viewportEqIntervals($price, 3);
+                prepare(q);
+                expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
+                expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+            });
         });
     });
 });
