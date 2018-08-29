@@ -1,6 +1,6 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
@@ -948,6 +948,37 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         expect(actual).not.toEqual(expected);
                     });
                 });
+            });
+        });
+
+        describe('when the input is zoomrange()', () => {
+            it('should return the first number in the array at low zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoom: 0.0};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(100);
+            });
+            it('should return an interpolated number in the array at a intermediate zoom level', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
+                const fakeDrawMetadata = {zoom: (Math.pow(2, 3 - 1) * 0.7 + 0.3 * Math.pow(2, 9 - 1))};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(130);
+            });
+            it('should return the last number in the array at high zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoom: 1000.0};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(200);
             });
         });
     });
