@@ -64,10 +64,6 @@
                     "file": "styling/viewport.html"
                 },
                 {
-                    "title": "Zoom based styling",
-                    "file": "styling/zoom.html"
-                },
-                {
                     "title": "Single Image",
                     "file": "styling/image-single.html"
                 },

@@ -50,7 +50,7 @@ export default class Zoomrange extends BaseExpression {
             list.shift();
             return blend(numerator / denominator,
                 genImpostor(list, numerator + 1, denominator),
-                linear(zoom(), pow(2, sub(a, 1)), pow(2, sub(b, 1)))
+                linear(pow(2, zoom()), pow(2, a), pow(2, b))
             );
         }
         this._impostor = genImpostor([...this.zoomBreakpointList.elems], 0, this.zoomBreakpointList.elems.length - 1);

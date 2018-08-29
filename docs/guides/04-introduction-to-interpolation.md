@@ -40,7 +40,7 @@ The example below demonstrates how to use CARTO VL to create a map with zoom-bas
 The styling below, is telling CARTO VL to use a symbol size of 1 at zoom levels less than 10, and at zooms greater than 14, to transition to the symbol size expression. At intermediate zoom levels, CARTO VL's interpolation will blend between 1 and the symbol size expression.
 
 ```js
-width: blend(1, sqrt($amount), linear(zoom(), 2^10, 2^14))
+width: blend(1, sqrt($amount), linear(zoom(), 10, 14))
 color: ramp(linear($amount, 10, 1000), emrld)
 strokeWidth: 0
 ```
