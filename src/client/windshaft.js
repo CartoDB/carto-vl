@@ -4,6 +4,7 @@ import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
+import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -45,11 +46,7 @@ export default class Windshaft {
         this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
-        // Force to include `cartodb_id` in the MNS columns.
-        // TODO: revisit this request to Maps API
-        if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{type: 'id'}];
-        }
+        this._forceIncludeCartodbId(MNS);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
@@ -57,14 +54,20 @@ export default class Windshaft {
         return this.metadata;
     }
 
+    _forceIncludeCartodbId (MNS) {
+        // Force to include `cartodb_id` in the MNS columns.
+        // TODO: revisit this request to Maps API
+        if (!MNS['cartodb_id']) {
+            MNS['cartodb_id'] = [{ type: 'id' }];
+        }
+    }
+
     requiresNewMetadata (viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
         const resolution = viz.resolution;
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
-        if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{type: 'id'}];
-        }
+        this._forceIncludeCartodbId(MNS);
         return this._needToInstantiate(MNS, resolution, filtering);
     }
 
@@ -196,6 +199,7 @@ export default class Windshaft {
         this.resolution = resolution;
         this._checkLayerMeta(MNS);
     }
+
     async _instantiate (MNS, resolution, filters, choices, metadata) {
         const id = this._getInstantiationID(MNS, resolution, filters, choices);
         if (this.inProgressInstantiations[id]) {
@@ -364,6 +368,10 @@ export default class Windshaft {
                 });
             }
         });
+
+        if (geomType === 'point') {
+            properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
+        }
 
         const idProperty = 'cartodb_id';
 

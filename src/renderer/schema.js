@@ -44,6 +44,8 @@ function simplify (MNS) {
 const AGG_PREFIX = '_cdb_agg_';
 const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
 
+export const CLUSTER_FEATURE_COUNT = '_cdb_feature_count';
+
 // column information functions
 export const column = {
     isAggregated: function isAggregated (name) {

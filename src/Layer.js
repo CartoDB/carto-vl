@@ -269,6 +269,20 @@ export default class Layer {
     }
 
     /**
+     * Viz attached to this layer.
+     *
+     * Calls to `blendToViz` and `update` wont' update the viz until those calls "commit",
+     * having performed and completed all asynchronous necessary sanity checks.
+     *
+     * @returns {carto.Viz} - Viz object currently bound to the layer
+     * @memberof carto.Layer
+     * @api
+     */
+    get viz () {
+        return this._viz;
+    }
+
+    /**
      * Change layer visibility to visible
      *
      * @memberof carto.Layer
