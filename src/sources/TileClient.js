@@ -59,20 +59,8 @@ export default class TileClient {
                 });
         });
     }
-
-    _getTileUrl (x, y, z) {
-        const subdomainIndex = this._getSubdomainIndex(x, y);
-        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
-    }
-
-    _getSubdomainIndex (x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return Math.abs(x + y) % this._templateURLs.length;
-    }
-
     async _requestDataframe (x, y, z, responseToDataframeTransformer) {
-        const response = await fetch(this._getTileUrl(x, y, z));
-        const dataframe = await responseToDataframeTransformer(response, x, y, z);
+        const dataframe = await responseToDataframeTransformer(x, y, z, this._templateURLs);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }
