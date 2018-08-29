@@ -956,7 +956,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata();
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoom: 0.0};
+                const fakeDrawMetadata = {zoomLevel: 0};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(100);
@@ -966,7 +966,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 r._bindMetadata();
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
                 // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
-                const fakeDrawMetadata = {zoom: (Math.pow(2, 3 - 1) * 0.7 + 0.3 * Math.pow(2, 9 - 1))};
+                const fakeDrawMetadata = {zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9))};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(130);
@@ -975,7 +975,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata();
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoom: 1000.0};
+                const fakeDrawMetadata = {zoomLevel: 100};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(200);
