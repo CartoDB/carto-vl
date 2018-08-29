@@ -4,7 +4,7 @@ import {
     validateStaticTypeErrors,
     validateCompileTypeError,
     validateMaxArgumentsError
-} from './utils';
+} from '../utils';
 
 import {
     globalQuantiles,
@@ -12,9 +12,9 @@ import {
     globalEqIntervals,
     viewportEqIntervals,
     viewportQuantiles
-} from '../../../../../src/renderer/viz/expressions';
+} from '../../../../../../src/renderer/viz/expressions';
 
-import Metadata from '../../../../../src/renderer/Metadata';
+import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
