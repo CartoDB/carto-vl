@@ -122,22 +122,10 @@ export default class Ramp extends BaseExpression {
     }
 
     eval (feature) {
-        const input = this.input.eval(feature);
         if (this.palette.type === 'number-array') {
-            const m = (input - this.minKey) / (this.maxKey - this.minKey);
-            for (let i = 0; i < this.palette.elems.length - 1; i++) {
-                const rangeMin = i / (this.palette.elems.length - 1);
-                const rangeMax = (i + 1) / (this.palette.elems.length - 1);
-                if (m > rangeMax) {
-                    continue;
-                }
-                const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
-                const a = this.palette.elems[i].eval(feature);
-                const b = this.palette.elems[i + 1].eval(feature);
-                return mix(a, b, clamp(rangeM, 0, 1));
-            }
+            return this._evalNumberArray(feature);
         }
-
+        const input = this.input.eval(feature);
         this.palette = this._calcPaletteValues(this.palette);
         const texturePixels = this._computeTextureIfNeeded();
         const numValues = texturePixels.length - 1;
@@ -148,6 +136,23 @@ export default class Ramp extends BaseExpression {
             : this._getColorValue(texturePixels, m);
 
         return color;
+    }
+
+    _evalNumberArray (feature) {
+        const input = this.input.eval(feature);
+        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+        for (let i = 0; i < this.palette.elems.length - 1; i++) {
+            const rangeMin = i / (this.palette.elems.length - 1);
+            const rangeMax = (i + 1) / (this.palette.elems.length - 1);
+            if (m > rangeMax) {
+                continue;
+            }
+            const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
+            const a = this.palette.elems[i].eval(feature);
+            const b = this.palette.elems[i + 1].eval(feature);
+            return mix(a, b, clamp(rangeM, 0, 1));
+        }
+        throw new Error('Unexpected condition on ramp._evalNumberArray()');
     }
 
     _getValue (texturePixels, numValues, m) {
@@ -250,7 +255,7 @@ export default class Ramp extends BaseExpression {
             };
             inline = `ramp_num${this._uid}(${inputGLSL})`;
             preface += `${nums.map(n => n.preface).join('\n')}
-            
+
             float ramp_num${this._uid}(float x){
                 return ${genBlend(nums, 0, this.palette.elems.length - 1)};
             }
