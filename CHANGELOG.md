@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add new `clusterCount()` expression
 - Support feature-dependant arrays in combination with ramp
 
+### Changed
+ - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
+
 ### Fixed
 - Add default export to allow `import carto from '@carto/carto-vl';`
 
