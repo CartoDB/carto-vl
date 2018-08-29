@@ -1,9 +1,10 @@
 import Classifier from './Classifier';
 import Property from '../basic/property';
 import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
+import jenks from './jenks';
 
 /**
- * Classify `input` by using the Jenks method with `n` buckets.
+ * Classify `input` by using the Jenks Natural Breaks method with `n` buckets.
  *
  * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
@@ -32,15 +33,21 @@ export default class GlobalJenks extends Classifier {
         checkMaxArguments(arguments, 2, 'globalJenks');
         checkInstance('globalJenks', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalJenks', 'buckets', 1, buckets);
-
         super({ input }, buckets);
+        this._sample = [];
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkExpression('globalJenks', 'input', 0, this.input);
         checkType('globalJenks', 'input', 0, 'number', this.input);
+        this._sample = metadata.sample.map(s => s[this.input.name]);
+    }
 
-        // TBD
+    _genBreakpoints () {
+        const fullBreaks = jenks(this._sample, this.buckets); // closed, including the extremes
+        this.breakpoints.forEach((breakpoint, index) => {
+            breakpoint.expr = fullBreaks[index + 1];
+        });
     }
 }

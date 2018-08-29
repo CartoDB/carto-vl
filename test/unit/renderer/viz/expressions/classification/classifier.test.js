@@ -7,11 +7,12 @@ import {
 } from '../utils';
 
 import {
-    globalQuantiles,
     property,
+    globalQuantiles,
     globalEqIntervals,
-    viewportEqIntervals,
-    viewportQuantiles
+    globalJenks,
+    viewportQuantiles,
+    viewportEqIntervals
 } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
@@ -125,6 +126,18 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 const q = globalEqIntervals($price, 2);
                 prepare(q);
                 expect(q.getBreakpointList()).toEqual([2.5]);
+            });
+
+            // globalJenks ---
+            it('globalJenks($price, 2)', () => {
+                const q = globalJenks($price, 2);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([3]);
+            });
+            it('globalJenks($price, 3)', () => {
+                const q = globalJenks($price, 3);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2, 4]);
             });
         });
 
