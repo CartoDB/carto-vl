@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { pow, blend, linear, zoom, sub } from '../expressions';
+import { pow, blend, linear, zoom } from '../expressions';
 import { implicitCast, checkType } from './utils';
 
 /**
