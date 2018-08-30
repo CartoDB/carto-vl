@@ -170,30 +170,6 @@ export default class Windshaft {
         this._mvtClient = new MVT(urlTemplates);
         this._mvtClient._workerInstance = new WindshaftWorker();
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
-        this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
-            const basename = schema.column.getBase(propertyName);
-            const column = this.metadata.properties[basename];
-            if (!column) {
-                return;
-            }
-            switch (column.type) {
-                case 'date':
-                {
-                    const d = new Date();
-                    d.setTime(1000 * propertyValue);
-                    const min = column.min;
-                    const max = column.max;
-                    const n = (d - min) / (max.getTime() - min.getTime());
-                    return n;
-                }
-                case 'category':
-                    return this.metadata.categorizeString(basename, propertyValue);
-                case 'number':
-                    return propertyValue;
-                default:
-                    throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
-            }
-        };
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
         this._mvtClient._metadata = metadata;
