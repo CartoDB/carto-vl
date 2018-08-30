@@ -1,7 +1,7 @@
 import { MVTWorker } from '../sources/MVTWorker';
 import schema from '../renderer/schema';
 
-class WindshaftWorker extends MVTWorker {
+export class WindshaftWorker extends MVTWorker {
     decodeProperty (metadata, propertyName, propertyValue) {
         const basename = schema.column.getBase(propertyName);
         const column = metadata.properties[basename];
@@ -27,7 +27,3 @@ class WindshaftWorker extends MVTWorker {
         }
     }
 }
-
-const worker = new WindshaftWorker();
-
-onmessage = worker.onmessage.bind(worker);

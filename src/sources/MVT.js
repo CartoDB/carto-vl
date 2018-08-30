@@ -63,7 +63,7 @@ import TileClient from './TileClient';
  *
  * @api
  */
-import Worker from './MVT.worker';
+import Worker from './MVTWorkers.worker';
 
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
@@ -122,13 +122,12 @@ export default class MVT extends Base {
 
         this._workerDispatch = {};
         this._mID = 0;
+        this._workerName = 'MVT';
     }
 
     get _worker () {
         if (!this._workerInstance) {
             this._workerInstance = new Worker();
-        }
-        if (!this._workerInitialized) {
             this._workerInstance.onmessage = event => {
                 const mID = event.data.mID;
                 const dataframe = event.data.dataframe;
@@ -139,7 +138,6 @@ export default class MVT extends Base {
                 }
                 this._workerDispatch[mID](dataframe);
             };
-            this._workerInitialized = true;
         }
         return this._workerInstance;
     }
@@ -159,7 +157,7 @@ export default class MVT extends Base {
     requestData (zoom, viewport) {
         return this._tileClient.requestData(zoom, viewport, (x, y, z, url) => {
             return new Promise(resolve => {
-                this._worker.postMessage({ x, y, z, url, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID });
+                this._worker.postMessage({ x, y, z, url, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID, workerName: this._workerName });
                 this._workerDispatch[this._mID] = resolve;
                 this._mID++;
             });
