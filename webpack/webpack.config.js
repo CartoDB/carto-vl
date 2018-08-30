@@ -21,7 +21,8 @@ module.exports = {
                 use: {
                     loader: 'worker-loader',
                     options: {
-                        publicPath: '/dist/'
+                        publicPath: '/dist/',
+                        inline: true
                     }
                 }
             }
