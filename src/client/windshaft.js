@@ -6,8 +6,6 @@ import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 
-import WindshaftWorker from './WindshaftWorker';
-
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
