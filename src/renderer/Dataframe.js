@@ -16,6 +16,9 @@ const AABBTestResults = {
 
 export default class Dataframe {
     constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
+        if (!center) {
+            return;
+        }
         this.active = active;
         this.center = center;
         this.geom = geom;
