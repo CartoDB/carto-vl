@@ -217,7 +217,7 @@ onmessage = function (event) {
 
 async function processEvent (event) {
     const params = event.data;
-    Object.setPrototypeOf(params.metadata, new Metadata());
+    Object.setPrototypeOf(params.metadata, Metadata.prototype);
     const dataframe = await worker._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, params.metadata);
     return {
         mID: params.mID,
