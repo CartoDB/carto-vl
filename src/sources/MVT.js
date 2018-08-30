@@ -125,7 +125,13 @@ export default class MVT extends Base {
         this._worker.onmessage = event => {
             const mID = event.data.mID;
             const dataframe = event.data.dataframe;
+            // console.log(event.data);
+            // debugger;
             Object.setPrototypeOf(dataframe, new Dataframe({}));
+            if (!dataframe.empty) {
+                dataframe.decodedGeom.vertices = new Float32Array(dataframe.decodedGeom.arrayBuffer1);
+                dataframe.decodedGeom.normals = new Float32Array(dataframe.decodedGeom.arrayBuffer2);
+            }
             this._workerDispatch[mID](dataframe);
         };
 

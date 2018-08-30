@@ -26,7 +26,11 @@ export default class Dataframe {
         this.scale = scale;
         this.type = type;
         this.decodedGeom = decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
+        this.numVertex = type === 'point'
+            ? size * 3
+            : this.decodedGeom.vertices
+                ? this.decodedGeom.vertices.length / 2
+                : this.decodedGeom.arrayBuffer1.byteLength / 8;
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;

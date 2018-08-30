@@ -223,7 +223,8 @@ const worker = new MVTWorker();
 
 onmessage = function (event) {
     processEvent(event).then(message => {
-        postMessage(message);
+        message.dataframe.geom = null;
+        postMessage(message, message.dataframe.empty ? [] : [message.dataframe.decodedGeom.arrayBuffer1, message.dataframe.decodedGeom.arrayBuffer2]);
     });
 };
 
