@@ -1,10 +1,6 @@
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../client/rsys';
 
-export function helloWorker () {
-
-}
-
 export default class TileClient {
     constructor (templateURLs) {
         if (!Array.isArray(templateURLs)) {

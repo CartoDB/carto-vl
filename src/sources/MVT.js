@@ -125,8 +125,6 @@ export default class MVT extends Base {
         this._worker.onmessage = event => {
             const mID = event.data.mID;
             const dataframe = event.data.dataframe;
-            // console.log(event.data);
-            // debugger;
             Object.setPrototypeOf(dataframe, new Dataframe({}));
             if (!dataframe.empty) {
                 dataframe.decodedGeom.vertices = new Float32Array(dataframe.decodedGeom.arrayBuffer1);
@@ -152,11 +150,6 @@ export default class MVT extends Base {
     }
 
     requestData (zoom, viewport) {
-        // TODO_WEBWORKER returns a promise to Dataframe
-
-        // call  requestdata with worker postMessage wrapper as a fetcher, current Tileclient.requestdataframe to MVT.worker
-        //      add Dataframe.prototype to returned stripped dataframe on wrapper
-
         return this._tileClient.requestData(zoom, viewport, (x, y, z, templateURLs) => {
             return new Promise(resolve => {
                 this._worker.postMessage({ x, y, z, templateURLs, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID });
