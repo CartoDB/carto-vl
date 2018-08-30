@@ -3,6 +3,7 @@ import * as Protobuf from 'pbf';
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
+import Metadata from '../renderer/Metadata';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -24,6 +25,30 @@ const MVT_TO_CARTO_TYPES = {
 };
 
 export class MVTWorker {
+    // Worker API
+    onmessage (event) {
+        this.processEvent(event).then(message => {
+            message.dataframe.geom = null;
+            const transferables = [];
+            if (!message.dataframe.empty) {
+                transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
+                if (message.dataframe.decodedGeom.normalsArrayBuffer) {
+                    transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);
+                }
+            }
+            postMessage(message, transferables);
+        });
+    }
+    async processEvent (event) {
+        const params = event.data;
+        Object.setPrototypeOf(params.metadata, Metadata.prototype);
+        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, params.metadata);
+        return {
+            mID: params.mID,
+            dataframe
+        };
+    }
+
     async _requestDataframe (x, y, z, url, layerID, metadata) {
         const response = await fetch(url);
         const dataframe = await this.responseToDataframeTransformer(response, x, y, z, layerID, metadata);
