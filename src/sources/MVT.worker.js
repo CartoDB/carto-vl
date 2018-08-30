@@ -25,26 +25,13 @@ const MVT_TO_CARTO_TYPES = {
 };
 
 class MVTWorker {
-    // From TileClient
-
-    _getTileUrl (x, y, z, templateURLs) {
-        const subdomainIndex = this._getSubdomainIndex(x, y, templateURLs);
-        return templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
-    }
-
-    _getSubdomainIndex (x, y, templateURLs) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return Math.abs(x + y) % templateURLs.length;
-    }
-
-    async _requestDataframe (x, y, z, templateURLs, layerID, metadata) {
-        const response = await fetch(this._getTileUrl(x, y, z, templateURLs));
+    async _requestDataframe (x, y, z, url, layerID, metadata) {
+        const response = await fetch(url);
         const dataframe = await this.responseToDataframeTransformer(response, x, y, z, layerID, metadata);
         return dataframe;
     }
 
     // From MVT
-
     async responseToDataframeTransformer (response, x, y, z, layerID, metadata) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
@@ -231,7 +218,7 @@ onmessage = function (event) {
 async function processEvent (event) {
     const params = event.data;
     Object.setPrototypeOf(params.metadata, new Metadata());
-    const dataframe = await worker._requestDataframe(params.x, params.y, params.z, params.templateURLs, params.layerID, params.metadata);
+    const dataframe = await worker._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, params.metadata);
     return {
         mID: params.mID,
         dataframe

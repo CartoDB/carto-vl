@@ -150,9 +150,9 @@ export default class MVT extends Base {
     }
 
     requestData (zoom, viewport) {
-        return this._tileClient.requestData(zoom, viewport, (x, y, z, templateURLs) => {
+        return this._tileClient.requestData(zoom, viewport, (x, y, z, url) => {
             return new Promise(resolve => {
-                this._worker.postMessage({ x, y, z, templateURLs, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID });
+                this._worker.postMessage({ x, y, z, url, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID });
                 this._workerDispatch[this._mID] = resolve;
                 this._mID++;
             });

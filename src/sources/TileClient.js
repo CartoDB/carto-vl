@@ -28,6 +28,16 @@ export default class TileClient {
         this._oldDataframes = [];
     }
 
+    _getTileUrl (x, y, z) {
+        const subdomainIndex = this._getSubdomainIndex(x, y);
+        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
+    }
+
+    _getSubdomainIndex (x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return Math.abs(x + y) % this._templateURLs.length;
+    }
+
     _getTiles (tiles, responseToDataframeTransformer) {
         this._requestGroupID++;
         let completedTiles = [];
@@ -56,7 +66,8 @@ export default class TileClient {
         });
     }
     async _requestDataframe (x, y, z, responseToDataframeTransformer) {
-        const dataframe = await responseToDataframeTransformer(x, y, z, this._templateURLs);
+        const url = this._getTileUrl(x, y, z);
+        const dataframe = await responseToDataframeTransformer(x, y, z, url);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }
