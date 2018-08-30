@@ -120,21 +120,28 @@ export default class MVT extends Base {
         this._options = options;
         this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
 
-        // Fix, not one worker per clone MVT
-        this._worker = new Worker();
-        this._worker.onmessage = event => {
-            const mID = event.data.mID;
-            const dataframe = event.data.dataframe;
-            Object.setPrototypeOf(dataframe, Dataframe.prototype);
-            if (!dataframe.empty) {
-                dataframe.decodedGeom.vertices = new Float32Array(dataframe.decodedGeom.verticesArrayBuffer);
-                dataframe.decodedGeom.normals = new Float32Array(dataframe.decodedGeom.normalsArrayBuffer);
-            }
-            this._workerDispatch[mID](dataframe);
-        };
-
         this._workerDispatch = {};
         this._mID = 0;
+    }
+
+    get _worker () {
+        if (!this._workerInstance) {
+            this._workerInstance = new Worker();
+        }
+        if (!this._workerInitialized) {
+            this._workerInstance.onmessage = event => {
+                const mID = event.data.mID;
+                const dataframe = event.data.dataframe;
+                Object.setPrototypeOf(dataframe, Dataframe.prototype);
+                if (!dataframe.empty) {
+                    dataframe.decodedGeom.vertices = new Float32Array(dataframe.decodedGeom.verticesArrayBuffer);
+                    dataframe.decodedGeom.normals = new Float32Array(dataframe.decodedGeom.normalsArrayBuffer);
+                }
+                this._workerDispatch[mID](dataframe);
+            };
+            this._workerInitialized = true;
+        }
+        return this._workerInstance;
     }
 
     _clone () {

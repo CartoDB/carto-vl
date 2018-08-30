@@ -6,6 +6,8 @@ import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 
+import WindshaftWorker from './windshaft.worker';
+
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
@@ -166,6 +168,7 @@ export default class Windshaft {
             this._mvtClient.free();
         }
         this._mvtClient = new MVT(urlTemplates);
+        this._mvtClient._workerInstance = new WindshaftWorker();
         this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
         this._mvtClient.decodeProperty = (propertyName, propertyValue) => {
             const basename = schema.column.getBase(propertyName);
