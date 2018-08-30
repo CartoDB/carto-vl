@@ -66,7 +66,8 @@ class MVTWorker {
         }
         switch (metadata.geomType) {
             case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
+                const arrayBuffer = new ArrayBuffer(mvtLayer.length * 2 * 3 * 4);// SIZEOF
+                return this._decode(mvtLayer, metadata, mvtExtent, arrayBuffer);
             case geometryTypes.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
             case geometryTypes.POLYGON:
@@ -92,6 +93,10 @@ class MVTWorker {
 
     _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {
         let numFeatures = 0;
+        let pointGeometries;
+        if (geometries) {
+            pointGeometries = new Float32Array(geometries);
+        }
         const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
@@ -101,6 +106,7 @@ class MVTWorker {
                 const decodedPolygons = decodeFn(geom, mvtExtent);
                 geometries.push(decodedPolygons);
             } else {
+                // TODO refactor
                 const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;
                 const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;
                 // Tiles may contain points in the border;
@@ -108,12 +114,12 @@ class MVTWorker {
                 if (x < -1 || x >= 1 || y < -1 || y >= 1) {
                     continue;
                 }
-                geometries[6 * numFeatures + 0] = x;
-                geometries[6 * numFeatures + 1] = y;
-                geometries[6 * numFeatures + 2] = x;
-                geometries[6 * numFeatures + 3] = y;
-                geometries[6 * numFeatures + 4] = x;
-                geometries[6 * numFeatures + 5] = y;
+                pointGeometries[6 * numFeatures + 0] = x;
+                pointGeometries[6 * numFeatures + 1] = y;
+                pointGeometries[6 * numFeatures + 2] = x;
+                pointGeometries[6 * numFeatures + 3] = y;
+                pointGeometries[6 * numFeatures + 4] = x;
+                pointGeometries[6 * numFeatures + 5] = y;
             }
             if (f.properties[metadata.idProperty] === undefined) {
                 throw new Error(`MVT feature with undefined idProperty '${metadata.idProperty}'`);
@@ -211,7 +217,14 @@ const worker = new MVTWorker();
 onmessage = function (event) {
     processEvent(event).then(message => {
         message.dataframe.geom = null;
-        postMessage(message, message.dataframe.empty ? [] : [message.dataframe.decodedGeom.arrayBuffer1, message.dataframe.decodedGeom.arrayBuffer2]);
+        const transferables = [];
+        if (!message.dataframe.empty) {
+            transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
+            if (message.dataframe.decodedGeom.normalsArrayBuffer) {
+                transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);
+            }
+        }
+        postMessage(message, transferables);
     });
 };
 

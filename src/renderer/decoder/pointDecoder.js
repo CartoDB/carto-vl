@@ -2,7 +2,7 @@
 
 export function decodePoint (vertices) {
     return {
-        vertices: vertices,
+        verticesArrayBuffer: vertices,
         breakpoints: []
     };
 }
