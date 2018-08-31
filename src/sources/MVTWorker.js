@@ -41,8 +41,11 @@ export class MVTWorker {
     }
     async processEvent (event) {
         const params = event.data;
-        Object.setPrototypeOf(params.metadata, Metadata.prototype);
-        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, params.metadata);
+        if (params.metadata) {
+            Object.setPrototypeOf(params.metadata, Metadata.prototype);
+            this.metadata = params.metadata;
+        }
+        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);
         return {
             mID: params.mID,
             dataframe

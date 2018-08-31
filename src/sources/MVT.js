@@ -152,7 +152,17 @@ export default class MVT extends Base {
                 } else if (url[0] === '/') {
                     url = window.location.protocol + '//' + window.location.host + url;
                 }
-                this._worker.postMessage({ x, y, z, url, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID, workerName: this._workerName });
+                this._worker.postMessage({
+                    x,
+                    y,
+                    z,
+                    url,
+                    layerID: this._options.layerID,
+                    metadata: this._metadataSent ? undefined : this._metadata,
+                    mID: this._mID,
+                    workerName: this._workerName
+                });
+                this._metadataSent = true;
                 this._workerDispatch[this._mID] = resolve;
                 this._mID++;
             });
