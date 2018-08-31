@@ -50,12 +50,11 @@ export class MVTWorker {
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {
         const response = await fetch(url);
-        const dataframe = await this.responseToDataframeTransformer(response, x, y, z, layerID, metadata);
+        const dataframe = await this.urlToDataframeTransformer(response, x, y, z, layerID, metadata);
         return dataframe;
     }
 
-    // From MVT
-    async responseToDataframeTransformer (response, x, y, z, layerID, metadata) {
+    async urlToDataframeTransformer (response, x, y, z, layerID, metadata) {
         const MVT_EXTENT = 4096;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength === 0 || response === 'null') {
