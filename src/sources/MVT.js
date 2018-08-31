@@ -114,10 +114,6 @@ export default class MVT extends Base {
                 const mID = event.data.mID;
                 const dataframe = event.data.dataframe;
                 Object.setPrototypeOf(dataframe, Dataframe.prototype);
-                if (!dataframe.empty) {
-                    dataframe.decodedGeom.vertices = new Float32Array(dataframe.decodedGeom.verticesArrayBuffer);
-                    dataframe.decodedGeom.normals = new Float32Array(dataframe.decodedGeom.normalsArrayBuffer);
-                }
                 this._workerDispatch[mID](dataframe);
             };
         }

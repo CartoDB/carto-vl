@@ -1,9 +1,9 @@
 import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
 import * as rsys from '../client/rsys';
-import Dataframe from '../renderer/Dataframe';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import Metadata from '../renderer/Metadata';
+import DummyDataframe from '../renderer/DummyDataframe';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -28,7 +28,6 @@ export class MVTWorker {
     // Worker API
     onmessage (event) {
         this.processEvent(event).then(message => {
-            message.dataframe.geom = null;
             const transferables = [];
             if (!message.dataframe.empty) {
                 transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
@@ -223,7 +222,7 @@ export class MVTWorker {
     }
 
     _generateDataFrame (rs, geometry, properties, size, type, metadata) {
-        return new Dataframe({
+        return new DummyDataframe({
             active: false,
             center: rs.center,
             geom: geometry,

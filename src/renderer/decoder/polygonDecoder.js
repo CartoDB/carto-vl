@@ -59,13 +59,15 @@ export function decodePolygon (geometry) {
 
     const verticesArrayBuffer = new ArrayBuffer(4 * index);
     const normalsArrayBuffer = new ArrayBuffer(4 * index);
-    const f1 = new Float32Array(verticesArrayBuffer);
-    const f2 = new Float32Array(normalsArrayBuffer);
+    const vertices = new Float32Array(verticesArrayBuffer);
+    const normals = new Float32Array(normalsArrayBuffer);
     for (let i = 0; i < index; i++) {
-        f1[i] = geomBuffer.vertices[i];
-        f2[i] = geomBuffer.normals[i];
+        vertices[i] = geomBuffer.vertices[i];
+        normals[i] = geomBuffer.normals[i];
     }
     return {
+        vertices,
+        normals,
         verticesArrayBuffer,
         normalsArrayBuffer,
         featureIDToVertexIndex,

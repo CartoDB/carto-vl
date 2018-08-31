@@ -1,8 +1,9 @@
 // If the geometry type is 'point' it will pass trough the geom (the vertex array)
 
-export function decodePoint (vertices) {
+export function decodePoint (verticesArrayBuffer) {
     return {
-        verticesArrayBuffer: vertices,
+        verticesArrayBuffer: verticesArrayBuffer,
+        vertices: new Float32Array(verticesArrayBuffer),
         breakpoints: []
     };
 }
