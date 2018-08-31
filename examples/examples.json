@@ -78,6 +78,10 @@
                 {
                     "title": "Draw Order",
                     "file": "styling/draw-order.html"
+                },
+                {
+                    "title": "Scaled width",
+                    "file": "styling/scaled.html"
                 }
             ]
         },
