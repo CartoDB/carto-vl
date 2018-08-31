@@ -81,7 +81,7 @@ export default class Base {
     /**
      * Linear interpolation between this and finalValue with the specified duration
      * @api
-     * @param {Expression} final
+     * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
      * @memberof carto.expressions.Base
@@ -89,6 +89,7 @@ export default class Base {
      * @name blendTo
      */
     blendTo (final, duration = 500) {
+        // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
