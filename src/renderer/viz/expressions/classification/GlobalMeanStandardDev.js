@@ -5,13 +5,14 @@ import { average, standardDeviation } from '../stats';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
+ *
+ * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
+ *
  * It uses average and standard deviation (population formula) to classify the dataset.
  * When using an odd number of buckets, the central class has a double size (classSize * 2), to honour the number of required buckets
  *
  * This method is suitable if data are normally (or near normal) distributed, and it is specially
  * appropiated for diverging datasets, which can be well displayed using a diverging color scheme like TEALROSE
- *
- * It will classify the input based on the entire dataset without filtering by viewport or by `filter`.
  *
  * @param {Number} input - The input expression to classify
  * @param {number} n - Number of buckets
@@ -61,27 +62,40 @@ export default class GlobalMeanStandardDev extends Classifier {
         super._bindMetadata(metadata);
         checkExpression('globalMeanStandardDev', 'input', 0, this.input);
         checkType('globalMeanStandardDev', 'input', 0, 'number', this.input);
-        this._sample = metadata.sample.map(s => s[this.input.name]);
-    }
 
-    _genBreakpoints () {
-        const avg = average(this._sample);
-        const standardDev = standardDeviation(this._sample);
-        let breaks;
-        let over = [];
-        let under = [];
-
-        const isEven = this.buckets % 2 === 0;
-        let factor = isEven ? 0.0 : 1.0; // if odd, central class is double sized
-        do {
-            over.push(avg + (factor * standardDev * this._classSize));
-            under.push(avg - (factor * standardDev * this._classSize));
-            breaks = [...new Set(over.concat(under))].sort();
-            factor++;
-        } while (breaks.length + 1 < this.buckets);
-
+        const sample = metadata.sample.map(s => s[this.input.name]);
+        const breaks = calculateBreakpoints(sample, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
     }
+}
+
+/**
+ * Calculate breakpoints according to mean-standard deviation process
+ *
+ * @export
+ * @param {Number[]} sample
+ * @param {Number} buckets - number of buckets
+ * @param {Number} classSize - in standard deviation units (usually 1.0, 0.5, 0.25...)
+ * @returns
+ */
+export function calculateBreakpoints (sample, buckets, classSize) {
+    let breaks;
+    const avg = average(sample);
+    const standardDev = standardDeviation(sample);
+
+    let over = [];
+    let under = [];
+    const isEven = buckets % 2 === 0;
+    let factor = isEven ? 0.0 : 1.0; // if odd, central class is double sized
+    do {
+        const step = factor * (standardDev * classSize);
+        over.push(avg + step);
+        under.push(avg - step);
+        breaks = [...new Set(over.concat(under))].sort();
+        factor++;
+    } while (breaks.length < buckets - 1);
+
+    return breaks;
 }
