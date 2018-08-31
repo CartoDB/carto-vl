@@ -402,7 +402,8 @@ export default class Layer {
             this.renderer.renderLayer(this._renderLayer, {
                 zoomLevel: this.map.getZoom()
             });
-            if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            const dataframesHaveChanged = !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()));
+            if (this.isAnimated() || this._fireUpdateOnNextRender || dataframesHaveChanged) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
