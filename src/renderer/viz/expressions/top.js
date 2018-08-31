@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
+import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
 
@@ -35,7 +35,6 @@ export default class Top extends BaseExpression {
 
         buckets = implicitCast(buckets);
         checkInstance('top', 'property', 0, Property, property);
-        checkLooseType('top', 'buckets', 1, 'number', buckets);
         checkFeatureIndependent('top', 'buckets', 1, buckets);
         const children = { property, buckets };
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {

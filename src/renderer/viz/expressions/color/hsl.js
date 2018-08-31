@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkExpression, checkLooseType, checkType, checkMaxArguments, clamp } from '../utils';
+import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
 
 /**
  * Evaluates to a hsl color.
@@ -63,13 +63,13 @@ function genHSL (name, alpha) {
 
             const children = { h, s, l };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'number', a);
+                checkExpression('hsla', name, 'a', 3, a);
                 children.a = a;
             }
 
-            hslCheckType('h', 0, h);
-            hslCheckType('s', 1, s);
-            hslCheckType('l', 2, l);
+            checkExpression(`hsl${alpha ? 'a' : ''}`, 'h', 0, h);
+            checkExpression(`hsl${alpha ? 'a' : ''}`, 's', 1, s);
+            checkExpression(`hsl${alpha ? 'a' : ''}`, 'l', 2, l);
 
             super(children);
             this.type = 'color';

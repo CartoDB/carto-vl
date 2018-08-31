@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
-import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent, checkMaxArguments } from './utils';
+import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
@@ -79,11 +79,6 @@ export class Animation extends BaseExpression {
         if (input.isA(Property)) {
             input = linear(input, globalMin(input), globalMax(input));
         }
-
-        checkLooseType('animation', 'input', 0, 'number', input);
-        checkLooseType('animation', 'duration', 1, 'number', duration);
-        checkFeatureIndependent('animation', 'duration', 1, duration);
-        checkLooseType('animation', 'fade', 2, 'fade', fade);
 
         const progress = number(0);
         super({ _input: input, progress, fade, duration });

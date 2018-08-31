@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkLooseType, checkType, checkMaxArguments } from '../utils';
+import { implicitCast, checkType, checkMaxArguments, checkExpression } from '../utils';
 
 /**
  * Evaluates to a rgb color.
@@ -62,13 +62,13 @@ function genRGB (name, alpha) {
             checkMaxArguments(arguments, 4, 'rgba');
 
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
-            checkLooseType(name, 'r', 0, 'number', r);
-            checkLooseType(name, 'g', 1, 'number', g);
-            checkLooseType(name, 'b', 2, 'number', b);
+            checkExpression(name, 'r', 0, r);
+            checkExpression(name, 'g', 1, g);
+            checkExpression(name, 'b', 2, b);
 
             const children = { r, g, b };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'number', a);
+                checkExpression(name, 'a', 3, 'number', a);
                 children.a = a;
             }
             super(children);

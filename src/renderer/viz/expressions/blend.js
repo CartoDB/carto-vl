@@ -1,4 +1,4 @@
-import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression, checkMaxArguments } from './utils';
+import { implicitCast, clamp, mix, checkType, checkExpression, checkMaxArguments } from './utils';
 import Transition from './transition';
 import BaseExpression from './base';
 
@@ -45,7 +45,6 @@ export default class Blend extends BaseExpression {
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        checkLooseType('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
@@ -76,7 +75,7 @@ export default class Blend extends BaseExpression {
         super._bindMetadata(meta);
 
         abTypeCheck(this.a, this.b);
-        checkType('blend', 'mix', 1, 'number', this.mix);
+        checkType('blend', 'mix', 2, 'number', this.mix);
 
         this.type = this.a.type;
     }
