@@ -1,6 +1,7 @@
 import { implicitCast } from './utils';
 import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
+import { parseVizExpression } from '../parser';
 
 /**
  * Abstract expression class
@@ -89,7 +90,9 @@ export default class Base {
      * @name blendTo
      */
     blendTo (final, duration = 500) {
-        // TODO blendFunc = 'linear'
+        if (typeof final === 'string') {
+            final = parseVizExpression(final);
+        }
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
