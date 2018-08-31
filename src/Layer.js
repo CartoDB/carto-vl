@@ -295,7 +295,6 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
         this.requestData();
-        this._fire('updated');
     }
 
     /**
@@ -434,7 +433,6 @@ export default class Layer {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
         this._needRefresh();
-        this._fireUpdateOnNextRender = true;
     }
 
     _needRefresh () {
