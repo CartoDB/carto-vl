@@ -30,6 +30,7 @@ export class MVTWorker {
         this.processEvent(event).then(message => {
             const transferables = [];
             if (!message.dataframe.empty) {
+                transferables.push(this._propertiesArrayBuffer);
                 transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
                 if (message.dataframe.decodedGeom.normalsArrayBuffer) {
                     transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);
@@ -185,6 +186,7 @@ export class MVTWorker {
         const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
 
         const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
+        this._propertiesArrayBuffer = arrayBuffer;
         for (let i = 0; i < propertyNames.length; i++) {
             const propertyName = propertyNames[i];
             properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
