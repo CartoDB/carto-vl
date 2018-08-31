@@ -135,6 +135,15 @@ export default class MVT extends Base {
     requestData (zoom, viewport) {
         return this._tileClient.requestData(zoom, viewport, (x, y, z, url) => {
             return new Promise(resolve => {
+                // Relative URLs don't work inside the Web Worker
+                if (url[0] === '.') {
+                    let parts = window.location.pathname.split('/');
+                    parts.pop();
+                    const path = parts.join('/');
+                    url = window.location.protocol + '//' + window.location.host + '/' + path + '/' + url;
+                } else if (url[0] === '/') {
+                    url = window.location.protocol + '//' + window.location.host + url;
+                }
                 this._worker.postMessage({ x, y, z, url, layerID: this._options.layerID, metadata: this._metadata, mID: this._mID, workerName: this._workerName });
                 this._workerDispatch[this._mID] = resolve;
                 this._mID++;
