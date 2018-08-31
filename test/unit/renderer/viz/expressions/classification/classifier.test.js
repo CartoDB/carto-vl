@@ -6,12 +6,14 @@ import {
     validateMaxArgumentsError
 } from '../utils';
 
+import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
 import {
-    globalQuantiles,
     property,
+    globalQuantiles,
     globalEqIntervals,
-    viewportEqIntervals,
-    viewportQuantiles
+    globalMeanStandardDev,
+    viewportQuantiles,
+    viewportEqIntervals
 } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
@@ -82,6 +84,10 @@ describe('src/renderer/viz/expressions/classifier', () => {
             ]
         });
 
+        function sampleValues () {
+            return METADATA.sample.map(s => s.price);
+        }
+
         function prepare (expr) {
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
@@ -125,6 +131,44 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 const q = globalEqIntervals($price, 2);
                 prepare(q);
                 expect(q.getBreakpointList()).toEqual([2.5]);
+            });
+
+            // globalMeanStandardDev ---
+            describe('. globalMeanStandardDev', () => {
+                const avg = average(sampleValues());
+                const std = standardDeviation(sampleValues());
+
+                it('globalMeanStandardDev($price, 2)', () => {
+                    const q = globalMeanStandardDev($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([avg]);
+                });
+
+                it('globalMeanStandardDev($price, 3)', () => {
+                    const q = globalMeanStandardDev($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([avg - std, avg + std]);
+                });
+
+                it('globalMeanStandardDev($price, 4)', () => {
+                    const q = globalMeanStandardDev($price, 4);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([avg - std, avg, avg + std]);
+                });
+
+                it('globalMeanStandardDev($price, 5)', () => {
+                    const q = globalMeanStandardDev($price, 5);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([
+                        avg - (2 * std), avg - std, avg + std, avg + (2 * std)
+                    ]);
+                });
+
+                it('globalMeanStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
+                    const q = globalMeanStandardDev($price, 3, 0.5);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([avg - 0.5 * std, avg + 0.5 * std]);
+                });
             });
         });
 
