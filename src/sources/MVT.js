@@ -113,7 +113,12 @@ export default class MVT extends Base {
             this._workerInstance.onmessage = event => {
                 const mID = event.data.mID;
                 const dataframe = event.data.dataframe;
+                const metadata = dataframe.metadata;
                 Object.setPrototypeOf(dataframe, Dataframe.prototype);
+                this._metadata.numCategories = metadata.numCategories;
+                this._metadata.categoryToID = metadata.categoryToID;
+                this._metadata.IDToCategory = metadata.IDToCategory;
+                dataframe.metadata = this._metadata;
                 this._workerDispatch[mID](dataframe);
             };
         }
