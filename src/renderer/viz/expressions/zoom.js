@@ -7,13 +7,13 @@ import { checkMaxArguments } from './utils';
  *
  * @return {Number}
  *
- * @example <caption>Only show feature at zoom levels les than 7.</caption>
+ * @example <caption>Only show feature at zoom levels less than 7.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.lt(s.zoom(), 7)
  * });
  *
- * @example <caption>Only show feature at zoom levels les than 7. (String)</caption>
+ * @example <caption>Only show feature at zoom levels less than 7. (String)</caption>
  * const viz = new carto.Viz(`
  *   filter: zoom() < 7
  * `);
