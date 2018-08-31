@@ -1,4 +1,5 @@
 import MVT from '../../../src/sources/MVT';
+import { MVTWorker } from '../../../src/sources/MVTWorker';
 
 describe('sources/MVT', () => {
     describe('constructor', () => {
@@ -41,9 +42,9 @@ describe('sources/MVT', () => {
                     }
                 }
             };
-            const source = new MVT('URL', metadata);
+            const worker = new MVTWorker();
             expect(() => {
-                source.decodeProperty('wadus', 'this is not a number');
+                worker.decodeProperty(metadata, 'wadus', 'this is not a number');
             }).toThrowError(/MVT decoding error. Metadata property \'wadus\' is of type \'number\' but the MVT tile contained a feature property of type string: \'this is not a number\'/);
         });
         it('should throw an error when the property type is number and the metadata declared type is category', () => {
@@ -55,9 +56,9 @@ describe('sources/MVT', () => {
                     }
                 }
             };
-            const source = new MVT('URL', metadata);
+            const worker = new MVTWorker();
             expect(() => {
-                source.decodeProperty('wadus', 123);
+                worker.decodeProperty(metadata, 'wadus', 123);
             }).toThrowError(/MVT decoding error. Metadata property \'wadus\' is of type \'category\' but the MVT tile contained a feature property of type number: \'123\'/);
         });
     });
