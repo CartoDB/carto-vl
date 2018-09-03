@@ -95,7 +95,7 @@ expected type was '${expectedType}', actual type was '${actualType}'`);
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${actualInstance}' is not an instance of '${expectedClass.name}'`);
+    expected type was instance of '${expectedClass.name}'`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
@@ -110,7 +110,7 @@ export function throwInvalidArray (expressionName, parameterName, parameterIndex
 
 export function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${str}' is not a string`);
+    expected type was 'string', but ${str}' is not a string`);
 }
 
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
