@@ -211,7 +211,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend();
+     *   const legend = layer.viz.color.getLegend();
      *   // legend = {
      *   //    type: 'category',
      *   //    data: [
@@ -229,7 +229,7 @@ export default class Ramp extends BaseExpression {
      * ´);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend();
+     *   const legend = layer.viz.color.getLegend();
      *   // legend = {
      *   //    type: 'category',
      *   //    data: [
@@ -248,7 +248,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegend();
      *   // legend = {
      *   //    type: 'category',
      *   //    data: [
@@ -266,7 +266,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegend();
      *   // legend = {
      *   //    type: 'category',
      *   //    data: [
@@ -285,7 +285,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend({
+     *   const legend = layer.viz.color.getLegend({
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
@@ -306,7 +306,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend({
+     *   const legend = layer.viz.color.getLegend({
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
@@ -328,7 +328,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend({
+     *   const legend = layer.viz.color.getLegend({
      *       samples: 4
      *   });
      *
@@ -350,7 +350,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.getViz().color.getLegend({
+     *   const legend = layer.viz.color.getLegend({
      *       samples: 4
      *   });
      *
@@ -385,7 +385,7 @@ export default class Ramp extends BaseExpression {
         }
 
         if (this.input.type === inputTypes.CATEGORY) {
-            const data = this._getLeyendCategories(config);
+            const data = this._getLegendCategories(config);
             return { type, data };
         }
     }
@@ -408,26 +408,31 @@ export default class Ramp extends BaseExpression {
         return { data, min, max };
     }
 
-    _getLeyendCategories (config) {
+    _getLegendCategories (config) {
         const name = this.input.getPropertyName();
         const categories = this._metadata.properties[name].categories;
         const maxNumCategories = this.input.numCategories - 1;
+        const legend = [];
 
-        return categories
-            .map((category, index) => {
+        for (let i = 0; i <= maxNumCategories; i++) {
+            const category = categories[i];
+
+            if (category) {
                 const feature = Object.defineProperty({},
                     name,
                     { value: category.name }
                 );
 
-                const key = category.name && index < maxNumCategories
+                const key = category.name && i < maxNumCategories
                     ? category.name
                     : config.defaultOthers;
 
                 const value = this.eval(feature);
-                return { key, value };
-            })
-            .filter(legend => legend.value !== null);
+                legend.push({ key, value });
+            }
+        }
+
+        return legend;
     }
 
     _evalNumberArray (feature, index) {
