@@ -207,6 +207,7 @@ export default class Layer {
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
+        this.map.triggerRepaint();
     }
 
     /**
@@ -387,12 +388,8 @@ export default class Layer {
     render (gl, matrix) {
         this._paintLayer();
 
-        // Checking this.map.repaint is needed, because MGL repaint is a setter and
-        // it has the strange quite buggy side-effect of doing a "final" repaint after
-        // being disabled if we disable it every frame, MGL will do a "final" repaint
-        // every frame, which will not disabled it in practice
-        if (!this.isAnimated() && this.map.repaint) {
-            this.map.repaint = false;
+        if (this.isAnimated()) {
+            this.map.triggerRepaint();
         }
     }
 
@@ -438,7 +435,7 @@ export default class Layer {
     }
 
     _needRefresh () {
-        this.map.repaint = true;
+        this.map.triggerRepaint();
     }
 
     /**

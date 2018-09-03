@@ -29,7 +29,6 @@ export default class Map {
 
         this._layers = new Set();
         this._hiddenLayers = new Set();
-        this._repaint = true;
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl');
