@@ -7,9 +7,9 @@
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <!-- Include Custom CSS -->
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
@@ -77,8 +77,8 @@
     });
 
     layer.on('updated', () => {
-      const histogram = layer.getViz().variables.histogram.eval();
-      const colorRamp = layer.getViz().color;
+      const histogram = layer.viz.variables.histogram.eval();
+      const colorRamp = layer.viz.color;
       const labels = histogram.map(value => value.x);
       const data = histogram.map(value => value.y);
       const backgroundColor = colorRamp
