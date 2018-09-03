@@ -115,10 +115,7 @@ export default class Ramp extends BaseExpression {
         super({ input, palette });
 
         this.minKey = 0;
-        this.maxKey = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
+        this.maxKey = 1;
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
@@ -414,6 +411,7 @@ export default class Ramp extends BaseExpression {
     _getLeyendCategories (config) {
         const name = this.input.getPropertyName();
         const categories = this._metadata.properties[name].categories;
+        const maxNumCategories = this.input.numCategories - 1;
 
         return categories
             .map((category, index) => {
@@ -421,7 +419,8 @@ export default class Ramp extends BaseExpression {
                     name,
                     { value: category.name }
                 );
-                const key = category.name && index < this.maxKey
+
+                const key = category.name && index < maxNumCategories
                     ? category.name
                     : config.defaultOthers;
 
