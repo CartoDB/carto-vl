@@ -46,9 +46,9 @@ export default class Top extends BaseExpression {
     }
 
     eval (feature) {
-        const catID = this._meta.categoryToID.get(this.property.eval(feature));
+        const catID = this._metadata.categoryToID.get(this.property.eval(feature));
         const buckets = this.numBuckets;
-        const metaColumn = this._meta.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -57,7 +57,7 @@ export default class Top extends BaseExpression {
 
         orderedCategoryNames.map((name, i) => {
             if (i === catID) {
-                ret = i < buckets ? this._meta.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
+                ret = i < buckets ? this._metadata.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
             }
         });
 
@@ -72,7 +72,7 @@ export default class Top extends BaseExpression {
         checkType('top', 'property', 0, 'category', this.property);
         checkType('top', 'buckets', 1, 'number', this.buckets);
 
-        this._meta = metadata;
+        this._metadata = metadata;
         this._textureBuckets = null;
     }
 
@@ -147,7 +147,7 @@ export default class Top extends BaseExpression {
     }
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
-        const metaColumn = this._meta.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.name];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
