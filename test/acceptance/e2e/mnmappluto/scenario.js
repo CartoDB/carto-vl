@@ -1,6 +1,6 @@
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    style: 'http://localhost:5000/test/common/basemaps/dark-matter-gl-style.json',
     center: [-74, 40.7],
     zoom: 12
 });

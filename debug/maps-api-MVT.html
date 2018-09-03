@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../examples/style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Add layer</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Add one CARTO layer to your map</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [-74, 40.7],
+            zoom: 0
+        });
+
+        async function loadMVT() {
+            const mapConfig = {
+                buffersize: { mvt: 0 },
+                layers: [
+                    {
+                        id: 'myCartoLayer',
+                        type: 'mapnik',
+                        options: {
+                            sql: 'SELECT * FROM world_borders'
+                        }
+                    },
+                    {
+                        id: 'myCartoLayer2',
+                        type: 'mapnik',
+                        options: {
+                            sql: 'SELECT * FROM pop_density_points'
+                        }
+                    }
+                ]
+            };
+            const response = await fetch('https://cartovl.carto.com/api/v1/map', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(mapConfig)
+            });
+            const layergroup = await response.json();
+            const tilejson = layergroup.metadata.tilejson.vector;
+
+            const source = new carto.source.MVT(tilejson.tiles[0], {
+                properties: {
+                }
+            },
+                {
+                    layerID: 'myCartoLayer2'
+                }
+            );
+
+            const viz = new carto.Viz();
+            const layer = new carto.Layer('myCartoLayer2', source, viz);
+
+            layer.addTo(map);
+            layer.on('loaded', () => {
+                window.loaded = true;
+            });
+        }
+
+        loadMVT();
+
+    </script>
+</body>
+
+</html>

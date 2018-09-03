@@ -5,6 +5,7 @@
 dist/
 docs/all
 docs/public
+examples/ignore/
 node_modules/
 secrets.json
 temp/

@@ -46,9 +46,10 @@ export default class ClusterAggregation extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return {
-            columns: [
-                schema.column.aggColumn(this.property.name, this._aggName)
-            ]
+            [this.property.name]: [{
+                type: 'aggregated',
+                op: this._aggName
+            }]
         };
     }
 }

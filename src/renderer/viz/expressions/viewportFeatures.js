@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import Property from './basic/property';
 import { implicitCast } from './utils';
+import schema from '../../schema';
 
 /**
  * Generates a list of features in the viewport
@@ -85,7 +86,7 @@ export default class ViewportFeatures extends BaseExpression {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
-            const columns = this._getMinimumNeededSchema().columns;
+            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
             this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
         this.expr = [];

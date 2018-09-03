@@ -1,6 +1,6 @@
 import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, imageList, BICYCLE, CAR, BUILDING } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange, imageList, BICYCLE, CAR, BUILDING } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
@@ -977,6 +977,37 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 });
             });
         });
+
+        describe('when the input is zoomrange()', () => {
+            it('should return the first number in the array at low zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoom: 0.0};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(100);
+            });
+            it('should return an interpolated number in the array at a intermediate zoom level', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
+                const fakeDrawMetadata = {zoom: (Math.pow(2, 3 - 1) * 0.7 + 0.3 * Math.pow(2, 9 - 1))};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(130);
+            });
+            it('should return the last number in the array at high zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoom: 1000.0};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(200);
+            });
+        });
     });
 
     describe('.getLegend', () => {
@@ -1241,6 +1272,72 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 expect(gl.createTexture).toHaveBeenCalledTimes(1);
                 expect(r._bindGLTexture).toHaveBeenCalledTimes(1);
             });
+        });
+    });
+
+    describe('._getColorValue', () => {
+        const firstColor = namedColor('red');
+        const secondColor = namedColor('blue');
+        const thirdColor = namedColor('green');
+        let actual;
+        let expected;
+
+        it('should get the first element if m is NaN', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, NaN);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is Positive Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.POSITIVE_INFINITY);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the first element if m is Negative Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.NEGATIVE_INFINITY);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is a positive number greater than 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 100);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the current element if m is between 0 and 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 0.5);
+            expected = firstColor.color;
+
+            expect(actual.r).not.toEqual(NaN);
+            expect(actual.g).not.toEqual(NaN);
+            expect(actual.b).not.toEqual(NaN);
+            expect(actual.a).not.toEqual(NaN);
         });
     });
 });

@@ -57,6 +57,6 @@ function project (coordinates) {
     const wm = projectToWebMercator(coordinates);
     return {
         x: mapSize * (0.5 + wm.x / WM_2R),
-        y: mapSize * (0.5 - wm.y / WM_2R + 0.03 /* offset */)
+        y: mapSize * (0.5 - wm.y / WM_2R)
     };
 }

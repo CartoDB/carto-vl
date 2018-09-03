@@ -17,10 +17,19 @@ export default class RenderLayer {
         }
         this.type = dataframe.type;
         if (this.renderer) {
-            dataframe.bind(this.renderer);
+            dataframe.bindRenderer(this.renderer);
         }
         this.dataframes.push(dataframe);
         this.idProperty = dataframe.metadata.idProperty;
+    }
+
+    setRenderer (renderer) {
+        this.renderer = renderer;
+        this.dataframes.forEach(d => d.bindRenderer(renderer));
+    }
+
+    setViz (viz) {
+        this.viz = viz;
     }
 
     getActiveDataframes () {

@@ -51,12 +51,6 @@ export default class BaseArray extends BaseExpression {
 
         this.type = `${type}-array`;
         this.elems = elems;
-
-        try {
-            this.elems.map(elem => elem.value);
-        } catch (error) {
-            throw new Error('Arrays must be formed by constant expressions, they cannot depend on feature properties');
-        }
     }
 
     get value () {
