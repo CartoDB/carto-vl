@@ -3,6 +3,7 @@ import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
 import Base from './Base';
 import TileClient from './TileClient';
+import Worker from './MVTWorkers.worker';
 
 /**
  * A MVTOptions object declares a MVT configuration
@@ -61,7 +62,6 @@ import TileClient from './TileClient';
  *
  * @api
  */
-import Worker from './MVTWorkers.worker';
 
 export default class MVT extends Base {
     /**
