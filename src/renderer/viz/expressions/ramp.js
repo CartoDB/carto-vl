@@ -14,7 +14,7 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image'
+    IMAGE: 'image-list'
 };
 
 const rampTypes = {

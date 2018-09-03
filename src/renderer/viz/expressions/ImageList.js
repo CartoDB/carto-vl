@@ -13,7 +13,7 @@ export default class ImageList extends Base {
         checkMaxArguments(arguments, 1, 'imageList');
         checkArray('imageArray', 'imageArray', 0, imageArray);
 
-        imageArray.forEach((image, i) => checkLooseType('imageArray', `imageArray[${i}]`, 0, 'image', image));
+        imageArray.forEach((image, i) => checkLooseType('imageArray', `imageArray[${i}]`, 0, 'color', image));
 
         const children = {};
 
@@ -22,7 +22,7 @@ export default class ImageList extends Base {
         });
         super(children);
         this.numImages = imageArray.length;
-        this.type = 'image';
+        this.type = 'image-list';
     }
 
     _applyToShaderSource () {
