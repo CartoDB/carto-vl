@@ -3,7 +3,6 @@ import Property from '../basic/property';
 import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalMeanStandardDev';
-import { average, standardDeviation } from '../stats';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -69,29 +68,40 @@ export default class ViewportMeanStandardDev extends Classifier {
     }
 
     _genBreakpoints () {
-        const sample = this._getSampleFromHistogram();
-        const avg = average(sample);
-        const standardDev = standardDeviation(sample);
-        // TODO this could be optimized calculating avg & standardDev from histogram itself
+        const avg = this._averageFrom(this._histogram.value);
+        const stdev = this._standardDevFrom(this._histogram.value, avg);
 
-        const breaks = calculateBreakpoints(avg, standardDev, this.buckets, this._classSize);
-        console.log(breaks);
+        const breaks = calculateBreakpoints(avg, stdev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
     }
 
-    _getSampleFromHistogram () {
-        const hist = this._histogram.value;
-        let sample = [];
-        hist.forEach(({ x, y }) => {
-            if (y === 0) {
-                return;
-            }
-            const avg = (x[0] + x[1]) / 2.0;
-            const repeat = Array(y).fill(avg);
-            sample = sample.concat(repeat);
+    _averageFrom (histogram) {
+        let sumFrequencies = 0.0;
+        let sumMidValueFrequencies = 0.0;
+        histogram.forEach(({ x, y }) => {
+            sumFrequencies += y;
+
+            const midValue = (x[0] + x[1]) / 2.0;
+            sumMidValueFrequencies += midValue * y;
         });
-        return sample;
+
+        const avg = sumMidValueFrequencies / sumFrequencies;
+        return avg;
+    }
+
+    _standardDevFrom (histogram, average) {
+        let sumFrequencies = 0.0;
+        let sumPowDifferences = 0.0;
+        histogram.forEach(({ x, y }) => {
+            sumFrequencies += y;
+
+            const midValue = (x[0] + x[1]) / 2.0;
+            sumPowDifferences += y * (midValue - average) * (midValue - average);
+        });
+
+        const variance = sumPowDifferences / sumFrequencies;
+        return Math.sqrt(variance);
     }
 }
