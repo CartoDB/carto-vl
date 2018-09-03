@@ -148,9 +148,9 @@ export default class MVT extends Base {
                     let parts = window.location.pathname.split('/');
                     parts.pop();
                     const path = parts.join('/');
-                    url = window.location.protocol + '//' + window.location.host + '/' + path + '/' + url;
+                    url = `${window.location.protocol}//${window.location.host}/${path}/${url}`;
                 } else if (url[0] === '/') {
-                    url = window.location.protocol + '//' + window.location.host + url;
+                    url = `${window.location.protocol}//${window.location.host}${url}`;
                 }
                 this._worker.postMessage({
                     x,
