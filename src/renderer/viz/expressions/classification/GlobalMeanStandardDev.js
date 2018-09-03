@@ -78,7 +78,7 @@ export default class GlobalMeanStandardDev extends Classifier {
  * @param {Number[]} sample
  * @param {Number} buckets - number of buckets
  * @param {Number} classSize - in standard deviation units (usually 1.0, 0.5, 0.25...)
- * @returns
+ * @returns {Number[]}
  */
 export function calculateBreakpoints (sample, buckets, classSize) {
     let breaks;
@@ -93,7 +93,8 @@ export function calculateBreakpoints (sample, buckets, classSize) {
         const step = factor * (standardDev * classSize);
         over.push(avg + step);
         under.push(avg - step);
-        breaks = [...new Set(over.concat(under))].sort();
+        breaks = [...new Set(over.concat(under))];
+        breaks.sort((a, b) => a - b);
         factor++;
     } while (breaks.length < buckets - 1);
 
