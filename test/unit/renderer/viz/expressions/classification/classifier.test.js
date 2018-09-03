@@ -13,44 +13,64 @@ import {
     globalEqIntervals,
     globalMeanStandardDev,
     viewportQuantiles,
-    viewportEqIntervals
+    viewportEqIntervals,
+    viewportMeanStandardDev
 } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
-        validateCompileTypeError('viewportQuantiles', []);
-        validateCompileTypeError('viewportQuantiles', ['number', 'category']);
-        validateCompileTypeError('viewportQuantiles', ['category', 2]);
-        validateCompileTypeError('viewportQuantiles', ['color', 2]);
-        validateCompileTypeError('viewportQuantiles', ['number', 'color']);
-        validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
+        describe('global', () => {
+            validateStaticTypeErrors('globalQuantiles', []);
+            validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
+            validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
+            validateStaticTypeErrors('globalQuantiles', ['color', 2]);
+            validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
+            validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
-        validateCompileTypeError('viewportEqIntervals', []);
-        validateCompileTypeError('viewportEqIntervals', ['number', 'category']);
-        validateCompileTypeError('viewportEqIntervals', ['category', 2]);
-        validateCompileTypeError('viewportEqIntervals', ['color', 2]);
-        validateCompileTypeError('viewportEqIntervals', ['number', 'color']);
-        validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
+            validateStaticTypeErrors('globalEqIntervals', []);
+            validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
+            validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
+            validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
+            validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
+            validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
 
-        validateStaticTypeErrors('globalQuantiles', []);
-        validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
-        validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
-        validateStaticTypeErrors('globalQuantiles', ['color', 2]);
-        validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
-        validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
+            validateStaticTypeErrors('globalMeanStandardDev', []);
+            validateStaticTypeErrors('globalMeanStandardDev', ['number', 'category']);
+            validateDynamicTypeErrors('globalMeanStandardDev', ['category', 2]);
+            validateStaticTypeErrors('globalMeanStandardDev', ['color', 2]);
+            validateStaticTypeErrors('globalMeanStandardDev', ['number', 'color']);
+            validateMaxArgumentsError('globalMeanStandardDev', ['number', 'number-array', 'number', 'number']);
+        });
 
-        validateStaticTypeErrors('globalEqIntervals', []);
-        validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
-        validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
-        validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
-        validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
-        validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
+        describe('viewport', () => {
+            validateCompileTypeError('viewportQuantiles', []);
+            validateCompileTypeError('viewportQuantiles', ['number', 'category']);
+            validateCompileTypeError('viewportQuantiles', ['category', 2]);
+            validateCompileTypeError('viewportQuantiles', ['color', 2]);
+            validateCompileTypeError('viewportQuantiles', ['number', 'color']);
+            validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
+
+            validateCompileTypeError('viewportEqIntervals', []);
+            validateCompileTypeError('viewportEqIntervals', ['number', 'category']);
+            validateCompileTypeError('viewportEqIntervals', ['category', 2]);
+            validateCompileTypeError('viewportEqIntervals', ['color', 2]);
+            validateCompileTypeError('viewportEqIntervals', ['number', 'color']);
+            validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
+
+            validateStaticTypeErrors('viewportMeanStandardDev', []);
+            validateStaticTypeErrors('viewportMeanStandardDev', ['number', 'category']);
+            validateDynamicTypeErrors('viewportMeanStandardDev', ['category', 2]);
+            validateStaticTypeErrors('viewportMeanStandardDev', ['color', 2]);
+            validateStaticTypeErrors('viewportMeanStandardDev', ['number', 'color']);
+            validateMaxArgumentsError('viewportMeanStandardDev', ['number', 'number-array', 'number', 'number']);
+        });
     });
 
     describe('type', () => {
         validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
+        validateStaticType('viewportMeanStandardDev', ['number-property', 2, 0.5], 'category');
     });
 
     describe('eval', () => {
@@ -134,7 +154,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             });
 
             // globalMeanStandardDev ---
-            describe('. globalMeanStandardDev', () => {
+            describe('.globalMeanStandardDev', () => {
                 const avg = average(sampleValues());
                 const std = standardDeviation(sampleValues());
 
@@ -196,6 +216,49 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 prepare(q);
                 expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
                 expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+            });
+
+            // viewportMeanStandardDev ---
+            describe('.viewportMeanStandardDev', () => {
+                const avg = average(sampleValues());
+                const std = standardDeviation(sampleValues());
+
+                it('viewportMeanStandardDev($price, 2)', () => {
+                    const q = viewportMeanStandardDev($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toBeCloseTo([avg], 2);
+                });
+
+                it('viewportMeanStandardDev($price, 3)', () => {
+                    const q = viewportMeanStandardDev($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
+                });
+
+                it('viewportMeanStandardDev($price, 4)', () => {
+                    const q = viewportMeanStandardDev($price, 4);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg, 2);
+                    expect(q.getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
+                });
+
+                it('viewportMeanStandardDev($price, 5)', () => {
+                    const q = viewportMeanStandardDev($price, 5);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - (2 * std), 2);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg - std, 2);
+                    expect(q.getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
+                    expect(q.getBreakpointList()[3]).toBeCloseTo(avg + (2 * std), 2);
+                });
+
+                it('viewportMeanStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
+                    const q = viewportMeanStandardDev($price, 3, 0.5);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
+                });
             });
         });
     });

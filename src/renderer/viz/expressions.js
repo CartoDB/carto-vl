@@ -200,6 +200,7 @@ import GlobalMeanStandardDev from './expressions/classification/GlobalMeanStanda
 
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
+import ViewportMeanStandardDev from './expressions/classification/ViewportMeanStandardDev';
 
 import Ramp from './expressions/ramp';
 
@@ -338,11 +339,14 @@ export const reverse = reverseFn;
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
+
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
+
 export const globalMeanStandardDev = (...args) => new GlobalMeanStandardDev(...args);
+export const viewportMeanStandardDev = (...args) => new ViewportMeanStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 
