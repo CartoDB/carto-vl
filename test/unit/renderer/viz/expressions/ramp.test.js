@@ -979,18 +979,40 @@ describe('src/renderer/viz/expressions/ramp', () => {
         });
 
         describe('when the input is zoomrange()', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    price: { type: 'number', min: 1, max: 13 }
+                },
+                sample: [
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                    { price: 6 },
+                    { price: 7 },
+                    { price: 8 },
+                    { price: 9 },
+                    { price: 10 },
+                    { price: 11 },
+                    { price: 12 },
+                    { price: 13 }
+                ]
+            });
+
             it('should return the first number in the array at low zoom levels', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
-                r._bindMetadata();
+                r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
                 const fakeDrawMetadata = {zoom: 0.0};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(100);
             });
+
             it('should return an interpolated number in the array at a intermediate zoom level', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
-                r._bindMetadata();
+                r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
                 // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
                 const fakeDrawMetadata = {zoom: (Math.pow(2, 3 - 1) * 0.7 + 0.3 * Math.pow(2, 9 - 1))};
@@ -998,9 +1020,10 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const actual = r.eval();
                 expect(actual).toEqual(130);
             });
+
             it('should return the last number in the array at high zoom levels', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
-                r._bindMetadata();
+                r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
                 const fakeDrawMetadata = {zoom: 1000.0};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
@@ -1276,6 +1299,27 @@ describe('src/renderer/viz/expressions/ramp', () => {
     });
 
     describe('._getColorValue', () => {
+        const METADATA = new Metadata({
+            properties: {
+                price: { type: 'number', min: 1, max: 13 }
+            },
+            sample: [
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 },
+                { price: 6 },
+                { price: 7 },
+                { price: 8 },
+                { price: 9 },
+                { price: 10 },
+                { price: 11 },
+                { price: 12 },
+                { price: 13 }
+            ]
+        });
+
         const firstColor = namedColor('red');
         const secondColor = namedColor('blue');
         const thirdColor = namedColor('green');
@@ -1285,7 +1329,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         it('should get the first element if m is NaN', () => {
             const r = ramp(0, [firstColor, secondColor, thirdColor]);
 
-            r._bindMetadata();
+            r._bindMetadata(METADATA);
             const texturePixels = r._computeTextureIfNeeded();
             actual = r._getColorValue(texturePixels, NaN);
             expected = firstColor.color;
@@ -1296,7 +1340,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         it('should get the last element if m is Positive Infinity', () => {
             const r = ramp(0, [firstColor, secondColor, thirdColor]);
 
-            r._bindMetadata();
+            r._bindMetadata(METADATA);
             const texturePixels = r._computeTextureIfNeeded();
             actual = r._getColorValue(texturePixels, Number.POSITIVE_INFINITY);
             expected = thirdColor.color;
@@ -1307,7 +1351,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         it('should get the first element if m is Negative Infinity', () => {
             const r = ramp(0, [firstColor, secondColor, thirdColor]);
 
-            r._bindMetadata();
+            r._bindMetadata(METADATA);
             const texturePixels = r._computeTextureIfNeeded();
             actual = r._getColorValue(texturePixels, Number.NEGATIVE_INFINITY);
             expected = firstColor.color;
@@ -1318,7 +1362,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         it('should get the last element if m is a positive number greater than 1', () => {
             const r = ramp(0, [firstColor, secondColor, thirdColor]);
 
-            r._bindMetadata();
+            r._bindMetadata(METADATA);
             const texturePixels = r._computeTextureIfNeeded();
             actual = r._getColorValue(texturePixels, 100);
             expected = thirdColor.color;
@@ -1329,7 +1373,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         it('should get the current element if m is between 0 and 1', () => {
             const r = ramp(0, [firstColor, secondColor, thirdColor]);
 
-            r._bindMetadata();
+            r._bindMetadata(METADATA);
             const texturePixels = r._computeTextureIfNeeded();
             actual = r._getColorValue(texturePixels, 0.5);
             expected = firstColor.color;

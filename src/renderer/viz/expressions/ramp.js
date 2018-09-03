@@ -108,9 +108,7 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        if (palette.type !== 'number-array') {
-            palette = _calcPaletteValues(palette);
-        }
+        palette = _calcPaletteValues(palette);
 
         super({ input, palette });
 
@@ -136,12 +134,12 @@ export default class Ramp extends BaseExpression {
     eval (feature) {
         const index = this._getIndex(feature);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
-            return this.palette[`image${index}`].eval();
+        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
+            return this._evalNumberArray(feature, index);
         }
 
-        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
-            return this._evalNumberArray(feature);
+        if (this.palette.type === paletteTypes.IMAGE) {
+            return this.palette[`image${index}`].eval();
         }
 
         const texturePixels = this._computeTextureIfNeeded();
@@ -431,20 +429,23 @@ export default class Ramp extends BaseExpression {
             .filter(legend => legend.value !== null);
     }
 
-    _evalNumberArray (feature) {
-        const input = this.input.eval(feature);
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
+    _evalNumberArray (feature, index) {
+        const m = (index - this.minKey) / (this.maxKey - this.minKey);
+
         for (let i = 0; i < this.palette.elems.length - 1; i++) {
             const rangeMin = i / (this.palette.elems.length - 1);
             const rangeMax = (i + 1) / (this.palette.elems.length - 1);
+
             if (m > rangeMax) {
                 continue;
             }
+
             const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
             const a = this.palette.elems[i].eval(feature);
             const b = this.palette.elems[i + 1].eval(feature);
             return mix(a, b, clamp(rangeM, 0, 1));
         }
+
         throw new Error('Unexpected condition on ramp._evalNumberArray()');
     }
 
@@ -874,12 +875,12 @@ function _calcPaletteValues (palette) {
     return palette;
 }
 
-<<<<<<< HEAD
 function _buildFeature (name, value) {
     const enumerable = true;
 
     return Object.defineProperty({}, name, { value, enumerable });
-=======
+}
+
 function _calcColorValueIndex (m) {
     if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
         return 0;
@@ -890,5 +891,4 @@ function _calcColorValueIndex (m) {
     }
 
     return Math.round(m * MAX_BYTE_VALUE);
->>>>>>> master
 }
