@@ -443,3 +443,10 @@ aside.toolbox {
   border-radius: 0 4px 4px 0;
   border-right: 1px solid rgba(22, 39, 69, 0.2);
 }
+
+
+/* Mapbox */
+.mapboxgl-ctrl-top-left {
+  top: 14px;
+  left: 14px;
+}
