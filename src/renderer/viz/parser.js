@@ -5,6 +5,7 @@ import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES } from './expressions/color/cssColorNames';
 import NamedColor from './expressions/color/NamedColor';
 import Hex from './expressions/color/hex';
+import Base from './expressions/base';
 
 // TODO use Schema classes
 
@@ -42,6 +43,14 @@ lowerCaseExpressions.star = expressions.STAR;
 lowerCaseExpressions.star_outline = expressions.STAR_OUTLINE;
 lowerCaseExpressions.triangle = expressions.TRIANGLE;
 lowerCaseExpressions.triangle_outline = expressions.TRIANGLE_OUTLINE;
+
+const originalBaseBlendTo = Base.prototype.blendTo;
+Base.prototype.blendTo = function (final, ...args) {
+    if (typeof final === 'string') {
+        final = parseVizExpression(final);
+    }
+    return originalBaseBlendTo.bind(this)(final, ...args);
+};
 
 export function parseVizExpression (str) {
     prepareJsep();
