@@ -64,10 +64,6 @@
                     "file": "styling/viewport.html"
                 },
                 {
-                    "title": "Zoom based styling",
-                    "file": "styling/zoom.html"
-                },
-                {
                     "title": "Single Image",
                     "file": "styling/image-single.html"
                 },
@@ -82,6 +78,10 @@
                 {
                     "title": "Draw Order",
                     "file": "styling/draw-order.html"
+                },
+                {
+                    "title": "Scaled width",
+                    "file": "styling/scaled.html"
                 }
             ]
         },

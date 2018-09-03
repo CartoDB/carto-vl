@@ -15,7 +15,7 @@ import BaseExpression from './base';
  * const viz = new carto.Viz({
  *   width: s.blend(3,
  *                  s.prop('dn'),
- *                  s.linear(s.zoom(), s.pow(2, 10), s.pow(2, 14))
+ *                  s.linear(s.zoom(), 10, 14))
  *           );
  * });
  *
@@ -23,7 +23,7 @@ import BaseExpression from './base';
  * const viz = new carto.Viz(`
  *   width: blend(3,
  *                $dn,
- *                linear(zoom(), 2^10, 2^14)
+ *                linear(zoom(), 10, 14)
  *          )
  * `);
  *

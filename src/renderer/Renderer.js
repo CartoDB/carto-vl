@@ -226,15 +226,11 @@ export default class Renderer {
         return dataframe.getFeature(index);
     }
 
-    renderLayer (renderLayer) {
+    renderLayer (renderLayer, drawMetadata) {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
         const aspect = this._getAspect();
-        const drawMetadata = {
-            zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)),
-            scale: gl.drawingBufferHeight / (this._zoom * 512 * (window.devicePixelRatio || 1))
-        };
 
         this._runViewportAggregations(renderLayer);
 

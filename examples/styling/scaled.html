@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Zoom based styling | CARTO</title>
+  <title>Scaled width | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -14,30 +14,30 @@
 </head>
 <body>
   <div id="map"></div>
-  <aside class="toolbox">
-    <div class="box">
-      <header>
-        <h1>Zoom based styling</h1>
-      </header>
-      <section>
-        <p class="description open-sans">Set symbol size proportionate to zoom</p>
-      </section>
-      <footer class="js-footer"></footer>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Scaled width</h1>
+        </header>
+        <section>
+          <p class="description open-sans">How to keep feature at constant widths in real meters</p>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+    <div id="loader">
+      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+        </svg>
+      </div>
     </div>
-  </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.1734, 41.3851],
-      zoom: 11,
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-73.96, 40.75],
+      zoom: 14,
       scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
@@ -50,9 +50,12 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset('spend_data');
+    const source = new carto.source.Dataset('taxi_50k');
     const viz = new carto.Viz(`
-        width: zoom() / 300
+      // 3 pixels at zoom level 13
+      // 6 pixels at zoom level 14
+      // 12 pixels at zoom level 15
+      width: scaled(6, 14)
     `);
     const layer = new carto.Layer('layer', source, viz);
 
