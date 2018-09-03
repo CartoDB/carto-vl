@@ -207,7 +207,7 @@ export default class Layer {
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
-        this.map.triggerRepaint();
+        this._needRefresh();
     }
 
     /**
@@ -389,7 +389,7 @@ export default class Layer {
         this._paintLayer();
 
         if (this.isAnimated()) {
-            this.map.triggerRepaint();
+            this._needRefresh();
         }
     }
 

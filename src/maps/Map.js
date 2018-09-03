@@ -195,4 +195,7 @@ export default class Map {
         m[15] = 1;
         return m;
     }
+
+    triggerRepaint () {
+    }
 }
