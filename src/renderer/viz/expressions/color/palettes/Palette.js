@@ -41,7 +41,7 @@ export default class Palette extends BaseExpression {
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
-                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                if (Array.isArray(target[name])) {
                     return target[name].map(hexToRgb);
                 }
             }
