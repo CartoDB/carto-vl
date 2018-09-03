@@ -68,7 +68,7 @@ function genRGB (name, alpha) {
 
             const children = { r, g, b };
             if (alpha) {
-                checkExpression(name, 'a', 3, 'number', a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
             super(children);

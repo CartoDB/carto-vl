@@ -69,7 +69,7 @@ function genHSV (name, alpha) {
             const children = { h, s, v };
             if (alpha) {
                 a = implicitCast(a);
-                checkExpression(name, name, 'a', 3, a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
 

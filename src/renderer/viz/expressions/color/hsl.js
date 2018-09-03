@@ -63,13 +63,13 @@ function genHSL (name, alpha) {
 
             const children = { h, s, l };
             if (alpha) {
-                checkExpression('hsla', name, 'a', 3, a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
 
-            checkExpression(`hsl${alpha ? 'a' : ''}`, 'h', 0, h);
-            checkExpression(`hsl${alpha ? 'a' : ''}`, 's', 1, s);
-            checkExpression(`hsl${alpha ? 'a' : ''}`, 'l', 2, l);
+            checkExpression(name, 'h', 0, h);
+            checkExpression(name, 's', 1, s);
+            checkExpression(name, 'l', 2, l);
 
             super(children);
             this.type = 'color';
