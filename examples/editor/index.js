@@ -58,7 +58,7 @@ strokeWidth:      2*zoom()/50000`
 const examples = [
     ['WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJjYXJ0b2dsIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogIHpvb20oKSAqIChhbmltYXRpb24oJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC41KVxuY29sb3I6ICByYW1wKGxpbmVhcihjbHVzdGVyQXZnKCR0ZW1wKSwgMCwzMCksIHRlYWxyb3NlKVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogYW5pbWF0aW9uKCRkYXksIDE0MCwgZmFkZSgwLjA1LCAwLjIpKSArIDAuMDUiLCJmIjp7ImxuZyI6MjQuNzM1NTY4NTIwNDAyOTIsImxhdCI6MTkuMTYzNDcwOTc4NzU0OTQ0fSwiZyI6MC44NDM4NjY0MzkyMzEyODQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
     ['Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChjbHVzdGVyTWF4KCRudW1iZXIpLzEwKVxuY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsMCwgNTApLCBTdW5zZXQpXG5zdHJva2VXaWR0aDogMVxuXG5cblxuXG4iLCJmIjp7ImxuZyI6LTg3LjcwOTk1MzA1MDcwODAxLCJsYXQiOjM3LjM3MDA0OTU5OTg5MzQzNH0sImciOjIuODM3NzkyNTAzNjMyNTY3NSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
-    ['Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiAoJGFzaWFuX3BvcCskYmxhY2tfcG9wKyRoaXNwYW5pY19vKS8kd2hpdGVfcG9wXG5jb2xvcjogaHN2YSgwLjUsIDEsIDEsIDAuNylcbnN0cm9rZVdpZHRoOiAwIiwiZiI6eyJsbmciOi05MC42OTkwNTg1MTI0MTE5NywibGF0Ijo0MC42MjE0NzUyMzQ0MTY2NjR9LCJnIjoyLjQ1NzMzNjA2NDIyMzUzMSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
+    ['Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KCgkYXNpYW5fcG9wKyRibGFja19wb3ArJGhpc3BhbmljX28pLyR3aGl0ZV9wb3ApKjJcbmNvbG9yOiBoc3ZhKDAuNSwgMSwgMSwgMC43KVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogJHdoaXRlX3BvcCA+IDEgIiwiZiI6eyJsbmciOi04OS44MjAyMzQxODU0NDk4LCJsYXQiOjM4LjAyMDA5MTA5MTA1NzM0fSwiZyI6My4xMzM3MjI0MzM3MjQ2OTQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
     ['Denver accidents', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAkY291bnQvMlxuY29sb3I6IG9wYWNpdHkoIHJhbXAobGluZWFyKCRjb3VudCwgMCwxMjApLCBSZWRPciksICRjb3VudC8yMClcbnN0cm9rZVdpZHRoOiAwXG5cblxuIiwiZiI6eyJsbmciOi0xMDQuOTY1MDU2MjE1NjY3NDYsImxhdCI6MzkuNzQ5NjE5Mzc4MjQ2MjJ9LCJnIjoxMS40MTg3MTg3NzA5MDQ0OTQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
     ['California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGdpc19hY3Jlcy8xMDAwMFxuY29sb3I6IHJnYmEoMCwwLDAsMClcbnN0cm9rZUNvbG9yOiAgaHN2KDAuMSwgJGdpc19hY3Jlcy8yMDAwMDAsICRnaXNfYWNyZXMvNDAwMDAwKVxuc3Ryb2tlV2lkdGg6ICRnaXNfYWNyZXMvNTAwMDAiLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2LCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
     ['California Wildfires size/opacity by acres burned colored by cause ', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiBvcGFjaXR5KHJhbXAobGluZWFyKCRjYXVzZSwgMSwxNCksIFByaXNtKSwkZ2lzX2FjcmVzLzEwMDAwMClcbnN0cm9rZVdpZHRoOiAwXG5cblxuXG5cbiIsImYiOnsibG5nIjotMTE5LjY3MzA3NjMzNzkwNDgzLCJsYXQiOjM3LjQ3ODE1Mjg2ODA2NzU1fSwiZyI6NC45NDY5MTE0NDI1NTk3MTMsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
@@ -89,7 +89,7 @@ const sourceTypes = {
 
 let index = 0; // current debug step
 
-let basemap = DEFAULT_BASEMAP;
+let basemap = '';
 let mapboxgl = window.mapboxgl;
 let map = new mapboxgl.Map({
     container: 'map',
@@ -263,8 +263,9 @@ const superRefresh = (opts) => {
     const vizStr = document.getElementById('styleEntry').value;
     const viz = new carto.Viz(vizStr);
 
+    setupMap(opts);
+
     if (!layer) {
-        setupMap(opts);
         layer = new carto.Layer('myCartoLayer', source, viz);
         layer.on('loaded', () => {
             saveConfig();
@@ -273,9 +274,10 @@ const superRefresh = (opts) => {
         });
         layer.addTo(map, 'watername_ocean');
     } else {
+        layer.hide();
         layer.update(source, viz)
             .then(() => {
-                setupMap(opts);
+                layer.show();
                 saveConfig();
                 document.getElementById('feedback').style.display = 'none';
                 hideLoader();
@@ -333,15 +335,17 @@ function createBasemapElements () {
 }
 
 function setBasemap (id) {
-    basemap = id;
-    map.setStyle(BASEMAPS[basemap]);
-    let added = false;
-    map.on('sourcedata', () => {
-        if (map.isStyleLoaded() && !added) {
-            layer.addTo(map, 'watername_ocean');
-            added = true;
-        }
-    });
+    if (basemap !== id) {
+        basemap = id;
+        map.setStyle(BASEMAPS[basemap]);
+        let added = false;
+        map.on('sourcedata', () => {
+            if (map.isStyleLoaded() && !added) {
+                layer.addTo(map, 'watername_ocean');
+                added = true;
+            }
+        });
+    }
 }
 
 const $map = document.getElementById('map');
@@ -431,9 +435,9 @@ function generateSnippet (config) {
         <!-- Include CARTO VL JS -->
         <script src="http://libs.cartocdn.com/carto-vl/v${carto.version}/carto-vl.js"></script>
         <!-- Include Mapbox GL JS -->
-        <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
         <!-- Include Mapbox GL CSS -->
-        <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
         <style>
            html, body {
                margin: 0;

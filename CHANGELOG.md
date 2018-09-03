@@ -6,9 +6,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Add new `clusterCount()` expression
+- Support feature-dependant arrays in combination with ramp
+
+### Fixed
+- Add default export to allow `import carto from '@carto/carto-vl';`
+
+## [0.7.0] - 2018-08-24
+### Added
+- Use the new Custom Layer interface with MGL (v0.48.0-carto1)
+- Add `layer.remove()` API function
+- Make viz optional in `layer.update(source, viz?)` API function
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression.
 - New method `ramp.getLegend`
+- Throw error extra arguments are passed to any expression
 - Add reverse expression to arrays, besides palettes
 
 ### Changed
@@ -19,7 +31,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Trigger feature events (hover, enter, leave) when layers are updated
 - Improve error message when creating buckets without an array
 - ramp($category, ...) implementation is fixed when using multiple categorical properties
-- Use undescore in image constants.
+- Use underscore in image constants
+- Use local basemaps for testing
+
+### Fixed
+- Fix animation example
+- Fix interactivity examples
 
 ### Removed
 - Removed XYZ expression
@@ -55,7 +72,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Improve GeoJSON source
 - Improve viewport feature collision
 
-## Removed
+### Removed
 - Remove deprecated expressions: torque and sprites
 
 ### Fixed

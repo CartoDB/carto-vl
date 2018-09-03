@@ -4,6 +4,7 @@ import Metadata from '../renderer/Metadata';
 import CartoValidationError from '../errors/carto-validation-error';
 import util from '../utils/util';
 import Base from './Base';
+import schema from '../renderer/schema';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -127,7 +128,7 @@ export default class GeoJSON extends Base {
         this._addNumericColumnField('cartodb_id');
 
         const featureCount = this._features.length;
-        const requiredColumns = new Set(viz.getMinimumNeededSchema().columns);
+        const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
         for (let i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             const keys = Object.keys(properties);

@@ -1,6 +1,6 @@
 const map = new mapboxgl.Map({
     container: 'map',
-    style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+    style: 'http://localhost:5000/test/common/basemaps/voyager-gl-style.json',
     center: [-20, 33],
     zoom: 3.8
 });

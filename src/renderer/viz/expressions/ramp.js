@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments } from './utils';
+import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
@@ -134,6 +134,10 @@ export default class Ramp extends BaseExpression {
     eval (feature) {
         const index = this._getIndex(feature);
 
+        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
+            return this._evalNumberArray(feature, index);
+        }
+
         if (this.palette.type === paletteTypes.IMAGE) {
             return this.palette[`image${index}`].eval();
         }
@@ -209,12 +213,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Others', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the color associated with each category (String)</caption>
@@ -224,12 +231,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().color.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Others', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Others', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the image url associated with each category</caption>
@@ -240,11 +250,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
-     *   //   { name: 'Car', values: [carImageUrl] }
-     *   //   { name: 'Bus', values: [busImageUrl] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: bicycleImageUrl },
+     *   //       { key: 'Others', value:  ''}
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the image url associated with each category (String)</caption>
@@ -254,11 +268,15 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.getViz().symbol.getLegend();
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [bicycleImageUrl] },
-     *   //   { name: 'Car', values: [carImageUrl] }
-     *   //   { name: 'Bus', values: [busImageUrl] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: bicycleImageUrl },
+     *   //       { key: 'Others', value:  ''}
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the top 3 categories and set default category name</caption>
@@ -272,12 +290,15 @@ export default class Ramp extends BaseExpression {
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get the top 3 categories and set default category name (String)</caption>
@@ -290,18 +311,21 @@ export default class Ramp extends BaseExpression {
      *      defaultOthers: 'Other Vehicles'
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'Bicycle', values: [{ r: 95, g: 70, b: 144, a: 1 }] },
-     *   //   { name: 'Car', values: [{ r: 29, g: 105, b: 150, a: 1 }] }
-     *   //   { name: 'Bus', values: [{ r: 56, g: 166, b: 165, a: 1 }] }
-     *   //   { name: 'Other Vehicles', values: [{ r: 15, g: 133, b: 84, a: 1 }] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get 4 samples for a linear color ramp</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   color: s.ramp(s.linear(s.prop('numeric'), 1, 100), s.palettes.PRISM)
+     *   color: s.ramp(s.linear(s.prop('numvehicles'), 1, 100), s.palettes.PRISM)
      * });
      *
      * layer.on('loaded', () => {
@@ -309,17 +333,21 @@ export default class Ramp extends BaseExpression {
      *       samples: 4
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'numvehicles',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
      *
      * @example <caption>Get 4 samples for a linear color ramp (String)</caption>
      * const viz = new carto.Viz(`
-     *   color: ramp(linear($numeric, 1, 100), PRISM)
+     *   color: ramp(linear($numvehicles, 1, 100), PRISM)
      * `);
      *
      * layer.on('loaded', () => {
@@ -327,13 +355,18 @@ export default class Ramp extends BaseExpression {
      *       samples: 4
      *   });
      *
-     *   // legend = [
-     *   //   { name: 'numeric', values: [// rgba color, [0, 25 ]] },
-     *   //   { name: 'numeric', values: [// rgba color, [25, 50 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [50, 75 ]] }
-     *   //   { name: 'numeric', values: [// rgba color, [75, 100 ]] }
-     *   // ]
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'numvehicles',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
      * });
+     *
      * @memberof carto.expressions.Ramp
      * @name getLegend
      * @instance
@@ -396,6 +429,26 @@ export default class Ramp extends BaseExpression {
             .filter(legend => legend.value !== null);
     }
 
+    _evalNumberArray (feature, index) {
+        const m = (index - this.minKey) / (this.maxKey - this.minKey);
+
+        for (let i = 0; i < this.palette.elems.length - 1; i++) {
+            const rangeMin = i / (this.palette.elems.length - 1);
+            const rangeMax = (i + 1) / (this.palette.elems.length - 1);
+
+            if (m > rangeMax) {
+                continue;
+            }
+
+            const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
+            const a = this.palette.elems[i].eval(feature);
+            const b = this.palette.elems[i + 1].eval(feature);
+            return mix(a, b, clamp(rangeM, 0, 1));
+        }
+
+        throw new Error('Unexpected condition on ramp._evalNumberArray()');
+    }
+
     _getValue (texturePixels, numValues, m) {
         const lowIndex = clamp(Math.floor(numValues * m), 0, numValues);
         const highIndex = clamp(Math.ceil(numValues * m), 0, numValues);
@@ -407,7 +460,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorValue (texturePixels, m) {
-        const index = Math.round(m * MAX_BYTE_VALUE);
+        const index = _calcColorValueIndex(m);
 
         return {
             r: Math.round(texturePixels[index * 4 + 0]),
@@ -439,42 +492,90 @@ export default class Ramp extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const input = this.input._applyToShaderSource(getGLSLforProperty);
-
         if (this.palette.type === paletteTypes.IMAGE) {
-            const images = this.palette._applyToShaderSource(getGLSLforProperty);
-
-            return {
-                preface: input.preface + images.preface,
-                inline: `${images.inline}(imageUV, ${input.inline})`
-            };
+            return this._applyToShaderSourceImage(getGLSLforProperty);
         }
 
-        let inline = `texture2D(texRamp${this._uid}, vec2((${input.inline}-keyMin${this._uid})/keyWidth${this._uid}, 0.5))`;
+        const input = this.input._applyToShaderSource(getGLSLforProperty);
+
+        let inline = '';
+        let preface = `
+        uniform float keyMin${this._uid};
+        uniform float keyWidth${this._uid};
+        `;
+
+        let inputGLSL;
         if (this.input.type === 'category' && this.input.isA(Property)) {
-            inline = `texture2D(texRamp${this._uid}, vec2(ramp_translate${this._uid}(${input.inline}), 0.5))`;
+            // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
+            inputGLSL = `ramp_translate${this._uid}(${input.inline})`;
+            preface +=
+            `
+            uniform sampler2D texRampTranslate${this._uid};
+            float ramp_translate${this._uid}(float s){
+                vec2 v = vec2(
+                    mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
+                    floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
+                );
+                return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
+            }
+            `;
+        } else {
+            // With numerical inputs we only need to transform the input to the [0,1] range
+            inputGLSL = `((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
+        }
+
+        if (this.palette.type === 'number-array') {
+            // With numeric arrays we use a combination of `mix` to allow for property-dependant values
+            const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+            const genBlend = (list, numerator, denominator) => {
+                let b;
+
+                if (numerator + 1 === denominator) {
+                    b = list[numerator + 1].inline;
+                } else {
+                    b = genBlend(list, numerator + 1, denominator);
+                }
+
+                return `
+                mix(${list[numerator].inline}, ${b},
+                    clamp(
+                         (x-${(numerator / denominator).toFixed(20)})
+                             /${(1 / denominator).toFixed(20)}
+                        ,0.,1.
+                        )
+                )`;
+            };
+            inline = `ramp_num${this._uid}(${inputGLSL})`;
+            // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
+            // For example:
+            //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
+            preface += `${nums.map(n => n.preface).join('\n')}
+
+            float ramp_num${this._uid}(float x){
+                return ${genBlend(nums, 0, this.palette.elems.length - 1)};
+            }
+            `;
+        } else {
+            // With color arrays we use a fast texture lookup, but this makes property-dependant values impossible
+            inline = `texture2D(texRamp${this._uid}, vec2(${inputGLSL}, 0.5)).rgba`;
+            preface += `uniform sampler2D texRamp${this._uid};\n`;
         }
 
         return {
-            preface: this._prefaceCode(input.preface + `
-                uniform sampler2D texRamp${this._uid};
-                uniform sampler2D texRampTranslate${this._uid};
-                uniform float keyMin${this._uid};
-                uniform float keyWidth${this._uid};
+            preface: this._prefaceCode(input.preface + preface),
+            inline
+        };
+    }
 
-                float ramp_translate${this._uid}(float s){
-                    vec2 v = vec2(
-                        mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
-                        floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
-                    );
-                    return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
-                }
-                `
-            ),
-
-            inline: this.palette.type === paletteTypes.NUMBER_ARRAY
-                ? `(${inline}.a)`
-                : `(${inline}.rgba)`
+    _applyToShaderSourceImage (getGLSLforProperty) {
+        const input = this.input._applyToShaderSource(getGLSLforProperty);
+        const images = this.palette._applyToShaderSource(getGLSLforProperty);
+        return {
+            preface: input.preface + images.preface,
+            inline: `${images.inline}(imageUV, ${input.inline})`
         };
     }
 
@@ -493,6 +594,9 @@ export default class Ramp extends BaseExpression {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
+        }
+        if (this.palette.type === 'number-array') {
+            this.palette.elems.forEach(e => e._postShaderCompile(program, gl));
         }
 
         this.input._postShaderCompile(program, gl);
@@ -597,6 +701,12 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
+        } else if (this.palette.type === 'number-array') {
+            this.palette.elems.forEach(e => e._preDraw(program, drawMetadata, gl));
+            gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
+            gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
+            gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
+            return super._preDraw(program, drawMetadata, gl);
         }
 
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
@@ -769,4 +879,16 @@ function _buildFeature (name, value) {
     const enumerable = true;
 
     return Object.defineProperty({}, name, { value, enumerable });
+}
+
+function _calcColorValueIndex (m) {
+    if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
+        return 0;
+    }
+
+    if (m === Number.POSITIVE_INFINITY || m > 1) {
+        return COLOR_ARRAY_LENGTH - 1;
+    }
+
+    return Math.round(m * MAX_BYTE_VALUE);
 }

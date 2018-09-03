@@ -107,9 +107,9 @@ export default class Property extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return {
-            columns: [
-                this.name
-            ]
+            [this.name]: [{
+                type: 'unaggregated'
+            }]
         };
     }
 }

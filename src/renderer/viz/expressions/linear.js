@@ -1,7 +1,6 @@
 import BaseExpression from './base';
 import { checkExpression, checkLooseType, implicitCast, checkType, checkMaxArguments } from './utils';
 import { globalMin, globalMax } from '../expressions';
-
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -71,9 +70,11 @@ export default class Linear extends BaseExpression {
             const smax = (max - inputMin) / inputDiff;
             return (input - smin) / (smax - smin);
         }
+
         const v = this.input.eval(feature);
         const min = this.min.eval(feature);
         const max = this.max.eval(feature);
+
         return (v - min) / (max - min);
     }
 

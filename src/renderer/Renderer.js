@@ -51,6 +51,42 @@ export default class Renderer {
         this.dataframes = [];
     }
 
+    /**
+     * Initialize renderer
+     * @param {WebGLRenderingContext} gl - WebGL context
+     */
+    initialize (gl) {
+        this._initGL(gl);
+    }
+
+    /**
+     * Set Renderer visualization center
+     * @param {number} x
+     * @param {number} y
+     */
+    setCenter (center) {
+        this._center.x = center.x;
+        this._center.y = center.y;
+    }
+
+    /**
+     * Set Renderer visualization zoom
+     * @param {number} zoom
+     */
+    setZoom (zoom) {
+        this._zoom = zoom;
+    }
+
+    /**
+     * Get Renderer visualization bounds
+     * @return {*}
+     */
+    getBounds () {
+        const sx = this._zoom * this._getAspect();
+        const sy = this._zoom;
+        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
+    }
+
     _initGL (gl) {
         this.gl = gl;
         const OESTextureFloat = gl.getExtension('OES_texture_float');
@@ -95,52 +131,7 @@ export default class Renderer {
         gl.bindTexture(gl.TEXTURE_2D, this.zeroTex);
     }
 
-    /**
-    * Get Renderer visualization center
-    * @return {RPoint}
-    */
-    getCenter () {
-        return { x: this._center.x, y: this._center.y };
-    }
-
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (x, y) {
-        this._center.x = x;
-        this._center.y = y;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const center = this.getCenter();
-        const sx = this.getZoom() * this.getAspect();
-        const sy = this.getZoom();
-        return [center.x - sx, center.y - sy, center.x + sx, center.y + sy];
-    }
-
-    /**
-     * Get Renderer visualization zoom
-     * @return {number}
-     */
-    getZoom () {
-        return this._zoom;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    getAspect () {
+    _getAspect () {
         if (this.gl) {
             return this.gl.canvas.width / this.gl.canvas.height;
         }
@@ -239,7 +230,7 @@ export default class Renderer {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
-        const aspect = this.getAspect();
+        const aspect = this._getAspect();
         const drawMetadata = {
             zoom: gl.drawingBufferHeight / (this._zoom * 1024 * (window.devicePixelRatio || 1)),
             scale: gl.drawingBufferHeight / (this._zoom * 512 * (window.devicePixelRatio || 1))

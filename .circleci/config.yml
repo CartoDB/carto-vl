@@ -20,7 +20,7 @@ jobs:
           paths:
             - ./node_modules
       - run: echo "127.0.0.1 localhost.localhost.lan" | sudo tee -a  /etc/hosts
-      - run: yarn build:min && yarn wait-on http://localhost.localhost.lan:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 10000
+      - run: yarn build:min && yarn wait-on http://localhost.localhost.lan:8181 && MIN=1 yarn mocha test/acceptance/e2e.test.js --timeout 15000
 
   test-unit-lint-docs:
     docker:

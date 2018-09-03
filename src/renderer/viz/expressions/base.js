@@ -12,8 +12,9 @@ import * as schema from '../../schema';
  *
  * @memberof carto.expressions
  * @name Base
- * @hideconstructor
  * @abstract
+ * @hideconstructor
+ * @class
  * @api
  */
 export default class Base {
@@ -36,6 +37,7 @@ export default class Base {
      * This is particularly useful for making legends.
      *
      * @api
+     * @memberof carto.expressions.Base
      * @param {object} feature
      * @returns {*} result - result of evaluating the expression for the input feature
      *
@@ -69,6 +71,7 @@ export default class Base {
 
     /**
      * @api
+     * @memberof carto.expressions.Base
      * @returns true if the evaluation of the expression may change without external action.
      */
     isAnimated () {

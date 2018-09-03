@@ -75,7 +75,7 @@ export default class Dataframe {
         this.freeObserver = freeObserver;
     }
 
-    bind (renderer) {
+    bindRenderer (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
         const vertices = this.decodedGeom.vertices;

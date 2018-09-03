@@ -1,8 +1,6 @@
 const map = new carto.Map({
     container: 'map',
-    background: 'black',
-    center: [-75, 40],
-    zoom: 5
+    background: 'black'
 });
 
 carto.setDefaultAuth({
