@@ -320,7 +320,8 @@ export default class Viz {
         if (!this.symbol.default) {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement
+                symbolPlacement: this.symbolPlacement,
+                offset: this.offset
             }, this);
         }
 
