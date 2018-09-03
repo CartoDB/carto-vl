@@ -1,4 +1,4 @@
-import { validateStaticType, validateCompileTypeError } from './utils';
+import { validateStaticType, validateTypeErrors } from './utils';
 
 describe('src/renderer/viz/expressions/zoomrange', () => {
     describe('type', () => {
@@ -6,7 +6,7 @@ describe('src/renderer/viz/expressions/zoomrange', () => {
     });
 
     describe('error control', () => {
-        validateCompileTypeError('zoomrange', []);
-        validateCompileTypeError('zoomrange', [0]);
+        validateTypeErrors('zoomrange', []);
+        validateTypeErrors('zoomrange', [0]);
     });
 });

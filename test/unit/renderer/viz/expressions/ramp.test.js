@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
@@ -8,10 +8,10 @@ const DEFAULT_COLOR = namedColor('gray');
 
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('ramp', []);
-        validateStaticTypeErrors('ramp', ['number']);
-        validateStaticTypeErrors('ramp', ['category']);
-        validateDynamicTypeErrors('ramp', ['number', 'image-array']);
+        validateTypeErrors('ramp', []);
+        validateTypeErrors('ramp', ['number']);
+        validateTypeErrors('ramp', ['category']);
+        validateTypeErrors('ramp', ['number', 'image-array']);
         validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
     });
 

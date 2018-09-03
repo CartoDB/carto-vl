@@ -39,48 +39,7 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
     }
 }
 
-export function validateTypeErrors (expressionName, argTypes) {
-    validateCompileTypeError(expressionName, argTypes);
-    // describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
-    //     const simpleArgs = argTypes.map(getSimpleArg);
-    //     const propertyArgs = argTypes.map(getPropertyArg);
-
-    //     _validateConstructorTimeTypeError(expressionName, simpleArgs);
-
-    //     if (equalArgs(simpleArgs, propertyArgs)) {
-    //         return;
-    //     }
-    //     if (argTypes.every(isArgConstructorTimeTyped)) {
-    //         _validateConstructorTimeTypeError(expressionName, propertyArgs);
-    //     } else {
-    //         _validateCompileTimeTypeError(expressionName, propertyArgs);
-    //     }
-    // });
-}
-
-export function validateDynamicTypeErrors (expressionName, argTypes) {
-    validateCompileTypeError(expressionName, argTypes);
-
-    // describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
-    //     _validateConstructorTimeTypeError(expressionName, argTypes.map(getSimpleArg));
-    //     _validateCompileTimeTypeError(expressionName, argTypes.map(getPropertyArg));
-    // });
-}
-
-export function validateStaticTypeErrors (expressionName, argTypes) {
-    validateCompileTypeError(expressionName, argTypes);
-
-    // describe(`invalid ${expressionName}(${argTypes.join(', ')})`, () => {
-    //     const simpleArgs = argTypes.map(getSimpleArg);
-    //     const propertyArgs = argTypes.map(getPropertyArg);
-    //     _validateConstructorTimeTypeError(expressionName, simpleArgs);
-    //     if (!equalArgs(simpleArgs, propertyArgs)) {
-    //         _validateConstructorTimeTypeError(expressionName, propertyArgs);
-    //     }
-    // });
-}
-
-export function validateCompileTypeError (expressionName, argTypes, regexGenerator = null) {
+export function validateTypeErrors (expressionName, argTypes, regexGenerator = null) {
     const simpleArgs = argTypes.map(getSimpleArg);
     _validateCompileTimeTypeError(expressionName, simpleArgs, regexGenerator);
 }

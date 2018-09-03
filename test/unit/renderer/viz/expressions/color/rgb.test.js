@@ -1,15 +1,15 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from '../utils';
 import { rgb, rgba } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/rgb', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('rgba', []);
-        validateStaticTypeErrors('rgba', ['number', 'number', 'number']);
-        validateDynamicTypeErrors('rgba', ['number', 'number', 'category', 'number']);
+        validateTypeErrors('rgba', []);
+        validateTypeErrors('rgba', ['number', 'number', 'number']);
+        validateTypeErrors('rgba', ['number', 'number', 'category', 'number']);
 
-        validateStaticTypeErrors('rgb', []);
-        validateStaticTypeErrors('rgb', ['number', 'number']);
-        validateDynamicTypeErrors('rgb', ['number', 'number', 'category']);
+        validateTypeErrors('rgb', []);
+        validateTypeErrors('rgb', ['number', 'number']);
+        validateTypeErrors('rgb', ['number', 'number', 'category']);
         validateMaxArgumentsError('rgb', ['number', 'number', 'number', 'number', 'number']);
     });
 

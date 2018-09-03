@@ -1,15 +1,15 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
+import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 describe('src/renderer/viz/expressions/transition', () => {
     describe('error control', () => {
-        validateCompileTypeError('transition', [undefined]);
-        validateCompileTypeError('transition', ['123']);
-        validateCompileTypeError('transition', [-4], expressionName =>
+        validateTypeErrors('transition', [undefined]);
+        validateTypeErrors('transition', ['123']);
+        validateTypeErrors('transition', [-4], expressionName =>
             new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*must be greater than[\\s\\S]*`, 'g'));
-        validateCompileTypeError('transition', ['number']);
-        validateCompileTypeError('transition', ['color']);
-        validateCompileTypeError('transition', ['category']);
+        validateTypeErrors('transition', ['number']);
+        validateTypeErrors('transition', ['color']);
+        validateTypeErrors('transition', ['category']);
         validateMaxArgumentsError('transition', ['number', 'number']);
     });
 

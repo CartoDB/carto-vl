@@ -1,13 +1,13 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/between', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('between', ['category', 'number', 'number']);
-        validateDynamicTypeErrors('between', ['number', 'category', 'number']);
-        validateDynamicTypeErrors('between', ['number', 'number', 'category']);
-        validateStaticTypeErrors('between', ['number', 'number', 'color']);
-        validateStaticTypeErrors('between', ['color', 'number', 'color']);
+        validateTypeErrors('between', ['category', 'number', 'number']);
+        validateTypeErrors('between', ['number', 'category', 'number']);
+        validateTypeErrors('between', ['number', 'number', 'category']);
+        validateTypeErrors('between', ['number', 'number', 'color']);
+        validateTypeErrors('between', ['color', 'number', 'color']);
         validateMaxArgumentsError('between', ['number', 'number', 'number', 'number']);
     });
 
