@@ -108,7 +108,9 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        palette = _calcPaletteValues(palette);
+        if (palette.type !== paletteTypes.NUMBER_ARRAY) {
+            palette = _calcPaletteValues(palette);
+        }
 
         super({ input, palette });
 
