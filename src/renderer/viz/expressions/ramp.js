@@ -108,7 +108,9 @@ export default class Ramp extends BaseExpression {
             checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
         }
 
-        palette = _calcPaletteValues(palette);
+        if (palette.type !== paletteTypes.NUMBER_ARRAY) {
+            palette = _calcPaletteValues(palette);
+        }
 
         super({ input, palette });
 
@@ -524,7 +526,7 @@ export default class Ramp extends BaseExpression {
             inputGLSL = `((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
         }
 
-        if (this.palette.type === 'number-array') {
+        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
             // With numeric arrays we use a combination of `mix` to allow for property-dependant values
             const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
             const genBlend = (list, numerator, denominator) => {
@@ -595,7 +597,7 @@ export default class Ramp extends BaseExpression {
             super._postShaderCompile(program, gl);
             return;
         }
-        if (this.palette.type === 'number-array') {
+        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
             this.palette.elems.forEach(e => e._postShaderCompile(program, gl));
         }
 
@@ -701,7 +703,7 @@ export default class Ramp extends BaseExpression {
         if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
-        } else if (this.palette.type === 'number-array') {
+        } else if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
             this.palette.elems.forEach(e => e._preDraw(program, drawMetadata, gl));
             gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
             gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
@@ -862,14 +864,10 @@ function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) 
 }
 
 function _calcPaletteValues (palette) {
-    try {
-        if (palette.type === paletteTypes.NUMBER_ARRAY) {
-            palette.floats = palette.eval();
-        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-            palette.colors = palette.eval();
-        }
-    } catch (error) {
-        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+    if (palette.type === paletteTypes.NUMBER_ARRAY) {
+        palette.floats = palette.eval();
+    } else if (palette.type === paletteTypes.COLOR_ARRAY) {
+        palette.colors = palette.eval();
     }
 
     return palette;
