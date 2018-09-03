@@ -64,7 +64,10 @@ export default class GlobalMeanStandardDev extends Classifier {
         checkType('globalMeanStandardDev', 'input', 0, 'number', this.input);
 
         const sample = metadata.sample.map(s => s[this.input.name]);
-        const breaks = calculateBreakpoints(sample, this.buckets, this._classSize);
+        const avg = average(sample);
+        const standardDev = standardDeviation(sample);
+
+        const breaks = calculateBreakpoints(avg, standardDev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
@@ -75,22 +78,20 @@ export default class GlobalMeanStandardDev extends Classifier {
  * Calculate breakpoints according to mean-standard deviation process
  *
  * @export
- * @param {Number[]} sample
+ * @param {Number} avg - average
+ * @param {Number} stDev - standard deviation
  * @param {Number} buckets - number of buckets
  * @param {Number} classSize - in standard deviation units (usually 1.0, 0.5, 0.25...)
  * @returns {Number[]}
  */
-export function calculateBreakpoints (sample, buckets, classSize) {
+export function calculateBreakpoints (avg, stDev, buckets, classSize) {
     let breaks;
-    const avg = average(sample);
-    const standardDev = standardDeviation(sample);
-
     let over = [];
     let under = [];
     const isEven = buckets % 2 === 0;
     let factor = isEven ? 0.0 : 1.0; // if odd, central class is double sized
     do {
-        const step = factor * (standardDev * classSize);
+        const step = factor * (stDev * classSize);
         over.push(avg + step);
         under.push(avg - step);
         breaks = [...new Set(over.concat(under))];
