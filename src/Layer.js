@@ -295,7 +295,6 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
         this.requestData();
-        this._fire('updated');
     }
 
     /**
@@ -399,8 +398,11 @@ export default class Layer {
     _paintLayer () {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.setViz(this._viz);
-            this.renderer.renderLayer(this._renderLayer);
-            if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            this.renderer.renderLayer(this._renderLayer, {
+                zoomLevel: this.map.getZoom()
+            });
+            const dataframesHaveChanged = !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()));
+            if (this.isAnimated() || this._fireUpdateOnNextRender || dataframesHaveChanged) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
@@ -434,7 +436,6 @@ export default class Layer {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
         this._needRefresh();
-        this._fireUpdateOnNextRender = true;
     }
 
     _needRefresh () {

@@ -16,6 +16,7 @@ const source = new carto.source.Dataset('mnmappluto');
 const viz = new carto.Viz(`
     color: ramp(linear($numfloors), prism)
     strokeWidth: 0
+    @aux: ramp(viewportQuantiles($numfloors, 8), prism)
 `);
 const layer = new carto.Layer('myCartoLayer', source, viz);
 
