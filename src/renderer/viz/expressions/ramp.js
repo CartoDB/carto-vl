@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
 
-import { interpolateRGBAinCieLAB } from '../colorspaces';
+import { interpolateRGBAinCieLAB, sRGBToCielab } from '../colorspaces';
 import NamedColor from './color/NamedColor';
 import Buckets from './buckets';
 import Property from './basic/property';
@@ -9,6 +9,7 @@ import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
+import CIELabGLSL from './color/CIELab.glsl';
 
 const DEFAULT_OTHERS_NAME = 'CARTOVL_OTHERS';
 const MAX_SAMPLES = 100;
@@ -515,7 +516,7 @@ export default class Ramp extends BaseExpression {
             // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
             inputGLSL = `ramp_translate${this._uid}(${input.inline})`;
             preface +=
-            `
+                `
             uniform sampler2D texRampTranslate${this._uid};
             float ramp_translate${this._uid}(float s){
                 vec2 v = vec2(
@@ -530,50 +531,69 @@ export default class Ramp extends BaseExpression {
             inputGLSL = `((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
         }
 
+        if (this.input.type === 'category') {
+            this.maxKey = this.input.numCategories - 1;
+        }
         if (this.palette.type === 'number-array') {
             // With numeric arrays we use a combination of `mix` to allow for property-dependant values
             const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
-            const genBlend = (list, numerator, denominator) => {
-                let b;
+            const GLSLNums = nums.map(num => num.inline);
+            const blend = this._genBlend(GLSLNums);
 
-                if (numerator + 1 === denominator) {
-                    b = list[numerator + 1].inline;
-                } else {
-                    b = genBlend(list, numerator + 1, denominator);
-                }
-
-                return `
-                mix(${list[numerator].inline}, ${b},
-                    clamp(
-                         (x-${(numerator / denominator).toFixed(20)})
-                             /${(1 / denominator).toFixed(20)}
-                        ,0.,1.
-                        )
-                )`;
-            };
-            inline = `ramp_num${this._uid}(${inputGLSL})`;
             // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
             // For example:
             //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
             //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
             //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
             //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
-            preface += `${nums.map(n => n.preface).join('\n')}
+            inline = `ramp_num${this._uid}(${inputGLSL})`;
+            preface += `${nums.map(num => num.preface).join('\n')}
 
             float ramp_num${this._uid}(float x){
-                return ${genBlend(nums, 0, this.palette.elems.length - 1)};
+                return ${blend};
             }
             `;
         } else {
-            // With color arrays we use a fast texture lookup, but this makes property-dependant values impossible
-            inline = `texture2D(texRamp${this._uid}, vec2(${inputGLSL}, 0.5)).rgba`;
-            preface += `uniform sampler2D texRamp${this._uid};\n`;
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+            const cielabColors = colors.map(c => sRGBToCielab({
+                r: c.r / MAX_BYTE_VALUE,
+                g: c.g / MAX_BYTE_VALUE,
+                b: c.b / MAX_BYTE_VALUE,
+                a: c.a
+            }));
+
+            const GLSLColors = cielabColors.map(color => `vec4(${color.l.toFixed(20)}, ${color.a.toFixed(20)}, ${color.b.toFixed(20)}, ${color.alpha.toFixed(20)})`);
+            const blend = this._genBlend(GLSLColors);
+
+            inline = `cielabToSRGBA(ramp_color${this._uid}(${inputGLSL}))`;
+            preface += `
+                ${CIELabGLSL}
+
+                vec4 ramp_color${this._uid}(float x){
+                    return ${blend};
+                }`;
         }
 
         return {
             preface: this._prefaceCode(input.preface + preface),
             inline
         };
+    }
+
+    _genBlend (list, index = 0) {
+        const currentColor = list[index];
+        if (index === list.length - 1) {
+            return currentColor;
+        }
+        const nextBlend = this._genBlend(list, index + 1);
+        return `
+            mix(${currentColor}, ${nextBlend},
+                clamp(
+                    (x-${(index / (list.length - 1)).toFixed(20)})
+                       /${(1 / (list.length - 1)).toFixed(20)}
+                    ,0.,1.
+                    )
+            )`;
     }
 
     _applyToShaderSourceImage (getGLSLforProperty) {
