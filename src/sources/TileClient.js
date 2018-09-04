@@ -17,9 +17,9 @@ export default class TileClient {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestData (zoom, viewport, responseToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
+    requestData (zoom, viewport, urlToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom);
-        this._getTiles(tiles, responseToDataframeTransformer);
+        this._getTiles(tiles, urlToDataframeTransformer);
     }
 
     free () {
@@ -28,13 +28,23 @@ export default class TileClient {
         this._oldDataframes = [];
     }
 
-    _getTiles (tiles, responseToDataframeTransformer) {
+    _getTileUrl (x, y, z) {
+        const subdomainIndex = this._getSubdomainIndex(x, y);
+        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
+    }
+
+    _getSubdomainIndex (x, y) {
+        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
+        return Math.abs(x + y) % this._templateURLs.length;
+    }
+
+    _getTiles (tiles, urlToDataframeTransformer) {
         this._requestGroupID++;
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
         tiles.forEach(({ x, y, z }) => {
-            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, responseToDataframeTransformer)).then(
+            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(
                 dataframe => {
                     dataframe.orderID = x + y / 1000;
                     if (dataframe.empty) {
@@ -55,20 +65,9 @@ export default class TileClient {
                 });
         });
     }
-
-    _getTileUrl (x, y, z) {
-        const subdomainIndex = this._getSubdomainIndex(x, y);
-        return this._templateURLs[subdomainIndex].replace('{x}', x).replace('{y}', y).replace('{z}', z);
-    }
-
-    _getSubdomainIndex (x, y) {
-        // Reference https://github.com/Leaflet/Leaflet/blob/v1.3.1/src/layer/tile/TileLayer.js#L214-L217
-        return Math.abs(x + y) % this._templateURLs.length;
-    }
-
-    async _requestDataframe (x, y, z, responseToDataframeTransformer) {
-        const response = await fetch(this._getTileUrl(x, y, z));
-        const dataframe = await responseToDataframeTransformer(response, x, y, z);
+    async _requestDataframe (x, y, z, urlToDataframeTransformer) {
+        const url = this._getTileUrl(x, y, z);
+        const dataframe = await urlToDataframeTransformer(x, y, z, url);
         if (!dataframe.empty) {
             this._addDataframe(dataframe);
         }
