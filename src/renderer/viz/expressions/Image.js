@@ -31,6 +31,7 @@ export default class Image extends Base {
 
         super({});
         this.type = 'color';
+        this.isImage = true;
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {
