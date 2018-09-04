@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation demo | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+    #timer.pause  {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background', type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    const animStart = '2018-04-11T12:00:00Z';
+    const animEnd = '2018-04-12T12:00:00Z';
+
+    const source = new carto.source.GeoJSON(generateData(30));
+    const source2 = new carto.source.GeoJSON(generateData(-30));
+    const source0 = new carto.source.GeoJSON(generateData(0));
+    function generateData(y = 0) {
+      const features = [];
+      let id = 0;
+      for (let x = -60; x <= 60; x += 30) {
+          features.push({
+            type: 'Feature',
+            geometry: {
+              type: 'Point',
+              coordinates: [x, y]
+            },
+            properties: {
+              cartodb_id: id++
+            }
+          });
+      }
+      return { type: 'FeatureCollection', features };
+    }
+
+    const s = carto.expressions;
+    const p = s.prop('cartodb_id');
+    const animation = s.animation(
+      p,
+      5,
+      s.fade(0, 1)
+    );
+    const viz = new carto.Viz({
+      width: 20,
+      color: s.ramp(p, s.palettes.PRISM),
+      filter: animation
+    });
+    const viz2 = new carto.Viz(`
+      width: 20
+      color: ramp($cartodb_id, PRISM)
+      filter: animation($cartodb_id, 5, fade(1, 0))
+    `);
+    const viz0 = new carto.Viz(`
+      width: 20
+      color: ramp($cartodb_id, PRISM)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+    const layer2 = new carto.Layer('layer2', source2, viz2);
+    const layer0 = new carto.Layer('layer0', source0, viz0);
+    layer.addTo(map, 'background');
+    layer2.addTo(map, 'background');
+    layer0.addTo(map, 'background');
+    layer.on('updated', () => {
+        const time = animation.getProgressValue();
+        document.getElementById("timer").textContent = time;
+        if (Number(time) < 0 || Number(time) >= 4) {
+          document.getElementById("timer").classList.add("pause");
+        } else {
+          document.getElementById("timer").classList.remove("pause");
+        }
+        document.getElementById("timer").textContent = time;
+
+    });
+  </script>
+</body>
+</html>
