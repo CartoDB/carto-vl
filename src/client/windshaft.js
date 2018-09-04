@@ -58,7 +58,7 @@ export default class Windshaft {
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{ type: 'id' }];
+            MNS['cartodb_id'] = [{ type: 'unaggregated' }];
         }
     }
 
