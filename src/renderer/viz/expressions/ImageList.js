@@ -1,5 +1,6 @@
 import Base from './base';
-import { checkArray, checkLooseType, checkMaxArguments } from './utils';
+import { checkArray, checkMaxArguments, checkExpression, checkInstance } from './utils';
+import Image from './Image';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.
@@ -13,7 +14,7 @@ export default class ImageList extends Base {
         checkMaxArguments(arguments, 1, 'imageList');
         checkArray('imageArray', 'imageArray', 0, imageArray);
 
-        imageArray.forEach((image, i) => checkLooseType('imageArray', `imageArray[${i}]`, 0, 'color', image));
+        imageArray.forEach((image, i) => checkExpression('imageArray', `imageArray[${i}]`, 0, image));
 
         const children = {};
 
@@ -23,6 +24,11 @@ export default class ImageList extends Base {
         super(children);
         this.numImages = imageArray.length;
         this.type = 'image-list';
+    }
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        this._getChildren().forEach((image, i) => checkInstance('imageArray', `imageArray[${i}]`, 0, Image, image));
     }
 
     _applyToShaderSource () {

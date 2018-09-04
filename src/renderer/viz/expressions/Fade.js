@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkMaxArguments } from './utils';
+import { implicitCast, checkMaxArguments, checkExpression, checkType } from './utils';
 
 /**
  * Create a FadeIn/FadeOut configuration. See `animation` for more details.
@@ -62,10 +62,9 @@ export class Fade extends BaseExpression {
             ? fadeIn
             : implicitCast(param2);
 
-        checkLooseType('fade', 'param1', 0, 'number', fadeIn);
-        checkLooseType('fade', 'param2', 1, 'number', fadeOut);
+        checkExpression('fade', 'param1', 0, fadeIn);
+        checkExpression('fade', 'param2', 1, fadeOut);
 
-        // TODO improve type check
         super({ fadeIn, fadeOut });
 
         this.type = 'fade';
@@ -74,5 +73,10 @@ export class Fade extends BaseExpression {
             in: inline.fadeIn,
             out: inline.fadeOut
         });
+    }
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        checkType('fade', 'param1', 0, 'number', this.fadeIn);
+        checkType('fade', 'param2', 1, 'number', this.fadeOut);
     }
 }
