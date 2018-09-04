@@ -1,8 +1,6 @@
 import {
-    validateDynamicTypeErrors,
     validateStaticType,
-    validateStaticTypeErrors,
-    validateCompileTypeError,
+    validateTypeErrors,
     validateMaxArgumentsError
 } from '../utils';
 
@@ -22,48 +20,48 @@ import Metadata from '../../../../../../src/renderer/Metadata';
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         describe('global', () => {
-            validateStaticTypeErrors('globalQuantiles', []);
-            validateStaticTypeErrors('globalQuantiles', ['number', 'category']);
-            validateDynamicTypeErrors('globalQuantiles', ['category', 2]);
-            validateStaticTypeErrors('globalQuantiles', ['color', 2]);
-            validateStaticTypeErrors('globalQuantiles', ['number', 'color']);
+            validateTypeErrors('globalQuantiles', []);
+            validateTypeErrors('globalQuantiles', ['number', 'category']);
+            validateTypeErrors('globalQuantiles', ['category', 2]);
+            validateTypeErrors('globalQuantiles', ['color', 2]);
+            validateTypeErrors('globalQuantiles', ['number', 'color']);
             validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
-            validateStaticTypeErrors('globalEqIntervals', []);
-            validateStaticTypeErrors('globalEqIntervals', ['number', 'category']);
-            validateDynamicTypeErrors('globalEqIntervals', ['category', 2]);
-            validateStaticTypeErrors('globalEqIntervals', ['color', 2]);
-            validateStaticTypeErrors('globalEqIntervals', ['number', 'color']);
+            validateTypeErrors('globalEqIntervals', []);
+            validateTypeErrors('globalEqIntervals', ['number', 'category']);
+            validateTypeErrors('globalEqIntervals', ['category', 2]);
+            validateTypeErrors('globalEqIntervals', ['color', 2]);
+            validateTypeErrors('globalEqIntervals', ['number', 'color']);
             validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
 
-            validateStaticTypeErrors('globalMeanStandardDev', []);
-            validateStaticTypeErrors('globalMeanStandardDev', ['number', 'category']);
-            validateDynamicTypeErrors('globalMeanStandardDev', ['category', 2]);
-            validateStaticTypeErrors('globalMeanStandardDev', ['color', 2]);
-            validateStaticTypeErrors('globalMeanStandardDev', ['number', 'color']);
+            validateTypeErrors('globalMeanStandardDev', []);
+            validateTypeErrors('globalMeanStandardDev', ['number', 'category']);
+            validateTypeErrors('globalMeanStandardDev', ['category', 2]);
+            validateTypeErrors('globalMeanStandardDev', ['color', 2]);
+            validateTypeErrors('globalMeanStandardDev', ['number', 'color']);
             validateMaxArgumentsError('globalMeanStandardDev', ['number', 'number-array', 'number', 'number']);
         });
 
         describe('viewport', () => {
-            validateCompileTypeError('viewportQuantiles', []);
-            validateCompileTypeError('viewportQuantiles', ['number', 'category']);
-            validateCompileTypeError('viewportQuantiles', ['category', 2]);
-            validateCompileTypeError('viewportQuantiles', ['color', 2]);
-            validateCompileTypeError('viewportQuantiles', ['number', 'color']);
+            validateTypeErrors('viewportQuantiles', []);
+            validateTypeErrors('viewportQuantiles', ['number', 'category']);
+            validateTypeErrors('viewportQuantiles', ['category', 2]);
+            validateTypeErrors('viewportQuantiles', ['color', 2]);
+            validateTypeErrors('viewportQuantiles', ['number', 'color']);
             validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
 
-            validateCompileTypeError('viewportEqIntervals', []);
-            validateCompileTypeError('viewportEqIntervals', ['number', 'category']);
-            validateCompileTypeError('viewportEqIntervals', ['category', 2]);
-            validateCompileTypeError('viewportEqIntervals', ['color', 2]);
-            validateCompileTypeError('viewportEqIntervals', ['number', 'color']);
+            validateTypeErrors('viewportEqIntervals', []);
+            validateTypeErrors('viewportEqIntervals', ['number', 'category']);
+            validateTypeErrors('viewportEqIntervals', ['category', 2]);
+            validateTypeErrors('viewportEqIntervals', ['color', 2]);
+            validateTypeErrors('viewportEqIntervals', ['number', 'color']);
             validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
-            validateStaticTypeErrors('viewportMeanStandardDev', []);
-            validateStaticTypeErrors('viewportMeanStandardDev', ['number', 'category']);
-            validateDynamicTypeErrors('viewportMeanStandardDev', ['category', 2]);
-            validateStaticTypeErrors('viewportMeanStandardDev', ['color', 2]);
-            validateStaticTypeErrors('viewportMeanStandardDev', ['number', 'color']);
+            validateTypeErrors('viewportMeanStandardDev', []);
+            validateTypeErrors('viewportMeanStandardDev', ['number', 'category']);
+            validateTypeErrors('viewportMeanStandardDev', ['category', 2]);
+            validateTypeErrors('viewportMeanStandardDev', ['color', 2]);
+            validateTypeErrors('viewportMeanStandardDev', ['number', 'color']);
             validateMaxArgumentsError('viewportMeanStandardDev', ['number', 'number-array', 'number', 'number']);
         });
     });
