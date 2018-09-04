@@ -310,6 +310,7 @@ export default class Viz {
 
     compileShaders (gl, metadata) {
         this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
+        checkVizPropertyTypes(this);
 
         this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
         this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
@@ -494,11 +495,42 @@ export default class Viz {
         if (!(vizSpec.offset instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[offset]');
         }
+
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
         }
+    }
+}
+
+function checkVizPropertyTypes (viz) {
+    if (viz.color.type !== 'color') {
+        throw new Error(`Viz property 'color:' must be of type 'color' but it was of type ${viz.color.type}`);
+    }
+    if (viz.strokeColor.type !== 'color') {
+        throw new Error(`Viz property 'strokeColor:' must be of type 'color' but it was of type ${viz.strokeColor.type}`);
+    }
+    if (viz.width.type !== 'number') {
+        throw new Error(`Viz property 'width:' must be of type 'number' but it was of type ${viz.width.type}`);
+    }
+    if (viz.strokeWidth.type !== 'number') {
+        throw new Error(`Viz property 'strokeWidth:' must be of type 'number' but it was of type ${viz.strokeWidth.type}`);
+    }
+    if (viz.order.type !== 'orderer') {
+        throw new Error(`Viz property 'order:' must be of type 'orderer' but it was of type ${viz.order.type}`);
+    }
+    if (viz.filter.type !== 'number') {
+        throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
+    }
+    if (viz.symbol.type !== 'color') {
+        throw new Error(`Viz property 'symbol:' must be of type 'color' but it was of type ${viz.symbol.type}`);
+    }
+    if (viz.symbolPlacement.type !== 'placement') {
+        throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
+    }
+    if (viz.offset.type !== 'placement') {
+        throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);
     }
 }
 
