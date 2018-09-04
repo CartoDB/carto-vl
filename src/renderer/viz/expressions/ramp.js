@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
+import { implicitCast, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
 
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 import NamedColor from './color/NamedColor';
@@ -91,17 +91,7 @@ export default class Ramp extends BaseExpression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-        checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
-        checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
-
-        if (palette.type === paletteTypes.IMAGE) {
-            checkInstance('ramp', 'palette', 1, ImageList, palette);
-            checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
-        }
-
-        if (palette.type !== 'number-array') {
-            palette = _calcPaletteValues(palette);
-        }
+        checkExpression('ramp', 'palette', 1, palette);
 
         super({ input, palette });
 
@@ -178,6 +168,10 @@ export default class Ramp extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+
+        if (this.palette.type !== 'number-array') {
+            this.palette = _calcPaletteValues(this.palette);
+        }
 
         if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
             this.input = new Linear(this.input);
