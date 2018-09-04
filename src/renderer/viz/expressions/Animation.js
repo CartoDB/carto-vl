@@ -148,7 +148,9 @@ export class Animation extends BaseExpression {
 
     _postShaderCompile (program, gl) {
         waitingForLayer.add(this);
-        this._paused = 'default';
+        if (!this._paused) {
+            this._paused = 'default';
+        }
         super._postShaderCompile(program, gl);
     }
 
@@ -158,6 +160,7 @@ export class Animation extends BaseExpression {
         if (this._paused && this._lastTime === undefined) {
             return;
         }
+
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -187,6 +190,7 @@ export class Animation extends BaseExpression {
         const fadeOut = this.fade.fadeOut.eval(feature);
 
         const output = 1 - clamp(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
+
         return output;
     }
 

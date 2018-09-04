@@ -283,18 +283,22 @@
             $playBtn.style.display = 'none';
             $pauseBtn.style.display = 'initial';
         };
+
         $pauseBtn.onclick = () => {
             viz.variables.animation.pause();
             $pauseBtn.style.display = 'none';
             $playBtn.style.display = 'initial';
         };
+
         $playBtn.style.display = 'none';
 
         let last = $timeRange.value;
+
         $timeRange.onchange = () => {
             viz.variables.animation.setProgressPct($timeRange.value);
             last = $timeRange.value;
         }
+
         layer.on('updated', () => {
             if ($timeRange.value == last) {
                 $timeRange.value = viz.variables.animation.getProgressPct();
