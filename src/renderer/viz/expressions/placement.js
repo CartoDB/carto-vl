@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkLooseType, checkType, implicitCast, checkMaxArguments } from './utils';
+import { checkType, implicitCast, checkMaxArguments } from './utils';
 
 /**
  * Placement. Define an image offset relative to its size. Where:
@@ -50,8 +50,6 @@ export default class Placement extends BaseExpression {
 
         x = implicitCast(x);
         y = implicitCast(y);
-        checkLooseType('placement', 'x', 0, 'number', x);
-        checkLooseType('placement', 'y', 1, 'number', y);
         super({ x, y });
         this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
         this.type = 'placement';

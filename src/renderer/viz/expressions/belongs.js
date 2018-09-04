@@ -1,4 +1,4 @@
-import { implicitCast, checkType, checkLooseType, checkExpression, checkMaxArguments } from './utils';
+import { implicitCast, checkType, checkExpression, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -75,9 +75,6 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
 
             checkExpression(name, 'value', 0, value);
             checkExpression(name, 'list', 1, list);
-
-            checkLooseType(name, 'value', 0, 'category', value);
-            checkLooseType(name, 'list', 1, 'category-array', list);
 
             let children = { value };
             list.elems.map((arg, index) => {
