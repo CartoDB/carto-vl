@@ -523,8 +523,8 @@ function checkVizPropertyTypes (viz) {
     if (viz.filter.type !== 'number') {
         throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
     }
-    if (viz.symbol.type !== 'color') {
-        throw new Error(`Viz property 'symbol:' must be of type 'color' but it was of type ${viz.symbol.type}`);
+    if (viz.symbol.type !== 'image') {
+        throw new Error(`Viz property 'symbol:' must be of type 'image' but it was of type ${viz.symbol.type}`);
     }
     if (viz.symbolPlacement.type !== 'placement') {
         throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);

@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkArray, checkMaxArguments, checkExpression, checkInstance } from './utils';
+import { checkArray, checkMaxArguments, checkExpression, checkType } from './utils';
 import Image from './Image';
 
 /**
@@ -28,7 +28,7 @@ export default class ImageList extends Base {
 
     _bindMetadata (meta) {
         super._bindMetadata(meta);
-        this._getChildren().forEach((image, i) => checkInstance('imageArray', `imageArray[${i}]`, 0, Image, image));
+        this._getChildren().forEach((image, i) => checkType('imageArray', `imageArray[${i}]`, 0, 'image', image));
     }
 
     _applyToShaderSource () {

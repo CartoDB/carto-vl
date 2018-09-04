@@ -77,7 +77,11 @@ export default class Blend extends BaseExpression {
         abTypeCheck(this.a, this.b);
         checkType('blend', 'mix', 2, 'number', this.mix);
 
-        this.type = this.a.type;
+        if (this.a.type === 'image' || this.b.type === 'image') {
+            this.type = 'image';
+        } else {
+            this.type = this.a.type;
+        }
     }
     _preDraw (...args) {
         super._preDraw(...args);
@@ -89,7 +93,11 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck (a, b) {
-    if (!((a.type === 'number' && b.type === 'number') || (a.type === 'color' && b.type === 'color'))) {
+    if (!((a.type === 'number' && b.type === 'number') ||
+    (a.type === 'color' && b.type === 'color') ||
+    (a.type === 'image' && b.type === 'color') ||
+    (a.type === 'color' && b.type === 'image') ||
+    (a.type === 'image' && b.type === 'image'))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }

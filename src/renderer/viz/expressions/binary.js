@@ -498,6 +498,11 @@ function getSignatureLoose (a, b) {
         return COLORS_TO_COLOR;
     } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
+        return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -516,6 +521,11 @@ function getSignature (a, b) {
         return COLORS_TO_COLOR;
     } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
+        return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -531,6 +541,8 @@ function getReturnTypeFromSignature (signature) {
             return 'color';
         case CATEGORIES_TO_NUMBER:
             return 'number';
+        case IMAGES_TO_IMAGE:
+            return 'image';
         default:
             return undefined;
     }

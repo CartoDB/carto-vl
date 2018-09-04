@@ -19,7 +19,7 @@ export function implicitCast (value) {
     }
     if (Array.isArray(value)) {
         const _array = array(value);
-        if (_array && _array.elems.some(elem => elem.isImage)) {
+        if (_array && _array.type === 'image-array') {
             return imageList(_array.elems);
         }
         return _array;

@@ -30,8 +30,7 @@ export default class Image extends Base {
         checkString('image', 'url', 0, url);
 
         super({});
-        this.type = 'color';
-        this.isImage = true;
+        this.type = 'image';
         this.canvas = null;
         this._url = url;
         this._promise = new Promise((resolve, reject) => {

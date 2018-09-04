@@ -14,7 +14,7 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image-list'
+    IMAGE_LIST: 'image-list'
 };
 
 const rampTypes = {
@@ -180,7 +180,7 @@ export default class Ramp extends BaseExpression {
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
@@ -191,7 +191,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             return this._applyToShaderSourceImage(getGLSLforProperty);
         }
 
@@ -279,7 +279,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromPalette (input, palette) {
-        if (palette.type === paletteTypes.IMAGE) {
+        if (palette.type === paletteTypes.IMAGE_LIST) {
             return palette.colors;
         }
 
@@ -289,7 +289,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _postShaderCompile (program, gl) {
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -398,7 +398,7 @@ export default class Ramp extends BaseExpression {
     _preDraw (program, drawMetadata, gl) {
         this.input._preDraw(program, drawMetadata, gl);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         } else if (this.palette.type === 'number-array') {
