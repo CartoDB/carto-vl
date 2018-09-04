@@ -25,6 +25,11 @@
         touchZoomRotate: false,
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     carto.setDefaultAuth({
         user: 'cartovl',
         apiKey: 'default_public'
