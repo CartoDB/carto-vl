@@ -139,6 +139,12 @@ const validation = {
         'feature-has-cartodb_id': {
             messageRegex: /featureHasCartodbId$/,
             friendlyMessage: '`cartodb_id` is a reserved property so it can not be used'
+        },
+        'windshaft-incompatible-cluster-aggr': {
+            messageRegex: /windshaftIncompatibleClusterAggr\[(.+), (.+)\]$/,
+            friendlyMessage: `Incompatible combination of cluster aggregation usages (
+                $0
+            }) with unaggregated usage for property '$1'`
         }
     },
     viz: {

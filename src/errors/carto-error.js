@@ -63,7 +63,7 @@ class CartoError extends Error {
     }
 
     /**
-     * Replace $0 with the proper paramter in the listedError regex to build a friendly message.
+     * Replace captured group indicators ($0, $1...) with the proper parameters in the listedError regex to build a friendly message.
      */
     _replaceRegex (error) {
         if (!error.friendlyMessage) {
@@ -71,7 +71,11 @@ class CartoError extends Error {
         }
         const match = this.message && this.message.match(error.messageRegex);
         if (match && match.length > 1) {
-            return error.friendlyMessage.replace('$0', match[1]);
+            let message = error.friendlyMessage;
+            for (let paramIndex = 0; paramIndex < match.length - 1; paramIndex++) {
+                message = message.replace(`$${paramIndex}`, match[paramIndex + 1]);
+            }
+            return message;
         }
         return error.friendlyMessage;
     }
