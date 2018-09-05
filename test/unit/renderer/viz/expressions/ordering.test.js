@@ -1,18 +1,18 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/ordering', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('asc', []);
-        validateStaticTypeErrors('asc', [undefined]);
-        validateStaticTypeErrors('asc', [123]);
-        validateStaticTypeErrors('asc', ['number']);
+        validateTypeErrors('asc', []);
+        validateTypeErrors('asc', [undefined]);
+        validateTypeErrors('asc', [123]);
+        validateTypeErrors('asc', ['number']);
         validateMaxArgumentsError('asc', ['number', 'number']);
 
-        validateStaticTypeErrors('desc', []);
-        validateStaticTypeErrors('desc', [undefined]);
-        validateStaticTypeErrors('desc', [123]);
-        validateStaticTypeErrors('desc', ['number']);
+        validateTypeErrors('desc', []);
+        validateTypeErrors('desc', [undefined]);
+        validateTypeErrors('desc', [123]);
+        validateTypeErrors('desc', ['number']);
         validateMaxArgumentsError('desc', ['number', 'number']);
 
         validateMaxArgumentsError('noOrder', ['number']);

@@ -1,16 +1,16 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 import GlobalMin from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMin';
 import GlobalMax from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMax';
 
 describe('src/renderer/viz/expressions/linear', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('linear', []);
-        validateStaticTypeErrors('linear', ['number', 'number']);
-        validateStaticTypeErrors('linear', ['number', 'color']);
-        validateStaticTypeErrors('linear', ['number', 'color', 'number']);
-        validateDynamicTypeErrors('linear', ['category', 'number', 'number']);
-        validateDynamicTypeErrors('linear', ['number', 'number', 'category']);
+        validateTypeErrors('linear', []);
+        validateTypeErrors('linear', ['number', 'number']);
+        validateTypeErrors('linear', ['number', 'color']);
+        validateTypeErrors('linear', ['number', 'color', 'number']);
+        validateTypeErrors('linear', ['category', 'number', 'number']);
+        validateTypeErrors('linear', ['number', 'number', 'category']);
         validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number']);
     });
 

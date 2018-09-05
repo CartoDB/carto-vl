@@ -1,12 +1,13 @@
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from '../utils';
 import { hex } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/hex', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('hex', []);
-        validateStaticTypeErrors('hex', ['number']);
-        validateStaticTypeErrors('hex', ['category']);
-        validateStaticTypeErrors('hex', ['#Z08080']);
+        validateTypeErrors('hex', []);
+        validateTypeErrors('hex', ['number']);
+        validateTypeErrors('hex', ['category']);
+        validateTypeErrors('hex', ['#Z08080'], expressionName =>
+            new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*Invalid hexadecimal[\\s\\S]*`, 'g'));
         validateMaxArgumentsError('hex', ['#Z08080', 'extraParam']);
     });
 

@@ -1,11 +1,11 @@
-import { validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/variable', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('variable', []);
-        validateStaticTypeErrors('variable', [undefined]);
-        validateStaticTypeErrors('variable', [123]);
-        validateStaticTypeErrors('variable', ['number']);
+        validateTypeErrors('variable', []);
+        validateTypeErrors('variable', [undefined]);
+        validateTypeErrors('variable', [123]);
+        validateTypeErrors('variable', ['number']);
         validateMaxArgumentsError('variable', ['number', 'number']);
     });
 });

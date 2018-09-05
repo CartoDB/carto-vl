@@ -1,12 +1,12 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/property', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('property', []);
-        validateStaticTypeErrors('property', [undefined]);
-        validateStaticTypeErrors('property', [123]);
-        validateStaticTypeErrors('property', ['number']);
+        validateTypeErrors('property', []);
+        validateTypeErrors('property', [undefined]);
+        validateTypeErrors('property', [123]);
+        validateTypeErrors('property', ['number']);
         validateMaxArgumentsError('property', ['number', 'number']);
     });
 

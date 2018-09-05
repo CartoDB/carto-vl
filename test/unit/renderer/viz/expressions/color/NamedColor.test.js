@@ -1,9 +1,9 @@
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import { namedColor } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/core/viz/expressions/NamedColor', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('namedColor', [undefined]);
+        validateTypeErrors('namedColor', [undefined]);
     });
 
     describe('type', () => {
