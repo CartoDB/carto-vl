@@ -548,3 +548,9 @@ aside.toolbox {
   border-left: 3px solid;
   transform: rotate(45deg) translate(5px, 4px);
 }
+
+/* Mapbox */
+.mapboxgl-ctrl-top-left {
+  top: 14px;
+  left: 14px;
+}

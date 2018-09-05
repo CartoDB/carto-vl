@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, checkLooseType, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
+import { implicitCast, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
 
 import { interpolateRGBAinCieLAB, sRGBToCielab } from '../colorspaces';
 import NamedColor from './color/NamedColor';
@@ -25,7 +25,7 @@ const paletteTypes = {
     PALETTE: 'palette',
     COLOR_ARRAY: 'color-array',
     NUMBER_ARRAY: 'number-array',
-    IMAGE: 'image'
+    IMAGE_LIST: 'image-list'
 };
 
 const rampTypes = {
@@ -101,6 +101,7 @@ export default class Ramp extends BaseExpression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
+<<<<<<< HEAD
         checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
         checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
 
@@ -112,10 +113,12 @@ export default class Ramp extends BaseExpression {
         if (palette.type !== paletteTypes.NUMBER_ARRAY) {
             palette = _calcPaletteValues(palette);
         }
+=======
+        checkExpression('ramp', 'palette', 1, palette);
+>>>>>>> master
 
         super({ input, palette });
         this.palette = palette;
-        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
     }
 
@@ -483,17 +486,31 @@ export default class Ramp extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
+<<<<<<< HEAD
         if (this.input.isA(Property)) {
             this.input = this.input.type === inputTypes.NUMBER
                 ? new Linear(this.input)
                 : new CategoryIndex(this.input);
 
+=======
+        this.type = this.palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
+        if (this.palette.type === 'image-list') {
+            this.type = 'image';
+        }
+
+        if (this.palette.type !== 'number-array') {
+            this.palette = _calcPaletteValues(this.palette);
+        }
+
+        if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
+            this.input = new Linear(this.input);
+>>>>>>> master
             this.input._bindMetadata(metadata);
         }
 
         checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
             checkInstance('ramp', 'palette', 1, ImageList, this.palette);
         }
@@ -505,7 +522,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             return this._applyToShaderSourceImage(getGLSLforProperty);
         }
 
@@ -578,7 +595,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _getColorsFromPalette (input, palette) {
-        if (palette.type === paletteTypes.IMAGE) {
+        if (palette.type === paletteTypes.IMAGE_LIST) {
             return palette.eval();
         }
 
@@ -588,7 +605,7 @@ export default class Ramp extends BaseExpression {
     }
 
     _postShaderCompile (program, gl) {
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             this.palette._postShaderCompile(program, gl);
             super._postShaderCompile(program, gl);
             return;
@@ -691,7 +708,7 @@ export default class Ramp extends BaseExpression {
 
         this.input._preDraw(program, drawMetadata, gl);
 
-        if (this.palette.type === paletteTypes.IMAGE) {
+        if (this.palette.type === paletteTypes.IMAGE_LIST) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
         }

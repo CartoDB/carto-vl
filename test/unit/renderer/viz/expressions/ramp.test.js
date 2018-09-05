@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateMaxArgumentsError, validateDynamicType } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange, imageList, BICYCLE, CAR, BUILDING } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
@@ -8,19 +8,19 @@ const DEFAULT_COLOR = namedColor('gray');
 
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('ramp', []);
-        validateStaticTypeErrors('ramp', ['number']);
-        validateStaticTypeErrors('ramp', ['category']);
-        validateDynamicTypeErrors('ramp', ['number', 'image-array']);
+        validateTypeErrors('ramp', []);
+        validateTypeErrors('ramp', ['number']);
+        validateTypeErrors('ramp', ['category']);
+        validateTypeErrors('ramp', ['number', 'image-array']);
         validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('ramp', ['number', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'color-array'], 'color');
-        validateStaticType('ramp', ['category', 'number-array'], 'number');
-        validateStaticType('ramp', ['category', 'image-array'], 'color');
+        validateDynamicType('ramp', ['number', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'color-array'], 'color');
+        validateDynamicType('ramp', ['category', 'number-array'], 'number');
+        validateDynamicType('ramp', ['category', 'image-array'], 'image');
     });
 
     describe('.eval', () => {
@@ -1004,7 +1004,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoom: 0.0};
+                const fakeDrawMetadata = {zoomLevel: 0};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(100);
@@ -1015,7 +1015,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
                 // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
-                const fakeDrawMetadata = {zoom: (Math.pow(2, 3 - 1) * 0.7 + 0.3 * Math.pow(2, 9 - 1))};
+                const fakeDrawMetadata = {zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9))};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(130);
@@ -1025,7 +1025,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata(METADATA);
                 const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoom: 1000.0};
+                const fakeDrawMetadata = {zoomLevel: 100};
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(200);

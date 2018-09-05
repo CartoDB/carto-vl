@@ -68,13 +68,13 @@ describe('Layer', () => {
             });
         });
 
-        it('should fire a "updated" event when the _onDataframeAdded is called', (done) => {
+        it('should fire a "updated" event when a new dataframe is added', (done) => {
             let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
                 layer._onDataframeAdded(layer._source._dataframe);
                 layer._paintLayer();
-                expect(update).toHaveBeenCalledTimes(2);
+                expect(update).toHaveBeenCalledTimes(1);
                 done();
             });
         });

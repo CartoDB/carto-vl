@@ -1,4 +1,4 @@
-import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression, checkMaxArguments } from './utils';
+import { implicitCast, clamp, mix, checkType, checkExpression, checkMaxArguments } from './utils';
 import Transition from './transition';
 import BaseExpression from './base';
 
@@ -15,7 +15,7 @@ import BaseExpression from './base';
  * const viz = new carto.Viz({
  *   width: s.blend(3,
  *                  s.prop('dn'),
- *                  s.linear(s.zoom(), s.pow(2, 10), s.pow(2, 14))
+ *                  s.linear(s.zoom(), 10, 14))
  *           );
  * });
  *
@@ -23,7 +23,7 @@ import BaseExpression from './base';
  * const viz = new carto.Viz(`
  *   width: blend(3,
  *                $dn,
- *                linear(zoom(), 2^10, 2^14)
+ *                linear(zoom(), 10, 14)
  *          )
  * `);
  *
@@ -42,10 +42,10 @@ export default class Blend extends BaseExpression {
         checkExpression('blend', 'a', 0, a);
         checkExpression('blend', 'b', 1, b);
         checkExpression('blend', 'mix', 2, mix);
+
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
-        checkLooseType('blend', 'mix', 2, 'number', mix);
 
         // TODO check interpolator type
         const originalMix = mix;
@@ -76,7 +76,7 @@ export default class Blend extends BaseExpression {
         super._bindMetadata(meta);
 
         abTypeCheck(this.a, this.b);
-        checkType('blend', 'mix', 1, 'number', this.mix);
+        checkType('blend', 'mix', 2, 'number', this.mix);
 
         this.type = this.a.type;
     }
@@ -90,7 +90,9 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck (a, b) {
-    if (!((a.type === 'number' && b.type === 'number') || (a.type === 'color' && b.type === 'color'))) {
+    const validTypes = ['number', 'color', 'image', 'placement'];
+
+    if (a.type !== b.type || !(validTypes.includes(a.type))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }

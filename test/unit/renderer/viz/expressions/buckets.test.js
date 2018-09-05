@@ -1,17 +1,17 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError, validateCompileTypeError } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
 import { OTHERS_INDEX } from '../../../../../src/renderer/viz/expressions/constants';
 
 describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
-        validateCompileTypeError('buckets', ['number', 'number']);
-        validateCompileTypeError('buckets', ['category', 'category']);
+        validateTypeErrors('buckets', ['number', 'number']);
+        validateTypeErrors('buckets', ['category', 'category']);
 
-        validateDynamicTypeErrors('buckets', ['number', 'category-array']);
-        validateDynamicTypeErrors('buckets', ['category', 'number-array']);
-        validateStaticTypeErrors('buckets', ['color', 'number-array']);
-        validateStaticTypeErrors('buckets', ['number', 'color-array']);
+        validateTypeErrors('buckets', ['number', 'category-array']);
+        validateTypeErrors('buckets', ['category', 'number-array']);
+        validateTypeErrors('buckets', ['color', 'number-array']);
+        validateTypeErrors('buckets', ['number', 'color-array']);
         validateMaxArgumentsError('buckets', ['number', 'number-array', 'number']);
     });
 

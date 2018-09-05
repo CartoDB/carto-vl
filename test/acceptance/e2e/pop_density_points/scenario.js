@@ -17,7 +17,7 @@ const source = new carto.source.Dataset('pop_density_points');
 const s = carto.expressions;
 const $dn = s.property('dn');
 const viz = new carto.Viz({
-    width: s.div(s.zoom(), 2 / 1024 * 300),
+    width: s.scaled(10, 4),
     color: s.ramp(s.linear($dn, 1, 300), s.palettes.PRISM),
     strokeColor: s.rgba(0, 0, 0, 0.2),
     strokeWidth: 1,

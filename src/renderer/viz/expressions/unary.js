@@ -1,4 +1,4 @@
-import { implicitCast, checkLooseType, checkType, checkMaxArguments } from './utils';
+import { implicitCast, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -287,7 +287,6 @@ function genUnaryOp (name, jsFn, glsl) {
             checkMaxArguments(arguments, 1, name);
 
             a = implicitCast(a);
-            checkLooseType(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
             this.inlineMaker = inlines => glsl(inlines.a);
