@@ -42,6 +42,7 @@ export default class Blend extends BaseExpression {
         checkExpression('blend', 'a', 0, a);
         checkExpression('blend', 'b', 1, b);
         checkExpression('blend', 'mix', 2, mix);
+
         if (a.type && b.type) {
             abTypeCheck(a, b);
         }
@@ -89,7 +90,9 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck (a, b) {
-    if (!((a.type === 'number' && b.type === 'number') || (a.type === 'color' && b.type === 'color'))) {
+    const validTypes = ['number', 'color', 'image', 'placement'];
+
+    if (!(validTypes.includes(a.type) && validTypes.includes(b.type))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }
