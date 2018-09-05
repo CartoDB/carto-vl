@@ -257,6 +257,8 @@ export default class Layer {
             viz.width._blendFrom(this._viz.width, ms, interpolator);
             viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
             viz.filter._blendFrom(this._viz.filter, ms, interpolator);
+            // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
+            // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
         }
 
         return this._vizChanged(viz).then(() => {

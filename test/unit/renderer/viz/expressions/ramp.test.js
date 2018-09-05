@@ -1,4 +1,4 @@
-import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateMaxArgumentsError, validateDynamicType } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
@@ -16,11 +16,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
     });
 
     describe('type', () => {
-        validateStaticType('ramp', ['number', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'color-array'], 'color');
-        validateStaticType('ramp', ['category', 'number-array'], 'number');
-        validateStaticType('ramp', ['category', 'image-array'], 'color');
+        validateDynamicType('ramp', ['number', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'color-array'], 'color');
+        validateDynamicType('ramp', ['category', 'number-array'], 'number');
+        validateDynamicType('ramp', ['category', 'image-array'], 'image');
     });
 
     describe('.eval', () => {

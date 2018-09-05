@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Query layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -43,6 +45,11 @@
       touchZoomRotate: false,
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -71,4 +78,5 @@
     }
   </script>
 </body>
+
 </html>

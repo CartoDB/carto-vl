@@ -84,7 +84,6 @@ export function validateStaticType (expressionName, argTypes, expectedType) {
 }
 export function validateDynamicType (expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
-        validateConstructorTimeType(expressionName, argTypes.map(getSimpleArg), expectedType);
         validateCompileTimeType(expressionName, argTypes.map(getPropertyArg), expectedType);
     });
 }

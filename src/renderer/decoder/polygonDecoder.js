@@ -57,9 +57,19 @@ export function decodePolygon (geometry) {
         breakpoints.push(index);
     }
 
+    const verticesArrayBuffer = new ArrayBuffer(4 * index);
+    const normalsArrayBuffer = new ArrayBuffer(4 * index);
+    const vertices = new Float32Array(verticesArrayBuffer);
+    const normals = new Float32Array(normalsArrayBuffer);
+    for (let i = 0; i < index; i++) {
+        vertices[i] = geomBuffer.vertices[i];
+        normals[i] = geomBuffer.normals[i];
+    }
     return {
-        vertices: geomBuffer.vertices.slice(0, index),
-        normals: geomBuffer.normals.slice(0, index),
+        vertices,
+        normals,
+        verticesArrayBuffer,
+        normalsArrayBuffer,
         featureIDToVertexIndex,
         breakpoints
     };
