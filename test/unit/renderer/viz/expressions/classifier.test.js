@@ -17,6 +17,61 @@ import {
 import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/classifier', () => {
+    const $price = property('price');
+    const METADATA = new Metadata({
+        properties: {
+            price: {
+                type: 'number',
+                min: 0,
+                max: 5
+            }
+        },
+        sample: [{
+            price: 0
+        },
+        {
+            price: 1
+        },
+        {
+            price: 2
+        },
+        {
+            price: 3
+        },
+        {
+            price: 4
+        },
+        {
+            price: 5
+        }
+        ]
+    });
+
+    function prepare (expr) {
+        expr._bindMetadata(METADATA);
+        expr._resetViewportAgg(METADATA);
+        expr.accumViewportAgg({
+            price: 0
+        });
+        expr.accumViewportAgg({
+            price: 1
+        });
+
+        expr.accumViewportAgg({
+            price: 2
+        });
+        expr.accumViewportAgg({
+            price: 3
+        });
+
+        expr.accumViewportAgg({
+            price: 4
+        });
+        expr.accumViewportAgg({
+            price: 5
+        });
+    }
+
     describe('error control', () => {
         validateCompileTypeError('viewportQuantiles', []);
         validateCompileTypeError('viewportQuantiles', ['number', 'category']);
@@ -51,61 +106,20 @@ describe('src/renderer/viz/expressions/classifier', () => {
         validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
     });
 
-    describe('eval', () => {
-        const $price = property('price');
-        const METADATA = new Metadata({
-            properties: {
-                price: {
-                    type: 'number',
-                    min: 0,
-                    max: 5
-                }
-            },
-            sample: [{
-                price: 0
-            },
-            {
-                price: 1
-            },
-            {
-                price: 2
-            },
-            {
-                price: 3
-            },
-            {
-                price: 4
-            },
-            {
-                price: 5
-            }
-            ]
+    describe('.eval', () => {
+        it('globalQuantiles', () => {
+            const q = globalQuantiles($price, 2);
+
+            prepare(q);
+
+            expect(q.eval({ price: -1 })).toEqual(0);
+            expect(q.eval({ price: 2 })).toEqual(0);
+            expect(q.eval({ price: 3.5 })).toEqual(1);
+            expect(q.eval({ price: 20 })).toEqual(1);
         });
+    });
 
-        function prepare (expr) {
-            expr._bindMetadata(METADATA);
-            expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({
-                price: 0
-            });
-            expr.accumViewportAgg({
-                price: 1
-            });
-
-            expr.accumViewportAgg({
-                price: 2
-            });
-            expr.accumViewportAgg({
-                price: 3
-            });
-
-            expr.accumViewportAgg({
-                price: 4
-            });
-            expr.accumViewportAgg({
-                price: 5
-            });
-        }
+    describe('.getBreakpointList', () => {
         it('globalQuantiles($price, 2)', () => {
             const q = globalQuantiles($price, 2);
             prepare(q);
