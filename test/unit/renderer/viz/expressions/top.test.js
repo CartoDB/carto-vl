@@ -45,4 +45,59 @@ describe('src/renderer/viz/expressions/top', () => {
             window.setTimeout = realWindowSetTimeout;
         });
     });
+
+    describe('eval', () => {
+        const meta = {
+            properties: {
+                wadus: {
+                    type: 'category',
+                    categories: [
+                        {
+                            name: 'D',
+                            frequency: 2
+                        },
+                        {
+                            name: 'B',
+                            frequency: 5
+                        },
+                        {
+                            name: 'A',
+                            frequency: 10
+                        },
+                        {
+                            name: 'C',
+                            frequency: 1
+                        }
+                    ]
+                }
+            }
+        };
+
+        it('should work with 1 bucket', () => {
+            const top = s.top(s.prop('wadus'), 1);
+            top._bindMetadata(meta);
+            expect(top.eval({wadus: 'A'})).toEqual(0);
+            expect(top.eval({wadus: 'B'})).toEqual(-1);
+            expect(top.eval({wadus: 'C'})).toEqual(-1);
+            expect(top.eval({wadus: 'D'})).toEqual(-1);
+        });
+
+        it('should work with 2 buckets', () => {
+            const top = s.top(s.prop('wadus'), 2);
+            top._bindMetadata(meta);
+            expect(top.eval({wadus: 'A'})).toEqual(0);
+            expect(top.eval({wadus: 'B'})).toEqual(1);
+            expect(top.eval({wadus: 'C'})).toEqual(-1);
+            expect(top.eval({wadus: 'D'})).toEqual(-1);
+        });
+
+        it('should work with 4 bucket', () => {
+            const top = s.top(s.prop('wadus'), 4);
+            top._bindMetadata(meta);
+            expect(top.eval({wadus: 'A'})).toEqual(0);
+            expect(top.eval({wadus: 'B'})).toEqual(1);
+            expect(top.eval({wadus: 'C'})).toEqual(3);
+            expect(top.eval({wadus: 'D'})).toEqual(2);
+        });
+    });
 });

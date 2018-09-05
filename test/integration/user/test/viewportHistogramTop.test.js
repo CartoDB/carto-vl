@@ -1,5 +1,6 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
+import { OTHERS_LABEL, OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
 
 const feature1 = {
     type: 'Feature',
@@ -63,8 +64,8 @@ describe('viewportHistogram() with top()', () => {
     it('should return the valid histogram', (done) => {
         layer.on('loaded', () => {
             expect(viz.variables.histogram.value).toEqual([
-                { x: 'a', y: 2 },
-                { x: 'CARTOVL_TOP_OTHERS_BUCKET', y: 1 }
+                { x: 0, y: 2 },
+                { x: OTHERS_INDEX, y: 1 }
             ]);
             done();
         });

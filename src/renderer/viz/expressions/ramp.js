@@ -927,7 +927,7 @@ function _categoryPropertyPrefaceGLSL (uid) {
     return `
         uniform sampler2D texRampTranslate${uid};
         float ramp_translate${uid}(float s){
-            vec2 v = vec2(mod(s, ${max}}), floor(s / ${max}));
+            vec2 v = vec2(mod(s, ${max}), floor(s / ${max}));
             return texture2D(texRampTranslate${uid}, v/${max}).a;
         }
     `;
