@@ -2,6 +2,7 @@ import mitt from 'mitt';
 import Layer from '../Layer';
 import { WM_R, projectToWebMercator } from '../utils/util';
 import { wToR } from '../client/rsys';
+import CartoValidationError from '../errors/carto-validation-error';
 
 /**
  *
@@ -189,8 +190,8 @@ export default class Interactivity {
 
         if (!event ||
             (!this._numListeners['featureEnter'] &&
-             !this._numListeners['featureHover'] &&
-             !this._numListeners['featureLeave'])) {
+                !this._numListeners['featureHover'] &&
+                !this._numListeners['featureLeave'])) {
             return;
         }
 
@@ -288,23 +289,23 @@ export default class Interactivity {
 
 function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
-        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
+        throw new CartoValidationError('interactivity', 'invalidLayerList');
     }
     if (!layerList.length) {
-        throw new Error('Invalid argument, layer list must not be empty');
+        throw new CartoValidationError('interactivity', 'emptyLayerList');
     }
     if (!layerList.every(layer => layer instanceof Layer)) {
-        throw new Error('Invalid layer, layer must be an instance of carto.Layer');
+        throw new CartoValidationError('interactivity', 'invalidLayer');
     }
 }
 function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
-        throw new Error('Invalid argument, all layers must belong to the same map');
+        throw new CartoValidationError('interactivity', 'notSameMap');
     }
 }
 
 function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
-        throw new Error(`Unrecognized event: ${eventName}. Available events: ${EVENTS.join(', ')}`);
+        throw new CartoValidationError('interactivity', `unrecognizedEvent[${eventName}, ${EVENTS.join(', ')}]`);
     }
 }

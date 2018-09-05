@@ -292,7 +292,7 @@ export default class Viz {
                 return;
             }
             if (temporarilyMarkedSet.has(node)) {
-                throw new Error('Viz contains a circular dependency');
+                throw new CartoValidationError('viz', 'circularDependency');
             }
             temporarilyMarkedSet.add(node);
             node._getDependencies().forEach(visit);
@@ -380,7 +380,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            throw new Error('No child found');
+            throw new CartoValidationError('viz', 'noChildFound');
         }
     }
 

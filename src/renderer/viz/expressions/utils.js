@@ -1,11 +1,12 @@
 import { number, category, array, imageList } from '../expressions';
 import BaseExpression from './base';
+import CartoValidationError from '../../../errors/carto-validation-error';
 
 export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new CartoValidationError('expressions', `expressionMaxArgsExceeded[${expressionName}, ${maxArguments}, ${constructorArguments.length}]`);
     }
 }
 
@@ -71,8 +72,7 @@ export function hexToRgb (hex) {
             a: parseInt(result[4], 16) / 255
         };
     }
-
-    throw new Error('Invalid hexadecimal color');
+    throw new CartoValidationError('expressions', 'expressionInvalidHex');
 }
 
 export function getOrdinalFromIndex (index) {
@@ -89,28 +89,28 @@ export function getStringErrorPreface (expressionName, parameterName, parameterI
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-expected type was '${expectedType}', actual type was '${actualType}'`);
+    const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+    throw new CartoValidationError('expressions', `expressionInvalidType[${errorPreface}, ${expectedType}, ${actualType}]`);
 }
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${actualInstance}' is not an instance of '${expectedClass.name}'`);
+    const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+    throw new CartoValidationError('expressions', `expressionInvalidInstance[${errorPreface}, ${actualInstance}, ${expectedClass.name}]`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    type of '${number}' is ${typeof number}, 'number' was expected`);
+    const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+    throw new CartoValidationError('expressions', `expressionInvalidNumber[${errorPreface}, ${number}, ${typeof number}]`);
 }
 
 export function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${array}' is not an array`);
+    const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+    throw new CartoValidationError('expressions', `expressionInvalidArray[${errorPreface}, ${array}]`);
 }
 
 export function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${str}' is not a string`);
+    const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+    throw new CartoValidationError('expressions', `expressionInvalidString[${errorPreface}, ${str}]`);
 }
 
 // Try to check the type, but accept undefined types without throwing, unless the expected type had to be known at constructor time
@@ -144,8 +144,8 @@ export function isArgConstructorTimeTyped (arg) {
 
 export function checkExpression (expressionName, parameterName, parameterIndex, parameter) {
     if (!(parameter instanceof BaseExpression)) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type carto.expressions.Base`);
+        const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+        throw new CartoValidationError('expressions', `expressionParamIsNotExp[${errorPreface}, ${parameter}]`);
     }
 }
 
@@ -156,8 +156,8 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
             parameter.type === type
         );
         if (!ok) {
-            throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-            expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
+            const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+            throw new CartoValidationError('expressions', `expressionInvalidType[${errorPreface}, ${expectedType.join()}, ${parameter.type}]`);
         }
     } else if (parameter.type !== expectedType) {
         throwInvalidType(expressionName, parameterName, parameterIndex, expectedType, parameter.type);
@@ -191,8 +191,8 @@ export function checkArray (expressionName, parameterName, parameterIndex, array
 
 export function checkFeatureIndependent (expressionName, parameterName, parameterIndex, parameter) {
     if (parameter.isFeatureDependent()) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        parameter cannot be feature dependent`);
+        const errorPreface = getStringErrorPreface(expressionName, parameterName, parameterIndex);
+        throw new CartoValidationError('expressions', `expressionNonFeatureIndependent[${errorPreface}]`);
     }
 }
 

@@ -1,4 +1,6 @@
 import { version } from '../../package';
+import CartoValidationError from '../errors/carto-validation-error';
+import CartoSecurityError from '../errors/carto-security-error';
 import MVT from '../sources/MVT';
 import Metadata from '../renderer/Metadata';
 import schema from '../renderer/schema';
@@ -77,9 +79,8 @@ export default class Windshaft {
             const aggregatedUsage = usages.some(x => x.type === 'aggregated');
             const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new Error(`Incompatible combination of cluster aggregation usages (${
-                    JSON.stringify(usages.filter(x => x.type === 'aggregated'))
-                }) with unaggregated usage for property '${propertyName}'`);
+                const aggregatedUsages = JSON.stringify(usages.filter(x => x.type === 'aggregated'));
+                throw new CartoValidationError('windshaft', `incompatibleClusterAggr[${aggregatedUsages}, ${propertyName}]`);
             }
         });
     }
@@ -188,7 +189,7 @@ export default class Windshaft {
                 case 'number':
                     return propertyValue;
                 default:
-                    throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+                    throw new CartoValidationError('windshaft', `decodingError[${typeof propertyValue}])`);
             }
         };
         this.urlTemplates = urlTemplates;
@@ -226,7 +227,7 @@ export default class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new Error('Aggregation not supported for this dataset');
+                throw new CartoValidationError('windshaft', 'aggrNotSupported');
             }
         }
     }
@@ -326,16 +327,16 @@ export default class Windshaft {
         try {
             response = await fetch(getMapRequest(conf, mapConfigAgg));
         } catch (error) {
-            throw new Error(`Failed to connect to Maps API with your user('${this._source._username}')`);
+            throw new CartoValidationError('windshaft', `failedMapsConnection[${this._source._username}]`);
         }
         const layergroup = await response.json();
         if (!response.ok) {
             if (response.status === 401) {
-                throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
+                throw new CartoSecurityError('windshaft', `unauthorizedAccessToMaps[${this._source._username}, ${this._source._apiKey}]`);
             } else if (response.status === 403) {
-                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`);
+                throw new CartoSecurityError('windshaft', `unauthorizedAccessToDataset[${this._source._apiKey}]`);
             }
-            throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+            throw new CartoValidationError('windshaft', `sqlErrors[${JSON.stringify(layergroup.errors)}]`);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
@@ -401,7 +402,7 @@ function adaptGeometryType (type) {
         case 'ST_LineString':
             return 'line';
         default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            throw new CartoValidationError('windshaft', `unimplementedGeometryType[${type}]`);
     }
 }
 

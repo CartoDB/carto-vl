@@ -1,6 +1,7 @@
 /* eslint quotes: "off" */
 
 import { parseVizDefinition, cleanComments } from '../../../../src/renderer/viz/parser';
+import CartoValidationError from '../../../../src/errors/carto-validation-error';
 
 describe('src/renderer/viz/parser', () => {
     // TODO: missing lots of tests here
@@ -75,19 +76,21 @@ describe('src/renderer/viz/parser', () => {
 
     describe('duplicated properties', () => {
         it('should throw an error', () => {
+            const expectedError = new CartoValidationError('parser', `alreadyDefined[Property, width]`);
             expect(() => parseVizDefinition(`
                 width: 1
                 width: 2
-            `)).toThrowError('Property \'width\' is already defined.');
+            `)).toThrowError(expectedError.message);
         });
     });
 
     describe('duplicated variables', () => {
         it('should throw an error', () => {
+            const expectedError = new CartoValidationError('parser', `alreadyDefined[Variable, a]`);
             expect(() => parseVizDefinition(`
                 @a: 1
                 @a: 2
-            `)).toThrowError('Variable \'a\' is already defined.');
+            `)).toThrowError(expectedError.message);
         });
     });
 

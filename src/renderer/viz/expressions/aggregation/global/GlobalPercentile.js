@@ -1,6 +1,7 @@
 import BaseExpression from '../../base';
 import { number } from '../../../expressions';
 import { checkMaxArguments } from '../../utils';
+import CartoValidationError from '../../../../../errors/carto-validation-error';
 /**
  * Return the Nth percentile of an numeric property for the entire source data.
  *
@@ -31,7 +32,7 @@ export default class GlobalPercentile extends BaseExpression {
         checkMaxArguments(arguments, 2, 'globalPercentile');
 
         if (!Number.isFinite(percentile)) {
-            throw new Error('Percentile must be a fixed literal number');
+            throw new CartoValidationError('expressions', 'aggregPercentileMustBeNumber');
         }
         super({ _value: number(0) });
         // TODO improve type check

@@ -1,6 +1,7 @@
 import { decodePoint } from './pointDecoder';
 import { decodeLine } from './lineDecoder';
 import { decodePolygon } from './polygonDecoder';
+import CartoValidationError from '../../errors/carto-validation-error';
 
 export function decodeGeom (geomType, geom) {
     switch (geomType) {
@@ -11,6 +12,6 @@ export function decodeGeom (geomType, geom) {
         case 'polygon':
             return decodePolygon(geom);
         default:
-            throw new Error(`Unimplemented geometry type: '${geomType}'`);
+            throw new CartoValidationError('renderer', `unimplementedGeometryType[${geomType}]`);
     }
 }

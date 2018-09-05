@@ -1,4 +1,5 @@
 import Cache from './Cache';
+import CartoValidationError from '../../errors/carto-validation-error';
 
 let programID = 1;
 const shaderCache = new Cache();
@@ -32,7 +33,7 @@ export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     gl.deleteShader(fragmentShader);
 
     if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
+        throw new CartoValidationError('renderer', `unableToLinkShader[${gl.getProgramInfoLog(shader.program)}]`);
     }
 
     shader.programID = programID++;
@@ -53,7 +54,7 @@ function _compileShader (gl, sourceCode, type) {
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+        throw new CartoValidationError('renderer', `errorCompilingShaders[${log}, ${sourceCode}]`);
     }
 
     shaderCache.set(gl, sourceCode, shader);

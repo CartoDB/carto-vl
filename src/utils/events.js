@@ -1,3 +1,4 @@
+import CartoValidationError from '../errors/carto-validation-error';
 
 let registeredHandlers = [];
 
@@ -44,7 +45,7 @@ export function on (eventName, layerList, callback) {
             internalCallbacks.push(internalCallback);
         });
     } else {
-        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
+        throw new CartoValidationError('layer', `unsupported-event[${eventName}]`);
     }
     registeredHandlers.push({
         eventName,

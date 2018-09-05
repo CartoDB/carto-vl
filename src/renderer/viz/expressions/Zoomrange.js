@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { pow, blend, linear, zoom } from '../expressions';
 import { implicitCast, checkType } from './utils';
+import CartoValidationError from '../../../errors/carto-validation-error';
 
 /**
  * Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).
@@ -39,7 +40,7 @@ export default class Zoomrange extends BaseExpression {
     _bindMetadata (metadata) {
         checkType('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
-            throw new Error('zoomrange() function must receive a list with at least two elements');
+            throw new CartoValidationError('expressions', 'zoomrangeLessThanTwo');
         }
         function genImpostor (list, numerator, denominator) {
             if (list.length === 1) {

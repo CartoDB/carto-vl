@@ -1,5 +1,6 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
+import CartoValidationError from '../errors/carto-validation-error';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -41,7 +42,7 @@ export default class Renderer {
         if (canvas) {
             this.gl = canvas.getContext('webgl');
             if (!this.gl) {
-                throw new Error('WebGL 1 is unsupported');
+                throw new CartoValidationError('renderer', 'unsupportedWebGL1');
             }
             this._initGL(this.gl);
         }
@@ -91,11 +92,11 @@ export default class Renderer {
         this.gl = gl;
         const OESTextureFloat = gl.getExtension('OES_texture_float');
         if (!OESTextureFloat) {
-            throw new Error('WebGL extension OES_texture_float is unsupported');
+            throw new CartoValidationError('renderer', 'unsupportedOESTextureFloat');
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+            throw new CartoValidationError('renderer', `maxRenderBufferSizeBelow[${supportedRTT}, ${RTT_WIDTH}]`);
         }
         this._initShaders();
 

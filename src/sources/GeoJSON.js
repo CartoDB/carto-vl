@@ -172,7 +172,7 @@ export default class GeoJSON extends Base {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError('source', `geojsonPropMixedType[${propertyName}]`);
         }
         this._addNumericColumnField(propertyName);
         const property = this._properties[propertyName];
@@ -197,7 +197,7 @@ export default class GeoJSON extends Base {
 
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError('source', `geojsonPropMixedType[${propertyName}]`);
         }
         this._addDateColumnField(propertyName);
         const column = this._properties[propertyName];
@@ -234,7 +234,7 @@ export default class GeoJSON extends Base {
 
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError('source', `geojsonPropMixedType[${propertyName}]`);
         }
         if (!this._catFields.has(propertyName)) {
             this._catFields.add(propertyName);

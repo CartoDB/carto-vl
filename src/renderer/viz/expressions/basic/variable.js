@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
+import CartoValidationError from '../../../../errors/carto-validation-error';
 
 /**
  * Alias to a named variable defined in the Viz.
@@ -42,14 +43,14 @@ export default function variable (name) {
     checkString('variable', 'name', 0, name);
 
     if (name === '') {
-        throw new Error('variable(): invalid parameter, zero-length string');
+        throw new CartoValidationError('expressions', 'variableEmptyName');
     }
     let alias;
     const resolve = aliases => {
         if (aliases[name]) {
             alias = aliases[name];
         } else {
-            throw new Error(`variable() name '${name}' doesn't exist`);
+            throw new CartoValidationError('expressions', `variableNotExists[${name}]`);
         }
     };
     const _getDependencies = () => {

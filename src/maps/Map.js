@@ -1,4 +1,5 @@
 import { layerVisibility } from '../constants/layer';
+import CartoValidationError from '../errors/carto-validation-error';
 /**
  * @description A simple non-interactive map.
  */
@@ -19,7 +20,7 @@ export default class Map {
         if (typeof options.container === 'string') {
             const container = window.document.getElementById(options.container);
             if (!container) {
-                throw new Error(`Container '${options.container}' not found.`);
+                throw new CartoValidationError('map', `containerNotFound[${options.container}]`);
             } else {
                 this._container = container;
             }
@@ -151,7 +152,7 @@ export default class Map {
                 this._gl.clear(this._gl.COLOR_BUFFER_BIT);
                 break;
             default:
-                // white
+            // white
         }
     }
 

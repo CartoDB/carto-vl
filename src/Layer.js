@@ -4,6 +4,7 @@ import Viz from './Viz';
 import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
+import CartoError from './errors/carto-error';
 import CartoValidationError from './errors/carto-validation-error';
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
@@ -127,7 +128,7 @@ export default class Layer {
             map.addLayer(this, beforeLayerID);
         } catch (error) {
             if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
+                throw new CartoError(error);
             }
 
             map.on('load', () => {
@@ -179,7 +180,7 @@ export default class Layer {
 
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoValidationError('layer', 'atomicChange');
         }
 
         // Everything was ok => commit changes
@@ -197,7 +198,7 @@ export default class Layer {
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoValidationError('layer', 'atomicChange');
         }
 
         if (this._viz) {
@@ -462,7 +463,7 @@ export default class Layer {
     async _vizChanged (viz) {
         await this._context;
         if (!this._source) {
-            throw new Error('A source is required before changing the viz');
+            throw new CartoValidationError('layer', 'sourceRequiredToChangeViz');
         }
 
         const source = this._source;
@@ -471,7 +472,7 @@ export default class Layer {
         await loadImagesPromise;
 
         if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+            throw new CartoValidationError('layer', 'sourceChangeStaleMetadata');
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);

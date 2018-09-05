@@ -28,10 +28,10 @@ describe('errors/CartoValidationError', () => {
     });
 
     it('should work with >1 template params in message', () => {
-        const error = new CartoValidationError('source', 'windshaftIncompatibleClusterAggr[{whatever}, propertyName]');
+        const error = new CartoValidationError('windshaft', 'incompatibleClusterAggr[{whatever}, propertyName]');
         expect(error.origin).toBe('validation');
-        expect(error.type).toBe('source');
-        const expected = ERROR_LIST.validation.source['windshaft-incompatible-cluster-aggr'].friendlyMessage
+        expect(error.type).toBe('windshaft');
+        const expected = ERROR_LIST.validation.windshaft['incompatible-cluster-aggr'].friendlyMessage
             .replace('$0', '{whatever}')
             .replace('$1', 'propertyName');
         expect(error.message).toBe(expected);

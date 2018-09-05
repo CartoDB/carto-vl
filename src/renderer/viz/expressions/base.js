@@ -1,6 +1,7 @@
 import { implicitCast } from './utils';
 import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
+import CartoValidationError from '../../../errors/carto-validation-error';
 
 /**
  * Abstract expression class
@@ -66,7 +67,7 @@ export default class Base {
      *
      */
     eval (feature) {
-        throw new Error('Unimplemented');
+        throw new CartoValidationError('expressions', 'expressionUnimplementedEval');
     }
 
     /**
@@ -128,7 +129,7 @@ export default class Base {
 
     _initializeChildrenArray (children) {
         if (this.maxParameters && this.maxParameters < children.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError('expressions', 'expressionExtraParameters');
         }
 
         this.childrenNames = [];
@@ -144,7 +145,7 @@ export default class Base {
         this.childrenNames = Object.keys(children);
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError('expressions', 'expressionExtraParameters');
         }
 
         Object.keys(children).map(name => {

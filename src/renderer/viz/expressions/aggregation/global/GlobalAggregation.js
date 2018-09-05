@@ -1,6 +1,7 @@
 import BaseExpression from '../../base';
 import { number } from '../../../expressions';
 import { implicitCast } from '../../utils';
+import CartoValidationError from '../../../../../errors/carto-validation-error';
 
 export default class GlobalAggregation extends BaseExpression {
     /**
@@ -32,7 +33,7 @@ export default class GlobalAggregation extends BaseExpression {
         this.property._bindMetadata(metadata);
         // TODO improve type check
         if (metadata.properties[this.property.name][this._name] === undefined) {
-            throw new Error(`Metadata ${this._name} for property ${this.property.name} is not defined`);
+            throw new CartoValidationError('expressions', `aggrUndefinedMetadataForProperty[${this._name}, ${this.property.name}]`);
         }
         this._value.expr = metadata.properties[this.property.name][this._name];
     }

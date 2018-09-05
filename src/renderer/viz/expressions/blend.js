@@ -1,6 +1,7 @@
 import { implicitCast, clamp, mix, checkLooseType, checkType, checkExpression, checkMaxArguments } from './utils';
 import Transition from './transition';
 import BaseExpression from './base';
+import CartoValidationError from '../../../errors/carto-validation-error';
 
 /**
  * Linearly interpolate from `a` to `b` based on `mix`.
@@ -90,7 +91,8 @@ export default class Blend extends BaseExpression {
 }
 
 function abTypeCheck (a, b) {
-    if (!((a.type === 'number' && b.type === 'number') || (a.type === 'color' && b.type === 'color'))) {
-        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
+    const validTypes = ['number', 'color', 'image', 'placement'];
+    if (a.type !== b.type || !(validTypes.includes(a.type))) {
+        throw new CartoValidationError('expressions', `blendWrongSignature[${a.type}, ${b.type}]`);
     }
 }

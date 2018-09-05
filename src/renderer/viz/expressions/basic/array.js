@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
+import CartoValidationError from '../../../../errors/carto-validation-error';
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
@@ -24,7 +25,7 @@ export default class BaseArray extends BaseExpression {
 
         elems = elems.map(implicitCast);
         if (!elems.length) {
-            throw new Error('array(): invalid parameters: must receive at least one argument');
+            throw new CartoValidationError('expressions', 'arrayNoElements');
         }
 
         let type = '';
@@ -37,13 +38,13 @@ export default class BaseArray extends BaseExpression {
         }
 
         if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+            throw new CartoValidationError('expressions', `arrayInvalidParamType[${type}]`);
         }
 
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type !== type && item.type !== undefined) {
-                throw new Error(`array(): invalid ${getOrdinalFromIndex(index + 1)} parameter type, invalid argument type combination`);
+                throw new CartoValidationError('expressions', `arrayInvalidParamTypeCombination[${getOrdinalFromIndex(index + 1)}]`);
             }
         });
 
@@ -70,12 +71,12 @@ export default class BaseArray extends BaseExpression {
 
         const type = this.elems[0].type;
         if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+            throw new CartoValidationError('expressions', `arrayInvalidParamType[${type}]`);
         }
         this.elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type !== type) {
-                throw new Error(`array(): invalid ${getOrdinalFromIndex(index)} parameter, invalid argument type combination`);
+                throw new CartoValidationError('expressions', `arrayInvalidParamTypeCombination[${getOrdinalFromIndex(index)}]`);
             }
         });
     }
