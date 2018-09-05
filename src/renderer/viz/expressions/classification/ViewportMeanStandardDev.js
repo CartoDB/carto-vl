@@ -1,6 +1,5 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
+import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalMeanStandardDev';
 
