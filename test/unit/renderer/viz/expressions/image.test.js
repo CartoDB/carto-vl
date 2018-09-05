@@ -1,5 +1,4 @@
 import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from './utils';
-import { image } from '../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/image', () => {
     describe('error control', () => {
@@ -13,10 +12,7 @@ describe('src/renderer/viz/expressions/image', () => {
     });
 
     describe('type', () => {
-        validateStaticType('image', ['wadus.svg'], 'color');
-        it('should include the `isImage` flag', () => {
-            expect(image('wadus').isImage).toBe(true);
-        });
+        validateStaticType('image', ['wadus.svg'], 'image');
     });
 
     describe('eval', () => {

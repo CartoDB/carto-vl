@@ -1,6 +1,5 @@
 import Base from './base';
 import { checkArray, checkMaxArguments, checkExpression, checkType } from './utils';
-import Image from './Image';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.
