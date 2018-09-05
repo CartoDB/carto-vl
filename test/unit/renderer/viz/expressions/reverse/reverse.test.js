@@ -1,4 +1,4 @@
-import { validateStaticType, validateMaxArgumentsError, validateCompileTypeError } from '../utils';
+import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from '../utils';
 import reverse from '../../../../../../src/renderer/viz/expressions/reverse/reverse';
 import { palettes, namedColor } from '../../../../../../src/renderer/viz/expressions';
 import Time from '../../../../../../src/renderer/viz/expressions/time';
@@ -11,7 +11,7 @@ describe('src/renderer/viz/expressions/reverse', () => {
         validateStaticType('reverse', ['palette'], 'palette');
     });
     describe('error control', () => {
-        validateCompileTypeError('reverse', ['number']);
+        validateTypeErrors('reverse', ['number']);
         validateMaxArgumentsError('reverse', [[1, 2], 0]);
         validateMaxArgumentsError('reverse', ['palette', 0]);
     });

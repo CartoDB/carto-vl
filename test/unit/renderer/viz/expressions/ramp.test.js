@@ -1,4 +1,4 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateMaxArgumentsError, validateDynamicType } from './utils';
 import * as cartocolor from 'cartocolor';
 import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
@@ -8,19 +8,19 @@ const DEFAULT_COLOR = namedColor('gray');
 
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('ramp', []);
-        validateStaticTypeErrors('ramp', ['number']);
-        validateStaticTypeErrors('ramp', ['category']);
-        validateDynamicTypeErrors('ramp', ['number', 'image-array']);
+        validateTypeErrors('ramp', []);
+        validateTypeErrors('ramp', ['number']);
+        validateTypeErrors('ramp', ['category']);
+        validateTypeErrors('ramp', ['number', 'image-array']);
         validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('ramp', ['number', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'color-array'], 'color');
-        validateStaticType('ramp', ['category', 'number-array'], 'number');
-        validateStaticType('ramp', ['category', 'image-array'], 'color');
+        validateDynamicType('ramp', ['number', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'color-array'], 'color');
+        validateDynamicType('ramp', ['category', 'number-array'], 'number');
+        validateDynamicType('ramp', ['category', 'image-array'], 'image');
     });
 
     describe('.eval', () => {

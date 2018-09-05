@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkExpression, checkLooseType, checkType, checkMaxArguments, clamp } from '../utils';
+import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
 import CartoValidationError from '../../../../errors/carto-validation-error';
 
 /**
@@ -64,13 +64,13 @@ function genHSL (name, alpha) {
 
             const children = { h, s, l };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'number', a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
 
-            hslCheckType('h', 0, h);
-            hslCheckType('s', 1, s);
-            hslCheckType('l', 2, l);
+            checkExpression(name, 'h', 0, h);
+            checkExpression(name, 's', 1, s);
+            checkExpression(name, 'l', 2, l);
 
             super(children);
             this.type = 'color';

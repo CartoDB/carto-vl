@@ -1,4 +1,4 @@
-import { validateStaticType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
+import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 import { alphaNormalize, rgb, property } from '../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/AlphaNormalize', () => {
@@ -7,9 +7,9 @@ describe('src/renderer/viz/expressions/AlphaNormalize', () => {
     });
     describe('error control', () => {
         validateMaxArgumentsError('alphaNormalize', ['color', 'number', 'number']);
-        validateCompileTypeError('alphaNormalize', []);
-        validateCompileTypeError('alphaNormalize', ['color']);
-        validateCompileTypeError('alphaNormalize', ['color', 'category']);
+        validateTypeErrors('alphaNormalize', []);
+        validateTypeErrors('alphaNormalize', ['color']);
+        validateTypeErrors('alphaNormalize', ['color', 'category']);
     });
     describe('eval', () => {
         it('should return a normalized color', () => {
