@@ -67,6 +67,13 @@ describe('src/renderer/viz/parser', () => {
         });
     });
 
+    describe('AND/OR are accepted', () => {
+        it('`color: rgb(255,255,255)\nfilter: 1 or 0` should not throw', () => {
+            const str = 'color: rgb(255,255,255)\nfilter: 1 OR 0';
+            expect(() => parseVizDefinition(str)).not.toThrow();
+        });
+    });
+
     describe('invalid identifier', () => {
         it('should throw an error', () => {
             expect(() => parseVizDefinition('width: wadus')).toThrow();
