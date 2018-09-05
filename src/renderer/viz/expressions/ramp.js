@@ -10,6 +10,7 @@ import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
 import CIELabGLSL from './color/CIELab.glsl';
+import CategoryIndex from './CategoryIndex';
 
 const DEFAULT_OTHERS_NAME = 'CARTOVL_OTHERS';
 const MAX_SAMPLES = 100;
@@ -39,7 +40,6 @@ const inputTypes = {
 
 const COLOR_ARRAY_LENGTH = 256;
 const MAX_BYTE_VALUE = 255;
-const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -114,9 +114,6 @@ export default class Ramp extends BaseExpression {
         }
 
         super({ input, palette });
-
-        this.minKey = 0;
-        this.maxKey = 1;
         this.palette = palette;
         this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
@@ -169,6 +166,10 @@ export default class Ramp extends BaseExpression {
     }
 
     _getMinMax (feature) {
+        const max = this.input.type === inputTypes.CATEGORY
+            ? this.input.numCategories - 1
+            : 1;
+
         if (this.input.isA(Linear)) {
             const name = Object.keys(feature)[0];
             const featureMin = _buildFeature(name, this.input.min.eval());
@@ -180,10 +181,8 @@ export default class Ramp extends BaseExpression {
             };
         }
 
-        return {
-            min: this.minKey,
-            max: this.maxKey
-        };
+        // FIXME
+        return { min: 0, max };
     }
 
     _getIndex (feature) {
@@ -437,7 +436,11 @@ export default class Ramp extends BaseExpression {
     }
 
     _evalNumberArray (feature, index) {
-        const m = (index - this.minKey) / (this.maxKey - this.minKey);
+        const max = this.input.type === inputTypes.CATEGORY
+            ? this.input.numCategories - 1
+            : 1;
+
+        const m = index / max;
 
         for (let i = 0; i < this.palette.elems.length - 1; i++) {
             const rangeMin = i / (this.palette.elems.length - 1);
@@ -480,8 +483,11 @@ export default class Ramp extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
-            this.input = new Linear(this.input);
+        if (this.input.isA(Property)) {
+            this.input = this.input.type === inputTypes.NUMBER
+                ? new Linear(this.input)
+                : new CategoryIndex(this.input);
+
             this.input._bindMetadata(metadata);
         }
 
@@ -504,38 +510,47 @@ export default class Ramp extends BaseExpression {
         }
 
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        let inputGLSL;
         let inline = '';
-        let preface = _basePrefaceGLSL(this._uid);
+        let preface = `
+            uniform float rampMax${this._uid};`;
 
-        if (this.input.type === inputTypes.CATEGORY && this.input.isA(Property)) {
-            inputGLSL = _categoryInlineInputGLSL(this._uid, input.inline);
-            preface += _categoryPropertyPrefaceGLSL(this._uid);
-        } else {
-            inputGLSL = _numberInlineInputGLSL(this._uid, input.inline);
-        }
-
-        if (this.palette.type === 'number-array') {
+        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
             const GLSLNums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
             const inlineGLSLNums = GLSLNums.map(num => num.inline);
             const GLSLBlend = this._generateGLSLBlend(inlineGLSLNums);
 
-            inline = _numberInlineGLSL(this._uid, inputGLSL);
-            preface += _numberPrefaceGLSL(this._uid, GLSLNums, GLSLBlend);
-        } else {
-            this.maxKey = this.input.numCategories - 1;
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            const cielabColors = colors.map(c => sRGBToCielab({
-                r: c.r / MAX_BYTE_VALUE,
-                g: c.g / MAX_BYTE_VALUE,
-                b: c.b / MAX_BYTE_VALUE,
-                a: c.a
-            }));
+            // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
+            // For example:
+            //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
+            //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
 
+            // With numeric arrays we use a combination of `mix` to allow for property-dependant values
+            inline = `ramp_num${this._uid}(${input.inline})`;
+            preface += `
+                ${GLSLNums.map(num => num.preface).join('\n')}
+    
+                float ramp_num${this._uid}(float x){
+                    return ${GLSLBlend};
+                }`;
+        } else {
+            const colors = this._getColorsFromPalette(this.input, this.palette);
+            const cielabColors = colors.map(color => sRGBToCielab({
+                r: color.r / MAX_BYTE_VALUE,
+                g: color.g / MAX_BYTE_VALUE,
+                b: color.b / MAX_BYTE_VALUE,
+                a: color.a
+            }));
             const GLSLColors = cielabColors.map(color => `vec4(${color.l.toFixed(20)}, ${color.a.toFixed(20)}, ${color.b.toFixed(20)}, ${color.alpha.toFixed(20)})`);
             const GLSLBlend = this._generateGLSLBlend(GLSLColors);
-            inline = _categoryInlineGLSL(this._uid, inputGLSL);
-            preface += _categoryPrefaceCielabGLSL(this._uid, CIELabGLSL, GLSLBlend);
+
+            inline = `cielabToSRGBA(ramp_color${this._uid}(${input.inline}))`;
+            preface += `
+                ${CIELabGLSL}
+                vec4 ramp_color${this._uid}(float x){
+                    return ${GLSLBlend};
+            }`;
         }
 
         return { preface: this._prefaceCode(input.preface + preface), inline };
@@ -568,8 +583,8 @@ export default class Ramp extends BaseExpression {
         }
 
         return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, this.defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, this.defaultOthersColor.eval());
+            ? _getColorsFromPaletteType(input, palette, this.input.numCategories, this.defaultOthersColor.eval())
+            : _getColorsFromColorArrayType(input, palette, this.input.numCategories, this.defaultOthersColor.eval());
     }
 
     _postShaderCompile (program, gl) {
@@ -578,15 +593,10 @@ export default class Ramp extends BaseExpression {
             super._postShaderCompile(program, gl);
             return;
         }
-        if (this.palette.type === 'number-array') {
-            this.palette.elems.forEach(e => e._postShaderCompile(program, gl));
-        }
 
+        this.palette._postShaderCompile(program, gl);
         this.input._postShaderCompile(program, gl);
-        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
-        this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
-        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
-        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
+        this._getBinding(program).rampMaxLoc = gl.getUniformLocation(program, `rampMax${this._uid}`);
     }
 
     _computeTextureIfNeeded () {
@@ -595,10 +605,6 @@ export default class Ramp extends BaseExpression {
         }
 
         this._texCategories = this.input.numCategories;
-        this.maxKey = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
         this._cachedTexturePixels = this.type === rampTypes.COLOR
             ? this._computeColorRampTexture()
             : this._computeNumericRampTexture();
@@ -679,56 +685,20 @@ export default class Ramp extends BaseExpression {
     }
 
     _preDraw (program, drawMetadata, gl) {
+        const max = this.input.type === inputTypes.CATEGORY
+            ? this.input.numCategories - 1
+            : 1;
+
         this.input._preDraw(program, drawMetadata, gl);
 
         if (this.palette.type === paletteTypes.IMAGE) {
             this.palette._preDraw(program, drawMetadata, gl);
             return;
-        } else if (this.palette.type === 'number-array') {
-            this.palette.elems.forEach(e => e._preDraw(program, drawMetadata, gl));
-            gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
-            gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
-            gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
-            return super._preDraw(program, drawMetadata, gl);
         }
 
-        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-        this._computeGLTextureIfNeeded(gl);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
-        gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
-        gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
-        drawMetadata.freeTexUnit++;
-
-        if (this.input.type === 'category' && this.input.isA(Property)) {
-            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-            const catIDs = this._metadata.properties[this.input.name].categories.length;
-            if (this._translatedIds !== catIDs) {
-                this._translatedIds = catIDs;
-                this._translateTexture = gl.createTexture();
-                const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
-                for (let i = 0; i < catIDs; i++) {
-                    const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
-                    const value = i / (catIDs - 1);
-                    const vec2Id = {
-                        x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
-                        y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
-                    };
-                    translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
-                }
-                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            } else {
-                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
-            }
-            gl.uniform1i(this._getBinding(program).texRampTranslateLoc, drawMetadata.freeTexUnit);
-            drawMetadata.freeTexUnit++;
-        }
+        this.palette._preDraw(program, drawMetadata, gl);
+        gl.uniform1f(this._getBinding(program).rampMaxLoc, max);
+        super._preDraw(program, drawMetadata, gl);
     }
 }
 
@@ -791,7 +761,7 @@ function _getSubPalettes (palette, numCategories) {
 function _getColorsFromColorArrayType (input, palette, numCategories, defaultOthersColor) {
     return input.type === inputTypes.CATEGORY
         ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, defaultOthersColor)
-        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
+        : palette.colors;
 }
 
 function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
@@ -810,21 +780,21 @@ function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, 
     }
 }
 
-function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
-    let othersColor;
+// function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
+//     let othersColor;
 
-    if (numCategories < colors.length) {
-        othersColor = colors[numCategories];
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    }
+//     if (numCategories < colors.length) {
+//         othersColor = colors[numCategories];
+//         return _avoidShowingInterpolation(numCategories, colors, othersColor);
+//     }
 
-    if (numCategories === colors.length) {
-        othersColor = colors[colors.length - 1];
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    }
+//     if (numCategories === colors.length) {
+//         othersColor = colors[colors.length - 1];
+//         return _avoidShowingInterpolation(numCategories, colors, othersColor);
+//     }
 
-    return colors;
-}
+//     return colors;
+// }
 
 function _addOthersColorToColors (colors, othersColor) {
     return [...colors, othersColor];
@@ -882,72 +852,4 @@ function _mixClampGLSL (currentColor, nextBlend, index, listLength) {
     const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
 
     return `mix(${currentColor}, ${nextBlend}, ${clamp})`;
-}
-
-/* Inlinge GLSL */
-
-function _categoryInlineInputGLSL (uid, inputInline) {
-    // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
-    return `ramp_translate${uid}(${inputInline})`;
-}
-
-function _categoryInlineGLSL (uid, inputGLSL) {
-    return `cielabToSRGBA(ramp_color${uid}(${inputGLSL}))`;
-}
-
-function _numberInlineInputGLSL (uid, inputInline) {
-    // With numerical inputs we only need to transform the input to the [0,1] range
-    return `((${inputInline}-keyMin${uid})/keyWidth${uid})`;
-}
-
-function _numberInlineGLSL (uid, inputGLSL) {
-    // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
-    // For example:
-    //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
-    //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
-    //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
-    //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
-
-    // With numeric arrays we use a combination of `mix` to allow for property-dependant values
-    return `ramp_num${uid}(${inputGLSL})`;
-}
-
-/* Preface GLSL */
-
-function _basePrefaceGLSL (uid) {
-    return `
-        uniform float keyMin${uid};
-        uniform float keyWidth${uid};
-    `;
-}
-
-function _categoryPropertyPrefaceGLSL (uid) {
-    const max = SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20);
-
-    return `
-        uniform sampler2D texRampTranslate${uid};
-        float ramp_translate${uid}(float s){
-            vec2 v = vec2(mod(s, ${max}), floor(s / ${max}));
-            return texture2D(texRampTranslate${uid}, v/${max}).a;
-        }
-    `;
-}
-
-function _numberPrefaceGLSL (uid, GLSLNums, GLSLBlend) {
-    return `
-        ${GLSLNums.map(num => num.preface).join('\n')}
-
-        float ramp_num${uid}(float x){
-            return ${GLSLBlend};
-        }
-    `;
-}
-
-function _categoryPrefaceCielabGLSL (uid, CIELabGLSL, GLSLBlend) {
-    return `
-        ${CIELabGLSL}
-        vec4 ramp_color${uid}(float x){
-            return ${GLSLBlend};
-        }
-    `;
 }
