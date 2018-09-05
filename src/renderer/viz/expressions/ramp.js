@@ -98,7 +98,6 @@ export default class Ramp extends BaseExpression {
         this.minKey = 0;
         this.maxKey = 1;
         this.palette = palette;
-        this.type = palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
         this.defaultOthersColor = new NamedColor('gray');
     }
 
@@ -168,6 +167,11 @@ export default class Ramp extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+
+        this.type = this.palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
+        if (this.palette.type === 'image-list') {
+            this.type = 'image';
+        }
 
         if (this.palette.type !== 'number-array') {
             this.palette = _calcPaletteValues(this.palette);
