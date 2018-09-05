@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ramp($category, ...) implementation is fixed when using multiple categorical properties
 - Use underscore in image constants
 - Use local basemaps for testing
+- Unary and Binary operators are case insensitive.
 
 ### Fixed
 - Fix animation example
