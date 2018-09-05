@@ -52,7 +52,6 @@ import { calculateBreakpoints } from './GlobalMeanStandardDev';
 export default class ViewportMeanStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
         checkMaxArguments(arguments, 3, 'viewportMeanStandardDev');
-        checkInstance('viewportMeanStandardDev', 'input', 0, Property, input && (input.property || input));
         checkNumber('viewportMeanStandardDev', 'buckets', 1, buckets);
         checkNumber('viewportMeanStandardDev', 'classSize', 2, classSize);
 
@@ -63,8 +62,7 @@ export default class ViewportMeanStandardDev extends Classifier {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('viewportMeanStandardDev', 'input', 0, this.input);
-        checkType('viewportMeanStandardDev', 'input', 0, 'number', this.input);
+        checkType('viewportMeanStandardDev', 'input', 0, ['number'], this.input);
     }
 
     _genBreakpoints () {
