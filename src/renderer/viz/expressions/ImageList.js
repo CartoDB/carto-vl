@@ -22,7 +22,7 @@ export default class ImageList extends Base {
         });
         super(children);
         this.numImages = imageArray.length;
-        this.type = 'image';
+        this.type = 'image-list';
     }
 
     _bindMetadata (meta) {

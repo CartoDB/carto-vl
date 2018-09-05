@@ -92,7 +92,7 @@ export default class Blend extends BaseExpression {
 function abTypeCheck (a, b) {
     const validTypes = ['number', 'color', 'image', 'placement'];
 
-    if (a.type !== b.type || !(validTypes.includes(a.type) && validTypes.includes(b.type))) {
+    if (a.type !== b.type || !(validTypes.includes(a.type))) {
         throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
     }
 }

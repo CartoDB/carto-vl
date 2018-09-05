@@ -9,12 +9,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add new `clusterCount()` expression
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions
+- Support symbol and symbolPlacement in features
 
 ### Changed
  - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
+- Unary and Binary operators are case insensitive.
 
 ### Fixed
 - Add default export to allow `import carto from '@carto/carto-vl';`
+- Fix `blendTo` with `circle` SVG
 
 ## [0.7.0] - 2018-08-24
 ### Added
@@ -24,8 +27,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Throw error for duplicated properties and variables
 - Throw error extra arguments are passed to any expression
 - Add reverse expression to arrays, besides palettes
-- Support symbol and symbolPlacement in features
-- Support `offset:` in combination with `symbol:`
 
 ### Changed
 - Improve polygon stroke rendering (+ joins)
@@ -37,7 +38,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - ramp($category, ...) implementation is fixed when using multiple categorical properties
 - Use underscore in image constants
 - Use local basemaps for testing
-- Unary and Binary operators are case insensitive.
 
 ### Fixed
 - Fix animation example
