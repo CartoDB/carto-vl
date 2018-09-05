@@ -53,8 +53,8 @@ const validation = {
             friendlyMessage: 'Invalid hexadecimal color'
         },
         'expression-invalid-instance': {
-            messageRegex: /expressionInvalidInstance\[(.+), (.+), (.+)\]$/,
-            friendlyMessage: '$0\n\'$1\' is not an instance of \'$2\''
+            messageRegex: /expressionInvalidInstance\[(.+), (.+)\]$/,
+            friendlyMessage: '$0\nexpected type was instance of \'$1\''
         },
         'expression-invalid-number': {
             messageRegex: /expressionInvalidNumber\[(.+), (.+), (.+)\]$/,
@@ -62,7 +62,7 @@ const validation = {
         },
         'expression-invalid-string': {
             messageRegex: /expressionInvalidString\[(.+), (.+)\]$/,
-            friendlyMessage: '$0\n\'$1\' is not a string'
+            friendlyMessage: '$0\ntype \'$1\' is not a string'
         },
         'expression-invalid-type': {
             messageRegex: /expressionInvalidType\[(.+), (.+), (.+)\]$/,
@@ -84,7 +84,6 @@ const validation = {
             messageRegex: /expressionUnimplementedEval$/,
             friendlyMessage: 'Unimplemented eval'
         },
-
         'hex-invalid-color-string': {
             messageRegex: /hexInvalidColorString\[(.+)\]$/,
             friendlyMessage: '$0\nInvalid hexadecimal color string'
@@ -443,6 +442,10 @@ const validation = {
         'non-valid-expression': {
             messageRegex: /nonValidExpression\[(.+)\]$/,
             friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
+        },
+        'property-must-be-of-type': {
+            messageRegex: /propertyMustBeOfType\[(.+), (.+), (.+)\]$/,
+            friendlyMessage: 'Viz property \'$0:\' must be of type \'$1\' but it was of type $2'
         },
         'resolution-number-required': {
             messageRegex: /resolutionNumberRequired$/,

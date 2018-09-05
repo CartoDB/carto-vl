@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkType, checkLooseType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
+import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
 import CartoValidationError from '../../../errors/carto-validation-error';
@@ -36,8 +36,6 @@ export default class Top extends BaseExpression {
 
         buckets = implicitCast(buckets);
         checkInstance('top', 'property', 0, Property, property);
-        checkLooseType('top', 'buckets', 1, 'number', buckets);
-        checkFeatureIndependent('top', 'buckets', 1, buckets);
         const children = { property, buckets };
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
@@ -63,11 +61,10 @@ export default class Top extends BaseExpression {
     }
 
     _bindMetadata (metadata) {
-        checkFeatureIndependent('top', 'buckets', 1, this.buckets);
-
         super._bindMetadata(metadata);
 
         checkType('top', 'property', 0, 'category', this.property);
+        checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         checkType('top', 'buckets', 1, 'number', this.buckets);
 
         this._meta = metadata;

@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -8,8 +8,8 @@ s.FALSE.toString = () => 's.FALSE';
 describe('src/renderer/viz/expressions/unary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER', () => {
-            validateDynamicTypeErrors('sin', ['category']);
-            validateStaticTypeErrors('sin', ['color']);
+            validateTypeErrors('sin', ['category']);
+            validateTypeErrors('sin', ['color']);
 
             validateMaxArgumentsError('sin', ['number', 'number']);
             validateMaxArgumentsError('ceil', ['number', 'number']);

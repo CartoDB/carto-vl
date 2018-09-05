@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
-import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent, checkMaxArguments } from './utils';
+import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
@@ -80,11 +80,6 @@ export class Animation extends BaseExpression {
             input = linear(input, globalMin(input), globalMax(input));
         }
 
-        checkLooseType('animation', 'input', 0, 'number', input);
-        checkLooseType('animation', 'duration', 1, 'number', duration);
-        checkFeatureIndependent('animation', 'duration', 1, duration);
-        checkLooseType('animation', 'fade', 2, 'fade', fade);
-
         const progress = number(0);
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
@@ -148,7 +143,9 @@ export class Animation extends BaseExpression {
 
     _postShaderCompile (program, gl) {
         waitingForLayer.add(this);
-        this._paused = 'default';
+        if (!this._paused) {
+            this._paused = 'default';
+        }
         super._postShaderCompile(program, gl);
     }
 
@@ -158,6 +155,7 @@ export class Animation extends BaseExpression {
         if (this._paused && this._lastTime === undefined) {
             return;
         }
+
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -187,6 +185,7 @@ export class Animation extends BaseExpression {
         const fadeOut = this.fade.fadeOut.eval(feature);
 
         const output = 1 - clamp(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
+
         return output;
     }
 

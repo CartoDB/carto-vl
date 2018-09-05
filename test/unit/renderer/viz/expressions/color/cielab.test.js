@@ -1,15 +1,15 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/cielab', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('cielab', ['number', 'number']);
+        validateTypeErrors('cielab', ['number', 'number']);
 
-        validateDynamicTypeErrors('cielab', ['category', 'number', 'number']);
-        validateDynamicTypeErrors('cielab', ['number', 'category', 'number']);
-        validateDynamicTypeErrors('cielab', ['number', 'number', 'category']);
+        validateTypeErrors('cielab', ['category', 'number', 'number']);
+        validateTypeErrors('cielab', ['number', 'category', 'number']);
+        validateTypeErrors('cielab', ['number', 'number', 'category']);
 
-        validateStaticTypeErrors('cielab', ['number', 'number', 'color']);
-        validateStaticTypeErrors('cielab', ['color', 'number', 'number']);
+        validateTypeErrors('cielab', ['number', 'number', 'color']);
+        validateTypeErrors('cielab', ['color', 'number', 'number']);
 
         validateMaxArgumentsError('cielab', ['number', 'number', 'number', 'number']);
     });

@@ -1,13 +1,13 @@
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import { hsv, hsva } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/hsv', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('hsv', []);
-        validateStaticTypeErrors('hsv', ['number']);
-        validateStaticTypeErrors('hsv', ['number', 'category']);
-        validateStaticTypeErrors('hsv', ['number', 'number', 'color']);
-        validateStaticTypeErrors('hsva', ['number', 'number', 'number']);
+        validateTypeErrors('hsv', []);
+        validateTypeErrors('hsv', ['number']);
+        validateTypeErrors('hsv', ['number', 'category']);
+        validateTypeErrors('hsv', ['number', 'number', 'color']);
+        validateTypeErrors('hsva', ['number', 'number', 'number']);
         validateMaxArgumentsError('hsv', ['number', 'number', 'number', 'number', 'number']);
         validateMaxArgumentsError('hsva', ['number', 'number', 'number', 'number', 'number']);
     });

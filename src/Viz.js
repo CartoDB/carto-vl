@@ -13,6 +13,9 @@ import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexSha
 import lineFragmentShaderGLSL from './renderer/shaders/geometry/line/lineFragmentShader.glsl';
 import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygonVertexShader.glsl';
 import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
+import SVG from './renderer/viz/expressions/SVG';
+import svgs from './renderer/viz/defaultSVGs';
+import Placement from './renderer/viz/expressions/placement';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -20,8 +23,8 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
-const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(s.FALSE);
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(s.ALIGN_BOTTOM);
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
 const DEFAULT_RESOLUTION = () => 1;
 
@@ -310,6 +313,7 @@ export default class Viz {
 
     compileShaders (gl, metadata) {
         this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
+        checkVizPropertyTypes(this);
 
         this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
         this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
@@ -320,7 +324,8 @@ export default class Viz {
         if (!this.symbol.default) {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement
+                symbolPlacement: this.symbolPlacement,
+                offset: this.offset
             }, this);
         }
 
@@ -448,8 +453,6 @@ export default class Viz {
     }
 
     _checkVizSpec (vizSpec) {
-        // TODO: Check expression types ie: color is not a number expression!
-
         // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
@@ -494,11 +497,42 @@ export default class Viz {
         if (!(vizSpec.offset instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[offset]');
         }
+
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
         }
+    }
+}
+
+function checkVizPropertyTypes (viz) {
+    if (viz.color.type !== 'color') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[color, color, ${viz.color.type}]`);
+    }
+    if (viz.strokeColor.type !== 'color') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[strokeColor, color, ${viz.strokeColor.type}]`);
+    }
+    if (viz.width.type !== 'number') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[width, number, ${viz.width.type}]`);
+    }
+    if (viz.strokeWidth.type !== 'number') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[strokeWidth, number, ${viz.strokeWidth.type}]`);
+    }
+    if (viz.order.type !== 'orderer') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[order, orderer, ${viz.order.type}]`);
+    }
+    if (viz.filter.type !== 'number') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[filter, number, ${viz.filter.type}]`);
+    }
+    if (viz.symbol.type !== 'image') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[symbol, image, ${viz.symbol.type}]`);
+    }
+    if (viz.symbolPlacement.type !== 'placement') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[symbolPlacement, placement, ${viz.symbolPlacement.type}]`);
+    }
+    if (viz.offset.type !== 'placement') {
+        throw new CartoValidationError('viz', `propertyMustBeOfType[offset, placement, ${viz.offset.type}]`);
     }
 }
 
