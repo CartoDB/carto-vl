@@ -78,11 +78,7 @@ export default class Blend extends BaseExpression {
         abTypeCheck(this.a, this.b);
         checkType('blend', 'mix', 2, 'number', this.mix);
 
-        if (this.a.type === 'image' || this.b.type === 'image') {
-            this.type = 'image';
-        } else {
-            this.type = this.a.type;
-        }
+        this.type = this.a.type;
     }
     _preDraw (...args) {
         super._preDraw(...args);
