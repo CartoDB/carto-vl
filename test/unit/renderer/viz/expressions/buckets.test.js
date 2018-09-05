@@ -1,6 +1,7 @@
 import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError, validateCompileTypeError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
+import { OTHERS_INDEX } from '../../../../../src/renderer/viz/expressions/constants';
 
 describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
@@ -53,8 +54,8 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     expect(response).toEqual(expected);
                 });
 
-                it('should classify unknown category as other', () => {
-                    const expected = 1;
+                it('should classify extra category as other', () => {
+                    const expected = OTHERS_INDEX;
                     let feature;
                     let response;
 
@@ -92,8 +93,8 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     expect(actual).toEqual(expected);
                 });
 
-                it('should classify unknown category as other', () => {
-                    const expected = 2;
+                it('should classify extra category as other', () => {
+                    const expected = OTHERS_INDEX;
                     let feature;
                     let actual;
 
@@ -139,8 +140,8 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     expect(actual).toEqual(expected);
                 });
 
-                it('should classify unknown category as other', () => {
-                    const expected = 3;
+                it('should classify extra category as other', () => {
+                    const expected = OTHERS_INDEX;
                     let feature;
                     let response;
 
@@ -178,7 +179,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is higher than the breakpoint', () => {
-                    const expected = 1;
+                    const expected = OTHERS_INDEX;
                     const feature = { price: 11 };
                     const actual = bucketExpression.eval(feature);
 
@@ -186,7 +187,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is equal than the breakpoint', () => {
-                    const expected = 1;
+                    const expected = OTHERS_INDEX;
                     const feature = { price: 10 };
                     const actual = bucketExpression.eval(feature);
 
@@ -225,7 +226,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the third category when is equal than the third breakpoint', () => {
-                    const expected = 2;
+                    const expected = OTHERS_INDEX;
                     const feature = { price: 20 };
                     const actual = bucketExpression.eval(feature);
 
@@ -233,7 +234,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the third category when is higher than the third breakpoint', () => {
-                    const expected = 2;
+                    const expected = OTHERS_INDEX;
                     const feature = { price: 21 };
                     const actual = bucketExpression.eval(feature);
 

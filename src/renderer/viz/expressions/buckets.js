@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
+import { OTHERS_INDEX } from './constants';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -101,25 +102,22 @@ export default class Buckets extends BaseExpression {
 
     eval (feature) {
         const v = this.input.eval(feature);
-        let i = 0;
 
         if (this.input.type === 'category') {
-            for (i = 0; i < this.list.elems.length; i++) {
+            for (let i = 0; i < this.list.elems.length; i++) {
                 if (v === this.list.elems[i].eval(feature)) {
                     return i;
                 }
             }
-        }
-
-        if (this.input.type === 'number') {
-            for (i = 0; i < this.list.elems.length; i++) {
+        } else if (this.input.type === 'number') {
+            for (let i = 0; i < this.list.elems.length; i++) {
                 if (v < this.list.elems[i].eval(feature)) {
                     return i;
                 }
             }
         }
 
-        return i;
+        return OTHERS_INDEX;
     }
 
     _bindMetadata (metadata) {
