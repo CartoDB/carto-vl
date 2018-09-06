@@ -1,10 +1,11 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateTypeErrors, validateStaticType } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/Fade', () => {
     describe('error control', () => {
         validateTypeErrors('fade', ['color']);
         validateTypeErrors('fade', [undefined, 'color']);
+        validateMaxArgumentsError('fade', ['number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -24,8 +25,8 @@ describe('src/renderer/viz/expressions/Fade', () => {
         });
 
         it('should set fadeIn and fadeOut parameters', () => {
-            expect(s.fade(1,2).fadeIn.eval()).toEqual(1);
-            expect(s.fade(1,2).fadeOut.eval()).toEqual(2);
+            expect(s.fade(1, 2).fadeIn.eval()).toEqual(1);
+            expect(s.fade(1, 2).fadeOut.eval()).toEqual(2);
         });
     });
 });

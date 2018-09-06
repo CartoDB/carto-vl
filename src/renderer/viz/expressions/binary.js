@@ -1,5 +1,5 @@
 import { number } from '../expressions';
-import { implicitCast } from './utils';
+import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
@@ -336,7 +336,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  */
 export const Equals = genBinaryOp('equals',
     NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
-    (x, y) => x == y ? 1 : 0,
+    (x, y) => x === y ? 1 : 0,
     (x, y) => `(${x}==${y}? 1.:0.)`
 );
 
@@ -367,7 +367,7 @@ export const Equals = genBinaryOp('equals',
  */
 export const NotEquals = genBinaryOp('notEquals',
     NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
-    (x, y) => x != y ? 1 : 0,
+    (x, y) => x !== y ? 1 : 0,
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
 
@@ -418,7 +418,7 @@ export const Or = genBinaryOp('or',
  * @param {Number} y - Second value of the expression
  * @return {Number} Result of the expression
  *
- * @example <caption>Show only elements with price < 30 AND category == 'fruit'.</caption>
+ * @example <caption>Show only elements with price < 30 AND category === 'fruit'.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   filter: s.and(
@@ -427,9 +427,9 @@ export const Or = genBinaryOp('or',
  *   )
  * });
  *
- * @example <caption>Show only elements with price < 30 AND category == 'fruit'. (String)</caption>
+ * @example <caption>Show only elements with price < 30 AND category === 'fruit'. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: $price < 30 and $category == 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
+ *   filter: $price < 30 and $category === 'fruit'  // Equivalent to and(lt($price, 30), eq($category, 'fruit'))
  * `);
  *
  * @memberof carto.expressions
@@ -443,9 +443,11 @@ export const And = genBinaryOp('and',
     (x, y) => `min(${x} * ${y}, 1.)`
 );
 
-function genBinaryOp(name, allowedSignature, jsFn, glsl) {
+function genBinaryOp (name, allowedSignature, jsFn, glsl) {
     return class BinaryOperation extends BaseExpression {
-        constructor(a, b) {
+        constructor (a, b) {
+            checkMaxArguments(arguments, 2, name);
+
             if (Number.isFinite(a) && Number.isFinite(b)) {
                 return number(jsFn(a, b));
             }
@@ -453,89 +455,83 @@ function genBinaryOp(name, allowedSignature, jsFn, glsl) {
             b = implicitCast(b);
 
             const signature = getSignatureLoose(a, b);
-            if (signature !== undefined) {
-                if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                    throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
-                }
-            }
 
             super({ a, b });
             this.type = getReturnTypeFromSignature(signature);
+            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(feature) {
+        eval (feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
-        _compile(meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             const [a, b] = [this.a, this.b];
 
             const signature = getSignature(a, b);
-            if (signature == UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
+            if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
                 throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
             this.type = getReturnTypeFromSignature(signature);
-
-            this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
     };
 }
 
-function getSignatureLoose(a, b) {
+function getSignatureLoose (a, b) {
     if (!a.type || !b.type) {
         if (!a.type && !b.type) {
             return undefined;
         }
         const knownType = a.type || b.type;
-        if (knownType == 'color') {
+        if (knownType === 'color') {
             return NUMBER_AND_COLOR_TO_COLOR;
         }
-    } else if (a.type == 'number' && b.type == 'number') {
+    } else if (a.type === 'number' && b.type === 'number') {
         return NUMBERS_TO_NUMBER;
-    } else if (a.type == 'number' && b.type == 'color') {
+    } else if (a.type === 'number' && b.type === 'color') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'number') {
+    } else if (a.type === 'color' && b.type === 'number') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'color') {
+    } else if (a.type === 'color' && b.type === 'color') {
         return COLORS_TO_COLOR;
-    } else if (a.type == 'category' && b.type == 'category') {
+    } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
-    } else if ((a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'image') ||
-        (a.type == 'color' && b.type == 'image')) {
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
 }
 
-function getSignature(a, b) {
+function getSignature (a, b) {
     if (!a.type || !b.type) {
         return undefined;
-    } else if (a.type == 'number' && b.type == 'number') {
+    } else if (a.type === 'number' && b.type === 'number') {
         return NUMBERS_TO_NUMBER;
-    } else if (a.type == 'number' && b.type == 'color') {
+    } else if (a.type === 'number' && b.type === 'color') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'number') {
+    } else if (a.type === 'color' && b.type === 'number') {
         return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type == 'color' && b.type == 'color') {
+    } else if (a.type === 'color' && b.type === 'color') {
         return COLORS_TO_COLOR;
-    } else if (a.type == 'category' && b.type == 'category') {
+    } else if (a.type === 'category' && b.type === 'category') {
         return CATEGORIES_TO_NUMBER;
-    } else if ((a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'color') ||
-        (a.type == 'image' && b.type == 'image') ||
-        (a.type == 'color' && b.type == 'image')) {
+    } else if ((a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'color') ||
+        (a.type === 'image' && b.type === 'image') ||
+        (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
 }
 
-function getReturnTypeFromSignature(signature) {
+function getReturnTypeFromSignature (signature) {
     switch (signature) {
         case NUMBERS_TO_NUMBER:
             return 'number';

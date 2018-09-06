@@ -35,22 +35,22 @@ import { hexToRgb } from '../../utils';
  */
 
 export default class Palette extends BaseExpression {
-    constructor(name, subPalettes) {
+    constructor (name, subPalettes) {
         super({});
         this.type = 'palette';
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
-                if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
+                if (typeof name !== 'symbol' && Number.isSafeInteger(Number(name)) && Array.isArray(target[name])) {
                     return target[name].map(hexToRgb);
                 }
             }
         });
-        
+
         this.tags = subPalettes.tags;
     }
 
-    getLongestSubPalette() {
+    getLongestSubPalette () {
         const s = this.subPalettes;
         for (let i = 20; i >= 0; i--) {
             if (s[i]) {
@@ -59,11 +59,11 @@ export default class Palette extends BaseExpression {
         }
     }
 
-    isQualitative() {
+    isQualitative () {
         return this.tags.includes('qualitative');
     }
 
-    isQuantitative() {
+    isQuantitative () {
         return this.tags.includes('quantitative');
     }
 }

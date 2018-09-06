@@ -1,57 +1,69 @@
 
 import jsep from 'jsep';
-import * as functions from './expressions';
+import * as expressions from './expressions';
 import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES } from './expressions/color/cssColorNames';
 import NamedColor from './expressions/color/NamedColor';
 import Hex from './expressions/color/hex';
+import Base from './expressions/base';
 
 // TODO use Schema classes
 
 const aggFns = [];
 
-const lowerCaseFunctions = {};
-Object.keys(functions)
-    .filter(name => name[0] == name[0].toLowerCase()) // Only get functions starting with lowercase
-    .map(name => { lowerCaseFunctions[name.toLocaleLowerCase()] = functions[name]; });
-lowerCaseFunctions.true = functions.TRUE;
-lowerCaseFunctions.false = functions.FALSE;
-lowerCaseFunctions.align_center = functions.ALIGN_CENTER;
-lowerCaseFunctions.align_bottom = functions.ALIGN_BOTTOM;
+const lowerCaseExpressions = {};
+Object.keys(expressions)
+    .filter(name => name[0] === name[0].toLowerCase()) // Only get expressions starting with lowercase
+    .map(name => { lowerCaseExpressions[name.toLocaleLowerCase()] = expressions[name]; });
 
-lowerCaseFunctions.pi = functions.PI;
-lowerCaseFunctions.e = functions.E;
-lowerCaseFunctions.hold = functions.HOLD;
+lowerCaseExpressions.true = expressions.TRUE;
+lowerCaseExpressions.false = expressions.FALSE;
+lowerCaseExpressions.align_center = expressions.ALIGN_CENTER;
+lowerCaseExpressions.align_bottom = expressions.ALIGN_BOTTOM;
 
-lowerCaseFunctions.bicycle = functions.BICYCLE;
-lowerCaseFunctions.building = functions.BUILDING;
-lowerCaseFunctions.bus = functions.BUS;
-lowerCaseFunctions.car = functions.CAR;
-lowerCaseFunctions.circle = functions.CIRCLE;
-lowerCaseFunctions.circleoutline = functions.CIRCLE_OUTLINE;
-lowerCaseFunctions.cross = functions.CROSS;
-lowerCaseFunctions.flag = functions.FLAG;
-lowerCaseFunctions.house = functions.HOUSE;
-lowerCaseFunctions.marker = functions.MARKER;
-lowerCaseFunctions.markeroutline = functions.MARKER_OUTLINE;
-lowerCaseFunctions.star = functions.STAR;
-lowerCaseFunctions.staroutline = functions.STAR_OUTLINE;
-lowerCaseFunctions.triangle = functions.TRIANGLE;
-lowerCaseFunctions.triangleoutline = functions.TRIANGLE_OUTLINE;
+lowerCaseExpressions.pi = expressions.PI;
+lowerCaseExpressions.e = expressions.E;
+lowerCaseExpressions.hold = expressions.HOLD;
 
+lowerCaseExpressions.bicycle = expressions.BICYCLE;
+lowerCaseExpressions.building = expressions.BUILDING;
+lowerCaseExpressions.bus = expressions.BUS;
+lowerCaseExpressions.car = expressions.CAR;
+lowerCaseExpressions.circle = expressions.CIRCLE;
+lowerCaseExpressions.circle_outline = expressions.CIRCLE_OUTLINE;
+lowerCaseExpressions.cross = expressions.CROSS;
+lowerCaseExpressions.flag = expressions.FLAG;
+lowerCaseExpressions.house = expressions.HOUSE;
+lowerCaseExpressions.marker = expressions.MARKER;
+lowerCaseExpressions.marker_outline = expressions.MARKER_OUTLINE;
+lowerCaseExpressions.plus = expressions.PLUS;
+lowerCaseExpressions.square = expressions.SQUARE;
+lowerCaseExpressions.square_outline = expressions.SQUARE_OUTLINE;
+lowerCaseExpressions.star = expressions.STAR;
+lowerCaseExpressions.star_outline = expressions.STAR_OUTLINE;
+lowerCaseExpressions.triangle = expressions.TRIANGLE;
+lowerCaseExpressions.triangle_outline = expressions.TRIANGLE_OUTLINE;
 
-export function parseVizExpression(str) {
+const originalBaseBlendTo = Base.prototype.blendTo;
+Base.prototype.blendTo = function (final, ...args) {
+    if (typeof final === 'string') {
+        final = parseVizExpression(final);
+    }
+    return originalBaseBlendTo.bind(this)(final, ...args);
+};
+
+export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
     cleanJsep();
     return r;
 }
 
-export function parseVizDefinition(str) {
+export function parseVizDefinition (str) {
     prepareJsep();
     const ast = jsep(cleanComments(str));
     let vizSpec = { variables: {} };
-    if (ast.type == 'Compound') {
+    if (ast.type === 'Compound') {
         ast.body.map(node => parseVizNamedExpr(vizSpec, node));
     } else {
         parseVizNamedExpr(vizSpec, ast);
@@ -60,144 +72,167 @@ export function parseVizDefinition(str) {
     return vizSpec;
 }
 
-function parseVizNamedExpr(vizSpec, node) {
-    if (node.operator != ':') {
-        throw new Error('Invalid syntax');
+function parseVizNamedExpr (vizSpec, node) {
+    if (node.operator !== ':') {
+        throw new Error('Invalid syntax.');
     }
-    if (node.left.name.length && node.left.name[0] == '@') {
+
+    if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
-    const name = node.left.name;
+
+    let name = node.left.name;
+
     if (!name) {
-        throw new Error('Invalid syntax');
-    }
-    if (name.startsWith('__cartovl_variable_')) {
-        vizSpec.variables[node.left.name.substr('__cartovl_variable_'.length)] = implicitCast(parseNode(node.right));
-    } else if (name == 'resolution') {
-        const value = parseNode(node.right);
-        vizSpec[name] = value;
-    } else {
-        const value = parseNode(node.right);
-        vizSpec[name] = implicitCast(value);
+        throw new Error('Invalid syntax.');
     }
 
+    if (name.startsWith('__cartovl_variable_')) {
+        name = node.left.name.substr('__cartovl_variable_'.length);
+        if (name in vizSpec.variables) {
+            throw new Error(`Variable '${name}' is already defined.`);
+        }
+        vizSpec.variables[name] = implicitCast(parseNode(node.right));
+    } else {
+        if (name in vizSpec) {
+            throw new Error(`Property '${name}' is already defined.`);
+        }
+        const value = parseNode(node.right);
+        vizSpec[name] = (name === 'resolution') ? value : implicitCast(value);
+    }
 }
 
-function parseFunctionCall(node) {
+function parseFunctionCall (node) {
     const name = node.callee.name.toLowerCase();
     if (aggFns.includes(name)) {
-        //node.arguments[0].name += '_' + name;
+        // node.arguments[0].name += '_' + name;
         const args = node.arguments.map(arg => parseNode(arg));
         return args[0];
     }
     const args = node.arguments.map(arg => parseNode(arg));
-    if (lowerCaseFunctions[name]) {
-        return lowerCaseFunctions[name](...args);
+    if (lowerCaseExpressions[name]) {
+        return lowerCaseExpressions[name](...args);
     }
-    throw new Error(`Invalid function name '${node.callee.name}'`);
+    throw new Error(`Invalid function name '${node.callee.name}'.`);
 }
 
-function parseBinaryOperation(node) {
+function parseBinaryOperation (node) {
     const left = parseNode(node.left);
     const right = parseNode(node.right);
-    switch (node.operator) {
+    switch (node.operator.toLowerCase()) {
         case '*':
-            return functions.mul(left, right);
+            return expressions.mul(left, right);
         case '/':
-            return functions.div(left, right);
+            return expressions.div(left, right);
         case '+':
-            return functions.add(left, right);
+            return expressions.add(left, right);
         case '-':
-            return functions.sub(left, right);
+            return expressions.sub(left, right);
         case '%':
-            return functions.mod(left, right);
+            return expressions.mod(left, right);
         case '^':
-            return functions.pow(left, right);
+            return expressions.pow(left, right);
         case '>':
-            return functions.greaterThan(left, right);
+            return expressions.greaterThan(left, right);
         case '>=':
-            return functions.greaterThanOrEqualTo(left, right);
+            return expressions.greaterThanOrEqualTo(left, right);
         case '<':
-            return functions.lessThan(left, right);
+            return expressions.lessThan(left, right);
         case '<=':
-            return functions.lessThanOrEqualTo(left, right);
+            return expressions.lessThanOrEqualTo(left, right);
         case '==':
-            return functions.equals(left, right);
+            return expressions.equals(left, right);
         case '!=':
-            return functions.notEquals(left, right);
+            return expressions.notEquals(left, right);
         case 'and':
-            return functions.and(left, right);
+            return expressions.and(left, right);
         case 'or':
-            return functions.or(left, right);
+            return expressions.or(left, right);
+        case 'in':
+            return expressions.in(left, right);
+        case 'nin':
+            return expressions.nin(left, right);
         default:
-            throw new Error(`Invalid binary operator '${node.operator}'`);
+            throw new Error(`Invalid binary operator '${node.operator}'.`);
     }
 }
 
-function parseUnaryOperation(node) {
+function parseUnaryOperation (node) {
     switch (node.operator) {
         case '-':
-            return functions.mul(-1, parseNode(node.argument));
+            return expressions.mul(-1, parseNode(node.argument));
         case '+':
             return parseNode(node.argument);
         default:
-            throw new Error(`Invalid unary operator '${node.operator}'`);
+            throw new Error(`Invalid unary operator '${node.operator}'.`);
     }
 }
 
-function parseIdentifier(node) {
-    if (node.name.length && node.name[0] == '@') {
+function parseIdentifier (node) {
+    if (node.name.length && node.name[0] === '@') {
         node.name = '__cartovl_variable_' + node.name.substr(1);
     }
     if (node.name.startsWith('__cartovl_variable_')) {
-        return functions.variable(node.name.substr('__cartovl_variable_'.length));
-    } else if (node.name[0] == '#') {
+        return expressions.variable(node.name.substr('__cartovl_variable_'.length));
+    } else if (node.name[0] === '#') {
         return new Hex(node.name);
-    } else if (node.name[0] == '$') {
-        return functions.property(node.name.substring(1));
-    } else if (functions.palettes[node.name.toUpperCase()]) {
-        return functions.palettes[node.name.toUpperCase()];
-    } else if (lowerCaseFunctions[node.name.toLowerCase()]) {
-        return lowerCaseFunctions[node.name.toLowerCase()];
+    } else if (node.name[0] === '$') {
+        return expressions.property(node.name.substring(1));
+    } else if (expressions.palettes[node.name.toUpperCase()]) {
+        return expressions.palettes[node.name.toUpperCase()];
+    } else if (lowerCaseExpressions[node.name.toLowerCase()]) {
+        return lowerCaseExpressions[node.name.toLowerCase()];
     } else if (CSS_COLOR_NAMES.includes(node.name.toLowerCase())) {
         return new NamedColor(node.name.toLowerCase());
     } else {
-        throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+        throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
     }
 }
 
-function parseNode(node) {
-    if (node.type == 'CallExpression') {
+function parseNode (node) {
+    if (node.type === 'CallExpression') {
         return parseFunctionCall(node);
-    } else if (node.type == 'Literal') {
+    } else if (node.type === 'Literal') {
         return node.value;
-    } else if (node.type == 'ArrayExpression') {
+    } else if (node.type === 'ArrayExpression') {
         return node.elements.map(e => parseNode(e));
-    } else if (node.type == 'BinaryExpression') {
+    } else if (node.type === 'BinaryExpression') {
         return parseBinaryOperation(node);
-    } else if (node.type == 'UnaryExpression') {
+    } else if (node.type === 'UnaryExpression') {
         return parseUnaryOperation(node);
-    } else if (node.type == 'Identifier') {
+    } else if (node.type === 'Identifier') {
         return parseIdentifier(node);
     }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'`);
+    throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
 }
 
-function prepareJsep() {
+function prepareJsep () {
     // jsep addBinaryOp pollutes its module scope, we need to remove the custom operators afterwards
     jsep.addBinaryOp(':', 0);
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
+    jsep.addBinaryOp('OR', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addBinaryOp('AND', 2);
+    jsep.addBinaryOp('in', 13);
+    jsep.addBinaryOp('IN', 1);
+    jsep.addBinaryOp('nin', 13);
+    jsep.addBinaryOp('NIN', 13);
     jsep.addIdentifierChar('@');
     jsep.addIdentifierChar('#');
     jsep.removeLiteral('true');
     jsep.removeLiteral('false');
 }
 
-function cleanJsep() {
+function cleanJsep () {
+    jsep.removeBinaryOp('in');
+    jsep.removeBinaryOp('IN');
+    jsep.removeBinaryOp('nin');
+    jsep.removeBinaryOp('NIN');
     jsep.removeBinaryOp('and');
+    jsep.removeBinaryOp('AND');
     jsep.removeBinaryOp('or');
+    jsep.removeBinaryOp('OR');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
     jsep.removeIdentifierChar('@');
@@ -213,7 +248,7 @@ function cleanJsep() {
  * - Keep comments inside single and double quotes tracking escape chars
  * Based on: https://j11y.io/javascript/removing-comments-in-javascript/
  */
-export function cleanComments(str) {
+export function cleanComments (str) {
     const mode = {
         singleQuote: false,
         doubleQuote: false,
@@ -226,11 +261,10 @@ export function cleanComments(str) {
     str = ('_' + str + '_').split('');
 
     for (let i = 0, l = str.length; i < l; i++) {
-
         if (mode.singleQuote) {
-            if (str[i] == '\\') {
+            if (str[i] === '\\') {
                 mode.escape++;
-            } else if (str[i] === '\'' && mode.escape % 2 == 0) {
+            } else if (str[i] === '\'' && mode.escape % 2 === 0) {
                 mode.singleQuote = false;
                 mode.escape = 0;
             }
@@ -238,9 +272,9 @@ export function cleanComments(str) {
         }
 
         if (mode.doubleQuote) {
-            if (str[i] == '\\') {
+            if (str[i] === '\\') {
                 mode.escape++;
-            } else if (str[i] === '"' && mode.escape % 2 == 0) {
+            } else if (str[i] === '"' && mode.escape % 2 === 0) {
                 mode.doubleQuote = false;
                 mode.escape = 0;
             }
@@ -270,7 +304,6 @@ export function cleanComments(str) {
         mode.singleQuote = str[i] === '\'';
 
         if (str[i] === '/') {
-
             if (str[i + 1] === '*') {
                 str[i] = '';
                 mode.blockComment = true;

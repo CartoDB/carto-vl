@@ -1,7 +1,7 @@
 import Feature from '../interactivity/feature';
 
 export default class RenderLayer {
-    constructor() {
+    constructor () {
         this.dataframes = [];
         this.renderer = null;
         this.viz = null;
@@ -11,57 +11,67 @@ export default class RenderLayer {
     }
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
-    addDataframe(dataframe) {
+    addDataframe (dataframe) {
         if (this.type) {
             this._checkDataframeType(dataframe);
         }
         this.type = dataframe.type;
         if (this.renderer) {
-            dataframe.bind(this.renderer);
+            dataframe.bindRenderer(this.renderer);
         }
         this.dataframes.push(dataframe);
         this.idProperty = dataframe.metadata.idProperty;
     }
 
-    getActiveDataframes() {
-        this.dataframes = this.dataframes.filter(df => !df.freed);
-        return this.dataframes.filter(df => df.active && df.numVertex);
+    setRenderer (renderer) {
+        this.renderer = renderer;
+        this.dataframes.forEach(d => d.bindRenderer(renderer));
     }
 
-    hasDataframes() {
+    setViz (viz) {
+        this.viz = viz;
+    }
+
+    getActiveDataframes () {
+        this.dataframes = this.dataframes.filter(df => !df.freed);
+        let active = this.dataframes.filter(df => df.active && df.numVertex);
+        if (active.length && active[0].orderID !== undefined) {
+            active = active.sort((a, b) => a.orderID - b.orderID);
+        }
+        return active;
+    }
+
+    hasDataframes () {
         return this.getActiveDataframes().length > 0;
     }
 
-    getNumFeatures() {
+    getNumFeatures () {
         return this.getActiveDataframes().map(d => d.numFeatures).reduce((x, y) => x + y, 0);
     }
 
-    _checkDataframeType(dataframe) {
-        if (this.type != dataframe.type) {
+    _checkDataframeType (dataframe) {
+        if (this.type !== dataframe.type) {
             throw new Error('Layer dataframes must always be of the same type');
         }
     }
 
-    getFeaturesAtPosition(pos) {
+    getFeaturesAtPosition (pos) {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df => df.getFeaturesAtPosition(pos, this.viz))).map(this._generateApiFeature.bind(this));
+        return [].concat(...this.getActiveDataframes().map(df =>
+            df.getFeaturesAtPosition(pos, this.viz)
+        )).map(rawFeature =>
+            new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
+        );
     }
 
-    /**
-     * Return a public `Feature` object from the internal feature object obtained from a dataframe.
-     */
-    _generateApiFeature(rawFeature) {
-        return new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty);
-    }
-
-    trackFeatureViz(featureID, vizProperty, newViz, customizedFeatures) {
+    trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {
         customizedFeatures[featureID] = customizedFeatures[featureID] || {};
         customizedFeatures[featureID][vizProperty] = newViz;
     }
 
-    freeDataframes() {
+    freeDataframes () {
         this.dataframes.map(df => df.free());
         this.dataframes = [];
         this.type = null;

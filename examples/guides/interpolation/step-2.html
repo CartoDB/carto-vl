@@ -5,9 +5,9 @@
     <!-- Include CARTO VL JS -->
     <script src="../../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <!-- Make the map visible -->
     <style>
         #map {
@@ -30,6 +30,12 @@
             dragRotate: false
         });
         map.touchZoomRotate.disableRotation();
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
         // Autenticate the client
         carto.setDefaultAuth({
             user: 'cartovl',
@@ -39,7 +45,7 @@
         const source = new carto.source.Dataset('tx_0125_copy_copy');
         // Add better styles
         const viz = new carto.Viz(`
-            width: blend(1, sqrt($amount), linear(zoom(), 2^10, 2^14))
+            width: ramp(zoomrange([9, 12, 13]), [1, 4, sqrt($amount)])
             color: ramp(linear($amount, 10, 1000), emrld)
             strokeWidth: 0
         `);

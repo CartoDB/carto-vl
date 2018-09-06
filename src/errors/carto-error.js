@@ -24,7 +24,7 @@ class CartoError extends Error {
      *
      * @return {CartoError} A well formed object representing the error.
      */
-    constructor(error) {
+    constructor (error) {
         super((error && error.message) || UNEXPECTED_ERROR);
 
         this.name = 'CartoError';
@@ -38,7 +38,7 @@ class CartoError extends Error {
         this.message = extraFields.friendlyMessage;
     }
 
-    _getExtraFields() {
+    _getExtraFields () {
         const errorList = this._getErrorList();
         for (let key in errorList) {
             const error = errorList[key];
@@ -58,7 +58,7 @@ class CartoError extends Error {
         };
     }
 
-    _getErrorList() {
+    _getErrorList () {
         return ERROR_LIST[this.origin] && ERROR_LIST[this.origin][this.type];
     }
 

@@ -2,10 +2,12 @@ precision highp float;
 
 varying vec2 uv;
 
-$style_preface
+vec2 featureID;
+
 $propertyPreface
+$style_preface
 
 void main(void) {
-    vec2 featureID = uv;
+    featureID = abs(uv);
     gl_FragColor = $style_inline;
 }

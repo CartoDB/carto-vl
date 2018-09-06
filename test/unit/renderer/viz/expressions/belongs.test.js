@@ -1,6 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/belongs', () => {
     const fakeMetadata = new Metadata({
@@ -20,12 +20,14 @@ describe('src/renderer/viz/expressions/belongs', () => {
     });
 
     describe('error control', () => {
-        validateStaticTypeErrors('in', []);
-        validateStaticTypeErrors('in', ['category']);
-        validateStaticTypeErrors('in', ['number']);
-        validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'category-array']);
-        validateDynamicTypeErrors('in', ['category', 'number-array']);
+        validateTypeErrors('in', []);
+        validateTypeErrors('in', ['category']);
+        validateTypeErrors('in', ['number']);
+        validateTypeErrors('in', ['color']);
+        validateTypeErrors('in', ['number', 'category-array']);
+        validateTypeErrors('in', ['category', 'number-array']);
+        validateMaxArgumentsError('in', ['category', 'category-array', 'number']);
+        validateMaxArgumentsError('nin', ['category', 'category-array', 'number']);
     });
 
     describe('type', () => {
@@ -37,7 +39,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('in($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 'category0' };
                 const sIn = s.in($category, ['category1', 'category2']);
-                sIn._compile(fakeMetadata);
+                sIn._bindMetadata(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });
@@ -45,7 +47,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('in($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 'category1' };
                 const sIn = s.in($category, ['category1', 'category2']);
-                sIn._compile(fakeMetadata);
+                sIn._bindMetadata(fakeMetadata);
                 const actual = sIn.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
@@ -55,7 +57,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('nin($category, ["category1", "category2"]) should return 1', () => {
                 const fakeFeature = { category: 'category0' };
                 const nin = s.nin($category, ['category1', 'category2']);
-                nin._compile(fakeMetadata);
+                nin._bindMetadata(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(1);
             });
@@ -63,7 +65,7 @@ describe('src/renderer/viz/expressions/belongs', () => {
             it('nin($category, ["category1", "category2"]) should return 0', () => {
                 const fakeFeature = { category: 'category1' };
                 const nin = s.nin($category, ['category1', 'category2']);
-                nin._compile(fakeMetadata);
+                nin._bindMetadata(fakeMetadata);
                 const actual = nin.eval(fakeFeature);
                 expect(actual).toEqual(0);
             });

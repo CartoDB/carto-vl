@@ -7,9 +7,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
@@ -59,42 +59,32 @@
       touchZoomRotate: false,
     });
 
-    // Define user
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define styles
-    const cartoColorViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
-      strokeWidth: 0
-    `);
-    const cartoColorReverseViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), reverse(sunsetdark))
-      strokeWidth: 0
-    `);
-    const customColorViz = new carto.Viz(`
-      color: ramp(linear($total_pop, 10000, 500000), [#0a3e39, #84ebe1])
-      strokeWidth: 0
-    `);
-
-    // Define layer
     const source = new carto.source.Dataset('us_county_points');
-    const layer = new carto.Layer('layer', source, cartoColorViz);
-
+    const viz = new carto.Viz(`color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)`);
+    const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', hideLoader);
 
     function setCartocolor() {
-      layer.blendToViz(cartoColorViz);
+      viz.color.blendTo('ramp(viewportQuantiles($total_pop, 5), sunsetdark)');
     }
     function setCartocolorReverse() {
-      layer.blendToViz(cartoColorReverseViz);
+      viz.color.blendTo('ramp(viewportQuantiles($total_pop, 5), reverse(sunsetdark))');
     }
     function setCustomColors() {
-      layer.blendToViz(customColorViz);
+        viz.color.blendTo('ramp(linear($total_pop, 10000, 500000), [#0a3e39, #84ebe1])');
     }
+
+    layer.on('loaded', hideLoader);
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }

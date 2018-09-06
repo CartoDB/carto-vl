@@ -1,13 +1,17 @@
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/buckets', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('buckets', ['number', 'category-array']);
-        validateDynamicTypeErrors('buckets', ['category', 'number-array']);
-        validateStaticTypeErrors('buckets', ['color', 'number-array']);
-        validateStaticTypeErrors('buckets', ['number', 'color-array']);
+        validateTypeErrors('buckets', ['number', 'number']);
+        validateTypeErrors('buckets', ['category', 'category']);
+
+        validateTypeErrors('buckets', ['number', 'category-array']);
+        validateTypeErrors('buckets', ['category', 'number-array']);
+        validateTypeErrors('buckets', ['color', 'number-array']);
+        validateTypeErrors('buckets', ['number', 'color-array']);
+        validateMaxArgumentsError('buckets', ['number', 'number-array', 'number']);
     });
 
     describe('type', () => {
@@ -24,7 +28,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                     city: {
                         type: 'category',
                         categories: [
-                            { name: 'Murcia' }, 
+                            { name: 'Murcia' },
                             { name: 'Madrid' },
                             { name: 'Pontevedra' },
                             { name: 'Barcelona' }
@@ -38,7 +42,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has one breakpoint', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Murcia']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -69,7 +73,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Murcia', 'Madrid']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -108,7 +112,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has more than two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($cities, ['Pontevedra', 'Murcia', 'Madrid']);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input feature in the first bucket', () => {
@@ -162,7 +166,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has one breakpoint', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($price, [10]);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
 
                 it('should classify the input in the first category when is lower than the breakpoint', () => {
@@ -193,16 +197,15 @@ describe('src/renderer/viz/expressions/buckets', () => {
             describe('and it has two breakpoints', () => {
                 beforeEach(() => {
                     bucketExpression = s.buckets($price, [10, 20]);
-                    bucketExpression._compile(METADATA);
+                    bucketExpression._bindMetadata(METADATA);
                 });
-                
+
                 it('should classify the input in the first category when is lower than the first breakpoint', () => {
                     const expected = 0;
                     const feature = { price: 9 };
                     const actual = bucketExpression.eval(feature);
 
                     expect(actual).toEqual(expected);
-
                 });
 
                 it('should classify the input in the second category when is equal than the first breakpoint', () => {
@@ -212,7 +215,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
 
                     expect(actual).toEqual(expected);
                 });
-                
+
                 it('should classify the input in the second category when is lower than the second breakpoint', () => {
                     const expected = 1;
                     const feature = { price: 15 };
@@ -220,7 +223,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
 
                     expect(actual).toEqual(expected);
                 });
-                
+
                 it('should classify the input in the third category when is equal than the third breakpoint', () => {
                     const expected = 2;
                     const feature = { price: 20 };

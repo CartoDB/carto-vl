@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkLooseType, checkType } from '../utils';
+import { implicitCast, checkType, checkMaxArguments, checkExpression } from '../utils';
 
 /**
  * Evaluates to a rgb color.
@@ -54,44 +54,46 @@ export const RGB = genRGB('rgb', false);
  */
 export const RGBA = genRGB('rgba', true);
 
-//TODO refactor to uniformcolor, write color (plain, literal)
+// TODO refactor to uniformcolor, write color (plain, literal)
 
-function genRGB(name, alpha) {
+function genRGB (name, alpha) {
     return class RGBA extends BaseExpression {
-        constructor(r, g, b, a) {
+        constructor (r, g, b, a) {
+            checkMaxArguments(arguments, 4, 'rgba');
+
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
-            checkLooseType(name, 'r', 0, 'number', r);
-            checkLooseType(name, 'g', 1, 'number', g);
-            checkLooseType(name, 'b', 2, 'number', b);
+            checkExpression(name, 'r', 0, r);
+            checkExpression(name, 'g', 1, g);
+            checkExpression(name, 'b', 2, b);
 
             const children = { r, g, b };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'number', a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
             super(children);
             this.type = 'color';
+            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(f) {
+        eval (f) {
             return {
                 r: this.r.eval(f),
                 g: this.g.eval(f),
                 b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 1,
+                a: alpha ? this.a.eval(f) : 1
             };
         }
-        _compile(meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             checkType(name, 'r', 0, 'number', this.r);
             checkType(name, 'g', 1, 'number', this.g);
             checkType(name, 'b', 2, 'number', this.b);
             if (alpha) {
                 checkType('rgba', 'a', 3, 'number', this.a);
             }
-            this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
     };
 }

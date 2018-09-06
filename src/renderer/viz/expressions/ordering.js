@@ -1,8 +1,14 @@
 import BaseExpression from './base';
-import { checkInstance } from './utils';
+import { checkInstance, checkMaxArguments } from './utils';
 
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
+ *
+ * Note: ordering expressions won't assure a perfect ordering.
+ * Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+ * This guarantees a maximum error, but not a perfect order.
+ * For most operations this is imperceptible, but usage of `order` in combination with animation or multi-scale expressions (`zoomrange` and `scaled`)
+ * may result in artifacts.
  *
  * @param {carto.expressions.Width} by - must be `width()`
  * @return {Order}
@@ -21,10 +27,12 @@ import { checkInstance } from './utils';
  * @memberof carto.expressions
  * @name asc
  * @function
- * @IGNOREapi
+ * @api
  */
 export class Asc extends BaseExpression {
-    constructor(by) {
+    constructor (by) {
+        checkMaxArguments(arguments, 1, 'asc');
+
         super({});
         checkInstance('asc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -33,6 +41,12 @@ export class Asc extends BaseExpression {
 
 /**
  * Order descending by a provided expression. NOTE: only works with `width()`.
+ *
+ * Note: ordering expressions won't assure a perfect ordering.
+ * Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+ * This guarantees a maximum error, but not a perfect order.
+ * For most operations this is imperceptible, but usage of `order` in combination with animation or multi-scale expressions (`zoomrange` and `scaled`)
+ * may result in artifacts.
  *
  * @param {carto.expressions.Width} by - must be `width()`
  * @return {Order}
@@ -51,10 +65,12 @@ export class Asc extends BaseExpression {
  * @memberof carto.expressions
  * @name desc
  * @function
- * @IGNOREapi
+ * @api
  */
 export class Desc extends BaseExpression {
-    constructor(by) {
+    constructor (by) {
+        checkMaxArguments(arguments, 1, 'desc');
+
         super({});
         checkInstance('desc', 'by', 0, Width, by);
         this.type = 'orderer';
@@ -80,10 +96,12 @@ export class Desc extends BaseExpression {
  * @memberof carto.expressions
  * @name noOrder
  * @function
- * @IGNOREapi
+ * @api
  */
 export class NoOrder extends BaseExpression {
-    constructor() {
+    constructor () {
+        checkMaxArguments(arguments, 0, 'noOrder');
+
         super({});
         this.type = 'orderer';
     }
@@ -91,6 +109,12 @@ export class NoOrder extends BaseExpression {
 
 /**
  * Return the expression assigned in the `width` property. ONLY usable in an `order:` property.
+ *
+ * Note: ordering expressions won't assure a perfect ordering.
+ * Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+ * This guarantees a maximum error, but not a perfect order.
+ * For most operations this is imperceptible, but usage of `order` in combination with animation or multi-scale expressions (`zoomrange` and `scaled`)
+ * may result in artifacts.
  *
  * @return {carto.expressions.Width}
  *
@@ -108,10 +132,12 @@ export class NoOrder extends BaseExpression {
  * @memberof carto.expressions
  * @name width
  * @function
- * @IGNOREapi
+ * @api
  */
 export class Width extends BaseExpression {
-    constructor() {
+    constructor () {
+        checkMaxArguments(arguments, 1, 'width');
+
         super({});
         this.type = 'propertyReference';
     }

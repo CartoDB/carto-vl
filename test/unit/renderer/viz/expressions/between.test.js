@@ -1,13 +1,14 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/between', () => {
     describe('error control', () => {
-        validateDynamicTypeErrors('between', ['category', 'number', 'number']);
-        validateDynamicTypeErrors('between', ['number', 'category', 'number']);
-        validateDynamicTypeErrors('between', ['number', 'number', 'category']);
-        validateStaticTypeErrors('between', ['number', 'number', 'color']);
-        validateStaticTypeErrors('between', ['color', 'number', 'color']);
+        validateTypeErrors('between', ['category', 'number', 'number']);
+        validateTypeErrors('between', ['number', 'category', 'number']);
+        validateTypeErrors('between', ['number', 'number', 'category']);
+        validateTypeErrors('between', ['number', 'number', 'color']);
+        validateTypeErrors('between', ['color', 'number', 'color']);
+        validateMaxArgumentsError('between', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -22,7 +23,7 @@ describe('src/renderer/viz/expressions/between', () => {
         testEval(21, 0);
     });
 
-    function testEval(price, expected) {
+    function testEval (price, expected) {
         it(`between($price, 10, 20) should return 0 when $price is ${price}`, () => {
             const fakeFeature = { price };
             const $price = s.property('price');
@@ -32,5 +33,3 @@ describe('src/renderer/viz/expressions/between', () => {
         });
     }
 });
-
-

@@ -6,18 +6,22 @@
 
 The easiest way to use CARTO VL is to include the required files from our CDN. This will add the `carto` and the `mapboxgl` objects to the global namespace.
 
+Usage of Mapbox GL is required to render the basemaps and can be used for other functionality too, read [Mapbox GL documentation](https://www.mapbox.com/mapbox-gl-js/api/) for more information. However, keep in mind that CARTO VL layers can only be controlled with the CARTO VL API (this documentation) and that Mapbox GL native layers can only be controlled with the Mapbox GL API. Therefore, CARTO VL expressions cannot be used for Mapbox GL layers and vice versa.
+
+Not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination.
+
 ```html
 <head>
   <!-- Include CARTO VL JS -->
   <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
 </head>
 ```
 
-Create a `div` where the map is going to be drawn. In this case we are giving the `div` a map `id`.
+Create a `div` where the map is going to be drawn.
 
 ```html
   <div id="map"></div>
@@ -65,7 +69,7 @@ At this point you will have a basic map ([example](http://carto.com/developers/c
 
 In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](https://carto.com/developers/fundamentals/authorization/).
 
-By default your CARTO data is secured. So the first thing you need to do is [authenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your `user` and `apiKey`.
+The first thing you need to do is [authenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your `user` and `apiKey`.
 
 ```js
 carto.setDefaultAuth({
@@ -81,7 +85,7 @@ const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 ```
 
 ### Defining the Viz object
-A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed, and processed. In this case we create an empty Viz object.
+A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL and defines how the data will be styled, displayed, and processed. In this case we create an empty Viz object with the default style.
 
 ```js
 const viz = new carto.Viz();
@@ -89,7 +93,7 @@ const viz = new carto.Viz();
 
 ### Defining the layer
 
-Now that we have defined our `source` and a `Viz object`, we need to define a [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be accessed by CARTO VL.
+Now that we have defined our `source` and a `Viz object`, we need to define a [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be added to the map.
 
 ```js
 const layer = new carto.Layer('layer', source, viz);

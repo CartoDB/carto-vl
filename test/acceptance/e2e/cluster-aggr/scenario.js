@@ -1,13 +1,14 @@
 const map = new carto.Map({
     container: 'map',
-    background: 'black',
-    center: [-75, 40],
-    zoom: 5
+    background: 'black'
 });
 
 carto.setDefaultAuth({
-    user: 'cartovl',
-    apiKey: 'default_public'
+    user: 'localhost',
+    apiKey: '1234'
+});
+carto.setDefaultConfig({
+    serverURL: 'http://{user}.localhost.lan:8181'
 });
 
 const source = new carto.source.Dataset('monarch_migration_1');
@@ -23,4 +24,6 @@ const viz = new carto.Viz(`
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
-layer.on('loaded', () => window.loaded = true); // Used by screenshot testing utility
+layer.on('loaded', () => {
+    window.loaded = true;
+});

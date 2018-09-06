@@ -1,4 +1,4 @@
-import { implicitCast, checkLooseType, checkType } from './utils';
+import { implicitCast, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 
 /**
@@ -103,7 +103,7 @@ export const Cos = genUnaryOp('cos', x => Math.cos(x), x => `cos(${x})`);
  * @param {Number} x - Numeric expression to compute the tangent in radians
  * @return {Number}
  *
- * @example <caption>Tan</caption>
+ * @example <caption>Tan.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   width: s.tan(0)  // 0
@@ -175,6 +175,17 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * Check if a numeric expression is NaN.
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
+ *
+ * @example <caption>Filter NaN values of the `numeric` property.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   filter: s.not(s.isNaN(s.prop('numeric')))
+ * });
+ *
+ * @example <caption>Filter NaN values of the `numeric` property. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   filter: not(isNaN($numeric))
+ * `);
  *
  * @param {Number} x - Numeric expression to check
  * @return {Number}
@@ -270,27 +281,28 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  */
 export const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 
-function genUnaryOp(name, jsFn, glsl) {
+function genUnaryOp (name, jsFn, glsl) {
     return class UnaryOperation extends BaseExpression {
-        constructor(a) {
+        constructor (a) {
+            checkMaxArguments(arguments, 1, name);
+
             a = implicitCast(a);
-            checkLooseType(name, 'x', 0, 'number', a);
             super({ a });
             this.type = 'number';
+            this.inlineMaker = inlines => glsl(inlines.a);
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(feature) {
+        eval (feature) {
             return jsFn(this.a.eval(feature));
         }
-        _compile(meta) {
-            super._compile(meta);
+        _bindMetadata (meta) {
+            super._bindMetadata(meta);
             checkType(name, 'x', 0, 'number', this.a);
-            if (this.a.type != 'number') {
+            if (this.a.type !== 'number') {
                 throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
             }
-            this.inlineMaker = inlines => glsl(inlines.a);
         }
     };
 }

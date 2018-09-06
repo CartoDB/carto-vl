@@ -1,26 +1,26 @@
-import { validateStaticType, validateStaticTypeErrors, validateDynamicTypeErrors } from './utils';
+import { validateTypeErrors, validateMaxArgumentsError, validateDynamicType } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear } from '../../../../../src/renderer/viz/expressions';
-import * as s from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, rgb, now, sin, zoomrange } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
 
-const DEFAULT_COLOR = s.namedColor('gray');
+const DEFAULT_COLOR = namedColor('gray');
 
 describe('src/renderer/viz/expressions/ramp', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('ramp', []);
-        validateStaticTypeErrors('ramp', ['number']);
-        validateStaticTypeErrors('ramp', ['category']);
-        validateDynamicTypeErrors('ramp', ['number', 'image-list']);
+        validateTypeErrors('ramp', []);
+        validateTypeErrors('ramp', ['number']);
+        validateTypeErrors('ramp', ['category']);
+        validateTypeErrors('ramp', ['number', 'image-array']);
+        validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('ramp', ['number', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'palette'], 'color');
-        validateStaticType('ramp', ['category', 'color-array'], 'color');
-        validateStaticType('ramp', ['category', 'number-array'], 'number');
-        validateStaticType('ramp', ['category', 'image-list'], 'color');
+        validateDynamicType('ramp', ['number', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'color-array'], 'color');
+        validateDynamicType('ramp', ['category', 'number-array'], 'number');
+        validateDynamicType('ramp', ['category', 'image-array'], 'image');
     });
 
     describe('.eval', () => {
@@ -33,7 +33,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 it('should get the first value', () => {
                     const r = ramp(0, values);
 
-                    r._compile();
+                    r._bindMetadata();
                     actual = r.eval();
                     expected = values[0];
 
@@ -43,7 +43,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 it('should be able to get the second value', () => {
                     const r = ramp(1, values);
 
-                    r._compile();
+                    r._bindMetadata();
                     actual = r.eval();
                     expected = values[1];
 
@@ -52,17 +52,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
             });
 
             describe('and values are colors', () => {
-                const firstColor = s.namedColor('red');
-                const secondColor = s.namedColor('blue');
+                const firstColor = namedColor('red');
+                const secondColor = namedColor('blue');
                 let actual;
                 let expected;
 
                 it('should get the first value', () => {
                     const r = ramp(0, [firstColor, secondColor]);
 
-                    r._compile();
+                    r._bindMetadata();
                     actual = r.eval();
-                    expected = firstColor._nameToRGBA();
+                    expected = firstColor.color;
 
                     expect(actual).toEqual(expected);
                 });
@@ -70,9 +70,9 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 it('should get the second value', () => {
                     const r = ramp(1, [firstColor, secondColor]);
 
-                    r._compile();
+                    r._bindMetadata();
                     actual = r.eval();
-                    expected = secondColor._nameToRGBA();
+                    expected = secondColor.color;
 
                     expect(actual).toEqual(expected);
                 });
@@ -88,7 +88,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         grade: {
                             type: 'category',
                             categories: [
-                                { name: 'A' }, 
+                                { name: 'A' },
                                 { name: 'B' },
                                 { name: 'C' },
                                 { name: 'D' },
@@ -97,13 +97,13 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         }
                     }
                 });
-                
-                const red = s.namedColor('red');
-                const blue = s.namedColor('blue');
-                const yellow = s.namedColor('yellow');
-                const purple = s.namedColor('purple');
-                const green = s.namedColor('green');
-                const orange = s.namedColor('orange');
+
+                const red = namedColor('red');
+                const blue = namedColor('blue');
+                const yellow = namedColor('yellow');
+                const purple = namedColor('purple');
+                const green = namedColor('green');
+                const orange = namedColor('orange');
 
                 let actual;
                 let expected;
@@ -112,39 +112,39 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     describe('and not all categories in the dataset have a bucket defined', () => {
                         it('should not show interpolation', () => {
                             let r;
-                            
+
                             r = ramp(buckets('A', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = red._nameToRGBA();
-            
+                            expected = red.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('B', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = blue._nameToRGBA();
-            
+                            expected = blue.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('C', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
-            
+                            expected = yellow.color;
+
                             expect(actual).toEqual(expected);
                         });
 
                         it('should use last color for the remaining categories', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = purple._nameToRGBA();
-            
+                            expected = purple.color;
+
                             expect(actual).toEqual(expected);
                         });
 
@@ -152,45 +152,45 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             const COLORS = [red, blue, yellow, green, orange, purple];
                             const CATEGORIES = ['A', 'B', 'C'];
                             let r;
-                            
+
                             r = ramp(buckets('A', CATEGORIES), COLORS);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = red._nameToRGBA();
-            
+                            expected = red.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('B', CATEGORIES), COLORS);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = blue._nameToRGBA();
-            
+                            expected = blue.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('C', CATEGORIES), COLORS);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
-            
+                            expected = yellow.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('D', CATEGORIES), COLORS);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = green._nameToRGBA();
-            
+                            expected = green.color;
+
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('E', CATEGORIES), COLORS);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = green._nameToRGBA();
-            
+                            expected = green.color;
+
                             expect(actual).toEqual(expected);
                         });
                     });
@@ -199,10 +199,10 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         it('should show interpolation', () => {
                             const r = ramp(buckets('E', ['A', 'B', 'C', 'D', 'E']), [red, blue, yellow, purple, green, orange]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = orange._nameToRGBA();
-            
+                            expected = orange.color;
+
                             expect(actual).not.toEqual(expected);
                         });
                     });
@@ -217,44 +217,44 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             let actual, expected;
 
                             r = ramp(buckets('A', categories), colors);
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
 
                             actual = r.eval();
-                            expected = red._nameToRGBA();
+                            expected = red.color;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('B', categories), colors);
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
 
                             actual = r.eval();
-                            expected = green._nameToRGBA();
+                            expected = green.color;
                             expect(actual).toEqual(expected);
 
                             r = ramp(buckets('C', categories), colors);
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
 
                             actual = r.eval();
-                            expected = yellow._nameToRGBA();
+                            expected = yellow.color;
                             expect(actual).toEqual(expected);
                         });
 
                         it('should use the last color for the last category', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
 
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
+                            expected = DEFAULT_COLOR.color;
 
                             expect(actual).toEqual(expected);
                         });
 
                         it('should use last color for the remaining categories', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
 
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
-            
+                            expected = DEFAULT_COLOR.color;
+
                             expect(actual).toEqual(expected);
                         });
                     });
@@ -268,11 +268,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
                                 const r = ramp(buckets(category, categories), colors);
                                 let actual, expected;
 
-                                r._compile(METADATA);
+                                r._bindMetadata(METADATA);
 
                                 actual = r.eval();
-                                expected = colors[index]._nameToRGBA();
-                                
+                                expected = colors[index].color;
+
                                 expect(actual).toEqual(expected);
                             });
                         });
@@ -284,23 +284,23 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         it('should use the default color for the remaining categories', () => {
                             const r = ramp(buckets('E', ['A', 'B', 'C', 'D']), [red, blue]);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
-                            expected = DEFAULT_COLOR._nameToRGBA();
-            
+                            expected = DEFAULT_COLOR.color;
+
                             expect(actual).toEqual(expected);
                         });
                     });
                 });
             });
 
-            describe('when categories are quantitative', () => {                
-                const red = s.namedColor('red');
-                const blue = s.namedColor('blue');
-                const yellow = s.namedColor('yellow');
-                const purple = s.namedColor('purple');
-                const green = s.namedColor('green');
-                const orange = s.namedColor('orange');
+            describe('when categories are quantitative', () => {
+                const red = namedColor('red');
+                const blue = namedColor('blue');
+                const yellow = namedColor('yellow');
+                const purple = namedColor('purple');
+                const green = namedColor('green');
+                const orange = namedColor('orange');
 
                 describe('and there are less buckets than colors', () => {
                     const RANGES = [10, 20, 30];
@@ -309,39 +309,39 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     let actual;
                     let expected;
-                    
+
                     it('should not show interpolation', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
-        
+                        expected = COLORS[0].color;
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(11, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
-        
+                        expected = COLORS[1].color;
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(21, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
-        
+                        expected = COLORS[2].color;
+
                         expect(actual).toEqual(expected);
                     });
 
                     it('should ignore the remaining colors and use the last color for the rest of the buckets', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = orange._nameToRGBA();
+                        expected = orange.color;
                     });
                 });
 
@@ -356,35 +356,35 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should not show interpolation', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
-        
+                        expected = COLORS[0].color;
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(11, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
-        
+                        expected = COLORS[1].color;
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(21, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
-        
+                        expected = COLORS[2].color;
+
                         expect(actual).toEqual(expected);
                     });
 
                     it('should use the last color for the rest of the buckets', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = yellow._nameToRGBA();
+                        expected = yellow.color;
                     });
                 });
 
@@ -399,42 +399,41 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[0]._nameToRGBA();
-        
+                        expected = COLORS[0].color;
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(11, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[1]._nameToRGBA();
-        
+                        expected = COLORS[1].color;
+
                         expect(actual).not.toEqual(expected);
 
                         r = ramp(buckets(21, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = COLORS[2]._nameToRGBA();
-        
+                        expected = COLORS[2].color;
+
                         expect(actual).not.toEqual(expected);
                     });
 
                     it('should use the default color for the rest', () => {
                         r = ramp(buckets(51, RANGES), COLORS);
 
-                        r._compile();
+                        r._bindMetadata();
                         actual = r.eval();
-                        expected = DEFAULT_COLOR._nameToRGBA();
-        
+                        expected = DEFAULT_COLOR.color;
+
                         expect(actual).toEqual(expected);
                     });
                 });
             });
         });
-    
 
         describe('when palettes are defined palettes', () => {
             describe('and palettes are qualitative', () => {
@@ -443,7 +442,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         city: {
                             type: 'category',
                             categories: [
-                                { name: 'Murcia' }, 
+                                { name: 'Murcia' },
                                 { name: 'Madrid' },
                                 { name: 'Pontevedra' },
                                 { name: 'Barcelona' },
@@ -464,51 +463,51 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     it('should not show interpolation', () => {
                         let r;
-                        
+
                         CATEGORIES.forEach((category, index) => {
                             r = ramp(buckets(category, CATEGORIES), palettes.PRISM);
-    
-                            r._compile(METADATA);
+
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
                             expected = hexToRgb(RAMP_COLORS[index]);
-            
-                            expect(actual).toEqual(expected);  
-                        });             
+
+                            expect(actual).toEqual(expected);
+                        });
                     });
-    
+
                     it('should use last color for the remaining categories', () => {
                         const r = ramp(buckets('Madrid', CATEGORIES), palettes.PRISM);
-    
-                        r._compile(METADATA);
+
+                        r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[5]);
-        
-                        expect(actual).toEqual(expected);  
+
+                        expect(actual).toEqual(expected);
                     });
                 });
 
                 describe('and all categories in the dataset have a bucket defined', () => {
                     const CATEGORIES = ['Murcia', 'Madrid', 'Pontevedra', 'Barcelona', 'Alicante', 'Cordoba', 'Zaragoza'];
                     const RAMP_COLORS = cartocolor.Prism[CATEGORIES.length];
-                    
+
                     it('should not show interpolation', () => {
                         const r = ramp(buckets('Barcelona', CATEGORIES), palettes.PRISM);
-    
-                        r._compile(METADATA);
+
+                        r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[3]);
-        
-                        expect(actual).not.toEqual(expected);                        
+
+                        expect(actual).not.toEqual(expected);
                     });
 
                     it('should not set the last ramp color to the last category', () => {
                         const r = ramp(buckets('Zaragoza', CATEGORIES), palettes.PRISM);
-    
-                        r._compile(METADATA);
+
+                        r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[6]);
-        
-                        expect(actual).not.toEqual(expected);  
+
+                        expect(actual).not.toEqual(expected);
                     });
                 });
             });
@@ -528,20 +527,20 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there are less or equal categories than the max quantitative ramp length (7)', () => {
                     const CATEGORIES = [10, 20, 30];
                     const RAMP_COLORS = cartocolor.Burg[CATEGORIES.length];
-                    
+
                     it('should not show interpolation', () => {
                         CATEGORIES.forEach((category, index) => {
                             const r = ramp(buckets(category - 1, CATEGORIES), palettes.BURG);
 
-                            r._compile(METADATA);
+                            r._bindMetadata(METADATA);
                             actual = r.eval();
                             expected = hexToRgb(RAMP_COLORS[index]);
-            
-                            expect(actual).toEqual(expected);  
+
+                            expect(actual).toEqual(expected);
                         });
                     });
                 });
-    
+
                 describe('and there are more categories than the max quantitative ramp length (7)', () => {
                     it('should show interpolation', () => {
                         const CATEGORIES = [10, 20, 30, 40, 50, 60, 70, 80, 90];
@@ -550,18 +549,18 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         r = ramp(buckets(9, CATEGORIES), palettes.BURG);
 
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[0]);
-        
+
                         expect(actual).toEqual(expected);
 
                         r = ramp(buckets(10, CATEGORIES), palettes.BURG);
 
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = hexToRgb(RAMP_COLORS[1]);
-        
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -573,7 +572,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         describe('when palettes are color arrays', () => {
             const METADATA = new Metadata({
                 properties: {
-                    price: { type: 'number', min: 0, max: 5 },
+                    price: { type: 'number', min: 0, max: 5 }
                 },
                 sample: [
                     { price: 0 },
@@ -581,16 +580,16 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     { price: 2 },
                     { price: 3 },
                     { price: 4 },
-                    { price: 5 },
+                    { price: 5 }
                 ]
             });
 
-            const $price = s.property('price');
-            const red = s.namedColor('red');
-            const blue = s.namedColor('blue');
-            const yellow = s.namedColor('yellow');
-            const purple = s.namedColor('purple');
-            const green = s.namedColor('green');
+            const $price = property('price');
+            const red = namedColor('red');
+            const blue = namedColor('blue');
+            const yellow = namedColor('yellow');
+            const purple = namedColor('purple');
+            const green = namedColor('green');
 
             let actual;
             let expected;
@@ -599,22 +598,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there are less categories than colors', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 4);
-                        const r = ramp(q,[red, blue, yellow, purple, green]);
-                        r._compile(METADATA);
+                        const r = ramp(q, [red, blue, yellow, purple, green]);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
-                        
+                        expected = blue.color;
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 3.1});
-                        expected = yellow._nameToRGBA();
-                        
+
+                        actual = r.eval({ price: 3.1 });
+                        expected = yellow.color;
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -622,22 +621,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there are the same number of categories than colors', () => {
                     it('should not show interpolation', () => {
                         const q = globalQuantiles($price, 4);
-                        const r = ramp(q,[red, blue, yellow]);
-                        r._compile(METADATA);
+                        const r = ramp(q, [red, blue, yellow]);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
-                        
+                        expected = blue.color;
+
                         expect(actual).toEqual(expected);
-                        
-                        actual = r.eval({price: 3.1});
-                        expected = yellow._nameToRGBA();
-                        
+
+                        actual = r.eval({ price: 3.1 });
+                        expected = yellow.color;
+
                         expect(actual).toEqual(expected);
                     });
                 });
@@ -645,17 +644,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there are more categories than colors', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 3);
-                        const r = ramp(q,[red, blue]);
-                        r._compile(METADATA);
+                        const r = ramp(q, [red, blue]);
+                        r._bindMetadata(METADATA);
 
-                        actual = r.eval({price: 1});
-                        expected = red._nameToRGBA();
-                        
+                        actual = r.eval({ price: 1 });
+                        expected = red.color;
+
                         expect(actual).toEqual(expected);
-                        
-                        actual = r.eval({price: 3});
-                        expected = blue._nameToRGBA();
-                        
+
+                        actual = r.eval({ price: 3 });
+                        expected = blue.color;
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -664,41 +663,41 @@ describe('src/renderer/viz/expressions/ramp', () => {
             describe('interpolation', () => {
                 const METADATA = new Metadata({
                     properties: {
-                        price: { type: 'number', min: 1, max: 5 },
+                        price: { type: 'number', min: 1, max: 5 }
                     },
                     sample: [
                         { price: 1 },
                         { price: 2 },
                         { price: 3 },
                         { price: 4 },
-                        { price: 5 },
+                        { price: 5 }
                     ]
                 });
 
                 describe('and it uses linear expression', () => {
                     it('should show interpolation', () => {
                         const q = linear($price);
-                        const r = ramp(q,[red, blue, yellow, purple, green]);
-                        r._compile(METADATA);
+                        const r = ramp(q, [red, blue, yellow, purple, green]);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
-                        
-                        expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 3.1});
-                        expected = yellow._nameToRGBA();
-                        
+                        expected = blue.color;
+
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 4.1});
-                        expected = purple._nameToRGBA();
-                        
+                        actual = r.eval({ price: 3.1 });
+                        expected = yellow.color;
+
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 4.1 });
+                        expected = purple.color;
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -706,22 +705,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and it does not use linear expression', () => {
                     it('should show interpolation', () => {
                         const q = $price;
-                        const r = ramp(q,[red, blue, yellow, purple, green]);
-                        r._compile(METADATA);
+                        const r = ramp(q, [red, blue, yellow, purple, green]);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
-                        expected = red._nameToRGBA();
+                        expected = red.color;
 
                         expect(actual).toEqual(expected);
 
                         actual = r.eval({ price: 2.1 });
-                        expected = blue._nameToRGBA();
-                        
+                        expected = blue.color;
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 3.1});
-                        expected = yellow._nameToRGBA();
-                        
+
+                        actual = r.eval({ price: 3.1 });
+                        expected = yellow.color;
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -733,7 +732,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there are between 2 and 7 colors', () => {
                     const METADATA = new Metadata({
                         properties: {
-                            price: { type: 'number', min: 1, max: 13 },
+                            price: { type: 'number', min: 1, max: 13 }
                         },
                         sample: [
                             { price: 1 },
@@ -751,30 +750,30 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             { price: 13 }
                         ]
                     });
-        
-                    const $price = s.property('price');
+
+                    const $price = property('price');
                     let actual;
                     let expected;
 
                     it('should not show interpolation', () => {
                         const RAMP_COLORS = cartocolor.Sunset[3];
-                        const q = globalQuantiles($price, 3); 
+                        const q = globalQuantiles($price, 3);
                         const r = ramp(q, palettes.SUNSET);
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
 
-                        actual = r.eval({ price: 1});
+                        actual = r.eval({ price: 1 });
                         expected = hexToRgb(RAMP_COLORS[0]);
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({ price: 6});
+                        actual = r.eval({ price: 6 });
                         expected = hexToRgb(RAMP_COLORS[1]);
-                        
+
                         expect(actual).toEqual(expected);
-                        
-                        actual = r.eval({price: 10});
+
+                        actual = r.eval({ price: 10 });
                         expected = hexToRgb(RAMP_COLORS[2]);
-                        
+
                         expect(actual).toEqual(expected);
                     });
                 });
@@ -782,7 +781,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 describe('and there more than 7 colors', () => {
                     const METADATA = new Metadata({
                         properties: {
-                            price: { type: 'number', min: 0, max: 10 },
+                            price: { type: 'number', min: 0, max: 10 }
                         },
                         sample: [
                             { price: 0 },
@@ -798,8 +797,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             { price: 10 }
                         ]
                     });
-        
-                    const $price = s.property('price');
+
+                    const $price = property('price');
                     let actual;
                     let expected;
 
@@ -807,7 +806,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
                         const q = globalQuantiles($price, 10);
                         const r = ramp(q, palettes.SUNSET);
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 0 });
                         expected = hexToRgb(RAMP_COLORS[0]);
@@ -816,32 +815,32 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         actual = r.eval({ price: 1.1 });
                         expected = hexToRgb(RAMP_COLORS[1]);
-                        
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 2.1});
+
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
-                        
+
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
-                        
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 4.1});
+
+                        actual = r.eval({ price: 4.1 });
                         expected = hexToRgb(RAMP_COLORS[4]);
-                        
-                        expect(actual).not.toEqual(expected); 
 
-                        actual = r.eval({price: 5.1});
-                        expected = hexToRgb(RAMP_COLORS[5]);
-                        
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 10});
+                        actual = r.eval({ price: 5.1 });
+                        expected = hexToRgb(RAMP_COLORS[5]);
+
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 10 });
                         expected = hexToRgb(RAMP_COLORS[6]);
-                        
+
                         expect(actual).toEqual(expected);
                     });
                 });
@@ -850,7 +849,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
             describe('interpolation', () => {
                 const METADATA = new Metadata({
                     properties: {
-                        price: { type: 'number', min: 1, max: 13 },
+                        price: { type: 'number', min: 1, max: 13 }
                     },
                     sample: [
                         { price: 1 },
@@ -868,8 +867,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         { price: 13 }
                     ]
                 });
-    
-                const $price = s.property('price');
+
+                const $price = property('price');
                 let actual;
                 let expected;
 
@@ -878,7 +877,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
                         const q = linear($price);
                         const r = ramp(q, palettes.SUNSET);
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
                         expected = hexToRgb(RAMP_COLORS[0]);
@@ -887,27 +886,27 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         actual = r.eval({ price: 1.1 });
                         expected = hexToRgb(RAMP_COLORS[1]);
-                        
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 2.1});
+
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
-                        
+
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
-                        
-                        expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 4.1});
-                        expected = hexToRgb(RAMP_COLORS[4]);
-                        
-                        expect(actual).not.toEqual(expected); 
 
-                        actual = r.eval({price: 5.1});
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 4.1 });
+                        expected = hexToRgb(RAMP_COLORS[4]);
+
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 5.1 });
                         expected = hexToRgb(RAMP_COLORS[5]);
-                        
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
@@ -916,7 +915,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
                         const r = ramp($price, palettes.SUNSET);
-                        r._compile(METADATA);
+                        r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
                         expected = hexToRgb(RAMP_COLORS[0]);
@@ -925,31 +924,255 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         actual = r.eval({ price: 1.1 });
                         expected = hexToRgb(RAMP_COLORS[1]);
-                        
+
                         expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 2.1});
+
+                        actual = r.eval({ price: 2.1 });
                         expected = hexToRgb(RAMP_COLORS[2]);
-                        
+
                         expect(actual).not.toEqual(expected);
 
-                        actual = r.eval({price: 3.1});
+                        actual = r.eval({ price: 3.1 });
                         expected = hexToRgb(RAMP_COLORS[3]);
-                        
-                        expect(actual).not.toEqual(expected);
-                        
-                        actual = r.eval({price: 4.1});
-                        expected = hexToRgb(RAMP_COLORS[4]);
-                        
-                        expect(actual).not.toEqual(expected); 
 
-                        actual = r.eval({price: 5.1});
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 4.1 });
+                        expected = hexToRgb(RAMP_COLORS[4]);
+
+                        expect(actual).not.toEqual(expected);
+
+                        actual = r.eval({ price: 5.1 });
                         expected = hexToRgb(RAMP_COLORS[5]);
-                        
+
                         expect(actual).not.toEqual(expected);
                     });
                 });
             });
+        });
+
+        describe('when the input is zoomrange()', () => {
+            it('should return the first number in the array at low zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoomLevel: 0};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(100);
+            });
+            it('should return an interpolated number in the array at a intermediate zoom level', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
+                const fakeDrawMetadata = {zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9))};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(130);
+            });
+            it('should return the last number in the array at high zoom levels', () => {
+                const r = ramp(zoomrange([3, 9]), [100, 200]);
+                r._bindMetadata();
+                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeDrawMetadata = {zoomLevel: 100};
+                r._preDraw(null, fakeDrawMetadata, fakeGL);
+                const actual = r.eval();
+                expect(actual).toEqual(200);
+            });
+        });
+    });
+
+    describe('when the color ramp has an animated expression', () => {
+        const METADATA = new Metadata({
+            properties: {
+                price: { type: 'number', min: 0, max: 5 }
+            },
+            sample: [
+                { price: 0 },
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 }
+            ]
+        });
+
+        let r;
+
+        beforeEach(() => {
+            r = ramp(buckets('A', ['A', 'B', 'C']), [ rgb(0, 0, sin(now())) ]);
+            r._bindMetadata(METADATA);
+            r.eval({ price: 1 });
+        });
+
+        describe('._computeColorRampTexture', () => {
+            it('should recalculate palette values', () => {
+                spyOn(r, '_calcPaletteValues').and.callThrough();
+
+                r._computeColorRampTexture();
+                expect(r._calcPaletteValues).toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeTextureIfNeeded', () => {
+            it('should calculate texture pixels', () => {
+                spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                r._computeTextureIfNeeded();
+                expect(r._computeColorRampTexture).toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeGLTextureIfNeeded', () => {
+            it('should create a new texture', () => {
+                const gl = { createTexture () {} };
+                spyOn(gl, 'createTexture');
+                spyOn(r, '_bindGLTexture');
+
+                r._computeGLTextureIfNeeded(gl);
+
+                expect(gl.createTexture).toHaveBeenCalled();
+                expect(r._bindGLTexture).toHaveBeenCalled();
+            });
+        });
+    });
+
+    describe('when the color ramp does not have an animated expression', () => {
+        const METADATA = new Metadata({
+            properties: {
+                price: { type: 'number', min: 0, max: 5 }
+            },
+            sample: [
+                { price: 0 },
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 }
+            ]
+        });
+
+        let r;
+
+        beforeEach(() => {
+            r = ramp(buckets('A', ['A', 'B', 'C']), [ rgb(0, 0, 0) ]);
+            r._bindMetadata(METADATA);
+            r.eval({ price: 1 });
+        });
+
+        describe('._computeColorRampTexture', () => {
+            it('should not recalculate palette values', () => {
+                spyOn(r, '_calcPaletteValues').and.callThrough();
+
+                r._computeColorRampTexture();
+
+                expect(r._calcPaletteValues).not.toHaveBeenCalled();
+            });
+        });
+
+        describe('._computeTextureIfNeeded', () => {
+            describe('and it has not calculated yet texture pixels', () => {
+                it('should calculate texture pixels', () => {
+                    spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                    r._cachedTexturePixels = null;
+                    r._computeTextureIfNeeded();
+
+                    expect(r._computeColorRampTexture).toHaveBeenCalled();
+                });
+            });
+
+            describe('and it has already calculated texture pixels', () => {
+                it('should not calculate texture pixels', () => {
+                    spyOn(r, '_computeColorRampTexture').and.callThrough();
+
+                    r._computeTextureIfNeeded();
+                    r._computeTextureIfNeeded();
+
+                    expect(r._computeColorRampTexture).not.toHaveBeenCalled();
+                });
+            });
+        });
+
+        describe('._computeGLTextureIfNeeded', () => {
+            it('should not create a new texture', () => {
+                const gl = { createTexture () {} };
+                spyOn(gl, 'createTexture');
+                spyOn(r, '_bindGLTexture');
+
+                r._computeGLTextureIfNeeded(gl);
+                r._computeGLTextureIfNeeded(gl);
+
+                expect(gl.createTexture).toHaveBeenCalledTimes(1);
+                expect(r._bindGLTexture).toHaveBeenCalledTimes(1);
+            });
+        });
+    });
+
+    describe('._getColorValue', () => {
+        const firstColor = namedColor('red');
+        const secondColor = namedColor('blue');
+        const thirdColor = namedColor('green');
+        let actual;
+        let expected;
+
+        it('should get the first element if m is NaN', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, NaN);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is Positive Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.POSITIVE_INFINITY);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the first element if m is Negative Infinity', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, Number.NEGATIVE_INFINITY);
+            expected = firstColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the last element if m is a positive number greater than 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 100);
+            expected = thirdColor.color;
+
+            expect(actual).toEqual(expected);
+        });
+
+        it('should get the current element if m is between 0 and 1', () => {
+            const r = ramp(0, [firstColor, secondColor, thirdColor]);
+
+            r._bindMetadata();
+            const texturePixels = r._computeTextureIfNeeded();
+            actual = r._getColorValue(texturePixels, 0.5);
+            expected = firstColor.color;
+
+            expect(actual.r).not.toEqual(NaN);
+            expect(actual.g).not.toEqual(NaN);
+            expect(actual.b).not.toEqual(NaN);
+            expect(actual.a).not.toEqual(NaN);
         });
     });
 });

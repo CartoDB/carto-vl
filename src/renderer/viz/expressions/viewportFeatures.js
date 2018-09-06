@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import Property from './basic/property';
 import { implicitCast } from './utils';
+import schema from '../../schema';
 
 /**
  * Generates a list of features in the viewport
@@ -12,18 +13,35 @@ import { implicitCast } from './utils';
  * @param {...Property} properties - properties that will appear in the feature list
  * @return {ViewportFeatures} ViewportFeatures
  *
+ * @example <caption>Define and use a list of features.</caption>
+ * const source = carto.source.Dataset('data');
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   variables: {
+ *     list: s.viewportFeatures(s.prop('value'), s.prop('category'))
+ *   }
+ * });
+ * const layer = carto.Layer('layer', source, viz);
+ * ...
+
+ * layer.on('updated', () => {
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
+ * });
+ *
  * @example <caption>Define and use a list of features. (String)</caption>
  * const source = carto.source.Dataset('data');
  * const viz = new carto.Viz(`
- *          \@list: viewportFeatures($value, $category)
+ *   \@list: viewportFeatures($value, $category)
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
- *
+
  * layer.on('updated', () => {
- *     viz.variables.list.value.forEach(feature => {
- *         console.log('value:', feature.value, 'category:', feature.category);
- *     });
+ *   viz.variables.list.value.forEach(feature => {
+ *     console.log('value:', feature.value, 'category:', feature.category);
+ *   });
  * });
  *
  * @memberof carto.expressions
@@ -32,7 +50,7 @@ import { implicitCast } from './utils';
  * @api
  */
 export default class ViewportFeatures extends BaseExpression {
-    constructor(...properties) {
+    constructor (...properties) {
         properties = properties.map(p => implicitCast(p));
 
         // We need to set all the properties as children of the expression
@@ -47,56 +65,47 @@ export default class ViewportFeatures extends BaseExpression {
         this._FeatureProxy = null;
     }
 
-    _compile() {
+    _applyToShaderSource () {
         throw new Error('viewportFeatures cannot be used in visualizations');
     }
 
-    isFeatureDependent() {
+    isFeatureDependent () {
         return false;
     }
 
-    get value() {
+    get value () {
         return this.expr;
     }
 
-    eval() {
+    eval () {
         return this.expr;
     }
 
-    _resetViewportAgg(metadata) {
+    _resetViewportAgg () {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new Error('viewportFeatures arguments can only be properties');
             }
-            const columns = this._getMinimumNeededSchema().columns;
-            this._FeatureProxy = this.genViewportFeatureClass(columns, metadata);
+            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
+            this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
         this.expr = [];
     }
 
-    accumViewportAgg(feature) {
+    accumViewportAgg (feature) {
         this.expr.push(new this._FeatureProxy(feature));
     }
 
-    genViewportFeatureClass(properties, metadata) {
-        const categoryProperties = properties.filter(name => metadata.properties[name].type === 'category');
-        const nonCategoryProperties = properties.filter(name => metadata.properties[name].type !== 'category');
+    genViewportFeatureClass (properties) {
         const cls = class ViewportFeature {
-            constructor(feature) {
+            constructor (feature) {
                 this._feature = feature;
             }
         };
-        nonCategoryProperties.forEach(prop => {
+        properties.forEach(prop => {
             Object.defineProperty(cls.prototype, prop, {
-                get: function() {
+                get: function () {
                     return this._feature[prop];
-                }
-            });
-        });
-        categoryProperties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function() {
-                    return metadata.IDToCategory.get(this._feature[prop]);
                 }
             });
         });
@@ -104,9 +113,11 @@ export default class ViewportFeatures extends BaseExpression {
     }
 }
 
-function _childrenFromProperties(properties) {
+function _childrenFromProperties (properties) {
     let i = 0;
     const childContainer = {};
-    properties.forEach(property => childContainer['p'+ ++i] = property);
+    properties.forEach(property => {
+        childContainer['p' + ++i] = property;
+    });
     return childContainer;
 }

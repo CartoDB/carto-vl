@@ -1,14 +1,14 @@
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import { hsl, hsla } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/hsl', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('hsl', []);
-        validateStaticTypeErrors('hsl', ['number']);
-        validateStaticTypeErrors('hsl', ['number', 'category']);
-        validateStaticTypeErrors('hsl', ['number', 'number', 'color']);
-
-        validateStaticTypeErrors('hsla', ['number', 'number', 'number']);
+        validateTypeErrors('hsl', []);
+        validateTypeErrors('hsl', ['number']);
+        validateTypeErrors('hsl', ['number', 'category']);
+        validateTypeErrors('hsl', ['number', 'number', 'color']);
+        validateMaxArgumentsError('hsl', ['number', 'number', 'number', 'number', 'number']);
+        validateMaxArgumentsError('hsla', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -38,7 +38,7 @@ describe('src/renderer/viz/expressions/hsl', () => {
     describe('.eval', () => {
         it('should work without alpha', () => {
             expect(hsl(0, 1, 0.5).eval()).toEqual({ r: 255, g: 0, b: 0, a: 1 });
-            expect(hsl(93/360, 0.59, 0.54).eval()).toEqual({ r: 130.77929999999998, g: 206.907, b: 68.49300000000001, a: 1 });
+            expect(hsl(93 / 360, 0.59, 0.54).eval()).toEqual({ r: 130.77929999999998, g: 206.907, b: 68.49300000000001, a: 1 });
         });
         it('should work with alpha', () => {
             expect(hsla(0, 1, 0.5, 1).eval()).toEqual({ r: 255, g: 0, b: 0, a: 1 });

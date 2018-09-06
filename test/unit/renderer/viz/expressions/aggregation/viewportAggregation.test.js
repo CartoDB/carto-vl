@@ -1,26 +1,45 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
+import Metadata from '../../../../../../src/renderer/Metadata';
+import { validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/viewportAggregation', () => {
+    describe('error control', () => {
+        validateMaxArgumentsError('viewportMax', ['number', 'number']);
+        validateMaxArgumentsError('viewportMin', ['number', 'number']);
+        validateMaxArgumentsError('viewportSum', ['number', 'number']);
+        validateMaxArgumentsError('viewportAvg', ['number', 'number']);
+        validateMaxArgumentsError('viewportCount', ['number', 'number']);
+        validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
+        validateMaxArgumentsError('viewportHistogram', ['number', 'number', 'number', 'number']);
+    });
+
     const $price = s.property('price');
     const $nulls = s.property('numeric_with_nulls');
     const $cat = s.property('cat');
+
     describe('viewport filtering', () => {
-        function fakeDrawMetadata(expr) {
-            expr._compile({
+        function fakeDrawMetadata (expr) {
+            const METADATA = new Metadata({
                 properties: {
                     numeric_with_nulls: { type: 'number' },
                     price: { type: 'number' },
                     cat: {
-                        type: 'category', categories: { a: 0, b: 0, c: 0 },
+                        type: 'category',
+                        categories: [
+                            { name: 'a' },
+                            { name: 'b' },
+                            { name: 'c' }
+                        ]
                     }
-                },
-                IDToCategory: new Map([[0, 'a'], [1, 'b'], [2, 'c']]),
+                }
             });
-            expr._resetViewportAgg();
-            expr.accumViewportAgg({ price: 0, cat: 0, numeric_with_nulls: 0 });
-            expr.accumViewportAgg({ price: 0.5, cat: 1, numeric_with_nulls: 1 });
-            expr.accumViewportAgg({ price: 1.5, cat: 1, numeric_with_nulls: NaN });
-            expr.accumViewportAgg({ price: 2, cat: 2, numeric_with_nulls: 2 });
+
+            expr._bindMetadata(METADATA);
+            expr._resetViewportAgg(METADATA);
+            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
+            expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });
+            expr.accumViewportAgg({ price: 0, cat: 'a', numeric_with_nulls: 0 });
         }
 
         describe('viewportMin()', () => {
@@ -107,14 +126,12 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
 
-
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
             viewportPercentile = s.viewportPercentile($price, 51);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(1.5);
-
 
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
@@ -126,7 +143,6 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 100);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
-
         });
 
         it('viewportHistogram($price, 1, 3) should eval to the correct histogram', () => {
@@ -153,12 +169,12 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportHistogram);
             expect(viewportHistogram.value).toEqual([
                 {
-                    x: 'a',
-                    y: 1
-                },
-                {
                     x: 'b',
                     y: 2
+                },
+                {
+                    x: 'a',
+                    y: 1
                 },
                 {
                     x: 'c',
@@ -166,6 +182,5 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 }
             ]);
         });
-
     });
 });

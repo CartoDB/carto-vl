@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Animation | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="../../node_modules/@carto/mapbox-gl/dist/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="../../node_modules/@carto/mapbox-gl/dist/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      center: [-104.93637263263889, 39.72562104533162],
+      zoom: 11
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('parcels');
+    const s = carto.expressions;
+    const viz = new carto.Viz(`
+    filter: ((animation(linear($ccyrblt, 1873, 2018), 20, fade(0, 100000))  +0.1   ) and neq($ccyrblt, 0))
+    color: ramp(linear(($total_valu/$area ), 0, (globalPercentile($total_valu, 99))/1000    )  , ag_sunset)
+    strokeColor: rgba(255,255,255,0.2)
+    strokeWidth: 0
+  `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+  </script>
+</body>
+
+</html>

@@ -1,4 +1,5 @@
-import * as carto from '../../../../src/';
+import carto from '../../../../src/';
+import { layerVisibility } from '../../../../src/constants/layer';
 import * as util from '../../util';
 
 const featureData = {
@@ -49,8 +50,8 @@ describe('Layer', () => {
             let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', async () => {
-                await layer.update(new carto.source.GeoJSON(featureData), viz);
-                layer.$paintCallback();
+                await layer.update(new carto.source.GeoJSON(featureData));
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
             });
@@ -61,19 +62,19 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(source, new carto.Viz('color: blue'));
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
                 done();
             });
         });
 
-        it('should fire a "updated" event when the _onDataframeAdded is called', (done) => {
+        it('should fire a "updated" event when a new dataframe is added', (done) => {
             let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
                 layer._onDataframeAdded(layer._source._dataframe);
-                layer.$paintCallback();
-                expect(update).toHaveBeenCalledTimes(2);
+                layer._paintLayer();
+                expect(update).toHaveBeenCalledTimes(1);
                 done();
             });
         });
@@ -83,11 +84,73 @@ describe('Layer', () => {
             await layer.update(source, new carto.Viz('width: now()'));
             layer.on('updated', update);
             layer.on('loaded', () => {
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(2);
-                layer.$paintCallback();
+                layer._paintLayer();
                 expect(update).toHaveBeenCalledTimes(3);
                 done();
+            });
+        });
+
+        describe('.hide', () => {
+            it('should hide a visible layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    layer.hide();
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    done();
+                });
+            });
+
+            it('should trigger an update event', (done) => {
+                let update = jasmine.createSpy('update');
+
+                layer.on('loaded', () => {
+                    layer.on('updated', update);
+                    layer.hide();
+                    expect(update).toHaveBeenCalledTimes(1);
+                    done();
+                });
+            });
+
+            it('should not request source data', (done) => {
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).not.toHaveBeenCalled();
+                    done();
+                });
+            });
+        });
+
+        describe('.show', () => {
+            beforeEach(() => {
+                layer.on('loaded', () => {
+                    layer.hide();
+                });
+            });
+
+            it('should show a hidden layer', (done) => {
+                layer.on('loaded', () => {
+                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    layer.show();
+                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    done();
+                });
+            });
+
+            it('should request source data', (done) => {
+                layer.on('loaded', () => {
+                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    layer.hide();
+                    layer.show();
+                    layer.requestData();
+
+                    expect(requestDataSourceSpy).toHaveBeenCalled();
+                    done();
+                });
             });
         });
     });

@@ -1,4 +1,4 @@
-import * as carto from '../../../../src';
+import carto from '../../../../src';
 import * as util from '../../util';
 
 // More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
@@ -197,90 +197,104 @@ describe('Interactivity', () => {
                 });
             });
         });
+    });
 
-        describe('when the user move the mouse on the map', () => {
-            describe('and the mouse enters in a feature', () => {
-                it('should fire a featureHover event with a features list containing the entered feature', done => {
-                    interactivity.on('featureHover', event => {
-                        expect(event.features[0].id).toEqual(-0);
-                        expect(event.features[0].layerId).toEqual('layer1');
-                        done();
-                    });
-                    onLoaded(() => {
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
-                    });
+    describe('when the user moves the mouse on the map', () => {
+        describe('and the mouse enters in a feature', () => {
+            it('should fire a featureHover event with a features list containing the entered feature', done => {
+                interactivity.on('featureHover', event => {
+                    expect(event.features.length).toBe(1);
+                    expect(event.features[0].id).toEqual(-0);
+                    expect(event.features[0].layerId).toEqual('layer1');
+                    done();
                 });
-
-                it('should fire a featureEnter event with a features list containing the entered feature', done => {
-                    interactivity.on('featureEnter', event => {
-                        expect(event.features[0].id).toEqual(-0);
-                        expect(event.features[0].layerId).toEqual('layer1');
-                        done();
-                    });
-                    onLoaded(() => {
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
-                    });
-                });
-
-                it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
-                    const featureEnterSpy = jasmine.createSpy('featureEnterSpy');
-                    onLoaded(() => {
-                        interactivity.on('featureEnter', featureEnterSpy);
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
-                        // Move mouse inside the same feature 1
-                        util.simulateMove({ lng: 5, lat: 15 });
-                        setTimeout(() => {
-                            expect(featureEnterSpy).toHaveBeenCalledTimes(1);
-                            done();
-                        }, 0);
-                    });
+                onLoaded(() => {
+                    // Move mouse inside a feature 1
+                    util.simulateMove({ lng: 5, lat: 5 });
                 });
             });
 
-            describe('and the mouse leaves a feature', () => {
-                it('should fire a featureHover event with an empty features list', done => {
-                    onLoaded(() => {
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
-                        interactivity.on('featureHover', event => {
-                            expect(event.features.length).toEqual(0);
-                            done();
-                        });
-                        // Move mouse outside any feature (over a feature 1 hole)
-                        util.simulateMove({ lng: 15, lat: 15 });
-                    });
+            it('should fire a featureEnter event with a features list containing the entered feature', done => {
+                interactivity.on('featureEnter', event => {
+                    expect(event.features.length).toBe(1);
+                    expect(event.features[0].id).toEqual(-0);
+                    expect(event.features[0].layerId).toEqual('layer1');
+                    done();
                 });
-
-                it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
-                    onLoaded(() => {
-                        interactivity.on('featureLeave', event => {
-                            expect(event.features[0].id).toEqual(-0);
-                            expect(event.features[0].layerId).toEqual('layer1');
-                            done();
-                        });
-                        // Move mouse inside a feature 1
-                        util.simulateMove({ lng: 5, lat: 5 });
-                        // Move mouse outside any feature
-                        util.simulateMove({ lng: -5, lat: -5 });
-                    });
+                onLoaded(() => {
+                    // Move mouse inside a feature 1
+                    util.simulateMove({ lng: 5, lat: 5 });
                 });
+            });
 
-                it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
-                    layer2.on('loaded', () => {
-                        const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
-                        // Move mouse outside any feature
-                        util.simulateMove({ lng: -5, lat: -5 });
-                        interactivity.on('featureLeave', featureLeaveSpy);
-                        interactivity.on('featureHover', () => {
-                            expect(featureLeaveSpy).not.toHaveBeenCalled();
-                            done();
-                        });
-                        // Move mouse outside any feature
-                        util.simulateMove({ lng: -10, lat: -10 });
+            it('should not fire a featureEnter event when the mouse is moved inside the same feature', done => {
+                const featureEnterSpy = jasmine.createSpy('featureEnterSpy');
+                onLoaded(() => {
+                    interactivity.on('featureEnter', featureEnterSpy);
+                    // Move mouse inside a feature 1
+                    util.simulateMove({ lng: 5, lat: 5 });
+                    // Move mouse inside the same feature 1
+                    util.simulateMove({ lng: 5, lat: 15 });
+                    setTimeout(() => {
+                        expect(featureEnterSpy).toHaveBeenCalledTimes(1);
+                        done();
+                    }, 0);
+                });
+            });
+        });
+
+        describe('and the mouse leaves a feature', () => {
+            it('should fire a featureLeave event with a features list containing the previously entered feature', done => {
+                onLoaded(() => {
+                    // Move mouse inside a feature 1
+                    util.simulateMove({ lng: 5, lat: 5 });
+                    interactivity.on('featureLeave', event => {
+                        expect(event.features.length).toBe(1);
+                        expect(event.features[0].id).toEqual(-0);
+                        expect(event.features[0].layerId).toEqual('layer1');
+                        done();
                     });
+                    // Move mouse outside any feature
+                    util.simulateMove({ lng: -5, lat: -5 });
+                });
+            });
+
+            it('should not fire a featureLeave event when the mouse is moved outside any feature', done => {
+                layer2.on('loaded', () => {
+                    const featureLeaveSpy = jasmine.createSpy('featureLeaveSpy');
+                    // Move mouse outside any feature
+                    util.simulateMove({ lng: -5, lat: -5 });
+                    interactivity.on('featureLeave', featureLeaveSpy);
+                    interactivity.on('featureHover', () => {
+                        expect(featureLeaveSpy).not.toHaveBeenCalled();
+                        done();
+                    });
+                    // Move mouse outside any feature (over a feature 1 hole)
+                    util.simulateMove({ lng: 15, lat: 15 });
+                });
+            });
+        });
+    });
+
+    describe('when the layer changes', () => {
+        describe('and appears a feature below the mouse', () => {
+            it('should fire a featureHover event with the feature 1', done => {
+                onLoaded(() => {
+                    // Hide feature
+                    viz1.filter = 0;
+                    // Setup initial mouse position
+                    util.simulateMove({ lng: 5, lat: 5 });
+
+                    // Register event after move to be called by layer `updated`
+                    interactivity.on('featureHover', event => {
+                        expect(event.features.length).toBe(1);
+                        expect(event.features[0].id).toEqual(-0);
+                        expect(event.features[0].layerId).toEqual('layer1');
+                        done();
+                    });
+
+                    // Show feature
+                    viz1.filter = 1;
                 });
             });
         });
@@ -332,16 +346,8 @@ describe('Interactivity', () => {
         });
     });
 
-    function onLoaded(callback) {
-        let allLoaded = 0;
-        function loaded() {
-            allLoaded++;
-            if (allLoaded == 2) {
-                callback();
-            }
-        }
-        layer1.on('loaded', loaded);
-        layer2.on('loaded', loaded);
+    function onLoaded (callback) {
+        carto.on('loaded', [layer1, layer2], callback);
     }
 
     afterEach(() => {
@@ -396,7 +402,109 @@ describe('Cursor', () => {
         });
     });
 
-    afterEach(()=>{
+    describe('when layer visibility changes to hidden', () => {
+        it('should not fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    describe('when layer visibility changes to visible', () => {
+        it('should fire any event', done => {
+            new carto.Interactivity(layer1);
+
+            expect(map.getCanvas().style.cursor).toEqual('');
+
+            layer1.on('loaded', () => {
+                layer1.hide();
+                layer1.show();
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+
+                setTimeout(() => {
+                    expect(map.getCanvas().style.cursor).toEqual('pointer');
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(setup.div);
+    });
+});
+
+describe('regression with a category filter', () => {
+    let map, setup, source1, viz1, layer1, interactivity;
+    beforeEach(() => {
+        setup = util.createMap('map');
+        map = setup.map;
+
+        const feature1 = {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [
+                    [
+                        [0, 0],
+                        [40, 0],
+                        [40, 40],
+                        [0, 40],
+                        [0, 0]
+                    ],
+                    [
+                        [10, 10],
+                        [10, 30],
+                        [30, 30],
+                        [30, 10],
+                        [10, 10]
+                    ]
+                ]
+            },
+            properties: {
+                cat: 'asdf'
+            }
+        };
+
+        source1 = new carto.source.GeoJSON(feature1);
+        viz1 = new carto.Viz(`
+            color: red
+            @wadus: 123
+            filter: $cat == 'asdf'
+        `);
+        layer1 = new carto.Layer('layer1', source1, viz1);
+        interactivity = new carto.Interactivity([layer1]);
+        layer1.addTo(map);
+    });
+
+    it('should fire a featureClick event with the feature 1 when it is clicked', done => {
+        interactivity.on('featureClick', event => {
+            expect(event.features.length).toBe(1);
+            expect(event.features[0].id).toEqual(-0);
+            expect(event.features[0].layerId).toEqual('layer1');
+            done();
+        });
+
+        layer1.on('loaded', () => {
+            // Click on the feature 1
+            util.simulateClick({ lng: 5, lat: 5 });
+        });
+    });
+
+    afterEach(() => {
         map.remove();
         document.body.removeChild(setup.div);
     });

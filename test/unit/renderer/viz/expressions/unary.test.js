@@ -1,6 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors } from './utils';
-
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -9,8 +8,21 @@ s.FALSE.toString = () => 's.FALSE';
 describe('src/renderer/viz/expressions/unary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER', () => {
-            validateDynamicTypeErrors('sin', ['category']);
-            validateStaticTypeErrors('sin', ['color']);
+            validateTypeErrors('sin', ['category']);
+            validateTypeErrors('sin', ['color']);
+
+            validateMaxArgumentsError('sin', ['number', 'number']);
+            validateMaxArgumentsError('ceil', ['number', 'number']);
+            validateMaxArgumentsError('log', ['number', 'number']);
+            validateMaxArgumentsError('cos', ['number', 'number']);
+            validateMaxArgumentsError('sqrt', ['number', 'number']);
+            validateMaxArgumentsError('tan', ['number', 'number']);
+            validateMaxArgumentsError('sign', ['number', 'number']);
+            validateMaxArgumentsError('abs', ['number', 'number']);
+            validateMaxArgumentsError('isNaN', ['number', 'number']);
+            validateMaxArgumentsError('not', ['number', 'number']);
+            validateMaxArgumentsError('floor', ['number', 'number']);
+            validateMaxArgumentsError('isNaN', ['number', 'number']);
         });
     });
 
@@ -77,7 +89,7 @@ describe('src/renderer/viz/expressions/unary', () => {
     });
 
     // Helper function to test binary expressions
-    function test(fn, param1, expected) {
+    function test (fn, param1, expected) {
         it(`${fn}(${param1}) should return ${expected}`, () => {
             let actual = s[fn](param1).eval();
             expect(actual).toEqual(expected);

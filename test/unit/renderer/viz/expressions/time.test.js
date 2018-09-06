@@ -1,6 +1,11 @@
 import Time from '../../../../../src/renderer/viz/expressions/time';
+import { validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/time', () => {
+    describe('error control', () => {
+        validateMaxArgumentsError('time', ['date', 'date']);
+    });
+
     const expectedDate = new Date('2016-05-30T13:45:00+05:00');
     it('should return a valid date when the parameter is a ISO_8601 string', () => {
         const time = new Time('2016-05-30T13:45:00+05:00');

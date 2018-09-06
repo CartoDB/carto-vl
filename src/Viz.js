@@ -7,15 +7,25 @@ import { implicitCast } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
 import CartoValidationError from './errors/carto-validation-error';
+import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
+import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
+import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexShader.glsl';
+import lineFragmentShaderGLSL from './renderer/shaders/geometry/line/lineFragmentShader.glsl';
+import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygonVertexShader.glsl';
+import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
+import SVG from './renderer/viz/expressions/SVG';
+import svgs from './renderer/viz/defaultSVGs';
+import Placement from './renderer/viz/expressions/placement';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
 const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
-const DEFAULT_ORDER_EXPRESSION = () => s.noOrder();
-const DEFAULT_FILTER_EXPRESSION = () => s.constant(1);
-const DEFAULT_SYMBOL_EXPRESSION = () => { const expr = s.FALSE; expr._default = true; return expr; };
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => s.ALIGN_BOTTOM;
+const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
+const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
+const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -30,15 +40,33 @@ const SUPPORTED_PROPERTIES = [
     'filter',
     'symbol',
     'symbolPlacement',
+    'offset',
     'resolution',
     'variables'
 ];
 
-export default class Viz {
+/**
+ * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
+ * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
+ * @typedef {object} VizSpec
+ * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+ * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+ * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+ * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+ * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
+ * @property {Image} symbol - show an image instead in the place of points
+ * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+ * @property {Placement} offset - offset to apply to the features in pixels
+ * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+ * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+ * @property {object} variables - An object describing the variables used.
+ * @api
+ */
 
+export default class Viz {
     /**
     * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
-    * displayed and processed.
+    * displayed and processed. A Viz instance can only be bound to one layer.
     *
     *
     * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
@@ -63,15 +91,17 @@ export default class Viz {
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
+    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+    * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-    * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+    * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+    * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
     * @property {object} variables - An object describing the variables used.
     *
     */
-    constructor(definition) {
+    constructor (definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
 
@@ -85,35 +115,36 @@ export default class Viz {
         this.updated = true;
         this._changeCallback = null;
 
+        this._updateRootExpressionList();
         this._updateRootExpressions();
 
         this._resolveAliases();
         this._validateAliasDAG();
     }
 
-    loadImages() {
+    loadImages () {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
-    _defineProperty(propertyName, propertyValue) {
+    _defineProperty (propertyName, propertyValue) {
         if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
             return;
         }
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (propertyName != 'resolution') {
+                if (propertyName !== 'resolution') {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
                 this._changed();
-            },
+            }
         });
 
         let property = propertyValue;
-        if (propertyName == 'variables') {
+        if (propertyName === 'variables') {
             let init = false;
             const handler = {
                 get: (obj, prop) => {
@@ -138,8 +169,39 @@ export default class Viz {
         this['_' + propertyName] = property;
     }
 
-    _getRootExpressions() {
-        return [
+    _getRootExpressions () {
+        return this._rootExpressions;
+    }
+    _getRootStyleExpressions () {
+        return this._rootStyleExpressions;
+    }
+
+    _updateRootExpressions () {
+        this._getRootExpressions().forEach(expr => {
+            expr.parent = this;
+            expr.notify = this._changed.bind(this);
+        });
+    }
+
+    isAnimated () {
+        return this._getRootStyleExpressions().some(expr => expr.isAnimated());
+    }
+
+    onChange (callback) {
+        this._changeCallback = callback;
+    }
+
+    _changed () {
+        this._updateRootExpressionList();
+        this._resolveAliases();
+        this._validateAliasDAG();
+        if (this._changeCallback) {
+            this._changeCallback(this);
+        }
+    }
+
+    _updateRootExpressionList () {
+        this._rootExpressions = [
             this.color,
             this.width,
             this.strokeColor,
@@ -148,45 +210,29 @@ export default class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
+            this.offset,
             ...Object.values(this.variables)
+        ];
+        this._rootStyleExpressions = [
+            this.color,
+            this.width,
+            this.strokeColor,
+            this.strokeWidth,
+            this.order,
+            this.filter,
+            this.symbol,
+            this.symbolPlacement,
+            this.offset
         ];
     }
 
-    _updateRootExpressions() {
-        this._getRootExpressions().forEach(expr => {
-            expr.parent = this;
-            expr.notify = this._changed.bind(this);
-        });
-    }
-
-    isAnimated() {
-        return this.color.isAnimated() ||
-            this.width.isAnimated() ||
-            this.strokeColor.isAnimated() ||
-            this.strokeWidth.isAnimated() ||
-            this.filter.isAnimated() ||
-            this.symbol.isAnimated() ||
-            this.symbolPlacement.isAnimated();
-    }
-
-    onChange(callback) {
-        this._changeCallback = callback;
-    }
-
-    _changed() {
-        this._resolveAliases();
-        this._validateAliasDAG();
-        if (this._changeCallback) {
-            this._changeCallback(this);
-        }
-    }
-
-    getMinimumNeededSchema() {
+    getMinimumNeededSchema () {
         const exprs = this._getRootExpressions().filter(x => x && x._getMinimumNeededSchema);
         return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
 
-    setDefaultsIfRequired(geomType) {
+    setDefaultsIfRequired (geomType) {
+        this._geomType = geomType;
         if (this._appliedDefaults) {
             return;
         }
@@ -209,7 +255,7 @@ export default class Viz {
         }
     }
 
-    _getDefaultGeomStyle(geomType) {
+    _getDefaultGeomStyle (geomType) {
         if (geomType === 'point') {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
@@ -222,7 +268,7 @@ export default class Viz {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
-                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))  // Not used in lines
+                STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1)) // Not used in lines
             };
         } else if (geomType === 'polygon') {
             return {
@@ -234,21 +280,13 @@ export default class Viz {
         }
     }
 
-    _resolveAliases() {
-        [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement
-        ].concat(Object.values(this.variables)).forEach(expr =>
-            expr._resolveAliases(this.variables)
-        );
+    _resolveAliases () {
+        this._getRootExpressions().forEach(expr => {
+            expr._resolveAliases(this.variables);
+        });
     }
 
-    _validateAliasDAG() {
+    _validateAliasDAG () {
         const permanentMarkedSet = new Set();
         const temporarilyMarkedSet = new Set();
         const visit = node => {
@@ -263,74 +301,87 @@ export default class Viz {
             node._getDependencies().forEach(visit);
             permanentMarkedSet.add(node);
         };
-        const unmarked = [
-            ...this.color._getDependencies(),
-            ...this.strokeColor._getDependencies(),
-            ...this.width._getDependencies(),
-            ...this.strokeWidth._getDependencies(),
-            ...this.filter._getDependencies(),
-            ...this.symbol._getDependencies(),
-            ...this.symbolPlacement._getDependencies()];
+        const unmarked = this._getRootExpressions().map(
+            expr => expr._getDependencies()
+        ).reduce((a, b) =>
+            [...a, ...b]
+            , []);
         while (unmarked.length) {
             visit(unmarked.pop());
         }
     }
 
-    compileShaders(gl, metadata) {
-        this.color._bind(metadata);
-        this.width._bind(metadata);
-        this.strokeColor._bind(metadata);
-        this.strokeWidth._bind(metadata);
-        this.symbol._bind(metadata);
-        this.filter._bind(metadata);
+    compileShaders (gl, metadata) {
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
+        checkVizPropertyTypes(this);
 
         this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
         this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
         this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
         this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
-        this.filterShader = compileShader(gl,shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
+        this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
 
-        this.symbolPlacement._bind(metadata);
-        if (!this.symbol._default) {
+        if (!this.symbol.default) {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement
+                symbolPlacement: this.symbolPlacement,
+                offset: this.offset
             }, this);
+        }
+
+        if (!this._geomType || this._geomType === 'point') {
+            this.pointShader = compileShader(gl,
+                { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'line') {
+            this.lineShader = compileShader(gl,
+                { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
+                { offset: this.offset }, this);
+        }
+        if (!this._geomType || this._geomType === 'polygon') {
+            this.polygonShader = compileShader(gl,
+                { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
+                { offset: this.offset }, this);
         }
     }
 
-    replaceChild(toReplace, replacer) {
+    replaceChild (toReplace, replacer) {
         if (Object.values(this.variables).includes(toReplace)) {
-            const varName = Object.keys(this.variables).find(varName => this.variables[varName] == toReplace);
+            const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.color) {
+        } else if (toReplace === this.color) {
             this.color = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.width) {
+        } else if (toReplace === this.width) {
             this.width = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.strokeColor) {
+        } else if (toReplace === this.strokeColor) {
             this.strokeColor = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.strokeWidth) {
+        } else if (toReplace === this.strokeWidth) {
             this.strokeWidth = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.filter) {
+        } else if (toReplace === this.filter) {
             this.filter = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.symbol) {
+        } else if (toReplace === this.symbol) {
             this.symbol = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace == this.symbolPlacement) {
+        } else if (toReplace === this.symbolPlacement) {
             this.symbolPlacement = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace === this.offset) {
+            this.offset = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -347,7 +398,7 @@ export default class Viz {
      * @param  {string|object} definition
      * @return {VizSpec}
      */
-    _getVizDefinition(definition) {
+    _getVizDefinition (definition) {
         if (util.isUndefined(definition)) {
             return this._setDefaults({});
         }
@@ -366,7 +417,7 @@ export default class Viz {
      * @param {VizSpec} vizSpec
      * @return {VizSpec}
      */
-    _setDefaults(vizSpec) {
+    _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
             vizSpec.color = DEFAULT_COLOR_EXPRESSION();
         }
@@ -394,34 +445,19 @@ export default class Viz {
         if (util.isUndefined(vizSpec.symbolPlacement)) {
             vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
         }
+        if (util.isUndefined(vizSpec.offset)) {
+            vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
+        }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
 
-    _checkVizSpec(vizSpec) {
-        /**
-         * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
-         * For a better understanding we recommend reading the {@link TODO|VIZ guide}
-         * @typedef {object} VizSpec
-         * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
-         * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
-         * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
-         * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-         * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test
-         * @property {Image} symbol - show an image instead in the place of points
-         * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-         * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-         * @property {number} resolution - resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
-         * @property {object} variables - An object describing the variables used.
-         * @api
-         */
-
-        // TODO: Check expression types ie: color is not a number expression!
-
+    _checkVizSpec (vizSpec) {
         // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.offset = implicitCast(vizSpec.offset);
         vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
@@ -458,6 +494,10 @@ export default class Viz {
         if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
         }
+        if (!(vizSpec.offset instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[offset]');
+        }
+
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
@@ -466,11 +506,41 @@ export default class Viz {
     }
 }
 
+function checkVizPropertyTypes (viz) {
+    if (viz.color.type !== 'color') {
+        throw new Error(`Viz property 'color:' must be of type 'color' but it was of type ${viz.color.type}`);
+    }
+    if (viz.strokeColor.type !== 'color') {
+        throw new Error(`Viz property 'strokeColor:' must be of type 'color' but it was of type ${viz.strokeColor.type}`);
+    }
+    if (viz.width.type !== 'number') {
+        throw new Error(`Viz property 'width:' must be of type 'number' but it was of type ${viz.width.type}`);
+    }
+    if (viz.strokeWidth.type !== 'number') {
+        throw new Error(`Viz property 'strokeWidth:' must be of type 'number' but it was of type ${viz.strokeWidth.type}`);
+    }
+    if (viz.order.type !== 'orderer') {
+        throw new Error(`Viz property 'order:' must be of type 'orderer' but it was of type ${viz.order.type}`);
+    }
+    if (viz.filter.type !== 'number') {
+        throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
+    }
+    if (viz.symbol.type !== 'image') {
+        throw new Error(`Viz property 'symbol:' must be of type 'image' but it was of type ${viz.symbol.type}`);
+    }
+    if (viz.symbolPlacement.type !== 'placement') {
+        throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
+    }
+    if (viz.offset.type !== 'placement') {
+        throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);
+    }
+}
+
 /**
  * Mark default expressions to apply the style defaults for each
  * geometry (point, line, polygon) when available.
  */
-function _markDefault(expression) {
+function _markDefault (expression) {
     expression.default = true;
     return expression;
 }

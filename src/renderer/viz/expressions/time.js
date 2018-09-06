@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import * as util from '../../../utils/util';
+import { checkMaxArguments } from './utils';
 
 /**
  * Time contant expression
@@ -24,20 +25,25 @@ import * as util from '../../../utils/util';
  * @api
  */
 export default class Time extends BaseExpression {
-    constructor(date) {
+    constructor (date) {
+        checkMaxArguments(arguments, 1, 'time');
+
         super({});
         // TODO improve type check
         this.type = 'time';
         this.date = util.castDate(date);
         this.inlineMaker = () => undefined;
     }
-    get value() {
+
+    get value () {
         return this.eval();
     }
-    eval() {
+
+    eval () {
         return this.date;
     }
-    isAnimated() {
+
+    isAnimated () {
         return false;
     }
 }

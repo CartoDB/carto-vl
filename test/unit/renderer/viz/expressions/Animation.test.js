@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors } from './utils';
+import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/Animation', () => {
     describe('error control', () => {
@@ -8,6 +8,7 @@ describe('src/renderer/viz/expressions/Animation', () => {
         validateTypeErrors('animation', ['number', 10, 'color']);
         validateTypeErrors('animation', ['color', 10]);
         validateTypeErrors('animation', ['number', 'color']);
+        validateMaxArgumentsError('animation', ['number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -33,8 +34,6 @@ describe('src/renderer/viz/expressions/Animation', () => {
             expect(t.eval()).toEqual(0.75);
         });
     });
-
-
 
     describe('.pause', () => {
         it('should pause the simulation when playing', () => {
@@ -116,7 +115,6 @@ describe('src/renderer/viz/expressions/Animation', () => {
             expect(t.getProgressPct()).toEqual(0.8);
         });
     });
-
 
     describe('.stop and .play', () => {
         it('should reset the simulation time', () => {

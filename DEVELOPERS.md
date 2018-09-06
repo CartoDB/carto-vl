@@ -24,6 +24,18 @@ $ yarn
 $ yarn build
 ```
 
+## <a name="documentation">Document your changes</a>
+
+This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+
+```bash
+# Generate the public documentation
+$ yarn docs
+
+# Serve docs and examples
+$ yarn serve
+```
+
 ## <a name="tests">Tests</a>
 
 ### Unit tests
@@ -86,12 +98,18 @@ Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 ### Acceptance tests (E2E tests)
 
-This end to end tests cover the entire library by perfoming tests againts real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images.
+This end to end tests cover the entire library by performing tests against real servers. This is done through iterative screenshot testing, comparing `test` screenshots against its reference images. To achieve real E2E testing, a Windshaft-cartodb server is deployed within a Docker container.
+
+To install Docker, follow the instructions on https://docs.docker.com/install/
+
+You'll also need to add `127.0.0.1 localhost.localhost.lan` your `/etc/hosts/` file.
 
 ```bash
 # Running the tests
 $ yarn test:e2e
 ```
+
+To rebuild the Docker image run: `docker build -t carto/windshaft-cartovl-testing test/acceptance/docker/`
 
 #### Generating new references
 
@@ -117,14 +135,18 @@ Adding `f-` at the beginning of any test folder marks this test to be executed w
 
 Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
-## <a name="documentation">Document your changes</a>
+## Release
 
-This is intended for the end-user of the library and it's the source of [CARTO VL's Official Documentation](https://carto.com/developers/carto-vl/). It's available in the directory `docs/public`.
+First create a release. This command bumps the version, creates a tag and uploads all to GitHub.
 
-```bash
-# Generate the public documentation
-$ yarn docs
-
-# Serve docs and examples
-$ yarn serve
 ```
+yarn version
+```
+
+Then, use this command to publish to our `CDN` and `npm`.
+
+```
+yarn publish
+```
+
+NOTE: `yarn publish` calls `yarn version` at the beginning of the process. If you don't want to bump the version just press `Enter` to skip the prompt and use the current version instead.

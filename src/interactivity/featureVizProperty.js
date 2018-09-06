@@ -12,54 +12,52 @@ import { parseVizExpression } from '../renderer/viz/parser';
  * @api
  */
 export default class FeatureVizProperty {
-    get value() {
-        return this._viz[this._propertyName].eval(this._properties);
+    constructor (propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
+        this._propertyName = propertyName;
+        this._properties = feature;
+        this._viz = viz;
+
+        this.blendTo = _generateBlenderFunction(propertyName, feature[idProperty], customizedFeatures, viz, trackFeatureViz, idProperty);
+        this.reset = _generateResetFunction(propertyName, feature[idProperty], customizedFeatures, viz, idProperty);
     }
 
-    constructor(propertyName, feature, viz, customizedFeatures, trackFeatureViz, idProperty) {
-        this._propertyName = propertyName;
-        this._feature = feature;
-        this._viz = viz;
-        this._properties = this._feature.properties;
-
-        this.blendTo = _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty);
-        this.reset = _generateResetFunction(propertyName, feature, customizedFeatures, viz, idProperty);
+    get value () {
+        return this._viz[this._propertyName].eval(this._properties);
     }
 }
 
-function _generateResetFunction(propertyName, feature, customizedFeatures, viz, idProperty) {
-    return function reset(duration = 500) {
-        if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
-            customizedFeatures[feature.id][propertyName].replaceChild(
-                customizedFeatures[feature.id][propertyName].mix,
+function _generateResetFunction (propertyName, id, customizedFeatures, viz, idProperty) {
+    return function reset (duration = 500) {
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].replaceChild(
+                customizedFeatures[id][propertyName].mix,
                 // transition(0) is used to ensure that blend._predraw() "GC" collects it
-                blend(notEquals(property(idProperty), feature.id), transition(0), transition(duration))
+                blend(notEquals(property(idProperty), id), transition(0), transition(duration))
             );
             viz[propertyName].notify();
-            customizedFeatures[feature.id][propertyName] = undefined;
+            customizedFeatures[id][propertyName] = undefined;
         }
     };
 }
 
-
-function _generateBlenderFunction(propertyName, feature, customizedFeatures, viz, trackFeatureViz, idProperty) {
-    return function generatedBlendTo(newExpression, duration = 500) {
-        if (typeof newExpression == 'string') {
+function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, trackFeatureViz, idProperty) {
+    return function generatedBlendTo (newExpression, duration = 500) {
+        if (typeof newExpression === 'string') {
             newExpression = parseVizExpression(newExpression);
         }
-        if (customizedFeatures[feature.id] && customizedFeatures[feature.id][propertyName]) {
-            customizedFeatures[feature.id][propertyName].a.blendTo(newExpression, duration);
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].a.blendTo(newExpression, duration);
             return;
         }
         const blendExpr = blend(
             newExpression,
             viz[propertyName],
-            blend(1, notEquals(property(idProperty), feature.id), transition(duration))
+            blend(1, notEquals(property(idProperty), id), transition(duration))
         );
-        trackFeatureViz(feature.id, propertyName, blendExpr, customizedFeatures);
+        trackFeatureViz(id, propertyName, blendExpr, customizedFeatures);
         viz.replaceChild(
             viz[propertyName],
-            blendExpr,
+            blendExpr
         );
         viz[propertyName].notify();
     };

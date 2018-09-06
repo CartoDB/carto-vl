@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Viewport Features | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script>
+    const innerTriangle = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [0, 50],
+            [0, 0],
+            [50, 0],
+            [0, 50]
+          ]
+        ]
+      },
+      properties: {
+        cartodb_id: 1,
+        value: 1,
+        category: 'a'
+      }
+    };
+
+    const innerLine = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [0, 50],
+          [0, 0]
+        ]
+      },
+      properties: {
+        cartodb_id: 11,
+        value: 11,
+        category: 'aa'
+      }
+    }
+
+    const intersectingTriangle = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [165, 50],
+            [165, 0],
+            [215, 0],
+            [165, 50]
+          ]
+        ]
+      },
+      properties: {
+        cartodb_id: 2,
+        value: 2,
+        category: 'b'
+      }
+    };
+
+    const intersectingLine = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+            [165, 50],
+            [165, 0],
+        ]
+      },
+      properties: {
+        cartodb_id: 12,
+        value: 12,
+        category: 'bb'
+      }
+    }
+
+    const outerTriangle = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [200, 50],
+            [200, 0],
+            [250, 0],
+            [200, 50]
+          ]
+        ]
+      },
+      properties: {
+        cartodb_id: 3,
+        value: 3,
+        category: 'c'
+      }
+    };
+
+    const outerLine = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+            [200, 50],
+            [200, 0]
+        ]
+      },
+      properties: {
+        cartodb_id: 13,
+        value: 13,
+        category: 'cc'
+      }
+    }
+
+    const outerBBOXTriangle = {
+      type: 'Feature',
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [-226, -70],
+            [-226, -85],
+            [-176, -85],
+            [-226, -70]
+          ]
+        ]
+      },
+      properties: {
+        cartodb_id: 4,
+        value: 4,
+        category: 'd'
+      }
+    };
+
+    const outerBBOXLine = {
+      type: 'Feature',
+      geometry: {
+        type: 'LineString',
+        coordinates: [
+          [-176, -85],
+          [-226, -70]
+        ]
+      },
+      properties: {
+        cartodb_id: 14,
+        value: 14,
+        category: 'dd'
+      }
+    }
+
+    const VIEWPORT_SIZE = 500;
+
+    const $map = document.getElementById('map');
+    $map.style.width = `${VIEWPORT_SIZE}px`;
+    $map.style.height = `${VIEWPORT_SIZE}px`;
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+          id: 'background',
+          type: 'background',
+          paint: {
+            'background-color': 'black'
+          }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    function generateData(features) {
+      return {
+        type: 'FeatureCollection',
+        features
+      };
+    }
+
+    const source = new carto.source.GeoJSON(generateData([
+        innerTriangle,
+        intersectingTriangle,
+        outerTriangle,
+        outerBBOXTriangle
+      ]),{
+        id: 'cartodb_id'
+      }
+    );
+
+    const viz = new carto.Viz(`
+      color: blend(red, green, viewportCount() == 2)
+      strokeWidth: 0
+      @list: viewportFeatures();
+    `);
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    const source2 = new carto.source.GeoJSON(generateData([
+        innerTriangle,
+        intersectingTriangle,
+        outerTriangle,
+        outerBBOXTriangle
+    ]), {
+      id: 'cartodb_id'
+    });
+
+    const viz2 = new carto.Viz(`
+      color: transparent
+      strokeWidth: 30
+      strokeColor: red
+      @list: viewportFeatures();
+    `);
+
+    const layer2 = new carto.Layer('layer2', source2, viz2);
+
+    const sourceLine = new carto.source.GeoJSON(generateData([
+        innerLine,
+        intersectingLine,
+        outerLine,
+        outerBBOXLine
+      ]),{
+        id: 'cartodb_id'
+      }
+    );
+
+    const vizLine = new carto.Viz(`
+      color: blend(blue, yellow, viewportCount() == 3)
+      width: 50
+      @list: viewportFeatures();`
+    );
+
+    const layerLine = new carto.Layer('layerLine', sourceLine, vizLine);
+
+    layer2.addTo(map, 'background');
+    layer.addTo(map, 'background');
+
+    layerLine.addTo(map, 'background');
+
+    layer.on('updated', () => {
+      console.log('Layer 1 Polygons:', viz.variables.list.value.length);
+    });
+
+    layer2.on('updated', () => {
+      console.log('Layer 2 Polygons:', viz2.variables.list.value.length);
+    });
+
+    layerLine.on('updated', () => {
+      console.log('Layer 3 Lines', vizLine.variables.list.value.length);
+    });
+  </script>
+</body>
+
+</html>

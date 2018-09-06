@@ -1,13 +1,14 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('category', []);
-        validateStaticTypeErrors('category', [undefined]);
-        validateStaticTypeErrors('category', [123]);
-        validateStaticTypeErrors('category', ['number']);
+        validateTypeErrors('category', []);
+        validateTypeErrors('category', [undefined]);
+        validateTypeErrors('category', [123]);
+        validateTypeErrors('category', ['number']);
+        validateMaxArgumentsError('category', ['number', 'number']);
     });
 
     describe('type', () => {
@@ -29,17 +30,17 @@ describe('src/renderer/viz/expressions/basic/category', () => {
                 category: {
                     type: 'category',
                     categories: [
-                        { name: 'cat0' }, 
+                        { name: 'cat0' },
                         { name: 'cat1' },
                         { name: 'cat2' }
                     ]
                 }
             }
         });
-        
+
         it('should return the value from the metadata', () => {
             const categoryExpresion = s.category('cat0');
-            categoryExpresion._compile(fakeMetadata);
+            categoryExpresion._bindMetadata(fakeMetadata);
             const actual = categoryExpresion.eval();
 
             expect(actual).toEqual('cat0');

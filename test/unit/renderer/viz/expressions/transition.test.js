@@ -1,14 +1,16 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors } from './utils';
+import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 describe('src/renderer/viz/expressions/transition', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('transition', [undefined]);
-        validateStaticTypeErrors('transition', ['123']);
-        validateStaticTypeErrors('transition', [-4]);
-        validateStaticTypeErrors('transition', ['number']);
-        validateStaticTypeErrors('transition', ['color']);
-        validateStaticTypeErrors('transition', ['category']);
+        validateTypeErrors('transition', [undefined]);
+        validateTypeErrors('transition', ['123']);
+        validateTypeErrors('transition', [-4], expressionName =>
+            new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*must be greater than[\\s\\S]*`, 'g'));
+        validateTypeErrors('transition', ['number']);
+        validateTypeErrors('transition', ['color']);
+        validateTypeErrors('transition', ['category']);
+        validateMaxArgumentsError('transition', ['number', 'number']);
     });
 
     describe('type', () => {
@@ -43,7 +45,4 @@ describe('src/renderer/viz/expressions/transition', () => {
             expect(actual).toEqual(0);
         });
     });
-
 });
-
-

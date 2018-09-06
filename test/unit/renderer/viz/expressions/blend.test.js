@@ -1,16 +1,17 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
+import { validateTypeErrors, validateStaticType, validateDynamicType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/blend', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('blend', []);
-        validateStaticTypeErrors('blend', ['number']);
-        validateStaticTypeErrors('blend', ['number', 'number']);
-        validateDynamicTypeErrors('blend', ['number', 'color', 'number']);
-        validateDynamicTypeErrors('blend', ['color', 'number', 'number']);
-        validateDynamicTypeErrors('blend', ['category', 'number', 'number']);
-        validateDynamicTypeErrors('blend', ['number', 'category', 'number']);
-        validateDynamicTypeErrors('blend', ['number', 'number', 'category']);
+        validateTypeErrors('blend', []);
+        validateTypeErrors('blend', ['number']);
+        validateTypeErrors('blend', ['number', 'number']);
+        validateTypeErrors('blend', ['number', 'color', 'number']);
+        validateTypeErrors('blend', ['color', 'number', 'number']);
+        validateTypeErrors('blend', ['category', 'number', 'number']);
+        validateTypeErrors('blend', ['number', 'category', 'number']);
+        validateTypeErrors('blend', ['number', 'number', 'category']);
+        validateMaxArgumentsError('blend', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -25,7 +26,7 @@ describe('src/renderer/viz/expressions/blend', () => {
         });
 
         it('should interpolate a float value 50%', () => {
-            const actual = s.blend(0, 100, .5).eval();
+            const actual = s.blend(0, 100, 0.5).eval();
             expect(actual).toEqual(50);
         });
 
@@ -35,5 +36,3 @@ describe('src/renderer/viz/expressions/blend', () => {
         });
     });
 });
-
-

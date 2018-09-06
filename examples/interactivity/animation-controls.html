@@ -5,9 +5,12 @@
     <title>Animation | CARTO VL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
     <script src="../../dist/carto-vl.js"></script>
-    <script src="https://cartodb-libs.global.ssl.fastly.net/mapbox-gl/v0.44.1-carto1/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../style.css">
     <style type="text/css">
@@ -234,6 +237,11 @@
             touchZoomRotate: false,
         });
 
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
         // Define user
         carto.setDefaultAuth({
             user: 'cartovl',
@@ -275,21 +283,25 @@
             $playBtn.style.display = 'none';
             $pauseBtn.style.display = 'initial';
         };
+
         $pauseBtn.onclick = () => {
             viz.variables.animation.pause();
             $pauseBtn.style.display = 'none';
             $playBtn.style.display = 'initial';
         };
+
         $playBtn.style.display = 'none';
 
         let last = $timeRange.value;
+
         $timeRange.onchange = () => {
             viz.variables.animation.setProgressPct($timeRange.value);
             last = $timeRange.value;
         }
+
         layer.on('updated', () => {
             if ($timeRange.value == last) {
-                $timeRange.value = viz.variables.animation.getProgress();
+                $timeRange.value = viz.variables.animation.getProgressPct();
                 last = $timeRange.value;
             }
         });

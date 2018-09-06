@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
-import { implicitCast, clamp, checkType, checkLooseType, checkFeatureIndependent } from './utils';
+import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
@@ -21,6 +21,14 @@ let waitingForOthers = new Set();
  * @param {Fade} fade fadeIn/fadeOut configuration, optional, defaults to 0.15 seconds of fadeIn and 0.15 seconds of fadeOut
  * @return {Number}
  *
+ * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.prop('day'), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $day (of numeric type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
@@ -28,25 +36,19 @@ let waitingForOthers = new Set();
  *   filter: animation($day, 40, fade(0.1, 0.3))
  * `);
  *
+ * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds.</caption>
+ * const viz = new carto.Viz({
+ *   width: 2,
+ *   color: s.ramp(s.linear(s.clusterAvg(s.prop('temp'), 0, 30)), s.palettes.TEALROSE),
+ *   filter: s.animation(s.linear(s.prop('date'), s.time('2022-03-09T00:00:00Z'), s.time('2033-08-12T00:00:00Z')), 40, s.fade(0.1, 0.3))
+ * });
+ *
  * @example <caption>Temporal map by $date (of date type), with a duration of 40 seconds, fadeIn of 0.1 seconds and fadeOut of 0.3 seconds. (String)</caption>
  * const viz = new carto.Viz(`
  *   width: 2
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
- *
- * @example <caption>Using the `getProgressValue` method to get the animation current value</caption>
- * const s = carto.expressions;
- * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
- * const animationStyle = {
- *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
- *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
- *   filter: animationExpr
- * };
- * layer.on('updated', () => {
- *   let currTime = Math.floor(animationExpr.getProgressValue());
- *   document.getElementById('timestamp').innerHTML = currTime;
- * });
  *
  * @memberof carto.expressions
  * @name animation
@@ -59,6 +61,7 @@ let waitingForOthers = new Set();
  * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
  * @memberof carto.expressions
+ * @extends carto.source.Base
  * @name Animation
  * @abstract
  * @hideconstructor
@@ -66,7 +69,9 @@ let waitingForOthers = new Set();
  * @api
  */
 export class Animation extends BaseExpression {
-    constructor(input, duration = 10, fade = new Fade()) {
+    constructor (input, duration = 10, fade = new Fade()) {
+        checkMaxArguments(arguments, 3, 'animation');
+
         duration = implicitCast(duration);
         input = implicitCast(input);
         const originalInput = input;
@@ -75,25 +80,40 @@ export class Animation extends BaseExpression {
             input = linear(input, globalMin(input), globalMax(input));
         }
 
-        checkLooseType('animation', 'input', 0, 'number', input);
-        checkLooseType('animation', 'duration', 1, 'number', duration);
-        checkFeatureIndependent('animation', 'duration', 1, duration);
-        checkLooseType('animation', 'fade', 2, 'fade', fade);
-
         const progress = number(0);
-
         super({ _input: input, progress, fade, duration });
         // TODO improve type check
         this.type = 'number';
         this._originalInput = originalInput;
         this._paused = false;
+
+        this.preface = `
+        #ifndef ANIMATION
+        #define ANIMATION
+
+        float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
+            float x = 0.;
+
+            // Check for NaN
+            if (_input <= 0.0 || 0.0 <= _input){
+                x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
+            }
+
+            return x;
+        }
+
+        #endif
+    `;
+
+        this.inlineMaker = inline =>
+            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 
-    isAnimated() {
+    isAnimated () {
         return !this.paused;
     }
 
-    _dataReady() {
+    _dataReady () {
         if (waitingForLayer.has(this)) {
             waitingForLayer.delete(this);
             waitingForOthers.add(this);
@@ -121,18 +141,21 @@ export class Animation extends BaseExpression {
         }
     }
 
-    _postShaderCompile(program, gl) {
+    _postShaderCompile (program, gl) {
         waitingForLayer.add(this);
-        this._paused = 'default';
+        if (!this._paused) {
+            this._paused = 'default';
+        }
         super._postShaderCompile(program, gl);
     }
 
-    _setTimestamp(timestamp) {
+    _setTimestamp (timestamp) {
         super._setTimestamp(timestamp);
 
         if (this._paused && this._lastTime === undefined) {
             return;
         }
+
         let deltaTime = 0;
         const speed = 1 / this.duration.value;
 
@@ -149,7 +172,7 @@ export class Animation extends BaseExpression {
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
     }
 
-    eval(feature) {
+    eval (feature) {
         const input = this._input.eval(feature);
 
         if (Number.isNaN(input)) {
@@ -162,20 +185,35 @@ export class Animation extends BaseExpression {
         const fadeOut = this.fade.fadeOut.eval(feature);
 
         const output = 1 - clamp(Math.abs(input - progress) * duration / (input > progress ? fadeIn : fadeOut), 0, 1);
+
         return output;
     }
 
     /**
      * Get the current time stamp of the animation
      *
-     * @api
      * @returns {Number|Date} Current time stamp of the animation. If the animation is based on a numeric expression this will output a number, if it is based on a date expression it will output a date
+     *
+     * @example <caption>Using the `getProgressValue` method to get the animation current value.</caption>
+     * const s = carto.expressions;
+     * let animationExpr = s.animation(s.linear(s.prop('saledate'), 1991, 2017), 20, s.fade(0.7, 0.4));
+     * const animationStyle = {
+     *   color: s.ramp(s.linear(s.prop('priceperunit'), 2000, 1010000), [s.rgb(0, 255, 0), s.rgb(255, 0, 0)]),
+     *   width: s.mul(s.sqrt(s.prop('priceperunit')), 0.05),
+     *   filter: animationExpr
+     * };
+     * layer.on('updated', () => {
+     *   let currTime = Math.floor(animationExpr.getProgressValue());
+     *   document.getElementById('timestamp').innerHTML = currTime;
+     * });
+     *
      * @memberof carto.expressions.Animation
-     * @instance
      * @name getProgressValue
+     * @instance
+     * @api
      */
-    getProgressValue() {
-        const progress = this.progress.eval(); //from 0 to 1
+    getProgressValue () {
+        const progress = this.progress.eval(); // from 0 to 1
         const min = this._input.min.eval();
         const max = this._input.max.eval();
 
@@ -198,7 +236,7 @@ export class Animation extends BaseExpression {
      * @name setCurrent
      * @param {Date|number} value - A JavaScript Date object with the new animation time
      */
-    setTimestamp(timestamp) {
+    setTimestamp (timestamp) {
         const date = castDate(timestamp);
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
@@ -222,7 +260,7 @@ export class Animation extends BaseExpression {
      * @memberof carto.expressions.Animation
      * @name getProgressPct
      */
-    getProgressPct() {
+    getProgressPct () {
         return this.progress.value;
     }
 
@@ -234,7 +272,7 @@ export class Animation extends BaseExpression {
      * @memberof carto.expressions.Animation
      * @name setProgressPct
      */
-    setProgressPct(progress) {
+    setProgressPct (progress) {
         progress = Number.parseFloat(progress);
 
         if (progress < 0 || progress > 1) {
@@ -252,7 +290,7 @@ export class Animation extends BaseExpression {
      * @instance
      * @name pause
      */
-    pause() {
+    pause () {
         this._paused = true;
     }
 
@@ -264,7 +302,7 @@ export class Animation extends BaseExpression {
      * @instance
      * @name play
      */
-    play() {
+    play () {
         this._paused = false;
     }
 
@@ -276,42 +314,21 @@ export class Animation extends BaseExpression {
      * @instance
      * @name stop
      */
-    stop() {
+    stop () {
         this.progress.expr = 0;
         this._paused = true;
     }
 
-    _compile(meta) {
-        this._originalInput._compile(meta);
-        this.duration._compile(meta);
+    _bindMetadata (meta) {
+        this._originalInput._bindMetadata(meta);
+        this.duration._bindMetadata(meta);
 
         checkType('animation', 'input', 0, ['number', 'date'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
-        super._compile(meta);
+        super._bindMetadata(meta);
 
         checkType('animation', 'input', 0, 'number', this._input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
-
-        this.preface = `
-            #ifndef ANIMATION
-            #define ANIMATION
-
-            float animation(float _input, float progress, float duration, float fadeIn, float fadeOut){
-                float x = 0.;
-
-                // Check for NaN
-                if (_input <= 0.0 || 0.0 <= _input){
-                    x = 1. - clamp(abs(_input - progress) * duration / (_input > progress ? fadeIn: fadeOut), 0., 1.);
-                }
-
-                return x;
-            }
-
-            #endif
-        `;
-
-        this.inlineMaker = inline =>
-            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
     }
 }

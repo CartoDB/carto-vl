@@ -1,7 +1,9 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
+import { validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/array', () => {
     describe('error control', () => {
+        validateMaxArgumentsError('array', ['number', 'number']);
     });
 
     describe('type', () => {

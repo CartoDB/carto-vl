@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { checkString } from '../utils';
+import { checkString, checkMaxArguments } from '../utils';
 
 /**
  * Evaluates the value of a column for every row in the dataset.
@@ -31,56 +31,57 @@ import { checkString } from '../utils';
  * @api
  */
 export default class Property extends BaseExpression {
-    constructor(name) {
+    constructor (name) {
+        checkMaxArguments(arguments, 1, 'property');
         checkString('property', 'name', 0, name);
-        if (name == '') {
+
+        if (name === '') {
             throw new Error('property(): invalid parameter, zero-length string');
         }
         super({});
         this.name = name;
+        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
-    isFeatureDependent(){
+    isFeatureDependent () {
         return true;
     }
 
-    get value() {
+    get value () {
         return this.eval();
     }
-    
-    eval(feature) {
+
+    eval (feature) {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
         return feature[this.name];
     }
 
-    _compile(meta) {
+    _bindMetadata (meta) {
         const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
-        
-        if (this.type == 'category') {
-            this.numCategories = metaColumn.categories.length;
-        }
 
-        super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
+        if (this.type === 'category' && this.numCategories === undefined) {
+            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
+        }
     }
 
-    _applyToShaderSource(getGLSLforProperty) {
+    _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
             inline: getGLSLforProperty(this.name)
         };
     }
 
-    _getMinimumNeededSchema() {
+    _getMinimumNeededSchema () {
         return {
-            columns: [
-                this.name
-            ]
+            [this.name]: [{
+                type: 'unaggregated'
+            }]
         };
     }
 }

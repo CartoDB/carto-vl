@@ -1,10 +1,11 @@
 /**
- *  @api
  *  @namespace carto
+ *  @api
  *
  *  @description
  *  The CARTO VL functionality is exposed through the **carto** namespace including:
  *
+ * - {@link carto.version|carto.version}
  * - {@link carto.source.Dataset|carto.source.Dataset}
  * - {@link carto.source.SQL|carto.source.SQL}
  * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
@@ -21,18 +22,29 @@
 import { setDefaultAuth } from './setup/auth-service';
 import { setDefaultConfig } from './setup/config-service';
 import Viz from './Viz';
-import Map from './integrator/Map';
+import Map from './maps/Map';
 import Interactivity from './interactivity/Interactivity';
 import Layer from './Layer';
 import * as expressions from './renderer/viz/expressions';
 import Dataset from './sources/Dataset';
-import GeoJSON from './sources/Geojson';
-import MVT from './sources/Mvt';
-import SQL from './sources/Sql';
+import GeoJSON from './sources/GeoJSON';
+import MVT from './sources/MVT';
+import SQL from './sources/SQL';
+import { on, off } from './utils/events';
+
+/**
+ * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
+ *
+ * @var {string} version
+ *
+ * @memberof carto
+ * @api
+ */
+import { version } from '../package.json';
 
 // Namespaces
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
-
+export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };

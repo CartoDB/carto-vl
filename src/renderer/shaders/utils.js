@@ -12,9 +12,9 @@ const programCache = new Cache();
  * @param {string} glslvertexShader - vertex shader code
  * @param {string} glslfragmentShader - fragment shader code
  */
-export function compileProgram(gl, glslvertexShader, glslfragmentShader) {
+export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     const code = glslvertexShader + glslfragmentShader;
-    
+
     if (programCache.has(gl, code)) {
         return programCache.get(gl, code);
     }
@@ -41,7 +41,7 @@ export function compileProgram(gl, glslvertexShader, glslfragmentShader) {
     return shader;
 }
 
-function _compileShader(gl, sourceCode, type) {
+function _compileShader (gl, sourceCode, type) {
     if (shaderCache.has(gl, sourceCode)) {
         return shaderCache.get(gl, sourceCode);
     }
@@ -49,19 +49,19 @@ function _compileShader(gl, sourceCode, type) {
     const shader = gl.createShader(type);
     gl.shaderSource(shader, sourceCode);
     gl.compileShader(shader);
-    
+
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
         throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
     }
-    
+
     shaderCache.set(gl, sourceCode, shader);
-    
+
     return shader;
 }
 
-export function createShaderFromTemplate(gl, glslTemplate, codes) {
+export function createShaderFromTemplate (gl, glslTemplate, codes) {
     let vertexShader = glslTemplate.vertexShader;
     let fragmentShader = glslTemplate.fragmentShader;
 
@@ -71,22 +71,23 @@ export function createShaderFromTemplate(gl, glslTemplate, codes) {
     });
 
     const shader = compileProgram(gl, vertexShader, fragmentShader);
-    
-    shader.vertexAttribute = gl.getAttribLocation(shader.program, 'vertex');
+
     shader.vertexPositionAttribute = gl.getAttribLocation(shader.program, 'vertexPosition');
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
+    shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
+
     shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
     shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
-    shader.colorStrokeTexture = gl.getUniformLocation(shader.program, 'colorStrokeTex');
+    shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
     shader.widthTexture = gl.getUniformLocation(shader.program, 'widthTex');
     shader.orderMinWidth = gl.getUniformLocation(shader.program, 'orderMinWidth');
     shader.orderMaxWidth = gl.getUniformLocation(shader.program, 'orderMaxWidth');
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
-    shader.devicePixelRatio = gl.getUniformLocation(shader.program, 'devicePixelRatio');
+    shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     shader.overrideColor = gl.getUniformLocation(shader.program, 'overrideColor');
-    
+
     return shader;
 }

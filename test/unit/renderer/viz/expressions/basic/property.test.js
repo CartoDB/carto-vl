@@ -1,19 +1,20 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticTypeErrors } from '../utils';
+import { validateTypeErrors, validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/property', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('property', []);
-        validateStaticTypeErrors('property', [undefined]);
-        validateStaticTypeErrors('property', [123]);
-        validateStaticTypeErrors('property', ['number']);
+        validateTypeErrors('property', []);
+        validateTypeErrors('property', [undefined]);
+        validateTypeErrors('property', [123]);
+        validateTypeErrors('property', ['number']);
+        validateMaxArgumentsError('property', ['number', 'number']);
     });
 
     describe('.eval', () => {
         it('should return the value from the feature', () => {
             const fakeFeature = {
                 property0: 'foo',
-                property1: 'bar',
+                property1: 'bar'
             };
 
             const $property0 = s.property('property0');

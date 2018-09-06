@@ -7,8 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>CARTO VL EDITOR</title>
 
-    <script src='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js'></script>
-    <link href='https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css' rel='stylesheet' />
+    <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+    <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
     <link rel="stylesheet" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400" rel="stylesheet">
     <script src="../../dist/carto-vl.js"></script>
@@ -29,12 +29,21 @@
 
             <section class="cvl-Sidebar--Config">
                 <h1>Local config</h1>
-                <label class="cvl-Sidebar--label" for="user"> Username</label>
-                <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl" />
-                <label class="cvl-Sidebar--label" for="user"> Dataset/Query</label>
-                <textarea class="cvl-Sidebar--Input" id="dataset" value="spend_data"></textarea>
-                <label class="cvl-Sidebar--label" for="user"> Server URL</label>
-                <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com" />
+                <form id="editor-form">
+                    <label class="cvl-Sidebar--label" for="user"> Username</label>
+                    <input type="text" class="cvl-Sidebar--Input" id="user" value="cartovl" />   
+                    <div class="cvl-Sidebar-RadioButtonContainer">                     
+                        <input id="source-dataset" type="radio" class="cvl-Sidebar--RadioButton" name="source" value="dataset" checked>
+                        <label class="cvl-Sidebar--label" for="source-dataset">Dataset</label>
+                        <input id="source-query" type="radio" class="cvl-Sidebar--RadioButton" name="source" value="query">
+                        <label class="cvl-Sidebar--label" for="source-query">Query</label>
+                    </div>
+                    
+                    <textarea class="cvl-Sidebar--Input cvl-Sidebar--Textarea cvl-Small--Textarea" id="source" value="spend_data"></textarea>
+                    
+                    <label class="cvl-Sidebar--label" for="user"> Server URL</label>
+                    <input type="text" class="cvl-Sidebar--Input" id="serverURL" value="https://{user}.carto.com" />
+                </form>
                 <div id="basemap" class="cvl-Sidebar--BasemapConfig"></div>
             </section>
 

@@ -7,9 +7,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
 <body>
@@ -43,6 +43,11 @@
       touchZoomRotate: false,
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -52,11 +57,11 @@
     // Define layer
     const source = new carto.source.Dataset('taxi_50k');
     const viz = new carto.Viz(`
-      width: ($fare_amount/15000)*zoom()
+      width: ($fare_amount/15000)
       filter: animation($tpep_pickup_datetime,10,fade(0.2,0.2))
       color: rgba(255,255,255,0.2)
       strokeColor: ramp(linear($tpep_pickup_datetime,time('2016-05-01T00:08:39Z'),time('2016-05-06T10:29:11Z')),[#CF1C90,#F8CA00,#9BBD4D,#07A5AB,#B100EB])
-      strokeWidth: ($trip_distance/30000)*zoom()
+      strokeWidth: ($trip_distance/30000)
       @wadus: viewportAvg($trip_distance)
       @wadus2: viewportAvg($fare_amount)
     `);

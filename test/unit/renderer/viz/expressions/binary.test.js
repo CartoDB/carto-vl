@@ -1,6 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateDynamicType } from './utils';
-
+import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -9,42 +8,48 @@ s.FALSE.toString = () => 's.FALSE';
 describe('src/renderer/viz/expressions/binary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('mul', ['number', 'category']);
-            validateDynamicTypeErrors('mul', ['category', 'number']);
-
-            validateDynamicTypeErrors('mul', ['category', 'category']);
+            validateTypeErrors('mul', ['number', 'category']);
+            validateTypeErrors('mul', ['category', 'number']);
+            validateTypeErrors('mul', ['category', 'category']);
+            validateMaxArgumentsError('mul', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
-            validateDynamicTypeErrors('add', ['number', 'category']);
-            validateDynamicTypeErrors('add', ['category', 'number']);
+            validateTypeErrors('add', ['number', 'category']);
+            validateTypeErrors('add', ['category', 'number']);
 
-            validateDynamicTypeErrors('add', ['category', 'category']);
+            validateTypeErrors('add', ['category', 'category']);
 
-            validateDynamicTypeErrors('add', ['number', 'color']);
-            validateDynamicTypeErrors('add', ['color', 'number']);
+            validateTypeErrors('add', ['number', 'color']);
+            validateTypeErrors('add', ['color', 'number']);
+
+            validateMaxArgumentsError('add', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER', () => {
-            validateDynamicTypeErrors('mod', ['number', 'category']);
-            validateDynamicTypeErrors('mod', ['category', 'number']);
+            validateTypeErrors('mod', ['number', 'category']);
+            validateTypeErrors('mod', ['category', 'number']);
 
-            validateDynamicTypeErrors('mod', ['category', 'category']);
+            validateTypeErrors('mod', ['category', 'category']);
 
-            validateDynamicTypeErrors('mod', ['number', 'color']);
-            validateDynamicTypeErrors('mod', ['color', 'number']);
+            validateTypeErrors('mod', ['number', 'color']);
+            validateTypeErrors('mod', ['color', 'number']);
 
-            validateStaticTypeErrors('mod', ['color', 'color']);
+            validateTypeErrors('mod', ['color', 'color']);
+
+            validateMaxArgumentsError('mod', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
-            validateDynamicTypeErrors('equals', ['number', 'category']);
-            validateDynamicTypeErrors('equals', ['category', 'number']);
+            validateTypeErrors('equals', ['number', 'category']);
+            validateTypeErrors('equals', ['category', 'number']);
 
-            validateDynamicTypeErrors('equals', ['number', 'color']);
-            validateDynamicTypeErrors('equals', ['color', 'number']);
+            validateTypeErrors('equals', ['number', 'color']);
+            validateTypeErrors('equals', ['color', 'number']);
 
-            validateStaticTypeErrors('equals', ['color', 'color']);
+            validateTypeErrors('equals', ['color', 'color']);
+
+            validateMaxArgumentsError('equals', ['number', 'number', 'number']);
         });
     });
 
@@ -191,7 +196,7 @@ describe('src/renderer/viz/expressions/binary', () => {
             test('neq', 2, 3, 1);
         });
 
-        function test(fn, param1, param2, expected) {
+        function test (fn, param1, param2, expected) {
             it(`${fn}(${param1}, ${param2}) should return ${expected}`, () => {
                 let actual = s[fn](param1, param2).eval();
                 expect(actual).toEqual(expected);

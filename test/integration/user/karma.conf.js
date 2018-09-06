@@ -1,11 +1,20 @@
-const webpackConfig = require('../../../webpack/webpack.config.js');
+const webpackConfig = process.env.MIN
+    ? require('../../../webpack/webpack.min.config.js')
+    : require('../../../webpack/webpack.config.js');
+
+// Disable bundle warnings
+webpackConfig.performance = webpackConfig.performance || {};
+webpackConfig.performance.hints = false;
 
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
         files: ['index.test.js'],
         reporters: ['mocha'],
-        port: 9876,  // karma web server port
+        mochaReporter: {
+            ignoreSkipped: true
+        },
+        port: 9876, // karma web server port
         colors: true,
         logLevel: config.LOG_INFO,
         browsers: ['ChromeHeadlessNoSandbox'],
@@ -13,7 +22,7 @@ module.exports = function (config) {
         singleRun: false,
         concurrency: Infinity,
         preprocessors: {
-            'index.test.js': ['webpack', 'sourcemap'],
+            'index.test.js': ['webpack', 'sourcemap']
         },
         webpack: webpackConfig,
         customLaunchers: {
@@ -22,6 +31,6 @@ module.exports = function (config) {
                 base: 'ChromeHeadless',
                 flags: ['--no-sandbox']
             }
-        },
+        }
     });
 };

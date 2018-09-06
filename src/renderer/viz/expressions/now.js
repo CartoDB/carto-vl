@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { number } from '../expressions';
+import { checkMaxArguments } from './utils';
 
 /**
  * Get the current timestamp. This is an advanced form of animation, `animation` expression is preferred.
@@ -23,24 +24,27 @@ import { number } from '../expressions';
  * @api
  */
 export default class Now extends BaseExpression {
-    constructor() {
+    constructor () {
+        checkMaxArguments(arguments, 0, 'now');
+
         super({ now: number(0) });
-    }
-    eval() {
-        return this.now.expr;
-    }
-    isAnimated() {
-        return true;
-    }
-    _compile(metadata) {
-        super._compile(metadata);
         this.type = 'number';
         super.inlineMaker = inline => inline.now;
     }
-    _preDraw(...args) {
-        this.now._preDraw(...args);
+
+    get value () {
+        return this.eval();
     }
-    _setTimestamp(timestamp){
+
+    eval () {
+        return this.now.expr;
+    }
+
+    isAnimated () {
+        return true;
+    }
+
+    _setTimestamp (timestamp) {
         this.now.expr = timestamp;
     }
 }

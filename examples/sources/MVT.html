@@ -8,9 +8,9 @@
   <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.js"></script>
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.45.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
@@ -44,6 +44,11 @@
       touchZoomRotate: false,
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     async function loadMVT() {
       const mapConfig = {
         buffersize: { mvt: 0 },
@@ -67,7 +72,7 @@
       });
       const layergroup = await response.json();
       const tilejson = layergroup.metadata.tilejson.vector;
-      const source = new carto.source.MVT(tilejson.tiles[0], {
+      const source = new carto.source.MVT(tilejson.tiles, {
         properties: {
           numfloors: { type: 'number' },
           cartodb_id: { type: 'number' }
@@ -79,7 +84,7 @@
       });
 
       const viz = new carto.Viz(`
-      color: ramp(linear($numfloors 0, 20), temps)
+      color: ramp(linear($numfloors, 0, 20), temps)
       strokeWidth: 0
       `);
       const layer = new carto.Layer('layer', source, viz);
