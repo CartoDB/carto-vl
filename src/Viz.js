@@ -54,7 +54,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
  * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
  * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
- * @property {Image} symbol - show an image instead in the place of points
+ * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
  * @property {Placement} offset - offset to apply to the features in pixels
  * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
@@ -92,7 +92,7 @@ export default class Viz {
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
     * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
-    * @property {Image} symbol - show an image instead in the place of points
+    * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
