@@ -95,7 +95,8 @@ export default class ViewportMeanStandardDev extends Classifier {
             sumFrequencies += y;
 
             const midValue = (x[0] + x[1]) / 2.0;
-            sumPowDifferences += y * (midValue - average) * (midValue - average);
+            const diff = (midValue - average);
+            sumPowDifferences += y * diff * diff;
         });
 
         const variance = sumPowDifferences / sumFrequencies;
