@@ -250,17 +250,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             expect(actual).toEqual(expected);
                         });
 
-                        it('should use the last color for the last category', () => {
-                            const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
-                            r._bindMetadata(METADATA);
-
-                            actual = r.eval();
-                            expected = DEFAULT_COLOR.color;
-
-                            expect(actual).toEqual(expected);
-                        });
-
-                        it('should use last color for the remaining categories', () => {
+                        it('should use the default color for the remaining categories', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, purple]);
                             r._bindMetadata(METADATA);
 
