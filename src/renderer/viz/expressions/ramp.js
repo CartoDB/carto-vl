@@ -101,21 +101,7 @@ export default class Ramp extends BaseExpression {
         palette = implicitCast(palette);
 
         checkExpression('ramp', 'input', 0, input);
-<<<<<<< HEAD
-        checkLooseType('ramp', 'input', 0, Object.values(inputTypes), input);
-        checkLooseType('ramp', 'palette', 1, Object.values(paletteTypes), palette);
-
-        if (palette.type === paletteTypes.IMAGE) {
-            checkInstance('ramp', 'palette', 1, ImageList, palette);
-            checkLooseType('ramp', 'input', 0, inputTypes.CATEGORY, input);
-        }
-
-        if (palette.type !== paletteTypes.NUMBER_ARRAY) {
-            palette = _calcPaletteValues(palette);
-        }
-=======
         checkExpression('ramp', 'palette', 1, palette);
->>>>>>> master
 
         super({ input, palette });
         this.palette = palette;
@@ -485,26 +471,12 @@ export default class Ramp extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-
-<<<<<<< HEAD
+        this.type = this.palette.childType;
         if (this.input.isA(Property)) {
             this.input = this.input.type === inputTypes.NUMBER
                 ? new Linear(this.input)
                 : new CategoryIndex(this.input);
 
-=======
-        this.type = this.palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-        if (this.palette.type === 'image-list') {
-            this.type = 'image';
-        }
-
-        if (this.palette.type !== 'number-array') {
-            this.palette = _calcPaletteValues(this.palette);
-        }
-
-        if (this.input.isA(Property) && this.input.type === inputTypes.NUMBER) {
-            this.input = new Linear(this.input);
->>>>>>> master
             this.input._bindMetadata(metadata);
         }
 
@@ -547,7 +519,7 @@ export default class Ramp extends BaseExpression {
             inline = `ramp_num${this._uid}(${input.inline})`;
             preface += `
                 ${GLSLNums.map(num => num.preface).join('\n')}
-    
+
                 float ramp_num${this._uid}(float x){
                     return ${GLSLBlend};
                 }`;

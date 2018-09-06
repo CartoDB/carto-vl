@@ -38,6 +38,7 @@ export default class Palette extends BaseExpression {
     constructor (name, subPalettes) {
         super({});
         this.type = 'palette';
+        this.childType = 'color';
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {

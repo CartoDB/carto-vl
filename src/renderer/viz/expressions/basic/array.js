@@ -49,7 +49,6 @@ export default class BaseArray extends BaseExpression {
 
         super(elems);
 
-        this.type = `${type}-array`;
         this.elems = elems;
     }
 
@@ -68,13 +67,15 @@ export default class BaseArray extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        const type = this.elems[0].type;
-        if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+        const childType = this.elems[0].type;
+        this.type = `${childType}-array`;
+        this.childType = childType;
+        if (['number', 'category', 'color', 'time', 'image'].indexOf(childType) === -1) {
+            throw new Error(`array(): invalid parameters type: ${childType}`);
         }
         this.elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
-            if (item.type !== type) {
+            if (item.type !== childType) {
                 throw new Error(`array(): invalid ${getOrdinalFromIndex(index)} parameter, invalid argument type combination`);
             }
         });
