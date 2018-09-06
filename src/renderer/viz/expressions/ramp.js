@@ -11,6 +11,9 @@ import Linear from './linear';
 import Top from './top';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
+import { constant } from '../expressions';
+import { OTHERS_GLSL_VALUE } from './constants';
+import Palette from './color/palettes/Palette';
 
 const DEFAULT_OTHERS_NAME = 'CARTOVL_OTHERS';
 const MAX_SAMPLES = 100;
@@ -94,8 +97,8 @@ const MAX_BYTE_VALUE = 255;
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor (input, palette) {
-        checkMaxArguments(arguments, 2, 'ramp');
+    constructor (input, palette, others = 'default') {
+        checkMaxArguments(arguments, 3, 'ramp');
 
         input = implicitCast(input);
         palette = implicitCast(palette);
@@ -105,16 +108,7 @@ export default class Ramp extends BaseExpression {
 
         super({ input, palette });
         this.palette = palette;
-        this.defaultOthersColor = new NamedColor('gray');
-    }
-
-    loadImages () {
-        return Promise.all([this.input.loadImages(), this.palette.loadImages()]);
-    }
-
-    _setUID (idGenerator) {
-        super._setUID(idGenerator);
-        this.palette._setUID(idGenerator);
+        this.others = others; // FIXME, others is not a children
     }
 
     eval (feature) {
@@ -122,10 +116,6 @@ export default class Ramp extends BaseExpression {
 
         if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
             return this._evalNumberArray(feature, index);
-        }
-
-        if (this.palette.type === paletteTypes.IMAGE) {
-            return this.palette[`image${index}`].eval();
         }
 
         const texturePixels = this._computeTextureIfNeeded();
@@ -448,30 +438,14 @@ export default class Ramp extends BaseExpression {
         throw new Error('Unexpected condition on ramp._evalNumberArray()');
     }
 
-    _getValue (texturePixels, numValues, m) {
-        const lowIndex = clamp(Math.floor(numValues * m), 0, numValues);
-        const highIndex = clamp(Math.ceil(numValues * m), 0, numValues);
-        const fract = numValues * m - Math.floor(numValues * m);
-        const low = texturePixels[lowIndex];
-        const high = texturePixels[highIndex];
-
-        return Math.round(fract * high + (1 - fract) * low);
-    }
-
-    _getColorValue (texturePixels, m) {
-        const index = _calcColorValueIndex(m);
-
-        return {
-            r: Math.round(texturePixels[index * 4 + 0]),
-            g: Math.round(texturePixels[index * 4 + 1]),
-            b: Math.round(texturePixels[index * 4 + 2]),
-            a: Math.round(texturePixels[index * 4 + 3]) / MAX_BYTE_VALUE
-        };
-    }
-
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this.type = this.palette.childType;
+        if (this.others === 'default') {
+            this.others = this.palette.type === 'number-array' ? constant(1) : new NamedColor('gray');
+        } else {
+            checkType('ramp', 'others', 2, this.palette.childType, this.others);
+        }
         if (this.input.isA(Property)) {
             this.input = this.input.type === inputTypes.NUMBER
                 ? new Linear(this.input)
@@ -494,53 +468,37 @@ export default class Ramp extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            return this._applyToShaderSourceImage(getGLSLforProperty);
-        }
-
         const input = this.input._applyToShaderSource(getGLSLforProperty);
-        let inline = '';
-        let preface = `
-            uniform float rampMax${this._uid};`;
 
-        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
-            const GLSLNums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
-            const inlineGLSLNums = GLSLNums.map(num => num.inline);
-            const GLSLBlend = this._generateGLSLBlend(inlineGLSLNums);
-
-            // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
-            // For example:
-            //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
-
-            // With numeric arrays we use a combination of `mix` to allow for property-dependant values
-            inline = `ramp_num${this._uid}(${input.inline})`;
-            preface += `
-                ${GLSLNums.map(num => num.preface).join('\n')}
-
-                float ramp_num${this._uid}(float x){
-                    return ${GLSLBlend};
-                }`;
+        let palette;
+        let others;
+        if (this.palette.isA(Palette)) {
+            const subPalette = this.palette.getColors(this.input.numCategories);
+            palette = subPalette.colors;
+            others = subPalette.othersColor || this.others;
         } else {
-            const colors = this._getColorsFromPalette(this.input, this.palette);
-            const cielabColors = colors.map(color => sRGBToCielab({
-                r: color.r / MAX_BYTE_VALUE,
-                g: color.g / MAX_BYTE_VALUE,
-                b: color.b / MAX_BYTE_VALUE,
-                a: color.a
-            }));
-            const GLSLColors = cielabColors.map(color => `vec4(${color.l.toFixed(20)}, ${color.a.toFixed(20)}, ${color.b.toFixed(20)}, ${color.alpha.toFixed(20)})`);
-            const GLSLBlend = this._generateGLSLBlend(GLSLColors);
-
-            inline = `cielabToSRGBA(ramp_color${this._uid}(${input.inline}))`;
-            preface += `
-                ${CIELabGLSL}
-                vec4 ramp_color${this._uid}(float x){
-                    return ${GLSLBlend};
-            }`;
+            palette = this.palette.elems;
+            others = this.others;
         }
+
+        const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
+        const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
+        // CHECK interpolate when numCats>=colors, discard colors otherwise
+
+        const GLSLBlend = this.palette.type === 'number-array'
+            ? this._generateGLSLBlend(GLSLPalette.map(elem => elem.inline))
+            : this._generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`));
+        const inline = `ramp_color${this._uid}(${input.inline})`;
+        const preface = `
+                    ${CIELabGLSL}
+                    ${GLSLPalette.map(elem => elem.preface).join('\n')}
+                    ${GLSLOthers.preface}
+
+                    vec4 ramp_color${this._uid}(float x){
+                        return x==${OTHERS_GLSL_VALUE}
+                            ? ${GLSLOthers.inline}
+                            : cielabToSRGBA(${GLSLBlend});
+                    }`;
 
         return { preface: this._prefaceCode(input.preface + preface), inline };
     }
@@ -556,283 +514,12 @@ export default class Ramp extends BaseExpression {
 
         return _mixClampGLSL(currentColor, nextBlend, index, list.length);
     }
-
-    _applyToShaderSourceImage (getGLSLforProperty) {
-        const input = this.input._applyToShaderSource(getGLSLforProperty);
-        const images = this.palette._applyToShaderSource(getGLSLforProperty);
-        return {
-            preface: input.preface + images.preface,
-            inline: `${images.inline}(imageUV, ${input.inline})`
-        };
-    }
-
-    _getColorsFromPalette (input, palette) {
-        if (palette.type === paletteTypes.IMAGE_LIST) {
-            return palette.eval();
-        }
-
-        return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.input.numCategories, this.defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.input.numCategories, this.defaultOthersColor.eval());
-    }
-
-    _postShaderCompile (program, gl) {
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            this.palette._postShaderCompile(program, gl);
-            super._postShaderCompile(program, gl);
-            return;
-        }
-
-        this.palette._postShaderCompile(program, gl);
-        this.input._postShaderCompile(program, gl);
-        this._getBinding(program).rampMaxLoc = gl.getUniformLocation(program, `rampMax${this._uid}`);
-    }
-
-    _computeTextureIfNeeded () {
-        if (this._cachedTexturePixels && !this.palette.isAnimated()) {
-            return this._cachedTexturePixels;
-        }
-
-        this._texCategories = this.input.numCategories;
-        this._cachedTexturePixels = this.type === rampTypes.COLOR
-            ? this._computeColorRampTexture()
-            : this._computeNumericRampTexture();
-
-        return this._cachedTexturePixels;
-    }
-
-    _calcPaletteValues (palette) {
-        return _calcPaletteValues(palette);
-    }
-
-    _computeColorRampTexture () {
-        if (this.palette.isAnimated()) {
-            this.palette = this._calcPaletteValues(this.palette);
-        }
-
-        const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
-        const colors = this._getColorsFromPalette(this.input, this.palette);
-
-        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vColorARaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vColorBRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vColorA = [vColorARaw.r / (COLOR_ARRAY_LENGTH - 1), vColorARaw.g / (COLOR_ARRAY_LENGTH - 1), vColorARaw.b / (COLOR_ARRAY_LENGTH - 1), vColorARaw.a];
-            const vColorB = [vColorBRaw.r / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.g / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.b / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.a];
-            const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
-            const v = interpolateRGBAinCieLAB({ r: vColorA[0], g: vColorA[1], b: vColorA[2], a: vColorA[3] }, { r: vColorB[0], g: vColorB[1], b: vColorB[2], a: vColorB[3] }, m);
-
-            texturePixels[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 2] = Math.round(v.b * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 3] = Math.round(v.a * MAX_BYTE_VALUE);
-        }
-
-        return texturePixels;
-    }
-
-    _computeNumericRampTexture () {
-        const texturePixels = new Float32Array(COLOR_ARRAY_LENGTH);
-        const floats = this.palette.floats;
-
-        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vColorARaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
-            const vColorBRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
-            const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
-            texturePixels[i] = ((1.0 - m) * vColorARaw + m * vColorBRaw);
-        }
-
-        return texturePixels;
-    }
-
-    _computeGLTextureIfNeeded (gl) {
-        const texturePixels = this._computeTextureIfNeeded();
-        const isAnimatedPalette = this.palette.isAnimated();
-
-        if (this._GLtexCategories !== this.input.numCategories || isAnimatedPalette) {
-            this._GLtexCategories = this.input.numCategories;
-            this.texture = gl.createTexture();
-            this._bindGLTexture(gl, texturePixels);
-        }
-    }
-
-    _bindGLTexture (gl, texturePixels) {
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-        if (this.type === rampTypes.COLOR) {
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        } else {
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    }
-
-    _preDraw (program, drawMetadata, gl) {
-        const max = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
-        this.input._preDraw(program, drawMetadata, gl);
-
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            this.palette._preDraw(program, drawMetadata, gl);
-            return;
-        }
-
-        this.palette._preDraw(program, drawMetadata, gl);
-        gl.uniform1f(this._getBinding(program).rampMaxLoc, max);
-        super._preDraw(program, drawMetadata, gl);
-    }
-}
-
-function _getColorsFromPaletteType (input, palette, numCategories, defaultOthersColor) {
-    switch (true) {
-        case input.isA(Buckets):
-            return _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor);
-        case input.isA(Top):
-            return _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor);
-        default:
-            return _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor);
-    }
-}
-
-function _getColorsFromPaletteTypeBuckets (palette, numCategories, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, numCategories);
-
-    if (palette.isQuantitative()) {
-        colors.push(defaultOthersColor);
-    }
-
-    if (palette.isQualitative()) {
-        defaultOthersColor = colors[numCategories];
-    }
-
-    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-}
-
-function _getColorsFromPaletteTypeTop (palette, numCategories, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, numCategories);
-
-    if (palette.isQualitative()) {
-        defaultOthersColor = colors[colors.length - 1];
-    }
-
-    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-}
-
-function _getColorsFromPaletteTypeDefault (input, palette, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, input.numCategories);
-
-    if (palette.isQualitative()) {
-        colors.pop();
-        defaultOthersColor = colors[input.numCategories];
-    }
-
-    if (input.numCategories === undefined) {
-        return colors;
-    }
-
-    return _avoidShowingInterpolation(input.numCategories, colors, defaultOthersColor);
-}
-
-function _getSubPalettes (palette, numCategories) {
-    return palette.subPalettes[numCategories]
-        ? palette.subPalettes[numCategories]
-        : palette.getLongestSubPalette();
-}
-
-function _getColorsFromColorArrayType (input, palette, numCategories, defaultOthersColor) {
-    return input.type === inputTypes.CATEGORY
-        ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, defaultOthersColor)
-        : palette.colors;
-}
-
-function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
-    switch (true) {
-        case input.isA(Classifier) && numCategories < colors.length:
-            return colors;
-        case input.isA(Property):
-            return colors;
-        case numCategories < colors.length:
-            return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
-        case numCategories > colors.length:
-            return _addOthersColorToColors(colors, defaultOthersColor);
-        default:
-            colors = _addOthersColorToColors(colors, defaultOthersColor);
-            return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-    }
-}
-
-// function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
-//     let othersColor;
-
-//     if (numCategories < colors.length) {
-//         othersColor = colors[numCategories];
-//         return _avoidShowingInterpolation(numCategories, colors, othersColor);
-//     }
-
-//     if (numCategories === colors.length) {
-//         othersColor = colors[colors.length - 1];
-//         return _avoidShowingInterpolation(numCategories, colors, othersColor);
-//     }
-
-//     return colors;
-// }
-
-function _addOthersColorToColors (colors, othersColor) {
-    return [...colors, othersColor];
-}
-
-function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) {
-    const colorArray = [];
-
-    for (let i = 0; i < colors.length; i++) {
-        if (i < numCategories) {
-            colorArray.push(colors[i]);
-        } else if (i === numCategories) {
-            colorArray.push(defaultOthersColor);
-        }
-    }
-
-    return colorArray;
-}
-
-function _calcPaletteValues (palette) {
-    try {
-        if (palette.type === paletteTypes.NUMBER_ARRAY) {
-            palette.floats = palette.eval();
-        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-            palette.colors = palette.eval();
-        }
-    } catch (error) {
-        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-    }
-
-    return palette;
 }
 
 function _buildFeature (name, value) {
     const enumerable = true;
 
     return Object.defineProperty({}, name, { value, enumerable });
-}
-
-function _calcColorValueIndex (m) {
-    if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
-        return 0;
-    }
-
-    if (m === Number.POSITIVE_INFINITY || m > 1) {
-        return COLOR_ARRAY_LENGTH - 1;
-    }
-
-    return Math.round(m * MAX_BYTE_VALUE);
 }
 
 function _mixClampGLSL (currentColor, nextBlend, index, listLength) {

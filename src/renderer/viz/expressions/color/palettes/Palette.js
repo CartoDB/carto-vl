@@ -1,5 +1,7 @@
 import BaseExpression from '../../base';
 import { hexToRgb } from '../../utils';
+import { RGBA } from '../rgb';
+import { constant } from '../../../expressions';
 
 /**
  * Color palettes.
@@ -37,7 +39,7 @@ import { hexToRgb } from '../../utils';
 export default class Palette extends BaseExpression {
     constructor (name, subPalettes) {
         super({});
-        this.type = 'palette';
+        this.type = 'color-array';
         this.childType = 'color';
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
@@ -49,6 +51,29 @@ export default class Palette extends BaseExpression {
         });
 
         this.tags = subPalettes.tags;
+    }
+
+    getColors (numCategories) {
+        if (this.isQualitative()) {
+            const colors = this._getBestSubPalette(numCategories + 1);
+            const othersColor = colors.pop();
+            return { colors, othersColor };
+        } else {
+            return {
+                colors: this._getBestSubPalette(numCategories),
+                othersColor: null
+            };
+        }
+    }
+
+    _getBestSubPalette (subPaletteIndex) {
+        const longestSubPalette = this.getLongestSubPalette();
+        const subPalette = (subPaletteIndex < longestSubPalette.length
+            ? [...this.subPalettes[subPaletteIndex]]
+            : [...longestSubPalette]);
+        return subPalette.map(color =>
+            new RGBA(constant(color.r), constant(color.g), constant(color.b), constant(color.a))
+        );
     }
 
     getLongestSubPalette () {

@@ -35,15 +35,6 @@ export default class CategoryIndex extends BaseExpression {
         super({ property });
         this._numTranslatedCategories = null;
         this.type = 'category';
-
-        const max = SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20);
-        this.inlineMaker = inline => `ramp_translate${this._uid}(${inline.property})`;
-        this.preface = `
-                uniform sampler2D texRampTranslate${this._uid};
-                float ramp_translate${this._uid}(float s){
-                    vec2 v = vec2(mod(s, ${max}), floor(s / ${max}));
-                    return texture2D(texRampTranslate${this._uid}, v/${max}).a;
-                }`;
     }
 
     eval (feature) {
@@ -86,11 +77,17 @@ export default class CategoryIndex extends BaseExpression {
         drawMetadata.freeTexUnit++;
     }
 
-    _applyToShaderSource () {
-        
-
+    _applyToShaderSource (getGLSLforProperty) {
+        const max = SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20);
+        const property = this.property._applyToShaderSource(getGLSLforProperty);
         return {
-
+            inline: `ramp_translate${this._uid}(${property.inline})`,
+            preface: `
+                    uniform sampler2D texRampTranslate${this._uid};
+                    float ramp_translate${this._uid}(float s){
+                        vec2 v = vec2(mod(s, ${max}), floor(s / ${max}));
+                        return texture2D(texRampTranslate${this._uid}, v/${max}).a;
+                    }`
         };
     }
 

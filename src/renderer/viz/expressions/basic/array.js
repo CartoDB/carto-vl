@@ -1,6 +1,8 @@
 import BaseExpression from '../base';
 import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
 
+const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image'];
+
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
@@ -36,10 +38,6 @@ export default class BaseArray extends BaseExpression {
             }
         }
 
-        if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
-        }
-
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type !== type && item.type !== undefined) {
@@ -50,6 +48,14 @@ export default class BaseArray extends BaseExpression {
         super(elems);
 
         this.elems = elems;
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const childGLSL = this.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+        return {
+            preface: childGLSL.map(c => c.preface).join('\n'),
+            inline: childGLSL.map(c => c.inline)
+        };
     }
 
     get value () {
@@ -70,7 +76,7 @@ export default class BaseArray extends BaseExpression {
         const childType = this.elems[0].type;
         this.type = `${childType}-array`;
         this.childType = childType;
-        if (['number', 'category', 'color', 'time', 'image'].indexOf(childType) === -1) {
+        if (SUPPORTED_CHILD_TYPES.indexOf(childType) === -1) {
             throw new Error(`array(): invalid parameters type: ${childType}`);
         }
         this.elems.map((item, index) => {

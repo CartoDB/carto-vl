@@ -35,7 +35,7 @@ vec3 xyztorgb(vec3 c){
     return c * XYZ_2_RGB;
 }
 
-vec3 xyztosrgb(vec3 c) {
+vec3 xyztosrgb(vec3 c) { // FIXME naming
     return rgb_to_srgb_approx(xyztorgb(c));
 }
 
@@ -48,4 +48,73 @@ vec4 cielabToSRGBA(vec4 cielab){
         )
     )), cielab.a);
 }
+#endif
+
+
+#ifndef SRGBA_TO_CIELAB
+#define SRGBA_TO_CIELAB
+vec4 sRGBToXYZ (vec4 srgba);
+vec4 sRGBToLinearRGB (vec4 srgba);
+float inverseGammaCorrection(float t);
+vec4 XYZToCieLab (vec4 xyza);
+float XYZToCieLabAux(float t);
+
+vec4 sRGBAToCieLAB(vec4 srgba){
+    return XYZToCieLab(sRGBToXYZ(srgba));
+}
+
+// Convert sRGB to CIE XYZ with the D65 white point
+vec4 sRGBToXYZ (vec4 srgba) {
+    // Poynton, "Frequently Asked Questions About Color," page 10
+    // Wikipedia: http://en.wikipedia.org/wiki/SRGB
+    // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space
+    vec4 rgba = sRGBToLinearRGB(srgba);
+    return vec4(
+        (0.4123955889674142161 * rgba.r + 0.3575834307637148171 * rgba.g + 0.1804926473817015735 * rgba.b),
+        (0.2125862307855955516 * rgba.r + 0.7151703037034108499 * rgba.g + 0.07220049864333622685 * rgba.b),
+        (0.01929721549174694484 * rgba.r + 0.1191838645808485318 * rgba.g + 0.9504971251315797660 * rgba.b),
+        rgba.a
+    );
+}
+
+vec4 sRGBToLinearRGB (vec4 srgba) {
+    // http://en.wikipedia.org/wiki/SRGB
+    return vec4(
+        inverseGammaCorrection(srgba.r),
+        inverseGammaCorrection(srgba.g),
+        inverseGammaCorrection(srgba.b),
+        srgba.a
+    );
+}
+
+float inverseGammaCorrection(float t) {
+    return t <= 0.0404482362771076 ? t / 12.92 : pow((t + 0.055) / 1.055, 2.4);
+}
+
+
+float WHITEPOINT_D65_X = 0.950456;
+float WHITEPOINT_D65_Y = 1.0;
+float WHITEPOINT_D65_Z = 1.088754;
+
+// Convert CIE XYZ to CIE L*a*b* (CIELAB) with the D65 white point
+vec4 XYZToCieLab (vec4 xyza) {
+    // Wikipedia: http://en.wikipedia.org/wiki/Lab_color_space
+
+    float xn = WHITEPOINT_D65_X;
+    float yn = WHITEPOINT_D65_Y;
+    float zn = WHITEPOINT_D65_Z;
+
+    return vec4(
+        116. * XYZToCieLabAux(xyza.y / yn) - 16.,
+        500. * (XYZToCieLabAux(xyza.x / xn) - XYZToCieLabAux(xyza.y / yn)),
+        200. * (XYZToCieLabAux(xyza.y / yn) - XYZToCieLabAux(xyza.z / zn)),
+        xyza.a
+    );
+}
+
+float XYZToCieLabAux(float t) {
+    return t >= 8.85645167903563082e-3
+            ? pow(t, 0.333333333333333) : (841.0 / 108.0) * t + 4.0 / 29.0;
+}
+
 #endif

@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
-import { OTHERS_INDEX } from './constants';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -67,28 +67,29 @@ export default class Buckets extends BaseExpression {
 
         if (input.type) {
             if (input.type !== 'number' && input.type !== 'category') {
-                throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
+                // throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
             }
             looseType = input.type;
         }
 
         let children = {
-            input
+            input,
+            list
         };
 
         let numCategories;
         if (list.elems) {
             list.elems.map((item, index) => {
                 if (item.type) {
-                    if (looseType && looseType !== item.type) {
-                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                    } else if (item.type !== 'number' && item.type !== 'category') {
-                        throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
-                    }
+                    // if (looseType && looseType !== item.type) {
+                    //     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                    //         `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
+                    // } else if (item.type !== 'number' && item.type !== 'category') {
+                    //     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
+                    // }
                 }
 
-                children[`arg${index}`] = item;
+                // children[`arg${index}`] = item;
             });
             numCategories = list.elems.length + 1;
         }
@@ -96,7 +97,6 @@ export default class Buckets extends BaseExpression {
         super(children);
         this.numCategories = numCategories;
 
-        this.list = list;
         this.type = 'category';
     }
 
@@ -140,26 +140,31 @@ export default class Buckets extends BaseExpression {
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-        let childInlines = {};
-        childSources.map((source, index) => {
-            childInlines[this.childrenNames[index]] = source.inline;
+        const childSourcesArray = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
+        let childSources = {};
+        childSourcesArray.map((source, index) => {
+            childSources[this.childrenNames[index]] = source;
         });
+
         const funcName = `buckets${this._uid}`;
         const cmp = this.input.type === 'category' ? '==' : '<';
+
+        // When there is "OTHERS" we don't need to take it into account
+        const divisor = this.input.type === 'category' ? this.numCategories - 2 : this.numCategories - 1;
+
         const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
-                return ${index}.;
+            `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
+                return ${index}./${divisor.toFixed(20)};
             }`;
         const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.numCategories - 1}.;
+            return ${this.input.type === 'category' ? OTHERS_GLSL_VALUE : (this.numCategories - 1).toFixed(20)};
         }`;
 
         return {
-            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
-            inline: `${funcName}(${childInlines.input})`
+            preface: this._prefaceCode(childSourcesArray.map(s => s.preface).join('\n') + preface),
+            inline: `${funcName}(${childSources.input.inline})`
         };
     }
 }

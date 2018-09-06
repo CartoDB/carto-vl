@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
-import { OTHERS_INDEX } from './constants';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 // Careful! This constant must match with the shader code of the Top expression
 const MAX_TOP_BUCKETS = 16;
@@ -95,8 +95,10 @@ export default class Top extends BaseExpression {
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
         return {
             preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).join('') + `
+            uniform float numCategories${this._uid};
+
             float top${this._uid}(float id){
-                float r = 16.;
+                float r;
                 if (${childSources._top0.inline} == id){
                     r = 0.;
                 } else if (${childSources._top1.inline} == id){
@@ -129,12 +131,20 @@ export default class Top extends BaseExpression {
                     r = 14.;
                 } else if (${childSources._top15.inline} == id){
                     r = 15.;
+                }else{
+                    return ${OTHERS_GLSL_VALUE};
                 }
-                return r;
+                return r/numCategories${this._uid};
             }`),
             inline: `top${this._uid}(${childSources.property.inline})`
         };
     }
+
+    _postShaderCompile (program, gl) {
+        this._numCategoriesLoc = gl.getUniformLocation(program, `numCategories${this._uid}`);
+        super._postShaderCompile(program, gl);
+    }
+
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
         const metaColumn = this._metadata.properties[this.property.name];
@@ -153,6 +163,7 @@ export default class Top extends BaseExpression {
             }
         });
 
+        gl.uniform1f(this._numCategoriesLoc, this.numCategories);
         super._preDraw(program, drawMetadata, gl);
     }
 }
