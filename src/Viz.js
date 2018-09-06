@@ -15,7 +15,8 @@ import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygon
 import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
 import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
-import Placement from './renderer/viz/expressions/placement';
+import Placement from './renderer/viz/expressions/Placement';
+import Translate from './renderer/viz/expressions/transformation/Translate';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -25,7 +26,7 @@ const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
-const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
+const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(1)));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -40,7 +41,7 @@ const SUPPORTED_PROPERTIES = [
     'filter',
     'symbol',
     'symbolPlacement',
-    'offset',
+    'transform',
     'resolution',
     'variables'
 ];
@@ -56,7 +57,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
  * @property {Image} symbol - show an image instead in the place of points
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
- * @property {Placement} offset - offset to apply to the features in pixels
+ * @property {Translation} transform - translation to apply to the features in pixels
  * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
  * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  * @property {object} variables - An object describing the variables used.
@@ -94,7 +95,7 @@ export default class Viz {
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-    * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
+    * @property {Translation} transform - translation to apply to the features in pixels
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
     * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
@@ -108,6 +109,7 @@ export default class Viz {
         Object.keys(vizSpec).forEach(property => {
             this._defineProperty(property, vizSpec[property]);
         });
+
         if (!Object.keys(vizSpec).includes('variables')) {
             this._defineProperty('variables', {});
         }
@@ -210,7 +212,7 @@ export default class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
-            this.offset,
+            this.transform,
             ...Object.values(this.variables)
         ];
         this._rootStyleExpressions = [
@@ -222,7 +224,7 @@ export default class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
-            this.offset
+            this.transform
         ];
     }
 
@@ -325,24 +327,24 @@ export default class Viz {
             this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement,
-                offset: this.offset
+                transform: this.transform
             }, this);
         }
 
         if (!this._geomType || this._geomType === 'point') {
             this.pointShader = compileShader(gl,
                 { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
-                { offset: this.offset }, this);
+                { transform: this.transform }, this);
         }
         if (!this._geomType || this._geomType === 'line') {
             this.lineShader = compileShader(gl,
                 { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
-                { offset: this.offset }, this);
+                { transform: this.transform }, this);
         }
         if (!this._geomType || this._geomType === 'polygon') {
             this.polygonShader = compileShader(gl,
                 { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
-                { offset: this.offset }, this);
+                { transform: this.transform }, this);
         }
     }
 
@@ -380,8 +382,8 @@ export default class Viz {
             this.symbolPlacement = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace === this.offset) {
-            this.offset = replacer;
+        } else if (toReplace === this.transform) {
+            this.transform = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
@@ -445,8 +447,8 @@ export default class Viz {
         if (util.isUndefined(vizSpec.symbolPlacement)) {
             vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
         }
-        if (util.isUndefined(vizSpec.offset)) {
-            vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
+        if (util.isUndefined(vizSpec.transform)) {
+            vizSpec.transform = DEFAULT_TRANSFORM_EXPRESSION();
         }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
@@ -457,7 +459,7 @@ export default class Viz {
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
-        vizSpec.offset = implicitCast(vizSpec.offset);
+        vizSpec.transform = implicitCast(vizSpec.transform);
         vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
@@ -494,8 +496,8 @@ export default class Viz {
         if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
         }
-        if (!(vizSpec.offset instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[offset]');
+        if (!(vizSpec.transform instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[transform]');
         }
 
         for (let key in vizSpec) {
@@ -531,8 +533,8 @@ function checkVizPropertyTypes (viz) {
     if (viz.symbolPlacement.type !== 'placement') {
         throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
     }
-    if (viz.offset.type !== 'placement') {
-        throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);
+    if (viz.transform.type !== 'translation') {
+        throw new Error(`Viz property 'transform:' must be of type 'translation' but it was of type ${viz.transform.type}`);
     }
 }
 

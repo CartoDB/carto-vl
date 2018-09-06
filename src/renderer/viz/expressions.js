@@ -244,7 +244,7 @@ import ViewportFeatures from './expressions/viewportFeatures';
 
 import Zoom from './expressions/zoom';
 
-import Placement from './expressions/placement';
+import Placement from './expressions/Placement';
 import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
@@ -252,6 +252,7 @@ import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
+import Translate from './expressions/transformation/Translate';
 
 /* Expose classes as constructor functions */
 
@@ -392,6 +393,7 @@ export const scaled = (...args) => new Scaled(...args);
 export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
+export const translate = (...args) => new Translate(...args);
 export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);

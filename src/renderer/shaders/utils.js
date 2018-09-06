@@ -52,6 +52,8 @@ function _compileShader (gl, sourceCode, type) {
 
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
+        console.log(shader);
+        console.log(sourceCode);
         gl.deleteShader(shader);
         throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
     }

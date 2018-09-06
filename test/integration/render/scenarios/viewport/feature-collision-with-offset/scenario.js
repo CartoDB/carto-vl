@@ -27,7 +27,7 @@ const viz1 = new carto.Viz(`
     color: blend(red, green, viewportCount() == 2)
     strokeWidth: 0,
     @list: viewportFeatures($value);
-    offset: placement(-165 , 0)
+    transform: translate(-165 , 0)
 `);
 
 const layer1 = new carto.Layer('triangles_without_stroke', source1, viz1);

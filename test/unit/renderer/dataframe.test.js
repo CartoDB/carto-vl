@@ -1,7 +1,7 @@
 import Dataframe from '../../../src/renderer/Dataframe';
 import Metadata from '../../../src/renderer/Metadata';
 import { pointInTriangle } from '../../../src/utils/geometry';
-import { placement } from '../../../src/renderer/viz/expressions';
+import { translate } from '../../../src/renderer/viz/expressions';
 
 describe('src/renderer/Dataframe', () => {
     describe('.getFeaturesAtPosition', () => {
@@ -40,7 +40,7 @@ describe('src/renderer/Dataframe', () => {
                 strokeWidth: { eval: () => 0.5 },
                 filter: { eval: () => 1.0 },
                 symbol: { default: true },
-                offset: { default: true }
+                transform: { default: true }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
 
@@ -61,14 +61,14 @@ describe('src/renderer/Dataframe', () => {
                     width: { eval: () => 0.5 },
                     strokeWidth: { eval: () => 0.5 },
                     filter: { eval: () => 0.0 },
-                    offset: { default: true }
+                    transform: { default: true }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 1.0, y: 1.0 + 0.999 / 1024 }, viz)).toEqual([]);
             });
 
-            describe('when an offset is applied', () => {
+            describe('when a transformation is applied', () => {
                 const dataframe = new Dataframe({
                     center: { x: 0, y: 0 },
                     scale: 1,
@@ -103,7 +103,7 @@ describe('src/renderer/Dataframe', () => {
                     strokeWidth: { eval: () => 0.5 },
                     filter: { eval: () => 1.0 },
                     symbol: { default: true },
-                    offset: placement(128, 256)
+                    transform: translate(128, 256)
                 };
                 dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
                 const ox = 128 / 1024;
@@ -157,7 +157,7 @@ describe('src/renderer/Dataframe', () => {
             const viz = {
                 width: { eval: () => 1 },
                 filter: { eval: () => 1.0 },
-                offset: { default: true }
+                transform: { default: true }
             };
 
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
@@ -176,12 +176,12 @@ describe('src/renderer/Dataframe', () => {
                 const viz = {
                     width: { eval: () => 1 },
                     filter: { eval: () => 0.0 },
-                    offset: { default: true }
+                    transform: { default: true }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: 0.999 / 1024 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 5, y: -0.999 / 1024 }, viz)).toEqual([]);
             });
-            describe('when an offset is applied', () => {
+            describe('when a transformation is applied', () => {
                 const segment = [
                     0, 0,
                     9, 0
@@ -216,7 +216,7 @@ describe('src/renderer/Dataframe', () => {
                 const viz = {
                     width: { eval: () => 1 },
                     filter: { eval: () => 1.0 },
-                    offset: placement(128, 256)
+                    transform: translate(128, 256)
                 };
                 dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
                 const ox = 128 / 1024;
@@ -270,7 +270,7 @@ describe('src/renderer/Dataframe', () => {
             const viz = {
                 strokeWidth: { eval: () => 1 },
                 filter: { eval: () => 1.0 },
-                offset: { default: true }
+                transform: { default: true }
             };
             dataframe.renderer = { _zoom: 1, gl: { canvas: { clientHeight: 1024 } } };
             const feature1 = {
@@ -293,7 +293,7 @@ describe('src/renderer/Dataframe', () => {
                 const viz = {
                     strokeWidth: { eval: () => 1 },
                     filter: { eval: () => 0.0 },
-                    offset: { default: true }
+                    transform: { default: true }
                 };
                 expect(dataframe.getFeaturesAtPosition({ x: 0.0, y: 0.0 }, viz)).toEqual([]);
                 expect(dataframe.getFeaturesAtPosition({ x: 0.5, y: 0.5 }, viz)).toEqual([]);
