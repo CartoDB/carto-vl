@@ -1,57 +1,29 @@
 import Base from './base';
-import { checkString, checkMaxArguments } from './utils';
-
 /**
- * Image. Load an image and use it as a symbol.
+ * Text. Add a text Text to a feature
  *
- * Note: image RGB color will be overridden if the viz `color` property is set.
+ * @param {string} input
  *
- * @param {string} url - Image path
- *
- * @example <caption>Load a svg image.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   symbol: s.image('./marker.svg')
- * });
- *
- * @example <caption>Load a svg image. (String)</caption>
- * const viz = new carto.Viz(`
- *    symbol: image('./marker.svg')
- * `);
+ * @example <caption>Add a text Text</caption>
+ * // TODO
+ * @example <caption>Add a text Text (String)</caption>
+ * // TODO
  * @memberof carto.expressions
- * @name image
+ * @name Text
  * @function
  * @api
 */
 
-export default class Image extends Base {
-    constructor (url) {
-        checkMaxArguments(arguments, 1, 'image');
-        checkString('image', 'url', 0, url);
-
-        super({});
-        this.type = 'image';
-        this.canvas = null;
-        this._url = url;
-        this._promise = new Promise((resolve, reject) => {
-            this.image = new window.Image();
-            this.image.onload = () => {
-                this.canvas = _getCanvasFromImage(this.image);
-                this.image = null;
-                resolve();
-            };
-            this.image.onerror = reject;
-            this.image.crossOrigin = 'anonymous';
-            this.image.src = this._url;
-        });
+export default class Text extends Base {
+    constructor (input, x = 10, y = 10) {
+        super({ input });
+        this.type = 'text';
+        this.canvas = _createCanvasForText(this.input, x, y);
     }
 
-    loadImages () {
-        this.count = this.count + 1 || 1;
-        return this._promise;
+    _compile (meta) {
+        super._compile(meta);
     }
-
-    eval () {}
 
     _free (gl) {
         if (this.texture) {
@@ -62,7 +34,7 @@ export default class Image extends Base {
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
-            inline: `texture2D(texSprite${this._uid}, canvasUV).rgba`
+            inline: `texture2D(texSprite${this._uid}, canvasUV).rgba` // FIXME
         };
     }
 
@@ -95,19 +67,20 @@ export default class Image extends Base {
     }
 }
 
-function _getCanvasFromImage (img) {
+function _createCanvasForText (input, x, y) {
     const CANVAS_SIZE = 256;
     const canvas = document.createElement('canvas');
+    const p = document.createElement('p');
+    const ctx = canvas.getContext('2d');
+    const text = input.expr;
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
-
-    const ctx = canvas.getContext('2d');
-
-    const max = Math.max(img.width, img.height);
-    const width = img.width / max * CANVAS_SIZE;
-    const height = img.height / max * CANVAS_SIZE;
-
-    ctx.drawImage(img, 1 + (CANVAS_SIZE - width) / 2, 1 + (CANVAS_SIZE - height) / 2, width - 2, height - 2);
+    p.text = text;
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px Verdana'; // FIXME
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.fillText(text, x, y);
+    ctx.restore();
 
     return canvas;
 }

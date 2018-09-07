@@ -11,7 +11,7 @@ $propertyPreface
 
 void main(void) {
     vec2 featureID = abs(featureIDVar);
-    vec2 imageUV = pointCoord*0.5+vec2(0.5);
+    vec2 canvasUV = pointCoord*0.5+vec2(0.5);
     vec4 symbolColor = $symbol_inline;
 
     vec4 c;
@@ -20,7 +20,7 @@ void main(void) {
     }else{
         c = symbolColor;
     }
-    if (imageUV!=clamp(imageUV, 0.,1.)){
+    if (canvasUV!=clamp(canvasUV, 0.,1.)){
         c.a = 0.;
     }
 

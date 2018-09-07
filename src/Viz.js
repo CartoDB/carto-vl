@@ -16,6 +16,7 @@ import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polyg
 import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/placement';
+import Text from './renderer/viz/expressions/Text';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -25,6 +26,8 @@ const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
+const DEFAULT_LABEL_EXPRESSION = () => _markDefault(new Text(''));
+const DEFAULT_LABELPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
 const DEFAULT_RESOLUTION = () => 1;
 
@@ -40,6 +43,8 @@ const SUPPORTED_PROPERTIES = [
     'filter',
     'symbol',
     'symbolPlacement',
+    'label',
+    'labelPlacement',
     'offset',
     'resolution',
     'variables'
@@ -210,6 +215,8 @@ export default class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
+            this.label,
+            this.labelPlacement,
             this.offset,
             ...Object.values(this.variables)
         ];
@@ -222,6 +229,8 @@ export default class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
+            this.label,
+            this.labelPlacement,
             this.offset
         ];
     }
@@ -329,6 +338,14 @@ export default class Viz {
             }, this);
         }
 
+        if (!this.label.default) {
+            this.labelShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
+                symbol: this.label,
+                symbolPlacement: this.labelPlacement,
+                offset: this.offset
+            }, this);
+        }
+
         if (!this._geomType || this._geomType === 'point') {
             this.pointShader = compileShader(gl,
                 { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
@@ -378,6 +395,14 @@ export default class Viz {
             replacer.notify = toReplace.notify;
         } else if (toReplace === this.symbolPlacement) {
             this.symbolPlacement = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace === this.label) {
+            this.label = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else if (toReplace === this.labelPlacement) {
+            this.labelPlacement = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else if (toReplace === this.offset) {
@@ -445,6 +470,12 @@ export default class Viz {
         if (util.isUndefined(vizSpec.symbolPlacement)) {
             vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
         }
+        if (util.isUndefined(vizSpec.label)) {
+            vizSpec.label = DEFAULT_LABEL_EXPRESSION();
+        }
+        if (util.isUndefined(vizSpec.labelPlacement)) {
+            vizSpec.labelPlacement = DEFAULT_LABELPLACEMENT_EXPRESSION();
+        }
         if (util.isUndefined(vizSpec.offset)) {
             vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
         }
@@ -459,6 +490,8 @@ export default class Viz {
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
         vizSpec.offset = implicitCast(vizSpec.offset);
         vizSpec.symbol = implicitCast(vizSpec.symbol);
+        vizSpec.label = implicitCast(vizSpec.label);
+        vizSpec.labelPlacement = implicitCast(vizSpec.labelPlacement);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
@@ -493,6 +526,12 @@ export default class Viz {
         }
         if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
+        }
+        if (!(vizSpec.label instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[label]');
+        }
+        if (!(vizSpec.labelPlacement instanceof BaseExpression)) {
+            throw new CartoValidationError('viz', 'nonValidExpression[labelPlacement]');
         }
         if (!(vizSpec.offset instanceof BaseExpression)) {
             throw new CartoValidationError('viz', 'nonValidExpression[offset]');
@@ -530,6 +569,12 @@ function checkVizPropertyTypes (viz) {
     }
     if (viz.symbolPlacement.type !== 'placement') {
         throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
+    }
+    if (viz.label.type !== 'text') {
+        throw new Error(`Viz property 'label:' must be of type 'text' but it was of type ${viz.label.type}`);
+    }
+    if (viz.labelPlacement.type !== 'placement') {
+        throw new Error(`Viz property 'labelPlacement:' must be of type 'placement' but it was of type ${viz.labelPlacement.type}`);
     }
     if (viz.offset.type !== 'placement') {
         throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);

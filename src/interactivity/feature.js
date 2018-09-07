@@ -28,6 +28,8 @@ export default class Feature {
         this.strokeWidth = new FeatureVizProperty('strokeWidth', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.symbol = new FeatureVizProperty('symbol', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.symbolPlacement = new FeatureVizProperty('symbolPlacement', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+        this.label = new FeatureVizProperty('label', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+        this.labelPlacement = new FeatureVizProperty('labelPlacement', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.variables = variables;
     }
 
@@ -38,6 +40,8 @@ export default class Feature {
         this.strokeWidth.reset(duration);
         this.symbol.reset(duration);
         this.symbolPlacement.reset(duration);
+        this.label.reset(duration);
+        this.labelPlacement.reset(duration);
 
         for (let key in this.variables) {
             this.variables[key].reset(duration);

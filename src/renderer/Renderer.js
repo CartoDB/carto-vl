@@ -326,8 +326,8 @@ export default class Renderer {
         const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
             let renderer = null;
-            if (!viz.symbol.default) {
-                renderer = viz.symbolShader;
+            if (!viz.label.default) {
+                renderer = viz.labelShader;
             } else if (dataframe.type === 'point') {
                 renderer = viz.pointShader;
             } else if (dataframe.type === 'line') {
@@ -337,7 +337,7 @@ export default class Renderer {
             }
             gl.useProgram(renderer.program);
 
-            if (!viz.symbol.default) {
+            if (!viz.label.default) {
                 gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
             }
 
@@ -385,6 +385,28 @@ export default class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
+
+            if (!viz.label.default) {
+                const textureId = viz.labelShader.textureIds.get(viz);
+                // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
+                drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
+                viz.label._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.label._preDraw(viz.labelShader.program, drawMetadata, gl);
+
+                viz.labelPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.labelPlacement._preDraw(viz.labelShader.program, drawMetadata, gl);
+
+                freeTexUnit = drawMetadata.freeTexUnit;
+
+                Object.keys(textureId).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            }
 
             if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);

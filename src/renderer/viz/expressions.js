@@ -249,6 +249,7 @@ import Image from './expressions/Image';
 import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
+import Text from './expressions/Text';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
@@ -303,6 +304,7 @@ export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
 export const imageList = (...args) => new ImageList(...args);
+export const text = (...args) => new Text(...args);
 
 export const svg = (...args) => new SVG(...args);
 

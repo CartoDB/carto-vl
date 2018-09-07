@@ -35,8 +35,8 @@ export default class ImageList extends Base {
             preface: this._prefaceCode(`
                 uniform sampler2D atlas${this._uid};
 
-                vec4 atlas${this._uid}Fn(vec2 imageUV, float cat) {
-                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
+                vec4 atlas${this._uid}Fn(vec2 canvasUV, float cat) {
+                    return texture2D(atlas${this._uid}, canvasUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
                 }
             `),
             inline: `atlas${this._uid}Fn`
