@@ -125,6 +125,12 @@ export default class Dataframe extends DummyDataframe {
         if (!viz.offset.default) {
             const offset = viz.offset.eval(feature);
             const widthScale = this.widthScale / 2;
+            viewportAABB = {
+                minx: viewportAABB.minx,
+                miny: viewportAABB.miny,
+                maxx: viewportAABB.maxx,
+                maxy: viewportAABB.maxy
+            };
             viewportAABB.minx -= offset[0] * widthScale;
             viewportAABB.maxx -= offset[0] * widthScale;
             viewportAABB.miny -= offset[1] * widthScale;
