@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Fixed
 - Add default export to allow `import carto from '@carto/carto-vl';`
 - Fix `blendTo` with `circle` SVG
+- Fix symbol override color
 
 ## [0.7.0] - 2018-08-24
 ### Added
