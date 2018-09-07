@@ -87,7 +87,6 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
     shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
-    shader.overrideColor = gl.getUniformLocation(shader.program, 'overrideColor');
 
     return shader;
 }
