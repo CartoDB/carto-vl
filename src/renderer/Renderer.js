@@ -163,7 +163,9 @@ export default class Renderer {
         const processedFeaturesIDs = new Set();
 
         const aspect = this.gl.canvas.width / this.gl.canvas.height;
+        const scale = 1 / this._zoom;
         dataframes.forEach(dataframe => {
+            const aabb = dataframe.getViewportAABB(scale, this._center, aspect);
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 const featureId = dataframe.properties[metadata.idProperty][i];
 
@@ -172,7 +174,7 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!this._isFeatureInViewport(dataframe, i, aspect, viz)) {
+                if (!dataframe.inViewport(i, viz, aabb)) {
                     continue;
                 }
 
@@ -190,15 +192,6 @@ export default class Renderer {
                 }
             }
         });
-    }
-
-    /**
-     * Check if the feature at the "index" position of the given dataframe is in the renderer viewport.
-     * NOTE: requires `this.aspect` to be set
-     */
-    _isFeatureInViewport (dataframe, index, aspect, viz) {
-        const scale = 1 / this._zoom;
-        return dataframe.inViewport(index, scale, this._center, aspect, viz);
     }
 
     /**
@@ -336,10 +329,6 @@ export default class Renderer {
                 renderer = viz.polygonShader;
             }
             gl.useProgram(renderer.program);
-
-            if (!viz.symbol.default) {
-                gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
-            }
 
             // Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);

@@ -6,14 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Add new `globalMeanStandardDev` and `viewportMeanStandardDev` classification expressions
+
+### Fixed
+- Fix symbol override color
+
+## [0.8.0] - 2018-09-07
+### Added
 - Add new `clusterCount()` expression
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions
-- Add new `globalMeanStandardDev` and `viewportMeanStandardDev` classification expressions
 - Support symbol and symbolPlacement in features
 
 ### Changed
- - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
+- zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
 - Unary and Binary operators are case insensitive.
 
 ### Fixed
