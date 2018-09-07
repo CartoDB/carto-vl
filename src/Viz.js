@@ -26,7 +26,7 @@ const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
-const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(1)));
+const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
