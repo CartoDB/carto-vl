@@ -8,7 +8,7 @@ import { checkType } from './utils';
  *
  * @internal
  */
-export default class ImageList extends Base {
+export default class ListImage extends Base {
     _bindMetadata (meta) {
         super._bindMetadata(meta);
         this.numImages = this.elems.length;

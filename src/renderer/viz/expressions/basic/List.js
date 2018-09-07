@@ -1,6 +1,6 @@
 import BaseExpression from '../base';
 import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
-import ImageList from '../ImageList';
+import ListImage from '../ListImage';
 import ListGeneric from './ListGeneric';
 
 const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image'];
@@ -52,7 +52,7 @@ export default class List extends BaseExpression {
 
         switch (this.elems[0].type) {
             case 'image':
-                Object.setPrototypeOf(this, ImageList.prototype);
+                Object.setPrototypeOf(this, ListImage.prototype);
                 break;
             default:
                 Object.setPrototypeOf(this, ListGeneric.prototype);

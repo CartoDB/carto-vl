@@ -2,7 +2,7 @@ import { checkType, clamp, checkInstance, mix } from './utils';
 
 import NamedColor from './color/NamedColor';
 import Property from './basic/property';
-import ImageList from './ImageList';
+import ListImage from './ListImage';
 import Linear from './linear';
 import Top from './top';
 import CIELabGLSL from './color/CIELab.glsl';
@@ -62,7 +62,7 @@ export default class RampGeneric extends Base {
 
         if (this.palette.type === paletteTypes.IMAGE_LIST) {
             checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
-            checkInstance('ramp', 'palette', 1, ImageList, this.palette);
+            checkInstance('ramp', 'palette', 1, ListImage, this.palette);
         }
 
         this._properties = metadata.properties;

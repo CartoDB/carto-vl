@@ -2,7 +2,7 @@ import defaultSVGs from '../defaultSVGs';
 import { checkType, checkInstance } from './utils';
 import Property from './basic/property';
 import CategoryIndex from './CategoryIndex';
-import ImageList from './ImageList';
+import ListImage from './ListImage';
 import SVG from './SVG';
 import Base from './base';
 
@@ -21,7 +21,7 @@ export default class RampImage extends Base {
         }
 
         checkType('ramp', 'input', 0, 'category', this.input);
-        checkInstance('ramp', 'palette', 1, ImageList, this.palette);
+        checkInstance('ramp', 'palette', 1, ListImage, this.palette);
     }
 
     eval (feature) {
