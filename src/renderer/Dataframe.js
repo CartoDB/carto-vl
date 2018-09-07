@@ -114,9 +114,12 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    inViewport (featureIndex, renderScale, center, aspect, viz) {
+    getViewportAABB (renderScale, center, aspect) {
+        return this._getBounds(renderScale, center, aspect);
+    }
+
+    inViewport (featureIndex, viz, viewportAABB) {
         const feature = this.getFeature(featureIndex);
-        const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
 
         if (!viz.offset.default) {
