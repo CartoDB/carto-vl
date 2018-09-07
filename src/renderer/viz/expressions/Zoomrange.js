@@ -37,7 +37,7 @@ export default class Zoomrange extends BaseExpression {
         return this._impostor.eval(feature);
     }
     _bindMetadata (metadata) {
-        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
+        checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
             throw new Error('zoomrange() function must receive a list with at least two elements');
         }

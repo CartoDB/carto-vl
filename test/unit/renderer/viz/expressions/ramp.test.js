@@ -11,16 +11,16 @@ describe('src/renderer/viz/expressions/ramp', () => {
         validateTypeErrors('ramp', []);
         validateTypeErrors('ramp', ['number']);
         validateTypeErrors('ramp', ['category']);
-        validateTypeErrors('ramp', ['number', 'image-array']);
-        validateMaxArgumentsError('ramp', ['number', 'color-array', 'number']);
+        validateTypeErrors('ramp', ['number', 'image-list']);
+        validateMaxArgumentsError('ramp', ['number', 'color-list', 'number']);
     });
 
     describe('type', () => {
         validateDynamicType('ramp', ['number', 'palette'], 'color');
         validateDynamicType('ramp', ['category', 'palette'], 'color');
-        validateDynamicType('ramp', ['category', 'color-array'], 'color');
-        validateDynamicType('ramp', ['category', 'number-array'], 'number');
-        validateDynamicType('ramp', ['category', 'image-array'], 'image');
+        validateDynamicType('ramp', ['category', 'color-list'], 'color');
+        validateDynamicType('ramp', ['category', 'number-list'], 'number');
+        validateDynamicType('ramp', ['category', 'image-list'], 'image');
     });
 
     describe('.eval', () => {

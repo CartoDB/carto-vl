@@ -19,7 +19,7 @@ export function implicitCast (value) {
     }
     if (Array.isArray(value)) {
         const _array = array(value);
-        if (_array && _array.type === 'image-array') {
+        if (_array && _array.type === 'image-list') {
             return imageList(_array.elems);
         }
         return _array;
@@ -117,10 +117,10 @@ export function throwInvalidString (expressionName, parameterName, parameterInde
 export function isArgConstructorTimeTyped (arg) {
     switch (arg) {
         case 'number':
-        case 'number-array':
+        case 'number-list':
         case 'number-property':
         case 'category':
-        case 'category-array':
+        case 'category-list':
         case 'category-property':
             return false;
         default:

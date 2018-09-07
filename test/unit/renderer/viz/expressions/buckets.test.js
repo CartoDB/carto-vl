@@ -8,16 +8,16 @@ describe('src/renderer/viz/expressions/buckets', () => {
         validateTypeErrors('buckets', ['number', 'number']);
         validateTypeErrors('buckets', ['category', 'category']);
 
-        validateTypeErrors('buckets', ['number', 'category-array']);
-        validateTypeErrors('buckets', ['category', 'number-array']);
-        validateTypeErrors('buckets', ['color', 'number-array']);
-        validateTypeErrors('buckets', ['number', 'color-array']);
-        validateMaxArgumentsError('buckets', ['number', 'number-array', 'number']);
+        validateTypeErrors('buckets', ['number', 'category-list']);
+        validateTypeErrors('buckets', ['category', 'number-list']);
+        validateTypeErrors('buckets', ['color', 'number-list']);
+        validateTypeErrors('buckets', ['number', 'color-list']);
+        validateMaxArgumentsError('buckets', ['number', 'number-list', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('buckets', ['number', 'number-array'], 'category');
-        validateStaticType('buckets', ['category', 'category-array'], 'category');
+        validateStaticType('buckets', ['number', 'number-list'], 'category');
+        validateStaticType('buckets', ['category', 'category-list'], 'category');
     });
 
     describe('eval', () => {

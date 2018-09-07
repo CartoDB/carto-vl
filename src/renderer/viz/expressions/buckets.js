@@ -63,15 +63,6 @@ export default class Buckets extends BaseExpression {
         input = implicitCast(input);
         list = implicitCast(list);
 
-        let looseType;
-
-        if (input.type) {
-            if (input.type !== 'number' && input.type !== 'category') {
-                // throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
-            }
-            looseType = input.type;
-        }
-
         let children = {
             input,
             list
@@ -79,18 +70,6 @@ export default class Buckets extends BaseExpression {
 
         let numCategories;
         if (list.elems) {
-            list.elems.map((item, index) => {
-                if (item.type) {
-                    // if (looseType && looseType !== item.type) {
-                    //     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                    //         `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                    // } else if (item.type !== 'number' && item.type !== 'category') {
-                    //     throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
-                    // }
-                }
-
-                // children[`arg${index}`] = item;
-            });
             numCategories = list.elems.length + 1;
         }
 
@@ -127,7 +106,7 @@ export default class Buckets extends BaseExpression {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
 
-        checkType('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
+        checkType('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {

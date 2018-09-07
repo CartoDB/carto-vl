@@ -125,7 +125,7 @@
 
 import Transition from './expressions/transition';
 
-import BaseArray from './expressions/basic/array';
+import BaseArray from './expressions/basic/List';
 
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
@@ -200,7 +200,7 @@ import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
 
-import Ramp from './expressions/ramp';
+import Ramp from './expressions/Ramp';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';

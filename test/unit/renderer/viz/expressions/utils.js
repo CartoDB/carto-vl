@@ -108,23 +108,23 @@ function getSimpleArg (type) {
     switch (type) {
         case 'number':
             return [s.number(0), '0'];
-        case 'number-array':
+        case 'number-list':
             return [s.array([s.number(0)]), '[0]'];
         case 'number-property':
             return [s.property('number'), '$number'];
         case 'category':
             return [s.category('category'), '\'category\''];
-        case 'category-array':
+        case 'category-list':
             return [s.array([s.category('category')]), '[\'category\']'];
         case 'category-property':
             return [s.property('category'), '$category'];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
-        case 'color-array':
+        case 'color-list':
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-array':
+        case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
             return [type, `${type}`];
@@ -136,21 +136,21 @@ function getPropertyArg (type) {
         case 'number':
         case 'number-property':
             return [s.property('number'), '$number'];
-        case 'number-array':
+        case 'number-list':
             return [s.array([s.number(0)]), '[0]'];
         case 'category':
         case 'category-property':
             return [s.property('category'), '$category'];
-        case 'category-array':
+        case 'category-list':
             return [s.array([s.category('category')]), '[\'category\']'];
         case 'color':
         case 'color-property':
             return [s.hsv(s.property('number'), 0, 0), 'hsv($number, 0, 0)'];
-        case 'color-array':
+        case 'color-list':
             return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-array':
+        case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
             return [type, `${type}`];

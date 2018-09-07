@@ -1,48 +1,8 @@
 import BaseExpression from './base';
-import { implicitCast, checkExpression, checkType, clamp, checkInstance, checkMaxArguments, mix } from './utils';
+import { implicitCast, checkExpression, checkMaxArguments } from './utils';
 
-import { interpolateRGBAinCieLAB, sRGBToCielab } from '../colorspaces';
-import NamedColor from './color/NamedColor';
-import Buckets from './buckets';
-import Property from './basic/property';
-import Classifier from './classification/Classifier';
-import ImageList from './ImageList';
-import Linear from './linear';
-import Top from './top';
-import CIELabGLSL from './color/CIELab.glsl';
-import CategoryIndex from './CategoryIndex';
-import { constant } from '../expressions';
-import { OTHERS_GLSL_VALUE } from './constants';
-import Palette from './color/palettes/Palette';
-
-const DEFAULT_OTHERS_NAME = 'CARTOVL_OTHERS';
-const MAX_SAMPLES = 100;
-const DEFAULT_SAMPLES = 10;
-
-const DEFAULT_OPTIONS = {
-    defaultOthers: DEFAULT_OTHERS_NAME,
-    samples: DEFAULT_SAMPLES
-};
-
-const paletteTypes = {
-    PALETTE: 'palette',
-    COLOR_ARRAY: 'color-array',
-    NUMBER_ARRAY: 'number-array',
-    IMAGE_LIST: 'image-list'
-};
-
-const rampTypes = {
-    COLOR: 'color',
-    NUMBER: 'number'
-};
-
-const inputTypes = {
-    NUMBER: 'number',
-    CATEGORY: 'category'
-};
-
-const COLOR_ARRAY_LENGTH = 256;
-const MAX_BYTE_VALUE = 255;
+import RampImage from './RampImage';
+import RampGeneric from './RampGeneric';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -111,70 +71,19 @@ export default class Ramp extends BaseExpression {
         this.others = others; // FIXME, others is not a children
     }
 
-    eval (feature) {
-        const index = this._getIndex(feature);
-
-        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
-            return this._evalNumberArray(feature, index);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        switch (this.palette.type) {
+            case 'image':
+                Object.setPrototypeOf(this, RampImage.prototype);
+                break;
+            default:
+                Object.setPrototypeOf(this, RampGeneric.prototype);
+                break;
         }
-
-        const texturePixels = this._computeTextureIfNeeded();
-        const { min, max } = this._getMinMax(feature);
-
-        this.palette = this._calcPaletteValues(this.palette);
-
-        const m = (index - min) / (max - min);
-        const numValues = texturePixels.length - 1;
-
-        const color = this.type === rampTypes.NUMBER
-            ? this._getValue(texturePixels, numValues, m)
-            : this._getColorValue(texturePixels, m);
-
-        if (Number.isNaN(color.r) ||
-            Number.isNaN(color.g) ||
-            Number.isNaN(color.b) ||
-            Number.isNaN(color.a)) {
-            return null;
-        }
-
-        return color;
+        return this._bindMetadata(metadata);
     }
 
-    _getFeatureIndex (feature) {
-        return this.input.eval(feature);
-    }
-
-    _getMinMax (feature) {
-        const max = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
-        if (this.input.isA(Linear)) {
-            const name = Object.keys(feature)[0];
-            const featureMin = _buildFeature(name, this.input.min.eval());
-            const featureMax = _buildFeature(name, this.input.max.eval());
-
-            return {
-                min: this.input.eval(featureMin),
-                max: this.input.eval(featureMax)
-            };
-        }
-
-        // FIXME
-        return { min: 0, max };
-    }
-
-    _getIndex (feature) {
-        if (this.input.isA(Property)) {
-            return this.input.getPropertyId(feature);
-        }
-
-        if (this.input.isA(Top)) {
-            return this.input.property.getPropertyId(feature);
-        }
-
-        return this.input.eval(feature);
-    }
     /**
      * Get the value associated with each category
      *
@@ -350,182 +259,4 @@ export default class Ramp extends BaseExpression {
      * @instance
      * @api
      */
-    getLegend (options) {
-        const config = Object.assign({}, DEFAULT_OPTIONS, options);
-        const type = this.input.type;
-
-        if (config.samples > MAX_SAMPLES) {
-            throw new Error(`The maximum number of samples for a legend is ${MAX_SAMPLES}`);
-        }
-
-        if (this.input.type === inputTypes.NUMBER) {
-            const { data, min, max } = this._getLegendNumeric(config);
-            return { type, min, max, data };
-        }
-
-        if (this.input.type === inputTypes.CATEGORY) {
-            const data = this._getLegendCategories(config);
-            return { type, data };
-        }
-    }
-
-    _getLegendNumeric (config) {
-        const name = this.input.getPropertyName();
-        const min = this.input.min.eval();
-        const max = this.input.max.eval();
-        const INC = (max - min) / config.samples;
-        const data = [];
-
-        for (let i = min; i < max; i += INC) {
-            const feature = _buildFeature(name, i);
-            const key = i;
-            const value = this.eval(feature);
-
-            data.push({ key, value });
-        }
-
-        return { data, min, max };
-    }
-
-    _getLegendCategories (config) {
-        const name = this.input.getPropertyName();
-        const categories = this._metadata.properties[name].categories;
-        const maxNumCategories = this.input.numCategories - 1;
-        const legend = [];
-
-        for (let i = 0; i <= maxNumCategories; i++) {
-            const category = categories[i];
-
-            if (category) {
-                const feature = Object.defineProperty({},
-                    name,
-                    { value: category.name }
-                );
-
-                const key = category.name && i < maxNumCategories
-                    ? category.name
-                    : config.defaultOthers;
-
-                const value = this.eval(feature);
-                legend.push({ key, value });
-            }
-        }
-
-        return legend;
-    }
-
-    _evalNumberArray (feature, index) {
-        const max = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
-        const m = index / max;
-
-        for (let i = 0; i < this.palette.elems.length - 1; i++) {
-            const rangeMin = i / (this.palette.elems.length - 1);
-            const rangeMax = (i + 1) / (this.palette.elems.length - 1);
-
-            if (m > rangeMax) {
-                continue;
-            }
-
-            const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
-            const a = this.palette.elems[i].eval(feature);
-            const b = this.palette.elems[i + 1].eval(feature);
-            return mix(a, b, clamp(rangeM, 0, 1));
-        }
-
-        throw new Error('Unexpected condition on ramp._evalNumberArray()');
-    }
-
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-        this.type = this.palette.childType;
-        if (this.others === 'default') {
-            this.others = this.palette.type === 'number-array' ? constant(1) : new NamedColor('gray');
-        } else {
-            checkType('ramp', 'others', 2, this.palette.childType, this.others);
-        }
-        if (this.input.isA(Property)) {
-            this.input = this.input.type === inputTypes.NUMBER
-                ? new Linear(this.input)
-                : new CategoryIndex(this.input);
-
-            this.input._bindMetadata(metadata);
-        }
-
-        checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
-
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
-            checkInstance('ramp', 'palette', 1, ImageList, this.palette);
-        }
-
-        this._properties = metadata.properties;
-        this._texCategories = null;
-        this._GLtexCategories = null;
-        this._metadata = metadata;
-    }
-
-    _applyToShaderSource (getGLSLforProperty) {
-        const input = this.input._applyToShaderSource(getGLSLforProperty);
-
-        let palette;
-        let others;
-        if (this.palette.isA(Palette)) {
-            const subPalette = this.palette.getColors(this.input.numCategories);
-            palette = subPalette.colors;
-            others = subPalette.othersColor || this.others;
-        } else {
-            palette = this.palette.elems;
-            others = this.others;
-        }
-
-        const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
-        const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
-        // CHECK interpolate when numCats>=colors, discard colors otherwise
-
-        const GLSLBlend = this.palette.type === 'number-array'
-            ? this._generateGLSLBlend(GLSLPalette.map(elem => elem.inline))
-            : this._generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`));
-        const inline = `ramp_color${this._uid}(${input.inline})`;
-        const preface = `
-                    ${CIELabGLSL}
-                    ${GLSLPalette.map(elem => elem.preface).join('\n')}
-                    ${GLSLOthers.preface}
-
-                    vec4 ramp_color${this._uid}(float x){
-                        return x==${OTHERS_GLSL_VALUE}
-                            ? ${GLSLOthers.inline}
-                            : cielabToSRGBA(${GLSLBlend});
-                    }`;
-
-        return { preface: this._prefaceCode(input.preface + preface), inline };
-    }
-
-    _generateGLSLBlend (list, index = 0) {
-        const currentColor = list[index];
-
-        if (index === list.length - 1) {
-            return currentColor;
-        }
-
-        const nextBlend = this._generateGLSLBlend(list, index + 1);
-
-        return _mixClampGLSL(currentColor, nextBlend, index, list.length);
-    }
-}
-
-function _buildFeature (name, value) {
-    const enumerable = true;
-
-    return Object.defineProperty({}, name, { value, enumerable });
-}
-
-function _mixClampGLSL (currentColor, nextBlend, index, listLength) {
-    const min = (index / (listLength - 1)).toFixed(20);
-    const max = (1 / (listLength - 1)).toFixed(20);
-    const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
-
-    return `mix(${currentColor}, ${nextBlend}, ${clamp})`;
 }

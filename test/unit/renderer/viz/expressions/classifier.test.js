@@ -76,28 +76,28 @@ describe('src/renderer/viz/expressions/classifier', () => {
         validateTypeErrors('viewportQuantiles', ['category', 2]);
         validateTypeErrors('viewportQuantiles', ['color', 2]);
         validateTypeErrors('viewportQuantiles', ['number', 'color']);
-        validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
+        validateMaxArgumentsError('viewportQuantiles', ['number', 'number-list', 'number']);
 
         validateTypeErrors('viewportEqIntervals', []);
         validateTypeErrors('viewportEqIntervals', ['number', 'category']);
         validateTypeErrors('viewportEqIntervals', ['category', 2]);
         validateTypeErrors('viewportEqIntervals', ['color', 2]);
         validateTypeErrors('viewportEqIntervals', ['number', 'color']);
-        validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
+        validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-list', 'number']);
 
         validateTypeErrors('globalQuantiles', []);
         validateTypeErrors('globalQuantiles', ['number', 'category']);
         validateTypeErrors('globalQuantiles', ['category', 2]);
         validateTypeErrors('globalQuantiles', ['color', 2]);
         validateTypeErrors('globalQuantiles', ['number', 'color']);
-        validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
+        validateMaxArgumentsError('globalQuantiles', ['number', 'number-list', 'number']);
 
         validateTypeErrors('globalEqIntervals', []);
         validateTypeErrors('globalEqIntervals', ['number', 'category']);
         validateTypeErrors('globalEqIntervals', ['category', 2]);
         validateTypeErrors('globalEqIntervals', ['color', 2]);
         validateTypeErrors('globalEqIntervals', ['number', 'color']);
-        validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
+        validateMaxArgumentsError('globalEqIntervals', ['number', 'number-list', 'number']);
     });
 
     describe('type', () => {

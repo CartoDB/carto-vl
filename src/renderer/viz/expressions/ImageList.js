@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkArray, checkMaxArguments, checkExpression, checkType } from './utils';
+import { checkType } from './utils';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.
@@ -9,25 +9,9 @@ import { checkArray, checkMaxArguments, checkExpression, checkType } from './uti
  * @internal
  */
 export default class ImageList extends Base {
-    constructor (imageArray) {
-        checkMaxArguments(arguments, 1, 'imageList');
-        checkArray('imageArray', 'imageArray', 0, imageArray);
-
-        imageArray.forEach((image, i) => checkExpression('imageArray', `imageArray[${i}]`, 0, image));
-
-        const children = {};
-
-        imageArray.forEach((image, i) => {
-            children[`image${i}`] = image;
-        });
-
-        super(children);
-        this.numImages = imageArray.length;
-        this.type = 'image-list';
-    }
-
     _bindMetadata (meta) {
         super._bindMetadata(meta);
+        this.numImages = this.elems.length;
         this._getChildren().forEach((image, i) => checkType('imageArray', `imageArray[${i}]`, 0, 'image', image));
     }
 
@@ -51,7 +35,7 @@ export default class ImageList extends Base {
     _preDraw (program, drawMetadata, gl) {
         this.init = true;
         for (let i = 0; i < this.numImages; i++) {
-            const image = this[`image${i}`];
+            const image = this[`image-${i}`];
             this.init = this.init && image.canvas;
         }
 
@@ -72,7 +56,7 @@ export default class ImageList extends Base {
             let offsetX = 0;
             let offsetY = 0;
             for (let i = 0; i < this.numImages; i++) {
-                const image = this[`image${i}`];
+                const image = this[`image-${i}`];
                 // get image, push image to texture atlas
                 gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, image.canvas);
                 offsetX += imageSize;

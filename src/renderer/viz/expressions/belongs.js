@@ -91,7 +91,7 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'value', 0, 'category', this.value);
-            checkType(name, 'list', 1, 'category-array', this.list);
+            checkType(name, 'list', 1, 'category-list', this.list);
         }
     };
 }
