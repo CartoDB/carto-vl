@@ -419,7 +419,8 @@ export default class Viz {
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
-            vizSpec.color = DEFAULT_COLOR_EXPRESSION();
+            const NO_OVERRIDE_COLOR = s.rgba(0, 0, 0, 0); // TODO move to contant expressions
+            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : NO_OVERRIDE_COLOR;
         }
         if (util.isUndefined(vizSpec.width)) {
             vizSpec.width = DEFAULT_WIDTH_EXPRESSION();
