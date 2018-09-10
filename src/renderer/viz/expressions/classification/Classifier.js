@@ -44,14 +44,15 @@ export default class Classifier extends BaseExpression {
             childInlines[this.childrenNames[index]] = source.inline;
         });
         const funcName = `classifier${this.classifierUID}`;
+        const divisor = this.numCategories - 1 || 1;
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-                return ${index.toFixed(2)};
+                return ${(index / divisor).toFixed(20)};
             }`;
         const funcBody = this.breakpoints.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.breakpoints.length.toFixed(1)};
+            return ${(this.breakpoints.length / divisor).toFixed(20)};
         }`;
         return {
             preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),

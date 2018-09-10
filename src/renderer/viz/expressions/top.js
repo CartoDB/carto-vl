@@ -69,6 +69,9 @@ export default class Top extends BaseExpression {
     get numCategories () {
         return this.numBuckets + 1;
     }
+    get numCategoriesWithoutOthers () {
+        return this.numCategories - 1;
+    }
 
     get numBuckets () {
         let buckets = Math.round(this.buckets.eval());
@@ -95,7 +98,7 @@ export default class Top extends BaseExpression {
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
         return {
             preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).join('') + `
-            uniform float numCategories${this._uid};
+            uniform float numCategoriesWithoutOthers${this._uid};
 
             float top${this._uid}(float id){
                 float r;
@@ -134,14 +137,14 @@ export default class Top extends BaseExpression {
                 }else{
                     return ${OTHERS_GLSL_VALUE};
                 }
-                return r/numCategories${this._uid};
+                return r/(numCategoriesWithoutOthers${this._uid}-1.);
             }`),
             inline: `top${this._uid}(${childSources.property.inline})`
         };
     }
 
     _postShaderCompile (program, gl) {
-        this._numCategoriesLoc = gl.getUniformLocation(program, `numCategories${this._uid}`);
+        this._numCategoriesLoc = gl.getUniformLocation(program, `numCategoriesWithoutOthers${this._uid}`);
         super._postShaderCompile(program, gl);
     }
 
@@ -163,7 +166,7 @@ export default class Top extends BaseExpression {
             }
         });
 
-        gl.uniform1f(this._numCategoriesLoc, this.numCategories);
+        gl.uniform1f(this._numCategoriesLoc, this.numCategoriesWithoutOthers);
         super._preDraw(program, drawMetadata, gl);
     }
 }

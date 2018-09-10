@@ -68,7 +68,7 @@ export default class Ramp extends BaseExpression {
 
         super({ input, palette });
         this.palette = palette;
-        this.others = others; // FIXME, others is not a children
+        this.others = others;
     }
 
     _bindMetadata (metadata) {

@@ -3,6 +3,8 @@ import { hexToRgb } from '../../utils';
 import { RGBA } from '../rgb';
 import { constant } from '../../../expressions';
 
+const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
+
 /**
  * Color palettes.
  *
@@ -65,6 +67,9 @@ export default class Palette extends BaseExpression {
     }
 
     _getBestSubPalette (subPaletteIndex) {
+        subPaletteIndex = subPaletteIndex <= MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            ? MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            : subPaletteIndex;
         const longestSubPalette = this.getLongestSubPalette();
         const subPalette = (subPaletteIndex < longestSubPalette.length
             ? [...this.subPalettes[subPaletteIndex]]

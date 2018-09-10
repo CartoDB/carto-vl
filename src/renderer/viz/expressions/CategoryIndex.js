@@ -45,6 +45,9 @@ export default class CategoryIndex extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._metadata = metadata;
+        const metaColumn = this._metadata.properties[this.property.name];
+        this.numCategories = metaColumn.categories.length;
+        this.numCategoriesWithoutOthers = this.numCategories;
         this._calcTranslated();
         checkType('categoryIndex', 'property', 0, 'category', this.property);
     }

@@ -6,6 +6,7 @@ export default class ReverseArray extends Base {
             array
         });
         this.type = array.type;
+        this.childType = array.childType;
     }
     get elems () {
         return [...this.array.elems].reverse();

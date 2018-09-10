@@ -58,6 +58,9 @@ export default class RampGeneric extends Base {
             checkInstance('ramp', 'palette', 1, ListImage, this.palette);
         }
 
+        this.others._bindMetadata(metadata);
+        this.childrenNames.push('others');
+
         this._properties = metadata.properties;
         this._texCategories = null;
         this._GLtexCategories = null;
@@ -201,7 +204,7 @@ export default class RampGeneric extends Base {
         let others;
 
         if (this.palette.isA(Palette)) {
-            const subPalette = this.palette.getColors(this.input.numCategories);
+            const subPalette = this.palette.getColors(this.input.numCategoriesWithoutOthers);
             palette = subPalette.colors;
             others = subPalette.othersColor || this.others;
         } else {
@@ -210,22 +213,24 @@ export default class RampGeneric extends Base {
         }
 
         const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
+
         const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
-        // CHECK interpolate when numCats>=colors, discard colors otherwise
 
         const GLSLBlend = this.palette.type === 'number-list'
             ? this._generateGLSLBlend(GLSLPalette.map(elem => elem.inline))
-            : this._generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`));
+            : `cielabToSRGBA(${
+                this._generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`))
+            })`;
         const inline = `ramp_color${this._uid}(${input.inline})`;
         const preface = `
                     ${CIELabGLSL}
                     ${GLSLPalette.map(elem => elem.preface).join('\n')}
                     ${GLSLOthers.preface}
 
-                    vec4 ramp_color${this._uid}(float x){
+                    ${this.palette.type === 'number-list' ? 'float' : 'vec4'} ramp_color${this._uid}(float x){
                         return x==${OTHERS_GLSL_VALUE}
                             ? ${GLSLOthers.inline}
-                            : cielabToSRGBA(${GLSLBlend});
+                            : ${GLSLBlend};
                     }`;
 
         return { preface: this._prefaceCode(input.preface + preface), inline };
