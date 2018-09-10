@@ -1,6 +1,6 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
-import { OTHERS_LABEL, OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
+import { OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
 
 const feature1 = {
     type: 'Feature',

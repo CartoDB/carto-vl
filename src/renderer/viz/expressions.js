@@ -125,8 +125,6 @@
 
 import Transition from './expressions/transition';
 
-import BaseArray from './expressions/basic/List';
-
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
 
@@ -318,7 +316,6 @@ export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
 export const list = (...args) => new List(...args);
-
 
 export const namedColor = (...args) => new NamedColor(...args);
 

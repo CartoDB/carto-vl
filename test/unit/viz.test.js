@@ -320,7 +320,7 @@ describe('api/viz', () => {
         it('should work with arrays of colors', () => {
             let viz = new Viz('@a: [red, lime, blue]');
             viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
-            expect(viz.variables.a.value).toEqual([ 
+            expect(viz.variables.a.value).toEqual([
                 { r: 255, g: 0, b: 0, a: 1 },
                 { r: 0, g: 255, b: 0, a: 1 },
                 { r: 0, g: 0, b: 255, a: 1 }]);
