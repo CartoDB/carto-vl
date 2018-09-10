@@ -76,18 +76,15 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             checkExpression(name, 'value', 0, value);
             checkExpression(name, 'list', 1, list);
 
-            let children = { value };
-            list.elems.map((arg, index) => {
-                children[`arg${index}`] = arg;
-            });
-            super(children);
-            this.list = list;
+            super({ value, list });
             this.inlineMaker = inlineMaker(this.list.elems);
             this.type = 'number';
         }
+
         eval (feature) {
             return jsEval(this.value.eval(feature), this.list.eval(feature));
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'value', 0, 'category', this.value);

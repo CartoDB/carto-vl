@@ -1,41 +1,42 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateMaxArgumentsError } from '../utils';
+import { validateMaxArgumentsError, validateTypeErrors } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/list', () => {
     describe('error control', () => {
         validateMaxArgumentsError('list', ['number', 'number']);
+        validateTypeErrors('list', [], () => 'list(): invalid parameters: must receive at least one argument');
+        validateTypeErrors('list', [[]], () => 'list(): invalid parameters: must receive at least one argument');
+        validateTypeErrors('list', [[1, 'a']]);
     });
 
     describe('type', () => {
         // TODO SUPPORTED_CHILD_TYPES
     });
 
-    describe('constructor', () => {
-        it('should throw an error when the list is empty ', () => {
-            expect(() => s.list()).toThrowError('list(): invalid parameters: must receive at least one argument');
-            expect(() => s.list([])).toThrowError('list(): invalid parameters: must receive at least one argument');
-        });
-
-        it('should throw an error when the list constains different types ', () => {
-            expect(() => s.list([1, 'a'])).toThrowError('list(): invalid second parameter type, invalid argument type combination');
-        });
-    });
-
     describe('.value', () => {
         it('should return list of numbers', () => {
-            const actual = s.list([1, 2, 3]).value;
+            const list = s.list([1, 2, 3]);
+
+            list._bindMetadata({});
+            const actual = list.value;
 
             expect(actual).toEqual([1, 2, 3]);
         });
 
         it('should return list of string', () => {
-            const actual = s.list(['a', 'b', 'c']).value;
+            const list = s.list(['a', 'b', 'c']);
+
+            list._bindMetadata({});
+            const actual = list.value;
 
             expect(actual).toEqual(['a', 'b', 'c']);
         });
 
         it('should return list of colors', () => {
-            const actual = s.list([s.hex('#F00'), s.hex('#00F')]).value;
+            const list = s.list([s.hex('#F00'), s.hex('#00F')]);
+
+            list._bindMetadata({});
+            const actual = list.value;
 
             expect(actual).toEqual([
                 {r: 255, g: 0, b: 0, a: 1},
@@ -43,7 +44,10 @@ describe('src/renderer/viz/expressions/basic/list', () => {
         });
 
         it('should return list of dates', () => {
-            const actual = s.list([s.date('2022-03-09T00:00:00Z')]).value;
+            const list = s.list([s.date('2022-03-09T00:00:00Z')]);
+
+            list._bindMetadata({});
+            const actual = list.value;
 
             expect(actual).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });

@@ -21,11 +21,7 @@ export function implicitCast (value) {
     }
 
     if (Array.isArray(value)) {
-        const _list = list(value);
-        if (_list && _list.type === 'image-list') {
-            return imageList(_list.elems);
-        }
-        return _list;
+        return list(value);
     }
 
     return value;

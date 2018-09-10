@@ -30,7 +30,6 @@ import { checkString, checkMaxArguments } from '../utils';
 export class Variable extends BaseExpression {
     constructor () {
         super({});
-        this.type = 'variable';
     }
 }
 
