@@ -35,36 +35,39 @@ export default class CategoryIndex extends BaseExpression {
         super({ property });
         this._numTranslatedCategories = null;
         this.type = 'category';
+
+        this._translatePixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
+        this._translateArray = [];
+        this._numTranslatedCategories = 0;
+        this._numTranslatedCategoriesGL = 0;
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        this._metadata = metadata;
+        this._calcTranslated();
+        checkType('categoryIndex', 'property', 0, 'category', this.property);
     }
 
     eval (feature) {
+        const name = this.property.eval(feature);
+        const id = this._metadata.categoryToID.get(name);
 
+        return this._translateArray[id];
     }
 
     _preDraw (program, drawMetadata, gl) {
         const metaColumn = this._metadata.properties[this.property.name];
         const numCategories = metaColumn.categories.length;
-
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
 
-        if (this._numTranslatedCategories !== numCategories) {
-            const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
-            this._numTranslatedCategories = numCategories;
+        if (this._numTranslatedCategoriesGL !== numCategories) {
+            this._numTranslatedCategoriesGL = numCategories;
+            this._calcTranslated();
             this._translateTexture = gl.createTexture();
-
-            for (let i = 0; i < numCategories; i++) {
-                const id = this._metadata.categoryToID.get(metaColumn.categories[i].name);
-                const value = i / (numCategories - 1);
-                const vec2Id = {
-                    x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
-                    y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
-                };
-                translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
-            }
-
             gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, this._translatePixels);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -95,9 +98,24 @@ export default class CategoryIndex extends BaseExpression {
         this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
     }
 
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-        this._metadata = metadata;
-        checkType('categoryIndex', 'property', 0, 'category', this.property);
+    _calcTranslated () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        const numCategories = metaColumn.categories.length;
+
+        if (this._numTranslatedCategories !== numCategories) {
+            this._numTranslatedCategories = numCategories;
+
+            for (let i = 0; i < numCategories; i++) {
+                const id = this._metadata.categoryToID.get(metaColumn.categories[i].name);
+                const value = i / (numCategories - 1);
+                const vec2Id = {
+                    x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
+                    y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
+                };
+
+                this._translatePixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
+                this._translateArray.push(value);
+            }
+        }
     }
 }

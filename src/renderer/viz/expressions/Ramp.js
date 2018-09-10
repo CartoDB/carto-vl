@@ -74,7 +74,7 @@ export default class Ramp extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         switch (this.palette.type) {
-            case 'image':
+            case 'image-list':
                 Object.setPrototypeOf(this, RampImage.prototype);
                 break;
             default:

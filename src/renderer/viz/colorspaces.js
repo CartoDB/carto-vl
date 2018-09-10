@@ -9,16 +9,16 @@ export function cielabToSRGB (cielab) {
 
 export function interpolateRGBAinCieLAB (rgbColorA, rgbColorB, m) {
     const cielabColorA = sRGBToCielab({
-        r: rgbColorA.r,
-        g: rgbColorA.g,
-        b: rgbColorA.b,
+        r: rgbColorA.r / 255,
+        g: rgbColorA.g / 255,
+        b: rgbColorA.b / 255,
         a: rgbColorA.a
     });
 
     const cielabColorB = sRGBToCielab({
-        r: rgbColorB.r,
-        g: rgbColorB.g,
-        b: rgbColorB.b,
+        r: rgbColorB.r / 255,
+        g: rgbColorB.g / 255,
+        b: rgbColorB.b / 255,
         a: rgbColorB.a
     });
 
@@ -29,7 +29,14 @@ export function interpolateRGBAinCieLAB (rgbColorA, rgbColorB, m) {
         alpha: (1 - m) * cielabColorA.alpha + m * cielabColorB.alpha
     };
 
-    return cielabToSRGB(cielabInterpolated);
+    const rgbaColor = cielabToSRGB(cielabInterpolated);
+
+    return {
+        r: Math.round(rgbaColor.r * 255),
+        g: Math.round(rgbaColor.g * 255),
+        b: Math.round(rgbaColor.b * 255),
+        a: rgbaColor.a
+    };
 }
 
 // Following functionality has been inspired by http://www.getreuer.info/home/colorspace

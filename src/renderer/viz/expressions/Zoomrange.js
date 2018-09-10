@@ -33,28 +33,36 @@ export default class Zoomrange extends BaseExpression {
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
     }
-    eval (feature) {
-        return this._impostor.eval(feature);
-    }
+
     _bindMetadata (metadata) {
         checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
             throw new Error('zoomrange() function must receive a list with at least two elements');
         }
-        function genImpostor (list, numerator, denominator) {
-            if (list.length === 1) {
-                return 1;
-            }
-            const a = list[0];
-            const b = list[1];
-            list.shift();
-            return blend(numerator / denominator,
-                genImpostor(list, numerator + 1, denominator),
-                linear(pow(2, zoom()), pow(2, a), pow(2, b))
-            );
-        }
-        this._impostor = genImpostor([...this.zoomBreakpointList.elems], 0, this.zoomBreakpointList.elems.length - 1);
+
+        const breakpointListCopy = [...this.zoomBreakpointList.elems];
+
+        this._impostor = _genImpostor(breakpointListCopy, 0, breakpointListCopy.length - 1);
         this.childrenNames.push('_impostor');
         super._bindMetadata(metadata);
     }
+
+    eval (feature) {
+        return this._impostor.eval(feature);
+    }
+}
+
+function _genImpostor (list, numerator, denominator) {
+    if (list.length === 1) {
+        return 1;
+    }
+
+    const a = list[0];
+    const b = list[1];
+    list.shift();
+
+    return blend(numerator / denominator,
+        _genImpostor(list, numerator + 1, denominator),
+        linear(pow(2, zoom()), pow(2, a), pow(2, b))
+    );
 }

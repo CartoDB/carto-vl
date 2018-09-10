@@ -252,7 +252,7 @@ describe('api/viz', () => {
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
-            viz = new Viz({ variables: { a: s.array([1, 2, 3]) } });
+            viz = new Viz({ variables: { a: s.list([1, 2, 3]) } });
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
             viz = new Viz({ variables: { a: [1, 2, 3] } }); // Implicit cast
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
@@ -269,7 +269,7 @@ describe('api/viz', () => {
             let viz = new Viz('@a: [@v, 2, 3] @v: 1');
             expect(viz.variables.v.value).toEqual(1);
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
-            viz = new Viz({ variables: { a: s.array([s.var('v'), 2, 3]), v: s.number(1) } });
+            viz = new Viz({ variables: { a: s.list([s.var('v'), 2, 3]), v: s.number(1) } });
             expect(viz.variables.v.value).toEqual(1);
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
             viz = new Viz({ variables: { a: [1, 2, 3], v: 1 } }); // Implicit cast
@@ -289,7 +289,7 @@ describe('api/viz', () => {
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
-            viz = new Viz({ variables: { a: s.array(['a', 'b', 'c']) } });
+            viz = new Viz({ variables: { a: s.list(['a', 'b', 'c']) } });
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
             viz = new Viz({ variables: { a: ['a', 'b', 'c'] } }); // Implicit cast
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
@@ -310,7 +310,7 @@ describe('api/viz', () => {
                 { r: 0, g: 0, b: 255, a: 1 }]);
             viz = new Viz({
                 variables: {
-                    a: s.array([
+                    a: s.list([
                         s.namedColor('red'),
                         s.namedColor('lime'),
                         s.namedColor('blue')])
@@ -344,7 +344,7 @@ describe('api/viz', () => {
         it('should work with arrays of dates', () => {
             let viz = new Viz('@a: [date("2022-03-09T00:00:00Z")]');
             expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
-            viz = new Viz({ variables: { a: s.array(s.date('2022-03-09T00:00:00Z')) } });
+            viz = new Viz({ variables: { a: s.list(s.date('2022-03-09T00:00:00Z')) } });
             expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });
 

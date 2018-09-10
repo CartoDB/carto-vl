@@ -1,5 +1,6 @@
-import { number, category, array, imageList } from '../expressions';
+import { number, category, list, imageList } from '../expressions';
 import BaseExpression from './base';
+import { interpolateRGBAinCieLAB } from '../colorspaces';
 
 export const DEFAULT = undefined;
 
@@ -14,16 +15,19 @@ export function implicitCast (value) {
     if (_isNumber(value)) {
         return number(value);
     }
+
     if (typeof value === 'string') {
         return category(value);
     }
+
     if (Array.isArray(value)) {
-        const _array = array(value);
-        if (_array && _array.type === 'image-list') {
-            return imageList(_array.elems);
+        const _list = list(value);
+        if (_list && _list.type === 'image-list') {
+            return imageList(_list.elems);
         }
-        return _array;
+        return _list;
     }
+
     return value;
 }
 
@@ -187,7 +191,13 @@ export function clamp (x, min, max) {
 }
 
 export function mix (x, y, a) {
-    return x * (1 - a) + y * a;
+    return typeof x === 'number'
+        ? x * (1 - a) + y * a
+        : interpolateRGBAinCieLAB(x, y, a);
+}
+
+export function fract (x) {
+    return x - Math.floor(x);
 }
 
 function _isNumber (value) {

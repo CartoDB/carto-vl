@@ -9,14 +9,6 @@ export default class ListGeneric extends BaseExpression {
         };
     }
 
-    get value () {
-        return this.elems.map(c => c.value);
-    }
-
-    eval (feature) {
-        return this.elems.map(c => c.eval(feature));
-    }
-
     _resolveAliases (aliases) {
         this.elems.map(c => c._resolveAliases(aliases));
     }

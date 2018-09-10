@@ -252,12 +252,11 @@ import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
+import List from './expressions/basic/List';
 
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
-
-export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -318,6 +317,8 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const list = (...args) => new List(...args);
+
 
 export const namedColor = (...args) => new NamedColor(...args);
 

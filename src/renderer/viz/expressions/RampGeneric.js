@@ -1,4 +1,4 @@
-import { checkType, clamp, checkInstance, mix } from './utils';
+import { checkType, checkInstance, mix, fract } from './utils';
 
 import NamedColor from './color/NamedColor';
 import Property from './basic/property';
@@ -41,9 +41,7 @@ const inputTypes = {
 export default class RampGeneric extends Base {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        if (this.palette.type === 'image-list') {
-            return this._bindMetadataImage(metadata);
-        }
+
         this.type = this.palette.childType;
         if (this.others === 'default') {
             this.others = this.palette.type === 'number-list' ? constant(1) : new NamedColor('gray');
@@ -72,56 +70,21 @@ export default class RampGeneric extends Base {
     }
 
     eval (feature) {
-        const index = this._getIndex(feature);
+        const input = this.input.eval(feature);
+        const palette = this.palette.isA(Palette)
+            ? this.palette.eval(feature).getColors(this.input.numCategories)
+            : this.palette.eval(feature);
 
-        if (this.palette.type === paletteTypes.NUMBER_ARRAY) {
-            return this._evalNumberArray(feature, index);
-        }
+        const maxValues = palette.length - 1;
+        const min = Math.floor(input * maxValues);
+        const max = Math.ceil(input * maxValues);
+        const m = fract(input * maxValues);
 
-        const texturePixels = this._computeTextureIfNeeded();
-        const { min, max } = this._getMinMax(feature);
-
-        this.palette = this._calcPaletteValues(this.palette);
-
-        const m = (index - min) / (max - min);
-        const numValues = texturePixels.length - 1;
-
-        const color = this.type === rampTypes.NUMBER
-            ? this._getValue(texturePixels, numValues, m)
-            : this._getColorValue(texturePixels, m);
-
-        if (Number.isNaN(color.r) ||
-            Number.isNaN(color.g) ||
-            Number.isNaN(color.b) ||
-            Number.isNaN(color.a)) {
-            return null;
-        }
-
-        return color;
+        return mix(palette[min], palette[max], m);
     }
 
     _getFeatureIndex (feature) {
         return this.input.eval(feature);
-    }
-
-    _getMinMax (feature) {
-        const max = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
-
-        if (this.input.isA(Linear)) {
-            const name = Object.keys(feature)[0];
-            const featureMin = _buildFeature(name, this.input.min.eval());
-            const featureMax = _buildFeature(name, this.input.max.eval());
-
-            return {
-                min: this.input.eval(featureMin),
-                max: this.input.eval(featureMax)
-            };
-        }
-
-        // FIXME
-        return { min: 0, max };
     }
 
     _getIndex (feature) {
@@ -200,39 +163,36 @@ export default class RampGeneric extends Base {
         return legend;
     }
 
-    _evalNumberArray (feature, index) {
-        const max = this.input.type === inputTypes.CATEGORY
-            ? this.input.numCategories - 1
-            : 1;
+    // _evalNumberArray (feature, index) {
+    //     const max = this.input.type === inputTypes.CATEGORY
+    //         ? this.input.numCategories - 1
+    //         : 1;
 
-        const m = index / max;
+    //     const m = index / max;
 
-        for (let i = 0; i < this.palette.elems.length - 1; i++) {
-            const rangeMin = i / (this.palette.elems.length - 1);
-            const rangeMax = (i + 1) / (this.palette.elems.length - 1);
+    //     for (let i = 0; i < this.palette.elems.length - 1; i++) {
+    //         const rangeMin = i / (this.palette.elems.length - 1);
+    //         const rangeMax = (i + 1) / (this.palette.elems.length - 1);
 
-            if (m > rangeMax) {
-                continue;
-            }
+    //         if (m > rangeMax) {
+    //             continue;
+    //         }
 
-            const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
-            const a = this.palette.elems[i].eval(feature);
-            const b = this.palette.elems[i + 1].eval(feature);
-            return mix(a, b, clamp(rangeM, 0, 1));
-        }
+    //         const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
+    //         const a = this.palette.elems[i].eval(feature);
+    //         const b = this.palette.elems[i + 1].eval(feature);
+    //         return mix(a, b, clamp(rangeM, 0, 1));
+    //     }
 
-        throw new Error('Unexpected condition on ramp._evalNumberArray()');
-    }
+    //     throw new Error('Unexpected condition on ramp._evalNumberArray()');
+    // }
 
     _applyToShaderSource (getGLSLforProperty) {
-        if (this.palette.type === 'image-list') {
-            return this._applyToShaderSourceImage(getGLSLforProperty);
-        }
-
         const input = this.input._applyToShaderSource(getGLSLforProperty);
 
         let palette;
         let others;
+
         if (this.palette.isA(Palette)) {
             const subPalette = this.palette.getColors(this.input.numCategories);
             palette = subPalette.colors;
