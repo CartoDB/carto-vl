@@ -114,14 +114,24 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    inViewport (featureIndex, renderScale, center, aspect, viz) {
+    getViewportAABB (renderScale, center, aspect) {
+        return this._getBounds(renderScale, center, aspect);
+    }
+
+    inViewport (featureIndex, viz, viewportAABB) {
         const feature = this.getFeature(featureIndex);
-        const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
 
         if (!viz.transform.default) {
             const vizOffset = viz.transform.eval(feature);
             const widthScale = this.widthScale / 2;
+            viewportAABB = {
+                minx: viewportAABB.minx,
+                miny: viewportAABB.miny,
+                maxx: viewportAABB.maxx,
+                maxy: viewportAABB.maxy
+            };
+
             viewportAABB.minx -= vizOffset[0] * widthScale;
             viewportAABB.maxx -= vizOffset[0] * widthScale;
             viewportAABB.miny -= vizOffset[1] * widthScale;

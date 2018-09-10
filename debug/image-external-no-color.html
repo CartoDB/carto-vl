@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Taxi pickups | CARTO</title>
+  <title>External Image | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
-  <script src="../dist/carto-vl.js"></script>
+  <script src="../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Taxi pickups</h1>
+        <h1>External Image with interactivity</h1>
       </header>
       <section>
-        <p class="description open-sans">Multi-scale animation with color interpolation through time of day and sized by trip distance</p>
+        <p class="description open-sans">Symbolize points with an external image, interactivity and no default color</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -36,11 +38,9 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-      center: [-74.0032059, 40.7482066],
-      zoom: 12,
-      scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+      center: [-95.907985, 37.746163],
+      zoom: 4,
+      dragRotate: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -48,31 +48,40 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
-    const source = new carto.source.Dataset('taxi_50k');
+    const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
-      width: ($fare_amount/15000)*scaled(1)
-      filter: animation($tpep_pickup_datetime,10,fade(0.2,0.2))
-      color: rgba(255,255,255,0.2)
-      strokeColor: ramp(linear($tpep_pickup_datetime,time('2016-05-01T00:08:39Z'),time('2016-05-06T10:29:11Z')),[#CF1C90,#F8CA00,#9BBD4D,#07A5AB,#B100EB])
-      strokeWidth: ($trip_distance/30000)*scaled(1)
-      @wadus: viewportAvg($trip_distance)
-      @wadus2: viewportAvg($fare_amount)
+    width: 25
+    symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
     `);
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', hideLoader);
 
+    const DURATION = 10;
+    const interactivity = new carto.Interactivity(layer);
+
+    interactivity.on('featureEnter', (event) => {
+      event.features.forEach((feature) => {
+        feature.color.blendTo('green', DURATION);
+      });
+    });
+    interactivity.on('featureLeave', (event) => {
+      event.features.forEach((feature) => {
+        feature.color.reset(DURATION);
+      });
+    });
+
+    layer.on('loaded', hideLoader);
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>

@@ -56,7 +56,8 @@ void main(void) {
     p.xy += ($symbolPlacement_inline)*size/resolution;
     p.xy += normalScale*($transform_inline);
 
-    if (size==0. || color.a==0. || size<orderMinWidth || size>=orderMaxWidth){
+    vec4 noOverrideColor = vec4(0.);
+    if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
     gl_Position  = p;
