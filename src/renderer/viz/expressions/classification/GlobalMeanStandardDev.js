@@ -53,6 +53,10 @@ export default class GlobalMeanStandardDev extends Classifier {
         checkNumber('globalMeanStandardDev', 'buckets', 1, buckets);
         checkNumber('globalMeanStandardDev', 'classSize', 2, classSize);
 
+        if (classSize <= 0) {
+            throw new RangeError(`The 'classSize must be > 0.0, but '${classSize}' was used.`);
+        }
+
         super({ input }, buckets);
         this._classSize = classSize;
         this._sample = [];

@@ -54,6 +54,10 @@ export default class ViewportMeanStandardDev extends Classifier {
         checkNumber('viewportMeanStandardDev', 'buckets', 1, buckets);
         checkNumber('viewportMeanStandardDev', 'classSize', 2, classSize);
 
+        if (classSize <= 0) {
+            throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
+        }
+
         const children = { input, _histogram: viewportHistogram(input) };
         super(children, buckets);
         this._classSize = classSize;

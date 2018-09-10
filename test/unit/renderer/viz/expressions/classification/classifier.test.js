@@ -187,6 +187,16 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([avg - 0.5 * std, avg + 0.5 * std]);
                 });
+
+                it('doesn\'t allow an invalid classSize (<=0)', () => {
+                    expect(() => globalMeanStandardDev($price, 3, 0.0)).toThrow();
+                    expect(() => globalMeanStandardDev($price, 3, -1.0)).toThrow();
+                });
+
+                it('doesn\'t allow an invalid number of buckets (<=2)', () => {
+                    expect(() => globalMeanStandardDev($price, 0)).toThrow();
+                    expect(() => globalMeanStandardDev($price, 1)).toThrow();
+                });
             });
         });
 
@@ -256,6 +266,16 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
+                });
+
+                it('doesn\'t allow an invalid classSize (<=0)', () => {
+                    expect(() => viewportMeanStandardDev($price, 3, 0.0)).toThrow();
+                    expect(() => viewportMeanStandardDev($price, 3, -1.0)).toThrow();
+                });
+
+                it('doesn\'t allow an invalid number of buckets (<=2)', () => {
+                    expect(() => viewportMeanStandardDev($price, 0)).toThrow();
+                    expect(() => viewportMeanStandardDev($price, 1)).toThrow();
                 });
             });
         });
