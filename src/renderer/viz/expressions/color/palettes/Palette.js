@@ -54,15 +54,13 @@ export default class Palette extends BaseExpression {
     }
 
     getColors (numCategories) {
+        const colors = this._getBestSubPalette(numCategories);
+
         if (this.isQualitative()) {
-            const colors = this._getBestSubPalette(numCategories + 1);
             const othersColor = colors.pop();
             return { colors, othersColor };
         } else {
-            return {
-                colors: this._getBestSubPalette(numCategories),
-                othersColor: null
-            };
+            return { colors, othersColor: null };
         }
     }
 

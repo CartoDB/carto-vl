@@ -125,7 +125,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input feature in the second bucket', () => {
-                    const expected = 1;
+                    const expected = 0.5;
                     const feature = { city: 'Murcia' };
                     const actual = bucketExpression.eval(feature);
 
@@ -133,7 +133,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input feature in the third bucket', () => {
-                    const expected = 2;
+                    const expected = 1;
                     const feature = { city: 'Madrid' };
                     const actual = bucketExpression.eval(feature);
 
@@ -210,7 +210,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is equal than the first breakpoint', () => {
-                    const expected = 1;
+                    const expected = 0.5;
                     const feature = { price: 10 };
                     const actual = bucketExpression.eval(feature);
 
@@ -218,7 +218,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is lower than the second breakpoint', () => {
-                    const expected = 1;
+                    const expected = 0.5;
                     const feature = { price: 15 };
                     const actual = bucketExpression.eval(feature);
 

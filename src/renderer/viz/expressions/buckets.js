@@ -68,30 +68,26 @@ export default class Buckets extends BaseExpression {
             list
         };
 
-        let numCategories;
-        if (list.elems) {
-            numCategories = list.elems.length + 1;
-        }
-
         super(children);
-        this.numCategories = numCategories;
-
+        this.numCategories = null;
+        this.numCategoriesWithoutOthers = null;
         this.type = 'category';
     }
 
     eval (feature) {
         const v = this.input.eval(feature);
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
         if (this.input.type === 'category') {
             for (let i = 0; i < this.list.elems.length; i++) {
                 if (v === this.list.elems[i].eval(feature)) {
-                    return i;
+                    return i / divisor;
                 }
             }
         } else if (this.input.type === 'number') {
             for (let i = 0; i < this.list.elems.length; i++) {
                 if (v < this.list.elems[i].eval(feature)) {
-                    return i;
+                    return i / divisor;
                 }
             }
         }
@@ -116,6 +112,9 @@ export default class Buckets extends BaseExpression {
                 throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
             }
         });
+
+        this.numCategories = this.list.elems.length + 1;
+        this.numCategoriesWithoutOthers = this.input.type === 'category' ? this.numCategories - 1 : this.numCategories;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -129,7 +128,7 @@ export default class Buckets extends BaseExpression {
         const cmp = this.input.type === 'category' ? '==' : '<';
 
         // When there is "OTHERS" we don't need to take it into account
-        const divisor = this.input.type === 'category' ? this.numCategories - 2 : this.numCategories - 1;
+        const divisor = this.numCategoriesWithoutOthers - 1;
 
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){

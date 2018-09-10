@@ -5,24 +5,29 @@ let classifierUID = 0;
 export default class Classifier extends BaseExpression {
     constructor (children, buckets) {
         const breakpoints = _genBreakpoints(children, buckets);
-
+        // TODO check buckets
         super(children);
 
         this.classifierUID = classifierUID++;
         this.numCategories = buckets;
+        this.numCategoriesWithoutOthers = buckets;
         this.buckets = buckets;
         this.breakpoints = breakpoints;
         this.type = 'category';
     }
 
     eval (feature) {
-        const NOT_FOUND_INDEX = -1;
         const input = this.input.eval(feature);
-        const index = this.breakpoints.findIndex((br) => {
+        const breakpoint = this.breakpoints.findIndex((br) => {
             return input <= br.expr;
         });
 
-        return index === NOT_FOUND_INDEX ? this.breakpoints.length : index;
+        const divisor = this.numCategories - 1 || 1;
+        const index = breakpoint === -1
+            ? this.breakpoints.length / divisor
+            : breakpoint / divisor;
+
+        return index;
     }
 
     getBreakpointList () {

@@ -1,4 +1,4 @@
-import { number, category, list, imageList } from '../expressions';
+import { number, category, list } from '../expressions';
 import BaseExpression from './base';
 import { interpolateRGBAinCieLAB } from '../colorspaces';
 

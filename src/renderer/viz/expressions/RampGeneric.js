@@ -8,7 +8,7 @@ import Top from './top';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
 import { constant } from '../expressions';
-import { OTHERS_GLSL_VALUE } from './constants';
+import { OTHERS_GLSL_VALUE, OTHERS_INDEX } from './constants';
 import Palette from './color/palettes/Palette';
 import Base from './base';
 
@@ -26,11 +26,6 @@ const paletteTypes = {
     COLOR_ARRAY: 'color-list',
     NUMBER_ARRAY: 'number-list',
     IMAGE_LIST: 'image-list'
-};
-
-const rampTypes = {
-    COLOR: 'color',
-    NUMBER: 'number'
 };
 
 const inputTypes = {
@@ -71,9 +66,21 @@ export default class RampGeneric extends Base {
 
     eval (feature) {
         const input = this.input.eval(feature);
-        const palette = this.palette.isA(Palette)
-            ? this.palette.eval(feature).getColors(this.input.numCategories)
-            : this.palette.eval(feature);
+        const maxPaletteSize = this.input.numCategoriesWithoutOthers < this.palette.length ? this.palette.length : this.input.numCategoriesWithoutOthers;
+
+        let palette;
+
+        if (this.palette.isA(Palette)) { // FIXME refactor
+            const paletteEval = this.palette.getColors(this.input.numCategoriesWithoutOthers, feature);
+            this.others = paletteEval.othersColor;
+            palette = paletteEval.colors.map((color) => color.eval(feature));
+        } else {
+            palette = this.palette.eval(feature).slice(0, maxPaletteSize);
+        }
+
+        if (input === OTHERS_INDEX) {
+            return this.others.eval(feature);
+        }
 
         const maxValues = palette.length - 1;
         const min = Math.floor(input * maxValues);
