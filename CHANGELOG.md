@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
-- Add new `globalMeanStandardDev` and `viewportMeanStandardDev` classification expressions
+- Add `globalStandardDev` and `viewportStandardDev` classification expressions
 
 ### Fixed
 - Fix symbol override color

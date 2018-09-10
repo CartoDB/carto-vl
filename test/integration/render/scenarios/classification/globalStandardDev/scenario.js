@@ -4,7 +4,7 @@ const map = new carto.Map({
 });
 
 const source = new carto.source.GeoJSON(sources['points']);
-const viz = new carto.Viz('color: ramp(globalMeanStandardDev($numeric, 3), TEALROSE), width: 50');
+const viz = new carto.Viz('color: ramp(globalStandardDev($numeric, 3), TEALROSE), width: 50');
 const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);

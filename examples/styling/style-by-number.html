@@ -42,7 +42,7 @@
               <label for="equalintervals">Equal intervals</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setRampMeanStandardDev()" id="standardDev">
+              <input type="radio" name="style" onclick="setRampStandardDev()" id="standardDev">
               <label for="standardDev">Mean-Standard Deviation</label>
             </li>
           </ul>
@@ -97,8 +97,8 @@
       color: ramp(viewportEqIntervals($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
-    const rampMeanStandardDevViz = new carto.Viz(`
-      color: ramp(viewportMeanStandardDev($total_pop, 5), tealrose)
+    const rampStandardDevViz = new carto.Viz(`
+      color: ramp(viewportStandardDev($total_pop, 5), tealrose)
       strokeWidth: 0
     `);
 
@@ -121,8 +121,8 @@
     function setRampEqualIntervals() {
       layer.blendToViz(rampEqualIntervalsViz);
     }
-    function setRampMeanStandardDev() {
-      layer.blendToViz(rampMeanStandardDevViz);
+    function setRampStandardDev() {
+      layer.blendToViz(rampStandardDevViz);
     }
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';

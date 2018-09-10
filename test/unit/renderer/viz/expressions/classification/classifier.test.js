@@ -9,10 +9,10 @@ import {
     property,
     globalQuantiles,
     globalEqIntervals,
-    globalMeanStandardDev,
+    globalStandardDev,
     viewportQuantiles,
     viewportEqIntervals,
-    viewportMeanStandardDev
+    viewportStandardDev
 } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
@@ -34,12 +34,12 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('globalEqIntervals', ['number', 'color']);
             validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('globalMeanStandardDev', []);
-            validateTypeErrors('globalMeanStandardDev', ['number', 'category']);
-            validateTypeErrors('globalMeanStandardDev', ['category', 2]);
-            validateTypeErrors('globalMeanStandardDev', ['color', 2]);
-            validateTypeErrors('globalMeanStandardDev', ['number', 'color']);
-            validateMaxArgumentsError('globalMeanStandardDev', ['number', 'number-array', 'number', 'number']);
+            validateTypeErrors('globalStandardDev', []);
+            validateTypeErrors('globalStandardDev', ['number', 'category']);
+            validateTypeErrors('globalStandardDev', ['category', 2]);
+            validateTypeErrors('globalStandardDev', ['color', 2]);
+            validateTypeErrors('globalStandardDev', ['number', 'color']);
+            validateMaxArgumentsError('globalStandardDev', ['number', 'number-array', 'number', 'number']);
         });
 
         describe('viewport', () => {
@@ -57,18 +57,18 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportEqIntervals', ['number', 'color']);
             validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('viewportMeanStandardDev', []);
-            validateTypeErrors('viewportMeanStandardDev', ['number', 'category']);
-            validateTypeErrors('viewportMeanStandardDev', ['category', 2]);
-            validateTypeErrors('viewportMeanStandardDev', ['color', 2]);
-            validateTypeErrors('viewportMeanStandardDev', ['number', 'color']);
-            validateMaxArgumentsError('viewportMeanStandardDev', ['number', 'number-array', 'number', 'number']);
+            validateTypeErrors('viewportStandardDev', []);
+            validateTypeErrors('viewportStandardDev', ['number', 'category']);
+            validateTypeErrors('viewportStandardDev', ['category', 2]);
+            validateTypeErrors('viewportStandardDev', ['color', 2]);
+            validateTypeErrors('viewportStandardDev', ['number', 'color']);
+            validateMaxArgumentsError('viewportStandardDev', ['number', 'number-array', 'number', 'number']);
         });
     });
 
     describe('type', () => {
         validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
-        validateStaticType('viewportMeanStandardDev', ['number-property', 2, 0.5], 'category');
+        validateStaticType('viewportStandardDev', ['number-property', 2, 0.5], 'category');
     });
 
     describe('eval', () => {
@@ -151,51 +151,51 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 expect(q.getBreakpointList()).toEqual([2.5]);
             });
 
-            // globalMeanStandardDev ---
-            describe('.globalMeanStandardDev', () => {
+            // globalStandardDev ---
+            describe('.globalStandardDev', () => {
                 const avg = average(sampleValues());
                 const std = standardDeviation(sampleValues());
 
-                it('globalMeanStandardDev($price, 2)', () => {
-                    const q = globalMeanStandardDev($price, 2);
+                it('globalStandardDev($price, 2)', () => {
+                    const q = globalStandardDev($price, 2);
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([avg]);
                 });
 
-                it('globalMeanStandardDev($price, 3)', () => {
-                    const q = globalMeanStandardDev($price, 3);
+                it('globalStandardDev($price, 3)', () => {
+                    const q = globalStandardDev($price, 3);
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([avg - std, avg + std]);
                 });
 
-                it('globalMeanStandardDev($price, 4)', () => {
-                    const q = globalMeanStandardDev($price, 4);
+                it('globalStandardDev($price, 4)', () => {
+                    const q = globalStandardDev($price, 4);
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([avg - std, avg, avg + std]);
                 });
 
-                it('globalMeanStandardDev($price, 5)', () => {
-                    const q = globalMeanStandardDev($price, 5);
+                it('globalStandardDev($price, 5)', () => {
+                    const q = globalStandardDev($price, 5);
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([
                         avg - (2 * std), avg - std, avg + std, avg + (2 * std)
                     ]);
                 });
 
-                it('globalMeanStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
-                    const q = globalMeanStandardDev($price, 3, 0.5);
+                it('globalStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
+                    const q = globalStandardDev($price, 3, 0.5);
                     prepare(q);
                     expect(q.getBreakpointList()).toEqual([avg - 0.5 * std, avg + 0.5 * std]);
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => globalMeanStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => globalMeanStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => globalStandardDev($price, 3, 0.0)).toThrow();
+                    expect(() => globalStandardDev($price, 3, -1.0)).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => globalMeanStandardDev($price, 0)).toThrow();
-                    expect(() => globalMeanStandardDev($price, 1)).toThrow();
+                    expect(() => globalStandardDev($price, 0)).toThrow();
+                    expect(() => globalStandardDev($price, 1)).toThrow();
                 });
             });
         });
@@ -226,34 +226,34 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
             });
 
-            // viewportMeanStandardDev ---
-            describe('.viewportMeanStandardDev', () => {
+            // viewportStandardDev ---
+            describe('.viewportStandardDev', () => {
                 const avg = average(sampleValues());
                 const std = standardDeviation(sampleValues());
 
-                it('viewportMeanStandardDev($price, 2)', () => {
-                    const q = viewportMeanStandardDev($price, 2);
+                it('viewportStandardDev($price, 2)', () => {
+                    const q = viewportStandardDev($price, 2);
                     prepare(q);
                     expect(q.getBreakpointList()).toBeCloseTo([avg], 2);
                 });
 
-                it('viewportMeanStandardDev($price, 3)', () => {
-                    const q = viewportMeanStandardDev($price, 3);
+                it('viewportStandardDev($price, 3)', () => {
+                    const q = viewportStandardDev($price, 3);
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
                 });
 
-                it('viewportMeanStandardDev($price, 4)', () => {
-                    const q = viewportMeanStandardDev($price, 4);
+                it('viewportStandardDev($price, 4)', () => {
+                    const q = viewportStandardDev($price, 4);
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg, 2);
                     expect(q.getBreakpointList()[2]).toBeCloseTo(avg + std, 2);
                 });
 
-                it('viewportMeanStandardDev($price, 5)', () => {
-                    const q = viewportMeanStandardDev($price, 5);
+                it('viewportStandardDev($price, 5)', () => {
+                    const q = viewportStandardDev($price, 5);
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - (2 * std), 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg - std, 2);
@@ -261,21 +261,21 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     expect(q.getBreakpointList()[3]).toBeCloseTo(avg + (2 * std), 2);
                 });
 
-                it('viewportMeanStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
-                    const q = viewportMeanStandardDev($price, 3, 0.5);
+                it('viewportStandardDev($price, 3, 0.5) --> using 1/2 standard deviation', () => {
+                    const q = viewportStandardDev($price, 3, 0.5);
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => viewportMeanStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => viewportMeanStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => viewportStandardDev($price, 3, 0.0)).toThrow();
+                    expect(() => viewportStandardDev($price, 3, -1.0)).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => viewportMeanStandardDev($price, 0)).toThrow();
-                    expect(() => viewportMeanStandardDev($price, 1)).toThrow();
+                    expect(() => viewportStandardDev($price, 0)).toThrow();
+                    expect(() => viewportStandardDev($price, 1)).toThrow();
                 });
             });
         });

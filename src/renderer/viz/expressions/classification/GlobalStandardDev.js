@@ -22,36 +22,36 @@ import { average, standardDeviation } from '../stats';
  * @example <caption>Use global mean-standard deviation to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.globalMeanStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
+ *   color: s.ramp(s.globalStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
  * });
  *
  * @example <caption>Use global mean-standard deviation to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(globalMeanStandardDev($density, 5), TEALROSE)
+ *   color: ramp(globalStandardDev($density, 5), TEALROSE)
  * `);
  *
  * @example <caption>Use global custom mean-standard deviation to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.globalMeanStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
+ *   color: s.ramp(s.globalStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
  * });
  *
  * @example <caption>Use global custom mean-standard deviation to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(globalMeanStandardDev($density, 7, 0.5), TEALROSE)
+ *   color: ramp(globalStandardDev($density, 7, 0.5), TEALROSE)
  * `);
  *
  * @memberof carto.expressions
- * @name globalMeanStandardDev
+ * @name globalStandardDev
  * @function
  * @api
  */
-export default class GlobalMeanStandardDev extends Classifier {
+export default class GlobalStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
-        checkMaxArguments(arguments, 3, 'globalMeanStandardDev');
-        checkInstance('globalMeanStandardDev', 'input', 0, Property, input && (input.property || input));
-        checkNumber('globalMeanStandardDev', 'buckets', 1, buckets);
-        checkNumber('globalMeanStandardDev', 'classSize', 2, classSize);
+        checkMaxArguments(arguments, 3, 'globalStandardDev');
+        checkInstance('globalStandardDev', 'input', 0, Property, input && (input.property || input));
+        checkNumber('globalStandardDev', 'buckets', 1, buckets);
+        checkNumber('globalStandardDev', 'classSize', 2, classSize);
 
         if (classSize <= 0) {
             throw new RangeError(`The 'classSize must be > 0.0, but '${classSize}' was used.`);
@@ -64,8 +64,8 @@ export default class GlobalMeanStandardDev extends Classifier {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalMeanStandardDev', 'input', 0, this.input);
-        checkType('globalMeanStandardDev', 'input', 0, 'number', this.input);
+        checkExpression('globalStandardDev', 'input', 0, this.input);
+        checkType('globalStandardDev', 'input', 0, 'number', this.input);
 
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = average(sample);

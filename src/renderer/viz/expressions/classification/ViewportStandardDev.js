@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
-import { calculateBreakpoints } from './GlobalMeanStandardDev';
+import { calculateBreakpoints } from './GlobalStandardDev';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -23,36 +23,36 @@ import { calculateBreakpoints } from './GlobalMeanStandardDev';
  * @example <caption>Use viewport mean-standard deviation to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.viewportMeanStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
+ *   color: s.ramp(s.viewportStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
  * });
  *
  * @example <caption>Use viewport mean-standard deviation to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(viewportMeanStandardDev($density, 5), tealrose)
+ *   color: ramp(viewportStandardDev($density, 5), tealrose)
  * `);
  *
  * @example <caption>Use viewport custom mean-standard deviation to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.viewportMeanStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
+ *   color: s.ramp(s.viewportStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
  * });
  *
  * @example <caption>Use viewport custom mean-standard deviation to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(viewportMeanStandardDev($density, 7, 0.5), tealrose)
+ *   color: ramp(viewportStandardDev($density, 7, 0.5), tealrose)
  * `);
  *
  * @memberof carto.expressions
- * @name viewportMeanStandardDev
+ * @name viewportStandardDev
  * @function
  * @api
  */
 
-export default class ViewportMeanStandardDev extends Classifier {
+export default class ViewportStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
-        checkMaxArguments(arguments, 3, 'viewportMeanStandardDev');
-        checkNumber('viewportMeanStandardDev', 'buckets', 1, buckets);
-        checkNumber('viewportMeanStandardDev', 'classSize', 2, classSize);
+        checkMaxArguments(arguments, 3, 'viewportStandardDev');
+        checkNumber('viewportStandardDev', 'buckets', 1, buckets);
+        checkNumber('viewportStandardDev', 'classSize', 2, classSize);
 
         if (classSize <= 0) {
             throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
@@ -65,7 +65,7 @@ export default class ViewportMeanStandardDev extends Classifier {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkType('viewportMeanStandardDev', 'input', 0, ['number'], this.input);
+        checkType('viewportStandardDev', 'input', 0, ['number'], this.input);
     }
 
     _genBreakpoints () {
