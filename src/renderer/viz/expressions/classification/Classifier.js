@@ -4,6 +4,9 @@ import { number } from '../../expressions';
 let classifierUID = 0;
 export default class Classifier extends BaseExpression {
     constructor (children, buckets) {
+        if (buckets <= 1) {
+            throw new RangeError(`The number of 'buckets' must be >=2, but ${buckets} was used.`);
+        }
         const breakpoints = _genBreakpoints(children, buckets);
 
         super(children);
