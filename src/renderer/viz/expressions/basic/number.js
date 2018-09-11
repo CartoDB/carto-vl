@@ -38,6 +38,11 @@ export default class BaseNumber extends BaseExpression {
     eval () {
         return this.expr;
     }
+
+    toString () {
+        return `${this.expr.toPrecision(5)}`;
+    }
+
     isAnimated () {
         return false;
     }

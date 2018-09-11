@@ -51,7 +51,7 @@ export default class Palette extends BaseExpression {
                 }
             }
         });
-
+        this.expressionName = name;
         this.tags = subPalettes.tags;
     }
 
@@ -64,6 +64,10 @@ export default class Palette extends BaseExpression {
         } else {
             return { colors, othersColor: null };
         }
+    }
+
+    toString () {
+        return this.expressionName;
     }
 
     _getBestSubPalette (subPaletteIndex) {

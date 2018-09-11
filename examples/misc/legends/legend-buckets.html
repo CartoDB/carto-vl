@@ -51,11 +51,10 @@
     });
     // Create the source
     const source = new carto.source.Dataset('table_311_complaints');
+
     // Add better styles
     const viz = new carto.Viz(`
-      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
-      color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
-      symbolPlacement: align_bottom
+      color: ramp(buckets($complaint,['Car','Bus','Building']), [#59ca22,#009fff,#f51ac4])
       width: 30
     `);
 
@@ -67,29 +66,21 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegend({others: 'Default'});
       const colorLegend = layer.viz.color.getLegend();
+      let colorLegendList = '';
 
-      let symbolLegendList = '';
+      colorLegend.data.forEach((legend, index) => {
+        const color = legend.value
+          ? rgbToHex(legend.value)
+          : 'white'
 
-      symbolLegend.data.forEach((legend, index) => {
-        const colorHex = rgbToHex(colorLegend.data[index].value);
-        symbolLegendList +=
-          `
-          <li>
-              <span 
-                class="image-mark"
-                style="
-                  background-color: ${colorHex};
-                  mask-image:url(${legend.value});
-                  -webkit-mask-image:url(${legend.value})
-              "></span>
-              <span>${legend.key}</span>
-          </li>
-        `
+        if (color) {
+          colorLegendList +=
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}</span></li>\n`;
+        }
       });
 
-      document.getElementById('content').innerHTML = symbolLegendList;
+      document.getElementById('content').innerHTML = colorLegendList;
     });
 
     function hideLoader() {

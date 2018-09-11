@@ -128,7 +128,7 @@ export default class Buckets extends BaseExpression {
         const cmp = this.input.type === 'category' ? '==' : '<';
 
         // When there is "OTHERS" we don't need to take it into account
-        const divisor = this.numCategoriesWithoutOthers - 1;
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
@@ -145,4 +145,45 @@ export default class Buckets extends BaseExpression {
             inline: `${funcName}(${childSources.input.inline})`
         };
     }
+
+    getLegendData (config) {
+        const name = this.toString();
+        const list = this.list.elems.map(elem => elem.eval());
+        const data = this.input.type === 'number'
+            ? _getLegendDataNumeric(list)
+            : _getLegendDataCategory(list, config);
+
+        return { data, name };
+    }
+}
+
+function _getLegendDataNumeric (list) {
+    const data = [];
+
+    for (let i = 0; i <= list.length; i++) {
+        const min = i - 1 >= 0 ? list[i - 1] : Number.NEGATIVE_INFINITY;
+        const max = i < list.length ? list[i] : Number.POSITIVE_INFINITY;
+        const key = [ min, max ];
+        const value = i / list.length;
+        data.push({ key, value });
+    }
+
+    return data;
+}
+
+function _getLegendDataCategory (list, config) {
+    const divisor = list.length - 1;
+    const data = list.map((category, index) => {
+        const key = category;
+        const value = index / divisor;
+
+        return { key, value };
+    });
+
+    data.push({
+        key: config.others,
+        value: OTHERS_INDEX
+    });
+
+    return data;
 }

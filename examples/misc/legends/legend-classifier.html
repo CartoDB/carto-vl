@@ -13,14 +13,16 @@
 </head>
 
 <body>
+  <!-- Map goes here -->
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Legend</h1>
+        <h1>Classified Population Density</h1>
       </header>
       <section>
         <div id="controls">
+          <p id="content-title"></p>
           <ul id="content"></ul>
         </div>
       </section>
@@ -39,57 +41,51 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-73.954323, 40.711743],
-      zoom: 15.7,
-      dragRotate: false
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
-    // Autenticate the client
+
+    // Authenticate the client
     carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
     });
-    // Create the source
-    const source = new carto.source.Dataset('table_311_complaints');
-    // Add better styles
+
+    // Define the source
+    const source = new carto.source.Dataset('pop_density_points');
+
+    // Define visualization
     const viz = new carto.Viz(`
-      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
-      color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
-      symbolPlacement: align_bottom
-      width: 30
+      width: scaled(1,1)
+      color: ramp(globalEqIntervals($dn, 5), prism)
+      strokeWidth: 0
     `);
 
     // Create the layer
     const layer = new carto.Layer('layer', source, viz);
-    // Add the layer to the map
-    layer.addTo(map);
 
+    layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegend({others: 'Default'});
+      // Get the legend
       const colorLegend = layer.viz.color.getLegend();
 
-      let symbolLegendList = '';
+      let colorLegendList = '';
 
-      symbolLegend.data.forEach((legend, index) => {
-        const colorHex = rgbToHex(colorLegend.data[index].value);
-        symbolLegendList +=
-          `
-          <li>
-              <span 
-                class="image-mark"
-                style="
-                  background-color: ${colorHex};
-                  mask-image:url(${legend.value});
-                  -webkit-mask-image:url(${legend.value})
-              "></span>
-              <span>${legend.key}</span>
-          </li>
-        `
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
+        const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
+
+        colorLegendList +=
+          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
       });
-
-      document.getElementById('content').innerHTML = symbolLegendList;
+      // Update the information
+      document.getElementById('content').innerHTML = colorLegendList;
+      document.getElementById('content-title').innerHTML = colorLegend.name;
     });
 
     function hideLoader() {

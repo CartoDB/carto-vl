@@ -65,6 +65,23 @@ export default class Classifier extends BaseExpression {
         // TODO
         super._preDraw(program, drawMetadata, gl);
     }
+
+    getLegendData () {
+        const breakpoints = this.getBreakpointList();
+        const breakpointsLength = breakpoints.length;
+        const name = this.toString();
+        const data = [];
+
+        for (let i = 0; i <= breakpointsLength; i++) {
+            const min = i - 1 >= 0 ? breakpoints[i - 1] : Number.NEGATIVE_INFINITY;
+            const max = i < breakpointsLength ? breakpoints[i] : Number.POSITIVE_INFINITY;
+            const key = [min, max];
+            const value = i / breakpointsLength;
+            data.push({key, value});
+        }
+
+        return { name, data };
+    }
 }
 
 function _genBreakpoints (children, buckets) {

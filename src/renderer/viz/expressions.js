@@ -244,7 +244,6 @@ import Zoom from './expressions/zoom';
 
 import Placement from './expressions/placement';
 import Image from './expressions/Image';
-import ListImage from './expressions/ListImage';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
@@ -299,7 +298,6 @@ export const clusterCount = (...args) => new ClusterCount(...args);
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
-export const imageList = (...args) => new ListImage(...args);
 
 export const svg = (...args) => new SVG(...args);
 

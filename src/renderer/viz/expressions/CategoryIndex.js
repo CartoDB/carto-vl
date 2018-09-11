@@ -121,4 +121,22 @@ export default class CategoryIndex extends BaseExpression {
             }
         }
     }
+
+    getLegendData () {
+        const name = this.getPropertyName();
+        const categories = this._metadata.properties[name].categories;
+        const categoriesLength = categories.length;
+        const divisor = categoriesLength - 1;
+        const data = [];
+
+        for (let i = 0; i < categoriesLength; i++) {
+            const category = categories[i];
+            const key = category.name;
+            const value = i / divisor;
+
+            data.push({ key, value });
+        }
+
+        return { data };
+    }
 }

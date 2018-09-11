@@ -15,13 +15,17 @@ export default class ListImage extends Base {
         this._getChildren().forEach((image, i) => checkType('imageArray', `imageArray[${i}]`, 0, 'image', image));
     }
 
+    eval (feature) {
+        return this.elems.map(elem => elem.eval(feature));
+    }
+
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`
                 uniform sampler2D atlas${this._uid};
 
-                vec4 atlas${this._uid}Fn(vec2 imageUV, float cat) {
-                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
+                vec4 atlas${this._uid}Fn(vec2 imageUV, float category) {
+                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(category, 16.), floor(category/16.))/16. ).rgba;
                 }
             `),
             inline: `atlas${this._uid}Fn`

@@ -40,6 +40,7 @@ export default class Property extends BaseExpression {
         }
         super({});
         this.name = name;
+        this.expressionName = name;
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -57,6 +58,10 @@ export default class Property extends BaseExpression {
         }
 
         return feature[this.name];
+    }
+
+    toString () {
+        return `$${this.expressionName}`;
     }
 
     get categories () {

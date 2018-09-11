@@ -228,7 +228,8 @@ aside.toolbox {
   margin-bottom: 0;
 }
 
-#content {
+#content,
+#controls {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
 }
 

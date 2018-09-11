@@ -1,8 +1,9 @@
 import { validateTypeErrors, validateMaxArgumentsError, validateDynamicType } from './utils';
 import * as cartocolor from 'cartocolor';
-import { ramp, buckets, palettes, globalQuantiles, linear, namedColor, property, zoomrange, imageList, BICYCLE, CAR, BUILDING } from '../../../../../src/renderer/viz/expressions';
+import { ramp, buckets, palettes, globalQuantiles, top, linear, namedColor, property, zoomrange, BICYCLE, CAR, BUILDING, globalEqIntervals } from '../../../../../src/renderer/viz/expressions';
 import { hexToRgb } from '../../../../../src/renderer/viz/expressions/utils';
 import Metadata from '../../../../../src/renderer/Metadata';
+import { OTHERS_LABEL } from '../../../../../src/renderer/viz/expressions/constants';
 
 const DEFAULT_COLOR = namedColor('gray');
 
@@ -1025,57 +1026,105 @@ describe('src/renderer/viz/expressions/ramp', () => {
     });
 
     describe('.getLegend', () => {
-        describe('when it is a linear input', () => {
+        const red = namedColor('red');
+        const blue = namedColor('blue');
+        const yellow = namedColor('yellow');
+
+        describe('when properties are numbers', () => {
             const METADATA = new Metadata({
                 properties: {
-                    price: { type: 'number', min: 1, max: 13 }
+                    price: { type: 'number', min: 1, max: 4 }
                 },
                 sample: [
                     { price: 1 },
                     { price: 2 },
                     { price: 3 },
-                    { price: 4 },
-                    { price: 5 },
-                    { price: 6 },
-                    { price: 7 },
-                    { price: 8 },
-                    { price: 9 },
-                    { price: 10 },
-                    { price: 11 },
-                    { price: 12 },
-                    { price: 13 }
+                    { price: 4 }
                 ]
             });
 
-            const red = namedColor('red');
-            const blue = namedColor('blue');
-            const yellow = namedColor('yellow');
             const $price = property('price');
-            let actual;
-            let expected;
 
-            it('should return the value in ranges', () => {
-                const r = ramp(linear($price), [red, blue, yellow]);
+            describe('and it is a classifier input', () => {
+                it('should return legend data', () => {
+                    let actual;
+                    let expected;
 
-                r._bindMetadata(METADATA);
+                    const r = ramp(globalEqIntervals($price, 2), [red, blue]);
 
-                actual = r.getLegend().data.length;
-                expected = 11;
-                expect(actual).toEqual(expected);
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegend().data;
+                    expected = [
+                        {
+                            key: [Number.NEGATIVE_INFINITY, 2.5],
+                            value: red.eval()
+                        },
+                        {
+                            key: [2.5, Number.POSITIVE_INFINITY],
+                            value: blue.eval()
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
             });
 
-            it('should return the value in ranges with custom configuration', () => {
-                const r = ramp(linear($price), [red, blue, yellow]);
+            describe('and it is a buckets input', () => {
+                it('should return legend data', () => {
+                    let actual;
+                    let expected;
 
-                r._bindMetadata(METADATA);
+                    const r = ramp(buckets($price, [2.5]), [red, blue]);
 
-                actual = r.getLegend({ samples: 20 }).data.length;
-                expected = 21;
-                expect(actual).toEqual(expected);
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegend().data;
+                    expected = [
+                        {
+                            key: [Number.NEGATIVE_INFINITY, 2.5],
+                            value: red.eval()
+                        },
+                        {
+                            key: [2.5, Number.POSITIVE_INFINITY],
+                            value: blue.eval()
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
+            });
+
+            describe('and it is a linear input', () => {
+                let actual;
+                let expected;
+
+                it('should return the value in ranges', () => {
+                    const r = ramp(linear($price), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegend({ samples: 3 }).data;
+                    expected = [
+                        {
+                            key: 1,
+                            value: red.eval()
+                        },
+                        {
+                            key: 2.5,
+                            value: { r: 202, g: 0, b: 136, a: 1 } // interpolated
+                        },
+                        {
+                            key: 4,
+                            value: blue.eval()
+                        }
+                    ];
+                    expect(actual).toEqual(expected);
+                });
             });
         });
 
-        describe('when palette is a color array', () => {
+        describe('when properties are categories', () => {
             const METADATA = new Metadata({
                 properties: {
                     grade: {
@@ -1093,71 +1142,79 @@ describe('src/renderer/viz/expressions/ramp', () => {
             let expected;
             let $grade = property('grade');
 
-            it('should return the value and the color for each category', () => {
-                const r = ramp(buckets($grade, ['A', 'B', 'C']), imageList([BICYCLE, CAR, BUILDING]));
+            describe('and it is a top input', () => {
+                it('should return legend data', () => {
+                    const r = ramp(top($grade, 2), [ red, blue ]);
 
-                r._bindMetadata(METADATA);
-
-                actual = r.getLegend().data;
-                expected = [
-                    {
-                        key: 'A',
-                        value: BICYCLE.url
-                    }, {
-                        key: 'B',
-                        value: CAR.url
-                    }, {
-                        key: 'C',
-                        value: BUILDING.url
-                    }
-                ];
-
-                expect(actual).toEqual(expected);
-            });
-        });
-
-        describe('when palette is an image array', () => {
-            const METADATA = new Metadata({
-                properties: {
-                    grade: {
-                        type: 'category',
-                        categories: [
-                            { name: 'A' },
-                            { name: 'B' },
-                            { name: 'C' }
-                        ]
-                    }
-                }
+                    r._bindMetadata(METADATA);
+                    actual = r.getLegend().data;
+                    expected = [
+                        {
+                            key: 'A',
+                            value: red.eval()
+                        }, {
+                            key: 'B',
+                            value: blue.eval()
+                        }, {
+                            key: OTHERS_LABEL,
+                            value: r.others.eval()
+                        }
+                    ];
+                });
             });
 
-            const red = namedColor('red');
-            const blue = namedColor('blue');
-            const yellow = namedColor('yellow');
+            describe('and it is a bucket input with a color array', () => {
+                it('should return the legend data for an image list', () => {
+                    const r = ramp(buckets($grade, ['A', 'B', 'C']), [BICYCLE, CAR, BUILDING]);
 
-            let actual;
-            let expected;
-            let $grade = property('grade');
+                    r._bindMetadata(METADATA);
 
-            it('should return the value and the image url for each category', () => {
-                const r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow]);
+                    actual = r.getLegend().data;
+                    expected = [
+                        {
+                            key: 'A',
+                            value: BICYCLE.url
+                        }, {
+                            key: 'B',
+                            value: CAR.url
+                        }, {
+                            key: 'C',
+                            value: BUILDING.url
+                        },
+                        {
+                            key: OTHERS_LABEL,
+                            value: r.others.eval()
+                        }
+                    ];
 
-                r._bindMetadata(METADATA);
+                    expect(actual).toEqual(expected);
+                });
 
-                actual = r.getLegend().data;
-                expected = [
-                    {
-                        key: 'A',
-                        value: red.color
-                    }, {
-                        key: 'B',
-                        value: blue.color
-                    }, {
-                        key: 'C',
-                        value: yellow.color
-                    }
-                ];
+                it('should return the letend data for a color list', () => {
+                    const r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow]);
 
-                expect(actual).toEqual(expected);
+                    r._bindMetadata(METADATA);
+
+                    actual = r.getLegend().data;
+                    expected = [
+                        {
+                            key: 'A',
+                            value: red.color
+                        }, {
+                            key: 'B',
+                            value: blue.color
+                        }, {
+                            key: 'C',
+                            value: yellow.color
+                        },
+                        {
+                            key: OTHERS_LABEL,
+                            value: r.others.eval()
+                        }
+                    ];
+
+                    expect(actual).toEqual(expected);
+                });
             });
         });
     });

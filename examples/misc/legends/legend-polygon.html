@@ -22,6 +22,7 @@
       </header>
       <section>
         <div id="controls">
+          <p id="content-title"></p>
           <ul id="content"></ul>
         </div>
       </section>
@@ -69,7 +70,7 @@
       hideLoader();
 
       const colorLegend = layer.viz.color.getLegend({
-        defaultOthers: 'Default',
+        others: 'Default',
         samples: 20
       });
 
@@ -88,6 +89,7 @@
 
       // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
+      document.getElementById('content-title').innerHTML = colorLegend.name;
     });
 
     function hideLoader() {

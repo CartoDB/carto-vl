@@ -95,9 +95,9 @@ describe('src/renderer/viz/expressions/top', () => {
             const top = s.top(s.prop('wadus'), 4);
             top._bindMetadata(meta);
             expect(top.eval({wadus: 'A'})).toEqual(0);
-            expect(top.eval({wadus: 'B'})).toEqual(1);
-            expect(top.eval({wadus: 'C'})).toEqual(3);
-            expect(top.eval({wadus: 'D'})).toEqual(2);
+            expect(top.eval({wadus: 'B'})).toEqual(1 / 3);
+            expect(top.eval({wadus: 'C'})).toEqual(3 / 3);
+            expect(top.eval({wadus: 'D'})).toEqual(2 / 3);
         });
     });
 });

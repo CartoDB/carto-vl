@@ -88,7 +88,7 @@ export default class Ramp extends BaseExpression {
      * Get the value associated with each category
      *
      * @param {object} config - Optional configuration
-     * @param {string} config.defaultOthers - Name for other category values. Defaults to 'Others'.
+     * @param {string} config.others - Name for other category values. Defaults to 'Others'.
      * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
      * @return {object} - { type, data }. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
      *
@@ -174,7 +174,7 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.viz.color.getLegend({
-     *      defaultOthers: 'Other Vehicles'
+     *      others: 'Other Vehicles'
      *   });
      *
      *   // legend = {
@@ -195,7 +195,7 @@ export default class Ramp extends BaseExpression {
      *
      * layer.on('loaded', () => {
      *   const legend = layer.viz.color.getLegend({
-     *      defaultOthers: 'Other Vehicles'
+     *      others: 'Other Vehicles'
      *   });
      *
      *   // legend = {

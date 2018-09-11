@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
-import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
 
 // Careful! This constant must match with the shader code of the Top expression
 const MAX_TOP_BUCKETS = 16;
@@ -49,10 +49,11 @@ export default class Top extends BaseExpression {
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
-
         const categoryName = this.property.eval(feature);
         const index = orderedCategoryNames.findIndex(category => category.name === categoryName);
-        return index >= this.numBuckets ? OTHERS_INDEX : index;
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+
+        return index >= this.numBuckets || index === -1 ? OTHERS_INDEX : index / divisor;
     }
 
     _bindMetadata (metadata) {
@@ -168,5 +169,30 @@ export default class Top extends BaseExpression {
 
         gl.uniform1f(this._numCategoriesLoc, this.numCategoriesWithoutOthers);
         super._preDraw(program, drawMetadata, gl);
+    }
+
+    getLegendData () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
+        const buckets = this.numBuckets;
+        const data = [];
+        const name = this.toString();
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+        orderedCategoryNames.forEach((category, i) => {
+            if (i < buckets) {
+                const key = category.name;
+                const value = i / divisor;
+                data.push({ key, value });
+            }
+        });
+
+        data.push({
+            key: OTHERS_LABEL,
+            value: OTHERS_INDEX
+        });
+
+        return { name, data };
     }
 }
