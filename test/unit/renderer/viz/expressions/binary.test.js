@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateCompileTypeError } from './utils';
+import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -8,46 +8,46 @@ s.FALSE.toString = () => 's.FALSE';
 describe('src/renderer/viz/expressions/binary', () => {
     describe('error control', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
-            validateCompileTypeError('mul', ['number', 'category']);
-            validateCompileTypeError('mul', ['category', 'number']);
-            validateCompileTypeError('mul', ['category', 'category']);
+            validateTypeErrors('mul', ['number', 'category']);
+            validateTypeErrors('mul', ['category', 'number']);
+            validateTypeErrors('mul', ['category', 'category']);
             validateMaxArgumentsError('mul', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {
-            validateCompileTypeError('add', ['number', 'category']);
-            validateCompileTypeError('add', ['category', 'number']);
+            validateTypeErrors('add', ['number', 'category']);
+            validateTypeErrors('add', ['category', 'number']);
 
-            validateCompileTypeError('add', ['category', 'category']);
+            validateTypeErrors('add', ['category', 'category']);
 
-            validateCompileTypeError('add', ['number', 'color']);
-            validateCompileTypeError('add', ['color', 'number']);
+            validateTypeErrors('add', ['number', 'color']);
+            validateTypeErrors('add', ['color', 'number']);
 
             validateMaxArgumentsError('add', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER', () => {
-            validateCompileTypeError('mod', ['number', 'category']);
-            validateCompileTypeError('mod', ['category', 'number']);
+            validateTypeErrors('mod', ['number', 'category']);
+            validateTypeErrors('mod', ['category', 'number']);
 
-            validateCompileTypeError('mod', ['category', 'category']);
+            validateTypeErrors('mod', ['category', 'category']);
 
-            validateCompileTypeError('mod', ['number', 'color']);
-            validateCompileTypeError('mod', ['color', 'number']);
+            validateTypeErrors('mod', ['number', 'color']);
+            validateTypeErrors('mod', ['color', 'number']);
 
-            validateCompileTypeError('mod', ['color', 'color']);
+            validateTypeErrors('mod', ['color', 'color']);
 
             validateMaxArgumentsError('mod', ['number', 'number', 'number']);
         });
 
         describe('Signature NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER', () => {
-            validateCompileTypeError('equals', ['number', 'category']);
-            validateCompileTypeError('equals', ['category', 'number']);
+            validateTypeErrors('equals', ['number', 'category']);
+            validateTypeErrors('equals', ['category', 'number']);
 
-            validateCompileTypeError('equals', ['number', 'color']);
-            validateCompileTypeError('equals', ['color', 'number']);
+            validateTypeErrors('equals', ['number', 'color']);
+            validateTypeErrors('equals', ['color', 'number']);
 
-            validateCompileTypeError('equals', ['color', 'color']);
+            validateTypeErrors('equals', ['color', 'color']);
 
             validateMaxArgumentsError('equals', ['number', 'number', 'number']);
         });

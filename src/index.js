@@ -47,3 +47,4 @@ import { version } from '../package.json';
 const source = { Dataset, SQL, GeoJSON, MVT };
 
 export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };

@@ -1,7 +1,7 @@
-import { decodeGeom } from './decoder';
 import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
+import DummyDataframe from './DummyDataframe';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -14,68 +14,18 @@ const AABBTestResults = {
     INTERSECTS: 0
 };
 
-export default class Dataframe {
-    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
-        this.active = active;
-        this.center = center;
-        this.geom = geom;
-        this.properties = properties;
-        this.scale = scale;
-        this.type = type;
-        this.decodedGeom = decodeGeom(this.type, this.geom);
-        this.numVertex = type === 'point' ? size * 3 : this.decodedGeom.vertices.length / 2;
-        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
-        this.propertyTex = [];
-        this.metadata = metadata;
-        this.propertyID = {}; // Name => PID
-        this.propertyCount = 0;
-        this._aabb = this._computeAABB(geom, type);
-    }
-
+export default class Dataframe extends DummyDataframe {
     get widthScale () {
         return this.renderer
             ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
             : 1;
     }
 
-    _computeAABB (geometry, type) {
-        switch (type) {
-            case 'point':
-                return [];
-            case 'line':
-            case 'polygon':
-                const aabbList = [];
-
-                for (let i = 0; i < geometry.length; i++) {
-                    const feature = geometry[i];
-
-                    let aabb = {
-                        minx: Number.POSITIVE_INFINITY,
-                        miny: Number.POSITIVE_INFINITY,
-                        maxx: Number.NEGATIVE_INFINITY,
-                        maxy: Number.NEGATIVE_INFINITY
-                    };
-
-                    for (let j = 0; j < feature.length; j++) {
-                        aabb = _updateAABBForGeometry(feature[j], aabb, type);
-                    }
-
-                    if (aabb.minx === Number.POSITIVE_INFINITY) {
-                        aabb = null;
-                    }
-
-                    aabbList.push(aabb);
-                }
-
-                return aabbList;
-        }
-    }
-
     setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
     }
 
-    bind (renderer) {
+    bindRenderer (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
         const vertices = this.decodedGeom.vertices;
@@ -164,14 +114,23 @@ export default class Dataframe {
         }
     }
 
-    inViewport (featureIndex, renderScale, center, aspect, viz) {
+    getViewportAABB (renderScale, center, aspect) {
+        return this._getBounds(renderScale, center, aspect);
+    }
+
+    inViewport (featureIndex, viz, viewportAABB) {
         const feature = this.getFeature(featureIndex);
-        const viewportAABB = this._getBounds(renderScale, center, aspect);
         let strokeWidthScale = 1;
 
         if (!viz.offset.default) {
             const offset = viz.offset.eval(feature);
             const widthScale = this.widthScale / 2;
+            viewportAABB = {
+                minx: viewportAABB.minx,
+                miny: viewportAABB.miny,
+                maxx: viewportAABB.maxx,
+                maxy: viewportAABB.maxy
+            };
             viewportAABB.minx -= offset[0] * widthScale;
             viewportAABB.maxx -= offset[0] * widthScale;
             viewportAABB.miny -= offset[1] * widthScale;
@@ -243,8 +202,8 @@ export default class Dataframe {
 
     _isPointInViewport (featureIndex, viewportAABB) {
         const { minx, maxx, miny, maxy } = viewportAABB;
-        const x = this.geom[6 * featureIndex + 0];
-        const y = this.geom[6 * featureIndex + 1];
+        const x = this.decodedGeom.vertices[6 * featureIndex + 0];
+        const y = this.decodedGeom.vertices[6 * featureIndex + 1];
         return x > minx && x < maxx && y > miny && y < maxy;
     }
 
@@ -529,42 +488,6 @@ export default class Dataframe {
 
         return diameter / 2 * this.widthScale;
     }
-}
-
-function _updateAABBForGeometry (feature, aabb, geometryType) {
-    switch (geometryType) {
-        case 'line':
-            return _updateAABBLine(feature, aabb);
-        case 'polygon':
-            return _updateAABBPolygon(feature, aabb);
-    }
-}
-
-function _updateAABBLine (line, aabb) {
-    const vertices = line;
-    const numVertices = line.length;
-
-    for (let i = 0; i < numVertices; i += 2) {
-        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
-        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
-        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);
-        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);
-    }
-
-    return aabb;
-}
-
-function _updateAABBPolygon (polygon, aabb) {
-    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
-
-    for (let i = 0; i < numVertices; i++) {
-        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
-        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
-        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
-        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
-    }
-
-    return aabb;
 }
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {

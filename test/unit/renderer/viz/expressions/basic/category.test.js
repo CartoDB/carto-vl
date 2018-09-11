@@ -1,13 +1,13 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import Metadata from '../../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/basic/category', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('category', []);
-        validateStaticTypeErrors('category', [undefined]);
-        validateStaticTypeErrors('category', [123]);
-        validateStaticTypeErrors('category', ['number']);
+        validateTypeErrors('category', []);
+        validateTypeErrors('category', [undefined]);
+        validateTypeErrors('category', [123]);
+        validateTypeErrors('category', ['number']);
         validateMaxArgumentsError('category', ['number', 'number']);
     });
 

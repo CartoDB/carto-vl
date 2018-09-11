@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Style by number | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,6 +13,7 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -39,6 +41,10 @@
               <input type="radio" name="style" onclick="setRampEqualIntervals()" id="equalintervals">
               <label for="equalintervals">Equal intervals</label>
             </li>
+            <li>
+              <input type="radio" name="style" onclick="setRampStandardDev()" id="standardDev">
+              <label for="standardDev">Mean-Standard Deviation</label>
+            </li>
           </ul>
         </div>
       </section>
@@ -63,6 +69,11 @@
       touchZoomRotate: false,
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     // Define user
     carto.setDefaultAuth({
       user: 'cartovl',
@@ -86,6 +97,10 @@
       color: ramp(viewportEqIntervals($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
+    const rampStandardDevViz = new carto.Viz(`
+      color: ramp(viewportStandardDev($total_pop, 5), tealrose)
+      strokeWidth: 0
+    `);
 
     // Define layer
     const source = new carto.source.Dataset('us_county_points');
@@ -106,9 +121,13 @@
     function setRampEqualIntervals() {
       layer.blendToViz(rampEqualIntervalsViz);
     }
+    function setRampStandardDev() {
+      layer.blendToViz(rampStandardDevViz);
+    }
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>

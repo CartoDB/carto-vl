@@ -9,7 +9,8 @@
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
- *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+ *  - **resolution**: - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  *
  * For example the point diameter could be using the `add` expression:
  *
@@ -159,6 +160,7 @@ import ClusterMax from './expressions/aggregation/cluster/ClusterMax';
 import ClusterMin from './expressions/aggregation/cluster/ClusterMin';
 import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
+import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
 import Constant from './expressions/basic/constant';
 
@@ -195,8 +197,11 @@ import Property from './expressions/basic/property';
 
 import GlobalEqIntervals from './expressions/classification/GlobalEqIntervals';
 import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
+import GlobalStandardDev from './expressions/classification/GlobalStandardDev';
+
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
+import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
 import Ramp from './expressions/ramp';
 
@@ -295,6 +300,7 @@ export const clusterMax = (...args) => new ClusterMax(...args);
 export const clusterMin = (...args) => new ClusterMin(...args);
 export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
+export const clusterCount = (...args) => new ClusterCount(...args);
 
 export const constant = (...args) => new Constant(...args);
 
@@ -334,10 +340,14 @@ export const reverse = reverseFn;
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
+
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
+
+export const globalStandardDev = (...args) => new GlobalStandardDev(...args);
+export const viewportStandardDev = (...args) => new ViewportStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 

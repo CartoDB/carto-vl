@@ -5,6 +5,7 @@ import { implicitCast } from './expressions/utils';
 import { CSS_COLOR_NAMES } from './expressions/color/cssColorNames';
 import NamedColor from './expressions/color/NamedColor';
 import Hex from './expressions/color/hex';
+import Base from './expressions/base';
 
 // TODO use Schema classes
 
@@ -43,6 +44,14 @@ lowerCaseExpressions.star_outline = expressions.STAR_OUTLINE;
 lowerCaseExpressions.triangle = expressions.TRIANGLE;
 lowerCaseExpressions.triangle_outline = expressions.TRIANGLE_OUTLINE;
 
+const originalBaseBlendTo = Base.prototype.blendTo;
+Base.prototype.blendTo = function (final, ...args) {
+    if (typeof final === 'string') {
+        final = parseVizExpression(final);
+    }
+    return originalBaseBlendTo.bind(this)(final, ...args);
+};
+
 export function parseVizExpression (str) {
     prepareJsep();
     const r = implicitCast(parseNode(jsep(str)));
@@ -67,13 +76,17 @@ function parseVizNamedExpr (vizSpec, node) {
     if (node.operator !== ':') {
         throw new Error('Invalid syntax.');
     }
+
     if (node.left.name.length && node.left.name[0] === '@') {
         node.left.name = '__cartovl_variable_' + node.left.name.substr(1);
     }
+
     let name = node.left.name;
+
     if (!name) {
         throw new Error('Invalid syntax.');
     }
+
     if (name.startsWith('__cartovl_variable_')) {
         name = node.left.name.substr('__cartovl_variable_'.length);
         if (name in vizSpec.variables) {
@@ -106,7 +119,7 @@ function parseFunctionCall (node) {
 function parseBinaryOperation (node) {
     const left = parseNode(node.left);
     const right = parseNode(node.right);
-    switch (node.operator) {
+    switch (node.operator.toLowerCase()) {
         case '*':
             return expressions.mul(left, right);
         case '/':
@@ -198,9 +211,13 @@ function prepareJsep () {
     jsep.addBinaryOp(':', 0);
     jsep.addBinaryOp('^', 11);
     jsep.addBinaryOp('or', 1);
+    jsep.addBinaryOp('OR', 1);
     jsep.addBinaryOp('and', 2);
+    jsep.addBinaryOp('AND', 2);
     jsep.addBinaryOp('in', 13);
+    jsep.addBinaryOp('IN', 1);
     jsep.addBinaryOp('nin', 13);
+    jsep.addBinaryOp('NIN', 13);
     jsep.addIdentifierChar('@');
     jsep.addIdentifierChar('#');
     jsep.removeLiteral('true');
@@ -209,9 +226,13 @@ function prepareJsep () {
 
 function cleanJsep () {
     jsep.removeBinaryOp('in');
+    jsep.removeBinaryOp('IN');
     jsep.removeBinaryOp('nin');
+    jsep.removeBinaryOp('NIN');
     jsep.removeBinaryOp('and');
+    jsep.removeBinaryOp('AND');
     jsep.removeBinaryOp('or');
+    jsep.removeBinaryOp('OR');
     jsep.removeBinaryOp('^');
     jsep.removeBinaryOp(':');
     jsep.removeIdentifierChar('@');

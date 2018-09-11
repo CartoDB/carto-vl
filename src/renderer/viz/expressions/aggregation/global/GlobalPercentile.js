@@ -1,5 +1,4 @@
 import BaseExpression from '../../base';
-import * as schema from '../../../../schema';
 import { number } from '../../../expressions';
 import { checkMaxArguments } from '../../utils';
 /**
@@ -61,13 +60,5 @@ export default class GlobalPercentile extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return this.property._getMinimumNeededSchema();
-    }
-
-    _getColumnName () {
-        if (this.property.aggName) {
-            // Property has aggregation
-            return schema.column.aggColumn(this.property.name, this.property.aggName);
-        }
-        return this.property.name;
     }
 }

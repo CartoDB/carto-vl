@@ -17,4 +17,6 @@ npm install @carto/carto-vl
 yarn add @carto/carto-vl
 
 var carto = require('@carto/carto-vl');
+// or (ES6)
+import carto from '@carto/carto-vl';
 ```

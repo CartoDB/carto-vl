@@ -131,6 +131,75 @@ export function pointInRectangle (point, bbox) {
     return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));
 }
 
+export function computeAABB (geometry, type) {
+    switch (type) {
+        case 'point':
+            return [];
+        case 'line':
+        case 'polygon':
+            const aabbList = [];
+
+            for (let i = 0; i < geometry.length; i++) {
+                const feature = geometry[i];
+
+                let aabb = {
+                    minx: Number.POSITIVE_INFINITY,
+                    miny: Number.POSITIVE_INFINITY,
+                    maxx: Number.NEGATIVE_INFINITY,
+                    maxy: Number.NEGATIVE_INFINITY
+                };
+
+                for (let j = 0; j < feature.length; j++) {
+                    aabb = _updateAABBForGeometry(feature[j], aabb, type);
+                }
+
+                if (aabb.minx === Number.POSITIVE_INFINITY) {
+                    aabb = null;
+                }
+
+                aabbList.push(aabb);
+            }
+
+            return aabbList;
+    }
+}
+
+function _updateAABBForGeometry (feature, aabb, geometryType) {
+    switch (geometryType) {
+        case 'line':
+            return _updateAABBLine(feature, aabb);
+        case 'polygon':
+            return _updateAABBPolygon(feature, aabb);
+    }
+}
+
+function _updateAABBLine (line, aabb) {
+    const vertices = line;
+    const numVertices = line.length;
+
+    for (let i = 0; i < numVertices; i += 2) {
+        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);
+    }
+
+    return aabb;
+}
+
+function _updateAABBPolygon (polygon, aabb) {
+    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
+
+    for (let i = 0; i < numVertices; i++) {
+        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);
+        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);
+        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);
+        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);
+    }
+
+    return aabb;
+}
+
 export default {
     intersect,
     sub,

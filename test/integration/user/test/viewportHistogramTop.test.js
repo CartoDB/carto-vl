@@ -1,4 +1,4 @@
-import * as carto from '../../../../src/index';
+import carto from '../../../../src/index';
 import * as util from '../../util';
 
 const feature1 = {
@@ -42,7 +42,7 @@ const feature3 = {
 
 const features = {
     type: 'FeatureCollection',
-    features: [ feature1, feature2, feature3 ]
+    features: [feature1, feature2, feature3]
 };
 
 describe('viewportHistogram() with top()', () => {
@@ -63,8 +63,8 @@ describe('viewportHistogram() with top()', () => {
     it('should return the valid histogram', (done) => {
         layer.on('loaded', () => {
             expect(viz.variables.histogram.value).toEqual([
-                {x: 'a', y: 2},
-                {x: 'CARTOVL_TOP_OTHERS_BUCKET', y: 1}
+                { x: 'a', y: 2 },
+                { x: 'CARTOVL_TOP_OTHERS_BUCKET', y: 1 }
             ]);
             done();
         });

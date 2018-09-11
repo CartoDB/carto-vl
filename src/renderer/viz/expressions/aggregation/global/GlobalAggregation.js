@@ -1,5 +1,4 @@
 import BaseExpression from '../../base';
-import * as schema from '../../../../schema';
 import { number } from '../../../expressions';
 import { implicitCast } from '../../utils';
 
@@ -39,13 +38,8 @@ export default class GlobalAggregation extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
-        return this.property._getMinimumNeededSchema();
-    }
-
-    _getColumnName () {
-        if (this.property.aggName) {
-            return schema.column.aggColumn(this.property.name, this.property.aggName);
-        }
-        return this.property.name;
+        return {
+            [this.property.name]: []
+        };
     }
 }

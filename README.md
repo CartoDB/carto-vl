@@ -26,7 +26,7 @@ The library is currently in its Beta version and we welcome [your feedback](http
 Run this
 
 ```
-width: zoom()
+width: 8
 color: ramp(buckets($dn, [80, 100, 140]), prism)
 strokeWidth: 0
 filter: $dn > 60

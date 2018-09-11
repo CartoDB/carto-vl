@@ -1,11 +1,12 @@
 import BaseExpression from '../../base';
 import PropertyExpression from '../../basic/property';
-import { checkType, checkInstance } from '../../utils';
+import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
 
 export default class ClusterAggregation extends BaseExpression {
     constructor ({ property, expressionName, aggName, aggType }) {
-        checkInstance(expressionName, 'property', 0, PropertyExpression, property);
+        checkExpression(expressionName, 'property', 0, property);
+
         super({ property });
         this._aggName = aggName;
         this._expressionName = expressionName;
@@ -30,6 +31,7 @@ export default class ClusterAggregation extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+        checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
         checkType(this._expressionName, 'property', 0, this.type, this.property);
     }
 
@@ -46,9 +48,10 @@ export default class ClusterAggregation extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return {
-            columns: [
-                schema.column.aggColumn(this.property.name, this._aggName)
-            ]
+            [this.property.name]: [{
+                type: 'aggregated',
+                op: this._aggName
+            }]
         };
     }
 }

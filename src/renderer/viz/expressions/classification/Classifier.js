@@ -1,10 +1,12 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
-import * as schema from '../../../schema';
 
 let classifierUID = 0;
 export default class Classifier extends BaseExpression {
     constructor (children, buckets) {
+        if (buckets <= 1) {
+            throw new RangeError(`The number of 'buckets' must be >=2, but ${buckets} was used.`);
+        }
         const breakpoints = _genBreakpoints(children, buckets);
 
         super(children);
@@ -59,14 +61,6 @@ export default class Classifier extends BaseExpression {
         this._genBreakpoints();
         // TODO
         super._preDraw(program, drawMetadata, gl);
-    }
-
-    _getColumnName () {
-        if (this.input.aggName) {
-            // Property has aggregation
-            return schema.column.aggColumn(this.input.name, this.input.aggName);
-        }
-        return this.input.name;
     }
 }
 

@@ -1,28 +1,9 @@
-import { VectorTile } from '@mapbox/vector-tile';
-import * as Protobuf from 'pbf';
-import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
-import * as rsys from '../client/rsys';
+
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
-import { RTT_WIDTH } from '../renderer/Renderer';
 import Base from './Base';
 import TileClient from './TileClient';
-
-// Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
-const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
-
-const geometryTypes = {
-    UNKNOWN: 'unknown',
-    POINT: 'point',
-    LINE: 'line',
-    POLYGON: 'polygon'
-};
-
-const MVT_TO_CARTO_TYPES = {
-    1: geometryTypes.POINT,
-    2: geometryTypes.LINE,
-    3: geometryTypes.POLYGON
-};
+import Worker from './MVTWorkers.worker';
 
 /**
  * A MVTOptions object declares a MVT configuration
@@ -120,6 +101,31 @@ export default class MVT extends Base {
         this._tileClient = new TileClient(templateURL);
         this._options = options;
         this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;
+
+        this._workerDispatch = {};
+        this._mID = 0;
+        this._workerName = 'MVT';
+    }
+
+    get _worker () {
+        if (!this._workerInstance) {
+            this._workerInstance = new Worker();
+            this._workerInstance.onmessage = event => {
+                const mID = event.data.mID;
+                const dataframe = event.data.dataframe;
+                const metadata = dataframe.metadata;
+                if (!dataframe.empty) {
+                    Object.setPrototypeOf(dataframe, Dataframe.prototype);
+                    this._metadata.numCategories = metadata.numCategories;
+                    this._metadata.categoryToID = metadata.categoryToID;
+                    this._metadata.IDToCategory = metadata.IDToCategory;
+                    this._metadata.geomType = metadata.geomType;
+                    dataframe.metadata = this._metadata;
+                }
+                this._workerDispatch[mID](dataframe);
+            };
+        }
+        return this._workerInstance;
     }
 
     _clone () {
@@ -135,175 +141,36 @@ export default class MVT extends Base {
     }
 
     requestData (zoom, viewport) {
-        return this._tileClient.requestData(zoom, viewport, this.responseToDataframeTransformer.bind(this),
-            zoom => this._options.maxZoom === undefined
-                ? this._options.viewportZoomToSourceZoom(zoom)
-                : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
-        );
-    }
-
-    async responseToDataframeTransformer (response, x, y, z) {
-        const MVT_EXTENT = 4096;
-        const arrayBuffer = await response.arrayBuffer();
-        if (arrayBuffer.byteLength === 0 || response === 'null') {
-            return { empty: true };
-        }
-        const tile = new VectorTile(new Protobuf(arrayBuffer));
-
-        if (Object.keys(tile.layers).length > 1 && !this._options.layerID) {
-            throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
-        }
-
-        const mvtLayer = tile.layers[this._options.layerID || Object.keys(tile.layers)[0]];
-
-        if (!mvtLayer) {
-            return { empty: true };
-        }
-
-        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, this._metadata, MVT_EXTENT);
-        const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, this._metadata.geomType);
-
-        return dataframe;
-    }
-
-    _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {
-        if (!mvtLayer.length) {
-            return { properties: [], geometries: {}, numFeatures: 0 };
-        }
-        if (!metadata.geomType) {
-            metadata.geomType = this._autoDiscoverType(mvtLayer);
-        }
-        switch (metadata.geomType) {
-            case geometryTypes.POINT:
-                return this._decode(mvtLayer, metadata, mvtExtent, new Float32Array(mvtLayer.length * 2 * 3));
-            case geometryTypes.LINE:
-                return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
-            case geometryTypes.POLYGON:
-                return this._decode(mvtLayer, metadata, mvtExtent, [], decodePolygons);
-            default:
-                throw new Error('MVT: invalid geometry type');
-        }
-    }
-
-    _autoDiscoverType (mvtLayer) {
-        const type = mvtLayer.feature(0).type;
-        switch (type) {
-            case mvtDecoderGeomTypes.point:
-                return geometryTypes.POINT;
-            case mvtDecoderGeomTypes.line:
-                return geometryTypes.LINE;
-            case mvtDecoderGeomTypes.polygon:
-                return geometryTypes.POLYGON;
-            default:
-                throw new Error('MVT: invalid geometry type');
-        }
-    }
-
-    _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {
-        let numFeatures = 0;
-        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
-        for (let i = 0; i < mvtLayer.length; i++) {
-            const f = mvtLayer.feature(i);
-            this._checkType(f, metadata.geomType);
-            const geom = f.loadGeometry();
-            if (decodeFn) {
-                const decodedPolygons = decodeFn(geom, mvtExtent);
-                geometries.push(decodedPolygons);
-            } else {
-                const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;
-                const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;
-                // Tiles may contain points in the border;
-                // we'll avoid here duplicatend points between tiles by excluding the 1-edge
-                if (x < -1 || x >= 1 || y < -1 || y >= 1) {
-                    continue;
+        return this._tileClient.requestData(zoom, viewport, (x, y, z, url) => {
+            return new Promise(resolve => {
+                // Relative URLs don't work inside the Web Worker
+                if (url[0] === '.') {
+                    let parts = window.location.pathname.split('/');
+                    parts.pop();
+                    const path = parts.join('/');
+                    url = `${window.location.protocol}//${window.location.host}/${path}/${url}`;
+                } else if (url[0] === '/') {
+                    url = `${window.location.protocol}//${window.location.host}${url}`;
                 }
-                geometries[6 * numFeatures + 0] = x;
-                geometries[6 * numFeatures + 1] = y;
-                geometries[6 * numFeatures + 2] = x;
-                geometries[6 * numFeatures + 3] = y;
-                geometries[6 * numFeatures + 4] = x;
-                geometries[6 * numFeatures + 5] = y;
-            }
-            if (f.properties[this._metadata.idProperty] === undefined) {
-                throw new Error(`MVT feature with undefined idProperty '${this._metadata.idProperty}'`);
-            }
-            this._decodeProperties(propertyNames, properties, f, numFeatures);
-            numFeatures++;
-        }
-
-        return { properties, geometries, numFeatures };
-    }
-
-    // Currently only mvtLayers with the same type in every feature are supported
-    _checkType (feature, expected) {
-        const type = feature.type;
-        const actual = MVT_TO_CARTO_TYPES[type];
-        if (actual !== expected) {
-            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
-        }
-    }
-
-    _initializePropertyArrays (metadata, length) {
-        const properties = {};
-        const propertyNames = [];
-        for (let i = 0; i < metadata.propertyKeys.length; i++) {
-            const propertyName = metadata.propertyKeys[i];
-            if (metadata.properties[propertyName].type === 'geometry') {
-                continue;
-            }
-            propertyNames.push(...metadata.propertyNames(propertyName));
-        }
-
-        const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
-
-        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
-        for (let i = 0; i < propertyNames.length; i++) {
-            const propertyName = propertyNames[i];
-            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
-        }
-
-        return { properties, propertyNames };
-    }
-
-    _decodeProperties (propertyNames, properties, feature, i) {
-        const length = propertyNames.length;
-        for (let j = 0; j < length; j++) {
-            const propertyName = propertyNames[j];
-            const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = this.decodeProperty(propertyName, propertyValue);
-        }
-    }
-
-    decodeProperty (propertyName, propertyValue) {
-        if (typeof propertyValue === 'string') {
-            if (this._metadata.properties[propertyName].type !== 'category') {
-                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
-            }
-            return this._metadata.categorizeString(propertyName, propertyValue);
-        } else if (typeof propertyValue === 'number') {
-            if (this._metadata.properties[propertyName].type !== 'number') {
-                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${this._metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
-            }
-            return propertyValue;
-        } else if (propertyValue === null || propertyValue === undefined) {
-            return Number.NaN;
-        } else {
-            throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
-        }
-    }
-
-    _generateDataFrame (rs, geometry, properties, size, type) {
-        return new Dataframe({
-            active: false,
-            center: rs.center,
-            geom: geometry,
-            properties: properties,
-            scale: rs.scale,
-            size: size,
-            type: type,
-            metadata: this._metadata
-        });
+                this._worker.postMessage({
+                    x,
+                    y,
+                    z,
+                    url,
+                    layerID: this._options.layerID,
+                    metadata: this._metadataSent ? undefined : this._metadata,
+                    mID: this._mID,
+                    workerName: this._workerName
+                });
+                this._metadataSent = true;
+                this._workerDispatch[this._mID] = resolve;
+                this._mID++;
+            });
+        },
+        zoom => this._options.maxZoom === undefined
+            ? this._options.viewportZoomToSourceZoom(zoom)
+            : Math.min(this._options.viewportZoomToSourceZoom(zoom), this._options.maxZoom)
+        );
     }
 
     free () {
