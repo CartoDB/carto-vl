@@ -1,17 +1,5 @@
-import {
-    validateTypeErrors,
-    validateStaticType,
-    validateMaxArgumentsError
-} from './utils';
-
-import {
-    globalQuantiles,
-    property,
-    globalEqIntervals,
-    viewportEqIntervals,
-    viewportQuantiles
-} from '../../../../../src/renderer/viz/expressions';
-
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
+import { globalQuantiles, property, globalEqIntervals, viewportEqIntervals, viewportQuantiles } from '../../../../../src/renderer/viz/expressions';
 import Metadata from '../../../../../src/renderer/Metadata';
 
 describe('src/renderer/viz/expressions/classifier', () => {
@@ -24,50 +12,24 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 max: 5
             }
         },
-        sample: [{
-            price: 0
-        },
-        {
-            price: 1
-        },
-        {
-            price: 2
-        },
-        {
-            price: 3
-        },
-        {
-            price: 4
-        },
-        {
-            price: 5
-        }
+        sample: [
+            { price: 1 },
+            { price: 2 },
+            { price: 3 },
+            { price: 4 },
+            { price: 5 }
         ]
     });
 
     function prepare (expr) {
         expr._bindMetadata(METADATA);
         expr._resetViewportAgg(METADATA);
-        expr.accumViewportAgg({
-            price: 0
-        });
-        expr.accumViewportAgg({
-            price: 1
-        });
-
-        expr.accumViewportAgg({
-            price: 2
-        });
-        expr.accumViewportAgg({
-            price: 3
-        });
-
-        expr.accumViewportAgg({
-            price: 4
-        });
-        expr.accumViewportAgg({
-            price: 5
-        });
+        expr.accumViewportAgg({ price: 0 });
+        expr.accumViewportAgg({ price: 1 });
+        expr.accumViewportAgg({ price: 2 });
+        expr.accumViewportAgg({ price: 3 });
+        expr.accumViewportAgg({ price: 4 });
+        expr.accumViewportAgg({ price: 5 });
     }
 
     describe('error control', () => {
@@ -123,16 +85,19 @@ describe('src/renderer/viz/expressions/classifier', () => {
             prepare(q);
             expect(q.getBreakpointList()).toEqual([3]);
         });
+
         it('viewportQuantiles($price, 2)', () => {
             const q = viewportQuantiles($price, 2);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([3]);
         });
+
         it('globalEqIntervals($price, 2)', () => {
             const q = globalEqIntervals($price, 2);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2.5]);
         });
+
         it('viewportEqIntervals($price, 2)', () => {
             const q = viewportEqIntervals($price, 2);
             prepare(q);
@@ -144,11 +109,13 @@ describe('src/renderer/viz/expressions/classifier', () => {
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2, 4]);
         });
+
         it('viewportQuantiles($price, 3)', () => {
             const q = viewportQuantiles($price, 3);
             prepare(q);
             expect(q.getBreakpointList()).toEqual([2, 4]);
         });
+
         it('viewportEqIntervals($price, 3)', () => {
             const q = viewportEqIntervals($price, 3);
             prepare(q);
