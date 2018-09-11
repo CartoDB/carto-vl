@@ -48,7 +48,8 @@
 <li><strong>filter</strong>: filter features by removing from rendering and interactivity all the features that don't pass the test</li>
 <li><strong>symbol</strong> - show an image instead in the place of points</li>
 <li><strong>symbolPlacement</strong> - when using <code>symbol</code>, offset to apply to the image</li>
-<li><strong>resolution</strong>: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points</li>
+<li><strong>order</strong>: - rendering order of the features, only applicable to points. See <a href="carto.expressions.html#.asc">carto.expressions.asc</a>, <a href="carto.expressions.html#.desc">carto.expressions.desc</a> and <a href="carto.expressions.html#.noOrder">carto.expressions.noOrder</a></li>
+<li><strong>resolution</strong>: - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke <a href="https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/">Torque resolution</a>, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.</li>
 </ul>
 <p>For example the point diameter could be using the <code>add</code> expression:</p>
 <pre class="prettyprint source lang-javascript"><code>const viz = new carto.Viz({
@@ -1402,6 +1403,11 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Order ascending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+<p>Note: ordering expressions won't assure a perfect ordering.
+Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+This guarantees a maximum error, but not a perfect order.
+For most operations this is imperceptible, but usage of <code>order</code> in combination with animation or multi-scale expressions (<code>zoomrange</code> and <code>scaled</code>)
+may result in artifacts.</p>
 </div>
 
 
@@ -1980,7 +1986,7 @@ const viz = new carto.Viz({
 const viz = new carto.Viz({
   width: s.blend(3,
                  s.prop('dn'),
-                 s.linear(s.zoom(), s.pow(2, 10), s.pow(2, 14))
+                 s.linear(s.zoom(), 10, 14))
           );
 });</code></pre>
 
@@ -1989,7 +1995,7 @@ const viz = new carto.Viz({
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: blend(3,
                $dn,
-               linear(zoom(), 2^10, 2^14)
+               linear(zoom(), 10, 14)
          )
 `);</code></pre>
 
@@ -2768,6 +2774,126 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: clusterAvg($population)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".clusterCount"><span class="type-signature">(static) </span>clusterCount<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Count of features per cluster.</p>
+<p>Note: <code>clusterCount</code> has no input parameters and if data is not aggregated, it always returns 1</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Cluster feature count</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use cluster count for width.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  width: s.clusterCount() / 50
+});</code></pre>
+
+        <p class="code-caption">Use cluster count for width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: clusterCount() / 50
 `);</code></pre>
 
 
@@ -3799,6 +3925,11 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Order descending by a provided expression. NOTE: only works with <code>width()</code>.</p>
+<p>Note: ordering expressions won't assure a perfect ordering.
+Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+This guarantees a maximum error, but not a perfect order.
+For most operations this is imperceptible, but usage of <code>order</code> in combination with animation or multi-scale expressions (<code>zoomrange</code> and <code>scaled</code>)
+may result in artifacts.</p>
 </div>
 
 
@@ -5956,13 +6087,269 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
+  color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.CB_REDS)
 });</code></pre>
 
         <p class="code-caption">Use global quantiles to define a color ramp. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  color: ramp(globalQuantiles($density, 5), PRISM)
+  color: ramp(globalQuantiles($density, 5), CB_REDS)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".globalStandardDev"><span class="type-signature">(static) </span>globalStandardDev<span class="signature">(input, n, classSize<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Classify <code>input</code> by using the Mean-Standard Deviation method with <code>n</code> buckets.</p>
+<p>It will classify the input based on the entire dataset without filtering by viewport or by <code>filter</code>.</p>
+<p>It uses average and standard deviation (population formula) to classify the dataset.
+When using an odd number of buckets, the central class has a double size (classSize * 2), to honour the number of required buckets</p>
+<p>This method is suitable if data are normally (or near normal) distributed, and it is specially
+appropiated for diverging datasets, which can be well displayed using a diverging color scheme like TEALROSE</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The input expression to classify</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Number of buckets</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>classSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional. The class size, defaults to 1.0 standard deviation (usual values are also 0.5 or 0.25)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use global mean-standard deviation to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.globalStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
+});</code></pre>
+
+        <p class="code-caption">Use global mean-standard deviation to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(globalStandardDev($density, 5), TEALROSE)
+`);</code></pre>
+
+        <p class="code-caption">Use global custom mean-standard deviation to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.globalStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
+});</code></pre>
+
+        <p class="code-caption">Use global custom mean-standard deviation to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(globalStandardDev($density, 7, 0.5), TEALROSE)
 `);</code></pre>
 
 
@@ -15483,6 +15870,262 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".viewportStandardDev"><span class="type-signature">(static) </span>viewportStandardDev<span class="signature">(input, n, classSize<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Classify <code>input</code> by using the Mean-Standard Deviation method with <code>n</code> buckets.</p>
+<p>It will classify the input based on the filtered dataset, filtering by viewport and by <code>filter</code>.</p>
+<p>It uses average and standard deviation (population formula) to classify the dataset.
+When using an odd number of buckets, the central class has a double size (classSize * 2), to honour the number of required buckets</p>
+<p>This method is suitable if data are normally (or near normal) distributed, and it is specially
+appropiated for diverging datasets, which can be well displayed using a diverging color scheme like TEALROSE</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>The input expression to classify</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>n</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Number of buckets</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>classSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional. The class size, defaults to 1.0 standard deviation (usual values are also 0.5 or 0.25)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use viewport mean-standard deviation to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.viewportStandardDev(s.prop('density'), 5), s.palettes.TEALROSE)
+});</code></pre>
+
+        <p class="code-caption">Use viewport mean-standard deviation to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(viewportStandardDev($density, 5), tealrose)
+`);</code></pre>
+
+        <p class="code-caption">Use viewport custom mean-standard deviation to define a color ramp.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.viewportStandardDev(s.prop('density'), 7, 0.5), s.palettes.TEALROSE)
+});</code></pre>
+
+        <p class="code-caption">Use viewport custom mean-standard deviation to define a color ramp. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(viewportStandardDev($density, 7, 0.5), tealrose)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".viewportSum"><span class="type-signature">(static) </span>viewportSum<span class="signature">(input)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -15653,6 +16296,126 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".width"><span class="type-signature">(static) </span>width<span class="signature">()</span><span class="type-signature"> &rarr; {carto.expressions.Width}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Return the expression assigned in the <code>width</code> property. ONLY usable in an <code>order:</code> property.</p>
+<p>Note: ordering expressions won't assure a perfect ordering.
+Features will be distributed in different buckets with the original order, and those buckets will be ordered.
+This guarantees a maximum error, but not a perfect order.
+For most operations this is imperceptible, but usage of <code>order</code> in combination with animation or multi-scale expressions (<code>zoomrange</code> and <code>scaled</code>)
+may result in artifacts.</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">carto.expressions.Width</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Ascending order based on width.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  order: s.asc(s.width())
+});</code></pre>
+
+        <p class="code-caption">Ascending order based on width. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  order: asc(width())
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".zoom"><span class="type-signature">(static) </span>zoom<span class="signature">()</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -15661,7 +16424,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.</p>
+    <p>Get the current zoom level.</p>
 </div>
 
 
@@ -15747,17 +16510,17 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Show constant width in zoom.</p>
+        <p class="code-caption">Only show feature at zoom levels less than 7.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.div(s.zoom(), 1000)
+  filter: s.lt(s.zoom(), 7)
 });</code></pre>
 
-        <p class="code-caption">Show constant width in zoom. (String)</p>
+        <p class="code-caption">Only show feature at zoom levels less than 7. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: zoom() / 1000
+  filter: zoom() &lt; 7
 `);</code></pre>
 
 
@@ -15948,7 +16711,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Aug 24 2018 16:18:30 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Sep 11 2018 11:54:35 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
