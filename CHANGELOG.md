@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions
 - Support symbol and symbolPlacement in features
+- Add expressions `toString()` method
 
 ### Changed
  - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
