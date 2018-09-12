@@ -134,7 +134,7 @@ export default class RampGeneric extends Base {
 
         return {
             palette: subPalette.colors,
-            others: this._defaultOthers ? subPalette.othersColor : this.others
+            others: this._defaultOthers && subPalette.othersColor ? subPalette.othersColor : this.others
         };
     }
 }
