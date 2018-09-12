@@ -330,9 +330,9 @@ export default class Renderer {
             }
             gl.useProgram(renderer.program);
 
-            if (!viz.label.default) {
-                gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
-            }
+            // if (!viz.label.default) {
+            //     gl.uniform1i(renderer.overrideColor, viz.color.default === undefined ? 1 : 0);
+            // }
 
             // Set filtering condition on "... AND feature is in current order bucket"
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
@@ -381,6 +381,16 @@ export default class Renderer {
 
             if (!viz.label.default) {
                 const textureId = viz.labelShader.textureIds.get(viz);
+
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeColor);
+                gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
+                freeTexUnit++;
+
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeWidth);
+                gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
+                freeTexUnit++;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.label._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);

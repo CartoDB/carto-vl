@@ -339,9 +339,9 @@ export default class Viz {
         }
 
         if (!this.label.default) {
-            this.labelShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
-                symbol: this.label,
-                symbolPlacement: this.labelPlacement,
+            this.labelShader = compileShader(gl, shaders.labels.labelsShaderGLSL, {
+                label: this.label,
+                labelPlacement: this.labelPlacement,
                 offset: this.offset
             }, this);
         }
