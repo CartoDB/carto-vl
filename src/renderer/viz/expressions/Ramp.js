@@ -3,6 +3,7 @@ import { implicitCast, checkExpression, checkMaxArguments } from './utils';
 
 import RampImage from './RampImage';
 import RampGeneric from './RampGeneric';
+import { DEFAULT_OTHERS } from './constants';
 
 /**
 * Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
@@ -57,7 +58,7 @@ import RampGeneric from './RampGeneric';
 * @api
 */
 export default class Ramp extends BaseExpression {
-    constructor (input, palette, others = 'default') {
+    constructor (input, palette, others = DEFAULT_OTHERS) {
         checkMaxArguments(arguments, 3, 'ramp');
 
         input = implicitCast(input);
@@ -69,6 +70,7 @@ export default class Ramp extends BaseExpression {
         super({ input, palette });
         this.palette = palette;
         this.others = others;
+        this._defaultOthers = others === DEFAULT_OTHERS;
     }
 
     _bindMetadata (metadata) {
@@ -81,6 +83,7 @@ export default class Ramp extends BaseExpression {
                 Object.setPrototypeOf(this, RampGeneric.prototype);
                 break;
         }
+
         return this._bindMetadata(metadata);
     }
 
