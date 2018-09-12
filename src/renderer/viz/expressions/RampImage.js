@@ -5,14 +5,14 @@ import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
 import SVG from './SVG';
 import Base from './base';
-import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS } from './constants';
+import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS, DEFAULT_OTHERS } from './constants';
 
 export default class RampImage extends Base {
     _bindMetadata (metadata) {
         Base.prototype._bindMetadata.call(this, metadata);
         this.type = this.palette.childType;
 
-        if (this.others === 'default') {
+        if (this.others === DEFAULT_OTHERS) {
             this.others = new SVG(defaultSVGs.circle);
         } else {
             checkType('ramp', 'others', 2, 'image', this.others);

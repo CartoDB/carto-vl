@@ -7,7 +7,7 @@ import Linear from './linear';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
 import { constant } from '../expressions';
-import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS } from './constants';
+import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_OTHERS } from './constants';
 import Palette from './color/palettes/Palette';
 import Base from './base';
 
@@ -28,7 +28,7 @@ export default class RampGeneric extends Base {
         super._bindMetadata(metadata);
 
         this.type = this.palette.childType;
-        if (this.others === 'default') {
+        if (this.others === DEFAULT_OTHERS) {
             this.others = this.palette.type === 'number-list' ? constant(1) : new NamedColor('gray');
         } else {
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
@@ -134,7 +134,7 @@ export default class RampGeneric extends Base {
 
         return {
             palette: subPalette.colors,
-            others: subPalette.othersColor || this.others
+            others: this._defaultOthers ? subPalette.othersColor : this.others
         };
     }
 }

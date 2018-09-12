@@ -503,6 +503,17 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).toEqual(expected);
                     });
+
+                    it('should use the default "others" color for the remaining categories', () => {
+                        const red = namedColor('red');
+                        const r = ramp(buckets('Madrid', CATEGORIES), palettes.PRISM, red);
+
+                        r._bindMetadata(METADATA);
+                        actual = r.eval();
+                        expected = red.eval();
+
+                        expect(actual).toEqual(expected);
+                    });
                 });
 
                 describe('and all categories in the dataset have a bucket defined', () => {
