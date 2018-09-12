@@ -16,6 +16,10 @@ export default class Classifier extends BaseExpression {
         this.type = 'category';
     }
 
+    toString () {
+        return `${this.expressionName}(${this.input.toString()}, ${this.buckets})`;
+    }
+
     eval (feature) {
         const input = this.input.eval(feature);
         const breakpoint = this.breakpoints.findIndex((br) => {
