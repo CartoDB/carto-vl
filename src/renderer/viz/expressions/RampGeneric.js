@@ -1,52 +1,39 @@
-import { checkType, checkInstance, mix, fract } from './utils';
+import { checkType, mix, fract } from './utils';
 
-import NamedColor from './color/NamedColor';
 import Property from './basic/property';
-import ListImage from './ListImage';
 import Linear from './linear';
 import CIELabGLSL from './color/CIELab.glsl';
 import CategoryIndex from './CategoryIndex';
-import { constant } from '../expressions';
-import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, OTHERS_INDEX, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
 import Palette from './color/palettes/Palette';
 import Base from './base';
-
-const paletteTypes = {
-    PALETTE: 'palette',
-    COLOR_ARRAY: 'color-list',
-    NUMBER_ARRAY: 'number-list',
-    IMAGE_LIST: 'image-list'
-};
-
-const inputTypes = {
-    NUMBER: 'number',
-    CATEGORY: 'category'
-};
+import Constant from './basic/constant';
+import NamedColor from './color/NamedColor';
 
 export default class RampGeneric extends Base {
     _bindMetadata (metadata) {
+        const DEFAULT_RAMP_OTHERS_NUMBER = new Constant(1);
+        const DEFAULT_RAMP_OTHERS_COLOR = new NamedColor('gray');
+
         super._bindMetadata(metadata);
 
         this.type = this.palette.childType;
-        if (this.others === DEFAULT_OTHERS) {
-            this.others = this.palette.type === 'number-list' ? constant(1) : new NamedColor('gray');
+        if (this.others === DEFAULT_RAMP_OTHERS) {
+            this.others = this.palette.type === 'number-list'
+                ? DEFAULT_RAMP_OTHERS_NUMBER
+                : DEFAULT_RAMP_OTHERS_COLOR;
         } else {
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
         }
         if (this.input.isA(Property)) {
-            this.input = this.input.type === inputTypes.NUMBER
+            this.input = this.input.type === 'number'
                 ? new Linear(this.input)
                 : new CategoryIndex(this.input);
 
             this.input._bindMetadata(metadata);
         }
 
-        checkType('ramp', 'input', 0, Object.values(inputTypes), this.input);
-
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            checkType('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
-            checkInstance('ramp', 'palette', 1, ListImage, this.palette);
-        }
+        checkType('ramp', 'input', 0, ['number', 'category'], this.input);
 
         this.others._bindMetadata(metadata);
         this.childrenNames.push('others');
@@ -105,14 +92,14 @@ export default class RampGeneric extends Base {
             ? _getInlineGLSLBlend(GLSLPalette)
             : _getInlineColorGLSLBlend(GLSLPalette);
 
-        const rampColorType = this.palette.type === 'number-list' ? 'float' : 'vec4';
+        const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
         const inline = `ramp_color${this._uid}(${input.inline})`;
         const prefaceGLSL = `
             ${CIELabGLSL}
             ${GLSLPalette.map(elem => elem.preface).join('\n')}
             ${GLSLOthers.preface}
 
-            ${rampColorType} ramp_color${this._uid}(float x){
+            ${rampFnReturnType} ramp_color${this._uid}(float x){
                 return x==${OTHERS_GLSL_VALUE}
                     ? ${GLSLOthers.inline}
                     : ${GLSLBlend};
@@ -148,21 +135,21 @@ function _getInlineColorGLSLBlend (GLSLPalette) {
 }
 
 function _generateGLSLBlend (list, index = 0) {
-    const currentColor = list[index];
+    const currentValue = list[index];
 
     if (index === list.length - 1) {
-        return currentColor;
+        return currentValue;
     }
 
     const nextBlend = _generateGLSLBlend(list, index + 1);
 
-    return _mixClampGLSL(currentColor, nextBlend, index, list.length);
+    return _mixClampGLSL(currentValue, nextBlend, index, list.length);
 }
 
-function _mixClampGLSL (currentColor, nextBlend, index, listLength) {
+function _mixClampGLSL (currentValue, nextBlend, index, listLength) {
     const min = (index / (listLength - 1)).toFixed(20);
     const max = (1 / (listLength - 1)).toFixed(20);
     const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
 
-    return `mix(${currentColor}, ${nextBlend}, ${clamp})`;
+    return `mix(${currentValue}, ${nextBlend}, ${clamp})`;
 }

@@ -5,6 +5,7 @@ const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
 * Transform a categorical property into a per-property category index. The evaluated result returns a value between 0 and 1.
+* The dataset must contain less than 65536 (256 * 256) different categories.
 *
 * @param {Category} property - The property to be evaluated, must be categorical
 * @return {Category}
@@ -42,12 +43,18 @@ export default class CategoryIndex extends BaseExpression {
         this._numTranslatedCategoriesGL = 0;
     }
 
+    get numCategories () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        return metaColumn.categories.length;
+    }
+
+    get numCategoriesWithoutOthers () {
+        return this.numCategories;
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._metadata = metadata;
-        const metaColumn = this._metadata.properties[this.property.name];
-        this.numCategories = metaColumn.categories.length;
-        this.numCategoriesWithoutOthers = this.numCategories;
         this._calcTranslated();
         checkType('categoryIndex', 'property', 0, 'category', this.property);
     }
@@ -60,12 +67,10 @@ export default class CategoryIndex extends BaseExpression {
     }
 
     _preDraw (program, drawMetadata, gl) {
-        const metaColumn = this._metadata.properties[this.property.name];
-        const numCategories = metaColumn.categories.length;
         gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
 
-        if (this._numTranslatedCategoriesGL !== numCategories) {
-            this._numTranslatedCategoriesGL = numCategories;
+        if (this._numTranslatedCategoriesGL !== this.numCategories) {
+            this._numTranslatedCategoriesGL = this.numCategories;
             this._calcTranslated();
             this._translateTexture = gl.createTexture();
             gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
@@ -103,7 +108,7 @@ export default class CategoryIndex extends BaseExpression {
 
     _calcTranslated () {
         const metaColumn = this._metadata.properties[this.property.name];
-        const numCategories = metaColumn.categories.length;
+        const numCategories = this.numCategories;
 
         if (this._numTranslatedCategories !== numCategories) {
             this._numTranslatedCategories = numCategories;
@@ -123,8 +128,7 @@ export default class CategoryIndex extends BaseExpression {
     }
 
     getLegendData () {
-        const name = this.getPropertyName();
-        const categories = this._metadata.properties[name].categories;
+        const categories = this._metadata.properties[this.property.name].categories;
         const categoriesLength = categories.length;
         const divisor = categoriesLength - 1;
         const data = [];

@@ -84,15 +84,17 @@ export default class Buckets extends BaseExpression {
                     return i / divisor;
                 }
             }
-        } else if (this.input.type === 'number') {
-            for (let i = 0; i < this.list.elems.length; i++) {
-                if (v < this.list.elems[i].eval(feature)) {
-                    return i / divisor;
-                }
+
+            return OTHERS_INDEX;
+        }
+
+        for (let i = 0; i < this.list.elems.length; i++) {
+            if (v < this.list.elems[i].eval(feature)) {
+                return i / divisor;
             }
         }
 
-        return OTHERS_INDEX;
+        return 1;
     }
 
     _bindMetadata (metadata) {
@@ -141,7 +143,7 @@ export default class Buckets extends BaseExpression {
         }`;
 
         return {
-            preface: this._prefaceCode(childSourcesArray.map(s => s.preface).join('\n') + preface),
+            preface: this._prefaceCode(childSources.list.preface + preface),
             inline: `${funcName}(${childSources.input.inline})`
         };
     }
@@ -181,7 +183,7 @@ function _getLegendDataCategory (list, config) {
     });
 
     data.push({
-        key: config.others,
+        key: config.othersLabel,
         value: OTHERS_INDEX
     });
 

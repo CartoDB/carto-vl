@@ -13,10 +13,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - New method `ramp.getLegend`
 - Add expressions `toString()` method
 - `ramp` with an image list defaults to `circle` for the `others` bucket
+- Add `geometryType` method in Viz
+- Add `categoryIndex` expression.
 
 ### Changed
- - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
+- zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
 - Unary and Binary operators are case insensitive.
+- Use an optional third parameter in `ramp` expression to override the default value for "others"
 
 ### Fixed
 - Add default export to allow `import carto from '@carto/carto-vl';`

@@ -24,7 +24,7 @@ export default class List extends Base {
             throw new Error('list(): invalid parameters: must receive at least one argument');
         }
 
-        if (!window.Array.isArray(elems)) {
+        if (!Array.isArray(elems)) {
             elems = [elems];
         }
 

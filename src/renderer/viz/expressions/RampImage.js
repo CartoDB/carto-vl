@@ -5,15 +5,19 @@ import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
 import SVG from './SVG';
 import Base from './base';
-import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS, DEFAULT_OTHERS } from './constants';
+import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
 
+const DEFAULT_RAMP_OTHERS_IMAGE = new SVG(defaultSVGs.circle);
 export default class RampImage extends Base {
     _bindMetadata (metadata) {
         Base.prototype._bindMetadata.call(this, metadata);
         this.type = this.palette.childType;
 
-        if (this.others === DEFAULT_OTHERS) {
-            this.others = new SVG(defaultSVGs.circle);
+        checkType('ramp', 'input', 0, 'category', this.input);
+        checkInstance('ramp', 'palette', 1, ListImage, this.palette);
+
+        if (this.others === DEFAULT_RAMP_OTHERS) {
+            this.others = DEFAULT_RAMP_OTHERS_IMAGE;
         } else {
             checkType('ramp', 'others', 2, 'image', this.others);
         }
@@ -22,9 +26,6 @@ export default class RampImage extends Base {
             this.input = new CategoryIndex(this.input);
             this.input._bindMetadata(metadata);
         }
-
-        checkType('ramp', 'input', 0, 'category', this.input);
-        checkInstance('ramp', 'palette', 1, ListImage, this.palette);
 
         this.others._bindMetadata(metadata);
         this.childrenNames.push('others');
@@ -38,7 +39,7 @@ export default class RampImage extends Base {
     _calcEval (input) {
         const index = Math.round(input * (this.input.numCategoriesWithoutOthers - 1));
         const paletteValues = this.palette.eval();
-        return paletteValues[index] ? paletteValues[index] : this.others.eval();
+        return paletteValues[index] || this.others.eval();
     }
 
     getLegend (options) {
@@ -65,14 +66,14 @@ export default class RampImage extends Base {
                 ${images.preface}
                 ${others.preface}
 
-                vec4 rampImage${this._uid}(float index, vec2 imageUV){
+                vec4 rampImage${this._uid}(vec2 imageUV, float index){
                     if (index == ${OTHERS_GLSL_VALUE}){
                         return ${others.inline};
                     }
                     return ${images.inline}(imageUV, rampImageMultiplier${this._uid}*index);
                 }
             `),
-            inline: `rampImage${this._uid}(${input.inline}, imageUV)`
+            inline: `rampImage${this._uid}(imageUV, ${input.inline})`
         };
     }
 

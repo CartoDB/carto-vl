@@ -76,7 +76,7 @@ export default class Base {
      * @memberof carto.expressions.Base
      * @returns {string}
      *
-     * @example <caption>Get the stringified expression to the viz color property.</caption>
+     * @example <caption>Get the stringified expression of the viz color property.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
      *   color: s.ramp(s.linear('amount'), s.palettes.PRISM)
@@ -84,7 +84,7 @@ export default class Base {
      * console.log(viz.color.toString());
      * // logs: "ramp(linear($amount), Prism)"
      *
-     * @example <caption>Get the stringified expression to the viz color property. (String)</caption>
+     * @example <caption>Get the stringified expression of the viz color property. (String)</caption>
      * const viz = new carto.Viz(`
      *   color: ramp(linear($amount), Prism)
      * `);
@@ -140,10 +140,6 @@ export default class Base {
 
     loadImages () {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
-    }
-
-    getPropertyName () {
-        return this._getChildren()[0].getPropertyName();
     }
 
     _bindMetadata (metadata) {

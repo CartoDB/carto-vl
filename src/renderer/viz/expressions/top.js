@@ -70,6 +70,7 @@ export default class Top extends BaseExpression {
     get numCategories () {
         return this.numBuckets + 1;
     }
+
     get numCategoriesWithoutOthers () {
         return this.numCategories - 1;
     }

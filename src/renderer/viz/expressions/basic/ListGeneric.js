@@ -16,8 +16,4 @@ export default class ListGeneric extends BaseExpression {
             inline: childGLSL.map(c => c.inline)
         };
     }
-
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-    }
 }

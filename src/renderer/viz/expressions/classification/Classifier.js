@@ -5,19 +5,17 @@ let classifierUID = 0;
 export default class Classifier extends BaseExpression {
     constructor (children, buckets) {
         const breakpoints = _genBreakpoints(children, buckets);
-        // TODO check buckets
-        super(children);
 
+        super(children);
         this.classifierUID = classifierUID++;
         this.numCategories = buckets;
         this.numCategoriesWithoutOthers = buckets;
-        this.buckets = buckets;
         this.breakpoints = breakpoints;
         this.type = 'category';
     }
 
     toString () {
-        return `${this.expressionName}(${this.input.toString()}, ${this.buckets})`;
+        return `${this.expressionName}(${this.input.toString()}, ${this.numCategories})`;
     }
 
     eval (feature) {
@@ -27,9 +25,7 @@ export default class Classifier extends BaseExpression {
         });
 
         const divisor = this.numCategories - 1 || 1;
-        const index = breakpoint === -1
-            ? this.breakpoints.length / divisor
-            : breakpoint / divisor;
+        const index = breakpoint === -1 ? 1 : breakpoint / divisor;
 
         return index;
     }
@@ -56,7 +52,7 @@ export default class Classifier extends BaseExpression {
         const funcBody = this.breakpoints.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${(this.breakpoints.length / divisor).toFixed(20)};
+            return 1.;
         }`;
         return {
             preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
@@ -66,7 +62,6 @@ export default class Classifier extends BaseExpression {
 
     _preDraw (program, drawMetadata, gl) {
         this._genBreakpoints();
-        // TODO
         super._preDraw(program, drawMetadata, gl);
     }
 
@@ -77,8 +72,8 @@ export default class Classifier extends BaseExpression {
         const data = [];
 
         for (let i = 0; i <= breakpointsLength; i++) {
-            const min = i - 1 >= 0 ? breakpoints[i - 1] : Number.NEGATIVE_INFINITY;
-            const max = i < breakpointsLength ? breakpoints[i] : Number.POSITIVE_INFINITY;
+            const min = breakpoints[i - 1] || Number.NEGATIVE_INFINITY;
+            const max = breakpoints[i] || Number.POSITIVE_INFINITY;
             const key = [min, max];
             const value = i / breakpointsLength;
             data.push({key, value});
