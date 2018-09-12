@@ -24,6 +24,11 @@ export function isObject (value) {
     return value !== null && (type === 'object' || type === 'function');
 }
 
+export function regExpThatContains (text) {
+    const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // in case it has special symbols
+    return new RegExp(escaped);
+}
+
 /**
  * Transform the given parameter into a Date object.
  * When a number is given as a parameter is asummed to be a milliseconds epoch.
