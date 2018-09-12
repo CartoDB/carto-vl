@@ -1,7 +1,7 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
-import CartoValidationError from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
@@ -109,10 +109,10 @@ export default class GeoJSON extends Base {
 
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError('source', 'dataRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError('source', 'dataObjectRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
         }
     }
 
@@ -335,7 +335,7 @@ export default class GeoJSON extends Base {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._type !== type) {
-                throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'`);
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);

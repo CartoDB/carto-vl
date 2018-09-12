@@ -6,7 +6,7 @@ import BaseExpression from './renderer/viz/expressions/base';
 import { implicitCast } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
-import CartoValidationError from './errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
 import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
 import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
 import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexShader.glsl';
@@ -408,7 +408,7 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError('viz', 'nonValidDefinition');
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
     }
 
     /**
@@ -463,41 +463,22 @@ export default class Viz {
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
-            throw new CartoValidationError('viz', 'resolutionNumberRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
         if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}`);
         }
         if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}`);
         }
-        if (!(vizSpec.color instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[color]');
-        }
-        if (!(vizSpec.strokeColor instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeColor]');
-        }
-        if (!(vizSpec.width instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[width]');
-        }
-        if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
-        }
-        if (!(vizSpec.order instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[order]');
-        }
-        if (!(vizSpec.filter instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[filter]');
-        }
-        if (!(vizSpec.symbol instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbol]');
-        }
-        if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
-        }
-        if (!(vizSpec.offset instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[offset]');
-        }
+
+        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
+            'symbol', 'symbolPlacement', 'offset'];
+        toCheck.forEach((parameter) => {
+            if (!(vizSpec[parameter] instanceof BaseExpression)) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+            }
+        });
 
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
