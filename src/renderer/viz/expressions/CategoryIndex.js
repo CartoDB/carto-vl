@@ -4,7 +4,7 @@ import { checkExpression, implicitCast, checkType, checkMaxArguments } from './u
 const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
 
 /**
-* Index value for the given category in the property category list
+* Transform a categorical property into a per-property category index. The evaluated result returns a value between 0 and 1.
 *
 * @param {Category} property - The property to be evaluated, must be categorical
 * @return {Category}

@@ -125,6 +125,7 @@ export default class Viz {
     /**
      * Get the geometry type of the visualization.
      * @readonly
+     * @api
      */
     get geometryType () {
         return this._geomType;
