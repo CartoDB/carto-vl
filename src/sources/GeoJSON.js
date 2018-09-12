@@ -57,7 +57,7 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -172,7 +172,7 @@ export default class GeoJSON extends Base {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName);
         const property = this._properties[propertyName];
@@ -335,7 +335,7 @@ export default class GeoJSON extends Base {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._type !== type) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);

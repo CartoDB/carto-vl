@@ -466,10 +466,10 @@ export default class Viz {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
         if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
         }
         if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
         }
 
         const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',

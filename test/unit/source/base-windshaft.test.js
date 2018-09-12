@@ -1,4 +1,5 @@
 import SourceBase from '../../../src/sources/BaseWindshaft';
+import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
 
 describe('sources/base-windshaft', () => {
     const auth = {
@@ -41,40 +42,45 @@ describe('sources/base-windshaft', () => {
         it('should throw an error if auth is not valid', function () {
             expect(function () {
                 source.initialize();
-            }).toThrowError('`auth` property is required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'auth\'');
+
             expect(function () {
                 source.initialize(1234);
-            }).toThrowError('`auth` property must be an object.');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' \'auth\' property must be an object.');
         });
 
         it('should throw an error if auth.apiKey is not valid', function () {
             expect(function () {
                 source.initialize({});
-            }).toThrowError('`apiKey` property is required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'apiKey\'');
+
             expect(function () {
                 source.initialize({ apiKey: 1234 });
-            }).toThrowError('`apiKey` property must be a string.');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' \'apiKey\' property must be a string.');
+
             expect(function () {
                 source.initialize({ apiKey: '' });
-            }).toThrowError('`apiKey` property must be not empty.');
+            }).toThrowError(cvt.INCORRECT_VALUE + ' \'apiKey\' property must be not empty.');
         });
 
         it('should throw an error if auth.username is not valid', function () {
             expect(function () {
                 source.initialize({ apiKey: '123456789' });
-            }).toThrowError('`username` property is required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'username\'');
+
             expect(function () {
                 source.initialize({ user: 1234, apiKey: '123456789' });
-            }).toThrowError('`username` property must be a string.');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' \'username\' property must be a string.');
+
             expect(function () {
                 source.initialize({ user: '', apiKey: '123456789' });
-            }).toThrowError('`username` property must be not empty.');
+            }).toThrowError(cvt.INCORRECT_VALUE + ' \'username\' property must be not empty.');
         });
 
         it('should throw an error if config are not valid', function () {
             expect(function () {
                 source.initialize(auth, 1234);
-            }).toThrowError('`config` property must be an object.');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' \'config\' property must be an object.');
         });
     });
 
