@@ -122,6 +122,10 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
+    /**
+     * Get the geometry type of the visualization.
+     * @readonly
+     */
     get geometryType () {
         return this._geomType;
     }
