@@ -71,8 +71,8 @@ export default class ViewportStandardDev extends Classifier {
     _genBreakpoints () {
         const avg = this._averageFrom(this._histogram.value);
         const stdev = this._standardDevFrom(this._histogram.value, avg);
+        const breaks = calculateBreakpoints(avg, stdev, this.numCategories, this._classSize);
 
-        const breaks = calculateBreakpoints(avg, stdev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
