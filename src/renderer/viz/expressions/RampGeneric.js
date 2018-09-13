@@ -25,6 +25,7 @@ export default class RampGeneric extends Base {
         } else {
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
         }
+
         if (this.input.isA(Property)) {
             this.input = this.input.type === 'number'
                 ? new Linear(this.input)
@@ -37,10 +38,6 @@ export default class RampGeneric extends Base {
 
         this.others._bindMetadata(metadata);
         this.childrenNames.push('others');
-
-        this._properties = metadata.properties;
-        this._texCategories = null;
-        this._GLtexCategories = null;
         this._metadata = metadata;
     }
 

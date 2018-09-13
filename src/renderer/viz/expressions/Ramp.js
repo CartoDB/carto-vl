@@ -12,7 +12,7 @@ import { DEFAULT_RAMP_OTHERS } from './constants';
 * Then, each input category will have a one to one match with an output value.
 *
 * Some case examples:
-* `ramp(buckets($product, ['House', 'Car', 'Bus']), [house, car, bus])`
+* `ramp(buckets($product, ['A, 'B', 'C']), [house, car, bus])`
 * `ramp(buckets($price, [20, 50, 120]), [1, 10, 4, 12])`
 * `ramp(top($product, 3), [blue, yellow, green])`
 * `ramp(globalQuantiles($price, 3), [red, yellow, green])`
@@ -22,7 +22,7 @@ import { DEFAULT_RAMP_OTHERS } from './constants';
 *
 * Some case examples:
 * `ramp(linear($price, 1, 10) [green, yellow, red])`
-* `ramp(buckets($product, ['House', 'Car', 'Bus'], [red, blue]))
+* `ramp(buckets($product, ['A, 'B', 'C'], [red, blue]))
 * - When the input is a categorical property, we wrap it automatically in a CategoryIndex expression
 * `ramp($product, Prism)` (equivalent to `ramp($categoryIndex($product)), Prism)`
 * - When the input is a numeric property, we wrap it automatically in a Linear expression.
@@ -44,18 +44,18 @@ import { DEFAULT_RAMP_OTHERS } from './constants';
 * @example <caption>Mapping categories to numbers, colors and images.</caption>
 * const s = carto.expressions;
 * const viz = new carto.Viz({
-*   width: s.ramp(s.buckets(s.prop('product'), ['House', 'Car', 'Bus']), [1, 2, 3])
-*   color: s.ramp(s.buckets(s.prop('product'), ['House', 'Car', 'Bus']), s.palettes.PRISM)
-*   strokeColor: s.ramp(s.buckets(s.prop('product'), ['House', 'Car', 'Bus']), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor('green')])
-*   symbol: s.ramp(s.buckets(s.prop('product'), ['House', 'Car', 'Bus']), [s.HOUSE, s.CAR, s.BUS])
+*   width: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [1, 2, 3])
+*   color: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), s.palettes.PRISM)
+*   strokeColor: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor('green')])
+*   symbol: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.HOUSE, s.CAR, s.BUS])
 * });
 *
 * @example <caption>Mapping categories to numbers, colors and images. (String)</caption>
 * const viz = new carto.Viz(`
-*   width: ramp(buckets(prop('product'), ['House', 'Car', 'Bus']), [1, 2, 3])
-*   color: ramp(buckets(prop('product'), ['House', 'Car', 'Bus']), Prism)
-*   strokeColor: ramp(buckets(prop('product'), ['House', 'Car', 'Bus']), [red, yellow, green])
-*   symbol: ramp(buckets(prop('product'), ['House', 'Car', 'Bus']), [house, car, bus])
+*   width: ramp(buckets($product), ['A, 'B', 'C']), [1, 2, 3])
+*   color: ramp(buckets($product), ['A, 'B', 'C']), Prism)
+*   strokeColor: ramp(buckets($product), ['A, 'B', 'C']), [red, yellow, green])
+*   symbol: ramp(buckets($product), ['A, 'B', 'C']), [house, car, bus])
 * `);
 *
 * @example <caption>Mapping classified numeric properties to numbers, colors and images.</caption>
