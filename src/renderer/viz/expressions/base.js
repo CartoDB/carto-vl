@@ -245,6 +245,10 @@ export default class Base {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
 
+    get value () {
+        return this.eval();
+    }
+
     _getBinding (shader) {
         if (!this._shaderBindings.has(shader)) {
             this._shaderBindings.set(shader, {});
