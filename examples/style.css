@@ -73,7 +73,6 @@ aside.toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
-  overflow: scroll;
   min-width: 250px;
   max-width: 250px;
   z-index: 2;
