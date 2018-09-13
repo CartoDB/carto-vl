@@ -1,12 +1,12 @@
-import { implicitCast, checkMaxArguments, checkType } from '../utils';
+import { implicitCast, checkMaxArguments } from '../utils';
 import ReversePalette from './ReversePalette';
-import ReverseArray from './ReverseArray';
+import ReverseList from './ReverseList';
 
 /**
  * Reverse the provided item.
  *
- * @param {Palette|BaseArray} x - item to be reversed
- * @return {Palette|BaseArray}
+ * @param {Palette|List} x - item to be reversed
+ * @return {Palette|List}
  *
  * @example <caption>Invert a Palette.</caption>
  * const s = carto.expressions;
@@ -19,13 +19,13 @@ import ReverseArray from './ReverseArray';
  *   color: ramp($type, reverse(PRISM))
  * `);
  *
- * @example <caption>Invert a Color Array.</caption>
+ * @example <caption>Invert a List.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
  * });
  *
- * @example <caption>Invert a Color Array (String).</caption>
+ * @example <caption>Invert a List (String).</caption>
  * const viz = new carto.Viz(`
  *   color: ramp($count, reverse([red, blue]))
  * `);
@@ -35,13 +35,13 @@ import ReverseArray from './ReverseArray';
  * @function
  * @api
  */
-export default function reverse (x) {
+export default function reverse (list) {
     checkMaxArguments(arguments, 1, 'reverse');
-    x = implicitCast(x);
-    checkType('reverse', 'x', 0, ['palette', 'number-list', 'category-list', 'color-list', 'time-list', 'image-list'], x);
-    if (x.type === 'palette') {
-        return new ReversePalette(x);
+    list = implicitCast(list);
+
+    if (list.type === 'palette') {
+        return new ReversePalette(list);
     } else {
-        return new ReverseArray(x);
+        return new ReverseList(list);
     }
 }

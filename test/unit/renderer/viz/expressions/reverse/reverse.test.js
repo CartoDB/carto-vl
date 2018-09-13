@@ -26,18 +26,18 @@ describe('src/renderer/viz/expressions/reverse', () => {
         });
     });
 
-    describe('array', () => {
+    describe('list', () => {
         describe('eval', () => {
             it('should reverse a number-list', () => {
-                const array = [0, 1, 2];
-                const reversed = reverse(array).eval();
+                const list = [0, 1, 2];
+                const reversed = reverse(list).eval();
                 expect(reversed[0]).toEqual(2);
                 expect(reversed[2]).toEqual(0);
             });
 
             it('should reverse a category-list', () => {
-                const array = ['A', 'B', 'C'];
-                const reversed = reverse(array).eval();
+                const list = ['A', 'B', 'C'];
+                const reversed = reverse(list).eval();
                 expect(reversed[0]).toEqual('C');
                 expect(reversed[2]).toEqual('A');
             });
@@ -54,8 +54,8 @@ describe('src/renderer/viz/expressions/reverse', () => {
                 const firstDay = new Time('2018-08-01');
                 const lastDay = new Time('2018-08-31');
 
-                const array = [firstDay, lastDay];
-                const reversed = reverse(array).eval();
+                const list = [firstDay, lastDay];
+                const reversed = reverse(list).eval();
                 expect(reversed[0]).toEqual(lastDay.eval());
                 expect(reversed[1]).toEqual(firstDay.eval());
             });
