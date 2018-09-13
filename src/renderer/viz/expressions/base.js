@@ -298,10 +298,6 @@ export default class Base {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
-
-    isRampable () {
-        return this.getLegend !== undefined;
-    }
 }
 
 function _toCamelCase (str) {
