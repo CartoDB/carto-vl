@@ -1,19 +1,7 @@
-import {
-    validateStaticType,
-    validateTypeErrors,
-    validateMaxArgumentsError
-} from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 
 import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
-import {
-    property,
-    globalQuantiles,
-    globalEqIntervals,
-    globalStandardDev,
-    viewportQuantiles,
-    viewportEqIntervals,
-    viewportStandardDev
-} from '../../../../../../src/renderer/viz/expressions';
+import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
 
@@ -81,24 +69,13 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     max: 5
                 }
             },
-            sample: [{
-                price: 0
-            },
-            {
-                price: 1
-            },
-            {
-                price: 2
-            },
-            {
-                price: 3
-            },
-            {
-                price: 4
-            },
-            {
-                price: 5
-            }
+            sample: [
+                { price: 0 },
+                { price: 1 },
+                { price: 2 },
+                { price: 3 },
+                { price: 4 },
+                { price: 5 }
             ]
         });
 

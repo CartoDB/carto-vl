@@ -70,8 +70,8 @@ export default class GlobalStandardDev extends Classifier {
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize);
 
-        const breaks = calculateBreakpoints(avg, standardDev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });

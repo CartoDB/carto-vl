@@ -44,7 +44,9 @@ export default function variable (name) {
     if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }
+
     let alias;
+
     const resolve = aliases => {
         if (aliases[name]) {
             alias = aliases[name];
@@ -52,9 +54,11 @@ export default function variable (name) {
             throw new Error(`variable() name '${name}' doesn't exist`);
         }
     };
+
     const _getDependencies = () => {
         return [alias];
     };
+
     let aliaser = {
         set: (obj, prop, value) => {
             if (prop === 'parent') {
@@ -69,6 +73,7 @@ export default function variable (name) {
             // Indicate success
             return true;
         },
+
         get: (obj, prop) => {
             if (prop === 'parent') {
                 return obj[prop];
@@ -90,6 +95,7 @@ export default function variable (name) {
             return obj[prop];
         }
     };
+
     const proxy = new Proxy(new Variable(), aliaser);
     return proxy;
 }
