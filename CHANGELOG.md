@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 ### Added
+- Add `globalStandardDev` and `viewportStandardDev` classification expressions
+
+### Fixed
+- Fix symbol override color
+
+## [0.8.0] - 2018-09-07
+### Added
 - Add new `clusterCount()` expression
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions

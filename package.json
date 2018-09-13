@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -19,7 +19,8 @@
     "Mamata Akella <makella@carto.com>",
     "Raúl Ochoa <rochoa@carto.com>",
     "Ariana Escobar <ariana@carto.com>",
-    "Elena Torro <elena@carto.com>"
+    "Elena Torro <elena@carto.com>",
+    "Víctor Velarde <victor@carto.com>"
   ],
   "license": "BSD-3-Clause",
   "files": [

@@ -195,8 +195,11 @@ import Property from './expressions/basic/property';
 
 import GlobalEqIntervals from './expressions/classification/GlobalEqIntervals';
 import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
+import GlobalStandardDev from './expressions/classification/GlobalStandardDev';
+
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
+import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
 import Ramp from './expressions/Ramp';
 
@@ -333,10 +336,14 @@ export const reverse = reverseFn;
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
+
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
+
+export const globalStandardDev = (...args) => new GlobalStandardDev(...args);
+export const viewportStandardDev = (...args) => new ViewportStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 
