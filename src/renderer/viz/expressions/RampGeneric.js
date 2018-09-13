@@ -94,7 +94,9 @@ export default class RampGeneric extends Base {
 
         const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
         const inline = `ramp_color${this._uid}(${input.inline})`;
-        const prefaceGLSL = `
+
+        const preface = this._prefaceCode(`
+            ${input.preface}
             ${CIELabGLSL}
             ${GLSLPalette.map(elem => elem.preface).join('\n')}
             ${GLSLOthers.preface}
@@ -103,9 +105,8 @@ export default class RampGeneric extends Base {
                 return x==${OTHERS_GLSL_VALUE}
                     ? ${GLSLOthers.inline}
                     : ${GLSLBlend};
-            }`;
-
-        const preface = this._prefaceCode(input.preface + prefaceGLSL);
+            }`
+        );
 
         return { preface, inline };
     }
