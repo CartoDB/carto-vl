@@ -79,11 +79,11 @@ export default class RampImage extends Base {
 
     _postShaderCompile (program, gl) {
         super._postShaderCompile(program, gl);
-        this._multiplierLoc = gl.getUniformLocation(program, `rampImageMultiplier${this._uid}`);
+        this._getBinding(program)._multiplierLoc = gl.getUniformLocation(program, `rampImageMultiplier${this._uid}`);
     }
 
     _preDraw (program, drawMetadata, gl) {
         super._preDraw(program, drawMetadata, gl);
-        gl.uniform1f(this._multiplierLoc, this.input.numCategoriesWithoutOthers - 1);
+        gl.uniform1f(this._getBinding(program)._multiplierLoc, this.input.numCategoriesWithoutOthers - 1);
     }
 }

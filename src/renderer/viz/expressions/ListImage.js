@@ -69,8 +69,6 @@ export default class ListImage extends Base {
                     offsetX = 0;
                     offsetY += imageSize;
                 }
-
-                image.canvas = null;
             }
 
             gl.generateMipmap(gl.TEXTURE_2D);
