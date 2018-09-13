@@ -93,7 +93,7 @@ export function throwInvalidType (expressionName, parameterName, parameterIndex,
 expected type was '${expectedType}', actual type was '${actualType}'`);
 }
 
-export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
+export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was instance of '${expectedClass.name}'`);
 }
@@ -153,7 +153,7 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
 export function checkInstance (expressionName, parameterName, parameterIndex, expectedClass, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (!(parameter.isA(expectedClass))) {
-        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass);
     }
 }
 
