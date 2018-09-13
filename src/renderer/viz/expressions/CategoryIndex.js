@@ -54,9 +54,9 @@ export default class CategoryIndex extends BaseExpression {
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+        checkType('categoryIndex', 'property', 0, 'category', this.property);
         this._metadata = metadata;
         this._calcTranslated();
-        checkType('categoryIndex', 'property', 0, 'category', this.property);
     }
 
     eval (feature) {
