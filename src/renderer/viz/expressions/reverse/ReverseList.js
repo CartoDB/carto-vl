@@ -4,6 +4,7 @@ import { checkType, checkExpression } from '../utils';
 export default class ReverseList extends Base {
     constructor (array) {
         super({array});
+
         checkExpression('reverseList', 'array', 0, array);
 
         if (this.array.elems) {
@@ -16,6 +17,9 @@ export default class ReverseList extends Base {
         this.array._bindMetadata(metadata);
 
         checkType('reverse', 'array', 0, ['palette', 'number-list', 'category-list', 'color-list', 'time-list', 'image-list'], this.array);
+
+        this.type = this.array.type;
+        this.childType = this.array.childType;
 
         super._bindMetadata(metadata);
     }
