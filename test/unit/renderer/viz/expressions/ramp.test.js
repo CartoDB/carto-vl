@@ -441,12 +441,12 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         expect(actual).not.toEqual(expected);
                     });
 
-                    it('should use the default color for the rest', () => {
+                    it('should use the last color for the last bucket', () => {
                         r = ramp(buckets(51, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
                         actual = r.eval();
-                        expected = DEFAULT_COLOR.value;
+                        expected = yellow.value;
 
                         expect(actual).toEqual(expected);
                     });

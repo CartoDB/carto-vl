@@ -179,7 +179,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is higher than the breakpoint', () => {
-                    const expected = OTHERS_INDEX;
+                    const expected = 1;
                     const feature = { price: 11 };
                     const actual = bucketExpression.eval(feature);
 
@@ -187,7 +187,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the second category when is equal than the breakpoint', () => {
-                    const expected = OTHERS_INDEX;
+                    const expected = 1;
                     const feature = { price: 10 };
                     const actual = bucketExpression.eval(feature);
 
@@ -226,7 +226,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the third category when is equal than the third breakpoint', () => {
-                    const expected = OTHERS_INDEX;
+                    const expected = 1;
                     const feature = { price: 20 };
                     const actual = bucketExpression.eval(feature);
 
@@ -234,7 +234,7 @@ describe('src/renderer/viz/expressions/buckets', () => {
                 });
 
                 it('should classify the input in the third category when is higher than the third breakpoint', () => {
-                    const expected = OTHERS_INDEX;
+                    const expected = 1;
                     const feature = { price: 21 };
                     const actual = bucketExpression.eval(feature);
 
