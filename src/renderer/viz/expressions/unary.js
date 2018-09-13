@@ -1,5 +1,6 @@
 import { implicitCast, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 /**
  * Compute the natural logarithm (base e) of a number x.
@@ -301,7 +302,7 @@ function genUnaryOp (name, jsFn, glsl) {
             super._bindMetadata(meta);
             checkType(name, 'x', 0, 'number', this.a);
             if (this.a.type !== 'number') {
-                throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unary operation cannot be performed to '${this.a.type}'`);
             }
         }
     };

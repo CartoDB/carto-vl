@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkMaxArguments } from './utils';
 import Property from './basic/property';
 import { number } from '../expressions';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 // Careful! This constant must match with the shader code of the Top expression
 const MAX_TOP_BUCKETS = 16;
@@ -85,7 +86,9 @@ export default class Top extends BaseExpression {
             // making this error an unrecoverable error, within the setTimeout the error is recoverable
             const prev = this.buckets.eval();
             setTimeout(() => {
-                throw new Error(`top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified`);
+                throw new CartoValidationError(
+                    `${cvt.INCORRECT_VALUE} top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`
+                );
             });
             buckets = 0;
         }

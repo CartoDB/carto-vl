@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
@@ -24,7 +25,7 @@ export default class BaseArray extends BaseExpression {
 
         elems = elems.map(implicitCast);
         if (!elems.length) {
-            throw new Error('array(): invalid parameters: must receive at least one argument');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} array(): invalid parameters: must receive at least one argument.`);
         }
 
         let type = '';
@@ -37,13 +38,15 @@ export default class BaseArray extends BaseExpression {
         }
 
         if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} array(): invalid parameters type: ${type}.`);
         }
 
         elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type !== type && item.type !== undefined) {
-                throw new Error(`array(): invalid ${getOrdinalFromIndex(index + 1)} parameter type, invalid argument type combination`);
+                throw new CartoValidationError(
+                    `${cvt.INCORRECT_TYPE} array(): invalid ${getOrdinalFromIndex(index + 1)} parameter, invalid argument type combination.`
+                );
             }
         });
 
@@ -70,12 +73,14 @@ export default class BaseArray extends BaseExpression {
 
         const type = this.elems[0].type;
         if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} array(): invalid parameters type: ${type}`);
         }
         this.elems.map((item, index) => {
             checkExpression('array', `item[${index}]`, index, item);
             if (item.type !== type) {
-                throw new Error(`array(): invalid ${getOrdinalFromIndex(index)} parameter, invalid argument type combination`);
+                throw new CartoValidationError(
+                    `${cvt.INCORRECT_TYPE} array(): invalid ${getOrdinalFromIndex(index + 1)} parameter, invalid argument type combination`
+                );
             }
         });
     }

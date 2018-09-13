@@ -1,6 +1,7 @@
 import { implicitCast } from './utils';
 import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 /**
  * Abstract expression class
@@ -128,7 +129,9 @@ export default class Base {
 
     _initializeChildrenArray (children) {
         if (this.maxParameters && this.maxParameters < children.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError(
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${children.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         this.childrenNames = [];
@@ -144,7 +147,9 @@ export default class Base {
         this.childrenNames = Object.keys(children);
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError(
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${this.childrenNames.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         Object.keys(children).map(name => {

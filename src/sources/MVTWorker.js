@@ -4,6 +4,7 @@ import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import Metadata from '../renderer/Metadata';
 import DummyDataframe from '../renderer/DummyDataframe';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -67,7 +68,9 @@ export class MVTWorker {
         const tile = new VectorTile(new Protobuf(arrayBuffer));
 
         if (Object.keys(tile.layers).length > 1 && !layerID) {
-            throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
+            throw new CartoValidationError(
+                `${cvt.MISSING_REQUIRED} LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`
+            );
         }
 
         const mvtLayer = tile.layers[layerID || Object.keys(tile.layers)[0]]; // FIXME this!!!

@@ -1,4 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
+import { CartoValidationTypes as cvt } from '../../../../../../src/errors/carto-validation-error';
 import { validateMaxArgumentsError } from '../utils';
 
 describe('src/renderer/viz/expressions/basic/array', () => {
@@ -11,15 +12,17 @@ describe('src/renderer/viz/expressions/basic/array', () => {
 
     describe('constructor', () => {
         it('should throw an error when the array is empty ', () => {
+            const missingRequired = cvt.MISSING_REQUIRED + ' array(): invalid parameters: must receive at least one argument.';
             expect(() => s.array()
-            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+            ).toThrowError(missingRequired);
+
             expect(() => s.array([])
-            ).toThrowError('array(): invalid parameters: must receive at least one argument');
+            ).toThrowError(missingRequired);
         });
 
         it('should throw an error when the array constains different types ', () => {
             expect(() => s.array([1, 'a'])
-            ).toThrowError('array(): invalid second parameter type, invalid argument type combination');
+            ).toThrowError(cvt.INCORRECT_TYPE + ' array(): invalid second parameter, invalid argument type combination.');
         });
     });
 
@@ -40,8 +43,8 @@ describe('src/renderer/viz/expressions/basic/array', () => {
             const actual = s.array([s.hex('#F00'), s.hex('#00F')]).value;
 
             expect(actual).toEqual([
-                {r: 255, g: 0, b: 0, a: 1},
-                {r: 0, g: 0, b: 255, a: 1}]);
+                { r: 255, g: 0, b: 0, a: 1 },
+                { r: 0, g: 0, b: 255, a: 1 }]);
         });
 
         it('should return array of dates', () => {

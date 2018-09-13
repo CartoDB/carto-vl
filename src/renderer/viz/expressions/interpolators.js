@@ -1,5 +1,6 @@
 import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 // TODO type checking
 
@@ -74,7 +75,7 @@ function genInterpolator (name, inlineMaker, preface, jsEval) {
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             if (this.m.type !== 'number') {
-                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Blending cannot be performed by '${this.m.type}'`);
             }
             this.type = 'number';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);

@@ -5,6 +5,7 @@ import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -77,7 +78,7 @@ export default class Windshaft {
             const aggregatedUsage = usages.some(x => x.type === 'aggregated');
             const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new Error(`Incompatible combination of cluster aggregation usages (${
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
                     JSON.stringify(usages.filter(x => x.type === 'aggregated'))
                 }) with unaggregated usage for property '${propertyName}'`);
             }

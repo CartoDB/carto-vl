@@ -462,7 +462,7 @@ export default class Layer {
     async _vizChanged (viz) {
         await this._context;
         if (!this._source) {
-            throw new Error('A source is required before changing the viz');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} a 'source' is required before changing the viz.`);
         }
 
         const source = this._source;

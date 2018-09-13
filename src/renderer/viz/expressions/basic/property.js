@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Evaluates the value of a column for every row in the dataset.
@@ -36,7 +37,7 @@ export default class Property extends BaseExpression {
         checkString('property', 'name', 0, name);
 
         if (name === '') {
-            throw new Error('property(): invalid parameter, zero-length string');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} property(): invalid parameter, zero-length string`);
         }
         super({});
         this.name = name;
@@ -53,7 +54,7 @@ export default class Property extends BaseExpression {
 
     eval (feature) {
         if (!feature) {
-            throw new Error('A property needs to be evaluated in a feature');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
         return feature[this.name];
     }
@@ -61,7 +62,7 @@ export default class Property extends BaseExpression {
     _bindMetadata (meta) {
         const metaColumn = meta.properties[this.name];
         if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Property '${this.name}' does not exist`);
         }
         this.type = metaColumn.type;
 

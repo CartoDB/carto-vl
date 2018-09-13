@@ -1,5 +1,6 @@
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../src/errors/carto-validation-error';
 
 describe('src/renderer/viz/expressions/top', () => {
     describe('error control', () => {
@@ -38,7 +39,7 @@ describe('src/renderer/viz/expressions/top', () => {
             const top = s.top(s.property('numericProperty'), 17);
             expect(() => {
                 top.numBuckets();
-            }).toThrowError('top() function has a limit of 16 buckets but \'17\' buckets were specified');
+            }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' top() function has a limit of 16 buckets but \'17\' buckets were specified.');
         });
 
         afterAll(() => {
