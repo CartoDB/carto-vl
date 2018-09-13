@@ -1,6 +1,6 @@
 import BaseExpression from './base';
 import { pow, blend, linear, zoom } from '../expressions';
-import { implicitCast, checkType } from './utils';
+import { implicitCast, checkType, checkExpression } from './utils';
 
 /**
  * Define a list of interpolated zoom ranges based on an input breakpoint list. Useful in combination with ramp (see examples).
@@ -29,12 +29,14 @@ export default class Zoomrange extends BaseExpression {
         zoomBreakpointList = implicitCast(zoomBreakpointList);
 
         super({});
+        checkExpression('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
         this.zoomBreakpointList = zoomBreakpointList;
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
     }
 
     _bindMetadata (metadata) {
+        this.zoomBreakpointList._bindMetadata(metadata);
         checkType('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
             throw new Error('zoomrange() function must receive a list with at least two elements');
