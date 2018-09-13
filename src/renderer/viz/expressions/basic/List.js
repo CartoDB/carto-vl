@@ -40,7 +40,6 @@ export default class List extends Base {
 
         super(elems);
         this.elems = elems;
-        this._setTypes();
     }
 
     _bindMetadata (metadata) {
