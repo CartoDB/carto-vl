@@ -7,10 +7,7 @@ describe('src/renderer/viz/expressions/basic/list', () => {
         validateTypeErrors('list', [], () => 'list(): invalid parameters: must receive at least one argument');
         validateTypeErrors('list', [[]], () => 'list(): invalid parameters: must receive at least one argument');
         validateTypeErrors('list', [[1, 'a']]);
-    });
-
-    describe('type', () => {
-        // TODO SUPPORTED_CHILD_TYPES
+        validateTypeErrors('list', [[function () {}]]);
     });
 
     describe('.value', () => {
