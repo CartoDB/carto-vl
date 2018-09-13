@@ -47,14 +47,10 @@ export default class RampGeneric extends Base {
     }
 
     _calcEval (input, feature) {
-        const maxPaletteSize = this.input.numCategoriesWithoutOthers < this.palette.length
-            ? this.palette.length
-            : this.input.numCategoriesWithoutOthers;
-
         const { palette, others } = this._getPalette();
         const paletteValues = this.palette.isA(Palette)
             ? palette.map((color) => color.eval(feature))
-            : this.palette.eval(feature).slice(0, maxPaletteSize);
+            : this.palette.eval(feature);
 
         if (input === OTHERS_INDEX) {
             return others.eval(feature);

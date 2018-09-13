@@ -125,7 +125,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                 describe('and there are less categories than colors', () => {
                     describe('and not all categories in the dataset have a bucket defined', () => {
-                        it('should not show interpolation', () => {
+                        it('should show interpolation', () => {
                             let r;
                             r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
@@ -138,68 +138,14 @@ describe('src/renderer/viz/expressions/ramp', () => {
                             r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
 
                             r._bindMetadata(METADATA);
-                            actual = r.eval({ grade: 'B' });
-                            expected = blue.value;
-
-                            expect(actual).toEqual(expected);
-
-                            r = ramp(buckets($grade, ['A', 'B', 'C']), [red, blue, yellow, purple]);
-
-                            r._bindMetadata(METADATA);
                             actual = r.eval({ grade: 'C' });
-                            expected = yellow.value;
+                            expected = purple.value;
 
                             expect(actual).toEqual(expected);
                         });
 
-                        it('should use last color for the remaining categories', () => {
+                        it('should use the others color for the remaining categories', () => {
                             const r = ramp(buckets('D', ['A', 'B', 'C']), [red, blue, yellow], purple);
-
-                            r._bindMetadata(METADATA);
-                            actual = r.eval();
-                            expected = purple.value;
-
-                            expect(actual).toEqual(expected);
-                        });
-
-                        it('should use only the same number of colors as categories', () => {
-                            const COLORS = [red, blue, yellow, green, orange, purple];
-                            const BREAKPOINTS = ['A', 'B', 'C'];
-                            let r;
-
-                            r = ramp(buckets('A', BREAKPOINTS), COLORS, purple);
-
-                            r._bindMetadata(METADATA);
-                            actual = r.eval();
-                            expected = red.value;
-
-                            expect(actual).toEqual(expected);
-
-                            r = ramp(buckets('B', BREAKPOINTS), COLORS, purple);
-
-                            r._bindMetadata(METADATA);
-                            actual = r.eval();
-                            expected = blue.value;
-
-                            expect(actual).toEqual(expected);
-
-                            r = ramp(buckets('C', BREAKPOINTS), COLORS, purple);
-
-                            r._bindMetadata(METADATA);
-                            actual = r.eval();
-                            expected = yellow.value;
-
-                            expect(actual).toEqual(expected);
-
-                            r = ramp(buckets('D', BREAKPOINTS), COLORS, purple);
-
-                            r._bindMetadata(METADATA);
-                            actual = r.eval();
-                            expected = purple.value;
-
-                            expect(actual).toEqual(expected);
-
-                            r = ramp(buckets('E', BREAKPOINTS), COLORS, purple);
 
                             r._bindMetadata(METADATA);
                             actual = r.eval();
@@ -329,38 +275,22 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     let actual;
                     let expected;
 
-                    it('should not show interpolation', () => {
+                    it('should show interpolation', () => {
                         r = ramp(buckets(1, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
                         actual = r.eval();
-                        expected = COLORS[0].value;
+                        expected = red.value;
 
                         expect(actual).toEqual(expected);
 
-                        r = ramp(buckets(11, RANGES), COLORS);
-
-                        r._bindMetadata(METADATA);
-                        actual = r.eval();
-                        expected = COLORS[1].value;
-
-                        expect(actual).toEqual(expected);
-
-                        r = ramp(buckets(21, RANGES), COLORS);
-
-                        r._bindMetadata(METADATA);
-                        actual = r.eval();
-                        expected = COLORS[2].value;
-
-                        expect(actual).toEqual(expected);
-                    });
-
-                    it('should ignore the remaining colors and use the last color for the rest of the buckets', () => {
                         r = ramp(buckets(31, RANGES), COLORS);
 
                         r._bindMetadata(METADATA);
                         actual = r.eval();
                         expected = orange.value;
+
+                        expect(actual).toEqual(expected);
                     });
                 });
 
@@ -636,13 +566,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                         expect(actual).toEqual(expected);
 
-                        actual = r.eval({ price: 2.1 });
-                        expected = blue.value;
-
-                        expect(actual).toEqual(expected);
-
-                        actual = r.eval({ price: 3.1 });
-                        expected = yellow.value;
+                        actual = r.eval({ price: 5.1 });
+                        expected = green.value;
 
                         expect(actual).toEqual(expected);
                     });
