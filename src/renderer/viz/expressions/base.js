@@ -301,5 +301,8 @@ export default class Base {
 }
 
 function _toCamelCase (str) {
+    if (str.toUpperCase() === str) {
+        return str.toLowerCase();
+    }
     return str.charAt(0).toLowerCase() + str.slice(1);
 }

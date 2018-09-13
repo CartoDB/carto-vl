@@ -40,7 +40,7 @@ export default class BaseNumber extends BaseExpression {
     }
 
     toString () {
-        return `${this.expr.toPrecision(5)}`;
+        return `${this.expr}`;
     }
 
     isAnimated () {

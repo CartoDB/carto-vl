@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support symbol and symbolPlacement in features
 - New method `ramp.getLegend`
 - Add expressions `toString()` method
+- Add viz `toString()` method
 - `ramp` with an image list defaults to `circle` for the `others` bucket
 - Add `geometryType` method in Viz
 - Add `categoryIndex` expression.

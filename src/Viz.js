@@ -513,6 +513,29 @@ export default class Viz {
             }
         }
     }
+
+    /**
+     * Stringify the visualization
+     *
+     * @returns {string}
+     * @memberof carto
+     * @api
+     */
+    toString () {
+        const variables = Object.keys(this.variables).map(varName =>
+            `@${varName}: ${this.variables[varName].toString()}\n`
+        );
+        return `color: ${this.color.toString()}
+            strokeColor: ${this.strokeColor.toString()}
+            width: ${this.width.toString()}
+            strokeWidth: ${this.strokeWidth.toString()}
+            filter: ${this.filter.toString()}
+            order: ${this.order.toString()}
+            symbol: ${this.symbol.toString()}
+            symbolPlacement: ${this.symbolPlacement.toString()}
+            offset: ${this.offset.toString()}
+            ${variables}`.replace(/ {4}/g, '');
+    }
 }
 
 function checkVizPropertyTypes (viz) {
