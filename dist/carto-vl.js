@@ -5726,7 +5726,7 @@ module.exports = function (content, url) {
 /*! exports provided: name, version, sideEffects, description, repository, author, contributors, license, files, dependencies, devDependencies, module, main, scripts, default */
 /***/ (function(module) {
 
-module.exports = {"name":"@carto/carto-vl","version":"0.8.0","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>","Víctor Velarde <victor@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","@mapbox/vector-tile":"^1.3.0","babel-loader":"^8.0.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.48.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"^3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","wait-on":"^2.1.0","webpack":"^4.17.1","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1","worker-loader":"^2.0.0"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:unit:min":"MIN=1 yarn test:unit","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:min":"MIN=1 yarn test:user","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000","test:render:min":"yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server --cors","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
+module.exports = {"name":"@carto/carto-vl","version":"0.8.0","sideEffects":false,"description":"CARTO Vector library","repository":{"type":"git","url":"git://github.com/CartoDB/carto-vl.git"},"author":{"name":"CARTO","url":"https://carto.com/"},"contributors":["David Manzanares <dmanzanares@carto.com>","Iago Lastra <iago@carto.com>","Jesús Arroyo Torrens <jarroyo@carto.com>","Javier Goizueta <jgoizueta@carto.com>","Mamata Akella <makella@carto.com>","Raúl Ochoa <rochoa@carto.com>","Ariana Escobar <ariana@carto.com>","Elena Torro <elena@carto.com>","Víctor Velarde <victor@carto.com>"],"license":"BSD-3-Clause","files":["src","dist"],"dependencies":{"@babel/core":"^7.0.0","@babel/preset-env":"^7.0.0","@mapbox/vector-tile":"^1.3.0","babel-loader":"^8.0.0","cartocolor":"^4.0.0","earcut":"^2.1.2","jsep":"CartoDB/jsep#additional-char-ids-packaged","lru-cache":"^4.1.1","mitt":"^1.1.3","pbf":"^3.1.0"},"devDependencies":{"@carto/mapbox-gl":"0.48.0-carto1","chai":"^4.1.2","chai-as-promised":"^7.1.1","eslint":"^4.15.0","eslint-config-semistandard":"^12.0.1","eslint-config-standard":"^11.0.0","eslint-plugin-import":"^2.13.0","eslint-plugin-node":"^6.0.1","eslint-plugin-promise":"^3.8.0","eslint-plugin-standard":"^3.1.0","exquisite-sst":"^1.5.0","fastly":"^2.2.0","glob":"^7.1.2","http-server":"^0.11.1","jasmine-core":"^2.99.1","jsdoc":"^3.5.5","jsdoc-escape-at":"^1.0.1","karma":"^2.0.2","karma-chrome-launcher":"^2.2.0","karma-falcon-benchmark":"^0.1.0","karma-falcon-benchmark-reporter":"^0.0.0","karma-jasmine":"^1.1.2","karma-mocha-reporter":"^2.2.5","karma-sourcemap-loader":"^0.3.7","karma-webpack":"3.0.0","lodash.template":"^4.4.0","mocha":"^5.0.0","puppeteer":"^1.1.0","s3":"^4.4.0","serve":"^7.2.0","sloc":"^0.2.0","svg-inline-loader":"^0.8.0","wait-on":"^2.1.0","webpack":"^4.17.1","webpack-cli":"^2.1.4","webpack-glsl-loader":"^1.0.1","worker-loader":"^2.0.0"},"module":"dist/carto-vl.js","main":"dist/carto-vl.js","scripts":{"build":"yarn build:dev && yarn build:min","build:dev":"webpack --config webpack/webpack.config.js","build:min":"webpack --config webpack/webpack.min.config.js","build:watch":"webpack -w --config webpack/webpack.config.js","docs":"rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json","docs:all":"rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json","lint":"eslint .","lint:fix":"eslint . --fix","test":"yarn test:unit && yarn lint && yarn docs","test:unit":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:unit:min":"MIN=1 yarn test:unit","test:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/unit/karma.conf.js","test:watchc":"karma start --no-single-run --auto-watch --browsers Chrome test/unit/karma.conf.js","test:user":"karma start --single-run --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:min":"MIN=1 yarn test:user","test:user:watch":"karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js","test:user:watchc":"karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js","test:browser":"karma start --no-single-run --browsers Chrome test/unit/karma.conf.js","test:render":"yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000","test:render:min":"yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000","test:render:clean":"rm -rf test/integration/render/scenarios/**/**/reference.png","test:render:prepare":"yarn build:dev && node test/integration/render/render.prepare.js ","test:e2e":"./scripts/run-local-e2e.sh","test:e2e:clean":"rm -rf test/acceptance/e2e/**/reference.png","test:e2e:prepare":"yarn build:dev && node test/acceptance/e2e.prepare.js ","test:fps":"node test/benchmark/fps/benchmark.js","test:perf":"karma start --single-run --browsers Chrome test/benchmark/karma.conf.js","serve":"yarn build:dev && yarn docs && http-server --cors","preversion":"./scripts/preversion.sh","postversion":"git push origin HEAD --follow-tags","prepublishOnly":"./scripts/release.sh","ghpublish":"git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master","loc":"sloc src/ examples/"}};
 
 /***/ }),
 
@@ -6210,6 +6210,15 @@ class Layer {
     }
 
     async _vizChanged (viz) {
+        if (this._cache) {
+            return this._cache;
+        }
+        this._cache = this._requestVizChanges(viz)
+            .then(() => { this._cache = null; });
+        return this._cache;
+    }
+
+    async _requestVizChanges (viz) {
         await this._context;
         if (!this._source) {
             throw new Error('A source is required before changing the viz');
@@ -6492,6 +6501,15 @@ class Viz {
 
         this._resolveAliases();
         this._validateAliasDAG();
+    }
+
+    /**
+     * Get the geometry type of the visualization.
+     * @readonly
+     * @api
+     */
+    get geometryType () {
+        return this._geomType;
     }
 
     loadImages () {
@@ -6877,6 +6895,29 @@ class Viz {
             }
         }
     }
+
+    /**
+     * Stringify the visualization
+     *
+     * @returns {string}
+     * @memberof carto
+     * @api
+     */
+    toString () {
+        const variables = Object.keys(this.variables).map(varName =>
+            `@${varName}: ${this.variables[varName].toString()}\n`
+        );
+        return `color: ${this.color.toString()}
+            strokeColor: ${this.strokeColor.toString()}
+            width: ${this.width.toString()}
+            strokeWidth: ${this.strokeWidth.toString()}
+            filter: ${this.filter.toString()}
+            order: ${this.order.toString()}
+            symbol: ${this.symbol.toString()}
+            symbolPlacement: ${this.symbolPlacement.toString()}
+            offset: ${this.offset.toString()}
+            ${variables}`.replace(/ {4}/g, '');
+    }
 }
 
 function checkVizPropertyTypes (viz) {
@@ -7198,7 +7239,7 @@ class AggregationFiltering {
 
     _between (f) {
         if (f.isA(_renderer_viz_expressions_between__WEBPACK_IMPORTED_MODULE_2__["default"])) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let lo = p && this._value(f.lowerLimit);
             let hi = p && lo && this._value(f.upperLimit);
             if (hi) {
@@ -7213,7 +7254,7 @@ class AggregationFiltering {
 
     _in (f) {
         if (f.isA(_renderer_viz_expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["In"])) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
@@ -7226,7 +7267,7 @@ class AggregationFiltering {
 
     _notIn (f) {
         if (f.isA(_renderer_viz_expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["Nin"])) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
@@ -7452,7 +7493,7 @@ class PreaggregationFiltering {
 
     _in (f) {
         if (f.isA(_renderer_viz_expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["In"])) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
@@ -7466,7 +7507,7 @@ class PreaggregationFiltering {
 
     _notIn (f) {
         if (f.isA(_renderer_viz_expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["Nin"])) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
@@ -7480,7 +7521,7 @@ class PreaggregationFiltering {
 
     _between (f) {
         if (f.isA(_renderer_viz_expressions_between__WEBPACK_IMPORTED_MODULE_2__["default"])) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);
             if (p && lo && hi) {
@@ -7533,7 +7574,7 @@ const SQLGenerators = {
     'greaterThan': f => sqlSep(' > ', f.left, f.right),
     'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
     'property': f => sqlId(f.property),
-    'value': f => sqlQ(f.value)
+    'value': f => sqlQ(f.input)
 };
 
 /**
@@ -11412,16 +11453,16 @@ function cielabToSRGB (cielab) {
 
 function interpolateRGBAinCieLAB (rgbColorA, rgbColorB, m) {
     const cielabColorA = sRGBToCielab({
-        r: rgbColorA.r,
-        g: rgbColorA.g,
-        b: rgbColorA.b,
+        r: rgbColorA.r / 255,
+        g: rgbColorA.g / 255,
+        b: rgbColorA.b / 255,
         a: rgbColorA.a
     });
 
     const cielabColorB = sRGBToCielab({
-        r: rgbColorB.r,
-        g: rgbColorB.g,
-        b: rgbColorB.b,
+        r: rgbColorB.r / 255,
+        g: rgbColorB.g / 255,
+        b: rgbColorB.b / 255,
         a: rgbColorB.a
     });
 
@@ -11432,7 +11473,14 @@ function interpolateRGBAinCieLAB (rgbColorA, rgbColorB, m) {
         alpha: (1 - m) * cielabColorA.alpha + m * cielabColorB.alpha
     };
 
-    return cielabToSRGB(cielabInterpolated);
+    const rgbaColor = cielabToSRGB(cielabInterpolated);
+
+    return {
+        r: Math.round(rgbaColor.r * 255),
+        g: Math.round(rgbaColor.g * 255),
+        b: Math.round(rgbaColor.b * 255),
+        a: rgbaColor.a
+    };
 }
 
 // Following functionality has been inspired by http://www.getreuer.info/home/colorspace
@@ -11635,13 +11683,12 @@ __webpack_require__.r(__webpack_exports__);
 /*!*****************************************!*\
   !*** ./src/renderer/viz/expressions.js ***!
   \*****************************************/
-/*! exports provided: transition, array, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, clusterCount, constant, image, imageList, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, globalQuantiles, viewportQuantiles, globalEqIntervals, viewportEqIntervals, globalStandardDev, viewportStandardDev, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, zoom, scaled, zoomrange, placement, alphaNormalize, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
+/*! exports provided: transition, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, clusterCount, constant, image, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, list, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, globalQuantiles, viewportQuantiles, globalEqIntervals, viewportEqIntervals, globalStandardDev, viewportStandardDev, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, zoom, scaled, zoomrange, placement, alphaNormalize, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "transition", function() { return transition; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "array", function() { return array; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "nin", function() { return nin; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "in", function() { return in_; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "between", function() { return between; });
@@ -11676,7 +11723,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clusterCount", function() { return clusterCount; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "constant", function() { return constant; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "image", function() { return image; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "imageList", function() { return imageList; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "svg", function() { return svg; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hex", function() { return hex; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "hsl", function() { return hsl; });
@@ -11686,6 +11732,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cubic", function() { return cubic; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ilinear", function() { return ilinear; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "linear", function() { return linear; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "list", function() { return list; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "namedColor", function() { return namedColor; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "now", function() { return now; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "number", function() { return number; });
@@ -11770,77 +11817,76 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ALIGN_CENTER", function() { return ALIGN_CENTER; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ALIGN_BOTTOM", function() { return ALIGN_BOTTOM; });
 /* harmony import */ var _expressions_transition__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./expressions/transition */ "./src/renderer/viz/expressions/transition.js");
-/* harmony import */ var _expressions_basic_array__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expressions/basic/array */ "./src/renderer/viz/expressions/basic/array.js");
-/* harmony import */ var _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expressions/belongs */ "./src/renderer/viz/expressions/belongs.js");
-/* harmony import */ var _expressions_between__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./expressions/between */ "./src/renderer/viz/expressions/between.js");
-/* harmony import */ var _expressions_binary__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./expressions/binary */ "./src/renderer/viz/expressions/binary.js");
-/* harmony import */ var _expressions_blend__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./expressions/blend */ "./src/renderer/viz/expressions/blend.js");
-/* harmony import */ var _expressions_buckets__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./expressions/buckets */ "./src/renderer/viz/expressions/buckets.js");
-/* harmony import */ var _expressions_basic_category__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./expressions/basic/category */ "./src/renderer/viz/expressions/basic/category.js");
-/* harmony import */ var _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./expressions/color/CIELab */ "./src/renderer/viz/expressions/color/CIELab.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterAvg */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMax */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMin */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMode */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterSum */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js");
-/* harmony import */ var _expressions_aggregation_cluster_ClusterCount__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterCount */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterCount.js");
-/* harmony import */ var _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./expressions/basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
-/* harmony import */ var _expressions_color_hex__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./expressions/color/hex */ "./src/renderer/viz/expressions/color/hex.js");
-/* harmony import */ var _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./expressions/color/hsl */ "./src/renderer/viz/expressions/color/hsl.js");
-/* harmony import */ var _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./expressions/color/hsv */ "./src/renderer/viz/expressions/color/hsv.js");
-/* harmony import */ var _expressions_interpolators__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./expressions/interpolators */ "./src/renderer/viz/expressions/interpolators.js");
-/* harmony import */ var _expressions_linear__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./expressions/linear */ "./src/renderer/viz/expressions/linear.js");
-/* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
-/* harmony import */ var _expressions_now__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./expressions/now */ "./src/renderer/viz/expressions/now.js");
-/* harmony import */ var _expressions_basic_number__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
-/* harmony import */ var _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./expressions/color/Opacity */ "./src/renderer/viz/expressions/color/Opacity.js");
-/* harmony import */ var _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./expressions/ordering */ "./src/renderer/viz/expressions/ordering.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["Asc"]; });
+/* harmony import */ var _expressions_belongs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./expressions/belongs */ "./src/renderer/viz/expressions/belongs.js");
+/* harmony import */ var _expressions_between__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./expressions/between */ "./src/renderer/viz/expressions/between.js");
+/* harmony import */ var _expressions_binary__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./expressions/binary */ "./src/renderer/viz/expressions/binary.js");
+/* harmony import */ var _expressions_blend__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./expressions/blend */ "./src/renderer/viz/expressions/blend.js");
+/* harmony import */ var _expressions_buckets__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./expressions/buckets */ "./src/renderer/viz/expressions/buckets.js");
+/* harmony import */ var _expressions_basic_category__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./expressions/basic/category */ "./src/renderer/viz/expressions/basic/category.js");
+/* harmony import */ var _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./expressions/color/CIELab */ "./src/renderer/viz/expressions/color/CIELab.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterAvg */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterAvg.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMax */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMax.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMin */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMin.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterMode */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterMode.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterSum */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterSum.js");
+/* harmony import */ var _expressions_aggregation_cluster_ClusterCount__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./expressions/aggregation/cluster/ClusterCount */ "./src/renderer/viz/expressions/aggregation/cluster/ClusterCount.js");
+/* harmony import */ var _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./expressions/basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
+/* harmony import */ var _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./expressions/color/hex */ "./src/renderer/viz/expressions/color/hex.js");
+/* harmony import */ var _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./expressions/color/hsl */ "./src/renderer/viz/expressions/color/hsl.js");
+/* harmony import */ var _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./expressions/color/hsv */ "./src/renderer/viz/expressions/color/hsv.js");
+/* harmony import */ var _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./expressions/interpolators */ "./src/renderer/viz/expressions/interpolators.js");
+/* harmony import */ var _expressions_linear__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./expressions/linear */ "./src/renderer/viz/expressions/linear.js");
+/* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
+/* harmony import */ var _expressions_now__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./expressions/now */ "./src/renderer/viz/expressions/now.js");
+/* harmony import */ var _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./expressions/basic/number */ "./src/renderer/viz/expressions/basic/number.js");
+/* harmony import */ var _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./expressions/color/Opacity */ "./src/renderer/viz/expressions/color/Opacity.js");
+/* harmony import */ var _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./expressions/ordering */ "./src/renderer/viz/expressions/ordering.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Asc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["Desc"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "Desc", function() { return _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Desc"]; });
 
-/* harmony import */ var _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/color/palettes */ "./src/renderer/viz/expressions/color/palettes.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_26__["default"]; });
+/* harmony import */ var _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./expressions/color/palettes */ "./src/renderer/viz/expressions/color/palettes.js");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "palettes", function() { return _expressions_color_palettes__WEBPACK_IMPORTED_MODULE_25__["default"]; });
 
-/* harmony import */ var _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./expressions/reverse/reverse */ "./src/renderer/viz/expressions/reverse/reverse.js");
-/* harmony import */ var _expressions_basic_property__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./expressions/basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./expressions/classification/GlobalEqIntervals */ "./src/renderer/viz/expressions/classification/GlobalEqIntervals.js");
-/* harmony import */ var _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./expressions/classification/GlobalQuantiles */ "./src/renderer/viz/expressions/classification/GlobalQuantiles.js");
-/* harmony import */ var _expressions_classification_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./expressions/classification/GlobalStandardDev */ "./src/renderer/viz/expressions/classification/GlobalStandardDev.js");
-/* harmony import */ var _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./expressions/classification/ViewportEqIntervals */ "./src/renderer/viz/expressions/classification/ViewportEqIntervals.js");
-/* harmony import */ var _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./expressions/classification/ViewportQuantiles */ "./src/renderer/viz/expressions/classification/ViewportQuantiles.js");
-/* harmony import */ var _expressions_classification_ViewportStandardDev__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./expressions/classification/ViewportStandardDev */ "./src/renderer/viz/expressions/classification/ViewportStandardDev.js");
-/* harmony import */ var _expressions_ramp__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/ramp */ "./src/renderer/viz/expressions/ramp.js");
-/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
-/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
-/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
-/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
-/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
-/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
-/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportAvg */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMax */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMin */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportSum */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportCount */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportPercentile */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportHistogram */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalAvg */ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalCount */ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMax */ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMin */ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
-/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
-/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
-/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
-/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
-/* harmony import */ var _expressions_ImageList__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./expressions/ImageList */ "./src/renderer/viz/expressions/ImageList.js");
-/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
-/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_62__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
-/* harmony import */ var _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_63__ = __webpack_require__(/*! ./expressions/Zoomrange */ "./src/renderer/viz/expressions/Zoomrange.js");
-/* harmony import */ var _expressions_Scaled__WEBPACK_IMPORTED_MODULE_64__ = __webpack_require__(/*! ./expressions/Scaled */ "./src/renderer/viz/expressions/Scaled.js");
-/* harmony import */ var _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_65__ = __webpack_require__(/*! ./expressions/AlphaNormalize */ "./src/renderer/viz/expressions/AlphaNormalize.js");
+/* harmony import */ var _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./expressions/reverse/reverse */ "./src/renderer/viz/expressions/reverse/reverse.js");
+/* harmony import */ var _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./expressions/basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./expressions/classification/GlobalEqIntervals */ "./src/renderer/viz/expressions/classification/GlobalEqIntervals.js");
+/* harmony import */ var _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./expressions/classification/GlobalQuantiles */ "./src/renderer/viz/expressions/classification/GlobalQuantiles.js");
+/* harmony import */ var _expressions_classification_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./expressions/classification/GlobalStandardDev */ "./src/renderer/viz/expressions/classification/GlobalStandardDev.js");
+/* harmony import */ var _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./expressions/classification/ViewportEqIntervals */ "./src/renderer/viz/expressions/classification/ViewportEqIntervals.js");
+/* harmony import */ var _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./expressions/classification/ViewportQuantiles */ "./src/renderer/viz/expressions/classification/ViewportQuantiles.js");
+/* harmony import */ var _expressions_classification_ViewportStandardDev__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./expressions/classification/ViewportStandardDev */ "./src/renderer/viz/expressions/classification/ViewportStandardDev.js");
+/* harmony import */ var _expressions_Ramp__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./expressions/Ramp */ "./src/renderer/viz/expressions/Ramp.js");
+/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
+/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
+/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
+/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
+/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
+/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
+/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportAvg */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMax */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMin */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportSum */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportCount */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportPercentile */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportHistogram */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalAvg */ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalCount */ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMax */ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMin */ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
+/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
+/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
+/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
+/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
+/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_61__ = __webpack_require__(/*! ./expressions/Zoomrange */ "./src/renderer/viz/expressions/Zoomrange.js");
+/* harmony import */ var _expressions_Scaled__WEBPACK_IMPORTED_MODULE_62__ = __webpack_require__(/*! ./expressions/Scaled */ "./src/renderer/viz/expressions/Scaled.js");
+/* harmony import */ var _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_63__ = __webpack_require__(/*! ./expressions/AlphaNormalize */ "./src/renderer/viz/expressions/AlphaNormalize.js");
+/* harmony import */ var _expressions_basic_List__WEBPACK_IMPORTED_MODULE_64__ = __webpack_require__(/*! ./expressions/basic/List */ "./src/renderer/viz/expressions/basic/List.js");
 /**
  *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
  *  A viz has the following properties:
@@ -12097,34 +12143,30 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
 /* Expose classes as constructor functions */
 
 const transition = (...args) => new _expressions_transition__WEBPACK_IMPORTED_MODULE_0__["default"](...args);
 
-const array = (...args) => new _expressions_basic_array__WEBPACK_IMPORTED_MODULE_1__["default"](...args);
-
-const in_ = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__["In"](...args);
-const nin = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_2__["Nin"](...args);
+const in_ = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["In"](...args);
+const nin = (...args) => new _expressions_belongs__WEBPACK_IMPORTED_MODULE_1__["Nin"](...args);
 
 
-const between = (...args) => new _expressions_between__WEBPACK_IMPORTED_MODULE_3__["default"](...args);
+const between = (...args) => new _expressions_between__WEBPACK_IMPORTED_MODULE_2__["default"](...args);
 
-const mul = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Mul"](...args);
-const div = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Div"](...args);
-const add = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Add"](...args);
-const sub = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Sub"](...args);
-const pow = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Pow"](...args);
-const mod = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Mod"](...args);
-const greaterThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["GreaterThan"](...args);
-const greaterThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["GreaterThanOrEqualTo"](...args);
-const lessThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["LessThan"](...args);
-const lessThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["LessThanOrEqualTo"](...args);
-const equals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Equals"](...args);
-const notEquals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["NotEquals"](...args);
-const and = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["And"](...args);
-const or = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_4__["Or"](...args);
+const mul = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Mul"](...args);
+const div = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Div"](...args);
+const add = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Add"](...args);
+const sub = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Sub"](...args);
+const pow = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Pow"](...args);
+const mod = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Mod"](...args);
+const greaterThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["GreaterThan"](...args);
+const greaterThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["GreaterThanOrEqualTo"](...args);
+const lessThan = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["LessThan"](...args);
+const lessThanOrEqualTo = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["LessThanOrEqualTo"](...args);
+const equals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Equals"](...args);
+const notEquals = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["NotEquals"](...args);
+const and = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["And"](...args);
+const or = (...args) => new _expressions_binary__WEBPACK_IMPORTED_MODULE_3__["Or"](...args);
 const gt = greaterThan;
 const gte = greaterThanOrEqualTo;
 const lt = lessThan;
@@ -12132,145 +12174,145 @@ const lte = lessThanOrEqualTo;
 const eq = equals;
 const neq = notEquals;
 
-const blend = (...args) => new _expressions_blend__WEBPACK_IMPORTED_MODULE_5__["default"](...args);
+const blend = (...args) => new _expressions_blend__WEBPACK_IMPORTED_MODULE_4__["default"](...args);
 
-const buckets = (...args) => new _expressions_buckets__WEBPACK_IMPORTED_MODULE_6__["default"](...args);
+const buckets = (...args) => new _expressions_buckets__WEBPACK_IMPORTED_MODULE_5__["default"](...args);
 
-const cielab = (...args) => new _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_8__["default"](...args);
+const cielab = (...args) => new _expressions_color_CIELab__WEBPACK_IMPORTED_MODULE_7__["default"](...args);
 
-const clusterAvg = (...args) => new _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_9__["default"](...args);
-const clusterMax = (...args) => new _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_10__["default"](...args);
-const clusterMin = (...args) => new _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_11__["default"](...args);
-const clusterMode = (...args) => new _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_12__["default"](...args);
-const clusterSum = (...args) => new _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_13__["default"](...args);
-const clusterCount = (...args) => new _expressions_aggregation_cluster_ClusterCount__WEBPACK_IMPORTED_MODULE_14__["default"](...args);
+const clusterAvg = (...args) => new _expressions_aggregation_cluster_ClusterAvg__WEBPACK_IMPORTED_MODULE_8__["default"](...args);
+const clusterMax = (...args) => new _expressions_aggregation_cluster_ClusterMax__WEBPACK_IMPORTED_MODULE_9__["default"](...args);
+const clusterMin = (...args) => new _expressions_aggregation_cluster_ClusterMin__WEBPACK_IMPORTED_MODULE_10__["default"](...args);
+const clusterMode = (...args) => new _expressions_aggregation_cluster_ClusterMode__WEBPACK_IMPORTED_MODULE_11__["default"](...args);
+const clusterSum = (...args) => new _expressions_aggregation_cluster_ClusterSum__WEBPACK_IMPORTED_MODULE_12__["default"](...args);
+const clusterCount = (...args) => new _expressions_aggregation_cluster_ClusterCount__WEBPACK_IMPORTED_MODULE_13__["default"](...args);
 
-const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](...args);
+const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](...args);
 
-const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
-const imageList = (...args) => new _expressions_ImageList__WEBPACK_IMPORTED_MODULE_60__["default"](...args);
+const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
 
-const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](...args);
+const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
 
-const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_16__["default"](...args);
+const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__["default"](...args);
 
-const hsl = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_17__["HSL"](...args);
-const hsla = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_17__["HSLA"](...args);
+const hsl = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__["HSL"](...args);
+const hsla = (...args) => new _expressions_color_hsl__WEBPACK_IMPORTED_MODULE_16__["HSLA"](...args);
 
-const hsv = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_18__["HSV"](...args);
-const hsva = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_18__["HSVA"](...args);
+const hsv = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__["HSV"](...args);
+const hsva = (...args) => new _expressions_color_hsv__WEBPACK_IMPORTED_MODULE_17__["HSVA"](...args);
 
-const cubic = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_19__["Cubic"](...args);
-const ilinear = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_19__["ILinear"](...args);
+const cubic = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__["Cubic"](...args);
+const ilinear = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__["ILinear"](...args);
 
-const linear = (...args) => new _expressions_linear__WEBPACK_IMPORTED_MODULE_20__["default"](...args);
+const linear = (...args) => new _expressions_linear__WEBPACK_IMPORTED_MODULE_19__["default"](...args);
+const list = (...args) => new _expressions_basic_List__WEBPACK_IMPORTED_MODULE_64__["default"](...args);
 
-const namedColor = (...args) => new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_21__["default"](...args);
+const namedColor = (...args) => new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__["default"](...args);
 
-const now = (...args) => new _expressions_now__WEBPACK_IMPORTED_MODULE_22__["default"](...args);
+const now = (...args) => new _expressions_now__WEBPACK_IMPORTED_MODULE_21__["default"](...args);
 
-const number = (...args) => new _expressions_basic_number__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
+const number = (...args) => new _expressions_basic_number__WEBPACK_IMPORTED_MODULE_22__["default"](...args);
 
-const opacity = (...args) => new _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_24__["default"](...args);
+const opacity = (...args) => new _expressions_color_Opacity__WEBPACK_IMPORTED_MODULE_23__["default"](...args);
 
-const asc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["Asc"](...args);
-const desc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["Desc"](...args);
-const noOrder = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["NoOrder"](...args);
-const width = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_25__["Width"](...args);
+const asc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Asc"](...args);
+const desc = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Desc"](...args);
+const noOrder = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["NoOrder"](...args);
+const width = (...args) => new _expressions_ordering__WEBPACK_IMPORTED_MODULE_24__["Width"](...args);
 
-const reverse = _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_27__["default"];
+const reverse = _expressions_reverse_reverse__WEBPACK_IMPORTED_MODULE_26__["default"];
 
-const property = (...args) => new _expressions_basic_property__WEBPACK_IMPORTED_MODULE_28__["default"](...args);
-
-
-const globalQuantiles = (...args) => new _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_30__["default"](...args);
-const viewportQuantiles = (...args) => new _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_33__["default"](...args);
-
-const globalEqIntervals = (...args) => new _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_29__["default"](...args);
-const viewportEqIntervals = (...args) => new _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_32__["default"](...args);
-
-const globalStandardDev = (...args) => new _expressions_classification_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_31__["default"](...args);
-const viewportStandardDev = (...args) => new _expressions_classification_ViewportStandardDev__WEBPACK_IMPORTED_MODULE_34__["default"](...args);
-
-const ramp = (...args) => new _expressions_ramp__WEBPACK_IMPORTED_MODULE_35__["default"](...args);
-
-const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__["RGB"](...args);
-const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__["RGBA"](...args);
-
-const category = (...args) => new _expressions_basic_category__WEBPACK_IMPORTED_MODULE_7__["default"](...args);
-
-const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
+const property = (...args) => new _expressions_basic_property__WEBPACK_IMPORTED_MODULE_27__["default"](...args);
 
 
-const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_38__["default"](...args);
+const globalQuantiles = (...args) => new _expressions_classification_GlobalQuantiles__WEBPACK_IMPORTED_MODULE_29__["default"](...args);
+const viewportQuantiles = (...args) => new _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_32__["default"](...args);
 
-const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_39__["Fade"](...args);
-const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_40__["Animation"](...args);
+const globalEqIntervals = (...args) => new _expressions_classification_GlobalEqIntervals__WEBPACK_IMPORTED_MODULE_28__["default"](...args);
+const viewportEqIntervals = (...args) => new _expressions_classification_ViewportEqIntervals__WEBPACK_IMPORTED_MODULE_31__["default"](...args);
 
-const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Log"](...args);
-const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sqrt"](...args);
-const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sin"](...args);
-const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Cos"](...args);
-const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Tan"](...args);
-const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sign"](...args);
-const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Abs"](...args);
-const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["IsNaN"](...args);
-const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Not"](...args);
-const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Floor"](...args);
-const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Ceil"](...args);
+const globalStandardDev = (...args) => new _expressions_classification_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_30__["default"](...args);
+const viewportStandardDev = (...args) => new _expressions_classification_ViewportStandardDev__WEBPACK_IMPORTED_MODULE_33__["default"](...args);
 
-const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_42__["default"])(...args);
+const ramp = (...args) => new _expressions_Ramp__WEBPACK_IMPORTED_MODULE_34__["default"](...args);
+
+const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__["RGB"](...args);
+const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__["RGBA"](...args);
+
+const category = (...args) => new _expressions_basic_category__WEBPACK_IMPORTED_MODULE_6__["default"](...args);
+
+const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_36__["default"](...args);
 
 
-const viewportAvg = (...args) => new _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_43__["default"](...args);
-const viewportMax = (...args) => new _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_44__["default"](...args);
-const viewportMin = (...args) => new _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_45__["default"](...args);
-const viewportSum = (...args) => new _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_46__["default"](...args);
-const viewportCount = (...args) => new _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_47__["default"](...args);
-const viewportPercentile = (...args) => new _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
-const viewportHistogram = (...args) => new _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_49__["default"](...args);
-const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
-const globalAvg = (...args) => new _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_50__["default"](...args);
-const globalMax = (...args) => new _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
-const globalMin = (...args) => new _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_53__["default"](...args);
-const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
-const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_51__["default"](...args);
-const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
+const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
 
-const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
-const scaled = (...args) => new _expressions_Scaled__WEBPACK_IMPORTED_MODULE_64__["default"](...args);
-const zoomrange = (...args) => new _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_63__["default"](...args);
+const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_38__["Fade"](...args);
+const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_39__["Animation"](...args);
 
-const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
-const alphaNormalize = (...args) => new _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_65__["default"](...args);
+const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Log"](...args);
+const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sqrt"](...args);
+const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sin"](...args);
+const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Cos"](...args);
+const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Tan"](...args);
+const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sign"](...args);
+const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Abs"](...args);
+const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["IsNaN"](...args);
+const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Not"](...args);
+const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Floor"](...args);
+const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Ceil"](...args);
 
-const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](Number.MAX_SAFE_INTEGER);
-const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](1);
-const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](0);
-const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](Math.PI);
-const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_15__["default"](Math.E);
+const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_41__["default"])(...args);
 
-const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].bicycle);
-const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].building);
-const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].bus);
-const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].car);
-const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].circle);
-const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].circleOutline);
-const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].cross);
-const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].flag);
-const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].house);
-const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].marker);
-const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].markerOutline);
-const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].plus);
-const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].square);
-const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].squareOutline);
-const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].star);
-const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].starOutline);
-const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].triangle);
-const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_61__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_62__["default"].triangleOutline);
 
-const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_58__["default"](constant(0), constant(0));
-const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_58__["default"](constant(0), constant(1));
+const viewportAvg = (...args) => new _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_42__["default"](...args);
+const viewportMax = (...args) => new _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_43__["default"](...args);
+const viewportMin = (...args) => new _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_44__["default"](...args);
+const viewportSum = (...args) => new _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_45__["default"](...args);
+const viewportCount = (...args) => new _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_46__["default"](...args);
+const viewportPercentile = (...args) => new _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_47__["default"](...args);
+const viewportHistogram = (...args) => new _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
+const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
+const globalAvg = (...args) => new _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_49__["default"](...args);
+const globalMax = (...args) => new _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_51__["default"](...args);
+const globalMin = (...args) => new _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
+const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_53__["default"](...args);
+const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_50__["default"](...args);
+const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+
+const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
+const scaled = (...args) => new _expressions_Scaled__WEBPACK_IMPORTED_MODULE_62__["default"](...args);
+const zoomrange = (...args) => new _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_61__["default"](...args);
+
+const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
+const alphaNormalize = (...args) => new _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_63__["default"](...args);
+
+const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Number.MAX_SAFE_INTEGER);
+const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](1);
+const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](0);
+const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.PI);
+const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.E);
+
+const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bicycle);
+const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].building);
+const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bus);
+const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].car);
+const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circle);
+const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circleOutline);
+const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].cross);
+const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].flag);
+const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].house);
+const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].marker);
+const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].markerOutline);
+const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].plus);
+const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].square);
+const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].squareOutline);
+const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].star);
+const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].starOutline);
+const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangle);
+const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangleOutline);
+
+const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](constant(0), constant(0));
+const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](constant(0), constant(1));
 
 
 
@@ -12716,6 +12758,168 @@ class Animation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/renderer/viz/expressions/CategoryIndex.js":
+/*!*******************************************************!*\
+  !*** ./src/renderer/viz/expressions/CategoryIndex.js ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CategoryIndex; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
+
+/**
+* Transform a categorical property into a per-property category index. The evaluated result returns a value between 0 and 1.
+* The dataset must contain less than 65536 (256 * 256) different categories.
+*
+* @param {Category} property - The property to be evaluated, must be categorical
+* @return {Category}
+*
+* @example <caption> Color by $city using the CARTOColor Prism by assigning different color in Prism to each category.</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz({
+*   color: s.ramp(s.categoryIndex(s.prop('city')), s.palettes.PRISM)
+* });
+*
+* @example <caption> Color by $city using the CARTOColor Prism by assigning different color in Prism to each category. (String)</caption>
+* const viz = new carto.Viz(`
+*   color: ramp(categoryIndex($city), PRISM)
+* `);
+*
+* @memberof carto.expressions
+* @name categoryIndex
+* @function
+* @api
+*/
+class CategoryIndex extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (property) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'categoryIndex');
+
+        property = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(property);
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('categoryIndex', 'property', 0, property);
+        super({ property });
+        this._numTranslatedCategories = null;
+        this.type = 'category';
+
+        this._translatePixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
+        this._translateArray = [];
+        this._numTranslatedCategories = 0;
+        this._numTranslatedCategoriesGL = 0;
+    }
+
+    get numCategories () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        return metaColumn.categories.length;
+    }
+
+    get numCategoriesWithoutOthers () {
+        return this.numCategories;
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('categoryIndex', 'property', 0, 'category', this.property);
+        this._metadata = metadata;
+        this._calcTranslated();
+    }
+
+    eval (feature) {
+        const name = this.property.eval(feature);
+        const id = this._metadata.categoryToID.get(name);
+
+        return this._translateArray[id];
+    }
+
+    _preDraw (program, drawMetadata, gl) {
+        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+
+        if (this._numTranslatedCategoriesGL !== this.numCategories) {
+            this._numTranslatedCategoriesGL = this.numCategories;
+            this._calcTranslated();
+            this._translateTexture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, this._translatePixels);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        } else {
+            gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
+        }
+
+        gl.uniform1i(this._getBinding(program).texRampTranslateLoc, drawMetadata.freeTexUnit);
+        drawMetadata.freeTexUnit++;
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const max = SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20);
+        const property = this.property._applyToShaderSource(getGLSLforProperty);
+        return {
+            inline: `ramp_translate${this._uid}(${property.inline})`,
+            preface: `
+                    uniform sampler2D texRampTranslate${this._uid};
+                    float ramp_translate${this._uid}(float s){
+                        vec2 v = vec2(mod(s, ${max}), floor(s / ${max}));
+                        return texture2D(texRampTranslate${this._uid}, v/${max}).a;
+                    }`
+        };
+    }
+
+    _postShaderCompile (program, gl) {
+        this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
+    }
+
+    _calcTranslated () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        const numCategories = this.numCategories;
+
+        if (this._numTranslatedCategories !== numCategories) {
+            this._numTranslatedCategories = numCategories;
+
+            for (let i = 0; i < numCategories; i++) {
+                const id = this._metadata.categoryToID.get(metaColumn.categories[i].name);
+                const value = i / (numCategories - 1);
+                const vec2Id = {
+                    x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
+                    y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
+                };
+
+                this._translatePixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
+                this._translateArray.push(value);
+            }
+        }
+    }
+
+    getLegendData () {
+        const categories = this._metadata.properties[this.property.name].categories;
+        const categoriesLength = categories.length;
+        const divisor = categoriesLength - 1;
+        const data = [];
+
+        for (let i = 0; i < categoriesLength; i++) {
+            const category = categories[i];
+            const key = category.name;
+            const value = i / divisor;
+
+            data.push({ key, value });
+        }
+
+        return { data };
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/renderer/viz/expressions/Fade.js":
 /*!**********************************************!*\
   !*** ./src/renderer/viz/expressions/Fade.js ***!
@@ -12860,7 +13064,7 @@ class Image extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super({});
         this.type = 'image';
         this.canvas = null;
-        this._url = url;
+        this.url = url;
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
@@ -12870,7 +13074,7 @@ class Image extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             };
             this.image.onerror = reject;
             this.image.crossOrigin = 'anonymous';
-            this.image.src = this._url;
+            this.image.src = this.url;
         });
     }
 
@@ -12879,7 +13083,9 @@ class Image extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         return this._promise;
     }
 
-    eval () {}
+    eval () {
+        return this.url;
+    }
 
     _free (gl) {
         if (this.texture) {
@@ -12943,16 +13149,16 @@ function _getCanvasFromImage (img) {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/ImageList.js":
+/***/ "./src/renderer/viz/expressions/ListImage.js":
 /*!***************************************************!*\
-  !*** ./src/renderer/viz/expressions/ImageList.js ***!
+  !*** ./src/renderer/viz/expressions/ListImage.js ***!
   \***************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ImageList; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ListImage; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 
@@ -12965,26 +13171,15 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @internal
  */
-class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (imageArray) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'imageList');
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkArray"])('imageArray', 'imageArray', 0, imageArray);
-
-        imageArray.forEach((image, i) => Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('imageArray', `imageArray[${i}]`, 0, image));
-
-        const children = {};
-
-        imageArray.forEach((image, i) => {
-            children[`image${i}`] = image;
-        });
-        super(children);
-        this.numImages = imageArray.length;
-        this.type = 'image-list';
-    }
-
+class ListImage extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     _bindMetadata (meta) {
         super._bindMetadata(meta);
+        this.numImages = this.elems.length;
         this._getChildren().forEach((image, i) => Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('imageArray', `imageArray[${i}]`, 0, 'image', image));
+    }
+
+    eval (feature) {
+        return this.elems.map(elem => elem.eval(feature));
     }
 
     _applyToShaderSource () {
@@ -12992,8 +13187,8 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             preface: this._prefaceCode(`
                 uniform sampler2D atlas${this._uid};
 
-                vec4 atlas${this._uid}Fn(vec2 imageUV, float cat) {
-                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
+                vec4 atlas${this._uid}Fn(vec2 imageUV, float category) {
+                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(category, 16.), floor(category/16.))/16. ).rgba;
                 }
             `),
             inline: `atlas${this._uid}Fn`
@@ -13007,7 +13202,7 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     _preDraw (program, drawMetadata, gl) {
         this.init = true;
         for (let i = 0; i < this.numImages; i++) {
-            const image = this[`image${i}`];
+            const image = this[`image-${i}`];
             this.init = this.init && image.canvas;
         }
 
@@ -13028,7 +13223,7 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             let offsetX = 0;
             let offsetY = 0;
             for (let i = 0; i < this.numImages; i++) {
-                const image = this[`image${i}`];
+                const image = this[`image-${i}`];
                 // get image, push image to texture atlas
                 gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, image.canvas);
                 offsetX += imageSize;
@@ -13037,8 +13232,6 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                     offsetX = 0;
                     offsetY += imageSize;
                 }
-
-                image.canvas = null;
             }
 
             gl.generateMipmap(gl.TEXTURE_2D);
@@ -13050,6 +13243,714 @@ class ImageList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
             drawMetadata.freeTexUnit++;
         }
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/Ramp.js":
+/*!**********************************************!*\
+  !*** ./src/renderer/viz/expressions/Ramp.js ***!
+  \**********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Ramp; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _RampImage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./RampImage */ "./src/renderer/viz/expressions/RampImage.js");
+/* harmony import */ var _RampGeneric__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./RampGeneric */ "./src/renderer/viz/expressions/RampGeneric.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
+
+
+
+
+
+
+/**
+* Create a ramp: a mapping between an input (numeric or categorical) and an output (number, colors and/or images)
+*
+* When the input has the same number of categories (without taking the "others" category into account).
+* Then, each input category will have a one to one match with an output value.
+*
+* Some case examples:
+* `ramp(buckets($product, ['A, 'B', 'C']), [house, car, bus])`
+* `ramp(buckets($price, [20, 50, 120]), [1, 10, 4, 12])`
+* `ramp(top($product, 3), [blue, yellow, green])`
+* `ramp(globalQuantiles($price, 3), [red, yellow, green])`
+*
+* When the input has different number of categories or the input is a linear expression.
+* Then it will interpolate the output values (Note: this is not supported if output values are images)
+*
+* Some case examples:
+* `ramp(linear($price, 1, 10) [green, yellow, red])`
+* `ramp(buckets($product, ['A, 'B', 'C'], [red, blue]))
+* - When the input is a categorical property, we wrap it automatically in a CategoryIndex expression
+* `ramp($product, Prism)` (equivalent to `ramp($categoryIndex($product)), Prism)`
+* - When the input is a numeric property, we wrap it automatically in a Linear expression.
+* `ramp($price, Prism)` (equivalent to `ramp($linear($price)), Prism)`
+*
+* The "others" value is setted by default, depending on the output type:
+* - If it is "Number", the "others" value is 1.
+* - If it is "Color" from a color array (i.e: [red, yellow, green]), the "others" value is the gray color.
+* - If it is "Color" from a cartocolor palette (i.e: Prism), the "others" value is the last color of the palette.
+* - If it is "Image", the "others" value is a circle.
+*
+* If we add a third parameter, the "others" default value will be overridden by this one
+*
+* @param {Number|Category} input - The input expression to give a color
+* @param {Palette|Color[]|Number[]} palette - The color palette that is going to be used
+* @param {Number|Color|Image} [others] - Value that overrides the default value for "others"
+* @return {Number|Color|Image}
+*
+* @example <caption>Mapping categories to numbers, colors and images.</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz({
+*   width: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [1, 2, 3])
+*   color: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), s.palettes.PRISM)
+*   strokeColor: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor('green')])
+*   symbol: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.HOUSE, s.CAR, s.BUS])
+* });
+*
+* @example <caption>Mapping categories to numbers, colors and images. (String)</caption>
+* const viz = new carto.Viz(`
+*   width: ramp(buckets($product), ['A, 'B', 'C']), [1, 2, 3])
+*   color: ramp(buckets($product), ['A, 'B', 'C']), Prism)
+*   strokeColor: ramp(buckets($product), ['A, 'B', 'C']), [red, yellow, green])
+*   symbol: ramp(buckets($product), ['A, 'B', 'C']), [house, car, bus])
+* `);
+*
+* @example <caption>Mapping classified numeric properties to numbers, colors and images.</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz({
+*   width: s.ramp(s.buckets(s.prop('price'), [40, 100]), [1, 2, 3])
+*   color: s.ramp(s.buckets(s.prop('price'), [40, 100]), s.palettes.PRISM)
+*   strokeColor: s.ramp(s.buckets(s.prop('price'), [40, 100]), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor(green)])
+*   symbol: s.ramp(s.buckets(s.prop('price'), [40, 100]), [s.HOUSE), s.CAR, s.BUS])
+* });
+*
+* @example <caption>Mapping classified numeric properties to numbers, colors and images. (String)</caption>
+* const viz = new carto.Viz(`
+*   width: ramp(buckets($price, [40, 100]), [1, 2, 3])
+*   color: ramp(buckets($price, [40, 100]), Prism)
+*   strokeColor: ramp(buckets($price, [40, 100]), [red, yellow, green])
+*   symbol: ramp(buckets($price, [40, 100]), [house, car, bus])
+* `);
+*
+* @example <caption>Override default values.</caption>
+* const s = carto.expressions;
+* const viz = new carto.Viz({
+*   width: s.ramp(s.top(s.prop('price'), 3), [1, 2, 3], 0)
+*   strokeColor: s.ramp(s.top(s.prop('price'), 3), Prism, s.namedColor('red'))
+*   color: s.ramp(s.top(s.prop('price'), 3), [s.namedColor('blue'), s.namedColor('red'), s.namedColor('yellow')], s.namedColor(black))
+*   symbol: s.ramp(s.top(s.prop('price'), 3), [s.HOUSE, s.CAR, s.BUS], s.CROSS)
+* });
+*
+* @example <caption>Override default values. (String)</caption>
+* const viz = new carto.Viz(`
+*   width: ramp(top($price, 3), [1, 2, 3], 0)
+*   strokeColor: ramp(top($price, 3), Prism, red)
+*   color: ramp(top($price, 3), [blue, red, yellow], black)
+*   symbol: ramp(top($price, 3), [house, car, bus], cross)
+* `);
+*
+* @memberof carto.expressions
+* @name ramp
+* @function
+* @api
+*/
+class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (input, palette, others = _constants__WEBPACK_IMPORTED_MODULE_4__["DEFAULT_RAMP_OTHERS"]) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'ramp');
+
+        input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
+        palette = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(palette);
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('ramp', 'input', 0, input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('ramp', 'palette', 1, palette);
+
+        if (others !== _constants__WEBPACK_IMPORTED_MODULE_4__["DEFAULT_RAMP_OTHERS"]) {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('ramp', 'others', 2, others);
+        }
+
+        super({ input, palette });
+        this.palette = palette;
+        this.others = others;
+        this._defaultOthers = others === _constants__WEBPACK_IMPORTED_MODULE_4__["DEFAULT_RAMP_OTHERS"];
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        switch (this.palette.type) {
+            case 'image-list':
+                Object.setPrototypeOf(this, _RampImage__WEBPACK_IMPORTED_MODULE_2__["default"].prototype);
+                break;
+            default:
+                Object.setPrototypeOf(this, _RampGeneric__WEBPACK_IMPORTED_MODULE_3__["default"].prototype);
+                break;
+        }
+
+        return this._bindMetadata(metadata);
+    }
+
+    /**
+     * Get a legend for the ramp.
+     *
+     * Note: This method works only for feature property independent outputs.
+     * Example:
+     * - This works: `ramp($price, [5, 15])`
+     * - This does not work: `ramp($price, [5, $amount])`
+     *
+     * @param {object} config - Optional configuration
+     * @param {string} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
+     * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
+     * @return {object} - { type, data }. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
+     *
+     * @example <caption>Get legend for a color ramp of a categorical property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.prop('vehicles'), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: '$vehicles',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a color ramp of a categorical property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp($vehicles, PRISM)
+     * ´);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: '$vehicles',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for an image ramp of a categorical property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   symbol: s.ramp(s.prop('vehicles'), [s.BICYCLE, s.CAR, s.BUS])
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.symbol.getLegend();
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: '$vehicles',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: busImageUrl },
+     *   //       { key: 'CARTO_VL_OTHERS', value: circleImageUrl }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for an image ramp of a categorical property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   symbol: ramp('$vehicles'), [BICYCLE, CAR, BUS])
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.symbol.getLegend();
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: '$vehicles',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: bicycleImageUrl },
+     *   //       { key: 'Car', value: carImageUrl },
+     *   //       { key: 'Bus', value: busImageUrl },
+     *   //       { key: 'CARTO_VL_OTHERS', value: circleImageUrl }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend of a ramp top expression and set "others" label.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.top(s.prop('vehicles')), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend({
+     *      othersLabel: 'Other Vehicles'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: 'top($vehicles)',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend of a ramp top expression and set "others" label. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(top($vehicles, 5), PRISM)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend({
+     *      othersLabel: 'Other Vehicles'
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'category',
+     *   //    name: 'top($vehicles)',
+     *   //    data: [
+     *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a linear ramp expression and set number of samples.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear(s.prop('numvehicles'), 1, 100), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend({
+     *       samples: 4
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'linear($numvehicles, 1, 100)',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a linear ramp expression and set number of samples. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($numvehicles, 1, 100), PRISM)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend({
+     *       samples: 4
+     *   });
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'linear($numvehicles, 1, 100)',
+     *   //    data: [
+     *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a buckets ramp expression.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.buckets((s.prop('numvehicles'), [1, 2, 3]), s.palettes.PRISM))
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'buckets($numvehicles, [1, 2, 3])',
+     *   //    data: [
+     *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a buckets ramp expression. (String)</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   color: ramp(buckets($numvehicles', [1, 2, 3]), Prism))
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'buckets($numvehicles, [1, 2, 3])',
+     *   //    data: [
+     *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a classifier ramp expression.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.globalEqIntervals(s.prop('numvehicles'), 4), s.palettes.PRISM)
+     * });
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'globalEqIntervals($numvehicles, 4)',
+     *   //    data: [
+     *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @example <caption>Get legend for a classifier ramp expression. (String)</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   color: ramp(globalEqIntervals($numvehicles, 4), Prism)
+     * `);
+     *
+     * layer.on('loaded', () => {
+     *   const legend = layer.viz.color.getLegend();
+     *
+     *   // legend = {
+     *   //    type: 'number',
+     *   //    name: 'globalEqIntervals($numvehicles, 4)',
+     *   //    data: [
+     *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //     ]
+     *   // }
+     * });
+     *
+     * @memberof carto.expressions.Ramp
+     * @name getLegend
+     * @instance
+     * @api
+     */
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/RampGeneric.js":
+/*!*****************************************************!*\
+  !*** ./src/renderer/viz/expressions/RampGeneric.js ***!
+  \*****************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RampGeneric; });
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _linear__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./linear */ "./src/renderer/viz/expressions/linear.js");
+/* harmony import */ var _color_CIELab_glsl__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./color/CIELab.glsl */ "./src/renderer/viz/expressions/color/CIELab.glsl");
+/* harmony import */ var _color_CIELab_glsl__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_color_CIELab_glsl__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _CategoryIndex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CategoryIndex */ "./src/renderer/viz/expressions/CategoryIndex.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+/* harmony import */ var _color_palettes_Palette__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./color/palettes/Palette */ "./src/renderer/viz/expressions/color/palettes/Palette.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _basic_constant__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./basic/constant */ "./src/renderer/viz/expressions/basic/constant.js");
+/* harmony import */ var _color_NamedColor__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
+
+
+
+
+
+
+
+
+
+
+
+
+class RampGeneric extends _base__WEBPACK_IMPORTED_MODULE_7__["default"] {
+    _bindMetadata (metadata) {
+        const DEFAULT_RAMP_OTHERS_NUMBER = new _basic_constant__WEBPACK_IMPORTED_MODULE_8__["default"](1);
+        const DEFAULT_RAMP_OTHERS_COLOR = new _color_NamedColor__WEBPACK_IMPORTED_MODULE_9__["default"]('gray');
+
+        super._bindMetadata(metadata);
+
+        this.type = this.palette.childType;
+        if (this.others === _constants__WEBPACK_IMPORTED_MODULE_5__["DEFAULT_RAMP_OTHERS"]) {
+            this.others = this.palette.type === 'number-list'
+                ? DEFAULT_RAMP_OTHERS_NUMBER
+                : DEFAULT_RAMP_OTHERS_COLOR;
+        } else {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])('ramp', 'others', 2, this.palette.childType, this.others);
+        }
+
+        if (this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_1__["default"])) {
+            this.input = this.input.type === 'number'
+                ? new _linear__WEBPACK_IMPORTED_MODULE_2__["default"](this.input)
+                : new _CategoryIndex__WEBPACK_IMPORTED_MODULE_4__["default"](this.input);
+
+            this.input._bindMetadata(metadata);
+        }
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])('ramp', 'input', 0, ['number', 'category'], this.input);
+
+        this.others._bindMetadata(metadata);
+        this.childrenNames.push('others');
+        this._metadata = metadata;
+    }
+
+    eval (feature) {
+        const input = this.input.eval(feature);
+        return this._calcEval(input, feature);
+    }
+
+    _calcEval (input, feature) {
+        const { palette, others } = this._getPalette();
+        const paletteValues = this.palette.isA(_color_palettes_Palette__WEBPACK_IMPORTED_MODULE_6__["default"])
+            ? palette.map((color) => color.eval(feature))
+            : this.palette.eval(feature);
+
+        if (input === _constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_INDEX"]) {
+            return others.eval(feature);
+        }
+
+        const maxValues = paletteValues.length - 1;
+        const min = Math.floor(input * maxValues);
+        const max = Math.ceil(input * maxValues);
+        const m = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["fract"])(input * maxValues);
+
+        return Object(_utils__WEBPACK_IMPORTED_MODULE_0__["mix"])(paletteValues[min], paletteValues[max], m);
+    }
+
+    getLegend (options) {
+        const config = Object.assign({}, _constants__WEBPACK_IMPORTED_MODULE_5__["DEFAULT_OPTIONS"], options);
+        const type = this.input.type;
+        const legendData = this.input.getLegendData(config);
+        const data = legendData.data.map(({key, value}) => {
+            value = this._calcEval(value, undefined);
+            return { key, value };
+        });
+
+        return { type, ...legendData, data };
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const input = this.input._applyToShaderSource(getGLSLforProperty);
+        const { palette, others } = this._getPalette();
+        const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
+        const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
+        const GLSLBlend = this.palette.type === 'number-list'
+            ? _getInlineGLSLBlend(GLSLPalette)
+            : _getInlineColorGLSLBlend(GLSLPalette);
+
+        const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
+        const inline = `ramp_color${this._uid}(${input.inline})`;
+
+        const preface = this._prefaceCode(`
+            ${input.preface}
+            ${_color_CIELab_glsl__WEBPACK_IMPORTED_MODULE_3___default.a}
+            ${GLSLPalette.map(elem => elem.preface).join('\n')}
+            ${GLSLOthers.preface}
+
+            ${rampFnReturnType} ramp_color${this._uid}(float x){
+                return x==${_constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_GLSL_VALUE"]}
+                    ? ${GLSLOthers.inline}
+                    : ${GLSLBlend};
+            }`
+        );
+
+        return { preface, inline };
+    }
+
+    _getPalette () {
+        return this.palette.isA(_color_palettes_Palette__WEBPACK_IMPORTED_MODULE_6__["default"])
+            ? this._getColorPalette()
+            : { palette: this.palette.elems, others: this.others };
+    }
+
+    _getColorPalette () {
+        const subPalette = this.palette.getColors(this.input.numCategoriesWithoutOthers);
+
+        return {
+            palette: subPalette.colors,
+            others: this._defaultOthers && subPalette.othersColor ? subPalette.othersColor : this.others
+        };
+    }
+}
+
+function _getInlineGLSLBlend (GLSLPalette) {
+    return _generateGLSLBlend(GLSLPalette.map(elem => elem.inline));
+}
+
+function _getInlineColorGLSLBlend (GLSLPalette) {
+    return `cielabToSRGBA(${_generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`))})`;
+}
+
+function _generateGLSLBlend (list, index = 0) {
+    const currentValue = list[index];
+
+    if (index === list.length - 1) {
+        return currentValue;
+    }
+
+    const nextBlend = _generateGLSLBlend(list, index + 1);
+
+    return _mixClampGLSL(currentValue, nextBlend, index, list.length);
+}
+
+function _mixClampGLSL (currentValue, nextBlend, index, listLength) {
+    const min = (index / (listLength - 1)).toFixed(20);
+    const max = (1 / (listLength - 1)).toFixed(20);
+    const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
+
+    return `mix(${currentValue}, ${nextBlend}, ${clamp})`;
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/RampImage.js":
+/*!***************************************************!*\
+  !*** ./src/renderer/viz/expressions/RampImage.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RampImage; });
+/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
+/* harmony import */ var _CategoryIndex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./CategoryIndex */ "./src/renderer/viz/expressions/CategoryIndex.js");
+/* harmony import */ var _ListImage__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./ListImage */ "./src/renderer/viz/expressions/ListImage.js");
+/* harmony import */ var _SVG__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
+
+
+
+
+
+
+
+
+const DEFAULT_RAMP_OTHERS_IMAGE = new _SVG__WEBPACK_IMPORTED_MODULE_5__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_0__["default"].circle);
+class RampImage extends _base__WEBPACK_IMPORTED_MODULE_6__["default"] {
+    _bindMetadata (metadata) {
+        _base__WEBPACK_IMPORTED_MODULE_6__["default"].prototype._bindMetadata.call(this, metadata);
+        this.type = this.palette.childType;
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('ramp', 'input', 0, 'category', this.input);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkInstance"])('ramp', 'palette', 1, _ListImage__WEBPACK_IMPORTED_MODULE_4__["default"], this.palette);
+
+        if (this.others === _constants__WEBPACK_IMPORTED_MODULE_7__["DEFAULT_RAMP_OTHERS"]) {
+            this.others = DEFAULT_RAMP_OTHERS_IMAGE;
+        } else {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('ramp', 'others', 2, 'image', this.others);
+        }
+
+        if (this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_2__["default"])) {
+            this.input = new _CategoryIndex__WEBPACK_IMPORTED_MODULE_3__["default"](this.input);
+            this.input._bindMetadata(metadata);
+        }
+
+        this.others._bindMetadata(metadata);
+        this.childrenNames.push('others');
+    }
+
+    eval (feature) {
+        const index = this.input.eval(feature);
+        return this._calcEval(index);
+    }
+
+    _calcEval (input) {
+        const index = Math.round(input * (this.input.numCategoriesWithoutOthers - 1));
+        const paletteValues = this.palette.eval();
+        return paletteValues[index] || this.others.eval();
+    }
+
+    getLegend (options) {
+        const config = Object.assign({}, _constants__WEBPACK_IMPORTED_MODULE_7__["DEFAULT_OPTIONS"], options);
+        const type = this.input.type;
+        const legendData = this.input.getLegendData(config);
+        const data = legendData.data.map(({key, value}) => {
+            value = this._calcEval(value);
+            return { key, value };
+        });
+
+        return { type, ...legendData, data };
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const input = this.input._applyToShaderSource(getGLSLforProperty);
+        const images = this.palette._applyToShaderSource(getGLSLforProperty);
+        const others = this.others._applyToShaderSource(getGLSLforProperty);
+        return {
+            preface: this._prefaceCode(`
+                uniform float rampImageMultiplier${this._uid};
+
+                ${input.preface}
+                ${images.preface}
+                ${others.preface}
+
+                vec4 rampImage${this._uid}(vec2 imageUV, float index){
+                    if (index == ${_constants__WEBPACK_IMPORTED_MODULE_7__["OTHERS_GLSL_VALUE"]}){
+                        return ${others.inline};
+                    }
+                    return ${images.inline}(imageUV, rampImageMultiplier${this._uid}*index);
+                }
+            `),
+            inline: `rampImage${this._uid}(imageUV, ${input.inline})`
+        };
+    }
+
+    _postShaderCompile (program, gl) {
+        super._postShaderCompile(program, gl);
+        this._getBinding(program)._multiplierLoc = gl.getUniformLocation(program, `rampImageMultiplier${this._uid}`);
+    }
+
+    _preDraw (program, drawMetadata, gl) {
+        super._preDraw(program, drawMetadata, gl);
+        gl.uniform1f(this._getBinding(program)._multiplierLoc, this.input.numCategoriesWithoutOthers - 1);
     }
 }
 
@@ -13193,34 +14094,44 @@ class Zoomrange extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         zoomBreakpointList = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(zoomBreakpointList);
 
         super({});
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
         this.zoomBreakpointList = zoomBreakpointList;
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
     }
-    eval (feature) {
-        return this._impostor.eval(feature);
-    }
+
     _bindMetadata (metadata) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('zoomrange', 'zoomBreakpointList', 0, 'number-array', this.zoomBreakpointList);
+        this.zoomBreakpointList._bindMetadata(metadata);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
             throw new Error('zoomrange() function must receive a list with at least two elements');
         }
-        function genImpostor (list, numerator, denominator) {
-            if (list.length === 1) {
-                return 1;
-            }
-            const a = list[0];
-            const b = list[1];
-            list.shift();
-            return Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["blend"])(numerator / denominator,
-                genImpostor(list, numerator + 1, denominator),
-                Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["linear"])(Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["zoom"])()), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, a), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, b))
-            );
-        }
-        this._impostor = genImpostor([...this.zoomBreakpointList.elems], 0, this.zoomBreakpointList.elems.length - 1);
+
+        const breakpointListCopy = [...this.zoomBreakpointList.elems];
+
+        this._impostor = _genImpostor(breakpointListCopy, 0, breakpointListCopy.length - 1);
         this.childrenNames.push('_impostor');
         super._bindMetadata(metadata);
     }
+
+    eval (feature) {
+        return this._impostor.eval(feature);
+    }
+}
+
+function _genImpostor (list, numerator, denominator) {
+    if (list.length === 1) {
+        return 1;
+    }
+
+    const a = list[0];
+    const b = list[1];
+    list.shift();
+
+    return Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["blend"])(numerator / denominator,
+        _genImpostor(list, numerator + 1, denominator),
+        Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["linear"])(Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["zoom"])()), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, a), Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["pow"])(2, b))
+    );
 }
 
 
@@ -13265,6 +14176,9 @@ class ClusterAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     get numCategories () {
         return this.property.numCategories;
+    }
+    get categories () {
+        return this.property.categories;
     }
 
     eval (feature) {
@@ -14720,9 +15634,9 @@ class Base {
         this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+        this.expressionName = _toCamelCase(this.constructor.name);
     }
 
-    // eslint-disable-next-line no-unused-vars
     /**
      * Evaluate the expression providing a feature.
      * This is particularly useful for making legends.
@@ -14758,6 +15672,34 @@ class Base {
      */
     eval (feature) {
         throw new Error('Unimplemented');
+    }
+
+    /**
+     * Get the expression stringified
+     *
+     * @api
+     * @memberof carto.expressions.Base
+     * @returns {string}
+     *
+     * @example <caption>Get the stringified expression of the viz color property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear('amount'), s.palettes.PRISM)
+     * });
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     * @example <caption>Get the stringified expression of the viz color property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($amount), Prism)
+     * `);
+     *
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     */
+    toString () {
+        return `${this.expressionName}(${this._getChildren().map(child => child.toString()).join(', ')})`;
     }
 
     /**
@@ -14908,6 +15850,10 @@ class Base {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
 
+    get value () {
+        return this.eval();
+    }
+
     _getBinding (shader) {
         if (!this._shaderBindings.has(shader)) {
             this._shaderBindings.set(shader, {});
@@ -14959,76 +15905,125 @@ class Base {
     }
 }
 
+function _toCamelCase (str) {
+    if (str.toUpperCase() === str) {
+        return str.toLowerCase();
+    }
+    return str.charAt(0).toLowerCase() + str.slice(1);
+}
+
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/basic/array.js":
-/*!*****************************************************!*\
-  !*** ./src/renderer/viz/expressions/basic/array.js ***!
-  \*****************************************************/
+/***/ "./src/renderer/viz/expressions/basic/List.js":
+/*!****************************************************!*\
+  !*** ./src/renderer/viz/expressions/basic/List.js ***!
+  \****************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return BaseArray; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return List; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _ListImage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ListImage */ "./src/renderer/viz/expressions/ListImage.js");
+/* harmony import */ var _ListGeneric__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ListGeneric */ "./src/renderer/viz/expressions/basic/ListGeneric.js");
 
 
+
+
+
+const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image'];
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
  * @param {Number[]|Category[]|Color[]|Date[]|Image[]} elements
- * @returns {Array}
+ * @returns {List}
  *
  * @memberof carto.expressions
  * @name array
  * @function
  * @api
  */
-class BaseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class List extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (elems) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'array');
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'list');
 
-        elems = elems || [];
+        if (!elems) {
+            throw new Error('list(): invalid parameters: must receive at least one argument');
+        }
 
         if (!Array.isArray(elems)) {
             elems = [elems];
         }
 
         elems = elems.map(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"]);
+
         if (!elems.length) {
-            throw new Error('array(): invalid parameters: must receive at least one argument');
-        }
-
-        let type = '';
-
-        for (let elem of elems) {
-            type = elem.type;
-            if (elem.type !== undefined) {
-                break;
-            }
-        }
-
-        if (['number', 'category', 'color', 'time', 'image', undefined].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
+            throw new Error('list(): invalid parameters: must receive at least one argument');
         }
 
         elems.map((item, index) => {
-            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('array', `item[${index}]`, index, item);
-            if (item.type !== type && item.type !== undefined) {
-                throw new Error(`array(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type, invalid argument type combination`);
-            }
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('list', `item[${index}]`, index, item);
         });
 
         super(elems);
-
-        this.type = `${type}-array`;
         this.elems = elems;
     }
 
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        this._setTypes();
+
+        if (SUPPORTED_CHILD_TYPES.indexOf(this.childType) === -1) {
+            throw new Error(`list(): invalid parameters type: ${this.childType}`);
+        }
+
+        this.elems.map((item, index) => {
+            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('list', `item[${index}]`, index, item);
+
+            if (item.type !== this.childType) {
+                throw new Error(`list(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type, invalid argument type combination`);
+            }
+        });
+
+        switch (this.elems[0].type) {
+            case 'image':
+                Object.setPrototypeOf(this, _ListImage__WEBPACK_IMPORTED_MODULE_2__["default"].prototype);
+                break;
+            default:
+                Object.setPrototypeOf(this, _ListGeneric__WEBPACK_IMPORTED_MODULE_3__["default"].prototype);
+                break;
+        }
+
+        return this._bindMetadata(metadata);
+    }
+
+    _setTypes () {
+        this.childType = this.elems[0].type;
+        this.type = `${this.childType}-list`;
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/basic/ListGeneric.js":
+/*!***********************************************************!*\
+  !*** ./src/renderer/viz/expressions/basic/ListGeneric.js ***!
+  \***********************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ListGeneric; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+
+
+class ListGeneric extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     get value () {
         return this.elems.map(c => c.value);
     }
@@ -15037,23 +16032,12 @@ class BaseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         return this.elems.map(c => c.eval(feature));
     }
 
-    _resolveAliases (aliases) {
-        this.elems.map(c => c._resolveAliases(aliases));
-    }
-
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-
-        const type = this.elems[0].type;
-        if (['number', 'category', 'color', 'time', 'image'].indexOf(type) === -1) {
-            throw new Error(`array(): invalid parameters type: ${type}`);
-        }
-        this.elems.map((item, index) => {
-            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('array', `item[${index}]`, index, item);
-            if (item.type !== type) {
-                throw new Error(`array(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index)} parameter, invalid argument type combination`);
-            }
-        });
+    _applyToShaderSource (getGLSLforProperty) {
+        const childGLSL = this.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+        return {
+            preface: childGLSL.map(c => c.preface).join('\n'),
+            inline: childGLSL.map(c => c.inline)
+        };
     }
 }
 
@@ -15180,6 +16164,9 @@ class Constant extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
+    toString () {
+        return this.expr;
+    }
     get value () {
         return this.eval();
     }
@@ -15243,6 +16230,11 @@ class BaseNumber extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     eval () {
         return this.expr;
     }
+
+    toString () {
+        return `${this.expr}`;
+    }
+
     isAnimated () {
         return false;
     }
@@ -15317,6 +16309,7 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         }
         super({});
         this.name = name;
+        this.expressionName = name;
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -15332,18 +16325,35 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         if (!feature) {
             throw new Error('A property needs to be evaluated in a feature');
         }
+
         return feature[this.name];
     }
 
-    _bindMetadata (meta) {
-        const metaColumn = meta.properties[this.name];
+    toString () {
+        return `$${this.expressionName}`;
+    }
+
+    get categories () {
+        return this.type === 'category'
+            ? this._metadata.properties[this.name].categories
+            : undefined;
+    }
+
+    _bindMetadata (metadata) {
+        const metaColumn = metadata.properties[this.name];
         if (!metaColumn) {
             throw new Error(`Property '${this.name}' does not exist`);
         }
+
+        this._metadata = metadata;
         this.type = metaColumn.type;
 
-        if (this.type === 'category' && this.numCategories === undefined) {
-            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
+        if (this.type === 'category' && !this.numCategories) {
+            Object.defineProperty(this, 'numCategories', {
+                get: function () {
+                    return metaColumn.categories.length;
+                }
+            });
         }
     }
 
@@ -15425,7 +16435,9 @@ function variable (name) {
     if (name === '') {
         throw new Error('variable(): invalid parameter, zero-length string');
     }
+
     let alias;
+
     const resolve = aliases => {
         if (aliases[name]) {
             alias = aliases[name];
@@ -15433,9 +16445,11 @@ function variable (name) {
             throw new Error(`variable() name '${name}' doesn't exist`);
         }
     };
+
     const _getDependencies = () => {
         return [alias];
     };
+
     let aliaser = {
         set: (obj, prop, value) => {
             if (prop === 'parent') {
@@ -15450,6 +16464,7 @@ function variable (name) {
             // Indicate success
             return true;
         },
+
         get: (obj, prop) => {
             if (prop === 'parent') {
                 return obj[prop];
@@ -15471,6 +16486,7 @@ function variable (name) {
             return obj[prop];
         }
     };
+
     const proxy = new Proxy(new Variable(), aliaser);
     return proxy;
 }
@@ -15497,7 +16513,7 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Check if a categorical value belongs to a list of categories.
  *
- * @param {Category} value - Categorical expression to be tested against the whitelist
+ * @param {Category} input - Categorical expression to be tested against the whitelist
  * @param {Category[]} list - Multiple expression parameters that will form the whitelist
  * @return {Number} Numeric expression with the result of the check
  *
@@ -15517,19 +16533,19 @@ __webpack_require__.r(__webpack_exports__);
  * @function
  * @api
  */
-const In = generateBelongsExpression('in', IN_INLINE_MAKER, (value, list) => list.some(item => item === value) ? 1 : 0);
+const In = generateBelongsExpression('in', IN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 1 : 0);
 
 function IN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '0.';
     }
-    return inline => `((${list.map((cat, index) => `(${inline.value} == ${inline[`arg${index}`]})`).join(' || ')})? 1.: 0.)`;
+    return inline => `((${list.map((cat, index) => `(${inline.input} == ${inline.list[index]})`).join(' || ')})? 1.: 0.)`;
 }
 
 /**
  * Check if value does not belong to the list of elements.
  *
- * @param {Category} value - Categorical expression to be tested against the blacklist
+ * @param {Category} input - Categorical expression to be tested against the blacklist
  * @param {Category[]} list - Multiple expression parameters that will form the blacklist
  * @return {Number} Numeric expression with the result of the check
  *
@@ -15549,42 +16565,39 @@ function IN_INLINE_MAKER (list) {
  * @function
  * @api
  */
-const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (value, list) => list.some(item => item === value) ? 0 : 1);
+const Nin = generateBelongsExpression('nin', NIN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 0 : 1);
 
 function NIN_INLINE_MAKER (list) {
     if (list.length === 0) {
         return () => '1.';
     }
-    return inline => `((${list.map((cat, index) => `(${inline.value} != ${inline[`arg${index}`]})`).join(' && ')})? 1.: 0.)`;
+    return inline => `((${list.map((cat, index) => `(${inline.input} != ${inline.list[index]})`).join(' && ')})? 1.: 0.)`;
 }
 
 function generateBelongsExpression (name, inlineMaker, jsEval) {
     return class BelongExpression extends _base__WEBPACK_IMPORTED_MODULE_1__["default"] {
-        constructor (value, list) {
+        constructor (input, list) {
             Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 2, name);
 
-            value = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(value);
+            input = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(input);
             list = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(list);
 
-            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkExpression"])(name, 'value', 0, value);
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkExpression"])(name, 'input', 0, input);
             Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkExpression"])(name, 'list', 1, list);
 
-            let children = { value };
-            list.elems.map((arg, index) => {
-                children[`arg${index}`] = arg;
-            });
-            super(children);
-            this.list = list;
+            super({ input, list });
             this.inlineMaker = inlineMaker(this.list.elems);
             this.type = 'number';
         }
+
         eval (feature) {
-            return jsEval(this.value.eval(feature), this.list.eval(feature));
+            return jsEval(this.input.eval(feature), this.list.eval(feature));
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
-            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])(name, 'value', 0, 'category', this.value);
-            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])(name, 'list', 1, 'category-array', this.list);
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])(name, 'input', 0, 'category', this.input);
+            Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])(name, 'list', 1, 'category-list', this.list);
         }
     };
 }
@@ -15612,7 +16625,7 @@ __webpack_require__.r(__webpack_exports__);
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {Number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {Number} input - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
  * @param {Number} lowerLimit - Numeric expression with the lower limit of the range
  * @param {Number} upperLimit -  Numeric expression with the upper limit of the range
  * @return {Number} Numeric expression with the result of the check
@@ -15634,27 +16647,27 @@ __webpack_require__.r(__webpack_exports__);
  * @api
  */
 class Between extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (value, lowerLimit, upperLimit) {
+    constructor (input, lowerLimit, upperLimit) {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 3, 'between');
 
-        value = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(value);
+        input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
         lowerLimit = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(lowerLimit);
         upperLimit = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(upperLimit);
 
-        super({ value, lowerLimit, upperLimit });
+        super({ input, lowerLimit, upperLimit });
         this.type = 'number';
-        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
+        this.inlineMaker = inline => `((${inline.input} >= ${inline.lowerLimit} &&  ${inline.input} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
     eval (feature) {
-        const value = this.value.eval(feature);
+        const input = this.input.eval(feature);
         const lower = this.lowerLimit.eval(feature);
         const upper = this.upperLimit.eval(feature);
-        return (value >= lower && value <= upper) ? 1 : 0;
+        return (input >= lower && input <= upper) ? 1 : 0;
     }
     _bindMetadata (meta) {
         super._bindMetadata(meta);
 
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('between', 'value', 0, 'number', this.value);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('between', 'input', 0, 'number', this.input);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('between', 'lowerLimit', 1, 'number', this.lowerLimit);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('between', 'upperLimit', 2, 'number', this.upperLimit);
     }
@@ -16148,6 +17161,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             const signature = getSignatureLoose(a, b);
 
             super({ a, b });
+            this.expressionName = name;
             this.type = getReturnTypeFromSignature(signature);
             this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
@@ -16369,6 +17383,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Buckets; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
 
 
 
@@ -16433,64 +17449,38 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
         list = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(list);
 
-        let looseType;
-
-        if (input.type) {
-            if (input.type !== 'number' && input.type !== 'category') {
-                throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
-            }
-            looseType = input.type;
-        }
-
         let children = {
-            input
+            input,
+            list
         };
 
-        let numCategories;
-        if (list.elems) {
-            list.elems.map((item, index) => {
-                if (item.type) {
-                    if (looseType && looseType !== item.type) {
-                        throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type` +
-                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                    } else if (item.type !== 'number' && item.type !== 'category') {
-                        throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`);
-                    }
-                }
-
-                children[`arg${index}`] = item;
-            });
-            numCategories = list.elems.length + 1;
-        }
-
         super(children);
-        this.numCategories = numCategories;
-
-        this.list = list;
+        this.numCategories = null;
+        this.numCategoriesWithoutOthers = null;
         this.type = 'category';
     }
 
     eval (feature) {
         const v = this.input.eval(feature);
-        let i = 0;
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
         if (this.input.type === 'category') {
-            for (i = 0; i < this.list.elems.length; i++) {
+            for (let i = 0; i < this.list.elems.length; i++) {
                 if (v === this.list.elems[i].eval(feature)) {
-                    return i;
+                    return i / divisor;
                 }
+            }
+
+            return _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_INDEX"];
+        }
+
+        for (let i = 0; i < this.list.elems.length; i++) {
+            if (v < this.list.elems[i].eval(feature)) {
+                return i / divisor;
             }
         }
 
-        if (this.input.type === 'number') {
-            for (i = 0; i < this.list.elems.length; i++) {
-                if (v < this.list.elems[i].eval(feature)) {
-                    return i;
-                }
-            }
-        }
-
-        return i;
+        return 1;
     }
 
     _bindMetadata (metadata) {
@@ -16500,7 +17490,7 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
         }
 
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
@@ -16510,31 +17500,80 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                 throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`);
             }
         });
+
+        this.numCategories = this.list.elems.length + 1;
+        this.numCategoriesWithoutOthers = this.input.type === 'category' ? this.numCategories - 1 : this.numCategories;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-        let childInlines = {};
-        childSources.map((source, index) => {
-            childInlines[this.childrenNames[index]] = source.inline;
+        const childSourcesArray = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
+        let childSources = {};
+        childSourcesArray.map((source, index) => {
+            childSources[this.childrenNames[index]] = source;
         });
+
         const funcName = `buckets${this._uid}`;
         const cmp = this.input.type === 'category' ? '==' : '<';
+
+        // When there is "OTHERS" we don't need to take it into account
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+
         const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
-                return ${index}.;
+            `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
+                return ${index}./${divisor.toFixed(20)};
             }`;
         const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.numCategories - 1}.;
+            return ${this.input.type === 'category' ? _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_GLSL_VALUE"] : (this.numCategories - 1).toFixed(20)};
         }`;
 
         return {
-            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
-            inline: `${funcName}(${childInlines.input})`
+            preface: this._prefaceCode(childSources.list.preface + preface),
+            inline: `${funcName}(${childSources.input.inline})`
         };
     }
+
+    getLegendData (config) {
+        const name = this.toString();
+        const list = this.list.elems.map(elem => elem.eval());
+        const data = this.input.type === 'number'
+            ? _getLegendDataNumeric(list)
+            : _getLegendDataCategory(list, config);
+
+        return { data, name };
+    }
+}
+
+function _getLegendDataNumeric (list) {
+    const data = [];
+
+    for (let i = 0; i <= list.length; i++) {
+        const min = i - 1 >= 0 ? list[i - 1] : Number.NEGATIVE_INFINITY;
+        const max = i < list.length ? list[i] : Number.POSITIVE_INFINITY;
+        const key = [ min, max ];
+        const value = i / list.length;
+        data.push({ key, value });
+    }
+
+    return data;
+}
+
+function _getLegendDataCategory (list, config) {
+    const divisor = list.length - 1;
+    const data = list.map((category, index) => {
+        const key = category;
+        const value = index / divisor;
+
+        return { key, value };
+    });
+
+    data.push({
+        key: config.othersLabel,
+        value: _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_INDEX"]
+    });
+
+    return data;
 }
 
 
@@ -16564,22 +17603,27 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const breakpoints = _genBreakpoints(children, buckets);
 
         super(children);
-
         this.classifierUID = classifierUID++;
         this.numCategories = buckets;
-        this.buckets = buckets;
+        this.numCategoriesWithoutOthers = buckets;
         this.breakpoints = breakpoints;
         this.type = 'category';
     }
 
+    toString () {
+        return `${this.expressionName}(${this.input.toString()}, ${this.numCategories})`;
+    }
+
     eval (feature) {
-        const NOT_FOUND_INDEX = -1;
         const input = this.input.eval(feature);
-        const index = this.breakpoints.findIndex((br) => {
+        const breakpoint = this.breakpoints.findIndex((br) => {
             return input <= br.expr;
         });
 
-        return index === NOT_FOUND_INDEX ? this.breakpoints.length : index;
+        const divisor = this.numCategories - 1 || 1;
+        const index = breakpoint === -1 ? 1 : breakpoint / divisor;
+
+        return index;
     }
 
     getBreakpointList () {
@@ -16596,14 +17640,15 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             childInlines[this.childrenNames[index]] = source.inline;
         });
         const funcName = `classifier${this.classifierUID}`;
+        const divisor = this.numCategories - 1 || 1;
         const elif = (_, index) =>
             `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-                return ${index.toFixed(2)};
+                return ${(index / divisor).toFixed(20)};
             }`;
         const funcBody = this.breakpoints.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.breakpoints.length.toFixed(1)};
+            return 1.;
         }`;
         return {
             preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
@@ -16613,8 +17658,24 @@ class Classifier extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     _preDraw (program, drawMetadata, gl) {
         this._genBreakpoints();
-        // TODO
         super._preDraw(program, drawMetadata, gl);
+    }
+
+    getLegendData () {
+        const breakpoints = this.getBreakpointList();
+        const breakpointsLength = breakpoints.length;
+        const name = this.toString();
+        const data = [];
+
+        for (let i = 0; i <= breakpointsLength; i++) {
+            const min = breakpoints[i - 1] || Number.NEGATIVE_INFINITY;
+            const max = breakpoints[i] || Number.POSITIVE_INFINITY;
+            const key = [min, max];
+            const value = i / breakpointsLength;
+            data.push({key, value});
+        }
+
+        return { name, data };
     }
 }
 
@@ -16691,7 +17752,7 @@ class GlobalEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defaul
         this.min = min;
         this.max = max;
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = min + (max - min) * p;
         });
     }
@@ -16760,7 +17821,7 @@ class GlobalQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["default"
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = copy[Math.floor(p * copy.length)];
         });
     }
@@ -16856,8 +17917,8 @@ class GlobalStandardDev extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defaul
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = Object(_stats__WEBPACK_IMPORTED_MODULE_3__["average"])(sample);
         const standardDev = Object(_stats__WEBPACK_IMPORTED_MODULE_3__["standardDeviation"])(sample);
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize);
 
-        const breaks = calculateBreakpoints(avg, standardDev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
@@ -16956,7 +18017,7 @@ class ViewportEqIntervals extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defa
         const max = this._max.eval();
 
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = min + (max - min) * p;
         });
     }
@@ -17040,7 +18101,7 @@ class ViewportQuantiles extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defaul
         // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
             for (i; i < histogramBuckets; i++) {
-                if (accumHistogram[i] > (index + 1) / this.buckets * total) {
+                if (accumHistogram[i] > (index + 1) / this.numCategories * total) {
                     break;
                 }
             }
@@ -17141,8 +18202,8 @@ class ViewportStandardDev extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defa
     _genBreakpoints () {
         const avg = this._averageFrom(this._histogram.value);
         const stdev = this._standardDevFrom(this._histogram.value, avg);
+        const breaks = Object(_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_3__["calculateBreakpoints"])(avg, stdev, this.numCategories, this._classSize);
 
-        const breaks = Object(_GlobalStandardDev__WEBPACK_IMPORTED_MODULE_3__["calculateBreakpoints"])(avg, stdev, this.buckets, this._classSize);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
@@ -17181,6 +18242,17 @@ class ViewportStandardDev extends _Classifier__WEBPACK_IMPORTED_MODULE_0__["defa
 
 /***/ }),
 
+/***/ "./src/renderer/viz/expressions/color/CIELab.glsl":
+/*!********************************************************!*\
+  !*** ./src/renderer/viz/expressions/color/CIELab.glsl ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "#ifndef CIELAB_TO_SRGBA\n#define CIELAB_TO_SRGBA\n\nconst mat3 XYZ_2_RGB = (mat3(\n    3.2404542,-1.5371385,-0.4985314,\n    -0.9692660, 1.8760108, 0.0415560,\n    0.0556434,-0.2040259, 1.0572252\n));\nconst float SRGB_GAMMA = 1.0 / 2.2;\n\nvec3 rgb_to_srgb_approx(vec3 rgb) {\n    return pow(rgb, vec3(SRGB_GAMMA));\n}\n\nfloat f1(float t){\n    const float sigma = 6./29.;\n    if (t>sigma){\n        return t*t*t;\n    }else{\n        return 3.*sigma*sigma*(t-4./29.);\n    }\n}\n\nvec3 cielabtoxyz(vec3 c) {\n    const float xn = 95.047/100.;\n    const float yn = 100./100.;\n    const float zn = 108.883/100.;\n    return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),\n                yn*f1((c.x+16.)/116.),\n                zn*f1((c.x+16.)/116.  - c.z/200. )\n            );\n}\n\nvec3 xyztorgb(vec3 c){\n    return c * XYZ_2_RGB;\n}\n\nvec3 xyztosrgb(vec3 c) { // FIXME naming\n    return rgb_to_srgb_approx(xyztorgb(c));\n}\n\nvec4 cielabToSRGBA(vec4 cielab){\n    return vec4(xyztosrgb(cielabtoxyz(\n        vec3(\n            clamp(cielab.r, 0., 100.),\n            clamp(cielab.g, -128., 128.),\n            clamp(cielab.b, -128., 128.)\n        )\n    )), cielab.a);\n}\n#endif\n\n\n#ifndef SRGBA_TO_CIELAB\n#define SRGBA_TO_CIELAB\nvec4 sRGBToXYZ (vec4 srgba);\nvec4 sRGBToLinearRGB (vec4 srgba);\nfloat inverseGammaCorrection(float t);\nvec4 XYZToCieLab (vec4 xyza);\nfloat XYZToCieLabAux(float t);\n\nvec4 sRGBAToCieLAB(vec4 srgba){\n    return XYZToCieLab(sRGBToXYZ(srgba));\n}\n\n// Convert sRGB to CIE XYZ with the D65 white point\nvec4 sRGBToXYZ (vec4 srgba) {\n    // Poynton, \"Frequently Asked Questions About Color,\" page 10\n    // Wikipedia: http://en.wikipedia.org/wiki/SRGB\n    // Wikipedia: http://en.wikipedia.org/wiki/CIE_1931_color_space\n    vec4 rgba = sRGBToLinearRGB(srgba);\n    return vec4(\n        (0.4123955889674142161 * rgba.r + 0.3575834307637148171 * rgba.g + 0.1804926473817015735 * rgba.b),\n        (0.2125862307855955516 * rgba.r + 0.7151703037034108499 * rgba.g + 0.07220049864333622685 * rgba.b),\n        (0.01929721549174694484 * rgba.r + 0.1191838645808485318 * rgba.g + 0.9504971251315797660 * rgba.b),\n        rgba.a\n    );\n}\n\nvec4 sRGBToLinearRGB (vec4 srgba) {\n    // http://en.wikipedia.org/wiki/SRGB\n    return vec4(\n        inverseGammaCorrection(srgba.r),\n        inverseGammaCorrection(srgba.g),\n        inverseGammaCorrection(srgba.b),\n        srgba.a\n    );\n}\n\nfloat inverseGammaCorrection(float t) {\n    return t <= 0.0404482362771076 ? t / 12.92 : pow((t + 0.055) / 1.055, 2.4);\n}\n\n\nfloat WHITEPOINT_D65_X = 0.950456;\nfloat WHITEPOINT_D65_Y = 1.0;\nfloat WHITEPOINT_D65_Z = 1.088754;\n\n// Convert CIE XYZ to CIE L*a*b* (CIELAB) with the D65 white point\nvec4 XYZToCieLab (vec4 xyza) {\n    // Wikipedia: http://en.wikipedia.org/wiki/Lab_color_space\n\n    float xn = WHITEPOINT_D65_X;\n    float yn = WHITEPOINT_D65_Y;\n    float zn = WHITEPOINT_D65_Z;\n\n    return vec4(\n        116. * XYZToCieLabAux(xyza.y / yn) - 16.,\n        500. * (XYZToCieLabAux(xyza.x / xn) - XYZToCieLabAux(xyza.y / yn)),\n        200. * (XYZToCieLabAux(xyza.y / yn) - XYZToCieLabAux(xyza.z / zn)),\n        xyza.a\n    );\n}\n\nfloat XYZToCieLabAux(float t) {\n    return t >= 8.85645167903563082e-3\n            ? pow(t, 0.333333333333333) : (841.0 / 108.0) * t + 4.0 / 29.0;\n}\n\n#endif\n"
+
+/***/ }),
+
 /***/ "./src/renderer/viz/expressions/color/CIELab.js":
 /*!******************************************************!*\
   !*** ./src/renderer/viz/expressions/color/CIELab.js ***!
@@ -17193,6 +18265,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CIELab; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _CIELab_glsl__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./CIELab.glsl */ "./src/renderer/viz/expressions/color/CIELab.glsl");
+/* harmony import */ var _CIELab_glsl__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_CIELab_glsl__WEBPACK_IMPORTED_MODULE_2__);
+
 
 
 
@@ -17235,53 +18310,8 @@ class CIELab extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.type = 'color';
 
         this._setGenericGLSL(inline =>
-            `vec4(xyztosrgb(cielabtoxyz(
-                vec3(
-                    clamp(${inline.l}, 0., 100.),
-                    clamp(${inline.a}, -128., 128.),
-                    clamp(${inline.b}, -128., 128.)
-                )
-            )), 1)`
-            , `
-        #ifndef cielabtoxyz_fn
-        #define cielabtoxyz_fn
-
-        const mat3 XYZ_2_RGB = (mat3(
-            3.2404542,-1.5371385,-0.4985314,
-           -0.9692660, 1.8760108, 0.0415560,
-            0.0556434,-0.2040259, 1.0572252
-       ));
-       const float SRGB_GAMMA = 1.0 / 2.2;
-
-       vec3 rgb_to_srgb_approx(vec3 rgb) {
-        return pow(rgb, vec3(SRGB_GAMMA));
-    }
-        float f1(float t){
-            const float sigma = 6./29.;
-            if (t>sigma){
-                return t*t*t;
-            }else{
-                return 3.*sigma*sigma*(t-4./29.);
-            }
-        }
-        vec3 cielabtoxyz(vec3 c) {
-            const float xn = 95.047/100.;
-            const float yn = 100./100.;
-            const float zn = 108.883/100.;
-            return vec3(xn*f1((c.x+16.)/116.  + c.y/500. ),
-                        yn*f1((c.x+16.)/116.),
-                        zn*f1((c.x+16.)/116.  - c.z/200. )
-                    );
-        }
-        vec3 xyztorgb(vec3 c){
-            return c *XYZ_2_RGB;
-        }
-
-        vec3 xyztosrgb(vec3 c) {
-            return rgb_to_srgb_approx(xyztorgb(c));
-        }
-        #endif
-        `);
+            `cielabToSRGBA(vec4(${inline.l}, ${inline.a}, ${inline.b}, 1.))`
+            , _CIELab_glsl__WEBPACK_IMPORTED_MODULE_2___default.a);
     }
     // TODO EVAL
 
@@ -17346,6 +18376,7 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super({});
         this.type = 'color';
         this.name = colorName;
+        this.expressionName = colorName;
         this.color = _nameToRGBA(this.name);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
@@ -17356,6 +18387,10 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     eval () {
         return this.color;
+    }
+
+    toString () {
+        return this.expressionName;
     }
 }
 
@@ -17673,7 +18708,11 @@ class Hex extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         } catch (error) {
             throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
+        this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
+    }
+    toString () {
+        return this.hexadecimalColor;
     }
     get value () {
         return this.eval();
@@ -18076,8 +19115,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Palette; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _rgb__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../rgb */ "./src/renderer/viz/expressions/color/rgb.js");
+/* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
 
 
+
+
+
+const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
 
 /**
  * Color palettes.
@@ -18116,6 +19161,7 @@ class Palette extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (name, subPalettes) {
         super({});
         this.type = 'palette';
+        this.childType = 'color';
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
@@ -18124,8 +19170,36 @@ class Palette extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                 }
             }
         });
-
+        this.expressionName = name;
         this.tags = subPalettes.tags;
+    }
+
+    getColors (numCategories) {
+        const colors = this._getBestSubPalette(numCategories);
+
+        if (this.isQualitative()) {
+            const othersColor = colors.pop();
+            return { colors, othersColor };
+        } else {
+            return { colors, othersColor: null };
+        }
+    }
+
+    toString () {
+        return this.expressionName;
+    }
+
+    _getBestSubPalette (subPaletteIndex) {
+        subPaletteIndex = subPaletteIndex <= MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            ? MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            : subPaletteIndex;
+        const longestSubPalette = this.getLongestSubPalette();
+        const subPalette = (subPaletteIndex < longestSubPalette.length
+            ? [...this.subPalettes[subPaletteIndex]]
+            : [...longestSubPalette]);
+        return subPalette.map(color =>
+            new _rgb__WEBPACK_IMPORTED_MODULE_2__["RGBA"](Object(_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"])(color.r), Object(_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"])(color.g), Object(_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"])(color.b), Object(_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"])(color.a))
+        );
     }
 
     getLongestSubPalette () {
@@ -18239,9 +19313,11 @@ function genRGB (name, alpha) {
             this.type = 'color';
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
+
         get value () {
             return this.eval();
         }
+
         eval (f) {
             return {
                 r: this.r.eval(f),
@@ -18250,6 +19326,7 @@ function genRGB (name, alpha) {
                 a: alpha ? this.a.eval(f) : 1
             };
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])(name, 'r', 0, 'number', this.r);
@@ -18261,6 +19338,34 @@ function genRGB (name, alpha) {
         }
     };
 }
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/constants.js":
+/*!***************************************************!*\
+  !*** ./src/renderer/viz/expressions/constants.js ***!
+  \***************************************************/
+/*! exports provided: DEFAULT_RAMP_OTHERS, DEFAULT_SAMPLES, OTHERS_GLSL_VALUE, OTHERS_INDEX, OTHERS_LABEL, DEFAULT_OPTIONS */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEFAULT_RAMP_OTHERS", function() { return DEFAULT_RAMP_OTHERS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEFAULT_SAMPLES", function() { return DEFAULT_SAMPLES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OTHERS_GLSL_VALUE", function() { return OTHERS_GLSL_VALUE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OTHERS_INDEX", function() { return OTHERS_INDEX; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "OTHERS_LABEL", function() { return OTHERS_LABEL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DEFAULT_OPTIONS", function() { return DEFAULT_OPTIONS; });
+const DEFAULT_RAMP_OTHERS = 'DEFAULT_RAMP_OTHERS';
+const DEFAULT_SAMPLES = 10;
+const OTHERS_GLSL_VALUE = '(-1.)';
+const OTHERS_INDEX = -1;
+const OTHERS_LABEL = 'CARTO_VL_OTHERS';
+const DEFAULT_OPTIONS = {
+    othersLabel: OTHERS_LABEL,
+    samples: DEFAULT_SAMPLES
+};
 
 
 /***/ }),
@@ -18477,6 +19582,23 @@ class Linear extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
+    }
+
+    getLegendData (config) {
+        const min = this.min.eval();
+        const max = this.max.eval();
+        const INC = 1 / (config.samples - 1);
+        const name = this.toString();
+        const data = [];
+
+        for (let i = 0; data.length < config.samples; i += INC) {
+            const value = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(i, 0, 1);
+            const key = i * (max - min) + min;
+
+            data.push({ key, value });
+        }
+
+        return { data, min, max, name };
     }
 }
 
@@ -18794,648 +19916,52 @@ class Placement extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/ramp.js":
-/*!**********************************************!*\
-  !*** ./src/renderer/viz/expressions/ramp.js ***!
-  \**********************************************/
+/***/ "./src/renderer/viz/expressions/reverse/ReverseList.js":
+/*!*************************************************************!*\
+  !*** ./src/renderer/viz/expressions/reverse/ReverseList.js ***!
+  \*************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Ramp; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
-/* harmony import */ var _colorspaces__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../colorspaces */ "./src/renderer/viz/colorspaces.js");
-/* harmony import */ var _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
-/* harmony import */ var _buckets__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./buckets */ "./src/renderer/viz/expressions/buckets.js");
-/* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
-/* harmony import */ var _classification_Classifier__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./classification/Classifier */ "./src/renderer/viz/expressions/classification/Classifier.js");
-/* harmony import */ var _ImageList__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./ImageList */ "./src/renderer/viz/expressions/ImageList.js");
-/* harmony import */ var _linear__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./linear */ "./src/renderer/viz/expressions/linear.js");
-/* harmony import */ var _top__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./top */ "./src/renderer/viz/expressions/top.js");
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReverseList; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
 
 
 
+class ReverseList extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (array) {
+        super({array});
 
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('reverseList', 'array', 0, array);
 
-
-
-
-
-
-
-
-const paletteTypes = {
-    PALETTE: 'palette',
-    COLOR_ARRAY: 'color-array',
-    NUMBER_ARRAY: 'number-array',
-    IMAGE_LIST: 'image-list'
-};
-
-const rampTypes = {
-    COLOR: 'color',
-    NUMBER: 'number'
-};
-
-const inputTypes = {
-    NUMBER: 'number',
-    CATEGORY: 'category'
-};
-
-const COLOR_ARRAY_LENGTH = 256;
-const MAX_BYTE_VALUE = 255;
-const SQRT_MAX_CATEGORIES_PER_PROPERTY = 256;
-
-/**
-* Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)
-*
-* Categories to colors
-* Categorical expressions can be used as the input for `ramp` in combination with color palettes. If the number of categories exceeds the number of available colors in the palette new colors will be generated by
-* using CieLAB interpolation.
-*
-* Categories to numeric
-* Categorical expression can be used as the input for `ramp` in combination with numeric palettes. If the number of input categories doesn't match the number of numbers in the numeric palette, linear interpolation will be used.
-*
-* Numeric expressions to colors
-* Numeric expressions can be used as the input for `ramp` in combination with color palettes. Colors will be generated by using CieLAB interpolation.
-*
-* Numeric expressions to numeric
-* Numeric expressions can be used as the input for `ramp` in combination with numeric palettes. Linear interpolation will be used to generate intermediate output values.
-*
-* @param {Number|Category} input - The input expression to give a color
-* @param {Palette|Color[]|Number[]} palette - The color palette that is going to be used
-* @return {Number|Color}
-*
-* @example <caption>Mapping categories to colors and numbers</caption>
-* const s = carto.expressions;
-* const viz = new carto.Viz({
-*   width: s.ramp(s.buckets(s.prop('dn'), [20, 50, 120]), [1, 4, 8])
-*   color: s.ramp(s.buckets(s.prop('dn'), [20, 50, 120]), s.palettes.PRISM)
-* });
-*
-* @example <caption>Mapping categories to colors and numbers (String)</caption>
-* const viz = new carto.Viz(`
-*   width: ramp(buckets($dn, [20, 50, 120]), [1, 10,4])
-*   color: ramp(buckets($dn, [20, 50, 120]), prism)
-* `);
-*
-*
-* @example <caption>Mapping numeric expressions to colors and numbers</caption>
-* const s = carto.expressions;
-* const viz = new carto.Viz({
-*   width: s.ramp(s.linear(s.prop('dn'), 40, 100), [1, 8])
-*   color: s.ramp(s.linear(s.prop('dn'), 40, 100), s.palettes.PRISM)
-* });
-*
-* @example <caption>Mapping numeric expressions to colors and numbers (String)</caption>
-* const viz = new carto.Viz(`
-*   width: ramp(linear($dn, 40, 100), [1, 10,4])
-*   color: ramp(linear($dn, 40, 100), prism)
-* `);
-*
-* @memberof carto.expressions
-* @name ramp
-* @function
-* @api
-*/
-class Ramp extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (input, palette) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'ramp');
-
-        input = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(input);
-        palette = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(palette);
-
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('ramp', 'input', 0, input);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('ramp', 'palette', 1, palette);
-
-        super({ input, palette });
-
-        this.minKey = 0;
-        this.maxKey = 1;
-        this.palette = palette;
-        this.defaultOthersColor = new _color_NamedColor__WEBPACK_IMPORTED_MODULE_3__["default"]('gray');
-    }
-
-    loadImages () {
-        return Promise.all([this.input.loadImages(), this.palette.loadImages()]);
-    }
-
-    _setUID (idGenerator) {
-        super._setUID(idGenerator);
-        this.palette._setUID(idGenerator);
-    }
-
-    eval (feature) {
-        if (this.palette.type === 'number-array') {
-            return this._evalNumberArray(feature);
+        if (this.array.elems) {
+            const childType = this.array.elems[0].type;
+            this.type = `${childType}-list`;
         }
-        const input = this.input.eval(feature);
-        this.palette = this._calcPaletteValues(this.palette);
-        const texturePixels = this._computeTextureIfNeeded();
-        const numValues = texturePixels.length - 1;
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
-
-        const color = this.type === rampTypes.NUMBER
-            ? this._getValue(texturePixels, numValues, m)
-            : this._getColorValue(texturePixels, m);
-
-        return color;
-    }
-
-    _evalNumberArray (feature) {
-        const input = this.input.eval(feature);
-        const m = (input - this.minKey) / (this.maxKey - this.minKey);
-        for (let i = 0; i < this.palette.elems.length - 1; i++) {
-            const rangeMin = i / (this.palette.elems.length - 1);
-            const rangeMax = (i + 1) / (this.palette.elems.length - 1);
-            if (m > rangeMax) {
-                continue;
-            }
-            const rangeM = (m - rangeMin) / (rangeMax - rangeMin);
-            const a = this.palette.elems[i].eval(feature);
-            const b = this.palette.elems[i + 1].eval(feature);
-            return Object(_utils__WEBPACK_IMPORTED_MODULE_1__["mix"])(a, b, Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(rangeM, 0, 1));
-        }
-        throw new Error('Unexpected condition on ramp._evalNumberArray()');
-    }
-
-    _getValue (texturePixels, numValues, m) {
-        const lowIndex = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(Math.floor(numValues * m), 0, numValues);
-        const highIndex = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["clamp"])(Math.ceil(numValues * m), 0, numValues);
-        const fract = numValues * m - Math.floor(numValues * m);
-        const low = texturePixels[lowIndex];
-        const high = texturePixels[highIndex];
-
-        return Math.round(fract * high + (1 - fract) * low);
-    }
-
-    _getColorValue (texturePixels, m) {
-        const index = _calcColorValueIndex(m);
-
-        return {
-            r: Math.round(texturePixels[index * 4 + 0]),
-            g: Math.round(texturePixels[index * 4 + 1]),
-            b: Math.round(texturePixels[index * 4 + 2]),
-            a: Math.round(texturePixels[index * 4 + 3]) / MAX_BYTE_VALUE
-        };
     }
 
     _bindMetadata (metadata) {
+        this.array._bindMetadata(metadata);
+
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('reverse', 'array', 0, ['palette', 'number-list', 'category-list', 'color-list', 'time-list', 'image-list'], this.array);
+
+        this.type = this.array.type;
+        this.childType = this.array.childType;
+
         super._bindMetadata(metadata);
-
-        this.type = this.palette.type === paletteTypes.NUMBER_ARRAY ? rampTypes.NUMBER : rampTypes.COLOR;
-        if (this.palette.type === 'image-list') {
-            this.type = 'image';
-        }
-
-        if (this.palette.type !== 'number-array') {
-            this.palette = _calcPaletteValues(this.palette);
-        }
-
-        if (this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"]) && this.input.type === inputTypes.NUMBER) {
-            this.input = new _linear__WEBPACK_IMPORTED_MODULE_8__["default"](this.input);
-            this.input._bindMetadata(metadata);
-        }
-
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('ramp', 'input', 0, Object.values(inputTypes), this.input);
-
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('ramp', 'input', 0, inputTypes.CATEGORY, this.input);
-            Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkInstance"])('ramp', 'palette', 1, _ImageList__WEBPACK_IMPORTED_MODULE_7__["default"], this.palette);
-        }
-
-        this._texCategories = null;
-        this._GLtexCategories = null;
-        this._metadata = metadata;
     }
 
-    _applyToShaderSource (getGLSLforProperty) {
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            return this._applyToShaderSourceImage(getGLSLforProperty);
-        }
-
-        const input = this.input._applyToShaderSource(getGLSLforProperty);
-
-        let inline = '';
-        let preface = `
-        uniform float keyMin${this._uid};
-        uniform float keyWidth${this._uid};
-        `;
-
-        let inputGLSL;
-        if (this.input.type === 'category' && this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"])) {
-            // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
-            inputGLSL = `ramp_translate${this._uid}(${input.inline})`;
-            preface +=
-            `
-            uniform sampler2D texRampTranslate${this._uid};
-            float ramp_translate${this._uid}(float s){
-                vec2 v = vec2(
-                    mod(s, ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}),
-                    floor(s / ${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)})
-                );
-                return texture2D(texRampTranslate${this._uid}, v/${SQRT_MAX_CATEGORIES_PER_PROPERTY.toFixed(20)}).a;
-            }
-            `;
-        } else {
-            // With numerical inputs we only need to transform the input to the [0,1] range
-            inputGLSL = `((${input.inline}-keyMin${this._uid})/keyWidth${this._uid})`;
-        }
-
-        if (this.palette.type === 'number-array') {
-            // With numeric arrays we use a combination of `mix` to allow for property-dependant values
-            const nums = this.palette.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
-            const genBlend = (list, numerator, denominator) => {
-                let b;
-
-                if (numerator + 1 === denominator) {
-                    b = list[numerator + 1].inline;
-                } else {
-                    b = genBlend(list, numerator + 1, denominator);
-                }
-
-                return `
-                mix(${list[numerator].inline}, ${b},
-                    clamp(
-                         (x-${(numerator / denominator).toFixed(20)})
-                             /${(1 / denominator).toFixed(20)}
-                        ,0.,1.
-                        )
-                )`;
-            };
-            inline = `ramp_num${this._uid}(${inputGLSL})`;
-            // the ramp_num function looks up the numeric array this.palette and performs linear interpolation to retrieve the final result
-            // For example:
-            //   with this.palette.elems=[10,20] ram_num(0.4) will return 14
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.75) will return 20
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.5) will return 10
-            //   with this.palette.elems=[0, 10, 30] ramp_num(0.25) will return 5
-            preface += `${nums.map(n => n.preface).join('\n')}
-
-            float ramp_num${this._uid}(float x){
-                return ${genBlend(nums, 0, this.palette.elems.length - 1)};
-            }
-            `;
-        } else {
-            // With color arrays we use a fast texture lookup, but this makes property-dependant values impossible
-            inline = `texture2D(texRamp${this._uid}, vec2(${inputGLSL}, 0.5)).rgba`;
-            preface += `uniform sampler2D texRamp${this._uid};\n`;
-        }
-
-        return {
-            preface: this._prefaceCode(input.preface + preface),
-            inline
-        };
-    }
-
-    _applyToShaderSourceImage (getGLSLforProperty) {
-        const input = this.input._applyToShaderSource(getGLSLforProperty);
-        const images = this.palette._applyToShaderSource(getGLSLforProperty);
-        return {
-            preface: input.preface + images.preface,
-            inline: `${images.inline}(imageUV, ${input.inline})`
-        };
-    }
-
-    _getColorsFromPalette (input, palette) {
-        if (palette.type === paletteTypes.IMAGE_LIST) {
-            return palette.colors;
-        }
-
-        return palette.type === paletteTypes.PALETTE
-            ? _getColorsFromPaletteType(input, palette, this.maxKey, this.defaultOthersColor.eval())
-            : _getColorsFromColorArrayType(input, palette, this.maxKey, this.defaultOthersColor.eval());
-    }
-
-    _postShaderCompile (program, gl) {
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            this.palette._postShaderCompile(program, gl);
-            super._postShaderCompile(program, gl);
-            return;
-        }
-        if (this.palette.type === 'number-array') {
-            this.palette.elems.forEach(e => e._postShaderCompile(program, gl));
-        }
-
-        this.input._postShaderCompile(program, gl);
-        this._getBinding(program).texLoc = gl.getUniformLocation(program, `texRamp${this._uid}`);
-        this._getBinding(program).texRampTranslateLoc = gl.getUniformLocation(program, `texRampTranslate${this._uid}`);
-        this._getBinding(program).keyMinLoc = gl.getUniformLocation(program, `keyMin${this._uid}`);
-        this._getBinding(program).keyWidthLoc = gl.getUniformLocation(program, `keyWidth${this._uid}`);
-    }
-
-    _computeTextureIfNeeded () {
-        if (this._cachedTexturePixels && !this.palette.isAnimated()) {
-            return this._cachedTexturePixels;
-        }
-
-        this._texCategories = this.input.numCategories;
-
-        if (this.input.type === inputTypes.CATEGORY) {
-            this.maxKey = this.input.numCategories - 1;
-        }
-
-        this._cachedTexturePixels = this.type === rampTypes.COLOR
-            ? this._computeColorRampTexture()
-            : this._computeNumericRampTexture();
-
-        return this._cachedTexturePixels;
-    }
-
-    _calcPaletteValues (palette) {
-        return _calcPaletteValues(palette);
-    }
-
-    _computeColorRampTexture () {
-        if (this.palette.isAnimated()) {
-            this.palette = this._calcPaletteValues(this.palette);
-        }
-
-        const texturePixels = new Uint8Array(4 * COLOR_ARRAY_LENGTH);
-        const colors = this._getColorsFromPalette(this.input, this.palette);
-
-        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vColorARaw = colors[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vColorBRaw = colors[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1))];
-            const vColorA = [vColorARaw.r / (COLOR_ARRAY_LENGTH - 1), vColorARaw.g / (COLOR_ARRAY_LENGTH - 1), vColorARaw.b / (COLOR_ARRAY_LENGTH - 1), vColorARaw.a];
-            const vColorB = [vColorBRaw.r / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.g / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.b / (COLOR_ARRAY_LENGTH - 1), vColorBRaw.a];
-            const m = i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (colors.length - 1));
-            const v = Object(_colorspaces__WEBPACK_IMPORTED_MODULE_2__["interpolateRGBAinCieLAB"])({ r: vColorA[0], g: vColorA[1], b: vColorA[2], a: vColorA[3] }, { r: vColorB[0], g: vColorB[1], b: vColorB[2], a: vColorB[3] }, m);
-
-            texturePixels[4 * i + 0] = Math.round(v.r * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 1] = Math.round(v.g * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 2] = Math.round(v.b * MAX_BYTE_VALUE);
-            texturePixels[4 * i + 3] = Math.round(v.a * MAX_BYTE_VALUE);
-        }
-
-        return texturePixels;
-    }
-
-    _computeNumericRampTexture () {
-        const texturePixels = new Float32Array(COLOR_ARRAY_LENGTH);
-        const floats = this.palette.floats;
-
-        for (let i = 0; i < COLOR_ARRAY_LENGTH; i++) {
-            const vColorARaw = floats[Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
-            const vColorBRaw = floats[Math.ceil(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1))];
-            const m = i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1) - Math.floor(i / (COLOR_ARRAY_LENGTH - 1) * (floats.length - 1));
-            texturePixels[i] = ((1.0 - m) * vColorARaw + m * vColorBRaw);
-        }
-
-        return texturePixels;
-    }
-
-    _computeGLTextureIfNeeded (gl) {
-        const texturePixels = this._computeTextureIfNeeded();
-        const isAnimatedPalette = this.palette.isAnimated();
-
-        if (this._GLtexCategories !== this.input.numCategories || isAnimatedPalette) {
-            this._GLtexCategories = this.input.numCategories;
-            this.texture = gl.createTexture();
-            this._bindGLTexture(gl, texturePixels);
-        }
-    }
-
-    _bindGLTexture (gl, texturePixels) {
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-        if (this.type === rampTypes.COLOR) {
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, COLOR_ARRAY_LENGTH, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, texturePixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        } else {
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, COLOR_ARRAY_LENGTH, 1, 0, gl.ALPHA, gl.FLOAT, texturePixels);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        }
-
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    }
-
-    _preDraw (program, drawMetadata, gl) {
-        this.input._preDraw(program, drawMetadata, gl);
-
-        if (this.palette.type === paletteTypes.IMAGE_LIST) {
-            this.palette._preDraw(program, drawMetadata, gl);
-            return;
-        } else if (this.palette.type === 'number-array') {
-            this.palette.elems.forEach(e => e._preDraw(program, drawMetadata, gl));
-            gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
-            gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
-            gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
-            return super._preDraw(program, drawMetadata, gl);
-        }
-
-        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-        this._computeGLTextureIfNeeded(gl);
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.uniform1i(this._getBinding(program).texLoc, drawMetadata.freeTexUnit);
-        gl.uniform1f(this._getBinding(program).keyMinLoc, (this.minKey));
-        gl.uniform1f(this._getBinding(program).keyWidthLoc, (this.maxKey) - (this.minKey));
-        drawMetadata.freeTexUnit++;
-
-        if (this.input.type === 'category' && this.input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"])) {
-            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-            const catIDs = this._metadata.properties[this.input.name].categories.length;
-            if (this._translatedIds !== catIDs) {
-                this._translatedIds = catIDs;
-                this._translateTexture = gl.createTexture();
-                const translatorPixels = new Float32Array(SQRT_MAX_CATEGORIES_PER_PROPERTY * SQRT_MAX_CATEGORIES_PER_PROPERTY);
-                for (let i = 0; i < catIDs; i++) {
-                    const id = this._metadata.categoryToID.get(this._metadata.properties[this.input.name].categories[i].name);
-                    const value = i / (catIDs - 1);
-                    const vec2Id = {
-                        x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
-                        y: Math.floor(id / SQRT_MAX_CATEGORIES_PER_PROPERTY)
-                    };
-                    translatorPixels[SQRT_MAX_CATEGORIES_PER_PROPERTY * vec2Id.y + vec2Id.x] = value;
-                }
-                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, SQRT_MAX_CATEGORIES_PER_PROPERTY, SQRT_MAX_CATEGORIES_PER_PROPERTY, 0, gl.ALPHA, gl.FLOAT, translatorPixels);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            } else {
-                gl.bindTexture(gl.TEXTURE_2D, this._translateTexture);
-            }
-            gl.uniform1i(this._getBinding(program).texRampTranslateLoc, drawMetadata.freeTexUnit);
-            drawMetadata.freeTexUnit++;
-        }
-    }
-}
-
-function _getColorsFromPaletteType (input, palette, numCategories, defaultOthersColor) {
-    switch (true) {
-        case input.isA(_buckets__WEBPACK_IMPORTED_MODULE_4__["default"]):
-            return _getColorsFromPaletteTypeBuckets(palette, numCategories, defaultOthersColor);
-        case input.isA(_top__WEBPACK_IMPORTED_MODULE_9__["default"]):
-            return _getColorsFromPaletteTypeTop(palette, numCategories, defaultOthersColor);
-        default:
-            return _getColorsFromPaletteTypeDefault(input, palette, defaultOthersColor);
-    }
-}
-
-function _getColorsFromPaletteTypeBuckets (palette, numCategories, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, numCategories);
-
-    if (palette.isQuantitative()) {
-        colors.push(defaultOthersColor);
-    }
-
-    if (palette.isQualitative()) {
-        defaultOthersColor = colors[numCategories];
-    }
-
-    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-}
-
-function _getColorsFromPaletteTypeTop (palette, numCategories, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, numCategories);
-
-    if (palette.isQualitative()) {
-        defaultOthersColor = colors[colors.length - 1];
-    }
-
-    return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-}
-
-function _getColorsFromPaletteTypeDefault (input, palette, defaultOthersColor) {
-    let colors = _getSubPalettes(palette, input.numCategories);
-
-    if (palette.isQualitative()) {
-        colors.pop();
-        defaultOthersColor = colors[input.numCategories];
-    }
-
-    if (input.numCategories === undefined) {
-        return colors;
-    }
-
-    return _avoidShowingInterpolation(input.numCategories, colors, defaultOthersColor);
-}
-
-function _getSubPalettes (palette, numCategories) {
-    return palette.subPalettes[numCategories]
-        ? palette.subPalettes[numCategories]
-        : palette.getLongestSubPalette();
-}
-
-function _getColorsFromColorArrayType (input, palette, numCategories, defaultOthersColor) {
-    return input.type === inputTypes.CATEGORY
-        ? _getColorsFromColorArrayTypeCategorical(input, numCategories, palette.colors, defaultOthersColor)
-        : _getColorsFromColorArrayTypeNumeric(input.numCategories, palette.colors);
-}
-
-function _getColorsFromColorArrayTypeCategorical (input, numCategories, colors, defaultOthersColor) {
-    switch (true) {
-        case input.isA(_classification_Classifier__WEBPACK_IMPORTED_MODULE_6__["default"]) && numCategories < colors.length:
-            return colors;
-        case input.isA(_basic_property__WEBPACK_IMPORTED_MODULE_5__["default"]):
-            return colors;
-        case numCategories < colors.length:
-            return _avoidShowingInterpolation(numCategories, colors, colors[numCategories]);
-        case numCategories > colors.length:
-            return _addOthersColorToColors(colors, defaultOthersColor);
-        default:
-            colors = _addOthersColorToColors(colors, defaultOthersColor);
-            return _avoidShowingInterpolation(numCategories, colors, defaultOthersColor);
-    }
-}
-
-function _getColorsFromColorArrayTypeNumeric (numCategories, colors) {
-    let othersColor;
-
-    if (numCategories < colors.length) {
-        othersColor = colors[numCategories];
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    }
-
-    if (numCategories === colors.length) {
-        othersColor = colors[colors.length - 1];
-        return _avoidShowingInterpolation(numCategories, colors, othersColor);
-    }
-
-    return colors;
-}
-
-function _addOthersColorToColors (colors, othersColor) {
-    return [...colors, othersColor];
-}
-
-function _avoidShowingInterpolation (numCategories, colors, defaultOthersColor) {
-    const colorArray = [];
-
-    for (let i = 0; i < colors.length; i++) {
-        if (i < numCategories) {
-            colorArray.push(colors[i]);
-        } else if (i === numCategories) {
-            colorArray.push(defaultOthersColor);
-        }
-    }
-
-    return colorArray;
-}
-
-function _calcPaletteValues (palette) {
-    try {
-        if (palette.type === paletteTypes.NUMBER_ARRAY) {
-            palette.floats = palette.eval();
-        } else if (palette.type === paletteTypes.COLOR_ARRAY) {
-            palette.colors = palette.eval();
-        }
-    } catch (error) {
-        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
-    }
-
-    return palette;
-}
-
-function _calcColorValueIndex (m) {
-    if (Number.isNaN(m) || m === Number.NEGATIVE_INFINITY) {
-        return 0;
-    }
-
-    if (m === Number.POSITIVE_INFINITY || m > 1) {
-        return COLOR_ARRAY_LENGTH - 1;
-    }
-
-    return Math.round(m * MAX_BYTE_VALUE);
-}
-
-
-/***/ }),
-
-/***/ "./src/renderer/viz/expressions/reverse/ReverseArray.js":
-/*!**************************************************************!*\
-  !*** ./src/renderer/viz/expressions/reverse/ReverseArray.js ***!
-  \**************************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ReverseArray; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
-
-
-class ReverseArray extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (array) {
-        super({
-            array
-        });
-        this.type = array.type;
-    }
     get elems () {
         return [...this.array.elems].reverse();
     }
+
     get value () {
         return this.elems.map(c => c.value);
     }
+
     eval (feature) {
         return this.elems.map(c => c.eval(feature));
     }
@@ -19503,7 +20029,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return reverse; });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _ReversePalette__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ReversePalette */ "./src/renderer/viz/expressions/reverse/ReversePalette.js");
-/* harmony import */ var _ReverseArray__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReverseArray */ "./src/renderer/viz/expressions/reverse/ReverseArray.js");
+/* harmony import */ var _ReverseList__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./ReverseList */ "./src/renderer/viz/expressions/reverse/ReverseList.js");
 
 
 
@@ -19511,8 +20037,8 @@ __webpack_require__.r(__webpack_exports__);
 /**
  * Reverse the provided item.
  *
- * @param {Palette|BaseArray} x - item to be reversed
- * @return {Palette|BaseArray}
+ * @param {Palette|List} x - item to be reversed
+ * @return {Palette|List}
  *
  * @example <caption>Invert a Palette.</caption>
  * const s = carto.expressions;
@@ -19525,13 +20051,13 @@ __webpack_require__.r(__webpack_exports__);
  *   color: ramp($type, reverse(PRISM))
  * `);
  *
- * @example <caption>Invert a Color Array.</caption>
+ * @example <caption>Invert a List.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
  * });
  *
- * @example <caption>Invert a Color Array (String).</caption>
+ * @example <caption>Invert a List (String).</caption>
  * const viz = new carto.Viz(`
  *   color: ramp($count, reverse([red, blue]))
  * `);
@@ -19541,14 +20067,14 @@ __webpack_require__.r(__webpack_exports__);
  * @function
  * @api
  */
-function reverse (x) {
+function reverse (list) {
     Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkMaxArguments"])(arguments, 1, 'reverse');
-    x = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(x);
-    Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])('reverse', 'x', 0, ['palette', 'number-array', 'category-array', 'color-array', 'time-array', 'image-array'], x);
-    if (x.type === 'palette') {
-        return new _ReversePalette__WEBPACK_IMPORTED_MODULE_1__["default"](x);
+    list = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(list);
+
+    if (list.type === 'palette') {
+        return new _ReversePalette__WEBPACK_IMPORTED_MODULE_1__["default"](list);
     } else {
-        return new _ReverseArray__WEBPACK_IMPORTED_MODULE_2__["default"](x);
+        return new _ReverseList__WEBPACK_IMPORTED_MODULE_2__["default"](list);
     }
 }
 
@@ -19692,6 +20218,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
 
 
 
@@ -19736,21 +20264,17 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super(children);
         this.type = 'category';
     }
+
     eval (feature) {
-        const catID = this._meta.categoryToID.get(this.property.eval(feature));
-        const buckets = this.numBuckets;
-        const metaColumn = this._meta.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
+        const categoryName = this.property.eval(feature);
+        const index = orderedCategoryNames.findIndex(category => category.name === categoryName);
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
-        let ret;
-        orderedCategoryNames.map((name, i) => {
-            if (i === catID) {
-                ret = i < buckets ? this._meta.IDToCategory.get(i) : 'CARTOVL_TOP_OTHERS_BUCKET';
-            }
-        });
-        return ret;
+        return index >= this.numBuckets || index === -1 ? _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_INDEX"] : index / divisor;
     }
 
     _bindMetadata (metadata) {
@@ -19760,13 +20284,18 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkFeatureIndependent"])('top', 'buckets', 1, this.buckets);
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('top', 'buckets', 1, 'number', this.buckets);
 
-        this._meta = metadata;
+        this._metadata = metadata;
         this._textureBuckets = null;
     }
 
     get numCategories () {
         return this.numBuckets + 1;
     }
+
+    get numCategoriesWithoutOthers () {
+        return this.numCategories - 1;
+    }
+
     get numBuckets () {
         let buckets = Math.round(this.buckets.eval());
 
@@ -19792,49 +20321,59 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.childrenNames.forEach(name => { childSources[name] = this[name]._applyToShaderSource(getGLSLforProperty); });
         return {
             preface: this._prefaceCode(Object.values(childSources).map(s => s.preface).join('') + `
+            uniform float numCategoriesWithoutOthers${this._uid};
+
             float top${this._uid}(float id){
-                float r = 0.;
+                float r;
                 if (${childSources._top0.inline} == id){
-                    r = 1.;
+                    r = 0.;
                 } else if (${childSources._top1.inline} == id){
-                    r = 2.;
+                    r = 1.;
                 } else if (${childSources._top2.inline} == id){
-                    r = 3.;
+                    r = 2.;
                 } else if (${childSources._top3.inline} == id){
-                    r = 4.;
+                    r = 3.;
                 } else if (${childSources._top4.inline} == id){
-                    r = 5.;
+                    r = 4.;
                 } else if (${childSources._top5.inline} == id){
-                    r = 6.;
+                    r = 5.;
                 } else if (${childSources._top6.inline} == id){
-                    r = 7.;
+                    r = 6.;
                 } else if (${childSources._top7.inline} == id){
-                    r = 8.;
+                    r = 7.;
                 } else if (${childSources._top8.inline} == id){
-                    r = 9.;
+                    r = 8.;
                 } else if (${childSources._top9.inline} == id){
-                    r = 10.;
+                    r = 9.;
                 } else if (${childSources._top10.inline} == id){
-                    r = 11.;
+                    r = 10.;
                 } else if (${childSources._top11.inline} == id){
-                    r = 12.;
+                    r = 11.;
                 } else if (${childSources._top12.inline} == id){
-                    r = 13.;
+                    r = 12.;
                 } else if (${childSources._top13.inline} == id){
-                    r = 14.;
+                    r = 13.;
                 } else if (${childSources._top14.inline} == id){
-                    r = 15.;
+                    r = 14.;
                 } else if (${childSources._top15.inline} == id){
-                    r = 16.;
+                    r = 15.;
+                }else{
+                    return ${_constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_GLSL_VALUE"]};
                 }
-                return r;
+                return r/(numCategoriesWithoutOthers${this._uid}-1.);
             }`),
             inline: `top${this._uid}(${childSources.property.inline})`
         };
     }
+
+    _postShaderCompile (program, gl) {
+        this._numCategoriesLoc = gl.getUniformLocation(program, `numCategoriesWithoutOthers${this._uid}`);
+        super._postShaderCompile(program, gl);
+    }
+
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
-        const metaColumn = this._meta.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.name];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
@@ -19844,13 +20383,39 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             this[`_top${i}`].expr = Number.POSITIVE_INFINITY;
         }
 
-        orderedCategoryNames.map((cat, i) => {
+        orderedCategoryNames.forEach((cat, i) => {
             if (i < buckets) {
-                this[`_top${i}`].expr = (i + 1);
+                this[`_top${i}`].expr = this._metadata.categoryToID.get(cat.name);
             }
         });
 
+        gl.uniform1f(this._numCategoriesLoc, this.numCategoriesWithoutOthers);
         super._preDraw(program, drawMetadata, gl);
+    }
+
+    getLegendData () {
+        const metaColumn = this._metadata.properties[this.property.name];
+        const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
+            b.frequency - a.frequency
+        );
+        const buckets = this.numBuckets;
+        const data = [];
+        const name = this.toString();
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+        orderedCategoryNames.forEach((category, i) => {
+            if (i < buckets) {
+                const key = category.name;
+                const value = i / divisor;
+                data.push({ key, value });
+            }
+        });
+
+        data.push({
+            key: _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_LABEL"],
+            value: _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_INDEX"]
+        });
+
+        return { name, data };
     }
 }
 
@@ -20241,6 +20806,7 @@ function genUnaryOp (name, jsFn, glsl) {
             a = Object(_utils__WEBPACK_IMPORTED_MODULE_0__["implicitCast"])(a);
             super({ a });
             this.type = 'number';
+            this.expressionName = name;
             this.inlineMaker = inlines => glsl(inlines.a);
         }
         get value () {
@@ -20266,7 +20832,7 @@ function genUnaryOp (name, jsFn, glsl) {
 /*!***********************************************!*\
   !*** ./src/renderer/viz/expressions/utils.js ***!
   \***********************************************/
-/*! exports provided: DEFAULT, checkMaxArguments, implicitCast, hexToRgb, getOrdinalFromIndex, getStringErrorPreface, throwInvalidType, throwInvalidInstance, throwInvalidNumber, throwInvalidArray, throwInvalidString, isArgConstructorTimeTyped, checkExpression, checkType, checkInstance, checkNumber, checkString, checkArray, checkFeatureIndependent, clamp, mix */
+/*! exports provided: DEFAULT, checkMaxArguments, implicitCast, hexToRgb, getOrdinalFromIndex, getStringErrorPreface, throwInvalidType, throwInvalidInstance, throwInvalidNumber, throwInvalidArray, throwInvalidString, isArgConstructorTimeTyped, checkExpression, checkType, checkInstance, checkNumber, checkString, checkArray, checkFeatureIndependent, clamp, mix, fract */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20292,8 +20858,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkFeatureIndependent", function() { return checkFeatureIndependent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return clamp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mix", function() { return mix; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fract", function() { return fract; });
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _colorspaces__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../colorspaces */ "./src/renderer/viz/colorspaces.js");
+
 
 
 
@@ -20310,16 +20879,15 @@ function implicitCast (value) {
     if (_isNumber(value)) {
         return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["number"])(value);
     }
+
     if (typeof value === 'string') {
         return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["category"])(value);
     }
+
     if (Array.isArray(value)) {
-        const _array = Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["array"])(value);
-        if (_array && _array.type === 'image-array') {
-            return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["imageList"])(_array.elems);
-        }
-        return _array;
+        return Object(_expressions__WEBPACK_IMPORTED_MODULE_0__["list"])(value);
     }
+
     return value;
 }
 
@@ -20413,10 +20981,10 @@ function throwInvalidString (expressionName, parameterName, parameterIndex, str)
 function isArgConstructorTimeTyped (arg) {
     switch (arg) {
         case 'number':
-        case 'number-array':
+        case 'number-list':
         case 'number-property':
         case 'category':
-        case 'category-array':
+        case 'category-list':
         case 'category-property':
             return false;
         default:
@@ -20483,7 +21051,13 @@ function clamp (x, min, max) {
 }
 
 function mix (x, y, a) {
-    return x * (1 - a) + y * a;
+    return typeof x === 'number'
+        ? x * (1 - a) + y * a
+        : Object(_colorspaces__WEBPACK_IMPORTED_MODULE_2__["interpolateRGBAinCieLAB"])(x, y, a);
+}
+
+function fract (x) {
+    return x - Math.floor(x);
 }
 
 function _isNumber (value) {
@@ -20806,6 +21380,7 @@ function parseVizNamedExpr (vizSpec, node) {
         if (name in vizSpec.variables) {
             throw new Error(`Variable '${name}' is already defined.`);
         }
+
         vizSpec.variables[name] = Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(parseNode(node.right));
     } else {
         if (name in vizSpec) {

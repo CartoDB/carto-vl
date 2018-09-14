@@ -1234,7 +1234,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".array"><span class="type-signature">(static) </span>array<span class="signature">(elements)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+    <h4 class="name" id=".array"><span class="type-signature">(static) </span>array<span class="signature">(elements)</span><span class="type-signature"> &rarr; {List}</span></h4>
     
 
     
@@ -1376,7 +1376,7 @@ const viz = new carto.Viz({
     </dt>
     <dd>
         
-<span class="param-type">Array</span>
+<span class="param-type">List</span>
 
 
     </dd>
@@ -1563,7 +1563,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(value, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    <h4 class="name" id=".between"><span class="type-signature">(static) </span>between<span class="signature">(input, lowerLimit, upperLimit)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -1608,7 +1608,7 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -2225,6 +2225,171 @@ const viz = new carto.Viz({
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
    color: ramp(buckets($procesedSpeed, ['slow', 'medium', 'high']), PRISM)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".categoryIndex"><span class="type-signature">(static) </span>categoryIndex<span class="signature">(property)</span><span class="type-signature"> &rarr; {<a href="global.html#Category">Category</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Transform a categorical property into a per-property category index. The evaluated result returns a value between 0 and 1.
+The dataset must contain less than 65536 (256 * 256) different categories.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>The property to be evaluated, must be categorical</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="global.html#Category">Category</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption"> Color by $city using the CARTOColor Prism by assigning different color in Prism to each category.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.categoryIndex(s.prop('city')), s.palettes.PRISM)
+});</code></pre>
+
+        <p class="code-caption"> Color by $city using the CARTOColor Prism by assigning different color in Prism to each category. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  color: ramp(categoryIndex($city), PRISM)
 `);</code></pre>
 
 
@@ -8112,7 +8277,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    <h4 class="name" id=".in"><span class="type-signature">(static) </span>in<span class="signature">(input, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -8156,7 +8321,7 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -10040,7 +10205,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".nin"><span class="type-signature">(static) </span>nin<span class="signature">(value, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
+    <h4 class="name" id=".nin"><span class="type-signature">(static) </span>nin<span class="signature">(input, list)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
     
@@ -10084,7 +10249,7 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>value</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -11591,7 +11756,7 @@ const viz = new carto.Viz(`
     
 
     
-    <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(input, palette)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>}</span></h4>
+    <h4 class="name" id=".ramp"><span class="type-signature">(static) </span>ramp<span class="signature">(input, palette, others<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>|<a href="global.html#Color">Color</a>|Image}</span></h4>
     
 
     
@@ -11599,16 +11764,33 @@ const viz = new carto.Viz(`
 
 
 <div class="description">
-    <p>Create a ramp: a mapping between an input (a numeric or categorical expression) and an output (a color palette or a numeric palette, to create bubble maps)</p>
-<p>Categories to colors
-Categorical expressions can be used as the input for <code>ramp</code> in combination with color palettes. If the number of categories exceeds the number of available colors in the palette new colors will be generated by
-using CieLAB interpolation.</p>
-<p>Categories to numeric
-Categorical expression can be used as the input for <code>ramp</code> in combination with numeric palettes. If the number of input categories doesn't match the number of numbers in the numeric palette, linear interpolation will be used.</p>
-<p>Numeric expressions to colors
-Numeric expressions can be used as the input for <code>ramp</code> in combination with color palettes. Colors will be generated by using CieLAB interpolation.</p>
-<p>Numeric expressions to numeric
-Numeric expressions can be used as the input for <code>ramp</code> in combination with numeric palettes. Linear interpolation will be used to generate intermediate output values.</p>
+    <p>Create a ramp: a mapping between an input (numeric or categorical) and an output (number, colors and/or images)</p>
+<p>When the input has the same number of categories (without taking the &quot;others&quot; category into account).
+Then, each input category will have a one to one match with an output value.</p>
+<p>Some case examples:
+<code>ramp(buckets($product, ['A, 'B', 'C']), [house, car, bus])</code>
+<code>ramp(buckets($price, [20, 50, 120]), [1, 10, 4, 12])</code>
+<code>ramp(top($product, 3), [blue, yellow, green])</code>
+<code>ramp(globalQuantiles($price, 3), [red, yellow, green])</code></p>
+<p>When the input has different number of categories or the input is a linear expression.
+Then it will interpolate the output values (Note: this is not supported if output values are images)</p>
+<p>Some case examples:
+<code>ramp(linear($price, 1, 10) [green, yellow, red])</code>
+`ramp(buckets($product, ['A, 'B', 'C'], [red, blue]))</p>
+<ul>
+<li>When the input is a categorical property, we wrap it automatically in a CategoryIndex expression
+<code>ramp($product, Prism)</code> (equivalent to <code>ramp($categoryIndex($product)), Prism)</code></li>
+<li>When the input is a numeric property, we wrap it automatically in a Linear expression.
+<code>ramp($price, Prism)</code> (equivalent to <code>ramp($linear($price)), Prism)</code></li>
+</ul>
+<p>The &quot;others&quot; value is setted by default, depending on the output type:</p>
+<ul>
+<li>If it is &quot;Number&quot;, the &quot;others&quot; value is 1.</li>
+<li>If it is &quot;Color&quot; from a color array (i.e: [red, yellow, green]), the &quot;others&quot; value is the gray color.</li>
+<li>If it is &quot;Color&quot; from a cartocolor palette (i.e: Prism), the &quot;others&quot; value is the last color of the palette.</li>
+<li>If it is &quot;Image&quot;, the &quot;others&quot; value is a circle.</li>
+</ul>
+<p>If we add a third parameter, the &quot;others&quot; default value will be overridden by this one</p>
 </div>
 
 
@@ -11631,6 +11813,8 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
 
         <th>Type</th>
 
+        
+        <th>Attributes</th>
         
 
         
@@ -11659,6 +11843,14 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
             
             </td>
 
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
             
 
             
@@ -11689,10 +11881,57 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"><p>The color palette that is going to be used</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>others</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+|
+
+<span class="param-type"><a href="global.html#Color">Color</a></span>
+|
+
+<span class="param-type">Image</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Value that overrides the default value for &quot;others&quot;</p></td>
         </tr>
 
     
@@ -11766,6 +12005,9 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
 |
 
 <span class="param-type"><a href="global.html#Color">Color</a></span>
+|
+
+<span class="param-type">Image</span>
 
 
     </dd>
@@ -11778,34 +12020,61 @@ Numeric expressions can be used as the input for <code>ramp</code> in combinatio
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Mapping categories to colors and numbers</p>
+        <p class="code-caption">Mapping categories to numbers, colors and images.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.ramp(s.buckets(s.prop('dn'), [20, 50, 120]), [1, 4, 8])
-  color: s.ramp(s.buckets(s.prop('dn'), [20, 50, 120]), s.palettes.PRISM)
+  width: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [1, 2, 3])
+  color: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), s.palettes.PRISM)
+  strokeColor: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor('green')])
+  symbol: s.ramp(s.buckets(s.prop('product'), ['A, 'B', 'C']), [s.HOUSE, s.CAR, s.BUS])
 });</code></pre>
 
-        <p class="code-caption">Mapping categories to colors and numbers (String)</p>
+        <p class="code-caption">Mapping categories to numbers, colors and images. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: ramp(buckets($dn, [20, 50, 120]), [1, 10,4])
-  color: ramp(buckets($dn, [20, 50, 120]), prism)
+  width: ramp(buckets($product), ['A, 'B', 'C']), [1, 2, 3])
+  color: ramp(buckets($product), ['A, 'B', 'C']), Prism)
+  strokeColor: ramp(buckets($product), ['A, 'B', 'C']), [red, yellow, green])
+  symbol: ramp(buckets($product), ['A, 'B', 'C']), [house, car, bus])
 `);</code></pre>
 
-        <p class="code-caption">Mapping numeric expressions to colors and numbers</p>
+        <p class="code-caption">Mapping classified numeric properties to numbers, colors and images.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  width: s.ramp(s.linear(s.prop('dn'), 40, 100), [1, 8])
-  color: s.ramp(s.linear(s.prop('dn'), 40, 100), s.palettes.PRISM)
+  width: s.ramp(s.buckets(s.prop('price'), [40, 100]), [1, 2, 3])
+  color: s.ramp(s.buckets(s.prop('price'), [40, 100]), s.palettes.PRISM)
+  strokeColor: s.ramp(s.buckets(s.prop('price'), [40, 100]), [s.namedColor('red'), s.namedColor('yellow'), s.namedColor(green)])
+  symbol: s.ramp(s.buckets(s.prop('price'), [40, 100]), [s.HOUSE), s.CAR, s.BUS])
 });</code></pre>
 
-        <p class="code-caption">Mapping numeric expressions to colors and numbers (String)</p>
+        <p class="code-caption">Mapping classified numeric properties to numbers, colors and images. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  width: ramp(linear($dn, 40, 100), [1, 10,4])
-  color: ramp(linear($dn, 40, 100), prism)
+  width: ramp(buckets($price, [40, 100]), [1, 2, 3])
+  color: ramp(buckets($price, [40, 100]), Prism)
+  strokeColor: ramp(buckets($price, [40, 100]), [red, yellow, green])
+  symbol: ramp(buckets($price, [40, 100]), [house, car, bus])
+`);</code></pre>
+
+        <p class="code-caption">Override default values.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  width: s.ramp(s.top(s.prop('price'), 3), [1, 2, 3], 0)
+  strokeColor: s.ramp(s.top(s.prop('price'), 3), Prism, s.namedColor('red'))
+  color: s.ramp(s.top(s.prop('price'), 3), [s.namedColor('blue'), s.namedColor('red'), s.namedColor('yellow')], s.namedColor(black))
+  symbol: s.ramp(s.top(s.prop('price'), 3), [s.HOUSE, s.CAR, s.BUS], s.CROSS)
+});</code></pre>
+
+        <p class="code-caption">Override default values. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: ramp(top($price, 3), [1, 2, 3], 0)
+  strokeColor: ramp(top($price, 3), Prism, red)
+  color: ramp(top($price, 3), [blue, red, yellow], black)
+  symbol: ramp(top($price, 3), [house, car, bus], cross)
 `);</code></pre>
 
 
@@ -11816,7 +12085,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Palette">Palette</a>|BaseArray}</span></h4>
+    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Palette">Palette</a>|List}</span></h4>
     
 
     
@@ -11869,7 +12138,7 @@ const viz = new carto.Viz({
 <span class="param-type"><a href="global.html#Palette">Palette</a></span>
 |
 
-<span class="param-type">BaseArray</span>
+<span class="param-type">List</span>
 
 
             
@@ -11952,7 +12221,7 @@ const viz = new carto.Viz({
 <span class="param-type"><a href="global.html#Palette">Palette</a></span>
 |
 
-<span class="param-type">BaseArray</span>
+<span class="param-type">List</span>
 
 
     </dd>
@@ -11978,14 +12247,14 @@ const viz = new carto.Viz({
   color: ramp($type, reverse(PRISM))
 `);</code></pre>
 
-        <p class="code-caption">Invert a Color Array.</p>
+        <p class="code-caption">Invert a List.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   color: s.ramp(s.prop('count'), s.reverse([s.namedColor('red'), s.namedColor('blue')]));
 });</code></pre>
 
-        <p class="code-caption">Invert a Color Array (String).</p>
+        <p class="code-caption">Invert a List (String).</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   color: ramp($count, reverse([red, blue]))
@@ -16705,13 +16974,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3>Global</h3><ul><li><a href="global.html#geometryType">geometryType</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Sep 11 2018 11:54:35 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Sep 14 2018 10:59:53 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
