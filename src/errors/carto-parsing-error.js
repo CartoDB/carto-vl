@@ -1,4 +1,4 @@
-import { CartoError } from './carto-error';
+import CartoError from './carto-error';
 
 /**
  * Utility to build a cartoError related to Parsing errors.
