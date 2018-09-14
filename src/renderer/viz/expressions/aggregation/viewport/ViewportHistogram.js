@@ -65,7 +65,7 @@ export default class ViewportHistogram extends BaseExpression {
 
     get roundedValue () {
         return this.eval()
-            .map(_roundValues);
+            .map(_roundValue);
     }
 
     eval () {
@@ -133,8 +133,7 @@ function _getCategoryValue (histogram) {
     return [...histogram]
         .map(([x, y]) => {
             return { x, y };
-        }
-        );
+        })
 }
 
 function _sortNumerically (a, b) {
@@ -145,6 +144,8 @@ function _sortNumerically (a, b) {
     return b.y - a.y;
 }
 
-function _roundValues (x, y) {
-    return { x: [Math.round(x), Math.round(x[1])], y };
+function _roundValue (value) {
+    const x = [Math.round(value.x[0]), Math.round(value.x[1])];
+    const y = value.y;
+    return { x, y };
 }

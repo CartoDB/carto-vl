@@ -77,14 +77,18 @@
 
     layer.addTo(map, 'watername_ocean');
 
-    layer.on('loaded', hideLoader);
+    layer.on('loaded', () => {
+      hideLoader();
+      drawHistogramLegend();
+    });
+
     layer.on('updated', drawHistogramLegend);
 
     function drawHistogramLegend() {
       // Get the color ramp
       const colorRamp = layer.viz.color;
       // Get the viewport histogram
-      const histogram = layer.viz.variables.histogram.value;
+      const histogram = layer.viz.variables.histogram.roundedValue;
       // Get labels (x)
       const labels = histogram.map(value => value.x);
       // Get data (y)
