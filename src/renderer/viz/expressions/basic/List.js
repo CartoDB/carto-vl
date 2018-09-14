@@ -9,11 +9,24 @@ const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image', '
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
- * @param {Number[]|Category[]|Color[]|Date[]|Image[]} elements
- * @returns {List}
+ * When used with Transformation expressions, the returned value will be a Transformation that will chain each single transformation one after another.
+ *
+ * @example <caption>Rotate then translate.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   transform: [s.rotate(90), s.translate(10, 20)]
+ * });
+ *
+ * @example <caption>Rotate then translate. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   transform: [rotate(90), translate(10, 20)]
+ * `);
+ *
+ * @param {Number[]|Category[]|Color[]|Date[]|Image[]|Transform[]} elements
+ * @returns {List|Transform}
  *
  * @memberof carto.expressions
- * @name array
+ * @name list
  * @function
  * @api
  */
