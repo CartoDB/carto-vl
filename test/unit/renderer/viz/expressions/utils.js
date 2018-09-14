@@ -52,25 +52,6 @@ export function validateMaxArgumentsError (expressionName, args) {
     });
 }
 
-function equalArgs (argsA, argsB) {
-    if (argsA.length !== argsB.length) {
-        return false;
-    }
-
-    return argsA.every((arg, index) => argsB[index] === arg);
-}
-
-function _validateCompileTimeTypeError (expressionName, args, regexGenerator = null) {
-    const regex = regexGenerator ? regexGenerator(expressionName, args)
-        : new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g');
-    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
-        expect(() => {
-            const expression = s[expressionName](...args.map(arg => arg[0]));
-            expression._bindMetadata(metadata);
-        }).toThrowError(regex);
-    });
-}
-
 export function validateStaticType (expressionName, argTypes, expectedType) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
@@ -97,7 +78,7 @@ function validateConstructorTimeType (expressionName, args, expectedType) {
 }
 
 function validateCompileTimeType (expressionName, args, expectedType) {
-    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at constructor time`, () => {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should be of type '${expectedType}' at compile time`, () => {
         expect(
             compile(s[expressionName](...args.map(arg => arg[0]))).type
         ).toEqual(expectedType);
@@ -108,23 +89,23 @@ function getSimpleArg (type) {
     switch (type) {
         case 'number':
             return [s.number(0), '0'];
-        case 'number-array':
-            return [s.array([s.number(0)]), '[0]'];
+        case 'number-list':
+            return [s.list([s.number(0)]), '[0]'];
         case 'number-property':
             return [s.property('number'), '$number'];
         case 'category':
             return [s.category('category'), '\'category\''];
-        case 'category-array':
-            return [s.array([s.category('category')]), '[\'category\']'];
+        case 'category-list':
+            return [s.list([s.category('category')]), '[\'category\']'];
         case 'category-property':
             return [s.property('category'), '$category'];
         case 'color':
             return [s.hsv(0, 0, 0), 'hsv(0, 0, 0)'];
-        case 'color-array':
-            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
+        case 'color-list':
+            return [s.list(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-array':
+        case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
             return [type, `${type}`];
@@ -136,21 +117,21 @@ function getPropertyArg (type) {
         case 'number':
         case 'number-property':
             return [s.property('number'), '$number'];
-        case 'number-array':
-            return [s.array([s.number(0)]), '[0]'];
+        case 'number-list':
+            return [s.list([s.number(0)]), '[0]'];
         case 'category':
         case 'category-property':
             return [s.property('category'), '$category'];
-        case 'category-array':
-            return [s.array([s.category('category')]), '[\'category\']'];
+        case 'category-list':
+            return [s.list([s.category('category')]), '[\'category\']'];
         case 'color':
         case 'color-property':
             return [s.hsv(s.property('number'), 0, 0), 'hsv($number, 0, 0)'];
-        case 'color-array':
-            return [s.array(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
+        case 'color-list':
+            return [s.list(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
-        case 'image-array':
+        case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
             return [type, `${type}`];
@@ -160,4 +141,23 @@ function getPropertyArg (type) {
 function compile (expression) {
     expression._bindMetadata(metadata);
     return expression;
+}
+
+function equalArgs (argsA, argsB) {
+    if (argsA.length !== argsB.length) {
+        return false;
+    }
+
+    return argsA.every((arg, index) => argsB[index] === arg);
+}
+
+function _validateCompileTimeTypeError (expressionName, args, regexGenerator = null) {
+    const regex = regexGenerator ? regexGenerator(expressionName, args)
+        : new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g');
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            const expression = s[expressionName](...args.map(arg => arg[0]));
+            expression._bindMetadata(metadata);
+        }).toThrowError(regex);
+    });
 }

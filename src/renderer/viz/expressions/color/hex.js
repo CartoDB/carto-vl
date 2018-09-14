@@ -35,7 +35,11 @@ export default class Hex extends BaseExpression {
         } catch (error) {
             throw new Error(getStringErrorPreface('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
         }
+        this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
+    }
+    toString () {
+        return this.hexadecimalColor;
     }
     get value () {
         return this.eval();

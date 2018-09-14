@@ -35,6 +35,7 @@ export default class NamedColor extends BaseExpression {
         super({});
         this.type = 'color';
         this.name = colorName;
+        this.expressionName = colorName;
         this.color = _nameToRGBA(this.name);
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
     }
@@ -45,6 +46,10 @@ export default class NamedColor extends BaseExpression {
 
     eval () {
         return this.color;
+    }
+
+    toString () {
+        return this.expressionName;
     }
 }
 

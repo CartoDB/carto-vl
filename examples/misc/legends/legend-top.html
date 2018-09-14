@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Include CARTO VL JS -->
+  <script src="../../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <!-- Include Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <!-- Map goes here -->
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Tree Species in San Francisco</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <ul id="content"></ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-122.424335, 37.771521],
+      zoom: 13,
+      dragRotate: false,
+    });
+    map.touchZoomRotate.disableRotation();
+
+    // Authenticate the client
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define the source
+    const source = new carto.source.Dataset('trees_sf');
+
+    // Define visualization
+    const viz = new carto.Viz(`
+      color: ramp(top($common_species,5), bold)
+      strokeWidth: 1
+    `);
+
+    // Create the layer
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', () => {
+      hideLoader();
+
+      // Get the legend
+      const colorLegend = layer.viz.color.getLegend();
+
+      let colorLegendList = '';
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        colorLegendList +=
+          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+      });
+      // Update the information
+      document.getElementById('content').innerHTML = colorLegendList;
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function rgbToHex(color) {
+      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+    }
+
+  </script>
+</body>
+
+</html>
