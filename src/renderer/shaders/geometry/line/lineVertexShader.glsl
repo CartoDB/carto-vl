@@ -19,7 +19,7 @@ float decodeWidth(vec2 enc) {
 }
 
 $propertyPreface
-$offset_preface
+$transform_preface
 
 void main(void) {
     color = texture2D(colorTex, featureID);
@@ -36,7 +36,7 @@ void main(void) {
     z = z * 2. - 1.;
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
-    p.xy += normalScale*($offset_inline);
+    p.xy += normalScale*($transform_inline);
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
