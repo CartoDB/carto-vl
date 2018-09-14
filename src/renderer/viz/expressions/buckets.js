@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
@@ -63,67 +64,38 @@ export default class Buckets extends BaseExpression {
         input = implicitCast(input);
         list = implicitCast(list);
 
-        let looseType;
-
-        if (input.type) {
-            if (input.type !== 'number' && input.type !== 'category') {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} buckets(): invalid first parameter type\n\t'input' type was ${input.type}`);
-            }
-            looseType = input.type;
-        }
-
         let children = {
-            input
+            input,
+            list
         };
 
-        let numCategories;
-        if (list.elems) {
-            list.elems.map((item, index) => {
-                if (item.type) {
-                    if (looseType && looseType !== item.type) {
-                        throw new CartoValidationError(
-                            `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                            `\n\texpected type was ${looseType}\n\tactual type was ${item.type}`);
-                    } else if (item.type !== 'number' && item.type !== 'category') {
-                        throw new CartoValidationError(
-                            `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`
-                        );
-                    }
-                }
-
-                children[`arg${index}`] = item;
-            });
-            numCategories = list.elems.length + 1;
-        }
-
         super(children);
-        this.numCategories = numCategories;
-
-        this.list = list;
+        this.numCategories = null;
+        this.numCategoriesWithoutOthers = null;
         this.type = 'category';
     }
 
     eval (feature) {
         const v = this.input.eval(feature);
-        let i = 0;
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
         if (this.input.type === 'category') {
-            for (i = 0; i < this.list.elems.length; i++) {
+            for (let i = 0; i < this.list.elems.length; i++) {
                 if (v === this.list.elems[i].eval(feature)) {
-                    return i;
+                    return i / divisor;
                 }
+            }
+
+            return OTHERS_INDEX;
+        }
+
+        for (let i = 0; i < this.list.elems.length; i++) {
+            if (v < this.list.elems[i].eval(feature)) {
+                return i / divisor;
             }
         }
 
-        if (this.input.type === 'number') {
-            for (i = 0; i < this.list.elems.length; i++) {
-                if (v < this.list.elems[i].eval(feature)) {
-                    return i;
-                }
-            }
-        }
-
-        return i;
+        return 1;
     }
 
     _bindMetadata (metadata) {
@@ -135,7 +107,7 @@ export default class Buckets extends BaseExpression {
             );
         }
 
-        checkType('buckets', 'list', 1, ['number-array', 'category-array'], this.list);
+        checkType('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
@@ -149,29 +121,78 @@ export default class Buckets extends BaseExpression {
                 );
             }
         });
+
+        this.numCategories = this.list.elems.length + 1;
+        this.numCategoriesWithoutOthers = this.input.type === 'category' ? this.numCategories - 1 : this.numCategories;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-        let childInlines = {};
-        childSources.map((source, index) => {
-            childInlines[this.childrenNames[index]] = source.inline;
+        const childSourcesArray = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
+        let childSources = {};
+        childSourcesArray.map((source, index) => {
+            childSources[this.childrenNames[index]] = source;
         });
+
         const funcName = `buckets${this._uid}`;
         const cmp = this.input.type === 'category' ? '==' : '<';
+
+        // When there is "OTHERS" we don't need to take it into account
+        const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+
         const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x${cmp}(${childInlines[`arg${index}`]})){
-                return ${index}.;
+            `${index > 0 ? 'else' : ''} if (x${cmp}(${childSources.list.inline[index]})){
+                return ${index}./${divisor.toFixed(20)};
             }`;
         const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.numCategories - 1}.;
+            return ${this.input.type === 'category' ? OTHERS_GLSL_VALUE : (this.numCategories - 1).toFixed(20)};
         }`;
 
         return {
-            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
-            inline: `${funcName}(${childInlines.input})`
+            preface: this._prefaceCode(childSources.list.preface + preface),
+            inline: `${funcName}(${childSources.input.inline})`
         };
     }
+
+    getLegendData (config) {
+        const name = this.toString();
+        const list = this.list.elems.map(elem => elem.eval());
+        const data = this.input.type === 'number'
+            ? _getLegendDataNumeric(list)
+            : _getLegendDataCategory(list, config);
+
+        return { data, name };
+    }
+}
+
+function _getLegendDataNumeric (list) {
+    const data = [];
+
+    for (let i = 0; i <= list.length; i++) {
+        const min = i - 1 >= 0 ? list[i - 1] : Number.NEGATIVE_INFINITY;
+        const max = i < list.length ? list[i] : Number.POSITIVE_INFINITY;
+        const key = [min, max];
+        const value = i / list.length;
+        data.push({ key, value });
+    }
+
+    return data;
+}
+
+function _getLegendDataCategory (list, config) {
+    const divisor = list.length - 1;
+    const data = list.map((category, index) => {
+        const key = category;
+        const value = index / divisor;
+
+        return { key, value };
+    });
+
+    data.push({
+        key: config.othersLabel,
+        value: OTHERS_INDEX
+    });
+
+    return data;
 }

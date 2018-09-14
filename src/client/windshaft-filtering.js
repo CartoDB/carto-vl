@@ -101,7 +101,7 @@ class AggregationFiltering {
 
     _between (f) {
         if (f.isA(Between)) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let lo = p && this._value(f.lowerLimit);
             let hi = p && lo && this._value(f.upperLimit);
             if (hi) {
@@ -116,7 +116,7 @@ class AggregationFiltering {
 
     _in (f) {
         if (f.isA(In)) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
@@ -129,7 +129,7 @@ class AggregationFiltering {
 
     _notIn (f) {
         if (f.isA(Nin)) {
-            let p = this._aggregation(f.value);
+            let p = this._aggregation(f.input);
             let values = f.list.elems.map(c => this._value(c)).filter(v => v !== null);
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 p.filters.push({
@@ -355,7 +355,7 @@ class PreaggregationFiltering {
 
     _in (f) {
         if (f.isA(In)) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
@@ -369,7 +369,7 @@ class PreaggregationFiltering {
 
     _notIn (f) {
         if (f.isA(Nin)) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let values = f.list.elems.map(cat => this._value(cat));
             if (p && values.length > 0 && values.length === f.list.elems.length) {
                 return {
@@ -383,7 +383,7 @@ class PreaggregationFiltering {
 
     _between (f) {
         if (f.isA(Between)) {
-            let p = this._property(f.value);
+            let p = this._property(f.input);
             let lo = this._value(f.lowerLimit);
             let hi = this._value(f.upperLimit);
             if (p && lo && hi) {
@@ -436,7 +436,7 @@ const SQLGenerators = {
     'greaterThan': f => sqlSep(' > ', f.left, f.right),
     'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
     'property': f => sqlId(f.property),
-    'value': f => sqlQ(f.value)
+    'value': f => sqlQ(f.input)
 };
 
 /**

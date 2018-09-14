@@ -458,6 +458,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             const signature = getSignatureLoose(a, b);
 
             super({ a, b });
+            this.expressionName = name;
             this.type = getReturnTypeFromSignature(signature);
             this.inlineMaker = inline => glsl(inline.a, inline.b);
         }

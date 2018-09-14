@@ -41,6 +41,7 @@ export default class Property extends BaseExpression {
         }
         super({});
         this.name = name;
+        this.expressionName = name;
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -56,18 +57,35 @@ export default class Property extends BaseExpression {
         if (!feature) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
+
         return feature[this.name];
     }
 
-    _bindMetadata (meta) {
-        const metaColumn = meta.properties[this.name];
+    toString () {
+        return `$${this.expressionName}`;
+    }
+
+    get categories () {
+        return this.type === 'category'
+            ? this._metadata.properties[this.name].categories
+            : undefined;
+    }
+
+    _bindMetadata (metadata) {
+        const metaColumn = metadata.properties[this.name];
         if (!metaColumn) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Property '${this.name}' does not exist`);
         }
+
+        this._metadata = metadata;
         this.type = metaColumn.type;
 
-        if (this.type === 'category' && this.numCategories === undefined) {
-            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
+        if (this.type === 'category' && !this.numCategories) {
+            Object.defineProperty(this, 'numCategories', {
+                get: function () {
+                    return metaColumn.categories.length;
+                }
+            });
         }
     }
 

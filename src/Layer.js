@@ -461,6 +461,15 @@ export default class Layer {
     }
 
     async _vizChanged (viz) {
+        if (this._cache) {
+            return this._cache;
+        }
+        this._cache = this._requestVizChanges(viz)
+            .then(() => { this._cache = null; });
+        return this._cache;
+    }
+
+    async _requestVizChanges (viz) {
         await this._context;
         if (!this._source) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} a 'source' is required before changing the viz.`);

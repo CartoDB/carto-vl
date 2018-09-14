@@ -1,7 +1,8 @@
-import { number, category, array, imageList } from '../expressions';
+import { number, category, list } from '../expressions';
 import BaseExpression from './base';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoParsingError from '../../../errors/carto-parsing-error';
+import { interpolateRGBAinCieLAB } from '../colorspaces';
 
 export const DEFAULT = undefined;
 
@@ -16,16 +17,15 @@ export function implicitCast (value) {
     if (_isNumber(value)) {
         return number(value);
     }
+
     if (typeof value === 'string') {
         return category(value);
     }
+
     if (Array.isArray(value)) {
-        const _array = array(value);
-        if (_array && _array.type === 'image-array') {
-            return imageList(_array.elems);
-        }
-        return _array;
+        return list(value);
     }
+
     return value;
 }
 
@@ -119,10 +119,10 @@ export function throwInvalidString (expressionName, parameterName, parameterInde
 export function isArgConstructorTimeTyped (arg) {
     switch (arg) {
         case 'number':
-        case 'number-array':
+        case 'number-list':
         case 'number-property':
         case 'category':
-        case 'category-array':
+        case 'category-list':
         case 'category-property':
             return false;
         default:
@@ -189,7 +189,13 @@ export function clamp (x, min, max) {
 }
 
 export function mix (x, y, a) {
-    return x * (1 - a) + y * a;
+    return typeof x === 'number'
+        ? x * (1 - a) + y * a
+        : interpolateRGBAinCieLAB(x, y, a);
+}
+
+export function fract (x) {
+    return x - Math.floor(x);
 }
 
 function _isNumber (value) {

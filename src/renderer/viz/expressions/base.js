@@ -31,9 +31,9 @@ export default class Base {
         this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+        this.expressionName = _toCamelCase(this.constructor.name);
     }
 
-    // eslint-disable-next-line no-unused-vars
     /**
      * Evaluate the expression providing a feature.
      * This is particularly useful for making legends.
@@ -69,6 +69,34 @@ export default class Base {
      */
     eval (feature) {
         throw new CartRuntimeError('Unimplemented');
+    }
+
+    /**
+     * Get the expression stringified
+     *
+     * @api
+     * @memberof carto.expressions.Base
+     * @returns {string}
+     *
+     * @example <caption>Get the stringified expression of the viz color property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear('amount'), s.palettes.PRISM)
+     * });
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     * @example <caption>Get the stringified expression of the viz color property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($amount), Prism)
+     * `);
+     *
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     */
+    toString () {
+        return `${this.expressionName}(${this._getChildren().map(child => child.toString()).join(', ')})`;
     }
 
     /**
@@ -223,6 +251,10 @@ export default class Base {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
 
+    get value () {
+        return this.eval();
+    }
+
     _getBinding (shader) {
         if (!this._shaderBindings.has(shader)) {
             this._shaderBindings.set(shader, {});
@@ -272,4 +304,11 @@ export default class Base {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
+}
+
+function _toCamelCase (str) {
+    if (str.toUpperCase() === str) {
+        return str.toLowerCase();
+    }
+    return str.charAt(0).toLowerCase() + str.slice(1);
 }

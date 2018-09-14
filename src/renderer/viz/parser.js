@@ -93,6 +93,7 @@ function parseVizNamedExpr (vizSpec, node) {
         if (name in vizSpec.variables) {
             throw new CartoParsingError(`Variable '${name}' is already defined.`);
         }
+
         vizSpec.variables[name] = implicitCast(parseNode(node.right));
     } else {
         if (name in vizSpec) {

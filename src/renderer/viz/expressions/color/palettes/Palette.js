@@ -1,5 +1,9 @@
 import BaseExpression from '../../base';
 import { hexToRgb } from '../../utils';
+import { RGBA } from '../rgb';
+import { constant } from '../../../expressions';
+
+const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
 
 /**
  * Color palettes.
@@ -38,6 +42,7 @@ export default class Palette extends BaseExpression {
     constructor (name, subPalettes) {
         super({});
         this.type = 'palette';
+        this.childType = 'color';
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
@@ -46,8 +51,36 @@ export default class Palette extends BaseExpression {
                 }
             }
         });
-
+        this.expressionName = name;
         this.tags = subPalettes.tags;
+    }
+
+    getColors (numCategories) {
+        const colors = this._getBestSubPalette(numCategories);
+
+        if (this.isQualitative()) {
+            const othersColor = colors.pop();
+            return { colors, othersColor };
+        } else {
+            return { colors, othersColor: null };
+        }
+    }
+
+    toString () {
+        return this.expressionName;
+    }
+
+    _getBestSubPalette (subPaletteIndex) {
+        subPaletteIndex = subPaletteIndex <= MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            ? MIN_CARTOCOLOR_SUBPALETTE_SIZE
+            : subPaletteIndex;
+        const longestSubPalette = this.getLongestSubPalette();
+        const subPalette = (subPaletteIndex < longestSubPalette.length
+            ? [...this.subPalettes[subPaletteIndex]]
+            : [...longestSubPalette]);
+        return subPalette.map(color =>
+            new RGBA(constant(color.r), constant(color.g), constant(color.b), constant(color.a))
+        );
     }
 
     getLongestSubPalette () {

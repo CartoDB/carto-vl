@@ -125,8 +125,6 @@
 
 import Transition from './expressions/transition';
 
-import BaseArray from './expressions/basic/array';
-
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
 
@@ -203,7 +201,8 @@ import ViewportEqIntervals from './expressions/classification/ViewportEqInterval
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
 import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
-import Ramp from './expressions/ramp';
+import Ramp from './expressions/Ramp';
+import List from './expressions/basic/List';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
@@ -247,20 +246,18 @@ import ViewportFeatures from './expressions/viewportFeatures';
 
 import Zoom from './expressions/zoom';
 
-import Placement from './expressions/placement';
+import Placement from './expressions/Placement';
 import Image from './expressions/Image';
-import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
+import Translate from './expressions/transformation/Translate';
 
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
-
-export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -305,7 +302,6 @@ export const clusterCount = (...args) => new ClusterCount(...args);
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
-export const imageList = (...args) => new ImageList(...args);
 
 export const svg = (...args) => new SVG(...args);
 
@@ -321,6 +317,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
@@ -399,6 +396,7 @@ export const scaled = (...args) => new Scaled(...args);
 export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
+export const translate = (...args) => new Translate(...args);
 export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);

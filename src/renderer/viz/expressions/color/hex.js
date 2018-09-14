@@ -37,7 +37,11 @@ export default class Hex extends BaseExpression {
             const preface = getStringErrorPreface('hex', 'hexadecimalColor', 0);
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${preface} \nInvalid hexadecimal color string`);
         }
+        this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
+    }
+    toString () {
+        return this.hexadecimalColor;
     }
     get value () {
         return this.eval();

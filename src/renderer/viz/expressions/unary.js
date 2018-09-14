@@ -290,6 +290,7 @@ function genUnaryOp (name, jsFn, glsl) {
             a = implicitCast(a);
             super({ a });
             this.type = 'number';
+            this.expressionName = name;
             this.inlineMaker = inlines => glsl(inlines.a);
         }
         get value () {

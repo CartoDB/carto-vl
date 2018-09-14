@@ -60,7 +60,7 @@ export default class ViewportQuantiles extends Classifier {
         // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
             for (i; i < histogramBuckets; i++) {
-                if (accumHistogram[i] > (index + 1) / this.buckets * total) {
+                if (accumHistogram[i] > (index + 1) / this.numCategories * total) {
                     break;
                 }
             }

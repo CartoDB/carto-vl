@@ -46,7 +46,7 @@ export default class ViewportEqIntervals extends Classifier {
         const max = this._max.eval();
 
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = min + (max - min) * p;
         });
     }
