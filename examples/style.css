@@ -69,7 +69,7 @@ body {
   z-index: 0;
 }
 
-aside.toolbox {
+.toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
@@ -79,7 +79,7 @@ aside.toolbox {
   overflow-wrap: break-word;
 }
 
-aside.chart-toolbox {
+.chart-toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
@@ -88,6 +88,11 @@ aside.chart-toolbox {
   min-width: 450px;
   max-width: 450px;
   z-index: 2;
+}
+
+.chart-toolbox-large { 
+  min-width: 600px;
+  max-width: 600px;
 }
 
 /* UTILITIES */

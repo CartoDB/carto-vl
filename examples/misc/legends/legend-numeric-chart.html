@@ -17,14 +17,14 @@
 <body>
   <!-- Map goes here -->
   <div id="map"></div>
-  <aside class="chart-toolbox">
+  <aside class="chart-toolbox chart-toolbox-large">
     <div class="box">
       <header>
         <h1>Histogram with purchase hours</h1>
       </header>
       <section>
         <div id="controls">
-          <canvas id="histogram" width="500" height="600"></canvas>
+          <canvas id="histogram" width="600" height="300"></canvas>
         </div>
       </section>
       <footer class="js-footer"></footer>
@@ -66,7 +66,7 @@
     // Define the visualization
     const viz = new carto.Viz(
       `
-      @histogram: viewportHistogram($hour, 1, 7)
+      @histogram: viewportHistogram($hour, 1, 12)
       color: ramp($hour, bold)
       width: 5
       strokeWidth: 0
@@ -100,6 +100,9 @@
       var myChart = new Chart(ctx, {
         type: 'bar',
         options: {
+          animation: {
+            duration: 0
+          },
           legend: {
             display: false
           },
