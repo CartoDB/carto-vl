@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Include CARTO VL JS -->
+  <script src="../../../../dist/carto-vl.js"></script>
+  <!-- Include Chart JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <!-- Include Custom CSS -->
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <!-- Map goes here -->
+  <div id="map"></div>
+  <aside class="chart-toolbox">
+    <div class="box">
+      <header>
+        <h1>Daytime sales</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <canvas id="histogram" width="500" height="600"></canvas>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [2.187695966305114, 41.38802296362937],
+      zoom: 12.073961457702497,
+      dragRotate: false,
+    });
+    map.touchZoomRotate.disableRotation();
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const ctx = document.getElementById('histogram').getContext('2d');
+    // Define the source
+    const source = new carto.source.Dataset('spend_data');
+    // Define the visualization
+    const viz = new carto.Viz(
+      `
+      @histogram: viewportHistogram($daytime)
+      color: ramp($daytime, bold)
+      width: 5
+      strokeWidth: 0
+    `
+    );
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', () => {
+      hideLoader();
+    });
+
+    layer.on('updated', () => {
+      const histogram = layer.viz.variables.histogram.eval();
+      const colorRamp = layer.viz.color;
+      const labels = histogram.map(value => value.x);
+      const data = histogram.map(value => value.y);
+      const backgroundColor = colorRamp
+        .getLegend()
+        .data
+        .map(legend => computeColor(legend.value));
+
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        options: {
+          legend: {
+            display: false
+          },
+          scales: {
+            yAxes: [{
+              gridLines: {
+                drawBorder: false,
+                display: false
+              },
+              ticks: {
+                display: false
+              }
+            }],
+            xAxes: [{
+              gridLines: {
+                drawBorder: false,
+                display: false
+              },
+              ticks: {
+                display: false
+              },
+              barPercentage: 1.0,
+              categoryPercentage: 1.0
+            }]
+          },
+        },
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor
+          }]
+        }
+      });
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function computeColor(color) {
+      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
+    }
+
+  </script>
+</body>
+
+</html>

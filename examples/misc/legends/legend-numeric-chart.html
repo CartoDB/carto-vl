@@ -3,7 +3,7 @@
 
 <head>
   <!-- Include CARTO VL JS -->
-  <script src="../../../dist/carto-vl.js"></script>
+  <script src="../../../../dist/carto-vl.js"></script>
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
   <!-- Include Mapbox GL JS -->
@@ -11,7 +11,7 @@
   <!-- Include Mapbox GL CSS -->
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <!-- Include Custom CSS -->
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
@@ -20,7 +20,7 @@
   <aside class="chart-toolbox">
     <div class="box">
       <header>
-        <h1>Histogram</h1>
+        <h1>Histogram with purchase hours</h1>
       </header>
       <section>
         <div id="controls">
@@ -42,8 +42,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [2.212774913887074, 41.416951606921714],
-      zoom: 11.5,
+      center: [2.187695966305114, 41.38802296362937],
+      zoom: 12.073961457702497,
       dragRotate: false,
     });
     map.touchZoomRotate.disableRotation();
@@ -53,6 +53,11 @@
       apiKey: 'default_public'
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     const ctx = document.getElementById('histogram').getContext('2d');
 
     // Define the source
@@ -61,8 +66,8 @@
     // Define the visualization
     const viz = new carto.Viz(
       `
-      @histogram: viewportHistogram($category)
-      color: ramp($category, bold)
+      @histogram: viewportHistogram($hour, 1, 7)
+      color: ramp($hour, bold)
       width: 5
       strokeWidth: 0
     `
@@ -72,36 +77,69 @@
 
     layer.addTo(map, 'watername_ocean');
 
-    layer.on('loaded', () => {
-      hideLoader();
-    });
+    layer.on('loaded', hideLoader);
+    layer.on('updated', drawHistogramLegend);
 
-    layer.on('updated', () => {
-      const histogram = layer.viz.variables.histogram.eval();
+    function drawHistogramLegend() {
+      // Get the color ramp
       const colorRamp = layer.viz.color;
+      // Get the viewport histogram
+      const histogram = layer.viz.variables.histogram.value;
+      // Get labels (x)
       const labels = histogram.map(value => value.x);
+      // Get data (y)
       const data = histogram.map(value => value.y);
-      const backgroundColor = colorRamp
+
+      // Get chart bars colors
+      const colors = colorRamp
         .getLegend()
         .data
         .map(legend => computeColor(legend.value));
 
+      // Draw chart using Chart.js library (https://www.chartjs.org/)
       var myChart = new Chart(ctx, {
-        type: 'horizontalBar',
+        type: 'bar',
         options: {
           legend: {
             display: false
+          },
+          scales: {
+            yAxes: [{
+              gridLines: {
+                drawBorder: false,
+                display: false
+              },
+              ticks: {
+                display: false
+              }
+            }],
+            xAxes: [{
+              gridLines: {
+                drawBorder: false,
+                display: false
+              },
+              ticks: {
+                callback: function (tick, index, ticks) {
+                  return `[${tick[0]}, ${tick[1]}]`;
+                },
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0
+              },
+              barPercentage: 0.95,
+              categoryPercentage: 1.0
+            }]
           }
         },
         data: {
           labels,
           datasets: [{
             data,
-            backgroundColor
+            backgroundColor: '#86d7ff'
           }]
         }
       });
-    });
+    }
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';

@@ -3,7 +3,7 @@ import { implicitCast } from '../../utils';
 import { checkMaxArguments } from '../../utils';
 
 /**
- * Generates an histogram.
+ * Generates a histogram.
  *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  * The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
@@ -58,7 +58,12 @@ export default class ViewportHistogram extends BaseExpression {
         }
     }
 
-    get value () {
+    get sortedValues () {
+        return this.eval()
+            .sort(_sortNumerically);
+    }
+
+    eval () {
         if (this._cached === null) {
             if (!this._histogram) {
                 return null;
@@ -72,10 +77,6 @@ export default class ViewportHistogram extends BaseExpression {
         }
 
         return this._cached;
-    }
-
-    eval () {
-        return this.value;
     }
 
     _bindMetadata (metadata) {
@@ -117,7 +118,7 @@ function _getNumericValue (histogram, size) {
 
     return hist.map((count, index) => {
         return {
-            x: [min + index / size * range, min + (index + 1) / size * range],
+            x: [Math.floor(min + index / size * range), Math.floor(min + (index + 1) / size * range)],
             y: count
         };
     });
@@ -128,10 +129,9 @@ function _getCategoryValue (histogram) {
         .map(([x, y]) => {
             return { x, y };
         })
-        .sort(_sortFirstNumerically);
 }
 
-function _sortFirstNumerically (a, b) {
+function _sortNumerically (a, b) {
     if (b.y - a.y === 0) {
         return a.x.localeCompare(b.x);
     }
