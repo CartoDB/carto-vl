@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -19,7 +19,8 @@
     "Mamata Akella <makella@carto.com>",
     "Raúl Ochoa <rochoa@carto.com>",
     "Ariana Escobar <ariana@carto.com>",
-    "Elena Torro <elena@carto.com>"
+    "Elena Torro <elena@carto.com>",
+    "Víctor Velarde <victor@carto.com>"
   ],
   "license": "BSD-3-Clause",
   "files": [
@@ -27,7 +28,10 @@
     "dist"
   ],
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
     "@mapbox/vector-tile": "^1.3.0",
+    "babel-loader": "^8.0.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
@@ -60,7 +64,7 @@
     "karma-jasmine": "^1.1.2",
     "karma-mocha-reporter": "^2.2.5",
     "karma-sourcemap-loader": "^0.3.7",
-    "karma-webpack": "^3.0.0",
+    "karma-webpack": "3.0.0",
     "lodash.template": "^4.4.0",
     "mocha": "^5.0.0",
     "puppeteer": "^1.1.0",
@@ -69,9 +73,10 @@
     "sloc": "^0.2.0",
     "svg-inline-loader": "^0.8.0",
     "wait-on": "^2.1.0",
-    "webpack": "^4.0.0",
+    "webpack": "^4.17.1",
     "webpack-cli": "^2.1.4",
-    "webpack-glsl-loader": "^1.0.1"
+    "webpack-glsl-loader": "^1.0.1",
+    "worker-loader": "^2.0.0"
   },
   "module": "dist/carto-vl.js",
   "main": "dist/carto-vl.js",
@@ -103,7 +108,7 @@
     "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:fps": "node test/benchmark/fps/benchmark.js",
     "test:perf": "karma start --single-run --browsers Chrome test/benchmark/karma.conf.js",
-    "serve": "yarn build:dev && yarn docs && http-server",
+    "serve": "yarn build:dev && yarn docs && http-server --cors",
     "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",
     "prepublishOnly": "./scripts/release.sh",

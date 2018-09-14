@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkArray, checkLooseType, checkMaxArguments } from './utils';
+import { checkType } from './utils';
 
 /**
  * ImageList. Load an array of images and use them as a symbols.
@@ -8,23 +8,15 @@ import { checkArray, checkLooseType, checkMaxArguments } from './utils';
  *
  * @internal
  */
-export default class ImageList extends Base {
-    constructor (imageArray) {
-        checkMaxArguments(arguments, 1, 'imageList');
-        checkArray('imageArray', 'imageArray', 0, imageArray);
+export default class ListImage extends Base {
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        this.numImages = this.elems.length;
+        this._getChildren().forEach((image, i) => checkType('imageArray', `imageArray[${i}]`, 0, 'image', image));
+    }
 
-        imageArray.forEach((image, i) => checkLooseType('imageArray', `imageArray[${i}]`, 0, 'image', image));
-
-        const children = {};
-
-        imageArray.forEach((image, i) => {
-            children[`image${i}`] = image;
-        });
-
-        super(children);
-        this.numImages = imageArray.length;
-        this._images = imageArray;
-        this.type = 'image';
+    eval (feature) {
+        return this.elems.map(elem => elem.eval(feature));
     }
 
     _applyToShaderSource () {
@@ -32,8 +24,8 @@ export default class ImageList extends Base {
             preface: this._prefaceCode(`
                 uniform sampler2D atlas${this._uid};
 
-                vec4 atlas${this._uid}Fn(vec2 imageUV, float cat) {
-                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(cat, 16.), floor(cat/16.))/16. ).rgba;
+                vec4 atlas${this._uid}Fn(vec2 imageUV, float category) {
+                    return texture2D(atlas${this._uid}, imageUV/16. + vec2(mod(category, 16.), floor(category/16.))/16. ).rgba;
                 }
             `),
             inline: `atlas${this._uid}Fn`
@@ -47,7 +39,7 @@ export default class ImageList extends Base {
     _preDraw (program, drawMetadata, gl) {
         this.init = true;
         for (let i = 0; i < this.numImages; i++) {
-            const image = this[`image${i}`];
+            const image = this[`image-${i}`];
             this.init = this.init && image.canvas;
         }
 
@@ -68,7 +60,7 @@ export default class ImageList extends Base {
             let offsetX = 0;
             let offsetY = 0;
             for (let i = 0; i < this.numImages; i++) {
-                const image = this[`image${i}`];
+                const image = this[`image-${i}`];
                 // get image, push image to texture atlas
                 gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, image.canvas);
                 offsetX += imageSize;
@@ -77,8 +69,6 @@ export default class ImageList extends Base {
                     offsetX = 0;
                     offsetY += imageSize;
                 }
-
-                image.canvas = null;
             }
 
             gl.generateMipmap(gl.TEXTURE_2D);

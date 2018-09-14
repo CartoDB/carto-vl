@@ -9,7 +9,8 @@
  *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
- *  - **resolution**: resolution of the property-aggregation functions, a value of 4 means to produce aggregation on grid cells of 4x4 pixels, only applicable to points
+ *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+ *  - **resolution**: - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  *
  * For example the point diameter could be using the `add` expression:
  *
@@ -124,8 +125,6 @@
 
 import Transition from './expressions/transition';
 
-import BaseArray from './expressions/basic/array';
-
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
 
@@ -196,10 +195,13 @@ import Property from './expressions/basic/property';
 
 import GlobalEqIntervals from './expressions/classification/GlobalEqIntervals';
 import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
+import GlobalStandardDev from './expressions/classification/GlobalStandardDev';
+
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
+import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
-import Ramp from './expressions/ramp';
+import Ramp from './expressions/Ramp';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
@@ -245,18 +247,16 @@ import Zoom from './expressions/zoom';
 
 import Placement from './expressions/placement';
 import Image from './expressions/Image';
-import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
+import List from './expressions/basic/List';
 
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
-
-export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -301,7 +301,6 @@ export const clusterCount = (...args) => new ClusterCount(...args);
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
-export const imageList = (...args) => new ImageList(...args);
 
 export const svg = (...args) => new SVG(...args);
 
@@ -317,6 +316,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
@@ -336,10 +336,14 @@ export const reverse = reverseFn;
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
+
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
+
+export const globalStandardDev = (...args) => new GlobalStandardDev(...args);
+export const viewportStandardDev = (...args) => new ViewportStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 

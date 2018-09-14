@@ -21,7 +21,23 @@ symbol: image('https://libs.cartocdn.com/carto-vl/assets/NASA_logo.svg')
 ```
 
 **Note:**
-Keep in mind that the server must respond with the appropriate CORS headers for the image file to be properly loaded.
+Keep in mind that the server must respond with the appropriate CORS headers for the image file to be properly loaded. Built-in images are not affected by CORS. See for example the following AWS S3 CORS configuration:
+```json
+{
+    "CORSRules": [
+        {
+            "AllowedMethods": [
+                "GET"
+            ],
+            "AllowedOrigins": [
+                "*",
+                "http://*",
+                "https://*"
+            ]
+        }
+    ]
+}
+```
 
 [Live example](http://carto.com/developers/carto-vl/examples/maps/guides/image-files/external-image.html)
 

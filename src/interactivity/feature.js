@@ -26,6 +26,8 @@ export default class Feature {
         this.width = new FeatureVizProperty('width', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.strokeColor = new FeatureVizProperty('strokeColor', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.strokeWidth = new FeatureVizProperty('strokeWidth', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+        this.symbol = new FeatureVizProperty('symbol', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+        this.symbolPlacement = new FeatureVizProperty('symbolPlacement', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
         this.variables = variables;
     }
 
@@ -34,6 +36,8 @@ export default class Feature {
         this.width.reset(duration);
         this.strokeColor.reset(duration);
         this.strokeWidth.reset(duration);
+        this.symbol.reset(duration);
+        this.symbolPlacement.reset(duration);
 
         for (let key in this.variables) {
             this.variables[key].reset(duration);

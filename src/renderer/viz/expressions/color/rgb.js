@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-import { implicitCast, checkLooseType, checkType, checkMaxArguments } from '../utils';
+import { implicitCast, checkType, checkMaxArguments, checkExpression } from '../utils';
 
 /**
  * Evaluates to a rgb color.
@@ -62,22 +62,24 @@ function genRGB (name, alpha) {
             checkMaxArguments(arguments, 4, 'rgba');
 
             [r, g, b, a] = [r, g, b, a].map(implicitCast);
-            checkLooseType(name, 'r', 0, 'number', r);
-            checkLooseType(name, 'g', 1, 'number', g);
-            checkLooseType(name, 'b', 2, 'number', b);
+            checkExpression(name, 'r', 0, r);
+            checkExpression(name, 'g', 1, g);
+            checkExpression(name, 'b', 2, b);
 
             const children = { r, g, b };
             if (alpha) {
-                checkLooseType(name, 'a', 3, 'number', a);
+                checkExpression(name, 'a', 3, a);
                 children.a = a;
             }
             super(children);
             this.type = 'color';
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
+
         get value () {
             return this.eval();
         }
+
         eval (f) {
             return {
                 r: this.r.eval(f),
@@ -86,6 +88,7 @@ function genRGB (name, alpha) {
                 a: alpha ? this.a.eval(f) : 1
             };
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'r', 0, 'number', this.r);

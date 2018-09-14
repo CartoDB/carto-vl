@@ -3,19 +3,19 @@ import { number } from '../expressions';
 import { checkMaxArguments } from './utils';
 
 /**
- * Get the current zoom level. Multiplying by zoom() makes features constant in real-world space respect their size at zoom level 0.
+ * Get the current zoom level.
  *
  * @return {Number}
  *
- * @example <caption>Show constant width in zoom.</caption>
+ * @example <caption>Only show feature at zoom levels less than 7.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   width: s.div(s.zoom(), 1000)
+ *   filter: s.lt(s.zoom(), 7)
  * });
  *
- * @example <caption>Show constant width in zoom. (String)</caption>
+ * @example <caption>Only show feature at zoom levels less than 7. (String)</caption>
  * const viz = new carto.Viz(`
- *   width: zoom() / 1000
+ *   filter: zoom() < 7
  * `);
  *
  * @memberof carto.expressions
@@ -35,7 +35,7 @@ export default class Zoom extends BaseExpression {
         return this.zoom.expr;
     }
     _preDraw (program, drawMetadata, gl) {
-        this.zoom.expr = drawMetadata.zoom;
+        this.zoom.expr = drawMetadata.zoomLevel;
         this.zoom._preDraw(program, drawMetadata, gl);
     }
 }

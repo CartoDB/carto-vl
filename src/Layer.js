@@ -207,6 +207,7 @@ export default class Layer {
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
+        this._needRefresh();
     }
 
     /**
@@ -256,6 +257,8 @@ export default class Layer {
             viz.width._blendFrom(this._viz.width, ms, interpolator);
             viz.strokeWidth._blendFrom(this._viz.strokeWidth, ms, interpolator);
             viz.filter._blendFrom(this._viz.filter, ms, interpolator);
+            // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
+            // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
         }
 
         return this._vizChanged(viz).then(() => {
@@ -295,7 +298,6 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
         this.requestData();
-        this._fire('updated');
     }
 
     /**
@@ -387,20 +389,19 @@ export default class Layer {
     render (gl, matrix) {
         this._paintLayer();
 
-        // Checking this.map.repaint is needed, because MGL repaint is a setter and
-        // it has the strange quite buggy side-effect of doing a "final" repaint after
-        // being disabled if we disable it every frame, MGL will do a "final" repaint
-        // every frame, which will not disabled it in practice
-        if (!this.isAnimated() && this.map.repaint) {
-            this.map.repaint = false;
+        if (this.isAnimated()) {
+            this._needRefresh();
         }
     }
 
     _paintLayer () {
         if (this._viz && this._viz.colorShader) {
             this._renderLayer.setViz(this._viz);
-            this.renderer.renderLayer(this._renderLayer);
-            if (this.isAnimated() || this._fireUpdateOnNextRender || !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()))) {
+            this.renderer.renderLayer(this._renderLayer, {
+                zoomLevel: this.map.getZoom()
+            });
+            const dataframesHaveChanged = !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()));
+            if (this.isAnimated() || this._fireUpdateOnNextRender || dataframesHaveChanged) {
                 this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
@@ -434,11 +435,10 @@ export default class Layer {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
         this._needRefresh();
-        this._fireUpdateOnNextRender = true;
     }
 
     _needRefresh () {
-        this.map.repaint = true;
+        this.map.triggerRepaint();
     }
 
     /**
@@ -459,6 +459,15 @@ export default class Layer {
     }
 
     async _vizChanged (viz) {
+        if (this._cache) {
+            return this._cache;
+        }
+        this._cache = this._requestVizChanges(viz)
+            .then(() => { this._cache = null; });
+        return this._cache;
+    }
+
+    async _requestVizChanges (viz) {
         await this._context;
         if (!this._source) {
             throw new Error('A source is required before changing the viz');

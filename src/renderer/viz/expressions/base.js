@@ -29,9 +29,9 @@ export default class Base {
         this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+        this.expressionName = _toCamelCase(this.constructor.name);
     }
 
-    // eslint-disable-next-line no-unused-vars
     /**
      * Evaluate the expression providing a feature.
      * This is particularly useful for making legends.
@@ -70,6 +70,34 @@ export default class Base {
     }
 
     /**
+     * Get the expression stringified
+     *
+     * @api
+     * @memberof carto.expressions.Base
+     * @returns {string}
+     *
+     * @example <caption>Get the stringified expression of the viz color property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear('amount'), s.palettes.PRISM)
+     * });
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     * @example <caption>Get the stringified expression of the viz color property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($amount), Prism)
+     * `);
+     *
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     */
+    toString () {
+        return `${this.expressionName}(${this._getChildren().map(child => child.toString()).join(', ')})`;
+    }
+
+    /**
      * @api
      * @memberof carto.expressions.Base
      * @returns true if the evaluation of the expression may change without external action.
@@ -81,7 +109,7 @@ export default class Base {
     /**
      * Linear interpolation between this and finalValue with the specified duration
      * @api
-     * @param {Expression} final
+     * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
      * @memberof carto.expressions.Base
@@ -89,7 +117,7 @@ export default class Base {
      * @name blendTo
      */
     blendTo (final, duration = 500) {
-        // TODO blendFunc = 'linear'
+        // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
@@ -112,10 +140,6 @@ export default class Base {
 
     loadImages () {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
-    }
-
-    getPropertyName () {
-        return this._getChildren()[0].getPropertyName();
     }
 
     _bindMetadata (metadata) {
@@ -221,6 +245,10 @@ export default class Base {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
     }
 
+    get value () {
+        return this.eval();
+    }
+
     _getBinding (shader) {
         if (!this._shaderBindings.has(shader)) {
             this._shaderBindings.set(shader, {});
@@ -270,4 +298,11 @@ export default class Base {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
+}
+
+function _toCamelCase (str) {
+    if (str.toUpperCase() === str) {
+        return str.toLowerCase();
+    }
+    return str.charAt(0).toLowerCase() + str.slice(1);
 }

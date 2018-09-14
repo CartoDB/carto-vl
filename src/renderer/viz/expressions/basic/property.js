@@ -40,6 +40,7 @@ export default class Property extends BaseExpression {
         }
         super({});
         this.name = name;
+        this.expressionName = name;
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -59,22 +60,14 @@ export default class Property extends BaseExpression {
         return feature[this.name];
     }
 
+    toString () {
+        return `$${this.expressionName}`;
+    }
+
     get categories () {
         return this.type === 'category'
             ? this._metadata.properties[this.name].categories
             : undefined;
-    }
-
-    getPropertyName () {
-        return this.name;
-    }
-
-    getPropertyId (feature) {
-        const value = this.eval(feature);
-
-        return this.type === 'category'
-            ? this._metadata.categoryToID.get(value)
-            : this.eval(value);
     }
 
     _bindMetadata (metadata) {

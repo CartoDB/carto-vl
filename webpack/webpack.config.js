@@ -15,10 +15,21 @@ module.exports = {
     module: {
         rules: [
             { test: /\.glsl$/, use: 'webpack-glsl-loader' },
-            { test: /\.svg$/, use: 'svg-inline-loader' }
+            { test: /\.svg$/, use: 'svg-inline-loader' },
+            {
+                test: /\.worker\.js$/,
+                use: {
+                    loader: 'worker-loader',
+                    options: {
+                        publicPath: '/dist/',
+                        inline: true
+                    }
+                }
+            }
         ]
     },
     plugins: [
         new webpack.BannerPlugin(banner)
+
     ]
 };

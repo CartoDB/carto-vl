@@ -1,6 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateDynamicTypeErrors, validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from './utils';
+import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 
 describe('src/renderer/viz/expressions/belongs', () => {
     const fakeMetadata = new Metadata({
@@ -20,18 +20,18 @@ describe('src/renderer/viz/expressions/belongs', () => {
     });
 
     describe('error control', () => {
-        validateStaticTypeErrors('in', []);
-        validateStaticTypeErrors('in', ['category']);
-        validateStaticTypeErrors('in', ['number']);
-        validateStaticTypeErrors('in', ['color']);
-        validateDynamicTypeErrors('in', ['number', 'category-array']);
-        validateDynamicTypeErrors('in', ['category', 'number-array']);
-        validateMaxArgumentsError('in', ['category', 'category-array', 'number']);
-        validateMaxArgumentsError('nin', ['category', 'category-array', 'number']);
+        validateTypeErrors('in', []);
+        validateTypeErrors('in', ['category']);
+        validateTypeErrors('in', ['number']);
+        validateTypeErrors('in', ['color']);
+        validateTypeErrors('in', ['number', 'category-list']);
+        validateTypeErrors('in', ['category', 'number-list']);
+        validateMaxArgumentsError('in', ['category', 'category-list', 'number']);
+        validateMaxArgumentsError('nin', ['category', 'category-list', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category-array'], 'number');
+        validateStaticType('in', ['category', 'category-list'], 'number');
     });
 
     describe('eval', () => {

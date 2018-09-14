@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkExpression, checkLooseType, implicitCast, checkType, checkMaxArguments } from './utils';
+import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
@@ -45,12 +45,6 @@ export default class Linear extends BaseExpression {
         checkExpression('linear', 'max', 2, max);
 
         super({ input, min, max });
-
-        if (this.min.type !== 'time') {
-            checkLooseType('linear', 'input', 0, 'number', this.input);
-            checkLooseType('linear', 'min', 1, 'number', this.min);
-            checkLooseType('linear', 'max', 2, 'number', this.max);
-        }
         this.type = 'number';
     }
 
@@ -100,5 +94,22 @@ export default class Linear extends BaseExpression {
 
             this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
+    }
+
+    getLegendData (config) {
+        const min = this.min.eval();
+        const max = this.max.eval();
+        const INC = 1 / (config.samples - 1);
+        const name = this.toString();
+        const data = [];
+
+        for (let i = 0; data.length < config.samples; i += INC) {
+            const value = clamp(i, 0, 1);
+            const key = i * (max - min) + min;
+
+            data.push({ key, value });
+        }
+
+        return { data, min, max, name };
     }
 }

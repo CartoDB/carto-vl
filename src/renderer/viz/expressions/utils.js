@@ -1,5 +1,6 @@
-import { number, category, array, imageList } from '../expressions';
+import { number, category, list } from '../expressions';
 import BaseExpression from './base';
+import { interpolateRGBAinCieLAB } from '../colorspaces';
 
 export const DEFAULT = undefined;
 
@@ -14,16 +15,15 @@ export function implicitCast (value) {
     if (_isNumber(value)) {
         return number(value);
     }
+
     if (typeof value === 'string') {
         return category(value);
     }
+
     if (Array.isArray(value)) {
-        const _array = array(value);
-        if (_array && _array.type === 'image-array') {
-            return imageList(_array.elems);
-        }
-        return _array;
+        return list(value);
     }
+
     return value;
 }
 
@@ -95,7 +95,7 @@ expected type was '${expectedType}', actual type was '${actualType}'`);
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${actualInstance}' is not an instance of '${expectedClass.name}'`);
+    expected type was instance of '${expectedClass.name}'`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
@@ -110,31 +110,17 @@ export function throwInvalidArray (expressionName, parameterName, parameterIndex
 
 export function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
     throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    '${str}' is not a string`);
-}
-
-// Try to check the type, but accept undefined types without throwing, unless the expected type had to be known at constructor time
-// This condition happens with types like color or fade, see isArgConstructorTimeTyped for details
-//
-// This is useful to make constructor-time checks, at constructor-time some types can be already known and errors can be throw.
-// Constructor-time is the best time to throw, but metadata is not provided yet, therefore, the checks cannot be complete,
-// they must be loose, the unknown of variables aliases types makes, also, a point to reduce the strictness of the check
-export function checkLooseType (expressionName, parameterName, parameterIndex, expectedType, parameter) {
-    checkExpression(expressionName, parameterName, parameterIndex, parameter);
-    const constructorTimeTyped = Array.isArray(expectedType) ? expectedType.every(isArgConstructorTimeTyped) : isArgConstructorTimeTyped(expectedType);
-    if (parameter.type !== undefined || constructorTimeTyped) {
-        checkType(expressionName, parameterName, parameterIndex, expectedType, parameter);
-    }
+    expected type was 'string', but ${str}' is not a string`);
 }
 
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
 export function isArgConstructorTimeTyped (arg) {
     switch (arg) {
         case 'number':
-        case 'number-array':
+        case 'number-list':
         case 'number-property':
         case 'category':
-        case 'category-array':
+        case 'category-list':
         case 'category-property':
             return false;
         default:
@@ -201,7 +187,13 @@ export function clamp (x, min, max) {
 }
 
 export function mix (x, y, a) {
-    return x * (1 - a) + y * a;
+    return typeof x === 'number'
+        ? x * (1 - a) + y * a
+        : interpolateRGBAinCieLAB(x, y, a);
+}
+
+export function fract (x) {
+    return x - Math.floor(x);
 }
 
 function _isNumber (value) {

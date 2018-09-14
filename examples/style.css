@@ -73,11 +73,10 @@ aside.toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
-  bottom: 24px;
-  overflow: scroll;
   min-width: 250px;
   max-width: 250px;
   z-index: 2;
+  overflow-wrap: break-word;
 }
 
 aside.chart-toolbox {
@@ -240,7 +239,8 @@ aside.chart-toolbox {
   margin-bottom: 0;
 }
 
-#content {
+#content,
+#controls {
   font-family: 'Montserrat', Arial, Helvetica, sans-serif;
 }
 
@@ -559,4 +559,10 @@ aside.chart-toolbox {
   min-height: 18px;
   border-left: 3px solid;
   transform: rotate(45deg) translate(5px, 4px);
+}
+
+/* Mapbox */
+.mapboxgl-ctrl-top-left {
+  top: 14px;
+  left: 14px;
 }

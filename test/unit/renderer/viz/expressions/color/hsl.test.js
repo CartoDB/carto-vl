@@ -1,12 +1,12 @@
-import { validateStaticType, validateStaticTypeErrors, validateMaxArgumentsError } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
 import { hsl, hsla } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/hsl', () => {
     describe('error control', () => {
-        validateStaticTypeErrors('hsl', []);
-        validateStaticTypeErrors('hsl', ['number']);
-        validateStaticTypeErrors('hsl', ['number', 'category']);
-        validateStaticTypeErrors('hsl', ['number', 'number', 'color']);
+        validateTypeErrors('hsl', []);
+        validateTypeErrors('hsl', ['number']);
+        validateTypeErrors('hsl', ['number', 'category']);
+        validateTypeErrors('hsl', ['number', 'number', 'color']);
         validateMaxArgumentsError('hsl', ['number', 'number', 'number', 'number', 'number']);
         validateMaxArgumentsError('hsla', ['number', 'number', 'number', 'number', 'number']);
     });
