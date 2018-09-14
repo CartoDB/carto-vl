@@ -22,6 +22,19 @@ import { checkType, implicitCast, checkMaxArguments } from '../utils';
  *   transform: rotate(30)
  * `);
  *
+ * @example <caption>Rotate 30 degrees in counter-clockwise direction.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: cross
+ *   transform: s.rotate(-30)
+ * });
+ *
+ * @example <caption>Rotate 30 degrees in counter-clockwise direction. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   symbol: cross
+ *   transform: rotate(-30)
+ * `);
+ *
  * @memberof carto.expressions
  * @name rotate
  * @function

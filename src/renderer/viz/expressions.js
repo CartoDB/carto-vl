@@ -254,7 +254,7 @@ import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
 import Translate from './expressions/transformation/Translate';
-import Rotate from './expressions/transformation/Rotation';
+import Rotate from './expressions/transformation/Rotate';
 
 /* Expose classes as constructor functions */
 
