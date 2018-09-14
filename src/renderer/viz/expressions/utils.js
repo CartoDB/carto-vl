@@ -1,6 +1,7 @@
 import { number, category, array, imageList } from '../expressions';
 import BaseExpression from './base';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoParsingError from '../../../errors/carto-parsing-error';
 
 export const DEFAULT = undefined;
 
@@ -73,7 +74,7 @@ export function hexToRgb (hex) {
         };
     }
 
-    throw new Error('Invalid hexadecimal color');
+    throw new CartoParsingError('Invalid hexadecimal color');
 }
 
 export function getOrdinalFromIndex (index) {
