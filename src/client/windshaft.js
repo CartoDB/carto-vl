@@ -6,6 +6,7 @@ import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -204,7 +205,7 @@ export default class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new Error('Aggregation not supported for this dataset');
+                throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Aggregation not supported for this dataset`);
             }
         }
     }
@@ -304,16 +305,20 @@ export default class Windshaft {
         try {
             response = await fetch(getMapRequest(conf, mapConfigAgg));
         } catch (error) {
-            throw new Error(`Failed to connect to Maps API with your user('${this._source._username}')`);
+            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._source._username}')`);
         }
         const layergroup = await response.json();
         if (!response.ok) {
             if (response.status === 401) {
-                throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
+                throw new CartoMapsAPIError(
+                    `${cmt.SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
+                );
             } else if (response.status === 403) {
-                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`);
+                throw new CartoMapsAPIError(
+                    `${cmt.SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
+                );
             }
-            throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+            throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
@@ -379,7 +384,7 @@ function adaptGeometryType (type) {
         case 'ST_LineString':
             return 'line';
         default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
     }
 }
 
