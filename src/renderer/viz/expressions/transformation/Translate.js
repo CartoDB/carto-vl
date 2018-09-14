@@ -32,8 +32,23 @@ export default class Translate extends BaseExpression {
         x = implicitCast(x);
         y = implicitCast(y);
         super({ x, y });
-        this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
-        this.type = 'translation';
+        this.type = 'transformation';
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const x = this.x._applyToShaderSource(getGLSLforProperty);
+        const y = this.y._applyToShaderSource(getGLSLforProperty);
+        return {
+            preface: this._prefaceCode(`
+                ${x.preface}
+                ${y.preface}
+
+                vec2 translate${this._uid}(vec2 p){
+                    return p+vec2(${x.inline}, ${y.inline});
+                }`),
+
+            inline: `translate${this._uid}`
+        };
     }
 
     eval (value) {

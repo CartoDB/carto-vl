@@ -2,8 +2,9 @@ import Base from '../base';
 import { checkExpression, implicitCast, getOrdinalFromIndex, checkMaxArguments } from '../utils';
 import ListImage from '../ListImage';
 import ListGeneric from './ListGeneric';
+import ListTransform from '../ListTransform';
 
-const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image'];
+const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image', 'transformation'];
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
@@ -61,6 +62,9 @@ export default class List extends Base {
         switch (this.elems[0].type) {
             case 'image':
                 Object.setPrototypeOf(this, ListImage.prototype);
+                break;
+            case 'transformation':
+                Object.setPrototypeOf(this, ListTransform.prototype);
                 break;
             default:
                 Object.setPrototypeOf(this, ListGeneric.prototype);
