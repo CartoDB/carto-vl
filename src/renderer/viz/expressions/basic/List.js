@@ -14,11 +14,13 @@ const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image', '
  * @example <caption>Rotate then translate.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
+ *   symbol: s.CROSS
  *   transform: [s.rotate(90), s.translate(10, 20)]
  * });
  *
  * @example <caption>Rotate then translate. (String)</caption>
  * const viz = new carto.Viz(`
+ *   symbol: cross
  *   transform: [rotate(90), translate(10, 20)]
  * `);
  *
