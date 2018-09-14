@@ -78,7 +78,7 @@
     });
 
     layer.on('updated', () => {
-      const histogram = layer.viz.variables.histogram.eval();
+      const histogram = layer.viz.variables.histogram.sortedValue;
       const colorRamp = layer.viz.color;
       const labels = histogram.map(value => value.x);
       const data = histogram.map(value => value.y);

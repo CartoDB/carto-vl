@@ -173,6 +173,25 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                     y: 2
                 },
                 {
+                    x: 'c',
+                    y: 1
+                },
+                {
+                    x: 'a',
+                    y: 1
+                },
+            ]);
+        });
+
+        it('viewportHistogram($cat) should be able to return the sorted values', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            fakeDrawMetadata(viewportHistogram);
+            expect(viewportHistogram.sortedValue).toEqual([
+                {
+                    x: 'b',
+                    y: 2
+                },
+                {
                     x: 'a',
                     y: 1
                 },
