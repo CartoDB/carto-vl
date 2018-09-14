@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Add `globalStandardDev` and `viewportStandardDev` classification expressions
 
+### Changed
+- Simplified `CartoError` and new specific error types
+
 ### Fixed
 - Fix symbol override color
 
