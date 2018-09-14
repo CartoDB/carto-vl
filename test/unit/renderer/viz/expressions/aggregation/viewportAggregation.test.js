@@ -179,7 +179,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 {
                     x: 'a',
                     y: 1
-                },
+                }
             ]);
         });
 
