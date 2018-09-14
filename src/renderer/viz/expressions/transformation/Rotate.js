@@ -12,7 +12,7 @@ import { checkType, implicitCast, checkMaxArguments } from '../utils';
  * @example <caption>Rotate 30 degrees in clockwise direction.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   symbol: cross
+ *   symbol: s.CROSS
  *   transform: s.rotate(30)
  * });
  *
@@ -25,7 +25,7 @@ import { checkType, implicitCast, checkMaxArguments } from '../utils';
  * @example <caption>Rotate 30 degrees in counter-clockwise direction.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   symbol: cross
+ *   symbol: s.CROSS
  *   transform: s.rotate(-30)
  * });
  *

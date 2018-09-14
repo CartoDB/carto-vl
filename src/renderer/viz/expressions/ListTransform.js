@@ -4,7 +4,7 @@ import { checkType } from './utils';
 export default class ListTransform extends Base {
     _bindMetadata (meta) {
         super._bindMetadata(meta);
-        this._getChildren().forEach((image, i) => checkType('ListTransformation', `ListTransformation[${i}]`, 0, 'transformation', image));
+        this._getChildren().forEach((transform, i) => checkType('ListTransformation', `ListTransformation[${i}]`, 0, 'transformation', transform));
         this.type = 'transformation';
     }
 
