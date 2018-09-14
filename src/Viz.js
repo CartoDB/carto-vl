@@ -16,6 +16,7 @@ import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polyg
 import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/placement';
+import CartoRuntimeError from './errors/carto-runtime-error';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -295,7 +296,7 @@ export default class Viz {
                 return;
             }
             if (temporarilyMarkedSet.has(node)) {
-                throw new Error('Viz contains a circular dependency');
+                throw new CartoRuntimeError('Viz contains a circular dependency');
             }
             temporarilyMarkedSet.add(node);
             node._getDependencies().forEach(visit);
@@ -385,7 +386,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            throw new Error('No child found');
+            throw new CartoRuntimeError('No child found');
         }
     }
 

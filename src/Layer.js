@@ -5,6 +5,7 @@ import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
@@ -128,7 +129,7 @@ export default class Layer {
             map.addLayer(this, beforeLayerID);
         } catch (error) {
             if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
+                throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
 
             map.on('load', () => {
@@ -180,7 +181,7 @@ export default class Layer {
 
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoRuntimeError('Another atomic change was done before this one committed (1)');
         }
 
         // Everything was ok => commit changes
@@ -198,7 +199,7 @@ export default class Layer {
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoRuntimeError('Another atomic change was done before this one committed (2)');
         }
 
         if (this._viz) {
@@ -471,7 +472,7 @@ export default class Layer {
         await loadImagesPromise;
 
         if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+            throw new CartoRuntimeError('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);

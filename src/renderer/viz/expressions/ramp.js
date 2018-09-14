@@ -9,6 +9,7 @@ import Classifier from './classification/Classifier';
 import ImageList from './ImageList';
 import Linear from './linear';
 import Top from './top';
+import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 const paletteTypes = {
     PALETTE: 'palette',
@@ -141,7 +142,7 @@ export default class Ramp extends BaseExpression {
             const b = this.palette.elems[i + 1].eval(feature);
             return mix(a, b, clamp(rangeM, 0, 1));
         }
-        throw new Error('Unexpected condition on ramp._evalNumberArray()');
+        throw new CartoRuntimeError('Unexpected condition on ramp._evalNumberArray()');
     }
 
     _getValue (texturePixels, numValues, m) {
@@ -212,7 +213,7 @@ export default class Ramp extends BaseExpression {
             // With categorical inputs we need to translate their global(per-dataset) IDs to local (per-property) IDs
             inputGLSL = `ramp_translate${this._uid}(${input.inline})`;
             preface +=
-            `
+                `
             uniform sampler2D texRampTranslate${this._uid};
             float ramp_translate${this._uid}(float s){
                 vec2 v = vec2(
@@ -573,7 +574,7 @@ function _calcPaletteValues (palette) {
             palette.colors = palette.eval();
         }
     } catch (error) {
-        throw new Error('Palettes must be formed by constant expressions, they cannot depend on feature properties');
+        throw new CartoRuntimeError('Palettes must be formed by constant expressions, they cannot depend on feature properties');
     }
 
     return palette;
