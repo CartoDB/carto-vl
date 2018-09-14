@@ -133,7 +133,7 @@ function _getCategoryValue (histogram) {
     return [...histogram]
         .map(([x, y]) => {
             return { x, y };
-        })
+        });
 }
 
 function _sortNumerically (a, b) {
