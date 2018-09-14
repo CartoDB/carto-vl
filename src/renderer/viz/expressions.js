@@ -125,8 +125,6 @@
 
 import Transition from './expressions/transition';
 
-import BaseArray from './expressions/basic/array';
-
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
 
@@ -197,10 +195,14 @@ import Property from './expressions/basic/property';
 
 import GlobalEqIntervals from './expressions/classification/GlobalEqIntervals';
 import GlobalQuantiles from './expressions/classification/GlobalQuantiles';
+import GlobalStandardDev from './expressions/classification/GlobalStandardDev';
+
 import ViewportEqIntervals from './expressions/classification/ViewportEqIntervals';
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
+import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
-import Ramp from './expressions/ramp';
+import Ramp from './expressions/Ramp';
+import List from './expressions/basic/List';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
@@ -246,7 +248,6 @@ import Zoom from './expressions/zoom';
 
 import Placement from './expressions/Placement';
 import Image from './expressions/Image';
-import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Zoomrange from './expressions/Zoomrange';
@@ -257,8 +258,6 @@ import Translate from './expressions/transformation/Translate';
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
-
-export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -303,7 +302,6 @@ export const clusterCount = (...args) => new ClusterCount(...args);
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
-export const imageList = (...args) => new ImageList(...args);
 
 export const svg = (...args) => new SVG(...args);
 
@@ -319,6 +317,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
@@ -338,10 +337,14 @@ export const reverse = reverseFn;
 export const property = (...args) => new Property(...args);
 export { property as prop };
 
-export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
 export const globalQuantiles = (...args) => new GlobalQuantiles(...args);
+export const viewportQuantiles = (...args) => new ViewportQuantiles(...args);
+
 export const globalEqIntervals = (...args) => new GlobalEqIntervals(...args);
 export const viewportEqIntervals = (...args) => new ViewportEqIntervals(...args);
+
+export const globalStandardDev = (...args) => new GlobalStandardDev(...args);
+export const viewportStandardDev = (...args) => new ViewportStandardDev(...args);
 
 export const ramp = (...args) => new Ramp(...args);
 

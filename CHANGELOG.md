@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add `globalStandardDev` and `viewportStandardDev` classification expressions
+
 ### Fixed
 - Fix symbol override color
 
@@ -14,14 +17,23 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions
 - Support symbol and symbolPlacement in features
+- New method `ramp.getLegend`
+- Add expressions `toString()` method
+- Add viz `toString()` method
+- `ramp` with an image list defaults to `circle` for the `others` bucket
+- Add `geometryType` method in Viz
+- Add `categoryIndex` expression.
 
 ### Changed
 - zoom() returns the current zoom level in the typical logarithmic form, returning the same value as Mapbox GL Map.getZoom() method
 - Unary and Binary operators are case insensitive.
+- Use an optional third parameter in `ramp` expression to override the default value for "others"
 
 ### Fixed
 - Add default export to allow `import carto from '@carto/carto-vl';`
 - Fix `blendTo` with `circle` SVG
+- Fix small error with color output in `ramp`
+- Fix `top()` with non MapsAPI sources
 
 ## [0.7.0] - 2018-08-24
 ### Added

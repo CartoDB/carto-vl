@@ -14,12 +14,12 @@ import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArgumen
  * @example <caption>Use global quantiles to define a color ramp.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.PRISM)
+ *   color: s.ramp(s.globalQuantiles(s.prop('density'), 5), s.palettes.CB_REDS)
  * });
  *
  * @example <caption>Use global quantiles to define a color ramp. (String)</caption>
  * const viz = new carto.Viz(`
- *   color: ramp(globalQuantiles($density, 5), PRISM)
+ *   color: ramp(globalQuantiles($density, 5), CB_REDS)
  * `);
  *
  * @memberof carto.expressions
@@ -45,7 +45,7 @@ export default class GlobalQuantiles extends Classifier {
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = copy[Math.floor(p * copy.length)];
         });
     }

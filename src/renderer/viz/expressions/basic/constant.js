@@ -33,6 +33,9 @@ export default class Constant extends BaseExpression {
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
+    toString () {
+        return this.expr;
+    }
     get value () {
         return this.eval();
     }
