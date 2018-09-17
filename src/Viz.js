@@ -533,7 +533,7 @@ function checkVizPropertyTypes (viz) {
         filter: 'number',
         symbol: 'image',
         symbolPlacement: 'placement',
-        transform: 'translation'
+        transform: 'transformation'
     };
 
     Object.keys(expectedTypePerProperty).forEach((property) => {

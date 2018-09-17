@@ -254,6 +254,7 @@ import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
 import Translate from './expressions/transformation/Translate';
+import Rotate from './expressions/transformation/Rotate';
 
 /* Expose classes as constructor functions */
 
@@ -397,6 +398,7 @@ export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
 export const translate = (...args) => new Translate(...args);
+export const rotate = (...args) => new Rotate(...args);
 export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);

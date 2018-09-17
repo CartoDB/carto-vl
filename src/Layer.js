@@ -241,17 +241,7 @@ export default class Layer {
         viz.setDefaultsIfRequired(this.metadata.geomType);
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
-                // If an existing variable is not re-declared we add it to the new viz
-                if (!viz.variables[varName]) {
-                    viz.variables[varName] = this._viz.variables[varName];
-                }
-            });
-
-            Object.keys(viz.variables).map(varName => {
-                // If the variable existed, we need to blend it, nothing to do if not
-                if (this._viz.variables[varName]) {
-                    viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
-                }
+                viz.variables[varName] = this._viz.variables[varName];
             });
 
             viz.color._blendFrom(this._viz.color, ms, interpolator);

@@ -375,6 +375,7 @@ export default class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
+            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
 
             if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
@@ -394,8 +395,6 @@ export default class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             } else if (dataframe.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
