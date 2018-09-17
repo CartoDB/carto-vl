@@ -1,5 +1,6 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -41,7 +42,7 @@ export default class Renderer {
         if (canvas) {
             this.gl = canvas.getContext('webgl');
             if (!this.gl) {
-                throw new Error('WebGL 1 is unsupported');
+                throw new CartoRuntimeError(`${crt.WEB_GL} WebGL 1 is unsupported`);
             }
             this._initGL(this.gl);
         }
@@ -91,11 +92,11 @@ export default class Renderer {
         this.gl = gl;
         const OESTextureFloat = gl.getExtension('OES_texture_float');
         if (!OESTextureFloat) {
-            throw new Error('WebGL extension OES_texture_float is unsupported');
+            throw new CartoRuntimeError(`${crt.WEB_GL} WebGL extension 'OES_texture_float' is unsupported`);
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+            throw new CartoRuntimeError(`${crt.WEB_GL} WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
         this._initShaders();
 
@@ -374,6 +375,7 @@ export default class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
+            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
 
             if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
@@ -393,8 +395,6 @@ export default class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             } else if (dataframe.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -412,12 +412,12 @@ export default class Renderer {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
             }
 
-            if (!viz.offset.default) {
+            if (!viz.transform.default) {
                 const textureId = renderer.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+                viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.transform._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 

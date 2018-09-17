@@ -1,6 +1,7 @@
 import { number } from '../expressions';
 import { implicitCast, checkMaxArguments } from './utils';
 import BaseExpression from './base';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 // Each binary expression can have a set of the following signatures (OR'ed flags)
 const UNSUPPORTED_SIGNATURE = 0;
@@ -473,7 +474,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
 
             const signature = getSignature(a, b);
             if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
             this.type = getReturnTypeFromSignature(signature);
         }

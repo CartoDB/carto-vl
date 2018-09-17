@@ -1,4 +1,5 @@
 import { layerVisibility } from '../constants/layer';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 /**
  * @description A simple non-interactive map.
  */
@@ -19,7 +20,7 @@ export default class Map {
         if (typeof options.container === 'string') {
             const container = window.document.getElementById(options.container);
             if (!container) {
-                throw new Error(`Container '${options.container}' not found.`);
+                throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Container '${options.container}' not found.`);
             } else {
                 this._container = container;
             }

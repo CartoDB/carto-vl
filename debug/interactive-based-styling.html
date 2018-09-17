@@ -64,7 +64,7 @@
     const viz = new carto.Viz(`
       color: opacity(BlueViolet, 0.5)
       strokeColor: opacity(BlueViolet, 0.8)
-      offset: placement(0, $pop2005/1000000)
+      transform: translate(0, $pop2005/1000000)
     `);
     const layer = new carto.Layer('layer', source, viz);
 

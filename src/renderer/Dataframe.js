@@ -122,8 +122,8 @@ export default class Dataframe extends DummyDataframe {
         const feature = this.getFeature(featureIndex);
         let strokeWidthScale = 1;
 
-        if (!viz.offset.default) {
-            const offset = viz.offset.eval(feature);
+        if (!viz.transform.default) {
+            const vizOffset = viz.transform.eval(feature);
             const widthScale = this.widthScale / 2;
             viewportAABB = {
                 minx: viewportAABB.minx,
@@ -131,10 +131,11 @@ export default class Dataframe extends DummyDataframe {
                 maxx: viewportAABB.maxx,
                 maxy: viewportAABB.maxy
             };
-            viewportAABB.minx -= offset[0] * widthScale;
-            viewportAABB.maxx -= offset[0] * widthScale;
-            viewportAABB.miny -= offset[1] * widthScale;
-            viewportAABB.maxy -= offset[1] * widthScale;
+
+            viewportAABB.minx -= vizOffset[0] * widthScale;
+            viewportAABB.maxx -= vizOffset[0] * widthScale;
+            viewportAABB.miny -= vizOffset[1] * widthScale;
+            viewportAABB.maxy -= vizOffset[1] * widthScale;
         }
 
         switch (this.type) {
@@ -282,14 +283,14 @@ export default class Dataframe extends DummyDataframe {
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
             if (!viz.symbol.default) {
-                const offset = viz.symbolPlacement.eval(feature);
-                center.x += offset[0] * strokeWidthScale;
-                center.y += offset[1] * strokeWidthScale;
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                center.x += symbolOffset[0] * strokeWidthScale;
+                center.y += symbolOffset[1] * strokeWidthScale;
             }
-            if (!viz.offset.default) {
-                const offset = viz.offset.eval(feature);
-                center.x += offset[0] * widthScale;
-                center.y += offset[1] * widthScale;
+            if (!viz.transform.default) {
+                const vizOffset = viz.transform.eval(feature);
+                center.x += vizOffset[0] * widthScale;
+                center.y += vizOffset[1] * widthScale;
             }
 
             const inside = pointInCircle(p, center, strokeWidthScale);
@@ -325,12 +326,15 @@ export default class Dataframe extends DummyDataframe {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
                 let offset = { x: 0, y: 0 };
-                if (!viz.offset.default) {
-                    const vizOffset = viz.offset.eval(feature);
+
+                if (!viz.transform.default) {
+                    const vizOffset = viz.transform.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
+
                 pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
+
                 if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
