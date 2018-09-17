@@ -81,7 +81,6 @@ export default class RampGeneric extends Base {
         const { palette, others } = this._getPalette();
         const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
         const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
-
         const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
         const inline = `ramp_color${this._uid}(${input.inline})`;
         const maxValues = GLSLPalette.length - 1;
@@ -92,6 +91,7 @@ export default class RampGeneric extends Base {
             ${GLSLOthers.preface}
 
             ${rampFnReturnType} ramp_colorBlend${this._uid}(float x){
+                x=clamp(x, 0., 1.);
                 float minIndex = floor(x*${maxValues.toFixed(20)});
                 float maxIndex = ceil(x*${maxValues.toFixed(20)});
                 float m = fract(x*${maxValues.toFixed(20)});
