@@ -143,7 +143,7 @@ export default class Buckets extends BaseExpression {
         }`;
 
         return {
-            preface: this._prefaceCode(childSources.list.preface + preface),
+            preface: this._prefaceCode(childSources.input.preface + childSources.list.preface + preface),
             inline: `${funcName}(${childSources.input.inline})`
         };
     }
