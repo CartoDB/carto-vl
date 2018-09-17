@@ -159,11 +159,13 @@ export class MVTWorker {
 
     // Currently only mvtLayers with the same type in every feature are supported
     _checkType (feature, expected) {
-        const type = feature.type;
+        let type = feature.type;
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
-            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
+            debugger;
+            // throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
         }
+        type = 3;
     }
 
     _initializePropertyArrays (metadata, length) {
