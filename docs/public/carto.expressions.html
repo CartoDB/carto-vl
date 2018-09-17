@@ -1234,166 +1234,6 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".array"><span class="type-signature">(static) </span>array<span class="signature">(elements)</span><span class="type-signature"> &rarr; {List}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>elements</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
-|
-
-<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
-|
-
-<span class="param-type">Array.&lt;<a href="global.html#Color">Color</a>></span>
-|
-
-<span class="param-type">Array.&lt;<a href="global.html#Date">Date</a>></span>
-|
-
-<span class="param-type">Array.&lt;Image></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">List</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-
-
-        
-            
-
-    
-
-    
     <h4 class="name" id=".asc"><span class="type-signature">(static) </span>asc<span class="signature">(by)</span><span class="type-signature"> &rarr; {Order}</span></h4>
     
 
@@ -8904,6 +8744,191 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".list"><span class="type-signature">(static) </span>list<span class="signature">(elements)</span><span class="type-signature"> &rarr; {List|Transform}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.</p>
+<p>When used with Transformation expressions, the returned value will be a Transformation that will chain each single transformation one after another.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>elements</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;<a href="global.html#Number">Number</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Category">Category</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Color">Color</a>></span>
+|
+
+<span class="param-type">Array.&lt;<a href="global.html#Date">Date</a>></span>
+|
+
+<span class="param-type">Array.&lt;Image></span>
+|
+
+<span class="param-type">Array.&lt;Transform></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">List</span>
+|
+
+<span class="param-type">Transform</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Rotate then translate.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.CROSS
+  transform: [s.rotate(90), s.translate(10, 20)]
+});</code></pre>
+
+        <p class="code-caption">Rotate then translate. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  symbol: cross
+  transform: [rotate(90), translate(10, 20)]
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".log"><span class="type-signature">(static) </span>log<span class="signature">(x)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -12711,6 +12736,188 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".rotate"><span class="type-signature">(static) </span>rotate<span class="signature">(angle)</span><span class="type-signature"> &rarr; {Transform}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Rotate. Define a rotation in degrees.</p>
+<p>Limitation: only supported in combination with <code>symbol:</code>.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>angle</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#Number">Number</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>angle to rotate in degrees in clockwise direction</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Transform</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Rotate 30 degrees in clockwise direction.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.CROSS
+  transform: s.rotate(30)
+});</code></pre>
+
+        <p class="code-caption">Rotate 30 degrees in clockwise direction. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  symbol: cross
+  transform: rotate(30)
+`);</code></pre>
+
+        <p class="code-caption">Rotate 30 degrees in counter-clockwise direction.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  symbol: s.CROSS
+  transform: s.rotate(-30)
+});</code></pre>
+
+        <p class="code-caption">Rotate 30 degrees in counter-clockwise direction. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  symbol: cross
+  transform: rotate(-30)
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".scale"><span class="type-signature">(static) </span>scale<span class="signature">(width, zoomlevel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {<a href="global.html#Number">Number</a>}</span></h4>
     
 
@@ -14283,6 +14490,197 @@ The animation is not cyclic. It will stick to one once the elapsed number of mil
     
 
 
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".translate"><span class="type-signature">(static) </span>translate<span class="signature">(x, y)</span><span class="type-signature"> &rarr; {Translate}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Translate. Define a translation:</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>first numeric expression that indicates the translation in the X direction.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>second numeric expression that indicates the translation in the Y direction.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Numeric expression</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Translate</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Apply an x, y translation</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  transform: s.translate(10, 20)
+});</code></pre>
+
+        <p class="code-caption">Apply an x, y translation. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  transform: translate(10, 20)
+`);</code></pre>
 
 
 
@@ -16980,7 +17378,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Sep 14 2018 10:59:53 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 17 2018 18:12:28 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

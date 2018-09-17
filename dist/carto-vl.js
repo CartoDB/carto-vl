@@ -5746,9 +5746,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _sources_Base__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./sources/Base */ "./src/sources/Base.js");
 /* harmony import */ var _renderer_Renderer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./renderer/Renderer */ "./src/renderer/Renderer.js");
 /* harmony import */ var _renderer_RenderLayer__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./renderer/RenderLayer */ "./src/renderer/RenderLayer.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
-/* harmony import */ var _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./renderer/viz/expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./constants/layer */ "./src/constants/layer.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../src/errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+/* harmony import */ var _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./renderer/viz/expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./constants/layer */ "./src/constants/layer.js");
+
+
 
 
 
@@ -5825,7 +5828,7 @@ class Layer {
      * @readonly
      */
     get visibility () {
-        return this._visible ? _constants_layer__WEBPACK_IMPORTED_MODULE_8__["layerVisibility"].VISIBLE : _constants_layer__WEBPACK_IMPORTED_MODULE_8__["layerVisibility"].HIDDEN;
+        return this._visible ? _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].VISIBLE : _constants_layer__WEBPACK_IMPORTED_MODULE_9__["layerVisibility"].HIDDEN;
     }
 
     /**
@@ -5878,7 +5881,7 @@ class Layer {
             map.addLayer(this, beforeLayerID);
         } catch (error) {
             if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
+                throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Error adding layer to map: ${error}`);
             }
 
             map.on('load', () => {
@@ -5930,7 +5933,7 @@ class Layer {
 
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["default"]('Another atomic change was done before this one committed (1)');
         }
 
         // Everything was ok => commit changes
@@ -5948,7 +5951,7 @@ class Layer {
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["default"]('Another atomic change was done before this one committed (2)');
         }
 
         if (this._viz) {
@@ -5985,22 +5988,12 @@ class Layer {
      * @async
      * @api
      */
-    async blendToViz (viz, ms = 400, interpolator = _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_7__["cubic"]) {
+    async blendToViz (viz, ms = 400, interpolator = _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_8__["cubic"]) {
         this._checkViz(viz);
         viz.setDefaultsIfRequired(this.metadata.geomType);
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
-                // If an existing variable is not re-declared we add it to the new viz
-                if (!viz.variables[varName]) {
-                    viz.variables[varName] = this._viz.variables[varName];
-                }
-            });
-
-            Object.keys(viz.variables).map(varName => {
-                // If the variable existed, we need to blend it, nothing to do if not
-                if (this._viz.variables[varName]) {
-                    viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
-                }
+                viz.variables[varName] = this._viz.variables[varName];
             });
 
             viz.color._blendFrom(this._viz.color, ms, interpolator);
@@ -6221,7 +6214,7 @@ class Layer {
     async _requestVizChanges (viz) {
         await this._context;
         if (!this._source) {
-            throw new Error('A source is required before changing the viz');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].MISSING_REQUIRED} a 'source' is required before changing the viz.`);
         }
 
         const source = this._source;
@@ -6230,7 +6223,7 @@ class Layer {
         await loadImagesPromise;
 
         if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__["default"]('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
@@ -6240,34 +6233,34 @@ class Layer {
 
     _checkId (id) {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(id)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'idRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].MISSING_REQUIRED} 'id'`);
         }
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isString(id)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'idStringRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_TYPE} 'id' property must be a string.`);
         }
         if (id === '') {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidId');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_VALUE} 'id' property must be not empty.`);
         }
     }
 
     _checkSource (source) {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(source)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'sourceRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof _sources_Base__WEBPACK_IMPORTED_MODULE_3__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidSource');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source.Base".`);
         }
     }
 
     _checkViz (viz) {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(viz)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'vizRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].MISSING_REQUIRED} 'viz'`);
         }
         if (!(viz instanceof _Viz__WEBPACK_IMPORTED_MODULE_2__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'nonValidViz');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"]('layer', 'sharedViz');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
     }
 
@@ -6363,22 +6356,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./renderer/viz/expressions/utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _renderer_viz_parser__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./renderer/viz/parser */ "./src/renderer/viz/parser.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/util */ "./src/utils/util.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
-/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointVertexShader.glsl */ "./src/renderer/shaders/geometry/point/pointVertexShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9__);
-/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointFragmentShader.glsl */ "./src/renderer/shaders/geometry/point/pointFragmentShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10__);
-/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineVertexShader.glsl */ "./src/renderer/shaders/geometry/line/lineVertexShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11__);
-/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineFragmentShader.glsl */ "./src/renderer/shaders/geometry/line/lineFragmentShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12__);
-/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonVertexShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonVertexShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13__);
-/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonFragmentShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonFragmentShader.glsl");
-/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14__);
-/* harmony import */ var _renderer_viz_expressions_SVG__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./renderer/viz/expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
-/* harmony import */ var _renderer_viz_defaultSVGs__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./renderer/viz/defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
-/* harmony import */ var _renderer_viz_expressions_placement__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./renderer/viz/expressions/placement */ "./src/renderer/viz/expressions/placement.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../src/errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointVertexShader.glsl */ "./src/renderer/shaders/geometry/point/pointVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_10__);
+/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./renderer/shaders/geometry/point/pointFragmentShader.glsl */ "./src/renderer/shaders/geometry/point/pointFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_11__);
+/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineVertexShader.glsl */ "./src/renderer/shaders/geometry/line/lineVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_12__);
+/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./renderer/shaders/geometry/line/lineFragmentShader.glsl */ "./src/renderer/shaders/geometry/line/lineFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_13___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_13__);
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonVertexShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonVertexShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_14___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_14__);
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./renderer/shaders/geometry/polygon/polygonFragmentShader.glsl */ "./src/renderer/shaders/geometry/polygon/polygonFragmentShader.glsl");
+/* harmony import */ var _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_15___default = /*#__PURE__*/__webpack_require__.n(_renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_15__);
+/* harmony import */ var _renderer_viz_expressions_SVG__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./renderer/viz/expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _renderer_viz_defaultSVGs__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./renderer/viz/defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _renderer_viz_expressions_Placement__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./renderer/viz/expressions/Placement */ "./src/renderer/viz/expressions/Placement.js");
+/* harmony import */ var _renderer_viz_expressions_transformation_Translate__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./renderer/viz/expressions/transformation/Translate */ "./src/renderer/viz/expressions/transformation/Translate.js");
+
+
 
 
 
@@ -6404,9 +6401,9 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(_renderer_viz_express
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["number"](0));
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["noOrder"]());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](1));
-const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new _renderer_viz_expressions_SVG__WEBPACK_IMPORTED_MODULE_15__["default"](_renderer_viz_defaultSVGs__WEBPACK_IMPORTED_MODULE_16__["default"].circle));
-const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new _renderer_viz_expressions_placement__WEBPACK_IMPORTED_MODULE_17__["default"](_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](0), _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](1)));
-const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["placement"](0, 0));
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new _renderer_viz_expressions_SVG__WEBPACK_IMPORTED_MODULE_16__["default"](_renderer_viz_defaultSVGs__WEBPACK_IMPORTED_MODULE_17__["default"].circle));
+const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new _renderer_viz_expressions_Placement__WEBPACK_IMPORTED_MODULE_18__["default"](_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](0), _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](1)));
+const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new _renderer_viz_expressions_transformation_Translate__WEBPACK_IMPORTED_MODULE_19__["default"](_renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](0), _renderer_viz_expressions__WEBPACK_IMPORTED_MODULE_3__["constant"](0)));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -6421,7 +6418,7 @@ const SUPPORTED_PROPERTIES = [
     'filter',
     'symbol',
     'symbolPlacement',
-    'offset',
+    'transform',
     'resolution',
     'variables'
 ];
@@ -6437,7 +6434,7 @@ const SUPPORTED_PROPERTIES = [
  * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
  * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
  * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
- * @property {Placement} offset - offset to apply to the features in pixels
+ * @property {Translation} transform - translation to apply to the features in pixels
  * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
  * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
  * @property {object} variables - An object describing the variables used.
@@ -6475,7 +6472,7 @@ class Viz {
     * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
     * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-    * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
+    * @property {Translation} transform - translation to apply to the features in pixels
     * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
     * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
@@ -6489,6 +6486,7 @@ class Viz {
         Object.keys(vizSpec).forEach(property => {
             this._defineProperty(property, vizSpec[property]);
         });
+
         if (!Object.keys(vizSpec).includes('variables')) {
             this._defineProperty('variables', {});
         }
@@ -6600,7 +6598,7 @@ class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
-            this.offset,
+            this.transform,
             ...Object.values(this.variables)
         ];
         this._rootStyleExpressions = [
@@ -6612,7 +6610,7 @@ class Viz {
             this.filter,
             this.symbol,
             this.symbolPlacement,
-            this.offset
+            this.transform
         ];
     }
 
@@ -6685,7 +6683,7 @@ class Viz {
                 return;
             }
             if (temporarilyMarkedSet.has(node)) {
-                throw new Error('Viz contains a circular dependency');
+                throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_9__["default"]('Viz contains a circular dependency');
             }
             temporarilyMarkedSet.add(node);
             node._getDependencies().forEach(visit);
@@ -6715,24 +6713,24 @@ class Viz {
             this.symbolShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl, _renderer_shaders_index__WEBPACK_IMPORTED_MODULE_1__["default"].symbolizer.symbolShaderGLSL, {
                 symbol: this.symbol,
                 symbolPlacement: this.symbolPlacement,
-                offset: this.offset
+                transform: this.transform
             }, this);
         }
 
         if (!this._geomType || this._geomType === 'point') {
             this.pointShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
-                { vertexShader: _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_9___default.a, fragmentShader: _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_10___default.a },
-                { offset: this.offset }, this);
+                { vertexShader: _renderer_shaders_geometry_point_pointVertexShader_glsl__WEBPACK_IMPORTED_MODULE_10___default.a, fragmentShader: _renderer_shaders_geometry_point_pointFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_11___default.a },
+                { transform: this.transform }, this);
         }
         if (!this._geomType || this._geomType === 'line') {
             this.lineShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
-                { vertexShader: _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_11___default.a, fragmentShader: _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_12___default.a },
-                { offset: this.offset }, this);
+                { vertexShader: _renderer_shaders_geometry_line_lineVertexShader_glsl__WEBPACK_IMPORTED_MODULE_12___default.a, fragmentShader: _renderer_shaders_geometry_line_lineFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_13___default.a },
+                { transform: this.transform }, this);
         }
         if (!this._geomType || this._geomType === 'polygon') {
             this.polygonShader = Object(_renderer_shaders_shaderCompiler__WEBPACK_IMPORTED_MODULE_2__["compileShader"])(gl,
-                { vertexShader: _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_13___default.a, fragmentShader: _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_14___default.a },
-                { offset: this.offset }, this);
+                { vertexShader: _renderer_shaders_geometry_polygon_polygonVertexShader_glsl__WEBPACK_IMPORTED_MODULE_14___default.a, fragmentShader: _renderer_shaders_geometry_polygon_polygonFragmentShader_glsl__WEBPACK_IMPORTED_MODULE_15___default.a },
+                { transform: this.transform }, this);
         }
     }
 
@@ -6770,12 +6768,12 @@ class Viz {
             this.symbolPlacement = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace === this.offset) {
-            this.offset = replacer;
+        } else if (toReplace === this.transform) {
+            this.transform = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            throw new Error('No child found');
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_9__["default"]('No child found');
         }
     }
 
@@ -6798,7 +6796,7 @@ class Viz {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isString(definition)) {
             return this._setDefaults(Object(_renderer_viz_parser__WEBPACK_IMPORTED_MODULE_6__["parseVizDefinition"])(definition));
         }
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidDefinition');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
     }
 
     /**
@@ -6836,8 +6834,8 @@ class Viz {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isUndefined(vizSpec.symbolPlacement)) {
             vizSpec.symbolPlacement = DEFAULT_SYMBOLPLACEMENT_EXPRESSION();
         }
-        if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isUndefined(vizSpec.offset)) {
-            vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isUndefined(vizSpec.transform)) {
+            vizSpec.transform = DEFAULT_TRANSFORM_EXPRESSION();
         }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
@@ -6848,46 +6846,27 @@ class Viz {
         vizSpec.width = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.width);
         vizSpec.strokeWidth = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.symbolPlacement);
-        vizSpec.offset = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.offset);
+        vizSpec.transform = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.transform);
         vizSpec.symbol = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.symbol);
         vizSpec.filter = Object(_renderer_viz_expressions_utils__WEBPACK_IMPORTED_MODULE_5__["implicitCast"])(vizSpec.filter);
 
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_7__["default"].isNumber(vizSpec.resolution)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'resolutionNumberRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
         if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
         }
         if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
         }
-        if (!(vizSpec.color instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[color]');
-        }
-        if (!(vizSpec.strokeColor instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[strokeColor]');
-        }
-        if (!(vizSpec.width instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[width]');
-        }
-        if (!(vizSpec.strokeWidth instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[strokeWidth]');
-        }
-        if (!(vizSpec.order instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[order]');
-        }
-        if (!(vizSpec.filter instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[filter]');
-        }
-        if (!(vizSpec.symbol instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[symbol]');
-        }
-        if (!(vizSpec.symbolPlacement instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[symbolPlacement]');
-        }
-        if (!(vizSpec.offset instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"]('viz', 'nonValidExpression[offset]');
-        }
+
+        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
+            'symbol', 'symbolPlacement', 'transform'];
+        toCheck.forEach((parameter) => {
+            if (!(vizSpec[parameter] instanceof _renderer_viz_expressions_base__WEBPACK_IMPORTED_MODULE_4__["default"])) {
+                throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+            }
+        });
 
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
@@ -6921,33 +6900,27 @@ class Viz {
 }
 
 function checkVizPropertyTypes (viz) {
-    if (viz.color.type !== 'color') {
-        throw new Error(`Viz property 'color:' must be of type 'color' but it was of type ${viz.color.type}`);
-    }
-    if (viz.strokeColor.type !== 'color') {
-        throw new Error(`Viz property 'strokeColor:' must be of type 'color' but it was of type ${viz.strokeColor.type}`);
-    }
-    if (viz.width.type !== 'number') {
-        throw new Error(`Viz property 'width:' must be of type 'number' but it was of type ${viz.width.type}`);
-    }
-    if (viz.strokeWidth.type !== 'number') {
-        throw new Error(`Viz property 'strokeWidth:' must be of type 'number' but it was of type ${viz.strokeWidth.type}`);
-    }
-    if (viz.order.type !== 'orderer') {
-        throw new Error(`Viz property 'order:' must be of type 'orderer' but it was of type ${viz.order.type}`);
-    }
-    if (viz.filter.type !== 'number') {
-        throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
-    }
-    if (viz.symbol.type !== 'image') {
-        throw new Error(`Viz property 'symbol:' must be of type 'image' but it was of type ${viz.symbol.type}`);
-    }
-    if (viz.symbolPlacement.type !== 'placement') {
-        throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
-    }
-    if (viz.offset.type !== 'placement') {
-        throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);
-    }
+    const expectedTypePerProperty = {
+        color: 'color',
+        strokeColor: 'color',
+        width: 'number',
+        strokeWidth: 'number',
+        order: 'orderer',
+        filter: 'number',
+        symbol: 'image',
+        symbolPlacement: 'placement',
+        transform: 'transformation'
+    };
+
+    Object.keys(expectedTypePerProperty).forEach((property) => {
+        const currentType = viz[property].type;
+        const expected = expectedTypePerProperty[property];
+        if (currentType !== expected) {
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["default"](
+                `${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_8__["CartoValidationTypes"].INCORRECT_TYPE} Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
+            );
+        }
+    });
 }
 
 /**
@@ -7634,6 +7607,10 @@ var _package__WEBPACK_IMPORTED_MODULE_0___namespace = /*#__PURE__*/__webpack_req
 /* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../renderer/schema */ "./src/renderer/schema.js");
 /* harmony import */ var _renderer_viz_expressions_time__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../renderer/viz/expressions/time */ "./src/renderer/viz/expressions/time.js");
 /* harmony import */ var _windshaft_filtering__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./windshaft-filtering */ "./src/client/windshaft-filtering.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../errors/carto-maps-api-error */ "./src/errors/carto-maps-api-error.js");
+
+
 
 
 
@@ -7713,7 +7690,7 @@ class Windshaft {
             const aggregatedUsage = usages.some(x => x.type === 'aggregated');
             const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new Error(`Incompatible combination of cluster aggregation usages (${
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__["CartoValidationTypes"].INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
                     JSON.stringify(usages.filter(x => x.type === 'aggregated'))
                 }) with unaggregated usage for property '${propertyName}'`);
             }
@@ -7839,7 +7816,7 @@ class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new Error('Aggregation not supported for this dataset');
+                throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](`${_errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["CartoMapsAPITypes"].NOT_SUPPORTED} Aggregation not supported for this dataset`);
             }
         }
     }
@@ -7939,16 +7916,20 @@ class Windshaft {
         try {
             response = await fetch(getMapRequest(conf, mapConfigAgg));
         } catch (error) {
-            throw new Error(`Failed to connect to Maps API with your user('${this._source._username}')`);
+            throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Failed to connect to Maps API with your user('${this._source._username}')`);
         }
         const layergroup = await response.json();
         if (!response.ok) {
             if (response.status === 401) {
-                throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
+                throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](
+                    `${_errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["CartoMapsAPITypes"].SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
+                );
             } else if (response.status === 403) {
-                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`);
+                throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](
+                    `${_errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["CartoMapsAPITypes"].SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
+                );
             }
-            throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+            throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](`SQL errors: ${JSON.stringify(layergroup.errors)}`);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
@@ -8014,7 +7995,7 @@ function adaptGeometryType (type) {
         case 'ST_LineString':
             return 'line';
         default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["default"](`${_errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_7__["CartoMapsAPITypes"].NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
     }
 }
 
@@ -8105,28 +8086,19 @@ const layerVisibility = Object.freeze({
 /*!***********************************!*\
   !*** ./src/errors/carto-error.js ***!
   \***********************************/
-/*! exports provided: CartoError */
+/*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CartoError", function() { return CartoError; });
-/* harmony import */ var _error_list__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./error-list */ "./src/errors/error-list.js");
-
-
-const UNEXPECTED_ERROR = 'unexpected error';
-const GENERIC_ORIGIN = 'generic';
-
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CartoError; });
 /**
  * Represents an error in the carto library.
  *
  * @typedef {object} CartoError
  * @property {string} message - A short error description
  * @property {string} name - The name of the error "CartoError"
- * @property {string} origin - Where the error was originated: 'validation'
  * @property {object} originalError - An object containing the internal/original error
- * @property {object} stack - Error stack trace
- * @property {string} type - Error type
  *
  * @event CartoError
  * @api
@@ -8139,59 +8111,111 @@ class CartoError extends Error {
      * @return {CartoError} A well formed object representing the error.
      */
     constructor (error) {
-        super((error && error.message) || UNEXPECTED_ERROR);
-
+        if (!(error && error.message)) {
+            throw Error('Invalid CartoError, a message is mandatory');
+        }
+        super(error.message);
         this.name = 'CartoError';
         this.originalError = error;
-        // this.stack = (new Error()).stack;
-        this.type = (error && error.type) || '';
-        this.origin = (error && error.origin) || GENERIC_ORIGIN;
-
-        // Add extra fields
-        const extraFields = this._getExtraFields();
-        this.message = extraFields.friendlyMessage;
-    }
-
-    _getExtraFields () {
-        const errorList = this._getErrorList();
-        for (let key in errorList) {
-            const error = errorList[key];
-            if (!(error.messageRegex instanceof RegExp)) {
-                throw new Error(`MessageRegex on ${key} is not a RegExp.`);
-            }
-            if (error.messageRegex.test(this.message)) {
-                return {
-                    friendlyMessage: this._replaceRegex(error)
-                };
-            }
-        }
-
-        // When cartoError not found return generic values
-        return {
-            friendlyMessage: this.message || ''
-        };
-    }
-
-    _getErrorList () {
-        return _error_list__WEBPACK_IMPORTED_MODULE_0__[this.origin] && _error_list__WEBPACK_IMPORTED_MODULE_0__[this.origin][this.type];
-    }
-
-    /**
-     * Replace $0 with the proper paramter in the listedError regex to build a friendly message.
-     */
-    _replaceRegex (error) {
-        if (!error.friendlyMessage) {
-            return this.message;
-        }
-        const match = this.message && this.message.match(error.messageRegex);
-        if (match && match.length > 1) {
-            return error.friendlyMessage.replace('$0', match[1]);
-        }
-        return error.friendlyMessage;
     }
 }
 
 
+/***/ }),
+
+/***/ "./src/errors/carto-maps-api-error.js":
+/*!********************************************!*\
+  !*** ./src/errors/carto-maps-api-error.js ***!
+  \********************************************/
+/*! exports provided: default, CartoMapsAPITypes */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CartoMapsAPIError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CartoMapsAPITypes", function() { return CartoMapsAPITypes; });
+/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ "./src/errors/carto-error.js");
+
+
+/**
+ * Utility to build a cartoError related to MapsAPI errors.
+ *
+ * @return {CartoError} A well formed object representing the error.
+ */
+class CartoMapsAPIError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (message) {
+        super({ message: message });
+        this.name = 'CartoMapsAPIError';
+    }
+}
+
+const CartoMapsAPITypes = {
+    NOT_SUPPORTED: '[Not supported]:',
+    SECURITY: '[Security]:'
+};
+
+
+/***/ }),
+
+/***/ "./src/errors/carto-parsing-error.js":
+/*!*******************************************!*\
+  !*** ./src/errors/carto-parsing-error.js ***!
+  \*******************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CartoParsingError; });
+/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ "./src/errors/carto-error.js");
+
+
+/**
+ * Utility to build a cartoError related to Parsing errors.
+ *
+ * @return {CartoError} A well formed object representing the error.
+ */
+class CartoParsingError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (message) {
+        super({ message: message });
+        this.name = 'CartoParsingError';
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/errors/carto-runtime-error.js":
+/*!*******************************************!*\
+  !*** ./src/errors/carto-runtime-error.js ***!
+  \*******************************************/
+/*! exports provided: default, CartoRuntimeTypes */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CartoRuntimeError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CartoRuntimeTypes", function() { return CartoRuntimeTypes; });
+/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ "./src/errors/carto-error.js");
+
+
+/**
+ * Utility to build a cartoError related to Runtime errors.
+ *
+ * @return {CartoError} A well formed object representing the error.
+ */
+class CartoRuntimeError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (message) {
+        super({ message: message });
+        this.name = 'CartoRuntimeError';
+    }
+}
+
+const CartoRuntimeTypes = {
+    NOT_SUPPORTED: '[Not supported]:',
+    WEB_GL: '[WebGL]:',
+    MVT: '[MVT]:'
+};
 
 
 /***/ }),
@@ -8200,12 +8224,13 @@ class CartoError extends Error {
 /*!**********************************************!*\
   !*** ./src/errors/carto-validation-error.js ***!
   \**********************************************/
-/*! exports provided: default */
+/*! exports provided: default, CartoValidationTypes */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return CartoValidationError; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CartoValidationTypes", function() { return CartoValidationTypes; });
 /* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ "./src/errors/carto-error.js");
 
 
@@ -8214,197 +8239,19 @@ __webpack_require__.r(__webpack_exports__);
  *
  * @return {CartoError} A well formed object representing the error.
  */
-class CartoValidationError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__["CartoError"] {
-    constructor (type, message) {
-        super({
-            origin: 'validation',
-            type: type,
-            message: message
-        });
+class CartoValidationError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (message) {
+        super({ message: message });
+        this.name = 'CartoValidationError';
     }
 }
 
-
-/***/ }),
-
-/***/ "./src/errors/error-list.js":
-/*!**********************************!*\
-  !*** ./src/errors/error-list.js ***!
-  \**********************************/
-/*! exports provided: validation */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "validation", function() { return validation; });
-const validation = {
-    layer: {
-        'id-required': {
-            messageRegex: /idRequired/,
-            friendlyMessage: '`id` property required.'
-        },
-        'id-string-required': {
-            messageRegex: /idStringRequired/,
-            friendlyMessage: '`id` property must be a string.'
-        },
-        'non-valid-id': {
-            messageRegex: /nonValidId/,
-            friendlyMessage: '`id` property must be not empty.'
-        },
-        'source-required': {
-            messageRegex: /sourceRequired/,
-            friendlyMessage: '`source` property required.'
-        },
-        'non-valid-source': {
-            messageRegex: /nonValidSource/,
-            friendlyMessage: 'The given object is not a valid source. See "carto.source.Base".'
-        },
-        'viz-required': {
-            messageRegex: /vizRequired/,
-            friendlyMessage: '`viz` property required.'
-        },
-        'non-valid-viz': {
-            messageRegex: /nonValidViz/,
-            friendlyMessage: 'The given object is not a valid viz. See "carto.Viz".'
-        },
-        'shared-viz': {
-            messageRegex: /sharedViz/,
-            friendlyMessage: 'The given Viz object is already bound to another layer. Vizs cannot be shared between different layers'
-        }
-    },
-    setup: {
-        'auth-required': {
-            messageRegex: /authRequired/,
-            friendlyMessage: '`auth` property is required.'
-        },
-        'auth-object-required': {
-            messageRegex: /authObjectRequired/,
-            friendlyMessage: '`auth` property must be an object.'
-        },
-        'api-key-required': {
-            messageRegex: /apiKeyRequired/,
-            friendlyMessage: '`apiKey` property is required.'
-        },
-        'api-key-string-required': {
-            messageRegex: /apiKeyStringRequired/,
-            friendlyMessage: '`apiKey` property must be a string.'
-        },
-        'non-valid-api-key': {
-            messageRegex: /nonValidApiKey/,
-            friendlyMessage: '`apiKey` property must be not empty.'
-        },
-        'username-required': {
-            messageRegex: /usernameRequired/,
-            friendlyMessage: '`username` property is required.'
-        },
-        'username-string-required': {
-            messageRegex: /usernameStringRequired/,
-            friendlyMessage: '`username` property must be a string.'
-        },
-        'non-valid-username': {
-            messageRegex: /nonValidUsername/,
-            friendlyMessage: '`username` property must be not empty.'
-        },
-        'config-object-required': {
-            messageRegex: /configObjectRequired/,
-            friendlyMessage: '`config` property must be an object.'
-        },
-        'server-url-string-required': {
-            messageRegex: /serverURLStringRequired/,
-            friendlyMessage: '`serverURL` property must be a string.'
-        }
-    },
-    source: {
-        'non-valid-server-url': {
-            messageRegex: /nonValidServerURL/,
-            friendlyMessage: '`serverURL` property is not a valid URL.'
-        },
-        'non-valid-template-url': {
-            messageRegex: /nonValidTemplateURL/,
-            friendlyMessage: '`templateURL` property is not a valid URL.'
-        },
-        'metadata-required': {
-            messageRegex: /metadataRequired/,
-            friendlyMessage: '`metadata` property is required for MVT source.'
-        },
-        'table-name-required': {
-            messageRegex: /tableNameRequired/,
-            friendlyMessage: '`tableName` property is required.'
-        },
-        'table-name-string-required': {
-            messageRegex: /tableNameStringRequired$/,
-            friendlyMessage: '`tableName` property must be a string.'
-        },
-        'non-valid-table-name': {
-            messageRegex: /nonValidTableName$/,
-            friendlyMessage: '`tableName` property must be not empty.'
-        },
-        'query-required': {
-            messageRegex: /queryRequired/,
-            friendlyMessage: '`query` property is required.'
-        },
-        'query-string-required': {
-            messageRegex: /queryStringRequired$/,
-            friendlyMessage: '`query` property must be a string.'
-        },
-        'non-valid-query': {
-            messageRegex: /nonValidQuery$/,
-            friendlyMessage: '`query` property must be not empty.'
-        },
-        'non-valid-sql-query': {
-            messageRegex: /nonValidSQLQuery$/,
-            friendlyMessage: '`query` property must be a SQL query.'
-        },
-        'data-required': {
-            messageRegex: /dataRequired/,
-            friendlyMessage: '`data` property is required.'
-        },
-        'data-object-required': {
-            messageRegex: /dataObjectRequired$/,
-            friendlyMessage: '`data` property must be an object.'
-        },
-        'non-valid-geojson-data': {
-            messageRegex: /nonValidGeoJSONData$/,
-            friendlyMessage: '`data` property must be a GeoJSON object.'
-        },
-        'multiple-feature-types': {
-            messageRegex: /multipleFeatureTypes\[(.+)\]$/,
-            friendlyMessage: 'multiple types not supported: $0.'
-        },
-        'first-polygon-external': {
-            messageRegex: /firstPolygonExternal$/,
-            friendlyMessage: 'first polygon ring must be external.'
-        },
-        'feature-has-cartodb_id': {
-            messageRegex: /featureHasCartodbId$/,
-            friendlyMessage: '`cartodb_id` is a reserved property so it can not be used'
-        }
-    },
-    viz: {
-        'non-valid-definition': {
-            messageRegex: /nonValidDefinition$/,
-            friendlyMessage: 'viz definition should be a vizSpec object or a valid viz string.'
-        },
-        'non-valid-expression': {
-            messageRegex: /nonValidExpression\[(.+)\]$/,
-            friendlyMessage: '`$0` parameter is not a valid viz Expresion.'
-        },
-        'resolution-number-required': {
-            messageRegex: /resolutionNumberRequired$/,
-            friendlyMessage: '`resolution` must be a number.'
-        },
-        'resolution-too-small': {
-            messageRegex: /resolutionTooSmall\[(.+)\]$/,
-            friendlyMessage: '`resolution` must be greater than $0.'
-        },
-        'resolution-too-big': {
-            messageRegex: /resolutionTooBig\[(.+)\]$/,
-            friendlyMessage: '`resolution` must be less than $0.'
-        }
-    }
+const CartoValidationTypes = {
+    MISSING_REQUIRED: '[Missing required property]:',
+    INCORRECT_TYPE: '[Property with an incorrect type]:',
+    INCORRECT_VALUE: '[Incorrect value]:',
+    TOO_MANY_ARGS: '[Too many arguments]:'
 };
-
-
 
 
 /***/ }),
@@ -8520,6 +8367,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Layer */ "./src/Layer.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
 /* harmony import */ var _client_rsys__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../client/rsys */ "./src/client/rsys.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -8711,8 +8560,8 @@ class Interactivity {
 
         if (!event ||
             (!this._numListeners['featureEnter'] &&
-             !this._numListeners['featureHover'] &&
-             !this._numListeners['featureLeave'])) {
+                !this._numListeners['featureHover'] &&
+                !this._numListeners['featureLeave'])) {
             return;
         }
 
@@ -8810,24 +8659,24 @@ class Interactivity {
 
 function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
-        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_TYPE} Invalid layer list, parameter must be an array of "carto.Layer" objects.`);
     }
     if (!layerList.length) {
-        throw new Error('Invalid argument, layer list must not be empty');
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_VALUE} Invalid argument, layer list must not be empty.`);
     }
     if (!layerList.every(layer => layer instanceof _Layer__WEBPACK_IMPORTED_MODULE_1__["default"])) {
-        throw new Error('Invalid layer, layer must be an instance of carto.Layer');
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_TYPE} Invalid layer, layer must be an instance of "carto.Layer".`);
     }
 }
 function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
-        throw new Error('Invalid argument, all layers must belong to the same map');
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_VALUE} Invalid argument, all layers must belong to the same map.`);
     }
 }
 
 function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
-        throw new Error(`Unrecognized event: ${eventName}. Available events: ${EVENTS.join(', ')}`);
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_VALUE} Unrecognized event: '${eventName}'. Available events: ${EVENTS.join(', ')}.`);
     }
 }
 
@@ -8986,6 +8835,8 @@ function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, tr
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Map; });
 /* harmony import */ var _constants_layer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../constants/layer */ "./src/constants/layer.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 /**
  * @description A simple non-interactive map.
@@ -9007,7 +8858,7 @@ class Map {
         if (typeof options.container === 'string') {
             const container = window.document.getElementById(options.container);
             if (!container) {
-                throw new Error(`Container '${options.container}' not found.`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].MISSING_REQUIRED} Container '${options.container}' not found.`);
             } else {
                 this._container = container;
             }
@@ -9329,8 +9180,8 @@ class Dataframe extends _DummyDataframe__WEBPACK_IMPORTED_MODULE_3__["default"] 
         const feature = this.getFeature(featureIndex);
         let strokeWidthScale = 1;
 
-        if (!viz.offset.default) {
-            const offset = viz.offset.eval(feature);
+        if (!viz.transform.default) {
+            const vizOffset = viz.transform.eval(feature);
             const widthScale = this.widthScale / 2;
             viewportAABB = {
                 minx: viewportAABB.minx,
@@ -9338,10 +9189,11 @@ class Dataframe extends _DummyDataframe__WEBPACK_IMPORTED_MODULE_3__["default"] 
                 maxx: viewportAABB.maxx,
                 maxy: viewportAABB.maxy
             };
-            viewportAABB.minx -= offset[0] * widthScale;
-            viewportAABB.maxx -= offset[0] * widthScale;
-            viewportAABB.miny -= offset[1] * widthScale;
-            viewportAABB.maxy -= offset[1] * widthScale;
+
+            viewportAABB.minx -= vizOffset[0] * widthScale;
+            viewportAABB.maxx -= vizOffset[0] * widthScale;
+            viewportAABB.miny -= vizOffset[1] * widthScale;
+            viewportAABB.maxy -= vizOffset[1] * widthScale;
         }
 
         switch (this.type) {
@@ -9489,14 +9341,14 @@ class Dataframe extends _DummyDataframe__WEBPACK_IMPORTED_MODULE_3__["default"] 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
             if (!viz.symbol.default) {
-                const offset = viz.symbolPlacement.eval(feature);
-                center.x += offset[0] * strokeWidthScale;
-                center.y += offset[1] * strokeWidthScale;
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                center.x += symbolOffset[0] * strokeWidthScale;
+                center.y += symbolOffset[1] * strokeWidthScale;
             }
-            if (!viz.offset.default) {
-                const offset = viz.offset.eval(feature);
-                center.x += offset[0] * widthScale;
-                center.y += offset[1] * widthScale;
+            if (!viz.transform.default) {
+                const vizOffset = viz.transform.eval(feature);
+                center.x += vizOffset[0] * widthScale;
+                center.y += vizOffset[1] * widthScale;
             }
 
             const inside = Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["pointInCircle"])(p, center, strokeWidthScale);
@@ -9532,12 +9384,15 @@ class Dataframe extends _DummyDataframe__WEBPACK_IMPORTED_MODULE_3__["default"] 
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
                 let offset = { x: 0, y: 0 };
-                if (!viz.offset.default) {
-                    const vizOffset = viz.offset.eval(feature);
+
+                if (!viz.transform.default) {
+                    const vizOffset = viz.transform.eval(feature);
                     offset.x = vizOffset[0] * widthScale;
                     offset.y = vizOffset[1] * widthScale;
                 }
+
                 pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
+
                 if (!Object(_src_utils_geometry__WEBPACK_IMPORTED_MODULE_1__["pointInRectangle"])(pointWithOffset, this._aabb[featureIndex]) ||
                     this._isFeatureFiltered(feature, viz.filter)) {
                     i = breakpoints[featureIndex] - 6;
@@ -9849,6 +9704,8 @@ class Metadata {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return RenderLayer; });
 /* harmony import */ var _interactivity_feature__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../interactivity/feature */ "./src/interactivity/feature.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 class RenderLayer {
@@ -9902,7 +9759,7 @@ class RenderLayer {
 
     _checkDataframeType (dataframe) {
         if (this.type !== dataframe.type) {
-            throw new Error('Layer dataframes must always be of the same type');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} Layer dataframes must always be of the same type`);
         }
     }
 
@@ -9945,6 +9802,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Renderer; });
 /* harmony import */ var _shaders__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./shaders */ "./src/renderer/shaders/index.js");
 /* harmony import */ var _viz_expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viz/expressions */ "./src/renderer/viz/expressions.js");
+/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+
 
 
 
@@ -9988,7 +9847,7 @@ class Renderer {
         if (canvas) {
             this.gl = canvas.getContext('webgl');
             if (!this.gl) {
-                throw new Error('WebGL 1 is unsupported');
+                throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["CartoRuntimeTypes"].WEB_GL} WebGL 1 is unsupported`);
             }
             this._initGL(this.gl);
         }
@@ -10038,11 +9897,11 @@ class Renderer {
         this.gl = gl;
         const OESTextureFloat = gl.getExtension('OES_texture_float');
         if (!OESTextureFloat) {
-            throw new Error('WebGL extension OES_texture_float is unsupported');
+            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["CartoRuntimeTypes"].WEB_GL} WebGL extension 'OES_texture_float' is unsupported`);
         }
         const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
         if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
+            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_2__["CartoRuntimeTypes"].WEB_GL} WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
         }
         this._initShaders();
 
@@ -10321,6 +10180,7 @@ class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
+            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
 
             if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);
@@ -10340,8 +10200,6 @@ class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             } else if (dataframe.type !== 'line') {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -10359,12 +10217,12 @@ class Renderer {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
             }
 
-            if (!viz.offset.default) {
+            if (!viz.transform.default) {
                 const textureId = renderer.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+                viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.transform._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -10596,6 +10454,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _pointDecoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pointDecoder */ "./src/renderer/decoder/pointDecoder.js");
 /* harmony import */ var _lineDecoder__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lineDecoder */ "./src/renderer/decoder/lineDecoder.js");
 /* harmony import */ var _polygonDecoder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./polygonDecoder */ "./src/renderer/decoder/polygonDecoder.js");
+/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+
 
 
 
@@ -10609,7 +10469,7 @@ function decodeGeom (geomType, geom) {
         case 'polygon':
             return Object(_polygonDecoder__WEBPACK_IMPORTED_MODULE_2__["decodePolygon"])(geom);
         default:
-            throw new Error(`Unimplemented geometry type: '${geomType}'`);
+            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__["CartoRuntimeTypes"].NOT_SUPPORTED} Unimplemented geometry type: '${geomType}'.`);
     }
 }
 
@@ -11039,7 +10899,7 @@ module.exports = "precision highp float;\n\nvarying lowp vec4 color;\n\nvoid mai
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n    color = texture2D(colorTex, featureID);\n    float filtering = texture2D(filterTex, featureID).a;\n    color.a *= filtering;\n    color.rgb *= color.a;\n    float size = decodeWidth(texture2D(widthTex, featureID).rg);\n\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / (64.);\n\n    // Set z range (-1, 1)\n    z = z * 2. - 1.;\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy += normalScale*($offset_inline);\n    if (size==0. || color.a==0.){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\nuniform vec2 resolution;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$transform_preface\n\nvoid main(void) {\n    color = texture2D(colorTex, featureID);\n    float filtering = texture2D(filterTex, featureID).a;\n    color.a *= filtering;\n    color.rgb *= color.a;\n    float size = decodeWidth(texture2D(widthTex, featureID).rg);\n\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / (64.);\n\n    // Set z range (-1, 1)\n    z = z * 2. - 1.;\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy = $transform_inline(p.xy*resolution)/resolution;\n    if (size==0. || color.a==0.){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -11061,7 +10921,7 @@ module.exports = "precision highp float;\n\nvarying lowp vec4 color;\nvarying lo
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec4 color;\nvarying highp vec4 stroke;\nvarying highp float dp;\nvarying highp float fillScale;\nvarying highp float strokeScale;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n  color = texture2D(colorTex, abs(featureID));\n  stroke = texture2D(strokeColorTex, abs(featureID));\n  float filtering = texture2D(filterTex, abs(featureID)).a;\n  color.a *= filtering;\n  stroke.a *= filtering;\n  float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n  float fillSize = size;\n  float strokeSize = decodeWidth(texture2D(strokeWidthTex, abs(featureID)).rg);\n  size += strokeSize;\n  fillScale = min(size / fillSize, 1.);\n  strokeScale = size / max(0.001, (fillSize - strokeSize));\n  if (fillScale == strokeScale) {\n    stroke.a = 0.;\n  }\n  dp = 1.0 / (size + 1.);\n  float sizeNormalizer = (size +1.)/size;\n\n\n  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);\n\n  vec2 size2 = (2.*size+4.)*normalScale;\n\n  if (featureID.y<0.){\n      pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n      p.xy += size2*vec2(0.866025, -0.5);\n  }else if (featureID.x<0.){\n      pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n      p.xy += size2*vec2(-0.866025, -0.5);\n  }else{\n      pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n      p.y += size2.y;\n  }\n\n  p.xy += normalScale*($offset_inline);\n  if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {\n    p.x = 10000.;\n  }\n\n  gl_Position = p;\n}\n"
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform vec2 normalScale;\nuniform vec2 resolution;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec4 color;\nvarying highp vec4 stroke;\nvarying highp float dp;\nvarying highp float fillScale;\nvarying highp float strokeScale;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$transform_preface\n\nvec2 transform(vec2 p){\n    return $transform_inline(p*resolution)/resolution;\n}\n\nvoid main(void) {\n  color = texture2D(colorTex, abs(featureID));\n  stroke = texture2D(strokeColorTex, abs(featureID));\n  float filtering = texture2D(filterTex, abs(featureID)).a;\n  color.a *= filtering;\n  stroke.a *= filtering;\n  float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n  float fillSize = size;\n  float strokeSize = decodeWidth(texture2D(strokeWidthTex, abs(featureID)).rg);\n  size += strokeSize;\n  fillScale = min(size / fillSize, 1.);\n  strokeScale = size / max(0.001, (fillSize - strokeSize));\n  if (fillScale == strokeScale) {\n    stroke.a = 0.;\n  }\n  dp = 1.0 / (size + 1.);\n  float sizeNormalizer = (size +1.)/size;\n\n\n  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);\n\n  vec2 size2 = (2.*size+4.)*normalScale;\n\n    if (featureID.y<0.){\n        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += transform(size2*vec2(0.866025, -0.5));\n    }else if (featureID.x<0.){\n        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += transform(size2*vec2(-0.866025, -0.5));\n    }else{\n        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n        p.xy += transform(vec2(0.,size2.y));\n    }\n\n  if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {\n    p.x = 10000.;\n  }\n\n  gl_Position = p;\n}\n"
 
 /***/ }),
 
@@ -11083,7 +10943,7 @@ module.exports = "precision lowp float;\n\nvarying lowp vec4 color;\n\nvoid main
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision mediump float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / 64.;\n\n    vec4 c;\n    if (normal == vec2(0.)){\n        c = texture2D(colorTex, featureID);\n    }else{\n        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);\n        c = texture2D(strokeColorTex, featureID);\n    }\n    z = 2.*z - 1.;\n    float filtering = texture2D(filterTex, featureID).a;\n    c.a *= filtering;\n    float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy += normalScale*($offset_inline);\n\n    if (c.a==0.){\n        p.x=10000.;\n    }\n    color = vec4(c.rgb*c.a, c.a);\n    gl_Position  = p;\n}\n"
+module.exports = "precision mediump float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\nattribute vec2 normal;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform vec2 normalScale;\nuniform vec2 resolution;\n\nuniform sampler2D colorTex;\nuniform sampler2D strokeColorTex;\nuniform sampler2D strokeWidthTex;\nuniform sampler2D filterTex;\n\nvarying lowp vec4 color;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$propertyPreface\n$transform_preface\n\nvoid main(void) {\n    // 64 is computed based on RTT_WIDTH and the depth buffer precision\n    // 64 = 2^(BUFFER_BITS)/RTT_WIDTH = 2^16/1024 = 64\n    float z = featureID.y * 63. / 64. + featureID.x / 64.;\n\n    vec4 c;\n    if (normal == vec2(0.)){\n        c = texture2D(colorTex, featureID);\n    }else{\n        z = mod(z + (z > 0.5 ? -1./64. : 1./64.), 1.);\n        c = texture2D(strokeColorTex, featureID);\n    }\n    z = 2.*z - 1.;\n    float filtering = texture2D(filterTex, featureID).a;\n    c.a *= filtering;\n    float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);\n\n    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);\n    p.xy = $transform_inline(p.xy*resolution)/resolution;\n\n    if (c.a==0.){\n        p.x=10000.;\n    }\n    color = vec4(c.rgb*c.a, c.a);\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -11317,7 +11177,7 @@ const symbolShaderGLSL = {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform float devicePixelRatio;\nuniform vec2 resolution;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$symbolPlacement_preface\n$propertyPreface\n$offset_preface\n\nvoid main(void) {\n    featureIDVar = abs(featureID);\n    color = texture2D(colorTex, abs(featureID));\n    float filtering = texture2D(filterTex, abs(featureID)).a;\n    color.a *= filtering;\n\n    float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n    float fillSize = size;\n\n    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);\n    float sizeNormalizer = (size +2.)/size;\n    vec2 size2 = (2.*size+4.)*normalScale;\n\n    if (featureID.y<0.){\n        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += size2*vec2(0.866025, -0.5);\n    }else if (featureID.x<0.){\n        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += size2*vec2(-0.866025, -0.5);\n    }else{\n        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n        p.y += size2.y;\n    }\n    pointCoord.y = -pointCoord.y;\n\n    p.xy += ($symbolPlacement_inline)*size/resolution;\n    p.xy += normalScale*($offset_inline);\n\n    vec4 noOverrideColor = vec4(0.);\n    if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
+module.exports = "precision highp float;\n\nattribute vec2 vertexPosition;\nattribute vec2 featureID;\n\nuniform vec2 vertexScale;\nuniform vec2 vertexOffset;\nuniform float orderMinWidth;\nuniform float orderMaxWidth;\nuniform float devicePixelRatio;\nuniform vec2 resolution;\nuniform vec2 normalScale;\n\nuniform sampler2D colorTex;\nuniform sampler2D widthTex;\nuniform sampler2D filterTex;\n//TODO order bucket texture\n\nvarying highp vec2 featureIDVar;\nvarying highp vec4 color;\nvarying highp vec2 pointCoord;\n\nfloat decodeWidth(vec2 enc) {\n  return enc.x*(255.*4.) + 4.*enc.y;\n}\n\n$symbolPlacement_preface\n$propertyPreface\n$transform_preface\n\nvec2 transform(vec2 p){\n    return $transform_inline(p*resolution)/resolution;\n}\n\nvoid main(void) {\n    featureIDVar = abs(featureID);\n    color = texture2D(colorTex, abs(featureID));\n    float filtering = texture2D(filterTex, abs(featureID)).a;\n    color.a *= filtering;\n\n    float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);\n    float fillSize = size;\n\n    vec4 p = vec4(vertexScale*vertexPosition-vertexOffset, 0.5, 1.);\n    float sizeNormalizer = (size +2.)/size;\n    vec2 size2 = (2.*size+4.)*normalScale;\n\n    if (featureID.y<0.){\n        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += transform(size2*vec2(0.866025, -0.5));\n    }else if (featureID.x<0.){\n        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;\n        p.xy += transform(size2*vec2(-0.866025, -0.5));\n    }else{\n        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;\n        p.xy += transform(vec2(0.,size2.y));\n    }\n    pointCoord.y = -pointCoord.y;\n\n\n    p.xy += ($symbolPlacement_inline)*size/resolution;\n\n\n    vec4 noOverrideColor = vec4(0.);\n    if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){\n        p.x=10000.;\n    }\n    gl_Position  = p;\n}\n"
 
 /***/ }),
 
@@ -11333,6 +11193,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "compileProgram", function() { return compileProgram; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createShaderFromTemplate", function() { return createShaderFromTemplate; });
 /* harmony import */ var _Cache__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cache */ "./src/renderer/shaders/Cache.js");
+/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+
 
 
 let programID = 1;
@@ -11367,7 +11229,7 @@ function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     gl.deleteShader(fragmentShader);
 
     if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
+        throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_1__["CartoRuntimeTypes"].WEB_GL} Unable to link the shader program: ${gl.getProgramInfoLog(shader.program)}.`);
     }
 
     shader.programID = programID++;
@@ -11388,7 +11250,7 @@ function _compileShader (gl, sourceCode, type) {
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+        throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_1__["CartoRuntimeTypes"].WEB_GL} An error occurred compiling the shaders: ${log}\nSource:\n${sourceCode}`);
     }
 
     shaderCache.set(gl, sourceCode, shader);
@@ -11683,7 +11545,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*****************************************!*\
   !*** ./src/renderer/viz/expressions.js ***!
   \*****************************************/
-/*! exports provided: transition, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, clusterCount, constant, image, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, list, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, globalQuantiles, viewportQuantiles, globalEqIntervals, viewportEqIntervals, globalStandardDev, viewportStandardDev, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, zoom, scaled, zoomrange, placement, alphaNormalize, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
+/*! exports provided: transition, nin, in, between, mul, div, add, sub, pow, mod, greaterThan, greaterThanOrEqualTo, lessThan, lessThanOrEqualTo, equals, notEquals, and, or, gt, gte, lt, lte, eq, neq, blend, buckets, cielab, clusterAvg, clusterMax, clusterMin, clusterMode, clusterSum, clusterCount, constant, image, svg, hex, hsl, hsla, hsv, hsva, cubic, ilinear, linear, list, namedColor, now, number, opacity, asc, desc, noOrder, width, reverse, property, prop, globalQuantiles, viewportQuantiles, globalEqIntervals, viewportEqIntervals, globalStandardDev, viewportStandardDev, ramp, rgb, rgba, category, time, date, top, fade, animation, log, sqrt, sin, cos, tan, sign, abs, isNaN, not, floor, ceil, variable, var, viewportAvg, viewportMax, viewportMin, viewportSum, viewportCount, viewportPercentile, viewportHistogram, viewportFeatures, globalAvg, globalMax, globalMin, globalSum, globalCount, globalPercentile, zoom, scaled, zoomrange, placement, translate, rotate, alphaNormalize, HOLD, TRUE, FALSE, PI, E, BICYCLE, BUILDING, BUS, CAR, CIRCLE, CIRCLE_OUTLINE, CROSS, FLAG, HOUSE, MARKER, MARKER_OUTLINE, PLUS, SQUARE, SQUARE_OUTLINE, STAR, STAR_OUTLINE, TRIANGLE, TRIANGLE_OUTLINE, ALIGN_CENTER, ALIGN_BOTTOM, palettes, Asc, Desc */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -11790,6 +11652,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "scaled", function() { return scaled; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "zoomrange", function() { return zoomrange; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "placement", function() { return placement; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "translate", function() { return translate; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "rotate", function() { return rotate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "alphaNormalize", function() { return alphaNormalize; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HOLD", function() { return HOLD; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TRUE", function() { return TRUE; });
@@ -11857,36 +11721,38 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions_classification_ViewportQuantiles__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./expressions/classification/ViewportQuantiles */ "./src/renderer/viz/expressions/classification/ViewportQuantiles.js");
 /* harmony import */ var _expressions_classification_ViewportStandardDev__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./expressions/classification/ViewportStandardDev */ "./src/renderer/viz/expressions/classification/ViewportStandardDev.js");
 /* harmony import */ var _expressions_Ramp__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./expressions/Ramp */ "./src/renderer/viz/expressions/Ramp.js");
-/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
-/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
-/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
-/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
-/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
-/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
-/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportAvg */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMax */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMin */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportSum */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportCount */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportPercentile */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js");
-/* harmony import */ var _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportHistogram */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalAvg */ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalCount */ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMax */ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMin */ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
-/* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
-/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
-/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
-/* harmony import */ var _expressions_placement__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/placement */ "./src/renderer/viz/expressions/placement.js");
-/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
-/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
-/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
-/* harmony import */ var _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_61__ = __webpack_require__(/*! ./expressions/Zoomrange */ "./src/renderer/viz/expressions/Zoomrange.js");
-/* harmony import */ var _expressions_Scaled__WEBPACK_IMPORTED_MODULE_62__ = __webpack_require__(/*! ./expressions/Scaled */ "./src/renderer/viz/expressions/Scaled.js");
-/* harmony import */ var _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_63__ = __webpack_require__(/*! ./expressions/AlphaNormalize */ "./src/renderer/viz/expressions/AlphaNormalize.js");
-/* harmony import */ var _expressions_basic_List__WEBPACK_IMPORTED_MODULE_64__ = __webpack_require__(/*! ./expressions/basic/List */ "./src/renderer/viz/expressions/basic/List.js");
+/* harmony import */ var _expressions_basic_List__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./expressions/basic/List */ "./src/renderer/viz/expressions/basic/List.js");
+/* harmony import */ var _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./expressions/color/rgb */ "./src/renderer/viz/expressions/color/rgb.js");
+/* harmony import */ var _expressions_time__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./expressions/time */ "./src/renderer/viz/expressions/time.js");
+/* harmony import */ var _expressions_top__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./expressions/top */ "./src/renderer/viz/expressions/top.js");
+/* harmony import */ var _expressions_Fade__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./expressions/Fade */ "./src/renderer/viz/expressions/Fade.js");
+/* harmony import */ var _expressions_Animation__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./expressions/Animation */ "./src/renderer/viz/expressions/Animation.js");
+/* harmony import */ var _expressions_unary__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./expressions/unary */ "./src/renderer/viz/expressions/unary.js");
+/* harmony import */ var _expressions_basic_variable__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./expressions/basic/variable */ "./src/renderer/viz/expressions/basic/variable.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportAvg */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportAvg.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMax */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMax.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportMin */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportMin.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportSum */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportSum.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportCount */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportCount.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportPercentile */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportPercentile.js");
+/* harmony import */ var _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./expressions/aggregation/viewport/ViewportHistogram */ "./src/renderer/viz/expressions/aggregation/viewport/ViewportHistogram.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalAvg */ "./src/renderer/viz/expressions/aggregation/global/GlobalAvg.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalCount */ "./src/renderer/viz/expressions/aggregation/global/GlobalCount.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMax */ "./src/renderer/viz/expressions/aggregation/global/GlobalMax.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalMin */ "./src/renderer/viz/expressions/aggregation/global/GlobalMin.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalSum */ "./src/renderer/viz/expressions/aggregation/global/GlobalSum.js");
+/* harmony import */ var _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_55__ = __webpack_require__(/*! ./expressions/aggregation/global/GlobalPercentile */ "./src/renderer/viz/expressions/aggregation/global/GlobalPercentile.js");
+/* harmony import */ var _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_56__ = __webpack_require__(/*! ./expressions/viewportFeatures */ "./src/renderer/viz/expressions/viewportFeatures.js");
+/* harmony import */ var _expressions_zoom__WEBPACK_IMPORTED_MODULE_57__ = __webpack_require__(/*! ./expressions/zoom */ "./src/renderer/viz/expressions/zoom.js");
+/* harmony import */ var _expressions_Placement__WEBPACK_IMPORTED_MODULE_58__ = __webpack_require__(/*! ./expressions/Placement */ "./src/renderer/viz/expressions/Placement.js");
+/* harmony import */ var _expressions_Image__WEBPACK_IMPORTED_MODULE_59__ = __webpack_require__(/*! ./expressions/Image */ "./src/renderer/viz/expressions/Image.js");
+/* harmony import */ var _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__ = __webpack_require__(/*! ./expressions/SVG */ "./src/renderer/viz/expressions/SVG.js");
+/* harmony import */ var _defaultSVGs__WEBPACK_IMPORTED_MODULE_61__ = __webpack_require__(/*! ./defaultSVGs */ "./src/renderer/viz/defaultSVGs.js");
+/* harmony import */ var _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_62__ = __webpack_require__(/*! ./expressions/Zoomrange */ "./src/renderer/viz/expressions/Zoomrange.js");
+/* harmony import */ var _expressions_Scaled__WEBPACK_IMPORTED_MODULE_63__ = __webpack_require__(/*! ./expressions/Scaled */ "./src/renderer/viz/expressions/Scaled.js");
+/* harmony import */ var _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_64__ = __webpack_require__(/*! ./expressions/AlphaNormalize */ "./src/renderer/viz/expressions/AlphaNormalize.js");
+/* harmony import */ var _expressions_transformation_Translate__WEBPACK_IMPORTED_MODULE_65__ = __webpack_require__(/*! ./expressions/transformation/Translate */ "./src/renderer/viz/expressions/transformation/Translate.js");
+/* harmony import */ var _expressions_transformation_Rotate__WEBPACK_IMPORTED_MODULE_66__ = __webpack_require__(/*! ./expressions/transformation/Rotate */ "./src/renderer/viz/expressions/transformation/Rotate.js");
 /**
  *  Expressions are used to define visualizations, a visualization (viz) is a set named properties and variables and its corresponding values: expressions.
  *  A viz has the following properties:
@@ -12143,6 +12009,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
 /* Expose classes as constructor functions */
 
 const transition = (...args) => new _expressions_transition__WEBPACK_IMPORTED_MODULE_0__["default"](...args);
@@ -12189,9 +12057,9 @@ const clusterCount = (...args) => new _expressions_aggregation_cluster_ClusterCo
 
 const constant = (...args) => new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](...args);
 
-const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
+const image = (...args) => new _expressions_Image__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
 
-const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](...args);
+const svg = (...args) => new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](...args);
 
 const hex = (...args) => new _expressions_color_hex__WEBPACK_IMPORTED_MODULE_15__["default"](...args);
 
@@ -12205,7 +12073,7 @@ const cubic = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODU
 const ilinear = (...args) => new _expressions_interpolators__WEBPACK_IMPORTED_MODULE_18__["ILinear"](...args);
 
 const linear = (...args) => new _expressions_linear__WEBPACK_IMPORTED_MODULE_19__["default"](...args);
-const list = (...args) => new _expressions_basic_List__WEBPACK_IMPORTED_MODULE_64__["default"](...args);
+const list = (...args) => new _expressions_basic_List__WEBPACK_IMPORTED_MODULE_35__["default"](...args);
 
 const namedColor = (...args) => new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_20__["default"](...args);
 
@@ -12236,55 +12104,57 @@ const viewportStandardDev = (...args) => new _expressions_classification_Viewpor
 
 const ramp = (...args) => new _expressions_Ramp__WEBPACK_IMPORTED_MODULE_34__["default"](...args);
 
-const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__["RGB"](...args);
-const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_35__["RGBA"](...args);
+const rgb = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__["RGB"](...args);
+const rgba = (...args) => new _expressions_color_rgb__WEBPACK_IMPORTED_MODULE_36__["RGBA"](...args);
 
 const category = (...args) => new _expressions_basic_category__WEBPACK_IMPORTED_MODULE_6__["default"](...args);
 
-const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_36__["default"](...args);
+const time = (...args) => new _expressions_time__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
 
 
-const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_37__["default"](...args);
+const top = (...args) => new _expressions_top__WEBPACK_IMPORTED_MODULE_38__["default"](...args);
 
-const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_38__["Fade"](...args);
-const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_39__["Animation"](...args);
+const fade = (...args) => new _expressions_Fade__WEBPACK_IMPORTED_MODULE_39__["Fade"](...args);
+const animation = (...args) => new _expressions_Animation__WEBPACK_IMPORTED_MODULE_40__["Animation"](...args);
 
-const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Log"](...args);
-const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sqrt"](...args);
-const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sin"](...args);
-const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Cos"](...args);
-const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Tan"](...args);
-const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Sign"](...args);
-const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Abs"](...args);
-const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["IsNaN"](...args);
-const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Not"](...args);
-const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Floor"](...args);
-const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_40__["Ceil"](...args);
+const log = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Log"](...args);
+const sqrt = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sqrt"](...args);
+const sin = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sin"](...args);
+const cos = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Cos"](...args);
+const tan = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Tan"](...args);
+const sign = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Sign"](...args);
+const abs = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Abs"](...args);
+const isNaN = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["IsNaN"](...args);
+const not = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Not"](...args);
+const floor = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Floor"](...args);
+const ceil = (...args) => new _expressions_unary__WEBPACK_IMPORTED_MODULE_41__["Ceil"](...args);
 
-const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_41__["default"])(...args);
+const variable = (...args) => Object(_expressions_basic_variable__WEBPACK_IMPORTED_MODULE_42__["default"])(...args);
 
 
-const viewportAvg = (...args) => new _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_42__["default"](...args);
-const viewportMax = (...args) => new _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_43__["default"](...args);
-const viewportMin = (...args) => new _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_44__["default"](...args);
-const viewportSum = (...args) => new _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_45__["default"](...args);
-const viewportCount = (...args) => new _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_46__["default"](...args);
-const viewportPercentile = (...args) => new _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_47__["default"](...args);
-const viewportHistogram = (...args) => new _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
-const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
-const globalAvg = (...args) => new _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_49__["default"](...args);
-const globalMax = (...args) => new _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_51__["default"](...args);
-const globalMin = (...args) => new _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
-const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_53__["default"](...args);
-const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_50__["default"](...args);
-const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+const viewportAvg = (...args) => new _expressions_aggregation_viewport_ViewportAvg__WEBPACK_IMPORTED_MODULE_43__["default"](...args);
+const viewportMax = (...args) => new _expressions_aggregation_viewport_ViewportMax__WEBPACK_IMPORTED_MODULE_44__["default"](...args);
+const viewportMin = (...args) => new _expressions_aggregation_viewport_ViewportMin__WEBPACK_IMPORTED_MODULE_45__["default"](...args);
+const viewportSum = (...args) => new _expressions_aggregation_viewport_ViewportSum__WEBPACK_IMPORTED_MODULE_46__["default"](...args);
+const viewportCount = (...args) => new _expressions_aggregation_viewport_ViewportCount__WEBPACK_IMPORTED_MODULE_47__["default"](...args);
+const viewportPercentile = (...args) => new _expressions_aggregation_viewport_ViewportPercentile__WEBPACK_IMPORTED_MODULE_48__["default"](...args);
+const viewportHistogram = (...args) => new _expressions_aggregation_viewport_ViewportHistogram__WEBPACK_IMPORTED_MODULE_49__["default"](...args);
+const viewportFeatures = (...args) => new _expressions_viewportFeatures__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
+const globalAvg = (...args) => new _expressions_aggregation_global_GlobalAvg__WEBPACK_IMPORTED_MODULE_50__["default"](...args);
+const globalMax = (...args) => new _expressions_aggregation_global_GlobalMax__WEBPACK_IMPORTED_MODULE_52__["default"](...args);
+const globalMin = (...args) => new _expressions_aggregation_global_GlobalMin__WEBPACK_IMPORTED_MODULE_53__["default"](...args);
+const globalSum = (...args) => new _expressions_aggregation_global_GlobalSum__WEBPACK_IMPORTED_MODULE_54__["default"](...args);
+const globalCount = (...args) => new _expressions_aggregation_global_GlobalCount__WEBPACK_IMPORTED_MODULE_51__["default"](...args);
+const globalPercentile = (...args) => new _expressions_aggregation_global_GlobalPercentile__WEBPACK_IMPORTED_MODULE_55__["default"](...args);
 
-const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_56__["default"](...args);
-const scaled = (...args) => new _expressions_Scaled__WEBPACK_IMPORTED_MODULE_62__["default"](...args);
-const zoomrange = (...args) => new _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_61__["default"](...args);
+const zoom = (...args) => new _expressions_zoom__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
+const scaled = (...args) => new _expressions_Scaled__WEBPACK_IMPORTED_MODULE_63__["default"](...args);
+const zoomrange = (...args) => new _expressions_Zoomrange__WEBPACK_IMPORTED_MODULE_62__["default"](...args);
 
-const placement = (...args) => new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](...args);
-const alphaNormalize = (...args) => new _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_63__["default"](...args);
+const placement = (...args) => new _expressions_Placement__WEBPACK_IMPORTED_MODULE_58__["default"](...args);
+const translate = (...args) => new _expressions_transformation_Translate__WEBPACK_IMPORTED_MODULE_65__["default"](...args);
+const rotate = (...args) => new _expressions_transformation_Rotate__WEBPACK_IMPORTED_MODULE_66__["default"](...args);
+const alphaNormalize = (...args) => new _expressions_AlphaNormalize__WEBPACK_IMPORTED_MODULE_64__["default"](...args);
 
 const HOLD = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Number.MAX_SAFE_INTEGER);
 const TRUE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](1);
@@ -12292,27 +12162,27 @@ const FALSE = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["def
 const PI = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.PI);
 const E = new _expressions_basic_constant__WEBPACK_IMPORTED_MODULE_14__["default"](Math.E);
 
-const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bicycle);
-const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].building);
-const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].bus);
-const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].car);
-const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circle);
-const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].circleOutline);
-const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].cross);
-const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].flag);
-const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].house);
-const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].marker);
-const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].markerOutline);
-const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].plus);
-const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].square);
-const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].squareOutline);
-const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].star);
-const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].starOutline);
-const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangle);
-const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_59__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_60__["default"].triangleOutline);
+const BICYCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].bicycle);
+const BUILDING = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].building);
+const BUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].bus);
+const CAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].car);
+const CIRCLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].circle);
+const CIRCLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].circleOutline);
+const CROSS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].cross);
+const FLAG = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].flag);
+const HOUSE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].house);
+const MARKER = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].marker);
+const MARKER_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].markerOutline);
+const PLUS = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].plus);
+const SQUARE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].square);
+const SQUARE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].squareOutline);
+const STAR = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].star);
+const STAR_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].starOutline);
+const TRIANGLE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].triangle);
+const TRIANGLE_OUTLINE = new _expressions_SVG__WEBPACK_IMPORTED_MODULE_60__["default"](_defaultSVGs__WEBPACK_IMPORTED_MODULE_61__["default"].triangleOutline);
 
-const ALIGN_CENTER = new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](constant(0), constant(0));
-const ALIGN_BOTTOM = new _expressions_placement__WEBPACK_IMPORTED_MODULE_57__["default"](constant(0), constant(1));
+const ALIGN_CENTER = new _expressions_Placement__WEBPACK_IMPORTED_MODULE_58__["default"](constant(0), constant(0));
+const ALIGN_BOTTOM = new _expressions_Placement__WEBPACK_IMPORTED_MODULE_58__["default"](constant(0), constant(1));
 
 
 
@@ -13249,6 +13119,132 @@ class ListImage extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
+/***/ "./src/renderer/viz/expressions/ListTransform.js":
+/*!*******************************************************!*\
+  !*** ./src/renderer/viz/expressions/ListTransform.js ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return ListTransform; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+class ListTransform extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        this._getChildren().forEach((transform, i) => Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('ListTransformation', `ListTransformation[${i}]`, 0, 'transformation', transform));
+        this.type = 'transformation';
+    }
+
+    eval (feature) {
+        return this.elems.map(elem => elem.eval(feature));
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const childGLSL = this.elems.map(elem => elem._applyToShaderSource(getGLSLforProperty));
+        return {
+            preface: this._prefaceCode(`
+                ${childGLSL.map(c => c.preface).join('\n')}
+
+                vec2 listTransform${this._uid}(vec2 p) {
+                    ${childGLSL.map(c => `p = ${c.inline}(p);`).join('\n')}
+                    return p;
+                }
+            `),
+            inline: `listTransform${this._uid}`
+        };
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/Placement.js":
+/*!***************************************************!*\
+  !*** ./src/renderer/viz/expressions/Placement.js ***!
+  \***************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Placement; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+/**
+ * Placement. Define an image offset relative to its size. Where:
+ * - `symbolPlacement: placement(1,1)` means to align the bottom left corner of the image with the point center.
+ * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
+ * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
+ *
+ * ```
+ *           |1
+ *           |
+ *           |
+ * -1 -------+------- 1
+ *           |
+ *           |
+ *         -1|
+ * ```
+ *
+ * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
+ * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
+ * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
+ *
+ * @param {number} x - first numeric expression that indicates the image offset in the X direction.
+ * @param {number} y - second numeric expression that indicates the image offset in the Y direction.
+ * @return {Placement} Numeric expression
+ *
+ * @example <caption>Setting the aligment to the top corner of the image.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.image('./marker.svg').
+ *   symbolPlacement: s.placement(1, 0)
+ * });
+ *
+ * @example <caption>Setting the aligment to the top corner of the image. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   symbol: image('./marker.svg')
+ *   symbolPlacement: placement(1, 0)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name placement
+ * @function
+ * @api
+ */
+
+class Placement extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (x, y) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'placement');
+
+        x = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x);
+        y = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(y);
+        super({ x, y });
+        this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
+        this.type = 'placement';
+    }
+    eval (v) {
+        return [this.x.eval(v), this.y.eval(v)];
+    }
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('placement', 'x', 0, 'number', this.x);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('placement', 'y', 1, 'number', this.y);
+    }
+}
+
+
+/***/ }),
+
 /***/ "./src/renderer/viz/expressions/Ramp.js":
 /*!**********************************************!*\
   !*** ./src/renderer/viz/expressions/Ramp.js ***!
@@ -14062,7 +14058,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Zoomrange; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+
 
 
 
@@ -14091,10 +14089,10 @@ __webpack_require__.r(__webpack_exports__);
  */
 class Zoomrange extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     constructor (zoomBreakpointList) {
-        zoomBreakpointList = Object(_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(zoomBreakpointList);
+        zoomBreakpointList = Object(_utils__WEBPACK_IMPORTED_MODULE_3__["implicitCast"])(zoomBreakpointList);
 
         super({});
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkExpression"])('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_3__["checkExpression"])('zoomrange', 'zoomBreakpointList', 0, zoomBreakpointList);
         this.zoomBreakpointList = zoomBreakpointList;
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
@@ -14102,9 +14100,9 @@ class Zoomrange extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     _bindMetadata (metadata) {
         this.zoomBreakpointList._bindMetadata(metadata);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkType"])('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_3__["checkType"])('zoomrange', 'zoomBreakpointList', 0, 'number-list', this.zoomBreakpointList);
         if (this.zoomBreakpointList.elems.length < 2) {
-            throw new Error('zoomrange() function must receive a list with at least two elements');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} zoomrange() function must receive a list with at least two elements.`);
         }
 
         const breakpointListCopy = [...this.zoomBreakpointList.elems];
@@ -14542,6 +14540,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -14576,7 +14576,7 @@ class GlobalAggregation extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this.property._bindMetadata(metadata);
         // TODO improve type check
         if (metadata.properties[this.property.name][this._name] === undefined) {
-            throw new Error(`Metadata ${this._name} for property ${this.property.name} is not defined`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].MISSING_REQUIRED} Metadata ${this._name} for property ${this.property.name} is not defined`);
         }
         this._value.expr = metadata.properties[this.property.name][this._name];
     }
@@ -14810,6 +14810,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -14843,7 +14845,7 @@ class GlobalPercentile extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_2__["checkMaxArguments"])(arguments, 2, 'globalPercentile');
 
         if (!Number.isFinite(percentile)) {
-            throw new Error('Percentile must be a fixed literal number');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} 'percentile' must be a fixed literal number`);
         }
         super({ _value: Object(_expressions__WEBPACK_IMPORTED_MODULE_1__["number"])(0) });
         // TODO improve type check
@@ -15603,6 +15605,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../schema */ "./src/renderer/schema.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+
+
 
 
 
@@ -15671,7 +15677,7 @@ class Base {
      *
      */
     eval (feature) {
-        throw new Error('Unimplemented');
+        throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__["default"]('Unimplemented');
     }
 
     /**
@@ -15761,7 +15767,9 @@ class Base {
 
     _initializeChildrenArray (children) {
         if (this.maxParameters && this.maxParameters < children.length) {
-            throw new Error('Extra parameters');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](
+                `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].TOO_MANY_ARGS} Extra parameters, got ${children.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         this.childrenNames = [];
@@ -15777,7 +15785,9 @@ class Base {
         this.childrenNames = Object.keys(children);
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
-            throw new Error('Extra parameters');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](
+                `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].TOO_MANY_ARGS} Extra parameters, got ${this.childrenNames.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         Object.keys(children).map(name => {
@@ -15929,21 +15939,40 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _ListImage__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ListImage */ "./src/renderer/viz/expressions/ListImage.js");
 /* harmony import */ var _ListGeneric__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./ListGeneric */ "./src/renderer/viz/expressions/basic/ListGeneric.js");
+/* harmony import */ var _ListTransform__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../ListTransform */ "./src/renderer/viz/expressions/ListTransform.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
 
 
 
 
 
-const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image'];
+
+
+const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image', 'transformation'];
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.
  *
- * @param {Number[]|Category[]|Color[]|Date[]|Image[]} elements
- * @returns {List}
+ * When used with Transformation expressions, the returned value will be a Transformation that will chain each single transformation one after another.
+ *
+ * @example <caption>Rotate then translate.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.CROSS
+ *   transform: [s.rotate(90), s.translate(10, 20)]
+ * });
+ *
+ * @example <caption>Rotate then translate. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   symbol: cross
+ *   transform: [rotate(90), translate(10, 20)]
+ * `);
+ *
+ * @param {Number[]|Category[]|Color[]|Date[]|Image[]|Transform[]} elements
+ * @returns {List|Transform}
  *
  * @memberof carto.expressions
- * @name array
+ * @name list
  * @function
  * @api
  */
@@ -15952,7 +15981,7 @@ class List extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'list');
 
         if (!elems) {
-            throw new Error('list(): invalid parameters: must receive at least one argument');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["CartoValidationTypes"].MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
         }
 
         if (!Array.isArray(elems)) {
@@ -15962,7 +15991,7 @@ class List extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         elems = elems.map(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"]);
 
         if (!elems.length) {
-            throw new Error('list(): invalid parameters: must receive at least one argument');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["CartoValidationTypes"].MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
         }
 
         elems.map((item, index) => {
@@ -15978,20 +16007,23 @@ class List extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         this._setTypes();
 
         if (SUPPORTED_CHILD_TYPES.indexOf(this.childType) === -1) {
-            throw new Error(`list(): invalid parameters type: ${this.childType}`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["CartoValidationTypes"].INCORRECT_TYPE} list(): invalid parameters type: ${this.childType}.`);
         }
 
         this.elems.map((item, index) => {
             Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])('list', `item[${index}]`, index, item);
 
             if (item.type !== this.childType) {
-                throw new Error(`list(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type, invalid argument type combination`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_5__["CartoValidationTypes"].INCORRECT_TYPE} list(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type, invalid argument type combination.`);
             }
         });
 
         switch (this.elems[0].type) {
             case 'image':
                 Object.setPrototypeOf(this, _ListImage__WEBPACK_IMPORTED_MODULE_2__["default"].prototype);
+                break;
+            case 'transformation':
+                Object.setPrototypeOf(this, _ListTransform__WEBPACK_IMPORTED_MODULE_4__["default"].prototype);
                 break;
             default:
                 Object.setPrototypeOf(this, _ListGeneric__WEBPACK_IMPORTED_MODULE_3__["default"].prototype);
@@ -16267,6 +16299,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Property; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -16305,7 +16339,7 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('property', 'name', 0, name);
 
         if (name === '') {
-            throw new Error('property(): invalid parameter, zero-length string');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} property(): invalid parameter, zero-length string`);
         }
         super({});
         this.name = name;
@@ -16323,7 +16357,7 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
     eval (feature) {
         if (!feature) {
-            throw new Error('A property needs to be evaluated in a feature');
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
 
         return feature[this.name];
@@ -16342,7 +16376,7 @@ class Property extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     _bindMetadata (metadata) {
         const metaColumn = metadata.properties[this.name];
         if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].MISSING_REQUIRED} Property '${this.name}' does not exist`);
         }
 
         this._metadata = metadata;
@@ -16389,6 +16423,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return variable; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -16433,7 +16469,7 @@ function variable (name) {
     Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('variable', 'name', 0, name);
 
     if (name === '') {
-        throw new Error('variable(): invalid parameter, zero-length string');
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} variable(): invalid parameter, zero-length string`);
     }
 
     let alias;
@@ -16442,7 +16478,7 @@ function variable (name) {
         if (aliases[name]) {
             alias = aliases[name];
         } else {
-            throw new Error(`variable() name '${name}' doesn't exist`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].MISSING_REQUIRED} variable() with name '${name}' doesn't exist`);
         }
     };
 
@@ -16702,6 +16738,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -17177,7 +17215,7 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
 
             const signature = getSignature(a, b);
             if (signature === UNSUPPORTED_SIGNATURE || !(signature & allowedSignature)) {
-                throw new Error(`${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} ${name}(): invalid parameter types\n'x' type was ${a.type}, 'y' type was ${b.type}`);
             }
             this.type = getReturnTypeFromSignature(signature);
         }
@@ -17269,6 +17307,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _transition__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./transition */ "./src/renderer/viz/expressions/transition.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -17364,7 +17404,7 @@ function abTypeCheck (a, b) {
     const validTypes = ['number', 'color', 'image', 'placement'];
 
     if (a.type !== b.type || !(validTypes.includes(a.type))) {
-        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was '${b.type}'`);
     }
 }
 
@@ -17383,7 +17423,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Buckets; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
 
 
 
@@ -17471,7 +17513,7 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                 }
             }
 
-            return _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_INDEX"];
+            return _constants__WEBPACK_IMPORTED_MODULE_3__["OTHERS_INDEX"];
         }
 
         for (let i = 0; i < this.list.elems.length; i++) {
@@ -17487,17 +17529,23 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         super._bindMetadata(metadata);
 
         if (this.input.type !== 'number' && this.input.type !== 'category') {
-            throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](
+                `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`
+            );
         }
 
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
-                throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type` +
-                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](
+                    `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type` +
+                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`
+                );
             } else if (item.type !== 'number' && item.type !== 'category') {
-                throw new Error(`buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](
+                    `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} buckets(): invalid ${Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getOrdinalFromIndex"])(index + 1)} parameter type\n\ttype was ${item.type}`
+                );
             }
         });
 
@@ -17525,11 +17573,11 @@ class Buckets extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const funcBody = this.list.elems.map(elif).join('');
         const preface = `float ${funcName}(float x){
             ${funcBody}
-            return ${this.input.type === 'category' ? _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_GLSL_VALUE"] : (this.numCategories - 1).toFixed(20)};
+            return ${this.input.type === 'category' ? _constants__WEBPACK_IMPORTED_MODULE_3__["OTHERS_GLSL_VALUE"] : (this.numCategories - 1).toFixed(20)};
         }`;
 
         return {
-            preface: this._prefaceCode(childSources.list.preface + preface),
+            preface: this._prefaceCode(childSources.input.preface + childSources.list.preface + preface),
             inline: `${funcName}(${childSources.input.inline})`
         };
     }
@@ -17551,7 +17599,7 @@ function _getLegendDataNumeric (list) {
     for (let i = 0; i <= list.length; i++) {
         const min = i - 1 >= 0 ? list[i - 1] : Number.NEGATIVE_INFINITY;
         const max = i < list.length ? list[i] : Number.POSITIVE_INFINITY;
-        const key = [ min, max ];
+        const key = [min, max];
         const value = i / list.length;
         data.push({ key, value });
     }
@@ -17570,7 +17618,7 @@ function _getLegendDataCategory (list, config) {
 
     data.push({
         key: config.othersLabel,
-        value: _constants__WEBPACK_IMPORTED_MODULE_2__["OTHERS_INDEX"]
+        value: _constants__WEBPACK_IMPORTED_MODULE_3__["OTHERS_INDEX"]
     });
 
     return data;
@@ -18339,6 +18387,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _cssColorNames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./cssColorNames */ "./src/renderer/viz/expressions/color/cssColorNames.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -18371,7 +18421,8 @@ class NamedColor extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkString"])('namedColor', 'colorName', 0, colorName);
 
         if (!_cssColorNames__WEBPACK_IMPORTED_MODULE_2__["CSS_COLOR_NAMES"].includes(colorName.toLowerCase())) {
-            throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('namedColor', 'colorName', 0) + `\nInvalid color name:  "${colorName}"`);
+            const preface = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('namedColor', 'colorName', 0);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_VALUE} ${preface}\nInvalid color name:  '${colorName}'`);
         }
         super({});
         this.type = 'color';
@@ -18671,6 +18722,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Hex; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -18706,7 +18759,8 @@ class Hex extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         try {
             this.color = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["hexToRgb"])(hexadecimalColor);
         } catch (error) {
-            throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
+            const preface = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('hex', 'hexadecimalColor', 0);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} ${preface} \nInvalid hexadecimal color string`);
         }
         this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
@@ -18738,6 +18792,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HSLA", function() { return HSLA; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -18892,7 +18948,7 @@ function genHSL (name, alpha) {
     function hslCheckType (parameterName, parameterIndex, parameter) {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])(name, parameterName, parameterIndex, parameter);
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
-            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }
 }
@@ -18913,6 +18969,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HSVA", function() { return HSVA; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -19068,7 +19126,7 @@ function genHSV (name, alpha) {
     function hsvCheckType (parameterName, parameterIndex, parameter) {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkExpression"])(name, parameterName, parameterIndex, parameter);
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
-            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }
 }
@@ -19384,6 +19442,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BounceEaseIn", function() { return BounceEaseIn; });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -19460,7 +19520,7 @@ function genInterpolator (name, inlineMaker, preface, jsEval) {
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             if (this.m.type !== 'number') {
-                throw new Error(`Blending cannot be performed by '${this.m.type}'`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} Blending cannot be performed by '${this.m.type}'`);
             }
             this.type = 'number';
             this._setGenericGLSL(inline => inlineMaker(inline.m), preface);
@@ -19835,87 +19895,6 @@ class Width extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
 
 /***/ }),
 
-/***/ "./src/renderer/viz/expressions/placement.js":
-/*!***************************************************!*\
-  !*** ./src/renderer/viz/expressions/placement.js ***!
-  \***************************************************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Placement; });
-/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
-
-
-
-/**
- * Placement. Define an image offset relative to its size. Where:
- * - `symbolPlacement: placement(1,1)` means to align the bottom left corner of the image with the point center.
- * - `symbolPlacement: placement(0,0)` means to align the center of the image with the point center.
- * - `symbolPlacement: placement(-1,-1)` means to align the top right corner of the image with the point center.
- *
- * ```
- *           |1
- *           |
- *           |
- * -1 -------+------- 1
- *           |
- *           |
- *         -1|
- * ```
- *
- * You can also use `align_center` and `align_bottom` to set the simbol placement as follows:
- * - `symbolPlacement: align_bottom` is equivalent to `symbolPlacement: placement(0, 1)`
- * - `symbolPlacement: align_center` is equivalent to `symbolPlacement: placement(0, 0)`
- *
- * @param {number} x - first numeric expression that indicates the image offset in the X direction.
- * @param {number} y - second numeric expression that indicates the image offset in the Y direction.
- * @return {Placement} Numeric expression
- *
- * @example <caption>Setting the aligment to the top corner of the image.</caption>
- * const s = carto.expressions;
- * const viz = new carto.Viz({
- *   symbol: s.image('./marker.svg').
- *   symbolPlacement: s.placement(1, 0)
- * });
- *
- * @example <caption>Setting the aligment to the top corner of the image. (String)</caption>
- * const viz = new carto.Viz(`
- *   symbol: image('./marker.svg')
- *   symbolPlacement: placement(1, 0)
- * `);
- *
- * @memberof carto.expressions
- * @name placement
- * @function
- * @api
- */
-
-class Placement extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
-    constructor (x, y) {
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'placement');
-
-        x = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x);
-        y = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(y);
-        super({ x, y });
-        this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
-        this.type = 'placement';
-    }
-    eval (v) {
-        return [this.x.eval(v), this.y.eval(v)];
-    }
-    _bindMetadata (meta) {
-        super._bindMetadata(meta);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('placement', 'x', 0, 'number', this.x);
-        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('placement', 'y', 1, 'number', this.y);
-    }
-}
-
-
-/***/ }),
-
 /***/ "./src/renderer/viz/expressions/reverse/ReverseList.js":
 /*!*************************************************************!*\
   !*** ./src/renderer/viz/expressions/reverse/ReverseList.js ***!
@@ -20218,7 +20197,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
-/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./constants */ "./src/renderer/viz/expressions/constants.js");
+
 
 
 
@@ -20274,7 +20255,7 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         const index = orderedCategoryNames.findIndex(category => category.name === categoryName);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
-        return index >= this.numBuckets || index === -1 ? _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_INDEX"] : index / divisor;
+        return index >= this.numBuckets || index === -1 ? _constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_INDEX"] : index / divisor;
     }
 
     _bindMetadata (metadata) {
@@ -20308,7 +20289,9 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
             // making this error an unrecoverable error, within the setTimeout the error is recoverable
             const prev = this.buckets.eval();
             setTimeout(() => {
-                throw new Error(`top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](
+                    `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_VALUE} top() function has a limit of ${MAX_TOP_BUCKETS} buckets but '${prev}' buckets were specified.`
+                );
             });
             buckets = 0;
         }
@@ -20358,7 +20341,7 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
                 } else if (${childSources._top15.inline} == id){
                     r = 15.;
                 }else{
-                    return ${_constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_GLSL_VALUE"]};
+                    return ${_constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_GLSL_VALUE"]};
                 }
                 return r/(numCategoriesWithoutOthers${this._uid}-1.);
             }`),
@@ -20411,11 +20394,192 @@ class Top extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         });
 
         data.push({
-            key: _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_LABEL"],
-            value: _constants__WEBPACK_IMPORTED_MODULE_4__["OTHERS_INDEX"]
+            key: _constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_LABEL"],
+            value: _constants__WEBPACK_IMPORTED_MODULE_5__["OTHERS_INDEX"]
         });
 
         return { name, data };
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/transformation/Rotate.js":
+/*!***************************************************************!*\
+  !*** ./src/renderer/viz/expressions/transformation/Rotate.js ***!
+  \***************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Rotate; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+/**
+ * Rotate. Define a rotation in degrees.
+ *
+ * Limitation: only supported in combination with `symbol:`.
+ *
+ * @param {Number} angle - angle to rotate in degrees in clockwise direction
+ * @return {Transform}
+ *
+ * @example <caption>Rotate 30 degrees in clockwise direction.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.CROSS
+ *   transform: s.rotate(30)
+ * });
+ *
+ * @example <caption>Rotate 30 degrees in clockwise direction. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   symbol: cross
+ *   transform: rotate(30)
+ * `);
+ *
+ * @example <caption>Rotate 30 degrees in counter-clockwise direction.</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   symbol: s.CROSS
+ *   transform: s.rotate(-30)
+ * });
+ *
+ * @example <caption>Rotate 30 degrees in counter-clockwise direction. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   symbol: cross
+ *   transform: rotate(-30)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name rotate
+ * @function
+ * @api
+ */
+
+class Rotate extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (angle) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'rotate');
+
+        angle = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(angle);
+        super({ angle });
+        this.type = 'transformation';
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const angle = this.angle._applyToShaderSource(getGLSLforProperty);
+        return {
+            preface: this._prefaceCode(`
+                ${angle.preface}
+
+                #ifndef DEGREES_TO_RADIANS
+                #define DEGREES_TO_RADIANS
+                float degreesToRadians(float degrees){
+                    return degrees/360.*2.*3.14159265359;
+                }
+                #endif
+                
+                vec2 rotate${this._uid}(vec2 p){
+                    float angle = degreesToRadians(${angle.inline});
+                    mat2 M = mat2(cos(angle), -sin(angle),
+                                  sin(angle),  cos(angle));
+                    return M * p;
+                }`),
+
+            inline: `rotate${this._uid}`
+        };
+    }
+
+    eval (feature) {
+        // TODO
+        return [0, 0];
+    }
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('rotate', 'angle', 0, 'number', this.angle);
+    }
+}
+
+
+/***/ }),
+
+/***/ "./src/renderer/viz/expressions/transformation/Translate.js":
+/*!******************************************************************!*\
+  !*** ./src/renderer/viz/expressions/transformation/Translate.js ***!
+  \******************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Translate; });
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils */ "./src/renderer/viz/expressions/utils.js");
+
+
+
+/**
+ * Translate. Define a translation:
+ *
+ * @param {number} x - first numeric expression that indicates the translation in the X direction.
+ * @param {number} y - second numeric expression that indicates the translation in the Y direction.
+ * @return {Translate} Numeric expression
+ *
+ * @example <caption>Apply an x, y translation</caption>
+ * const s = carto.expressions;
+ * const viz = new carto.Viz({
+ *   transform: s.translate(10, 20)
+ * });
+ *
+ * @example <caption>Apply an x, y translation. (String)</caption>
+ * const viz = new carto.Viz(`
+ *   transform: translate(10, 20)
+ * `);
+ *
+ * @memberof carto.expressions
+ * @name translate
+ * @function
+ * @api
+ */
+
+class Translate extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
+    constructor (x, y) {
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 2, 'translate');
+
+        x = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(x);
+        y = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["implicitCast"])(y);
+        super({ x, y });
+        this.type = 'transformation';
+    }
+
+    _applyToShaderSource (getGLSLforProperty) {
+        const x = this.x._applyToShaderSource(getGLSLforProperty);
+        const y = this.y._applyToShaderSource(getGLSLforProperty);
+        return {
+            preface: this._prefaceCode(`
+                ${x.preface}
+                ${y.preface}
+
+                vec2 translate${this._uid}(vec2 p){
+                    return p+vec2(${x.inline}, ${y.inline});
+                }`),
+
+            inline: `translate${this._uid}`
+        };
+    }
+
+    eval (value) {
+        return [this.x.eval(value), this.y.eval(value)];
+    }
+
+    _bindMetadata (meta) {
+        super._bindMetadata(meta);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('translate', 'x', 0, 'number', this.x);
+        Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkType"])('translate', 'y', 1, 'number', this.y);
     }
 }
 
@@ -20434,6 +20598,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Transition; });
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -20455,7 +20621,8 @@ class Transition extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkMaxArguments"])(arguments, 1, 'transition');
         Object(_utils__WEBPACK_IMPORTED_MODULE_1__["checkNumber"])('transition', 'duration', 0, duration);
         if (duration < 0) {
-            throw new Error(Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('transition', 'duration', 0) + 'duration must be greater than or equal to 0');
+            const preface = Object(_utils__WEBPACK_IMPORTED_MODULE_1__["getStringErrorPreface"])('transition', 'duration', 0);
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} ${preface} 'duration' must be greater than or equal to 0.`);
         }
         super({});
         this.aTime = Date.now();
@@ -20515,6 +20682,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Ceil", function() { return Ceil; });
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 
 
@@ -20819,7 +20988,7 @@ function genUnaryOp (name, jsFn, glsl) {
             super._bindMetadata(meta);
             Object(_utils__WEBPACK_IMPORTED_MODULE_0__["checkType"])(name, 'x', 0, 'number', this.a);
             if (this.a.type !== 'number') {
-                throw new Error(`Unary operation cannot be performed to '${this.a.type}'`);
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} Unary operation cannot be performed to '${this.a.type}'`);
             }
         }
     };
@@ -20861,7 +21030,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fract", function() { return fract; });
 /* harmony import */ var _expressions__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../expressions */ "./src/renderer/viz/expressions.js");
 /* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./base */ "./src/renderer/viz/expressions/base.js");
-/* harmony import */ var _colorspaces__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../colorspaces */ "./src/renderer/viz/colorspaces.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../errors/carto-parsing-error */ "./src/errors/carto-parsing-error.js");
+/* harmony import */ var _colorspaces__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../colorspaces */ "./src/renderer/viz/colorspaces.js");
+
+
 
 
 
@@ -20870,7 +21043,7 @@ const DEFAULT = undefined;
 
 function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].TOO_MANY_ARGS} Expression '${expressionName}' accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
@@ -20936,7 +21109,7 @@ function hexToRgb (hex) {
         };
     }
 
-    throw new Error('Invalid hexadecimal color');
+    throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_3__["default"]('Invalid hexadecimal color');
 }
 
 function getOrdinalFromIndex (index) {
@@ -20953,27 +21126,27 @@ function getStringErrorPreface (expressionName, parameterName, parameterIndex) {
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
 function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-expected type was '${expectedType}', actual type was '${actualType}'`);
+    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    expected type was '${expectedType}', actual type was '${actualType}'`);
 }
 
-function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
+    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was instance of '${expectedClass.name}'`);
 }
 
 function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     type of '${number}' is ${typeof number}, 'number' was expected`);
 }
 
 function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     '${array}' is not an array`);
 }
 
 function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was 'string', but ${str}' is not a string`);
 }
 
@@ -20994,8 +21167,8 @@ function isArgConstructorTimeTyped (arg) {
 
 function checkExpression (expressionName, parameterName, parameterIndex, parameter) {
     if (!(parameter instanceof _base__WEBPACK_IMPORTED_MODULE_1__["default"])) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type carto.expressions.Base`);
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        '${parameter}' is not of type "carto.expressions.Base"`);
     }
 }
 
@@ -21006,7 +21179,7 @@ function checkType (expressionName, parameterName, parameterIndex, expectedType,
             parameter.type === type
         );
         if (!ok) {
-            throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
             expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
         }
     } else if (parameter.type !== expectedType) {
@@ -21017,7 +21190,7 @@ function checkType (expressionName, parameterName, parameterIndex, expectedType,
 function checkInstance (expressionName, parameterName, parameterIndex, expectedClass, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (!(parameter.isA(expectedClass))) {
-        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass);
     }
 }
 
@@ -21041,7 +21214,7 @@ function checkArray (expressionName, parameterName, parameterIndex, array) {
 
 function checkFeatureIndependent (expressionName, parameterName, parameterIndex, parameter) {
     if (parameter.isFeatureDependent()) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_2__["CartoValidationTypes"].INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
         parameter cannot be feature dependent`);
     }
 }
@@ -21053,7 +21226,7 @@ function clamp (x, min, max) {
 function mix (x, y, a) {
     return typeof x === 'number'
         ? x * (1 - a) + y * a
-        : Object(_colorspaces__WEBPACK_IMPORTED_MODULE_2__["interpolateRGBAinCieLAB"])(x, y, a);
+        : Object(_colorspaces__WEBPACK_IMPORTED_MODULE_4__["interpolateRGBAinCieLAB"])(x, y, a);
 }
 
 function fract (x) {
@@ -21081,6 +21254,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _basic_property__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./basic/property */ "./src/renderer/viz/expressions/basic/property.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./utils */ "./src/renderer/viz/expressions/utils.js");
 /* harmony import */ var _schema__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../schema */ "./src/renderer/schema.js");
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../../errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+
+
 
 
 
@@ -21149,7 +21326,7 @@ class ViewportFeatures extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
 
     _applyToShaderSource () {
-        throw new Error('viewportFeatures cannot be used in visualizations');
+        throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_5__["default"]('\'viewportFeatures\' cannot be used in visualizations.');
     }
 
     isFeatureDependent () {
@@ -21167,7 +21344,7 @@ class ViewportFeatures extends _base__WEBPACK_IMPORTED_MODULE_0__["default"] {
     _resetViewportAgg () {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(_basic_property__WEBPACK_IMPORTED_MODULE_1__["default"])))) {
-                throw new Error('viewportFeatures arguments can only be properties');
+                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_4__["CartoValidationTypes"].INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
             const columns = Object.keys(_schema__WEBPACK_IMPORTED_MODULE_3__["default"].simplify(this._getMinimumNeededSchema()));
             this._FeatureProxy = this.genViewportFeatureClass(columns);
@@ -21286,6 +21463,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./expressions/color/NamedColor */ "./src/renderer/viz/expressions/color/NamedColor.js");
 /* harmony import */ var _expressions_color_hex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./expressions/color/hex */ "./src/renderer/viz/expressions/color/hex.js");
 /* harmony import */ var _expressions_base__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./expressions/base */ "./src/renderer/viz/expressions/base.js");
+/* harmony import */ var _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../errors/carto-parsing-error */ "./src/errors/carto-parsing-error.js");
+
 
 
 
@@ -21362,7 +21541,7 @@ function parseVizDefinition (str) {
 
 function parseVizNamedExpr (vizSpec, node) {
     if (node.operator !== ':') {
-        throw new Error('Invalid syntax.');
+        throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"]('Invalid syntax.');
     }
 
     if (node.left.name.length && node.left.name[0] === '@') {
@@ -21372,19 +21551,19 @@ function parseVizNamedExpr (vizSpec, node) {
     let name = node.left.name;
 
     if (!name) {
-        throw new Error('Invalid syntax.');
+        throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"]('Invalid syntax.');
     }
 
     if (name.startsWith('__cartovl_variable_')) {
         name = node.left.name.substr('__cartovl_variable_'.length);
         if (name in vizSpec.variables) {
-            throw new Error(`Variable '${name}' is already defined.`);
+            throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Variable '${name}' is already defined.`);
         }
 
         vizSpec.variables[name] = Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(parseNode(node.right));
     } else {
         if (name in vizSpec) {
-            throw new Error(`Property '${name}' is already defined.`);
+            throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Property '${name}' is already defined.`);
         }
         const value = parseNode(node.right);
         vizSpec[name] = (name === 'resolution') ? value : Object(_expressions_utils__WEBPACK_IMPORTED_MODULE_2__["implicitCast"])(value);
@@ -21402,7 +21581,7 @@ function parseFunctionCall (node) {
     if (lowerCaseExpressions[name]) {
         return lowerCaseExpressions[name](...args);
     }
-    throw new Error(`Invalid function name '${node.callee.name}'.`);
+    throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Invalid function name '${node.callee.name}'.`);
 }
 
 function parseBinaryOperation (node) {
@@ -21442,7 +21621,7 @@ function parseBinaryOperation (node) {
         case 'nin':
             return _expressions__WEBPACK_IMPORTED_MODULE_1__["nin"](left, right);
         default:
-            throw new Error(`Invalid binary operator '${node.operator}'.`);
+            throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Invalid binary operator '${node.operator}'.`);
     }
 }
 
@@ -21453,7 +21632,7 @@ function parseUnaryOperation (node) {
         case '+':
             return parseNode(node.argument);
         default:
-            throw new Error(`Invalid unary operator '${node.operator}'.`);
+            throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Invalid unary operator '${node.operator}'.`);
     }
 }
 
@@ -21474,7 +21653,7 @@ function parseIdentifier (node) {
     } else if (_expressions_color_cssColorNames__WEBPACK_IMPORTED_MODULE_3__["CSS_COLOR_NAMES"].includes(node.name.toLowerCase())) {
         return new _expressions_color_NamedColor__WEBPACK_IMPORTED_MODULE_4__["default"](node.name.toLowerCase());
     } else {
-        throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
+        throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Invalid expression '${JSON.stringify(node)}'.`);
     }
 }
 
@@ -21492,7 +21671,7 @@ function parseNode (node) {
     } else if (node.type === 'Identifier') {
         return parseIdentifier(node);
     }
-    throw new Error(`Invalid expression '${JSON.stringify(node)}'.`);
+    throw new _errors_carto_parsing_error__WEBPACK_IMPORTED_MODULE_7__["default"](`Invalid expression '${JSON.stringify(node)}'.`);
 }
 
 function prepareJsep () {
@@ -21825,7 +22004,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkAuth", function() { return checkAuth; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cleanDefaultAuth", function() { return cleanDefaultAuth; });
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
 
 
 
@@ -21868,10 +22047,10 @@ function cleanDefaultAuth () {
  */
 function checkAuth (auth) {
     if (_utils_util__WEBPACK_IMPORTED_MODULE_0__["isUndefined"](auth)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'authRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].MISSING_REQUIRED} 'auth'`);
     }
     if (!_utils_util__WEBPACK_IMPORTED_MODULE_0__["isObject"](auth)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'authObjectRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} 'auth' property must be an object.`);
     }
     auth.username = auth.user; // API adapter
     checkApiKey(auth.apiKey);
@@ -21880,25 +22059,25 @@ function checkAuth (auth) {
 
 function checkApiKey (apiKey) {
     if (_utils_util__WEBPACK_IMPORTED_MODULE_0__["isUndefined"](apiKey)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'apiKeyRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].MISSING_REQUIRED} 'apiKey'`);
     }
     if (!_utils_util__WEBPACK_IMPORTED_MODULE_0__["isString"](apiKey)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'apiKeyStringRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} 'apiKey' property must be a string.`);
     }
     if (apiKey === '') {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'nonValidApiKey');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_VALUE} 'apiKey' property must be not empty.`);
     }
 }
 
 function checkUsername (username) {
     if (_utils_util__WEBPACK_IMPORTED_MODULE_0__["isUndefined"](username)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'usernameRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].MISSING_REQUIRED} 'username'`);
     }
     if (!_utils_util__WEBPACK_IMPORTED_MODULE_0__["isString"](username)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'usernameStringRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} 'username' property must be a string.`);
     }
     if (username === '') {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'nonValidUsername');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_VALUE} 'username' property must be not empty.`);
     }
 }
 
@@ -21921,7 +22100,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkConfig", function() { return checkConfig; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "cleanDefaultConfig", function() { return cleanDefaultConfig; });
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
 
 
 
@@ -21964,7 +22143,7 @@ function cleanDefaultConfig () {
 function checkConfig (config) {
     if (config) {
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_0__["isObject"](config)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'configObjectRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} 'config' property must be an object.`);
         }
         _checkServerURL(config.serverURL);
     }
@@ -21972,7 +22151,7 @@ function checkConfig (config) {
 
 function _checkServerURL (serverURL) {
     if (!_utils_util__WEBPACK_IMPORTED_MODULE_0__["isString"](serverURL)) {
-        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"]('setup', 'serverURLStringRequired');
+        throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_1__["CartoValidationTypes"].INCORRECT_TYPE} 'serverURL' property must be a string.`);
     }
 }
 
@@ -22142,7 +22321,7 @@ class DataframeCache {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return Dataset; });
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
 /* harmony import */ var _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BaseWindshaft */ "./src/sources/BaseWindshaft.js");
 
@@ -22201,13 +22380,13 @@ class Dataset extends _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__["default"] {
 
     _checkTableName (tableName) {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(tableName)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'tableNameRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].MISSING_REQUIRED} 'tableName'`);
         }
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isString(tableName)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'tableNameStringRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_TYPE} 'tableName' property must be a string.`);
         }
         if (tableName === '') {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'nonValidTableName');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_VALUE} 'tableName' property must be not empty.`);
         }
     }
 }
@@ -22228,10 +22407,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _client_rsys__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../client/rsys */ "./src/client/rsys.js");
 /* harmony import */ var _renderer_Dataframe__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../renderer/Dataframe */ "./src/renderer/Dataframe.js");
 /* harmony import */ var _renderer_Metadata__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../renderer/Metadata */ "./src/renderer/Metadata.js");
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
-/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
-/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Base */ "./src/sources/Base.js");
-/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../renderer/schema */ "./src/renderer/schema.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../src/errors/carto-runtime-error */ "./src/errors/carto-runtime-error.js");
+/* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
+/* harmony import */ var _Base__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Base */ "./src/sources/Base.js");
+/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../renderer/schema */ "./src/renderer/schema.js");
+
 
 
 
@@ -22242,7 +22423,7 @@ __webpack_require__.r(__webpack_exports__);
 
 const SAMPLE_TARGET_SIZE = 1000;
 
-class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
+class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_6__["default"] {
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
@@ -22291,7 +22472,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'nonValidGeoJSONData');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -22342,11 +22523,11 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
     }
 
     _checkData (data) {
-        if (_utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].isUndefined(data)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'dataRequired');
+        if (_utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].isUndefined(data)) {
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].MISSING_REQUIRED} 'data'`);
         }
-        if (!_utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].isObject(data)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', 'dataObjectRequired');
+        if (!_utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].isObject(data)) {
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} 'data' property must be an object.`);
         }
     }
 
@@ -22362,7 +22543,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         this._addNumericColumnField('cartodb_id');
 
         const featureCount = this._features.length;
-        const requiredColumns = new Set(Object.keys(_renderer_schema__WEBPACK_IMPORTED_MODULE_6__["default"].simplify(viz.getMinimumNeededSchema())));
+        const requiredColumns = new Set(Object.keys(_renderer_schema__WEBPACK_IMPORTED_MODULE_7__["default"].simplify(viz.getMinimumNeededSchema())));
         for (let i = 0; i < this._features.length; i++) {
             const properties = this._features[i].properties;
             const keys = Object.keys(properties);
@@ -22406,7 +22587,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName);
         const property = this._properties[propertyName];
@@ -22431,13 +22612,15 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__["default"](
+                `${_src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__["CartoRuntimeTypes"].NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+            );
         }
         this._addDateColumnField(propertyName);
         const column = this._properties[propertyName];
-        const dateValue = _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].castDate(value);
-        column.min = column.min ? _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].castDate(Math.min(column.min, dateValue)) : dateValue;
-        column.max = column.max ? _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].castDate(Math.max(column.max, dateValue)) : dateValue;
+        const dateValue = _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].castDate(value);
+        column.min = column.min ? _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].castDate(Math.min(column.min, dateValue)) : dateValue;
+        column.max = column.max ? _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].castDate(Math.max(column.max, dateValue)) : dateValue;
         column.sum += value;
         column.count++;
     }
@@ -22468,7 +22651,9 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
 
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new _src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__["default"](
+                `${_src_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_4__["CartoRuntimeTypes"].NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+            );
         }
         if (!this._catFields.has(propertyName)) {
             this._catFields.add(propertyName);
@@ -22516,7 +22701,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             dateFields.forEach(name => {
                 const property = this._properties[name];
                 // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d = _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].castDate(f.properties[name]).getTime();
+                const d = _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].castDate(f.properties[name]).getTime();
                 const min = property.min;
                 const max = property.max;
                 const n = (d - min.getTime()) / (max.getTime() - min.getTime());
@@ -22569,7 +22754,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._type !== type) {
-                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"]('source', `multipleFeatureTypes[${this._type}, ${type}]`);
+                throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_3__["CartoValidationTypes"].INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);
@@ -22600,8 +22785,8 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
     _computePointGeometry (data) {
         const lat = data[1];
         const lng = data[0];
-        const wm = _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].projectToWebMercator({ lat, lng });
-        return _client_rsys__WEBPACK_IMPORTED_MODULE_0__["wToR"](wm.x, wm.y, { scale: _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].WM_R, center: this._center });
+        const wm = _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].projectToWebMercator({ lat, lng });
+        return _client_rsys__WEBPACK_IMPORTED_MODULE_0__["wToR"](wm.x, wm.y, { scale: _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].WM_R, center: this._center });
     }
 
     _computeLineStringGeometry (data, reverse) {
@@ -22701,7 +22886,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
                 this._type = geometry.type;
             }
             const samplePoint = this._samplePoint(geometry);
-            const sampleXY = _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
+            const sampleXY = _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
             x += sampleXY.x;
             y += sampleXY.y;
             nPoints += 1;
@@ -22712,7 +22897,7 @@ class GeoJSON extends _Base__WEBPACK_IMPORTED_MODULE_5__["default"] {
         }
 
         this._center = { x, y };
-        this._dataframeCenter = _client_rsys__WEBPACK_IMPORTED_MODULE_0__["wToR"](this._center.x, this._center.y, { scale: _utils_util__WEBPACK_IMPORTED_MODULE_4__["default"].WM_R, center: { x: 0, y: 0 } });
+        this._dataframeCenter = _client_rsys__WEBPACK_IMPORTED_MODULE_0__["wToR"](this._center.x, this._center.y, { scale: _utils_util__WEBPACK_IMPORTED_MODULE_5__["default"].WM_R, center: { x: 0, y: 0 } });
     }
 
     free () {
@@ -22929,7 +23114,7 @@ class MVT extends _Base__WEBPACK_IMPORTED_MODULE_2__["default"] {
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = function() {
-  return __webpack_require__(/*! !./node_modules/worker-loader/dist/workers/InlineWorker.js */ "./node_modules/worker-loader/dist/workers/InlineWorker.js")("/*!\n * CARTO VL js https://carto.com/\n * Version: 0.8.0\n * \n */\n/******/ (function(modules) { // webpackBootstrap\n/******/ \t// The module cache\n/******/ \tvar installedModules = {};\n/******/\n/******/ \t// The require function\n/******/ \tfunction __webpack_require__(moduleId) {\n/******/\n/******/ \t\t// Check if module is in cache\n/******/ \t\tif(installedModules[moduleId]) {\n/******/ \t\t\treturn installedModules[moduleId].exports;\n/******/ \t\t}\n/******/ \t\t// Create a new module (and put it into the cache)\n/******/ \t\tvar module = installedModules[moduleId] = {\n/******/ \t\t\ti: moduleId,\n/******/ \t\t\tl: false,\n/******/ \t\t\texports: {}\n/******/ \t\t};\n/******/\n/******/ \t\t// Execute the module function\n/******/ \t\tmodules[moduleId].call(module.exports, module, module.exports, __webpack_require__);\n/******/\n/******/ \t\t// Flag the module as loaded\n/******/ \t\tmodule.l = true;\n/******/\n/******/ \t\t// Return the exports of the module\n/******/ \t\treturn module.exports;\n/******/ \t}\n/******/\n/******/\n/******/ \t// expose the modules object (__webpack_modules__)\n/******/ \t__webpack_require__.m = modules;\n/******/\n/******/ \t// expose the module cache\n/******/ \t__webpack_require__.c = installedModules;\n/******/\n/******/ \t// define getter function for harmony exports\n/******/ \t__webpack_require__.d = function(exports, name, getter) {\n/******/ \t\tif(!__webpack_require__.o(exports, name)) {\n/******/ \t\t\tObject.defineProperty(exports, name, { enumerable: true, get: getter });\n/******/ \t\t}\n/******/ \t};\n/******/\n/******/ \t// define __esModule on exports\n/******/ \t__webpack_require__.r = function(exports) {\n/******/ \t\tif(typeof Symbol !== 'undefined' && Symbol.toStringTag) {\n/******/ \t\t\tObject.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });\n/******/ \t\t}\n/******/ \t\tObject.defineProperty(exports, '__esModule', { value: true });\n/******/ \t};\n/******/\n/******/ \t// create a fake namespace object\n/******/ \t// mode & 1: value is a module id, require it\n/******/ \t// mode & 2: merge all properties of value into the ns\n/******/ \t// mode & 4: return value when already ns object\n/******/ \t// mode & 8|1: behave like require\n/******/ \t__webpack_require__.t = function(value, mode) {\n/******/ \t\tif(mode & 1) value = __webpack_require__(value);\n/******/ \t\tif(mode & 8) return value;\n/******/ \t\tif((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;\n/******/ \t\tvar ns = Object.create(null);\n/******/ \t\t__webpack_require__.r(ns);\n/******/ \t\tObject.defineProperty(ns, 'default', { enumerable: true, value: value });\n/******/ \t\tif(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));\n/******/ \t\treturn ns;\n/******/ \t};\n/******/\n/******/ \t// getDefaultExport function for compatibility with non-harmony modules\n/******/ \t__webpack_require__.n = function(module) {\n/******/ \t\tvar getter = module && module.__esModule ?\n/******/ \t\t\tfunction getDefault() { return module['default']; } :\n/******/ \t\t\tfunction getModuleExports() { return module; };\n/******/ \t\t__webpack_require__.d(getter, 'a', getter);\n/******/ \t\treturn getter;\n/******/ \t};\n/******/\n/******/ \t// Object.prototype.hasOwnProperty.call\n/******/ \t__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };\n/******/\n/******/ \t// __webpack_public_path__\n/******/ \t__webpack_require__.p = \"\";\n/******/\n/******/\n/******/ \t// Load entry module and return exports\n/******/ \treturn __webpack_require__(__webpack_require__.s = \"./src/sources/MVTWorkers.worker.js\");\n/******/ })\n/************************************************************************/\n/******/ ({\n\n/***/ \"./node_modules/@mapbox/point-geometry/index.js\":\n/*!******************************************************!*\\\n  !*** ./node_modules/@mapbox/point-geometry/index.js ***!\n  \\******************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = Point;\n\n/**\n * A standalone point geometry with useful accessor, comparison, and\n * modification methods.\n *\n * @class Point\n * @param {Number} x the x-coordinate. this could be longitude or screen\n * pixels, or any other sort of unit.\n * @param {Number} y the y-coordinate. this could be latitude or screen\n * pixels, or any other sort of unit.\n * @example\n * var point = new Point(-77, 38);\n */\nfunction Point(x, y) {\n    this.x = x;\n    this.y = y;\n}\n\nPoint.prototype = {\n\n    /**\n     * Clone this point, returning a new point that can be modified\n     * without affecting the old one.\n     * @return {Point} the clone\n     */\n    clone: function() { return new Point(this.x, this.y); },\n\n    /**\n     * Add this point's x & y coordinates to another point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    add:     function(p) { return this.clone()._add(p); },\n\n    /**\n     * Subtract this point's x & y coordinates to from point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    sub:     function(p) { return this.clone()._sub(p); },\n\n    /**\n     * Multiply this point's x & y coordinates by point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    multByPoint:    function(p) { return this.clone()._multByPoint(p); },\n\n    /**\n     * Divide this point's x & y coordinates by point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    divByPoint:     function(p) { return this.clone()._divByPoint(p); },\n\n    /**\n     * Multiply this point's x & y coordinates by a factor,\n     * yielding a new point.\n     * @param {Point} k factor\n     * @return {Point} output point\n     */\n    mult:    function(k) { return this.clone()._mult(k); },\n\n    /**\n     * Divide this point's x & y coordinates by a factor,\n     * yielding a new point.\n     * @param {Point} k factor\n     * @return {Point} output point\n     */\n    div:     function(k) { return this.clone()._div(k); },\n\n    /**\n     * Rotate this point around the 0, 0 origin by an angle a,\n     * given in radians\n     * @param {Number} a angle to rotate around, in radians\n     * @return {Point} output point\n     */\n    rotate:  function(a) { return this.clone()._rotate(a); },\n\n    /**\n     * Rotate this point around p point by an angle a,\n     * given in radians\n     * @param {Number} a angle to rotate around, in radians\n     * @param {Point} p Point to rotate around\n     * @return {Point} output point\n     */\n    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },\n\n    /**\n     * Multiply this point by a 4x1 transformation matrix\n     * @param {Array<Number>} m transformation matrix\n     * @return {Point} output point\n     */\n    matMult: function(m) { return this.clone()._matMult(m); },\n\n    /**\n     * Calculate this point but as a unit vector from 0, 0, meaning\n     * that the distance from the resulting point to the 0, 0\n     * coordinate will be equal to 1 and the angle from the resulting\n     * point to the 0, 0 coordinate will be the same as before.\n     * @return {Point} unit vector point\n     */\n    unit:    function() { return this.clone()._unit(); },\n\n    /**\n     * Compute a perpendicular point, where the new y coordinate\n     * is the old x coordinate and the new x coordinate is the old y\n     * coordinate multiplied by -1\n     * @return {Point} perpendicular point\n     */\n    perp:    function() { return this.clone()._perp(); },\n\n    /**\n     * Return a version of this point with the x & y coordinates\n     * rounded to integers.\n     * @return {Point} rounded point\n     */\n    round:   function() { return this.clone()._round(); },\n\n    /**\n     * Return the magitude of this point: this is the Euclidean\n     * distance from the 0, 0 coordinate to this point's x and y\n     * coordinates.\n     * @return {Number} magnitude\n     */\n    mag: function() {\n        return Math.sqrt(this.x * this.x + this.y * this.y);\n    },\n\n    /**\n     * Judge whether this point is equal to another point, returning\n     * true or false.\n     * @param {Point} other the other point\n     * @return {boolean} whether the points are equal\n     */\n    equals: function(other) {\n        return this.x === other.x &&\n               this.y === other.y;\n    },\n\n    /**\n     * Calculate the distance from this point to another point\n     * @param {Point} p the other point\n     * @return {Number} distance\n     */\n    dist: function(p) {\n        return Math.sqrt(this.distSqr(p));\n    },\n\n    /**\n     * Calculate the distance from this point to another point,\n     * without the square root step. Useful if you're comparing\n     * relative distances.\n     * @param {Point} p the other point\n     * @return {Number} distance\n     */\n    distSqr: function(p) {\n        var dx = p.x - this.x,\n            dy = p.y - this.y;\n        return dx * dx + dy * dy;\n    },\n\n    /**\n     * Get the angle from the 0, 0 coordinate to this point, in radians\n     * coordinates.\n     * @return {Number} angle\n     */\n    angle: function() {\n        return Math.atan2(this.y, this.x);\n    },\n\n    /**\n     * Get the angle from this point to another point, in radians\n     * @param {Point} b the other point\n     * @return {Number} angle\n     */\n    angleTo: function(b) {\n        return Math.atan2(this.y - b.y, this.x - b.x);\n    },\n\n    /**\n     * Get the angle between this point and another point, in radians\n     * @param {Point} b the other point\n     * @return {Number} angle\n     */\n    angleWith: function(b) {\n        return this.angleWithSep(b.x, b.y);\n    },\n\n    /*\n     * Find the angle of the two vectors, solving the formula for\n     * the cross product a x b = |a||b|sin(θ) for θ.\n     * @param {Number} x the x-coordinate\n     * @param {Number} y the y-coordinate\n     * @return {Number} the angle in radians\n     */\n    angleWithSep: function(x, y) {\n        return Math.atan2(\n            this.x * y - this.y * x,\n            this.x * x + this.y * y);\n    },\n\n    _matMult: function(m) {\n        var x = m[0] * this.x + m[1] * this.y,\n            y = m[2] * this.x + m[3] * this.y;\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _add: function(p) {\n        this.x += p.x;\n        this.y += p.y;\n        return this;\n    },\n\n    _sub: function(p) {\n        this.x -= p.x;\n        this.y -= p.y;\n        return this;\n    },\n\n    _mult: function(k) {\n        this.x *= k;\n        this.y *= k;\n        return this;\n    },\n\n    _div: function(k) {\n        this.x /= k;\n        this.y /= k;\n        return this;\n    },\n\n    _multByPoint: function(p) {\n        this.x *= p.x;\n        this.y *= p.y;\n        return this;\n    },\n\n    _divByPoint: function(p) {\n        this.x /= p.x;\n        this.y /= p.y;\n        return this;\n    },\n\n    _unit: function() {\n        this._div(this.mag());\n        return this;\n    },\n\n    _perp: function() {\n        var y = this.y;\n        this.y = this.x;\n        this.x = -y;\n        return this;\n    },\n\n    _rotate: function(angle) {\n        var cos = Math.cos(angle),\n            sin = Math.sin(angle),\n            x = cos * this.x - sin * this.y,\n            y = sin * this.x + cos * this.y;\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _rotateAround: function(angle, p) {\n        var cos = Math.cos(angle),\n            sin = Math.sin(angle),\n            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),\n            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _round: function() {\n        this.x = Math.round(this.x);\n        this.y = Math.round(this.y);\n        return this;\n    }\n};\n\n/**\n * Construct a point from an array if necessary, otherwise if the input\n * is already a Point, or an unknown type, return it unchanged\n * @param {Array<Number>|Point|*} a any kind of input value\n * @return {Point} constructed point, or passed-through value.\n * @example\n * // this\n * var point = Point.convert([0, 1]);\n * // is equivalent to\n * var point = new Point(0, 1);\n */\nPoint.convert = function (a) {\n    if (a instanceof Point) {\n        return a;\n    }\n    if (Array.isArray(a)) {\n        return new Point(a[0], a[1]);\n    }\n    return a;\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/index.js\":\n/*!***************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/index.js ***!\n  \\***************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\nmodule.exports.VectorTile = __webpack_require__(/*! ./lib/vectortile.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortile.js\");\nmodule.exports.VectorTileFeature = __webpack_require__(/*! ./lib/vectortilefeature.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\");\nmodule.exports.VectorTileLayer = __webpack_require__(/*! ./lib/vectortilelayer.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\");\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortile.js\":\n/*!************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortile.js ***!\n  \\************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar VectorTileLayer = __webpack_require__(/*! ./vectortilelayer */ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\");\n\nmodule.exports = VectorTile;\n\nfunction VectorTile(pbf, end) {\n    this.layers = pbf.readFields(readTile, {}, end);\n}\n\nfunction readTile(tag, layers, pbf) {\n    if (tag === 3) {\n        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);\n        if (layer.length) layers[layer.name] = layer;\n    }\n}\n\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\":\n/*!*******************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js ***!\n  \\*******************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar Point = __webpack_require__(/*! @mapbox/point-geometry */ \"./node_modules/@mapbox/point-geometry/index.js\");\n\nmodule.exports = VectorTileFeature;\n\nfunction VectorTileFeature(pbf, end, extent, keys, values) {\n    // Public\n    this.properties = {};\n    this.extent = extent;\n    this.type = 0;\n\n    // Private\n    this._pbf = pbf;\n    this._geometry = -1;\n    this._keys = keys;\n    this._values = values;\n\n    pbf.readFields(readFeature, this, end);\n}\n\nfunction readFeature(tag, feature, pbf) {\n    if (tag == 1) feature.id = pbf.readVarint();\n    else if (tag == 2) readTag(pbf, feature);\n    else if (tag == 3) feature.type = pbf.readVarint();\n    else if (tag == 4) feature._geometry = pbf.pos;\n}\n\nfunction readTag(pbf, feature) {\n    var end = pbf.readVarint() + pbf.pos;\n\n    while (pbf.pos < end) {\n        var key = feature._keys[pbf.readVarint()],\n            value = feature._values[pbf.readVarint()];\n        feature.properties[key] = value;\n    }\n}\n\nVectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];\n\nVectorTileFeature.prototype.loadGeometry = function() {\n    var pbf = this._pbf;\n    pbf.pos = this._geometry;\n\n    var end = pbf.readVarint() + pbf.pos,\n        cmd = 1,\n        length = 0,\n        x = 0,\n        y = 0,\n        lines = [],\n        line;\n\n    while (pbf.pos < end) {\n        if (length <= 0) {\n            var cmdLen = pbf.readVarint();\n            cmd = cmdLen & 0x7;\n            length = cmdLen >> 3;\n        }\n\n        length--;\n\n        if (cmd === 1 || cmd === 2) {\n            x += pbf.readSVarint();\n            y += pbf.readSVarint();\n\n            if (cmd === 1) { // moveTo\n                if (line) lines.push(line);\n                line = [];\n            }\n\n            line.push(new Point(x, y));\n\n        } else if (cmd === 7) {\n\n            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90\n            if (line) {\n                line.push(line[0].clone()); // closePolygon\n            }\n\n        } else {\n            throw new Error('unknown command ' + cmd);\n        }\n    }\n\n    if (line) lines.push(line);\n\n    return lines;\n};\n\nVectorTileFeature.prototype.bbox = function() {\n    var pbf = this._pbf;\n    pbf.pos = this._geometry;\n\n    var end = pbf.readVarint() + pbf.pos,\n        cmd = 1,\n        length = 0,\n        x = 0,\n        y = 0,\n        x1 = Infinity,\n        x2 = -Infinity,\n        y1 = Infinity,\n        y2 = -Infinity;\n\n    while (pbf.pos < end) {\n        if (length <= 0) {\n            var cmdLen = pbf.readVarint();\n            cmd = cmdLen & 0x7;\n            length = cmdLen >> 3;\n        }\n\n        length--;\n\n        if (cmd === 1 || cmd === 2) {\n            x += pbf.readSVarint();\n            y += pbf.readSVarint();\n            if (x < x1) x1 = x;\n            if (x > x2) x2 = x;\n            if (y < y1) y1 = y;\n            if (y > y2) y2 = y;\n\n        } else if (cmd !== 7) {\n            throw new Error('unknown command ' + cmd);\n        }\n    }\n\n    return [x1, y1, x2, y2];\n};\n\nVectorTileFeature.prototype.toGeoJSON = function(x, y, z) {\n    var size = this.extent * Math.pow(2, z),\n        x0 = this.extent * x,\n        y0 = this.extent * y,\n        coords = this.loadGeometry(),\n        type = VectorTileFeature.types[this.type],\n        i, j;\n\n    function project(line) {\n        for (var j = 0; j < line.length; j++) {\n            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;\n            line[j] = [\n                (p.x + x0) * 360 / size - 180,\n                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90\n            ];\n        }\n    }\n\n    switch (this.type) {\n    case 1:\n        var points = [];\n        for (i = 0; i < coords.length; i++) {\n            points[i] = coords[i][0];\n        }\n        coords = points;\n        project(coords);\n        break;\n\n    case 2:\n        for (i = 0; i < coords.length; i++) {\n            project(coords[i]);\n        }\n        break;\n\n    case 3:\n        coords = classifyRings(coords);\n        for (i = 0; i < coords.length; i++) {\n            for (j = 0; j < coords[i].length; j++) {\n                project(coords[i][j]);\n            }\n        }\n        break;\n    }\n\n    if (coords.length === 1) {\n        coords = coords[0];\n    } else {\n        type = 'Multi' + type;\n    }\n\n    var result = {\n        type: \"Feature\",\n        geometry: {\n            type: type,\n            coordinates: coords\n        },\n        properties: this.properties\n    };\n\n    if ('id' in this) {\n        result.id = this.id;\n    }\n\n    return result;\n};\n\n// classifies an array of rings into polygons with outer rings and holes\n\nfunction classifyRings(rings) {\n    var len = rings.length;\n\n    if (len <= 1) return [rings];\n\n    var polygons = [],\n        polygon,\n        ccw;\n\n    for (var i = 0; i < len; i++) {\n        var area = signedArea(rings[i]);\n        if (area === 0) continue;\n\n        if (ccw === undefined) ccw = area < 0;\n\n        if (ccw === area < 0) {\n            if (polygon) polygons.push(polygon);\n            polygon = [rings[i]];\n\n        } else {\n            polygon.push(rings[i]);\n        }\n    }\n    if (polygon) polygons.push(polygon);\n\n    return polygons;\n}\n\nfunction signedArea(ring) {\n    var sum = 0;\n    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {\n        p1 = ring[i];\n        p2 = ring[j];\n        sum += (p2.x - p1.x) * (p1.y + p2.y);\n    }\n    return sum;\n}\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\":\n/*!*****************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js ***!\n  \\*****************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar VectorTileFeature = __webpack_require__(/*! ./vectortilefeature.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\");\n\nmodule.exports = VectorTileLayer;\n\nfunction VectorTileLayer(pbf, end) {\n    // Public\n    this.version = 1;\n    this.name = null;\n    this.extent = 4096;\n    this.length = 0;\n\n    // Private\n    this._pbf = pbf;\n    this._keys = [];\n    this._values = [];\n    this._features = [];\n\n    pbf.readFields(readLayer, this, end);\n\n    this.length = this._features.length;\n}\n\nfunction readLayer(tag, layer, pbf) {\n    if (tag === 15) layer.version = pbf.readVarint();\n    else if (tag === 1) layer.name = pbf.readString();\n    else if (tag === 5) layer.extent = pbf.readVarint();\n    else if (tag === 2) layer._features.push(pbf.pos);\n    else if (tag === 3) layer._keys.push(pbf.readString());\n    else if (tag === 4) layer._values.push(readValueMessage(pbf));\n}\n\nfunction readValueMessage(pbf) {\n    var value = null,\n        end = pbf.readVarint() + pbf.pos;\n\n    while (pbf.pos < end) {\n        var tag = pbf.readVarint() >> 3;\n\n        value = tag === 1 ? pbf.readString() :\n            tag === 2 ? pbf.readFloat() :\n            tag === 3 ? pbf.readDouble() :\n            tag === 4 ? pbf.readVarint64() :\n            tag === 5 ? pbf.readVarint() :\n            tag === 6 ? pbf.readSVarint() :\n            tag === 7 ? pbf.readBoolean() : null;\n    }\n\n    return value;\n}\n\n// return feature `i` from this layer as a `VectorTileFeature`\nVectorTileLayer.prototype.feature = function(i) {\n    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');\n\n    this._pbf.pos = this._features[i];\n\n    var end = this._pbf.readVarint() + this._pbf.pos;\n    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/earcut/src/earcut.js\":\n/*!*******************************************!*\\\n  !*** ./node_modules/earcut/src/earcut.js ***!\n  \\*******************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = earcut;\nmodule.exports.default = earcut;\n\nfunction earcut(data, holeIndices, dim) {\n\n    dim = dim || 2;\n\n    var hasHoles = holeIndices && holeIndices.length,\n        outerLen = hasHoles ? holeIndices[0] * dim : data.length,\n        outerNode = linkedList(data, 0, outerLen, dim, true),\n        triangles = [];\n\n    if (!outerNode) return triangles;\n\n    var minX, minY, maxX, maxY, x, y, invSize;\n\n    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);\n\n    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox\n    if (data.length > 80 * dim) {\n        minX = maxX = data[0];\n        minY = maxY = data[1];\n\n        for (var i = dim; i < outerLen; i += dim) {\n            x = data[i];\n            y = data[i + 1];\n            if (x < minX) minX = x;\n            if (y < minY) minY = y;\n            if (x > maxX) maxX = x;\n            if (y > maxY) maxY = y;\n        }\n\n        // minX, minY and invSize are later used to transform coords into integers for z-order calculation\n        invSize = Math.max(maxX - minX, maxY - minY);\n        invSize = invSize !== 0 ? 1 / invSize : 0;\n    }\n\n    earcutLinked(outerNode, triangles, dim, minX, minY, invSize);\n\n    return triangles;\n}\n\n// create a circular doubly linked list from polygon points in the specified winding order\nfunction linkedList(data, start, end, dim, clockwise) {\n    var i, last;\n\n    if (clockwise === (signedArea(data, start, end, dim) > 0)) {\n        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);\n    } else {\n        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);\n    }\n\n    if (last && equals(last, last.next)) {\n        removeNode(last);\n        last = last.next;\n    }\n\n    return last;\n}\n\n// eliminate colinear or duplicate points\nfunction filterPoints(start, end) {\n    if (!start) return start;\n    if (!end) end = start;\n\n    var p = start,\n        again;\n    do {\n        again = false;\n\n        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {\n            removeNode(p);\n            p = end = p.prev;\n            if (p === p.next) break;\n            again = true;\n\n        } else {\n            p = p.next;\n        }\n    } while (again || p !== end);\n\n    return end;\n}\n\n// main ear slicing loop which triangulates a polygon (given as a linked list)\nfunction earcutLinked(ear, triangles, dim, minX, minY, invSize, pass) {\n    if (!ear) return;\n\n    // interlink polygon nodes in z-order\n    if (!pass && invSize) indexCurve(ear, minX, minY, invSize);\n\n    var stop = ear,\n        prev, next;\n\n    // iterate through ears, slicing them one by one\n    while (ear.prev !== ear.next) {\n        prev = ear.prev;\n        next = ear.next;\n\n        if (invSize ? isEarHashed(ear, minX, minY, invSize) : isEar(ear)) {\n            // cut off the triangle\n            triangles.push(prev.i / dim);\n            triangles.push(ear.i / dim);\n            triangles.push(next.i / dim);\n\n            removeNode(ear);\n\n            // skipping the next vertice leads to less sliver triangles\n            ear = next.next;\n            stop = next.next;\n\n            continue;\n        }\n\n        ear = next;\n\n        // if we looped through the whole remaining polygon and can't find any more ears\n        if (ear === stop) {\n            // try filtering points and slicing again\n            if (!pass) {\n                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, invSize, 1);\n\n            // if this didn't work, try curing all small self-intersections locally\n            } else if (pass === 1) {\n                ear = cureLocalIntersections(ear, triangles, dim);\n                earcutLinked(ear, triangles, dim, minX, minY, invSize, 2);\n\n            // as a last resort, try splitting the remaining polygon into two\n            } else if (pass === 2) {\n                splitEarcut(ear, triangles, dim, minX, minY, invSize);\n            }\n\n            break;\n        }\n    }\n}\n\n// check whether a polygon node forms a valid ear with adjacent nodes\nfunction isEar(ear) {\n    var a = ear.prev,\n        b = ear,\n        c = ear.next;\n\n    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear\n\n    // now make sure we don't have other points inside the potential ear\n    var p = ear.next.next;\n\n    while (p !== ear.prev) {\n        if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.next;\n    }\n\n    return true;\n}\n\nfunction isEarHashed(ear, minX, minY, invSize) {\n    var a = ear.prev,\n        b = ear,\n        c = ear.next;\n\n    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear\n\n    // triangle bbox; min & max are calculated like this for speed\n    var minTX = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x),\n        minTY = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y),\n        maxTX = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x),\n        maxTY = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y);\n\n    // z-order range for the current triangle bbox;\n    var minZ = zOrder(minTX, minTY, minX, minY, invSize),\n        maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);\n\n    var p = ear.prevZ,\n        n = ear.nextZ;\n\n    // look for points inside the triangle in both directions\n    while (p && p.z >= minZ && n && n.z <= maxZ) {\n        if (p !== ear.prev && p !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.prevZ;\n\n        if (n !== ear.prev && n !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&\n            area(n.prev, n, n.next) >= 0) return false;\n        n = n.nextZ;\n    }\n\n    // look for remaining points in decreasing z-order\n    while (p && p.z >= minZ) {\n        if (p !== ear.prev && p !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.prevZ;\n    }\n\n    // look for remaining points in increasing z-order\n    while (n && n.z <= maxZ) {\n        if (n !== ear.prev && n !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&\n            area(n.prev, n, n.next) >= 0) return false;\n        n = n.nextZ;\n    }\n\n    return true;\n}\n\n// go through all polygon nodes and cure small local self-intersections\nfunction cureLocalIntersections(start, triangles, dim) {\n    var p = start;\n    do {\n        var a = p.prev,\n            b = p.next.next;\n\n        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {\n\n            triangles.push(a.i / dim);\n            triangles.push(p.i / dim);\n            triangles.push(b.i / dim);\n\n            // remove two nodes involved\n            removeNode(p);\n            removeNode(p.next);\n\n            p = start = b;\n        }\n        p = p.next;\n    } while (p !== start);\n\n    return p;\n}\n\n// try splitting polygon into two and triangulate them independently\nfunction splitEarcut(start, triangles, dim, minX, minY, invSize) {\n    // look for a valid diagonal that divides the polygon into two\n    var a = start;\n    do {\n        var b = a.next.next;\n        while (b !== a.prev) {\n            if (a.i !== b.i && isValidDiagonal(a, b)) {\n                // split the polygon in two by the diagonal\n                var c = splitPolygon(a, b);\n\n                // filter colinear points around the cuts\n                a = filterPoints(a, a.next);\n                c = filterPoints(c, c.next);\n\n                // run earcut on each half\n                earcutLinked(a, triangles, dim, minX, minY, invSize);\n                earcutLinked(c, triangles, dim, minX, minY, invSize);\n                return;\n            }\n            b = b.next;\n        }\n        a = a.next;\n    } while (a !== start);\n}\n\n// link every hole into the outer loop, producing a single-ring polygon without holes\nfunction eliminateHoles(data, holeIndices, outerNode, dim) {\n    var queue = [],\n        i, len, start, end, list;\n\n    for (i = 0, len = holeIndices.length; i < len; i++) {\n        start = holeIndices[i] * dim;\n        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;\n        list = linkedList(data, start, end, dim, false);\n        if (list === list.next) list.steiner = true;\n        queue.push(getLeftmost(list));\n    }\n\n    queue.sort(compareX);\n\n    // process holes from left to right\n    for (i = 0; i < queue.length; i++) {\n        eliminateHole(queue[i], outerNode);\n        outerNode = filterPoints(outerNode, outerNode.next);\n    }\n\n    return outerNode;\n}\n\nfunction compareX(a, b) {\n    return a.x - b.x;\n}\n\n// find a bridge between vertices that connects hole with an outer ring and and link it\nfunction eliminateHole(hole, outerNode) {\n    outerNode = findHoleBridge(hole, outerNode);\n    if (outerNode) {\n        var b = splitPolygon(outerNode, hole);\n        filterPoints(b, b.next);\n    }\n}\n\n// David Eberly's algorithm for finding a bridge between hole and outer polygon\nfunction findHoleBridge(hole, outerNode) {\n    var p = outerNode,\n        hx = hole.x,\n        hy = hole.y,\n        qx = -Infinity,\n        m;\n\n    // find a segment intersected by a ray from the hole's leftmost point to the left;\n    // segment's endpoint with lesser x will be potential connection point\n    do {\n        if (hy <= p.y && hy >= p.next.y && p.next.y !== p.y) {\n            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);\n            if (x <= hx && x > qx) {\n                qx = x;\n                if (x === hx) {\n                    if (hy === p.y) return p;\n                    if (hy === p.next.y) return p.next;\n                }\n                m = p.x < p.next.x ? p : p.next;\n            }\n        }\n        p = p.next;\n    } while (p !== outerNode);\n\n    if (!m) return null;\n\n    if (hx === qx) return m.prev; // hole touches outer segment; pick lower endpoint\n\n    // look for points inside the triangle of hole point, segment intersection and endpoint;\n    // if there are no points found, we have a valid connection;\n    // otherwise choose the point of the minimum angle with the ray as connection point\n\n    var stop = m,\n        mx = m.x,\n        my = m.y,\n        tanMin = Infinity,\n        tan;\n\n    p = m.next;\n\n    while (p !== stop) {\n        if (hx >= p.x && p.x >= mx && hx !== p.x &&\n                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {\n\n            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential\n\n            if ((tan < tanMin || (tan === tanMin && p.x > m.x)) && locallyInside(p, hole)) {\n                m = p;\n                tanMin = tan;\n            }\n        }\n\n        p = p.next;\n    }\n\n    return m;\n}\n\n// interlink polygon nodes in z-order\nfunction indexCurve(start, minX, minY, invSize) {\n    var p = start;\n    do {\n        if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, invSize);\n        p.prevZ = p.prev;\n        p.nextZ = p.next;\n        p = p.next;\n    } while (p !== start);\n\n    p.prevZ.nextZ = null;\n    p.prevZ = null;\n\n    sortLinked(p);\n}\n\n// Simon Tatham's linked list merge sort algorithm\n// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html\nfunction sortLinked(list) {\n    var i, p, q, e, tail, numMerges, pSize, qSize,\n        inSize = 1;\n\n    do {\n        p = list;\n        list = null;\n        tail = null;\n        numMerges = 0;\n\n        while (p) {\n            numMerges++;\n            q = p;\n            pSize = 0;\n            for (i = 0; i < inSize; i++) {\n                pSize++;\n                q = q.nextZ;\n                if (!q) break;\n            }\n            qSize = inSize;\n\n            while (pSize > 0 || (qSize > 0 && q)) {\n\n                if (pSize !== 0 && (qSize === 0 || !q || p.z <= q.z)) {\n                    e = p;\n                    p = p.nextZ;\n                    pSize--;\n                } else {\n                    e = q;\n                    q = q.nextZ;\n                    qSize--;\n                }\n\n                if (tail) tail.nextZ = e;\n                else list = e;\n\n                e.prevZ = tail;\n                tail = e;\n            }\n\n            p = q;\n        }\n\n        tail.nextZ = null;\n        inSize *= 2;\n\n    } while (numMerges > 1);\n\n    return list;\n}\n\n// z-order of a point given coords and inverse of the longer side of data bbox\nfunction zOrder(x, y, minX, minY, invSize) {\n    // coords are transformed into non-negative 15-bit integer range\n    x = 32767 * (x - minX) * invSize;\n    y = 32767 * (y - minY) * invSize;\n\n    x = (x | (x << 8)) & 0x00FF00FF;\n    x = (x | (x << 4)) & 0x0F0F0F0F;\n    x = (x | (x << 2)) & 0x33333333;\n    x = (x | (x << 1)) & 0x55555555;\n\n    y = (y | (y << 8)) & 0x00FF00FF;\n    y = (y | (y << 4)) & 0x0F0F0F0F;\n    y = (y | (y << 2)) & 0x33333333;\n    y = (y | (y << 1)) & 0x55555555;\n\n    return x | (y << 1);\n}\n\n// find the leftmost node of a polygon ring\nfunction getLeftmost(start) {\n    var p = start,\n        leftmost = start;\n    do {\n        if (p.x < leftmost.x) leftmost = p;\n        p = p.next;\n    } while (p !== start);\n\n    return leftmost;\n}\n\n// check if a point lies within a convex triangle\nfunction pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {\n    return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&\n           (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&\n           (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;\n}\n\n// check if a diagonal between two polygon nodes is valid (lies in polygon interior)\nfunction isValidDiagonal(a, b) {\n    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&\n           locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b);\n}\n\n// signed area of a triangle\nfunction area(p, q, r) {\n    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);\n}\n\n// check if two points are equal\nfunction equals(p1, p2) {\n    return p1.x === p2.x && p1.y === p2.y;\n}\n\n// check if two segments intersect\nfunction intersects(p1, q1, p2, q2) {\n    if ((equals(p1, q1) && equals(p2, q2)) ||\n        (equals(p1, q2) && equals(p2, q1))) return true;\n    return area(p1, q1, p2) > 0 !== area(p1, q1, q2) > 0 &&\n           area(p2, q2, p1) > 0 !== area(p2, q2, q1) > 0;\n}\n\n// check if a polygon diagonal intersects any polygon segments\nfunction intersectsPolygon(a, b) {\n    var p = a;\n    do {\n        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&\n                intersects(p, p.next, a, b)) return true;\n        p = p.next;\n    } while (p !== a);\n\n    return false;\n}\n\n// check if a polygon diagonal is locally inside the polygon\nfunction locallyInside(a, b) {\n    return area(a.prev, a, a.next) < 0 ?\n        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :\n        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;\n}\n\n// check if the middle point of a polygon diagonal is inside the polygon\nfunction middleInside(a, b) {\n    var p = a,\n        inside = false,\n        px = (a.x + b.x) / 2,\n        py = (a.y + b.y) / 2;\n    do {\n        if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y &&\n                (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))\n            inside = !inside;\n        p = p.next;\n    } while (p !== a);\n\n    return inside;\n}\n\n// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;\n// if one belongs to the outer ring and another to a hole, it merges it into a single ring\nfunction splitPolygon(a, b) {\n    var a2 = new Node(a.i, a.x, a.y),\n        b2 = new Node(b.i, b.x, b.y),\n        an = a.next,\n        bp = b.prev;\n\n    a.next = b;\n    b.prev = a;\n\n    a2.next = an;\n    an.prev = a2;\n\n    b2.next = a2;\n    a2.prev = b2;\n\n    bp.next = b2;\n    b2.prev = bp;\n\n    return b2;\n}\n\n// create a node and optionally link it with previous one (in a circular doubly linked list)\nfunction insertNode(i, x, y, last) {\n    var p = new Node(i, x, y);\n\n    if (!last) {\n        p.prev = p;\n        p.next = p;\n\n    } else {\n        p.next = last.next;\n        p.prev = last;\n        last.next.prev = p;\n        last.next = p;\n    }\n    return p;\n}\n\nfunction removeNode(p) {\n    p.next.prev = p.prev;\n    p.prev.next = p.next;\n\n    if (p.prevZ) p.prevZ.nextZ = p.nextZ;\n    if (p.nextZ) p.nextZ.prevZ = p.prevZ;\n}\n\nfunction Node(i, x, y) {\n    // vertice index in coordinates array\n    this.i = i;\n\n    // vertex coordinates\n    this.x = x;\n    this.y = y;\n\n    // previous and next vertice nodes in a polygon ring\n    this.prev = null;\n    this.next = null;\n\n    // z-order curve value\n    this.z = null;\n\n    // previous and next nodes in z-order\n    this.prevZ = null;\n    this.nextZ = null;\n\n    // indicates whether this is a steiner point\n    this.steiner = false;\n}\n\n// return a percentage difference between the polygon area and its triangulation area;\n// used to verify correctness of triangulation\nearcut.deviation = function (data, holeIndices, dim, triangles) {\n    var hasHoles = holeIndices && holeIndices.length;\n    var outerLen = hasHoles ? holeIndices[0] * dim : data.length;\n\n    var polygonArea = Math.abs(signedArea(data, 0, outerLen, dim));\n    if (hasHoles) {\n        for (var i = 0, len = holeIndices.length; i < len; i++) {\n            var start = holeIndices[i] * dim;\n            var end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;\n            polygonArea -= Math.abs(signedArea(data, start, end, dim));\n        }\n    }\n\n    var trianglesArea = 0;\n    for (i = 0; i < triangles.length; i += 3) {\n        var a = triangles[i] * dim;\n        var b = triangles[i + 1] * dim;\n        var c = triangles[i + 2] * dim;\n        trianglesArea += Math.abs(\n            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -\n            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));\n    }\n\n    return polygonArea === 0 && trianglesArea === 0 ? 0 :\n        Math.abs((trianglesArea - polygonArea) / polygonArea);\n};\n\nfunction signedArea(data, start, end, dim) {\n    var sum = 0;\n    for (var i = start, j = end - dim; i < end; i += dim) {\n        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);\n        j = i;\n    }\n    return sum;\n}\n\n// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts\nearcut.flatten = function (data) {\n    var dim = data[0][0].length,\n        result = {vertices: [], holes: [], dimensions: dim},\n        holeIndex = 0;\n\n    for (var i = 0; i < data.length; i++) {\n        for (var j = 0; j < data[i].length; j++) {\n            for (var d = 0; d < dim; d++) result.vertices.push(data[i][j][d]);\n        }\n        if (i > 0) {\n            holeIndex += data[i - 1].length;\n            result.holes.push(holeIndex);\n        }\n    }\n    return result;\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/ieee754/index.js\":\n/*!***************************************!*\\\n  !*** ./node_modules/ieee754/index.js ***!\n  \\***************************************/\n/*! no static exports found */\n/***/ (function(module, exports) {\n\nexports.read = function (buffer, offset, isLE, mLen, nBytes) {\n  var e, m\n  var eLen = (nBytes * 8) - mLen - 1\n  var eMax = (1 << eLen) - 1\n  var eBias = eMax >> 1\n  var nBits = -7\n  var i = isLE ? (nBytes - 1) : 0\n  var d = isLE ? -1 : 1\n  var s = buffer[offset + i]\n\n  i += d\n\n  e = s & ((1 << (-nBits)) - 1)\n  s >>= (-nBits)\n  nBits += eLen\n  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}\n\n  m = e & ((1 << (-nBits)) - 1)\n  e >>= (-nBits)\n  nBits += mLen\n  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}\n\n  if (e === 0) {\n    e = 1 - eBias\n  } else if (e === eMax) {\n    return m ? NaN : ((s ? -1 : 1) * Infinity)\n  } else {\n    m = m + Math.pow(2, mLen)\n    e = e - eBias\n  }\n  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)\n}\n\nexports.write = function (buffer, value, offset, isLE, mLen, nBytes) {\n  var e, m, c\n  var eLen = (nBytes * 8) - mLen - 1\n  var eMax = (1 << eLen) - 1\n  var eBias = eMax >> 1\n  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)\n  var i = isLE ? 0 : (nBytes - 1)\n  var d = isLE ? 1 : -1\n  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0\n\n  value = Math.abs(value)\n\n  if (isNaN(value) || value === Infinity) {\n    m = isNaN(value) ? 1 : 0\n    e = eMax\n  } else {\n    e = Math.floor(Math.log(value) / Math.LN2)\n    if (value * (c = Math.pow(2, -e)) < 1) {\n      e--\n      c *= 2\n    }\n    if (e + eBias >= 1) {\n      value += rt / c\n    } else {\n      value += rt * Math.pow(2, 1 - eBias)\n    }\n    if (value * c >= 2) {\n      e++\n      c /= 2\n    }\n\n    if (e + eBias >= eMax) {\n      m = 0\n      e = eMax\n    } else if (e + eBias >= 1) {\n      m = ((value * c) - 1) * Math.pow(2, mLen)\n      e = e + eBias\n    } else {\n      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)\n      e = 0\n    }\n  }\n\n  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}\n\n  e = (e << mLen) | m\n  eLen += mLen\n  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}\n\n  buffer[offset + i - d] |= s * 128\n}\n\n\n/***/ }),\n\n/***/ \"./node_modules/pbf/index.js\":\n/*!***********************************!*\\\n  !*** ./node_modules/pbf/index.js ***!\n  \\***********************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = Pbf;\n\nvar ieee754 = __webpack_require__(/*! ieee754 */ \"./node_modules/ieee754/index.js\");\n\nfunction Pbf(buf) {\n    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);\n    this.pos = 0;\n    this.type = 0;\n    this.length = this.buf.length;\n}\n\nPbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum\nPbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64\nPbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields\nPbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32\n\nvar SHIFT_LEFT_32 = (1 << 16) * (1 << 16),\n    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;\n\nPbf.prototype = {\n\n    destroy: function() {\n        this.buf = null;\n    },\n\n    // === READING =================================================================\n\n    readFields: function(readField, result, end) {\n        end = end || this.length;\n\n        while (this.pos < end) {\n            var val = this.readVarint(),\n                tag = val >> 3,\n                startPos = this.pos;\n\n            this.type = val & 0x7;\n            readField(tag, result, this);\n\n            if (this.pos === startPos) this.skip(val);\n        }\n        return result;\n    },\n\n    readMessage: function(readField, result) {\n        return this.readFields(readField, result, this.readVarint() + this.pos);\n    },\n\n    readFixed32: function() {\n        var val = readUInt32(this.buf, this.pos);\n        this.pos += 4;\n        return val;\n    },\n\n    readSFixed32: function() {\n        var val = readInt32(this.buf, this.pos);\n        this.pos += 4;\n        return val;\n    },\n\n    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)\n\n    readFixed64: function() {\n        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;\n        this.pos += 8;\n        return val;\n    },\n\n    readSFixed64: function() {\n        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;\n        this.pos += 8;\n        return val;\n    },\n\n    readFloat: function() {\n        var val = ieee754.read(this.buf, this.pos, true, 23, 4);\n        this.pos += 4;\n        return val;\n    },\n\n    readDouble: function() {\n        var val = ieee754.read(this.buf, this.pos, true, 52, 8);\n        this.pos += 8;\n        return val;\n    },\n\n    readVarint: function(isSigned) {\n        var buf = this.buf,\n            val, b;\n\n        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;\n        b = buf[this.pos];   val |= (b & 0x0f) << 28;\n\n        return readVarintRemainder(val, isSigned, this);\n    },\n\n    readVarint64: function() { // for compatibility with v2.0.1\n        return this.readVarint(true);\n    },\n\n    readSVarint: function() {\n        var num = this.readVarint();\n        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding\n    },\n\n    readBoolean: function() {\n        return Boolean(this.readVarint());\n    },\n\n    readString: function() {\n        var end = this.readVarint() + this.pos,\n            str = readUtf8(this.buf, this.pos, end);\n        this.pos = end;\n        return str;\n    },\n\n    readBytes: function() {\n        var end = this.readVarint() + this.pos,\n            buffer = this.buf.subarray(this.pos, end);\n        this.pos = end;\n        return buffer;\n    },\n\n    // verbose for performance reasons; doesn't affect gzipped size\n\n    readPackedVarint: function(arr, isSigned) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readVarint(isSigned));\n        return arr;\n    },\n    readPackedSVarint: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSVarint());\n        return arr;\n    },\n    readPackedBoolean: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readBoolean());\n        return arr;\n    },\n    readPackedFloat: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFloat());\n        return arr;\n    },\n    readPackedDouble: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readDouble());\n        return arr;\n    },\n    readPackedFixed32: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFixed32());\n        return arr;\n    },\n    readPackedSFixed32: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSFixed32());\n        return arr;\n    },\n    readPackedFixed64: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFixed64());\n        return arr;\n    },\n    readPackedSFixed64: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSFixed64());\n        return arr;\n    },\n\n    skip: function(val) {\n        var type = val & 0x7;\n        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}\n        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;\n        else if (type === Pbf.Fixed32) this.pos += 4;\n        else if (type === Pbf.Fixed64) this.pos += 8;\n        else throw new Error('Unimplemented type: ' + type);\n    },\n\n    // === WRITING =================================================================\n\n    writeTag: function(tag, type) {\n        this.writeVarint((tag << 3) | type);\n    },\n\n    realloc: function(min) {\n        var length = this.length || 16;\n\n        while (length < this.pos + min) length *= 2;\n\n        if (length !== this.length) {\n            var buf = new Uint8Array(length);\n            buf.set(this.buf);\n            this.buf = buf;\n            this.length = length;\n        }\n    },\n\n    finish: function() {\n        this.length = this.pos;\n        this.pos = 0;\n        return this.buf.subarray(0, this.length);\n    },\n\n    writeFixed32: function(val) {\n        this.realloc(4);\n        writeInt32(this.buf, val, this.pos);\n        this.pos += 4;\n    },\n\n    writeSFixed32: function(val) {\n        this.realloc(4);\n        writeInt32(this.buf, val, this.pos);\n        this.pos += 4;\n    },\n\n    writeFixed64: function(val) {\n        this.realloc(8);\n        writeInt32(this.buf, val & -1, this.pos);\n        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);\n        this.pos += 8;\n    },\n\n    writeSFixed64: function(val) {\n        this.realloc(8);\n        writeInt32(this.buf, val & -1, this.pos);\n        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);\n        this.pos += 8;\n    },\n\n    writeVarint: function(val) {\n        val = +val || 0;\n\n        if (val > 0xfffffff || val < 0) {\n            writeBigVarint(val, this);\n            return;\n        }\n\n        this.realloc(4);\n\n        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] =   (val >>> 7) & 0x7f;\n    },\n\n    writeSVarint: function(val) {\n        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);\n    },\n\n    writeBoolean: function(val) {\n        this.writeVarint(Boolean(val));\n    },\n\n    writeString: function(str) {\n        str = String(str);\n        this.realloc(str.length * 4);\n\n        this.pos++; // reserve 1 byte for short string length\n\n        var startPos = this.pos;\n        // write the string directly to the buffer and see how much was written\n        this.pos = writeUtf8(this.buf, str, this.pos);\n        var len = this.pos - startPos;\n\n        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);\n\n        // finally, write the message length in the reserved place and restore the position\n        this.pos = startPos - 1;\n        this.writeVarint(len);\n        this.pos += len;\n    },\n\n    writeFloat: function(val) {\n        this.realloc(4);\n        ieee754.write(this.buf, val, this.pos, true, 23, 4);\n        this.pos += 4;\n    },\n\n    writeDouble: function(val) {\n        this.realloc(8);\n        ieee754.write(this.buf, val, this.pos, true, 52, 8);\n        this.pos += 8;\n    },\n\n    writeBytes: function(buffer) {\n        var len = buffer.length;\n        this.writeVarint(len);\n        this.realloc(len);\n        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];\n    },\n\n    writeRawMessage: function(fn, obj) {\n        this.pos++; // reserve 1 byte for short message length\n\n        // write the message directly to the buffer and see how much was written\n        var startPos = this.pos;\n        fn(obj, this);\n        var len = this.pos - startPos;\n\n        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);\n\n        // finally, write the message length in the reserved place and restore the position\n        this.pos = startPos - 1;\n        this.writeVarint(len);\n        this.pos += len;\n    },\n\n    writeMessage: function(tag, fn, obj) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeRawMessage(fn, obj);\n    },\n\n    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },\n    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },\n    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },\n    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },\n    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },\n    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },\n    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },\n    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },\n    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },\n\n    writeBytesField: function(tag, buffer) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeBytes(buffer);\n    },\n    writeFixed32Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeFixed32(val);\n    },\n    writeSFixed32Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeSFixed32(val);\n    },\n    writeFixed64Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeFixed64(val);\n    },\n    writeSFixed64Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeSFixed64(val);\n    },\n    writeVarintField: function(tag, val) {\n        this.writeTag(tag, Pbf.Varint);\n        this.writeVarint(val);\n    },\n    writeSVarintField: function(tag, val) {\n        this.writeTag(tag, Pbf.Varint);\n        this.writeSVarint(val);\n    },\n    writeStringField: function(tag, str) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeString(str);\n    },\n    writeFloatField: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeFloat(val);\n    },\n    writeDoubleField: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeDouble(val);\n    },\n    writeBooleanField: function(tag, val) {\n        this.writeVarintField(tag, Boolean(val));\n    }\n};\n\nfunction readVarintRemainder(l, s, p) {\n    var buf = p.buf,\n        h, b;\n\n    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);\n\n    throw new Error('Expected varint not more than 10 bytes');\n}\n\nfunction readPackedEnd(pbf) {\n    return pbf.type === Pbf.Bytes ?\n        pbf.readVarint() + pbf.pos : pbf.pos + 1;\n}\n\nfunction toNum(low, high, isSigned) {\n    if (isSigned) {\n        return high * 0x100000000 + (low >>> 0);\n    }\n\n    return ((high >>> 0) * 0x100000000) + (low >>> 0);\n}\n\nfunction writeBigVarint(val, pbf) {\n    var low, high;\n\n    if (val >= 0) {\n        low  = (val % 0x100000000) | 0;\n        high = (val / 0x100000000) | 0;\n    } else {\n        low  = ~(-val % 0x100000000);\n        high = ~(-val / 0x100000000);\n\n        if (low ^ 0xffffffff) {\n            low = (low + 1) | 0;\n        } else {\n            low = 0;\n            high = (high + 1) | 0;\n        }\n    }\n\n    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {\n        throw new Error('Given varint doesn\\'t fit into 10 bytes');\n    }\n\n    pbf.realloc(10);\n\n    writeBigVarintLow(low, high, pbf);\n    writeBigVarintHigh(high, pbf);\n}\n\nfunction writeBigVarintLow(low, high, pbf) {\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos]   = low & 0x7f;\n}\n\nfunction writeBigVarintHigh(high, pbf) {\n    var lsb = (high & 0x07) << 4;\n\n    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f;\n}\n\nfunction makeRoomForExtraLength(startPos, len, pbf) {\n    var extraLen =\n        len <= 0x3fff ? 1 :\n        len <= 0x1fffff ? 2 :\n        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));\n\n    // if 1 byte isn't enough for encoding message length, shift the data to the right\n    pbf.realloc(extraLen);\n    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];\n}\n\nfunction writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }\nfunction writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }\nfunction writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }\nfunction writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }\nfunction writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }\nfunction writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }\nfunction writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }\nfunction writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }\nfunction writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }\n\n// Buffer code below from https://github.com/feross/buffer, MIT-licensed\n\nfunction readUInt32(buf, pos) {\n    return ((buf[pos]) |\n        (buf[pos + 1] << 8) |\n        (buf[pos + 2] << 16)) +\n        (buf[pos + 3] * 0x1000000);\n}\n\nfunction writeInt32(buf, val, pos) {\n    buf[pos] = val;\n    buf[pos + 1] = (val >>> 8);\n    buf[pos + 2] = (val >>> 16);\n    buf[pos + 3] = (val >>> 24);\n}\n\nfunction readInt32(buf, pos) {\n    return ((buf[pos]) |\n        (buf[pos + 1] << 8) |\n        (buf[pos + 2] << 16)) +\n        (buf[pos + 3] << 24);\n}\n\nfunction readUtf8(buf, pos, end) {\n    var str = '';\n    var i = pos;\n\n    while (i < end) {\n        var b0 = buf[i];\n        var c = null; // codepoint\n        var bytesPerSequence =\n            b0 > 0xEF ? 4 :\n            b0 > 0xDF ? 3 :\n            b0 > 0xBF ? 2 : 1;\n\n        if (i + bytesPerSequence > end) break;\n\n        var b1, b2, b3;\n\n        if (bytesPerSequence === 1) {\n            if (b0 < 0x80) {\n                c = b0;\n            }\n        } else if (bytesPerSequence === 2) {\n            b1 = buf[i + 1];\n            if ((b1 & 0xC0) === 0x80) {\n                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);\n                if (c <= 0x7F) {\n                    c = null;\n                }\n            }\n        } else if (bytesPerSequence === 3) {\n            b1 = buf[i + 1];\n            b2 = buf[i + 2];\n            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {\n                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);\n                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {\n                    c = null;\n                }\n            }\n        } else if (bytesPerSequence === 4) {\n            b1 = buf[i + 1];\n            b2 = buf[i + 2];\n            b3 = buf[i + 3];\n            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {\n                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);\n                if (c <= 0xFFFF || c >= 0x110000) {\n                    c = null;\n                }\n            }\n        }\n\n        if (c === null) {\n            c = 0xFFFD;\n            bytesPerSequence = 1;\n\n        } else if (c > 0xFFFF) {\n            c -= 0x10000;\n            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);\n            c = 0xDC00 | c & 0x3FF;\n        }\n\n        str += String.fromCharCode(c);\n        i += bytesPerSequence;\n    }\n\n    return str;\n}\n\nfunction writeUtf8(buf, str, pos) {\n    for (var i = 0, c, lead; i < str.length; i++) {\n        c = str.charCodeAt(i); // code point\n\n        if (c > 0xD7FF && c < 0xE000) {\n            if (lead) {\n                if (c < 0xDC00) {\n                    buf[pos++] = 0xEF;\n                    buf[pos++] = 0xBF;\n                    buf[pos++] = 0xBD;\n                    lead = c;\n                    continue;\n                } else {\n                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;\n                    lead = null;\n                }\n            } else {\n                if (c > 0xDBFF || (i + 1 === str.length)) {\n                    buf[pos++] = 0xEF;\n                    buf[pos++] = 0xBF;\n                    buf[pos++] = 0xBD;\n                } else {\n                    lead = c;\n                }\n                continue;\n            }\n        } else if (lead) {\n            buf[pos++] = 0xEF;\n            buf[pos++] = 0xBF;\n            buf[pos++] = 0xBD;\n            lead = null;\n        }\n\n        if (c < 0x80) {\n            buf[pos++] = c;\n        } else {\n            if (c < 0x800) {\n                buf[pos++] = c >> 0x6 | 0xC0;\n            } else {\n                if (c < 0x10000) {\n                    buf[pos++] = c >> 0xC | 0xE0;\n                } else {\n                    buf[pos++] = c >> 0x12 | 0xF0;\n                    buf[pos++] = c >> 0xC & 0x3F | 0x80;\n                }\n                buf[pos++] = c >> 0x6 & 0x3F | 0x80;\n            }\n            buf[pos++] = c & 0x3F | 0x80;\n        }\n    }\n    return pos;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/WindshaftWorker.js\":\n/*!***************************************!*\\\n  !*** ./src/client/WindshaftWorker.js ***!\n  \\***************************************/\n/*! exports provided: WindshaftWorker */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"WindshaftWorker\", function() { return WindshaftWorker; });\n/* harmony import */ var _sources_MVTWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../sources/MVTWorker */ \"./src/sources/MVTWorker.js\");\n/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../renderer/schema */ \"./src/renderer/schema.js\");\n\n\n\nclass WindshaftWorker extends _sources_MVTWorker__WEBPACK_IMPORTED_MODULE_0__[\"MVTWorker\"] {\n    decodeProperty (metadata, propertyName, propertyValue) {\n        const basename = _renderer_schema__WEBPACK_IMPORTED_MODULE_1__[\"default\"].column.getBase(propertyName);\n        const column = metadata.properties[basename];\n        if (!column) {\n            return;\n        }\n        switch (column.type) {\n            case 'date':\n                return decodeDate(column, propertyValue);\n            case 'category':\n                return metadata.categorizeString(basename, propertyValue);\n            case 'number':\n                return propertyValue;\n            default:\n                throw new Error(`Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);\n        }\n    }\n}\n\nfunction decodeDate (column, propertyValue) {\n    const d = new Date();\n    d.setTime(1000 * propertyValue);\n    const {min, max} = column;\n    const n = (d - min) / (max.getTime() - min.getTime());\n    return n;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/mvt/feature-decoder.js\":\n/*!*******************************************!*\\\n  !*** ./src/client/mvt/feature-decoder.js ***!\n  \\*******************************************/\n/*! exports provided: Polygon, decodeLines, decodePolygons, signedPolygonArea, clipPolygon */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Polygon\", function() { return Polygon; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeLines\", function() { return decodeLines; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePolygons\", function() { return decodePolygons; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"signedPolygonArea\", function() { return signedPolygonArea; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"clipPolygon\", function() { return clipPolygon; });\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/geometry */ \"./src/utils/geometry.js\");\n\nclass Polygon {\n    constructor () {\n        this.flat = [];\n        this.holes = [];\n        this.clipped = [];\n        this.clippedType = []; // Store a bitmask of the clipped half-planes\n    }\n}\n\nfunction decodeLines (geometries, mvtExtent) {\n    let decodedGeometries = [];\n    geometries.map(l => {\n        let line = [];\n        l.map(point => {\n            line.push([2 * point.x / mvtExtent - 1, 2 * (1 - point.y / mvtExtent) - 1]);\n        });\n        decodedGeometries.push(...clipLine(line));\n    });\n    return decodedGeometries;\n}\n\n/*\n    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.\n    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)\n    See:\n        https://github.com/mapbox/vector-tile-spec/tree/master/2.1\n        https://en.wikipedia.org/wiki/Shoelace_formula\n*/\nfunction decodePolygons (geometries, mvtExtent) {\n    let currentPolygon = null;\n    let decoded = [];\n    let invertedOrientation;\n    geometries.forEach(geom => {\n        let area = signedPolygonArea(geom);\n        if (area === 0) {\n            return;\n        }\n        if (invertedOrientation === undefined) {\n            // According to the MVT spec this condition cannot happen for\n            // MVT spec compliant tiles, but many buggy implementations\n            // don't comply with this rule when generating tiles\n            // Also, other implementations accept this out-of-the-spec condition\n            invertedOrientation = area > 0;\n        }\n        const isExternalPolygon = invertedOrientation ? area > 0 : area < 0;\n\n        const preClippedVertices = _getPreClippedVertices(geom, mvtExtent);\n\n        if (isExternalPolygon) {\n            if (currentPolygon) {\n                decoded.push(currentPolygon);\n            }\n\n            currentPolygon = new Polygon();\n        }\n\n        currentPolygon = clipPolygon(preClippedVertices, currentPolygon, !isExternalPolygon);\n    });\n\n    if (currentPolygon) {\n        decoded.push(currentPolygon);\n    }\n\n    return decoded;\n}\n\nfunction signedPolygonArea (vertices) {\n    // https://en.wikipedia.org/wiki/Shoelace_formula\n    let a = 0;\n    for (let i = 0; i < vertices.length; i++) {\n        let j = (i + 1) % vertices.length;\n        a += vertices[i].x * vertices[j].y;\n        a -= vertices[j].x * vertices[i].y;\n    }\n    return a / 2;\n}\n\nconst CLIPMAX = 1;\nconst CLIPMIN = -CLIPMAX;\n\nconst clippingEdges = [\n    {\n        // Right edge; x <= CLIPMAX for points inside\n        inside: p => p[0] <= CLIPMAX,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [CLIPMAX, -100], [CLIPMAX, 100])\n    },\n    {\n        // Top edge; y <= CLIPMAX for points inside\n        inside: p => p[1] <= CLIPMAX,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [-100, CLIPMAX], [100, CLIPMAX])\n    },\n    {\n        // Left edge; x >= CLIPMIN for points inside\n        inside: p => p[0] >= CLIPMIN,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100])\n    },\n    {\n        // Bottom edge; y >= CLIPMIN for points inside\n        inside: p => p[1] >= CLIPMIN,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [-100, CLIPMIN], [100, CLIPMIN])\n    }\n];\nconst numberOfEdges = clippingEdges.length;\n\nfunction clipPolygon (preClippedVertices, polygon, isHole) {\n    // Sutherland-Hodgman Algorithm to clip polygons to the tile\n    // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf\n\n    let clippedTypes = {};\n\n    // for each clipping edge\n    for (let i = 0; i < numberOfEdges; i++) {\n        const preClippedVertices2 = [];\n        const clippedTypes2 = {};\n\n        const setClippedType = (vertexIndex, oldVertexIndex, edge = -1) => {\n            let clippedType = 0;\n            if (oldVertexIndex >= 0) {\n                clippedType = clippedTypes[oldVertexIndex] || 0;\n            }\n            if (edge >= 0) {\n                clippedType = clippedType | (1 << edge);\n            }\n            if (clippedType) {\n                clippedTypes2[vertexIndex] = clippedType;\n            }\n        };\n\n        // for each edge on polygon\n        for (let k = 0; k < preClippedVertices.length - 1; k++) {\n            // clip polygon edge\n            const a = preClippedVertices[k];\n            const b = preClippedVertices[k + 1];\n\n            const insideA = clippingEdges[i].inside(a);\n            const insideB = clippingEdges[i].inside(b);\n\n            if (insideA && insideB) {\n                // case 1: both inside, push B vertex\n                setClippedType(preClippedVertices2.length, k + 1);\n                preClippedVertices2.push(b);\n            } else if (insideA) {\n                // case 2: just B outside, push intersection\n                const intersectionPoint = clippingEdges[i].intersect(a, b);\n                setClippedType(preClippedVertices2.length, k + 1, i);\n                preClippedVertices2.push(intersectionPoint);\n            } else if (insideB) {\n                // case 4: just A outside: push intersection, push B\n                const intersectionPoint = clippingEdges[i].intersect(a, b);\n                setClippedType(preClippedVertices2.length, k, i);\n                preClippedVertices2.push(intersectionPoint);\n                setClippedType(preClippedVertices2.length, k + 1);\n                preClippedVertices2.push(b);\n            } else {\n                // case 3: both outside: do nothing\n            }\n        }\n        if (preClippedVertices2.length) {\n            if (clippedTypes2[0]) {\n                clippedTypes2[preClippedVertices2.length] = clippedTypes2[0];\n            }\n            preClippedVertices2.push(preClippedVertices2[0]);\n        }\n        preClippedVertices = preClippedVertices2;\n        clippedTypes = clippedTypes2;\n    }\n\n    // rings with less than 3 vertices are degenerate\n    const MIN_VALID_NUM_VERTICES = 3;\n\n    // preClippedVertices is closed by repeating the first vertex\n    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES + 1) {\n        if (isHole) {\n            polygon.holes.push(polygon.flat.length / 2);\n        }\n        preClippedVertices.forEach(v => {\n            polygon.flat.push(v[0], v[1]);\n        });\n        Object.keys(clippedTypes).forEach(i => {\n            polygon.clipped.push(Number(i) * 2);\n            polygon.clippedType.push(clippedTypes[i]);\n        });\n    }\n\n    return polygon;\n}\n\nfunction _getPreClippedVertices (geom, mvtExtent) {\n    return geom.map((coord) => {\n        let x = coord.x;\n        let y = coord.y;\n\n        x = 2 * x / mvtExtent - 1;\n        y = 2 * (1 - y / mvtExtent) - 1;\n\n        return [x, y];\n    });\n}\n\nfunction clipLine (line) {\n    // linestring clipping based on the Cohen-Sutherland algorithm\n    // input is a single linestring [point0, point1, ...]\n    // output is an array of flat linestrings:\n    // [[p0x, p0y, p1x, p1y, ...], ...]\n    let clippedLine = [];\n    const clippedLines = [];\n    function clipType (point) {\n        let type = 0;\n        for (let i = 0; i < numberOfEdges; i++) {\n            type = type | (clippingEdges[i].inside(point) ? 0 : (1 << i));\n        }\n        return type;\n    }\n    function intersect (point1, point2, type) {\n        for (let i = 0; i < numberOfEdges; i++) {\n            const mask = 1 << i;\n            if (type & mask) {\n                const p = clippingEdges[i].intersect(point1, point2);\n                type = clipType(p) & ~mask;\n                return [p, type];\n            }\n        }\n    }\n    let point0 = line[0];\n    let type0 = clipType(point0);\n    for (let i = 1; i < line.length; ++i) {\n        let point1 = line[i];\n        let type1 = clipType(point1);\n        const nextType = type1;\n        const nextPoint = point1;\n\n        for (; ;) {\n            if (!(type0 | type1)) {\n                // both points inside\n                clippedLine.push(...point0);\n                if (type1 !== nextType) {\n                    clippedLine.push(...point1);\n                    if (i < line.length - 1) {\n                        // break line\n                        clippedLines.push(clippedLine);\n                        clippedLine = [];\n                    }\n                } else if (i === line.length - 1) {\n                    clippedLine.push(...point1);\n                }\n                break;\n            } else if (type0 & type1) {\n                // both points outside\n                break;\n            } else if (type0) {\n                // only point1 inside\n                [point0, type0] = intersect(point0, point1, type0);\n            } else {\n                // only point0 inside\n                [point1, type1] = intersect(point0, point1, type1);\n            }\n        }\n\n        point0 = nextPoint;\n        type0 = nextType;\n    }\n\n    clippedLine = _removeDuplicatedVerticesOnLine(clippedLine);\n    if (clippedLine.length > 0) {\n        clippedLines.push(clippedLine);\n    }\n\n    return clippedLines;\n}\n\nfunction _removeDuplicatedVerticesOnLine (line) {\n    const result = [];\n    let prevX;\n    let prevY;\n    for (let i = 0; i < line.length; i += 2) {\n        const x = line[i];\n        const y = line[i + 1];\n        if (x !== prevX || y !== prevY) {\n            result.push(x, y);\n            prevX = x;\n            prevY = y;\n        }\n    }\n    return result;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/rsys.js\":\n/*!****************************!*\\\n  !*** ./src/client/rsys.js ***!\n  \\****************************/\n/*! exports provided: wToR, rTiles, getRsysFromTile, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"wToR\", function() { return wToR; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"rTiles\", function() { return rTiles; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getRsysFromTile\", function() { return getRsysFromTile; });\n/**\n * An RSys defines a local coordinate system that maps the coordinates\n * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle\n * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)\n * It is the combination of a translation and anisotropic scaling.\n * @typedef {object} RSys - Renderer relative coordinate system\n * @property {RPoint} center - Position of the local system in external coordinates\n * @property {number} scale - Y-scale (local Y-distance / external Y-distance)\n*/\n\n/*\n * Random notes\n *\n * We can redefine Dataframe to use a Rsys instead of center, scale\n * and we can use an Rsys for the Renderer's canvas.\n *\n * Some interesting World coordinate systems:\n *\n * WM (Webmercator): represents a part of the world (excluding polar regions)\n * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)\n *\n * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*\n * with coordinates in the range +/-1. Results from dividing Webmercator coordinates\n * by WM_R. (positive orientation: E,N)\n *\n * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.\n * (positive orientation: E,S)\n *\n * An RSys's rectangle (its bounds) is the area covered by the local coordinates in\n * the range +/-1.\n *\n * When an RSys external coordinate system is WM or NWMC, we can compute:\n * * Minimum zoom level for which tiles are no larger than the RSys rectangle:\n *   Math.ceil(Math.log2(1 / r.scale));\n * * Maximum zoom level for which tiles are no smaller than the rectangle:\n *   Math.floor(Math.log2(1 / r.scale));\n * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)\n *\n * We'll use the term World coordinates below for the *external* reference system\n * of an RSys (usually NWMC).\n */\n\n/* eslint no-unused-vars: [\"off\"] */\n\n/**\n * R coordinates to World\n * @param {RSys} r - ref. of the passed coordinates\n * @param {number} x - x coordinate in r\n * @param {number} y - y coordinate in r\n * @return {RPoint} World coordinates\n */\nfunction rToW (r, x, y) {\n    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };\n}\n\n/**\n * World coordinates to local RSys\n * @param {number} x - x W-coordinate\n * @param {number} y - y W-coordinate\n * @param {RSys} r - target ref. system\n * @return {RPoint} R coordinates\n */\nfunction wToR (x, y, r) {\n    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };\n}\n\n/**\n * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)\n * @param {number} x - TC x coordinate\n * @param {number} y - TC y coordinate\n * @param {number} z - Tile zoom level\n * @return {RSys}\n */\nfunction tileRsys (x, y, z) {\n    let max = Math.pow(2, z);\n    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };\n}\n\n/**\n * TC tiles that intersect the local rectangle of an RSys\n * (with the largest tile size no larger than the rectangle)\n * @param {RSys} rsys\n * @return {Array} - array of TC tiles {x, y, z}\n */\nfunction rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {\n    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);\n}\n\n/**\n * TC tiles of a given zoom level that intersect a W rectangle\n * @param {number} z\n * @param {Array} - rectangle extents [minx, miny, maxx, maxy]\n * @return {Array} - array of TC tiles {x, y, z}\n */\nfunction wRectangleTiles (z, wr) {\n    const [wMinx, wMiny, wMaxx, wMaxy] = wr;\n    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)\n\n    const clamp = x => Math.min(Math.max(x, 0), n - 1);\n    // compute tile coordinate ranges\n    const tMinx = clamp(Math.floor(n * (wMinx + 1) * 0.5));\n    const tMaxx = clamp(Math.ceil(n * (wMaxx + 1) * 0.5) - 1);\n    const tMiny = clamp(Math.floor(n * (1 - wMaxy) * 0.5));\n    const tMaxy = clamp(Math.ceil(n * (1 - wMiny) * 0.5) - 1);\n    let tiles = [];\n    for (let x = tMinx; x <= tMaxx; ++x) {\n        for (let y = tMiny; y <= tMaxy; ++y) {\n            tiles.push({ x: x, y: y, z: z });\n        }\n    }\n    return tiles;\n}\n\n/**\n * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.\n * @param {*} x\n * @param {*} y\n * @param {*} z\n * @returns {RSys}\n */\nfunction getRsysFromTile (x, y, z) {\n    return {\n        center: {\n            x: ((x + 0.5) / Math.pow(2, z)) * 2.0 - 1,\n            y: (1.0 - (y + 0.5) / Math.pow(2, z)) * 2.0 - 1.0\n        },\n        scale: 1 / Math.pow(2, z)\n    };\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({ rTiles, getRsysFromTile, wToR });\n\n\n/***/ }),\n\n/***/ \"./src/renderer/DummyDataframe.js\":\n/*!****************************************!*\\\n  !*** ./src/renderer/DummyDataframe.js ***!\n  \\****************************************/\n/*! exports provided: default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return DummyDataframe; });\n/* harmony import */ var _decoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./decoder */ \"./src/renderer/decoder/index.js\");\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/geometry */ \"./src/utils/geometry.js\");\n\n\n\nclass DummyDataframe {\n    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {\n        this.active = active;\n        this.center = center;\n        this.properties = properties;\n        this.scale = scale;\n        this.type = type;\n        this.decodedGeom = Object(_decoder__WEBPACK_IMPORTED_MODULE_0__[\"decodeGeom\"])(type, geom);\n        this.numVertex = type === 'point'\n            ? size * 3\n            : this.decodedGeom.vertices.length / 2;\n        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;\n        this.propertyTex = [];\n        this.metadata = metadata;\n        this.propertyCount = 0;\n        this._aabb = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__[\"computeAABB\"])(geom, type);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/Metadata.js\":\n/*!**********************************!*\\\n  !*** ./src/renderer/Metadata.js ***!\n  \\**********************************/\n/*! exports provided: IDENTITY, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"IDENTITY\", function() { return IDENTITY; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Metadata; });\n\n// The IDENTITY metadata contains zero properties\nconst IDENTITY = {\n    properties: {}\n};\n\nclass Metadata {\n    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {\n        this.properties = properties;\n        this.featureCount = featureCount;\n        this.sample = sample;\n        this.geomType = geomType;\n        this.isAggregated = isAggregated;\n        this.idProperty = idProperty || 'cartodb_id';\n\n        this.categoryToID = new Map();\n        this.IDToCategory = new Map();\n        this.numCategories = 0;\n\n        Object.values(properties).map(property => {\n            property.categories = property.categories || [];\n            property.categories.map(category => this.categorizeString(property, category.name, true));\n        });\n\n        this.propertyKeys = Object.keys(this.properties);\n    }\n    categorizeString (propertyName, category, init = false) {\n        if (category === undefined) {\n            category = null;\n        }\n        if (this.categoryToID.has(category)) {\n            return this.categoryToID.get(category);\n        }\n        if (!init) {\n            this.properties[propertyName].categories.push({\n                name: category,\n                frequency: Number.NaN\n            });\n        }\n        this.categoryToID.set(category, this.numCategories);\n        this.IDToCategory.set(this.numCategories, category);\n        this.numCategories++;\n        return this.numCategories - 1;\n    }\n    propertyNames (propertyName) {\n        const prop = this.properties[propertyName];\n        if (prop.aggregations) {\n            return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);\n        }\n        return [propertyName];\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/common.js\":\n/*!****************************************!*\\\n  !*** ./src/renderer/decoder/common.js ***!\n  \\****************************************/\n/*! exports provided: addLineString, resizeBuffer */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"addLineString\", function() { return addLineString; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"resizeBuffer\", function() { return resizeBuffer; });\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/geometry */ \"./src/utils/geometry.js\");\n\n\n/**\n * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list\n * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.\n * https://github.com/CartoDB/carto-vl/wiki/Line-rendering\n */\nfunction addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {\n    let prevPoint, currentPoint, nextPoint;\n    let prevNormal, nextNormal;\n    let drawLine;\n\n    // We need at least two points\n    if (lineString.length >= 4) {\n        // Initialize the first two points\n        prevPoint = [lineString[0], lineString[1]];\n        currentPoint = [lineString[2], lineString[3]];\n        prevNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getLineNormal\"])(prevPoint, currentPoint);\n\n        for (let i = 4; i <= lineString.length; i += 2) {\n            drawLine = !(skipCallback && skipCallback(i));\n\n            if (drawLine) {\n                // First triangle\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n\n                // Second triangle\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n            }\n\n            // If there is a next point, compute its properties\n            if (i <= lineString.length - 2) {\n                nextPoint = [lineString[i], lineString[i + 1]];\n            } else if (isPolygon) {\n                nextPoint = [lineString[2], lineString[3]];\n            }\n\n            if (nextPoint) {\n                nextNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getLineNormal\"])(currentPoint, nextPoint);\n\n                if (drawLine) {\n                    // `turnLeft` indicates that the nextLine turns to the left\n                    // `joinNormal` contains the direction and size for the `miter` vertex\n                    //  If this is not defined means that the join must be `bevel`.\n                    let {turnLeft, joinNormal} = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getJoinNormal\"])(prevNormal, nextNormal);\n\n                    let leftNormal = turnLeft ? prevNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"neg\"])(nextNormal);\n                    let rightNormal = turnLeft ? nextNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"neg\"])(prevNormal);\n\n                    // Third triangle\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = 0;\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    // Mark vertex to be stroke in PolygonShader with the\n                    // non-zero value 1e-37, so it validates the expression\n                    // `normal != vec2(0.)` without affecting the vertex position.\n                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = leftNormal[0];\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    geomBuffer.normals[index++] = leftNormal[1];\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = rightNormal[0];\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    geomBuffer.normals[index++] = rightNormal[1];\n\n                    if (joinNormal) {\n                        // Forth triangle\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = joinNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = joinNormal[1];\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = rightNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = rightNormal[1];\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = leftNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = leftNormal[1];\n                    }\n                }\n            }\n\n            // Update the variables for the next iteration\n            prevPoint = currentPoint;\n            currentPoint = nextPoint;\n            prevNormal = nextNormal;\n            nextPoint = null;\n        }\n    }\n    return index;\n}\n\n/**\n * Resize a Float32Array buffer in an efficient way\n */\nfunction resizeBuffer (oldBuffer, newSize) {\n    const newBuffer = new Float32Array(newSize);\n    newBuffer.set(oldBuffer);\n    return newBuffer;\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/index.js\":\n/*!***************************************!*\\\n  !*** ./src/renderer/decoder/index.js ***!\n  \\***************************************/\n/*! exports provided: decodeGeom */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeGeom\", function() { return decodeGeom; });\n/* harmony import */ var _pointDecoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pointDecoder */ \"./src/renderer/decoder/pointDecoder.js\");\n/* harmony import */ var _lineDecoder__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lineDecoder */ \"./src/renderer/decoder/lineDecoder.js\");\n/* harmony import */ var _polygonDecoder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./polygonDecoder */ \"./src/renderer/decoder/polygonDecoder.js\");\n\n\n\n\nfunction decodeGeom (geomType, geom) {\n    switch (geomType) {\n        case 'point':\n            return Object(_pointDecoder__WEBPACK_IMPORTED_MODULE_0__[\"decodePoint\"])(geom);\n        case 'line':\n            return Object(_lineDecoder__WEBPACK_IMPORTED_MODULE_1__[\"decodeLine\"])(geom);\n        case 'polygon':\n            return Object(_polygonDecoder__WEBPACK_IMPORTED_MODULE_2__[\"decodePolygon\"])(geom);\n        default:\n            throw new Error(`Unimplemented geometry type: '${geomType}'`);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/lineDecoder.js\":\n/*!*********************************************!*\\\n  !*** ./src/renderer/decoder/lineDecoder.js ***!\n  \\*********************************************/\n/*! exports provided: decodeLine */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeLine\", function() { return decodeLine; });\n/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common */ \"./src/renderer/decoder/common.js\");\n\n\n// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.\n// The geom will be an array of coordinates in this case\n\nconst STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024; // 4 MB\nconst MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;\n\nlet index = 0;\nlet geomBuffer = {\n    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),\n    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)\n};\n\nfunction decodeLine (geometry) {\n    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature\n    let featureIDToVertexIndex = new Map();\n\n    index = 0;\n    for (let i = 0; i < geometry.length; i++) {\n        const feature = geometry[i];\n        for (let j = 0; j < feature.length; j++) {\n            // Increase buffers size if required\n            resizeBuffers(MAX_VERTICES_COORDINATES_PER_SEGMENT * feature[j].length);\n\n            // Add line string\n            index = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"addLineString\"])(feature[j], geomBuffer, index);\n        }\n\n        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0\n            ? { start: 0, end: index }\n            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });\n\n        breakpoints.push(index);\n    }\n\n    const verticesArrayBuffer = new ArrayBuffer(4 * index);\n    const normalsArrayBuffer = new ArrayBuffer(4 * index);\n    const vertices = new Float32Array(verticesArrayBuffer);\n    const normals = new Float32Array(normalsArrayBuffer);\n    for (let i = 0; i < index; i++) {\n        vertices[i] = geomBuffer.vertices[i];\n        normals[i] = geomBuffer.normals[i];\n    }\n    return {\n        vertices,\n        normals,\n        verticesArrayBuffer,\n        normalsArrayBuffer,\n        featureIDToVertexIndex,\n        breakpoints\n    };\n}\n\n// Resize buffers as needed if `additionalSize` floats overflow the current buffers.\nfunction resizeBuffers (additionalSize) {\n    const minimumNeededSize = index + additionalSize;\n    if (minimumNeededSize > geomBuffer.vertices.length) {\n        const newSize = 2 * minimumNeededSize;\n        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"resizeBuffer\"])(geomBuffer.vertices, newSize);\n        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"resizeBuffer\"])(geomBuffer.normals, newSize);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/pointDecoder.js\":\n/*!**********************************************!*\\\n  !*** ./src/renderer/decoder/pointDecoder.js ***!\n  \\**********************************************/\n/*! exports provided: decodePoint */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePoint\", function() { return decodePoint; });\n// If the geometry type is 'point' it will pass trough the geom (the vertex array)\n\nfunction decodePoint (verticesArrayBuffer) {\n    return {\n        verticesArrayBuffer: verticesArrayBuffer,\n        vertices: new Float32Array(verticesArrayBuffer),\n        breakpoints: []\n    };\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/polygonDecoder.js\":\n/*!************************************************!*\\\n  !*** ./src/renderer/decoder/polygonDecoder.js ***!\n  \\************************************************/\n/*! exports provided: decodePolygon */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePolygon\", function() { return decodePolygon; });\n/* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! earcut */ \"./node_modules/earcut/src/earcut.js\");\n/* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(earcut__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common */ \"./src/renderer/decoder/common.js\");\n\n\n\n// If the geometry type is 'polygon' it will triangulate the polygon list (geom)\n// geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices\n// Example:\n/*   let geom = [{\n       flat: [\n         0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square\n         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square\n       ]\n       holes: [5]\n     }]\n*/\n\nconst STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 * 2; // 8 MB\nconst VERTEX_COORDINATES_PER_TRIANGLE = 2;\nconst MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;\n\nlet index = 0;\nlet geomBuffer = {\n    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),\n    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)\n};\n\nfunction decodePolygon (geometry) {\n    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature\n    let featureIDToVertexIndex = new Map();\n\n    index = 0;\n    for (let i = 0; i < geometry.length; i++) {\n        const feature = geometry[i];\n        for (let j = 0; j < feature.length; j++) {\n            const polygon = feature[j];\n            const triangles = earcut__WEBPACK_IMPORTED_MODULE_0__(polygon.flat, polygon.holes);\n\n            // Increase buffers size if required\n            resizeBuffers(VERTEX_COORDINATES_PER_TRIANGLE * triangles.length +\n                          MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);\n\n            // Add polygon\n            for (let k = 0; k < triangles.length; k++) {\n                addVertex(polygon.flat, 2 * triangles[k]);\n            }\n\n            // Add polygon stroke\n            index = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"addLineString\"])(polygon.flat, geomBuffer, index, true, (pointIndex) => {\n                // Skip adding the line which connects two rings OR is clipped\n                return polygon.holes.includes((pointIndex - 2) / 2) || isClipped(polygon, pointIndex - 4, pointIndex - 2);\n            });\n        }\n\n        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0\n            ? { start: 0, end: index }\n            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });\n\n        breakpoints.push(index);\n    }\n\n    const verticesArrayBuffer = new ArrayBuffer(4 * index);\n    const normalsArrayBuffer = new ArrayBuffer(4 * index);\n    const vertices = new Float32Array(verticesArrayBuffer);\n    const normals = new Float32Array(normalsArrayBuffer);\n    for (let i = 0; i < index; i++) {\n        vertices[i] = geomBuffer.vertices[i];\n        normals[i] = geomBuffer.normals[i];\n    }\n    return {\n        vertices,\n        normals,\n        verticesArrayBuffer,\n        normalsArrayBuffer,\n        featureIDToVertexIndex,\n        breakpoints\n    };\n}\n\n// Resize buffers as needed if `additionalSize` floats overflow the current buffers\nfunction resizeBuffers (additionalSize) {\n    const minimumNeededSize = index + additionalSize;\n    if (minimumNeededSize > geomBuffer.vertices.length) {\n        const newSize = 2 * minimumNeededSize;\n        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"resizeBuffer\"])(geomBuffer.vertices, newSize);\n        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"resizeBuffer\"])(geomBuffer.normals, newSize);\n    }\n}\n\n// Add vertex in triangles.\nfunction addVertex (array, vertexIndex) {\n    geomBuffer.vertices[index] = array[vertexIndex];\n    geomBuffer.normals[index++] = 0;\n    geomBuffer.vertices[index] = array[vertexIndex + 1];\n    geomBuffer.normals[index++] = 0;\n}\n\nfunction isClipped (polygon, i, j) {\n    if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {\n        if (polygon.clippedType[polygon.clipped.indexOf(i)] &\n            polygon.clippedType[polygon.clipped.indexOf(j)]) {\n            return true;\n        }\n    }\n    return false;\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/schema.js\":\n/*!********************************!*\\\n  !*** ./src/renderer/schema.js ***!\n  \\********************************/\n/*! exports provided: IDENTITY, union, equals, CLUSTER_FEATURE_COUNT, column, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"IDENTITY\", function() { return IDENTITY; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"union\", function() { return union; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"equals\", function() { return equals; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CLUSTER_FEATURE_COUNT\", function() { return CLUSTER_FEATURE_COUNT; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"column\", function() { return column; });\n\nconst IDENTITY = {};\n\n/*\nconst mns = {\n    price:  [{type: 'unaggregated'}],\n    amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}]\n};\n\n*/\n\nfunction union (a, b) {\n    const result = {};\n    const propertyNames = new Set(Object.keys(a).concat(Object.keys(b)));\n    propertyNames.forEach(propertyName => {\n        const aUsages = a[propertyName] || [];\n        const bUsages = b[propertyName] || [];\n        const combinedUsage = [...aUsages, ...bUsages];\n        result[propertyName] = combinedUsage;\n    });\n    return result;\n}\n\nfunction equals (a, b) {\n    if (!a || !b) {\n        return false;\n    }\n    return JSON.stringify(simplify(a)) === JSON.stringify(simplify(b));\n}\n\nfunction simplify (MNS) {\n    const result = {};\n    const propertyNames = Object.keys(MNS).sort();\n    propertyNames.forEach(propertyName => {\n        // Stringify and Set to remove duplicates\n        let usage = [...new Set(MNS[propertyName].map(u => JSON.stringify(u)))];\n        usage.sort();\n        usage = usage.map(u => JSON.parse(u));\n        result[propertyName] = usage;\n    });\n    return result;\n}\n\nconst AGG_PREFIX = '_cdb_agg_';\nconst AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');\n\nconst CLUSTER_FEATURE_COUNT = '_cdb_feature_count';\n\n// column information functions\nconst column = {\n    isAggregated: function isAggregated (name) {\n        return name.startsWith(AGG_PREFIX);\n    },\n    getBase: function getBase (name) {\n        return name.replace(AGG_PATTERN, '');\n    },\n    getAggFN: function getAggFN (name) {\n        let s = name.substr(AGG_PREFIX.length);\n        return s.substr(0, s.indexOf('_'));\n    },\n    aggColumn (name, aggFN) {\n        return `${AGG_PREFIX}${aggFN}_${name}`;\n    }\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({ column, equals, union, IDENTITY, simplify });\n\n\n/***/ }),\n\n/***/ \"./src/sources/MVTWorker.js\":\n/*!**********************************!*\\\n  !*** ./src/sources/MVTWorker.js ***!\n  \\**********************************/\n/*! exports provided: MVTWorker */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"MVTWorker\", function() { return MVTWorker; });\n/* harmony import */ var _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @mapbox/vector-tile */ \"./node_modules/@mapbox/vector-tile/index.js\");\n/* harmony import */ var _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var pbf__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! pbf */ \"./node_modules/pbf/index.js\");\n/* harmony import */ var pbf__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(pbf__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _client_rsys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../client/rsys */ \"./src/client/rsys.js\");\n/* harmony import */ var _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../client/mvt/feature-decoder */ \"./src/client/mvt/feature-decoder.js\");\n/* harmony import */ var _renderer_Metadata__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../renderer/Metadata */ \"./src/renderer/Metadata.js\");\n/* harmony import */ var _renderer_DummyDataframe__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../renderer/DummyDataframe */ \"./src/renderer/DummyDataframe.js\");\n\n\n\n\n\n\n\n// TODO import correctly\nconst RTT_WIDTH = 1024;\n\n// Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39\nconst mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };\n\nconst geometryTypes = {\n    UNKNOWN: 'unknown',\n    POINT: 'point',\n    LINE: 'line',\n    POLYGON: 'polygon'\n};\n\nconst MVT_TO_CARTO_TYPES = {\n    1: geometryTypes.POINT,\n    2: geometryTypes.LINE,\n    3: geometryTypes.POLYGON\n};\n\nclass MVTWorker {\n    // Worker API\n    onmessage (event) {\n        this.processEvent(event).then(message => {\n            const transferables = [];\n            if (!message.dataframe.empty) {\n                transferables.push(this._propertiesArrayBuffer);\n                transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);\n                if (message.dataframe.decodedGeom.normalsArrayBuffer) {\n                    transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);\n                }\n            }\n            postMessage(message, transferables);\n        });\n    }\n    async processEvent (event) {\n        const params = event.data;\n        if (params.metadata) {\n            Object.setPrototypeOf(params.metadata, _renderer_Metadata__WEBPACK_IMPORTED_MODULE_4__[\"default\"].prototype);\n            this.metadata = params.metadata;\n        }\n        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);\n        return {\n            mID: params.mID,\n            dataframe\n        };\n    }\n\n    async _requestDataframe (x, y, z, url, layerID, metadata) {\n        const response = await fetch(url);\n        const dataframe = await this.urlToDataframeTransformer(response, x, y, z, layerID, metadata);\n        return dataframe;\n    }\n\n    async urlToDataframeTransformer (response, x, y, z, layerID, metadata) {\n        const MVT_EXTENT = 4096;\n        const arrayBuffer = await response.arrayBuffer();\n        if (arrayBuffer.byteLength === 0 || response === 'null') {\n            return { empty: true };\n        }\n        const tile = new _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__[\"VectorTile\"](new pbf__WEBPACK_IMPORTED_MODULE_1__(arrayBuffer));\n\n        if (Object.keys(tile.layers).length > 1 && !layerID) {\n            throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);\n        }\n\n        const mvtLayer = tile.layers[layerID || Object.keys(tile.layers)[0]]; // FIXME this!!!\n\n        if (!mvtLayer) {\n            return { empty: true };\n        }\n\n        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);\n        const rs = _client_rsys__WEBPACK_IMPORTED_MODULE_2__[\"getRsysFromTile\"](x, y, z);\n        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, metadata.geomType, metadata);\n\n        return dataframe;\n    }\n\n    _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {\n        if (!mvtLayer.length) {\n            return { properties: [], geometries: {}, numFeatures: 0 };\n        }\n        if (!metadata.geomType) {\n            metadata.geomType = this._autoDiscoverType(mvtLayer);\n        }\n        switch (metadata.geomType) {\n            case geometryTypes.POINT:\n                const arrayBuffer = new ArrayBuffer(mvtLayer.length * 2 * 3 * 4);// SIZEOF\n                return this._decode(mvtLayer, metadata, mvtExtent, arrayBuffer);\n            case geometryTypes.LINE:\n                return this._decode(mvtLayer, metadata, mvtExtent, [], _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__[\"decodeLines\"]);\n            case geometryTypes.POLYGON:\n                return this._decode(mvtLayer, metadata, mvtExtent, [], _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__[\"decodePolygons\"]);\n            default:\n                throw new Error('MVT: invalid geometry type');\n        }\n    }\n\n    _autoDiscoverType (mvtLayer) {\n        const type = mvtLayer.feature(0).type;\n        switch (type) {\n            case mvtDecoderGeomTypes.point:\n                return geometryTypes.POINT;\n            case mvtDecoderGeomTypes.line:\n                return geometryTypes.LINE;\n            case mvtDecoderGeomTypes.polygon:\n                return geometryTypes.POLYGON;\n            default:\n                throw new Error('MVT: invalid geometry type');\n        }\n    }\n\n    _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {\n        let numFeatures = 0;\n        let pointGeometries;\n        if (geometries) {\n            pointGeometries = new Float32Array(geometries);\n        }\n        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);\n        for (let i = 0; i < mvtLayer.length; i++) {\n            const f = mvtLayer.feature(i);\n            this._checkType(f, metadata.geomType);\n            const geom = f.loadGeometry();\n            if (decodeFn) {\n                const decodedPolygons = decodeFn(geom, mvtExtent);\n                geometries.push(decodedPolygons);\n            } else {\n                // TODO refactor\n                const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;\n                const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;\n                // Tiles may contain points in the border;\n                // we'll avoid here duplicated points between tiles by excluding the 1-edge\n                if (x < -1 || x >= 1 || y < -1 || y >= 1) {\n                    continue;\n                }\n                pointGeometries[6 * numFeatures + 0] = x;\n                pointGeometries[6 * numFeatures + 1] = y;\n                pointGeometries[6 * numFeatures + 2] = x;\n                pointGeometries[6 * numFeatures + 3] = y;\n                pointGeometries[6 * numFeatures + 4] = x;\n                pointGeometries[6 * numFeatures + 5] = y;\n            }\n            if (f.properties[metadata.idProperty] === undefined) {\n                throw new Error(`MVT feature with undefined idProperty '${metadata.idProperty}'`);\n            }\n            this._decodeProperties(metadata, propertyNames, properties, f, numFeatures);\n            numFeatures++;\n        }\n\n        return { properties, geometries, numFeatures };\n    }\n\n    // Currently only mvtLayers with the same type in every feature are supported\n    _checkType (feature, expected) {\n        const type = feature.type;\n        const actual = MVT_TO_CARTO_TYPES[type];\n        if (actual !== expected) {\n            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);\n        }\n    }\n\n    _initializePropertyArrays (metadata, length) {\n        const propertyNames = this._getPropertyNamesFrom(metadata);\n        const properties = this._getPropertiesFor(propertyNames, length);\n        return { propertyNames, properties };\n    }\n\n    _getPropertyNamesFrom (metadata) {\n        const propertyNames = [];\n        for (let i = 0; i < metadata.propertyKeys.length; i++) {\n            const propertyName = metadata.propertyKeys[i];\n            if (metadata.properties[propertyName].type === 'geometry') {\n                continue;\n            }\n            propertyNames.push(...metadata.propertyNames(propertyName));\n        }\n        return propertyNames;\n    }\n\n    _getPropertiesFor (propertyNames, length) {\n        const properties = {};\n        const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;\n\n        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);\n        this._propertiesArrayBuffer = arrayBuffer;\n        for (let i = 0; i < propertyNames.length; i++) {\n            const propertyName = propertyNames[i];\n            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);\n        }\n\n        return properties;\n    }\n\n    _decodeProperties (metadata, propertyNames, properties, feature, i) {\n        const length = propertyNames.length;\n        for (let j = 0; j < length; j++) {\n            const propertyName = propertyNames[j];\n            const propertyValue = feature.properties[propertyName];\n            properties[propertyName][i] = this.decodeProperty(metadata, propertyName, propertyValue);\n        }\n    }\n\n    decodeProperty (metadata, propertyName, propertyValue) {\n        if (typeof propertyValue === 'string') {\n            if (metadata.properties[propertyName].type !== 'category') {\n                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);\n            }\n            return metadata.categorizeString(propertyName, propertyValue);\n        } else if (typeof propertyValue === 'number') {\n            if (metadata.properties[propertyName].type !== 'number') {\n                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);\n            }\n            return propertyValue;\n        } else if (propertyValue === null || propertyValue === undefined) {\n            return Number.NaN;\n        } else {\n            throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);\n        }\n    }\n\n    _generateDataFrame (rs, geometry, properties, size, type, metadata) {\n        return new _renderer_DummyDataframe__WEBPACK_IMPORTED_MODULE_5__[\"default\"]({\n            active: false,\n            center: rs.center,\n            geom: geometry,\n            properties: properties,\n            scale: rs.scale,\n            size: size,\n            type: type,\n            metadata\n        });\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/sources/MVTWorkers.worker.js\":\n/*!******************************************!*\\\n  !*** ./src/sources/MVTWorkers.worker.js ***!\n  \\******************************************/\n/*! no exports provided */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _MVTWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MVTWorker */ \"./src/sources/MVTWorker.js\");\n/* harmony import */ var _client_WindshaftWorker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../client/WindshaftWorker */ \"./src/client/WindshaftWorker.js\");\n\n\n\n// This file publishes a Web Worker onmessage function that will redirect incoming messages\n// based on an ID (`workerName`) defined by the message sender\n// to each different Worker implementation\n\nconst workers = {\n    MVT: new _MVTWorker__WEBPACK_IMPORTED_MODULE_0__[\"MVTWorker\"](),\n    windshaft: new _client_WindshaftWorker__WEBPACK_IMPORTED_MODULE_1__[\"WindshaftWorker\"]()\n};\n\nonmessage = function (event) {\n    return workers[event.data.workerName].onmessage(event);\n};\n\n\n/***/ }),\n\n/***/ \"./src/utils/geometry.js\":\n/*!*******************************!*\\\n  !*** ./src/utils/geometry.js ***!\n  \\*******************************/\n/*! exports provided: intersect, sub, dot, perpendicular, getLineNormal, getJoinNormal, neg, pointInTriangle, halfPlaneSign, equalPoints, pointInCircle, pointInRectangle, computeAABB, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"intersect\", function() { return intersect; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"sub\", function() { return sub; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"dot\", function() { return dot; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"perpendicular\", function() { return perpendicular; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getLineNormal\", function() { return getLineNormal; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getJoinNormal\", function() { return getJoinNormal; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"neg\", function() { return neg; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInTriangle\", function() { return pointInTriangle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"halfPlaneSign\", function() { return halfPlaneSign; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"equalPoints\", function() { return equalPoints; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInCircle\", function() { return pointInCircle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInRectangle\", function() { return pointInRectangle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"computeAABB\", function() { return computeAABB; });\n// If AB intersects CD => return intersection point\n// Intersection method from Real Time Rendering, Third Edition, page 780\nfunction intersect (a, b, c, d) {\n    const o1 = a;\n    const o2 = c;\n    const d1 = sub(b, a);\n    const d2 = sub(d, c);\n    const d1t = perpendicular(d1);\n    const d2t = perpendicular(d2);\n\n    const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);\n    const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);\n\n    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {\n        return [o1[0] + s * d1[0], o1[1] + s * d1[1]];\n    }\n}\n\nfunction sub ([ax, ay], [bx, by]) {\n    return ([ax - bx, ay - by]);\n}\n\nfunction dot ([ax, ay], [bx, by]) {\n    return (ax * bx + ay * by);\n}\n\nfunction perpendicular ([x, y]) {\n    return [-y, x];\n}\n\n/**\n * Compute the normal of a line AB.\n * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise\n */\nfunction getLineNormal (a, b) {\n    const u = normalize(a[0] - b[0], a[1] - b[1]);\n    return [-u[1], u[0]];\n}\n\n/**\n * Compute the normal of the join from the lines' normals.\n * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)\n * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.\n * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,\n * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`\n */\nfunction getJoinNormal (prevNormal, nextNormal) {\n    const u = [prevNormal[1], -prevNormal[0]];\n    const v = [-nextNormal[1], nextNormal[0]];\n    const sin = v[0] * u[1] - v[1] * u[0];\n    const cos = v[0] * u[0] + v[1] * u[1];\n    const factor = Math.abs(sin);\n    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg\n    return {\n        turnLeft: sin > 0,\n        joinNormal: miterJoin && neg([\n            (u[0] + v[0]) / factor,\n            (u[1] + v[1]) / factor\n        ])\n    };\n}\n\n/**\n * Return the negative of the provided vector\n */\nfunction neg (v) {\n    return [-v[0], -v[1]];\n}\n\n/**\n * Return the vector scaled to length 1\n */\nfunction normalize (x, y) {\n    const s = Math.hypot(x, y);\n    return [x / s, y / s];\n}\n\n// Returns true if p is inside the triangle or on a triangle's edge, false otherwise\n// Parameters in {x: 0, y:0} form\nfunction pointInTriangle (p, v1, v2, v3) {\n    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle\n    // contains an explanation of both this algorithm and one based on barycentric coordinates,\n    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations\n\n    if (equalPoints(v1, v2) || equalPoints(v2, v3) || equalPoints(v3, v1)) {\n        // Avoid zero area triangle\n        return false;\n    }\n\n    // A point is inside a triangle or in one of the triangles edges\n    // if the point is in the three half-plane defined by the 3 edges\n    const b1 = halfPlaneSign(p, v1, v2) < 0;\n    const b2 = halfPlaneSign(p, v2, v3) < 0;\n    const b3 = halfPlaneSign(p, v3, v1) < 0;\n\n    return (b1 === b2) && (b2 === b3);\n}\n\n// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`\n// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,\n// returns >0 if the point is OUTSIDE\n// Parameters in {x: 0, y:0} form\nfunction halfPlaneSign (p, a, b) {\n    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`\n    // The result's sign is the half plane test result\n    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);\n}\n\nfunction equalPoints (a, b) {\n    return (a.x === b.x) && (a.y === b.y);\n}\n\nfunction pointInCircle (p, center, scale) {\n    const diff = {\n        x: p.x - center.x,\n        y: p.y - center.y\n    };\n    const lengthSquared = diff.x * diff.x + diff.y * diff.y;\n    return lengthSquared <= scale * scale;\n}\n\nfunction pointInRectangle (point, bbox) {\n    if (bbox === null) {\n        return false;\n    }\n    const p = {\n        x: point.x.toFixed(2),\n        y: point.y.toFixed(2)\n    };\n\n    return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));\n}\n\nfunction computeAABB (geometry, type) {\n    switch (type) {\n        case 'point':\n            return [];\n        case 'line':\n        case 'polygon':\n            const aabbList = [];\n\n            for (let i = 0; i < geometry.length; i++) {\n                const feature = geometry[i];\n\n                let aabb = {\n                    minx: Number.POSITIVE_INFINITY,\n                    miny: Number.POSITIVE_INFINITY,\n                    maxx: Number.NEGATIVE_INFINITY,\n                    maxy: Number.NEGATIVE_INFINITY\n                };\n\n                for (let j = 0; j < feature.length; j++) {\n                    aabb = _updateAABBForGeometry(feature[j], aabb, type);\n                }\n\n                if (aabb.minx === Number.POSITIVE_INFINITY) {\n                    aabb = null;\n                }\n\n                aabbList.push(aabb);\n            }\n\n            return aabbList;\n    }\n}\n\nfunction _updateAABBForGeometry (feature, aabb, geometryType) {\n    switch (geometryType) {\n        case 'line':\n            return _updateAABBLine(feature, aabb);\n        case 'polygon':\n            return _updateAABBPolygon(feature, aabb);\n    }\n}\n\nfunction _updateAABBLine (line, aabb) {\n    const vertices = line;\n    const numVertices = line.length;\n\n    for (let i = 0; i < numVertices; i += 2) {\n        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);\n        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);\n        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);\n        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);\n    }\n\n    return aabb;\n}\n\nfunction _updateAABBPolygon (polygon, aabb) {\n    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];\n\n    for (let i = 0; i < numVertices; i++) {\n        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);\n        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);\n        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);\n        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);\n    }\n\n    return aabb;\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n    intersect,\n    sub,\n    dot,\n    perpendicular,\n    getLineNormal,\n    getJoinNormal,\n    neg,\n    halfPlaneSign,\n    pointInTriangle,\n    equalPoints,\n    pointInCircle,\n    pointInRectangle\n});\n\n\n/***/ })\n\n/******/ });\n//# sourceMappingURL=b1ac4009da119186e99a.worker.js.map", "/dist/" + "b1ac4009da119186e99a.worker.js");
+  return __webpack_require__(/*! !./node_modules/worker-loader/dist/workers/InlineWorker.js */ "./node_modules/worker-loader/dist/workers/InlineWorker.js")("/*!\n * CARTO VL js https://carto.com/\n * Version: 0.8.0\n * \n */\n/******/ (function(modules) { // webpackBootstrap\n/******/ \t// The module cache\n/******/ \tvar installedModules = {};\n/******/\n/******/ \t// The require function\n/******/ \tfunction __webpack_require__(moduleId) {\n/******/\n/******/ \t\t// Check if module is in cache\n/******/ \t\tif(installedModules[moduleId]) {\n/******/ \t\t\treturn installedModules[moduleId].exports;\n/******/ \t\t}\n/******/ \t\t// Create a new module (and put it into the cache)\n/******/ \t\tvar module = installedModules[moduleId] = {\n/******/ \t\t\ti: moduleId,\n/******/ \t\t\tl: false,\n/******/ \t\t\texports: {}\n/******/ \t\t};\n/******/\n/******/ \t\t// Execute the module function\n/******/ \t\tmodules[moduleId].call(module.exports, module, module.exports, __webpack_require__);\n/******/\n/******/ \t\t// Flag the module as loaded\n/******/ \t\tmodule.l = true;\n/******/\n/******/ \t\t// Return the exports of the module\n/******/ \t\treturn module.exports;\n/******/ \t}\n/******/\n/******/\n/******/ \t// expose the modules object (__webpack_modules__)\n/******/ \t__webpack_require__.m = modules;\n/******/\n/******/ \t// expose the module cache\n/******/ \t__webpack_require__.c = installedModules;\n/******/\n/******/ \t// define getter function for harmony exports\n/******/ \t__webpack_require__.d = function(exports, name, getter) {\n/******/ \t\tif(!__webpack_require__.o(exports, name)) {\n/******/ \t\t\tObject.defineProperty(exports, name, { enumerable: true, get: getter });\n/******/ \t\t}\n/******/ \t};\n/******/\n/******/ \t// define __esModule on exports\n/******/ \t__webpack_require__.r = function(exports) {\n/******/ \t\tif(typeof Symbol !== 'undefined' && Symbol.toStringTag) {\n/******/ \t\t\tObject.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });\n/******/ \t\t}\n/******/ \t\tObject.defineProperty(exports, '__esModule', { value: true });\n/******/ \t};\n/******/\n/******/ \t// create a fake namespace object\n/******/ \t// mode & 1: value is a module id, require it\n/******/ \t// mode & 2: merge all properties of value into the ns\n/******/ \t// mode & 4: return value when already ns object\n/******/ \t// mode & 8|1: behave like require\n/******/ \t__webpack_require__.t = function(value, mode) {\n/******/ \t\tif(mode & 1) value = __webpack_require__(value);\n/******/ \t\tif(mode & 8) return value;\n/******/ \t\tif((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;\n/******/ \t\tvar ns = Object.create(null);\n/******/ \t\t__webpack_require__.r(ns);\n/******/ \t\tObject.defineProperty(ns, 'default', { enumerable: true, value: value });\n/******/ \t\tif(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));\n/******/ \t\treturn ns;\n/******/ \t};\n/******/\n/******/ \t// getDefaultExport function for compatibility with non-harmony modules\n/******/ \t__webpack_require__.n = function(module) {\n/******/ \t\tvar getter = module && module.__esModule ?\n/******/ \t\t\tfunction getDefault() { return module['default']; } :\n/******/ \t\t\tfunction getModuleExports() { return module; };\n/******/ \t\t__webpack_require__.d(getter, 'a', getter);\n/******/ \t\treturn getter;\n/******/ \t};\n/******/\n/******/ \t// Object.prototype.hasOwnProperty.call\n/******/ \t__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };\n/******/\n/******/ \t// __webpack_public_path__\n/******/ \t__webpack_require__.p = \"\";\n/******/\n/******/\n/******/ \t// Load entry module and return exports\n/******/ \treturn __webpack_require__(__webpack_require__.s = \"./src/sources/MVTWorkers.worker.js\");\n/******/ })\n/************************************************************************/\n/******/ ({\n\n/***/ \"./node_modules/@mapbox/point-geometry/index.js\":\n/*!******************************************************!*\\\n  !*** ./node_modules/@mapbox/point-geometry/index.js ***!\n  \\******************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = Point;\n\n/**\n * A standalone point geometry with useful accessor, comparison, and\n * modification methods.\n *\n * @class Point\n * @param {Number} x the x-coordinate. this could be longitude or screen\n * pixels, or any other sort of unit.\n * @param {Number} y the y-coordinate. this could be latitude or screen\n * pixels, or any other sort of unit.\n * @example\n * var point = new Point(-77, 38);\n */\nfunction Point(x, y) {\n    this.x = x;\n    this.y = y;\n}\n\nPoint.prototype = {\n\n    /**\n     * Clone this point, returning a new point that can be modified\n     * without affecting the old one.\n     * @return {Point} the clone\n     */\n    clone: function() { return new Point(this.x, this.y); },\n\n    /**\n     * Add this point's x & y coordinates to another point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    add:     function(p) { return this.clone()._add(p); },\n\n    /**\n     * Subtract this point's x & y coordinates to from point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    sub:     function(p) { return this.clone()._sub(p); },\n\n    /**\n     * Multiply this point's x & y coordinates by point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    multByPoint:    function(p) { return this.clone()._multByPoint(p); },\n\n    /**\n     * Divide this point's x & y coordinates by point,\n     * yielding a new point.\n     * @param {Point} p the other point\n     * @return {Point} output point\n     */\n    divByPoint:     function(p) { return this.clone()._divByPoint(p); },\n\n    /**\n     * Multiply this point's x & y coordinates by a factor,\n     * yielding a new point.\n     * @param {Point} k factor\n     * @return {Point} output point\n     */\n    mult:    function(k) { return this.clone()._mult(k); },\n\n    /**\n     * Divide this point's x & y coordinates by a factor,\n     * yielding a new point.\n     * @param {Point} k factor\n     * @return {Point} output point\n     */\n    div:     function(k) { return this.clone()._div(k); },\n\n    /**\n     * Rotate this point around the 0, 0 origin by an angle a,\n     * given in radians\n     * @param {Number} a angle to rotate around, in radians\n     * @return {Point} output point\n     */\n    rotate:  function(a) { return this.clone()._rotate(a); },\n\n    /**\n     * Rotate this point around p point by an angle a,\n     * given in radians\n     * @param {Number} a angle to rotate around, in radians\n     * @param {Point} p Point to rotate around\n     * @return {Point} output point\n     */\n    rotateAround:  function(a,p) { return this.clone()._rotateAround(a,p); },\n\n    /**\n     * Multiply this point by a 4x1 transformation matrix\n     * @param {Array<Number>} m transformation matrix\n     * @return {Point} output point\n     */\n    matMult: function(m) { return this.clone()._matMult(m); },\n\n    /**\n     * Calculate this point but as a unit vector from 0, 0, meaning\n     * that the distance from the resulting point to the 0, 0\n     * coordinate will be equal to 1 and the angle from the resulting\n     * point to the 0, 0 coordinate will be the same as before.\n     * @return {Point} unit vector point\n     */\n    unit:    function() { return this.clone()._unit(); },\n\n    /**\n     * Compute a perpendicular point, where the new y coordinate\n     * is the old x coordinate and the new x coordinate is the old y\n     * coordinate multiplied by -1\n     * @return {Point} perpendicular point\n     */\n    perp:    function() { return this.clone()._perp(); },\n\n    /**\n     * Return a version of this point with the x & y coordinates\n     * rounded to integers.\n     * @return {Point} rounded point\n     */\n    round:   function() { return this.clone()._round(); },\n\n    /**\n     * Return the magitude of this point: this is the Euclidean\n     * distance from the 0, 0 coordinate to this point's x and y\n     * coordinates.\n     * @return {Number} magnitude\n     */\n    mag: function() {\n        return Math.sqrt(this.x * this.x + this.y * this.y);\n    },\n\n    /**\n     * Judge whether this point is equal to another point, returning\n     * true or false.\n     * @param {Point} other the other point\n     * @return {boolean} whether the points are equal\n     */\n    equals: function(other) {\n        return this.x === other.x &&\n               this.y === other.y;\n    },\n\n    /**\n     * Calculate the distance from this point to another point\n     * @param {Point} p the other point\n     * @return {Number} distance\n     */\n    dist: function(p) {\n        return Math.sqrt(this.distSqr(p));\n    },\n\n    /**\n     * Calculate the distance from this point to another point,\n     * without the square root step. Useful if you're comparing\n     * relative distances.\n     * @param {Point} p the other point\n     * @return {Number} distance\n     */\n    distSqr: function(p) {\n        var dx = p.x - this.x,\n            dy = p.y - this.y;\n        return dx * dx + dy * dy;\n    },\n\n    /**\n     * Get the angle from the 0, 0 coordinate to this point, in radians\n     * coordinates.\n     * @return {Number} angle\n     */\n    angle: function() {\n        return Math.atan2(this.y, this.x);\n    },\n\n    /**\n     * Get the angle from this point to another point, in radians\n     * @param {Point} b the other point\n     * @return {Number} angle\n     */\n    angleTo: function(b) {\n        return Math.atan2(this.y - b.y, this.x - b.x);\n    },\n\n    /**\n     * Get the angle between this point and another point, in radians\n     * @param {Point} b the other point\n     * @return {Number} angle\n     */\n    angleWith: function(b) {\n        return this.angleWithSep(b.x, b.y);\n    },\n\n    /*\n     * Find the angle of the two vectors, solving the formula for\n     * the cross product a x b = |a||b|sin(θ) for θ.\n     * @param {Number} x the x-coordinate\n     * @param {Number} y the y-coordinate\n     * @return {Number} the angle in radians\n     */\n    angleWithSep: function(x, y) {\n        return Math.atan2(\n            this.x * y - this.y * x,\n            this.x * x + this.y * y);\n    },\n\n    _matMult: function(m) {\n        var x = m[0] * this.x + m[1] * this.y,\n            y = m[2] * this.x + m[3] * this.y;\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _add: function(p) {\n        this.x += p.x;\n        this.y += p.y;\n        return this;\n    },\n\n    _sub: function(p) {\n        this.x -= p.x;\n        this.y -= p.y;\n        return this;\n    },\n\n    _mult: function(k) {\n        this.x *= k;\n        this.y *= k;\n        return this;\n    },\n\n    _div: function(k) {\n        this.x /= k;\n        this.y /= k;\n        return this;\n    },\n\n    _multByPoint: function(p) {\n        this.x *= p.x;\n        this.y *= p.y;\n        return this;\n    },\n\n    _divByPoint: function(p) {\n        this.x /= p.x;\n        this.y /= p.y;\n        return this;\n    },\n\n    _unit: function() {\n        this._div(this.mag());\n        return this;\n    },\n\n    _perp: function() {\n        var y = this.y;\n        this.y = this.x;\n        this.x = -y;\n        return this;\n    },\n\n    _rotate: function(angle) {\n        var cos = Math.cos(angle),\n            sin = Math.sin(angle),\n            x = cos * this.x - sin * this.y,\n            y = sin * this.x + cos * this.y;\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _rotateAround: function(angle, p) {\n        var cos = Math.cos(angle),\n            sin = Math.sin(angle),\n            x = p.x + cos * (this.x - p.x) - sin * (this.y - p.y),\n            y = p.y + sin * (this.x - p.x) + cos * (this.y - p.y);\n        this.x = x;\n        this.y = y;\n        return this;\n    },\n\n    _round: function() {\n        this.x = Math.round(this.x);\n        this.y = Math.round(this.y);\n        return this;\n    }\n};\n\n/**\n * Construct a point from an array if necessary, otherwise if the input\n * is already a Point, or an unknown type, return it unchanged\n * @param {Array<Number>|Point|*} a any kind of input value\n * @return {Point} constructed point, or passed-through value.\n * @example\n * // this\n * var point = Point.convert([0, 1]);\n * // is equivalent to\n * var point = new Point(0, 1);\n */\nPoint.convert = function (a) {\n    if (a instanceof Point) {\n        return a;\n    }\n    if (Array.isArray(a)) {\n        return new Point(a[0], a[1]);\n    }\n    return a;\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/index.js\":\n/*!***************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/index.js ***!\n  \\***************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\nmodule.exports.VectorTile = __webpack_require__(/*! ./lib/vectortile.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortile.js\");\nmodule.exports.VectorTileFeature = __webpack_require__(/*! ./lib/vectortilefeature.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\");\nmodule.exports.VectorTileLayer = __webpack_require__(/*! ./lib/vectortilelayer.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\");\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortile.js\":\n/*!************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortile.js ***!\n  \\************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar VectorTileLayer = __webpack_require__(/*! ./vectortilelayer */ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\");\n\nmodule.exports = VectorTile;\n\nfunction VectorTile(pbf, end) {\n    this.layers = pbf.readFields(readTile, {}, end);\n}\n\nfunction readTile(tag, layers, pbf) {\n    if (tag === 3) {\n        var layer = new VectorTileLayer(pbf, pbf.readVarint() + pbf.pos);\n        if (layer.length) layers[layer.name] = layer;\n    }\n}\n\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\":\n/*!*******************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js ***!\n  \\*******************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar Point = __webpack_require__(/*! @mapbox/point-geometry */ \"./node_modules/@mapbox/point-geometry/index.js\");\n\nmodule.exports = VectorTileFeature;\n\nfunction VectorTileFeature(pbf, end, extent, keys, values) {\n    // Public\n    this.properties = {};\n    this.extent = extent;\n    this.type = 0;\n\n    // Private\n    this._pbf = pbf;\n    this._geometry = -1;\n    this._keys = keys;\n    this._values = values;\n\n    pbf.readFields(readFeature, this, end);\n}\n\nfunction readFeature(tag, feature, pbf) {\n    if (tag == 1) feature.id = pbf.readVarint();\n    else if (tag == 2) readTag(pbf, feature);\n    else if (tag == 3) feature.type = pbf.readVarint();\n    else if (tag == 4) feature._geometry = pbf.pos;\n}\n\nfunction readTag(pbf, feature) {\n    var end = pbf.readVarint() + pbf.pos;\n\n    while (pbf.pos < end) {\n        var key = feature._keys[pbf.readVarint()],\n            value = feature._values[pbf.readVarint()];\n        feature.properties[key] = value;\n    }\n}\n\nVectorTileFeature.types = ['Unknown', 'Point', 'LineString', 'Polygon'];\n\nVectorTileFeature.prototype.loadGeometry = function() {\n    var pbf = this._pbf;\n    pbf.pos = this._geometry;\n\n    var end = pbf.readVarint() + pbf.pos,\n        cmd = 1,\n        length = 0,\n        x = 0,\n        y = 0,\n        lines = [],\n        line;\n\n    while (pbf.pos < end) {\n        if (length <= 0) {\n            var cmdLen = pbf.readVarint();\n            cmd = cmdLen & 0x7;\n            length = cmdLen >> 3;\n        }\n\n        length--;\n\n        if (cmd === 1 || cmd === 2) {\n            x += pbf.readSVarint();\n            y += pbf.readSVarint();\n\n            if (cmd === 1) { // moveTo\n                if (line) lines.push(line);\n                line = [];\n            }\n\n            line.push(new Point(x, y));\n\n        } else if (cmd === 7) {\n\n            // Workaround for https://github.com/mapbox/mapnik-vector-tile/issues/90\n            if (line) {\n                line.push(line[0].clone()); // closePolygon\n            }\n\n        } else {\n            throw new Error('unknown command ' + cmd);\n        }\n    }\n\n    if (line) lines.push(line);\n\n    return lines;\n};\n\nVectorTileFeature.prototype.bbox = function() {\n    var pbf = this._pbf;\n    pbf.pos = this._geometry;\n\n    var end = pbf.readVarint() + pbf.pos,\n        cmd = 1,\n        length = 0,\n        x = 0,\n        y = 0,\n        x1 = Infinity,\n        x2 = -Infinity,\n        y1 = Infinity,\n        y2 = -Infinity;\n\n    while (pbf.pos < end) {\n        if (length <= 0) {\n            var cmdLen = pbf.readVarint();\n            cmd = cmdLen & 0x7;\n            length = cmdLen >> 3;\n        }\n\n        length--;\n\n        if (cmd === 1 || cmd === 2) {\n            x += pbf.readSVarint();\n            y += pbf.readSVarint();\n            if (x < x1) x1 = x;\n            if (x > x2) x2 = x;\n            if (y < y1) y1 = y;\n            if (y > y2) y2 = y;\n\n        } else if (cmd !== 7) {\n            throw new Error('unknown command ' + cmd);\n        }\n    }\n\n    return [x1, y1, x2, y2];\n};\n\nVectorTileFeature.prototype.toGeoJSON = function(x, y, z) {\n    var size = this.extent * Math.pow(2, z),\n        x0 = this.extent * x,\n        y0 = this.extent * y,\n        coords = this.loadGeometry(),\n        type = VectorTileFeature.types[this.type],\n        i, j;\n\n    function project(line) {\n        for (var j = 0; j < line.length; j++) {\n            var p = line[j], y2 = 180 - (p.y + y0) * 360 / size;\n            line[j] = [\n                (p.x + x0) * 360 / size - 180,\n                360 / Math.PI * Math.atan(Math.exp(y2 * Math.PI / 180)) - 90\n            ];\n        }\n    }\n\n    switch (this.type) {\n    case 1:\n        var points = [];\n        for (i = 0; i < coords.length; i++) {\n            points[i] = coords[i][0];\n        }\n        coords = points;\n        project(coords);\n        break;\n\n    case 2:\n        for (i = 0; i < coords.length; i++) {\n            project(coords[i]);\n        }\n        break;\n\n    case 3:\n        coords = classifyRings(coords);\n        for (i = 0; i < coords.length; i++) {\n            for (j = 0; j < coords[i].length; j++) {\n                project(coords[i][j]);\n            }\n        }\n        break;\n    }\n\n    if (coords.length === 1) {\n        coords = coords[0];\n    } else {\n        type = 'Multi' + type;\n    }\n\n    var result = {\n        type: \"Feature\",\n        geometry: {\n            type: type,\n            coordinates: coords\n        },\n        properties: this.properties\n    };\n\n    if ('id' in this) {\n        result.id = this.id;\n    }\n\n    return result;\n};\n\n// classifies an array of rings into polygons with outer rings and holes\n\nfunction classifyRings(rings) {\n    var len = rings.length;\n\n    if (len <= 1) return [rings];\n\n    var polygons = [],\n        polygon,\n        ccw;\n\n    for (var i = 0; i < len; i++) {\n        var area = signedArea(rings[i]);\n        if (area === 0) continue;\n\n        if (ccw === undefined) ccw = area < 0;\n\n        if (ccw === area < 0) {\n            if (polygon) polygons.push(polygon);\n            polygon = [rings[i]];\n\n        } else {\n            polygon.push(rings[i]);\n        }\n    }\n    if (polygon) polygons.push(polygon);\n\n    return polygons;\n}\n\nfunction signedArea(ring) {\n    var sum = 0;\n    for (var i = 0, len = ring.length, j = len - 1, p1, p2; i < len; j = i++) {\n        p1 = ring[i];\n        p2 = ring[j];\n        sum += (p2.x - p1.x) * (p1.y + p2.y);\n    }\n    return sum;\n}\n\n\n/***/ }),\n\n/***/ \"./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js\":\n/*!*****************************************************************!*\\\n  !*** ./node_modules/@mapbox/vector-tile/lib/vectortilelayer.js ***!\n  \\*****************************************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nvar VectorTileFeature = __webpack_require__(/*! ./vectortilefeature.js */ \"./node_modules/@mapbox/vector-tile/lib/vectortilefeature.js\");\n\nmodule.exports = VectorTileLayer;\n\nfunction VectorTileLayer(pbf, end) {\n    // Public\n    this.version = 1;\n    this.name = null;\n    this.extent = 4096;\n    this.length = 0;\n\n    // Private\n    this._pbf = pbf;\n    this._keys = [];\n    this._values = [];\n    this._features = [];\n\n    pbf.readFields(readLayer, this, end);\n\n    this.length = this._features.length;\n}\n\nfunction readLayer(tag, layer, pbf) {\n    if (tag === 15) layer.version = pbf.readVarint();\n    else if (tag === 1) layer.name = pbf.readString();\n    else if (tag === 5) layer.extent = pbf.readVarint();\n    else if (tag === 2) layer._features.push(pbf.pos);\n    else if (tag === 3) layer._keys.push(pbf.readString());\n    else if (tag === 4) layer._values.push(readValueMessage(pbf));\n}\n\nfunction readValueMessage(pbf) {\n    var value = null,\n        end = pbf.readVarint() + pbf.pos;\n\n    while (pbf.pos < end) {\n        var tag = pbf.readVarint() >> 3;\n\n        value = tag === 1 ? pbf.readString() :\n            tag === 2 ? pbf.readFloat() :\n            tag === 3 ? pbf.readDouble() :\n            tag === 4 ? pbf.readVarint64() :\n            tag === 5 ? pbf.readVarint() :\n            tag === 6 ? pbf.readSVarint() :\n            tag === 7 ? pbf.readBoolean() : null;\n    }\n\n    return value;\n}\n\n// return feature `i` from this layer as a `VectorTileFeature`\nVectorTileLayer.prototype.feature = function(i) {\n    if (i < 0 || i >= this._features.length) throw new Error('feature index out of bounds');\n\n    this._pbf.pos = this._features[i];\n\n    var end = this._pbf.readVarint() + this._pbf.pos;\n    return new VectorTileFeature(this._pbf, end, this.extent, this._keys, this._values);\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/earcut/src/earcut.js\":\n/*!*******************************************!*\\\n  !*** ./node_modules/earcut/src/earcut.js ***!\n  \\*******************************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = earcut;\nmodule.exports.default = earcut;\n\nfunction earcut(data, holeIndices, dim) {\n\n    dim = dim || 2;\n\n    var hasHoles = holeIndices && holeIndices.length,\n        outerLen = hasHoles ? holeIndices[0] * dim : data.length,\n        outerNode = linkedList(data, 0, outerLen, dim, true),\n        triangles = [];\n\n    if (!outerNode) return triangles;\n\n    var minX, minY, maxX, maxY, x, y, invSize;\n\n    if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);\n\n    // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox\n    if (data.length > 80 * dim) {\n        minX = maxX = data[0];\n        minY = maxY = data[1];\n\n        for (var i = dim; i < outerLen; i += dim) {\n            x = data[i];\n            y = data[i + 1];\n            if (x < minX) minX = x;\n            if (y < minY) minY = y;\n            if (x > maxX) maxX = x;\n            if (y > maxY) maxY = y;\n        }\n\n        // minX, minY and invSize are later used to transform coords into integers for z-order calculation\n        invSize = Math.max(maxX - minX, maxY - minY);\n        invSize = invSize !== 0 ? 1 / invSize : 0;\n    }\n\n    earcutLinked(outerNode, triangles, dim, minX, minY, invSize);\n\n    return triangles;\n}\n\n// create a circular doubly linked list from polygon points in the specified winding order\nfunction linkedList(data, start, end, dim, clockwise) {\n    var i, last;\n\n    if (clockwise === (signedArea(data, start, end, dim) > 0)) {\n        for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);\n    } else {\n        for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);\n    }\n\n    if (last && equals(last, last.next)) {\n        removeNode(last);\n        last = last.next;\n    }\n\n    return last;\n}\n\n// eliminate colinear or duplicate points\nfunction filterPoints(start, end) {\n    if (!start) return start;\n    if (!end) end = start;\n\n    var p = start,\n        again;\n    do {\n        again = false;\n\n        if (!p.steiner && (equals(p, p.next) || area(p.prev, p, p.next) === 0)) {\n            removeNode(p);\n            p = end = p.prev;\n            if (p === p.next) break;\n            again = true;\n\n        } else {\n            p = p.next;\n        }\n    } while (again || p !== end);\n\n    return end;\n}\n\n// main ear slicing loop which triangulates a polygon (given as a linked list)\nfunction earcutLinked(ear, triangles, dim, minX, minY, invSize, pass) {\n    if (!ear) return;\n\n    // interlink polygon nodes in z-order\n    if (!pass && invSize) indexCurve(ear, minX, minY, invSize);\n\n    var stop = ear,\n        prev, next;\n\n    // iterate through ears, slicing them one by one\n    while (ear.prev !== ear.next) {\n        prev = ear.prev;\n        next = ear.next;\n\n        if (invSize ? isEarHashed(ear, minX, minY, invSize) : isEar(ear)) {\n            // cut off the triangle\n            triangles.push(prev.i / dim);\n            triangles.push(ear.i / dim);\n            triangles.push(next.i / dim);\n\n            removeNode(ear);\n\n            // skipping the next vertice leads to less sliver triangles\n            ear = next.next;\n            stop = next.next;\n\n            continue;\n        }\n\n        ear = next;\n\n        // if we looped through the whole remaining polygon and can't find any more ears\n        if (ear === stop) {\n            // try filtering points and slicing again\n            if (!pass) {\n                earcutLinked(filterPoints(ear), triangles, dim, minX, minY, invSize, 1);\n\n            // if this didn't work, try curing all small self-intersections locally\n            } else if (pass === 1) {\n                ear = cureLocalIntersections(ear, triangles, dim);\n                earcutLinked(ear, triangles, dim, minX, minY, invSize, 2);\n\n            // as a last resort, try splitting the remaining polygon into two\n            } else if (pass === 2) {\n                splitEarcut(ear, triangles, dim, minX, minY, invSize);\n            }\n\n            break;\n        }\n    }\n}\n\n// check whether a polygon node forms a valid ear with adjacent nodes\nfunction isEar(ear) {\n    var a = ear.prev,\n        b = ear,\n        c = ear.next;\n\n    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear\n\n    // now make sure we don't have other points inside the potential ear\n    var p = ear.next.next;\n\n    while (p !== ear.prev) {\n        if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.next;\n    }\n\n    return true;\n}\n\nfunction isEarHashed(ear, minX, minY, invSize) {\n    var a = ear.prev,\n        b = ear,\n        c = ear.next;\n\n    if (area(a, b, c) >= 0) return false; // reflex, can't be an ear\n\n    // triangle bbox; min & max are calculated like this for speed\n    var minTX = a.x < b.x ? (a.x < c.x ? a.x : c.x) : (b.x < c.x ? b.x : c.x),\n        minTY = a.y < b.y ? (a.y < c.y ? a.y : c.y) : (b.y < c.y ? b.y : c.y),\n        maxTX = a.x > b.x ? (a.x > c.x ? a.x : c.x) : (b.x > c.x ? b.x : c.x),\n        maxTY = a.y > b.y ? (a.y > c.y ? a.y : c.y) : (b.y > c.y ? b.y : c.y);\n\n    // z-order range for the current triangle bbox;\n    var minZ = zOrder(minTX, minTY, minX, minY, invSize),\n        maxZ = zOrder(maxTX, maxTY, minX, minY, invSize);\n\n    var p = ear.prevZ,\n        n = ear.nextZ;\n\n    // look for points inside the triangle in both directions\n    while (p && p.z >= minZ && n && n.z <= maxZ) {\n        if (p !== ear.prev && p !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.prevZ;\n\n        if (n !== ear.prev && n !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&\n            area(n.prev, n, n.next) >= 0) return false;\n        n = n.nextZ;\n    }\n\n    // look for remaining points in decreasing z-order\n    while (p && p.z >= minZ) {\n        if (p !== ear.prev && p !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&\n            area(p.prev, p, p.next) >= 0) return false;\n        p = p.prevZ;\n    }\n\n    // look for remaining points in increasing z-order\n    while (n && n.z <= maxZ) {\n        if (n !== ear.prev && n !== ear.next &&\n            pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&\n            area(n.prev, n, n.next) >= 0) return false;\n        n = n.nextZ;\n    }\n\n    return true;\n}\n\n// go through all polygon nodes and cure small local self-intersections\nfunction cureLocalIntersections(start, triangles, dim) {\n    var p = start;\n    do {\n        var a = p.prev,\n            b = p.next.next;\n\n        if (!equals(a, b) && intersects(a, p, p.next, b) && locallyInside(a, b) && locallyInside(b, a)) {\n\n            triangles.push(a.i / dim);\n            triangles.push(p.i / dim);\n            triangles.push(b.i / dim);\n\n            // remove two nodes involved\n            removeNode(p);\n            removeNode(p.next);\n\n            p = start = b;\n        }\n        p = p.next;\n    } while (p !== start);\n\n    return p;\n}\n\n// try splitting polygon into two and triangulate them independently\nfunction splitEarcut(start, triangles, dim, minX, minY, invSize) {\n    // look for a valid diagonal that divides the polygon into two\n    var a = start;\n    do {\n        var b = a.next.next;\n        while (b !== a.prev) {\n            if (a.i !== b.i && isValidDiagonal(a, b)) {\n                // split the polygon in two by the diagonal\n                var c = splitPolygon(a, b);\n\n                // filter colinear points around the cuts\n                a = filterPoints(a, a.next);\n                c = filterPoints(c, c.next);\n\n                // run earcut on each half\n                earcutLinked(a, triangles, dim, minX, minY, invSize);\n                earcutLinked(c, triangles, dim, minX, minY, invSize);\n                return;\n            }\n            b = b.next;\n        }\n        a = a.next;\n    } while (a !== start);\n}\n\n// link every hole into the outer loop, producing a single-ring polygon without holes\nfunction eliminateHoles(data, holeIndices, outerNode, dim) {\n    var queue = [],\n        i, len, start, end, list;\n\n    for (i = 0, len = holeIndices.length; i < len; i++) {\n        start = holeIndices[i] * dim;\n        end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;\n        list = linkedList(data, start, end, dim, false);\n        if (list === list.next) list.steiner = true;\n        queue.push(getLeftmost(list));\n    }\n\n    queue.sort(compareX);\n\n    // process holes from left to right\n    for (i = 0; i < queue.length; i++) {\n        eliminateHole(queue[i], outerNode);\n        outerNode = filterPoints(outerNode, outerNode.next);\n    }\n\n    return outerNode;\n}\n\nfunction compareX(a, b) {\n    return a.x - b.x;\n}\n\n// find a bridge between vertices that connects hole with an outer ring and and link it\nfunction eliminateHole(hole, outerNode) {\n    outerNode = findHoleBridge(hole, outerNode);\n    if (outerNode) {\n        var b = splitPolygon(outerNode, hole);\n        filterPoints(b, b.next);\n    }\n}\n\n// David Eberly's algorithm for finding a bridge between hole and outer polygon\nfunction findHoleBridge(hole, outerNode) {\n    var p = outerNode,\n        hx = hole.x,\n        hy = hole.y,\n        qx = -Infinity,\n        m;\n\n    // find a segment intersected by a ray from the hole's leftmost point to the left;\n    // segment's endpoint with lesser x will be potential connection point\n    do {\n        if (hy <= p.y && hy >= p.next.y && p.next.y !== p.y) {\n            var x = p.x + (hy - p.y) * (p.next.x - p.x) / (p.next.y - p.y);\n            if (x <= hx && x > qx) {\n                qx = x;\n                if (x === hx) {\n                    if (hy === p.y) return p;\n                    if (hy === p.next.y) return p.next;\n                }\n                m = p.x < p.next.x ? p : p.next;\n            }\n        }\n        p = p.next;\n    } while (p !== outerNode);\n\n    if (!m) return null;\n\n    if (hx === qx) return m.prev; // hole touches outer segment; pick lower endpoint\n\n    // look for points inside the triangle of hole point, segment intersection and endpoint;\n    // if there are no points found, we have a valid connection;\n    // otherwise choose the point of the minimum angle with the ray as connection point\n\n    var stop = m,\n        mx = m.x,\n        my = m.y,\n        tanMin = Infinity,\n        tan;\n\n    p = m.next;\n\n    while (p !== stop) {\n        if (hx >= p.x && p.x >= mx && hx !== p.x &&\n                pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {\n\n            tan = Math.abs(hy - p.y) / (hx - p.x); // tangential\n\n            if ((tan < tanMin || (tan === tanMin && p.x > m.x)) && locallyInside(p, hole)) {\n                m = p;\n                tanMin = tan;\n            }\n        }\n\n        p = p.next;\n    }\n\n    return m;\n}\n\n// interlink polygon nodes in z-order\nfunction indexCurve(start, minX, minY, invSize) {\n    var p = start;\n    do {\n        if (p.z === null) p.z = zOrder(p.x, p.y, minX, minY, invSize);\n        p.prevZ = p.prev;\n        p.nextZ = p.next;\n        p = p.next;\n    } while (p !== start);\n\n    p.prevZ.nextZ = null;\n    p.prevZ = null;\n\n    sortLinked(p);\n}\n\n// Simon Tatham's linked list merge sort algorithm\n// http://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html\nfunction sortLinked(list) {\n    var i, p, q, e, tail, numMerges, pSize, qSize,\n        inSize = 1;\n\n    do {\n        p = list;\n        list = null;\n        tail = null;\n        numMerges = 0;\n\n        while (p) {\n            numMerges++;\n            q = p;\n            pSize = 0;\n            for (i = 0; i < inSize; i++) {\n                pSize++;\n                q = q.nextZ;\n                if (!q) break;\n            }\n            qSize = inSize;\n\n            while (pSize > 0 || (qSize > 0 && q)) {\n\n                if (pSize !== 0 && (qSize === 0 || !q || p.z <= q.z)) {\n                    e = p;\n                    p = p.nextZ;\n                    pSize--;\n                } else {\n                    e = q;\n                    q = q.nextZ;\n                    qSize--;\n                }\n\n                if (tail) tail.nextZ = e;\n                else list = e;\n\n                e.prevZ = tail;\n                tail = e;\n            }\n\n            p = q;\n        }\n\n        tail.nextZ = null;\n        inSize *= 2;\n\n    } while (numMerges > 1);\n\n    return list;\n}\n\n// z-order of a point given coords and inverse of the longer side of data bbox\nfunction zOrder(x, y, minX, minY, invSize) {\n    // coords are transformed into non-negative 15-bit integer range\n    x = 32767 * (x - minX) * invSize;\n    y = 32767 * (y - minY) * invSize;\n\n    x = (x | (x << 8)) & 0x00FF00FF;\n    x = (x | (x << 4)) & 0x0F0F0F0F;\n    x = (x | (x << 2)) & 0x33333333;\n    x = (x | (x << 1)) & 0x55555555;\n\n    y = (y | (y << 8)) & 0x00FF00FF;\n    y = (y | (y << 4)) & 0x0F0F0F0F;\n    y = (y | (y << 2)) & 0x33333333;\n    y = (y | (y << 1)) & 0x55555555;\n\n    return x | (y << 1);\n}\n\n// find the leftmost node of a polygon ring\nfunction getLeftmost(start) {\n    var p = start,\n        leftmost = start;\n    do {\n        if (p.x < leftmost.x) leftmost = p;\n        p = p.next;\n    } while (p !== start);\n\n    return leftmost;\n}\n\n// check if a point lies within a convex triangle\nfunction pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {\n    return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&\n           (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&\n           (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;\n}\n\n// check if a diagonal between two polygon nodes is valid (lies in polygon interior)\nfunction isValidDiagonal(a, b) {\n    return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) &&\n           locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b);\n}\n\n// signed area of a triangle\nfunction area(p, q, r) {\n    return (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);\n}\n\n// check if two points are equal\nfunction equals(p1, p2) {\n    return p1.x === p2.x && p1.y === p2.y;\n}\n\n// check if two segments intersect\nfunction intersects(p1, q1, p2, q2) {\n    if ((equals(p1, q1) && equals(p2, q2)) ||\n        (equals(p1, q2) && equals(p2, q1))) return true;\n    return area(p1, q1, p2) > 0 !== area(p1, q1, q2) > 0 &&\n           area(p2, q2, p1) > 0 !== area(p2, q2, q1) > 0;\n}\n\n// check if a polygon diagonal intersects any polygon segments\nfunction intersectsPolygon(a, b) {\n    var p = a;\n    do {\n        if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&\n                intersects(p, p.next, a, b)) return true;\n        p = p.next;\n    } while (p !== a);\n\n    return false;\n}\n\n// check if a polygon diagonal is locally inside the polygon\nfunction locallyInside(a, b) {\n    return area(a.prev, a, a.next) < 0 ?\n        area(a, b, a.next) >= 0 && area(a, a.prev, b) >= 0 :\n        area(a, b, a.prev) < 0 || area(a, a.next, b) < 0;\n}\n\n// check if the middle point of a polygon diagonal is inside the polygon\nfunction middleInside(a, b) {\n    var p = a,\n        inside = false,\n        px = (a.x + b.x) / 2,\n        py = (a.y + b.y) / 2;\n    do {\n        if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y &&\n                (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x))\n            inside = !inside;\n        p = p.next;\n    } while (p !== a);\n\n    return inside;\n}\n\n// link two polygon vertices with a bridge; if the vertices belong to the same ring, it splits polygon into two;\n// if one belongs to the outer ring and another to a hole, it merges it into a single ring\nfunction splitPolygon(a, b) {\n    var a2 = new Node(a.i, a.x, a.y),\n        b2 = new Node(b.i, b.x, b.y),\n        an = a.next,\n        bp = b.prev;\n\n    a.next = b;\n    b.prev = a;\n\n    a2.next = an;\n    an.prev = a2;\n\n    b2.next = a2;\n    a2.prev = b2;\n\n    bp.next = b2;\n    b2.prev = bp;\n\n    return b2;\n}\n\n// create a node and optionally link it with previous one (in a circular doubly linked list)\nfunction insertNode(i, x, y, last) {\n    var p = new Node(i, x, y);\n\n    if (!last) {\n        p.prev = p;\n        p.next = p;\n\n    } else {\n        p.next = last.next;\n        p.prev = last;\n        last.next.prev = p;\n        last.next = p;\n    }\n    return p;\n}\n\nfunction removeNode(p) {\n    p.next.prev = p.prev;\n    p.prev.next = p.next;\n\n    if (p.prevZ) p.prevZ.nextZ = p.nextZ;\n    if (p.nextZ) p.nextZ.prevZ = p.prevZ;\n}\n\nfunction Node(i, x, y) {\n    // vertice index in coordinates array\n    this.i = i;\n\n    // vertex coordinates\n    this.x = x;\n    this.y = y;\n\n    // previous and next vertice nodes in a polygon ring\n    this.prev = null;\n    this.next = null;\n\n    // z-order curve value\n    this.z = null;\n\n    // previous and next nodes in z-order\n    this.prevZ = null;\n    this.nextZ = null;\n\n    // indicates whether this is a steiner point\n    this.steiner = false;\n}\n\n// return a percentage difference between the polygon area and its triangulation area;\n// used to verify correctness of triangulation\nearcut.deviation = function (data, holeIndices, dim, triangles) {\n    var hasHoles = holeIndices && holeIndices.length;\n    var outerLen = hasHoles ? holeIndices[0] * dim : data.length;\n\n    var polygonArea = Math.abs(signedArea(data, 0, outerLen, dim));\n    if (hasHoles) {\n        for (var i = 0, len = holeIndices.length; i < len; i++) {\n            var start = holeIndices[i] * dim;\n            var end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;\n            polygonArea -= Math.abs(signedArea(data, start, end, dim));\n        }\n    }\n\n    var trianglesArea = 0;\n    for (i = 0; i < triangles.length; i += 3) {\n        var a = triangles[i] * dim;\n        var b = triangles[i + 1] * dim;\n        var c = triangles[i + 2] * dim;\n        trianglesArea += Math.abs(\n            (data[a] - data[c]) * (data[b + 1] - data[a + 1]) -\n            (data[a] - data[b]) * (data[c + 1] - data[a + 1]));\n    }\n\n    return polygonArea === 0 && trianglesArea === 0 ? 0 :\n        Math.abs((trianglesArea - polygonArea) / polygonArea);\n};\n\nfunction signedArea(data, start, end, dim) {\n    var sum = 0;\n    for (var i = start, j = end - dim; i < end; i += dim) {\n        sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);\n        j = i;\n    }\n    return sum;\n}\n\n// turn a polygon in a multi-dimensional array form (e.g. as in GeoJSON) into a form Earcut accepts\nearcut.flatten = function (data) {\n    var dim = data[0][0].length,\n        result = {vertices: [], holes: [], dimensions: dim},\n        holeIndex = 0;\n\n    for (var i = 0; i < data.length; i++) {\n        for (var j = 0; j < data[i].length; j++) {\n            for (var d = 0; d < dim; d++) result.vertices.push(data[i][j][d]);\n        }\n        if (i > 0) {\n            holeIndex += data[i - 1].length;\n            result.holes.push(holeIndex);\n        }\n    }\n    return result;\n};\n\n\n/***/ }),\n\n/***/ \"./node_modules/ieee754/index.js\":\n/*!***************************************!*\\\n  !*** ./node_modules/ieee754/index.js ***!\n  \\***************************************/\n/*! no static exports found */\n/***/ (function(module, exports) {\n\nexports.read = function (buffer, offset, isLE, mLen, nBytes) {\n  var e, m\n  var eLen = (nBytes * 8) - mLen - 1\n  var eMax = (1 << eLen) - 1\n  var eBias = eMax >> 1\n  var nBits = -7\n  var i = isLE ? (nBytes - 1) : 0\n  var d = isLE ? -1 : 1\n  var s = buffer[offset + i]\n\n  i += d\n\n  e = s & ((1 << (-nBits)) - 1)\n  s >>= (-nBits)\n  nBits += eLen\n  for (; nBits > 0; e = (e * 256) + buffer[offset + i], i += d, nBits -= 8) {}\n\n  m = e & ((1 << (-nBits)) - 1)\n  e >>= (-nBits)\n  nBits += mLen\n  for (; nBits > 0; m = (m * 256) + buffer[offset + i], i += d, nBits -= 8) {}\n\n  if (e === 0) {\n    e = 1 - eBias\n  } else if (e === eMax) {\n    return m ? NaN : ((s ? -1 : 1) * Infinity)\n  } else {\n    m = m + Math.pow(2, mLen)\n    e = e - eBias\n  }\n  return (s ? -1 : 1) * m * Math.pow(2, e - mLen)\n}\n\nexports.write = function (buffer, value, offset, isLE, mLen, nBytes) {\n  var e, m, c\n  var eLen = (nBytes * 8) - mLen - 1\n  var eMax = (1 << eLen) - 1\n  var eBias = eMax >> 1\n  var rt = (mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0)\n  var i = isLE ? 0 : (nBytes - 1)\n  var d = isLE ? 1 : -1\n  var s = value < 0 || (value === 0 && 1 / value < 0) ? 1 : 0\n\n  value = Math.abs(value)\n\n  if (isNaN(value) || value === Infinity) {\n    m = isNaN(value) ? 1 : 0\n    e = eMax\n  } else {\n    e = Math.floor(Math.log(value) / Math.LN2)\n    if (value * (c = Math.pow(2, -e)) < 1) {\n      e--\n      c *= 2\n    }\n    if (e + eBias >= 1) {\n      value += rt / c\n    } else {\n      value += rt * Math.pow(2, 1 - eBias)\n    }\n    if (value * c >= 2) {\n      e++\n      c /= 2\n    }\n\n    if (e + eBias >= eMax) {\n      m = 0\n      e = eMax\n    } else if (e + eBias >= 1) {\n      m = ((value * c) - 1) * Math.pow(2, mLen)\n      e = e + eBias\n    } else {\n      m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen)\n      e = 0\n    }\n  }\n\n  for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) {}\n\n  e = (e << mLen) | m\n  eLen += mLen\n  for (; eLen > 0; buffer[offset + i] = e & 0xff, i += d, e /= 256, eLen -= 8) {}\n\n  buffer[offset + i - d] |= s * 128\n}\n\n\n/***/ }),\n\n/***/ \"./node_modules/pbf/index.js\":\n/*!***********************************!*\\\n  !*** ./node_modules/pbf/index.js ***!\n  \\***********************************/\n/*! no static exports found */\n/***/ (function(module, exports, __webpack_require__) {\n\n\"use strict\";\n\n\nmodule.exports = Pbf;\n\nvar ieee754 = __webpack_require__(/*! ieee754 */ \"./node_modules/ieee754/index.js\");\n\nfunction Pbf(buf) {\n    this.buf = ArrayBuffer.isView && ArrayBuffer.isView(buf) ? buf : new Uint8Array(buf || 0);\n    this.pos = 0;\n    this.type = 0;\n    this.length = this.buf.length;\n}\n\nPbf.Varint  = 0; // varint: int32, int64, uint32, uint64, sint32, sint64, bool, enum\nPbf.Fixed64 = 1; // 64-bit: double, fixed64, sfixed64\nPbf.Bytes   = 2; // length-delimited: string, bytes, embedded messages, packed repeated fields\nPbf.Fixed32 = 5; // 32-bit: float, fixed32, sfixed32\n\nvar SHIFT_LEFT_32 = (1 << 16) * (1 << 16),\n    SHIFT_RIGHT_32 = 1 / SHIFT_LEFT_32;\n\nPbf.prototype = {\n\n    destroy: function() {\n        this.buf = null;\n    },\n\n    // === READING =================================================================\n\n    readFields: function(readField, result, end) {\n        end = end || this.length;\n\n        while (this.pos < end) {\n            var val = this.readVarint(),\n                tag = val >> 3,\n                startPos = this.pos;\n\n            this.type = val & 0x7;\n            readField(tag, result, this);\n\n            if (this.pos === startPos) this.skip(val);\n        }\n        return result;\n    },\n\n    readMessage: function(readField, result) {\n        return this.readFields(readField, result, this.readVarint() + this.pos);\n    },\n\n    readFixed32: function() {\n        var val = readUInt32(this.buf, this.pos);\n        this.pos += 4;\n        return val;\n    },\n\n    readSFixed32: function() {\n        var val = readInt32(this.buf, this.pos);\n        this.pos += 4;\n        return val;\n    },\n\n    // 64-bit int handling is based on github.com/dpw/node-buffer-more-ints (MIT-licensed)\n\n    readFixed64: function() {\n        var val = readUInt32(this.buf, this.pos) + readUInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;\n        this.pos += 8;\n        return val;\n    },\n\n    readSFixed64: function() {\n        var val = readUInt32(this.buf, this.pos) + readInt32(this.buf, this.pos + 4) * SHIFT_LEFT_32;\n        this.pos += 8;\n        return val;\n    },\n\n    readFloat: function() {\n        var val = ieee754.read(this.buf, this.pos, true, 23, 4);\n        this.pos += 4;\n        return val;\n    },\n\n    readDouble: function() {\n        var val = ieee754.read(this.buf, this.pos, true, 52, 8);\n        this.pos += 8;\n        return val;\n    },\n\n    readVarint: function(isSigned) {\n        var buf = this.buf,\n            val, b;\n\n        b = buf[this.pos++]; val  =  b & 0x7f;        if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 7;  if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 14; if (b < 0x80) return val;\n        b = buf[this.pos++]; val |= (b & 0x7f) << 21; if (b < 0x80) return val;\n        b = buf[this.pos];   val |= (b & 0x0f) << 28;\n\n        return readVarintRemainder(val, isSigned, this);\n    },\n\n    readVarint64: function() { // for compatibility with v2.0.1\n        return this.readVarint(true);\n    },\n\n    readSVarint: function() {\n        var num = this.readVarint();\n        return num % 2 === 1 ? (num + 1) / -2 : num / 2; // zigzag encoding\n    },\n\n    readBoolean: function() {\n        return Boolean(this.readVarint());\n    },\n\n    readString: function() {\n        var end = this.readVarint() + this.pos,\n            str = readUtf8(this.buf, this.pos, end);\n        this.pos = end;\n        return str;\n    },\n\n    readBytes: function() {\n        var end = this.readVarint() + this.pos,\n            buffer = this.buf.subarray(this.pos, end);\n        this.pos = end;\n        return buffer;\n    },\n\n    // verbose for performance reasons; doesn't affect gzipped size\n\n    readPackedVarint: function(arr, isSigned) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readVarint(isSigned));\n        return arr;\n    },\n    readPackedSVarint: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSVarint());\n        return arr;\n    },\n    readPackedBoolean: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readBoolean());\n        return arr;\n    },\n    readPackedFloat: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFloat());\n        return arr;\n    },\n    readPackedDouble: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readDouble());\n        return arr;\n    },\n    readPackedFixed32: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFixed32());\n        return arr;\n    },\n    readPackedSFixed32: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSFixed32());\n        return arr;\n    },\n    readPackedFixed64: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readFixed64());\n        return arr;\n    },\n    readPackedSFixed64: function(arr) {\n        var end = readPackedEnd(this);\n        arr = arr || [];\n        while (this.pos < end) arr.push(this.readSFixed64());\n        return arr;\n    },\n\n    skip: function(val) {\n        var type = val & 0x7;\n        if (type === Pbf.Varint) while (this.buf[this.pos++] > 0x7f) {}\n        else if (type === Pbf.Bytes) this.pos = this.readVarint() + this.pos;\n        else if (type === Pbf.Fixed32) this.pos += 4;\n        else if (type === Pbf.Fixed64) this.pos += 8;\n        else throw new Error('Unimplemented type: ' + type);\n    },\n\n    // === WRITING =================================================================\n\n    writeTag: function(tag, type) {\n        this.writeVarint((tag << 3) | type);\n    },\n\n    realloc: function(min) {\n        var length = this.length || 16;\n\n        while (length < this.pos + min) length *= 2;\n\n        if (length !== this.length) {\n            var buf = new Uint8Array(length);\n            buf.set(this.buf);\n            this.buf = buf;\n            this.length = length;\n        }\n    },\n\n    finish: function() {\n        this.length = this.pos;\n        this.pos = 0;\n        return this.buf.subarray(0, this.length);\n    },\n\n    writeFixed32: function(val) {\n        this.realloc(4);\n        writeInt32(this.buf, val, this.pos);\n        this.pos += 4;\n    },\n\n    writeSFixed32: function(val) {\n        this.realloc(4);\n        writeInt32(this.buf, val, this.pos);\n        this.pos += 4;\n    },\n\n    writeFixed64: function(val) {\n        this.realloc(8);\n        writeInt32(this.buf, val & -1, this.pos);\n        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);\n        this.pos += 8;\n    },\n\n    writeSFixed64: function(val) {\n        this.realloc(8);\n        writeInt32(this.buf, val & -1, this.pos);\n        writeInt32(this.buf, Math.floor(val * SHIFT_RIGHT_32), this.pos + 4);\n        this.pos += 8;\n    },\n\n    writeVarint: function(val) {\n        val = +val || 0;\n\n        if (val > 0xfffffff || val < 0) {\n            writeBigVarint(val, this);\n            return;\n        }\n\n        this.realloc(4);\n\n        this.buf[this.pos++] =           val & 0x7f  | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] = ((val >>>= 7) & 0x7f) | (val > 0x7f ? 0x80 : 0); if (val <= 0x7f) return;\n        this.buf[this.pos++] =   (val >>> 7) & 0x7f;\n    },\n\n    writeSVarint: function(val) {\n        this.writeVarint(val < 0 ? -val * 2 - 1 : val * 2);\n    },\n\n    writeBoolean: function(val) {\n        this.writeVarint(Boolean(val));\n    },\n\n    writeString: function(str) {\n        str = String(str);\n        this.realloc(str.length * 4);\n\n        this.pos++; // reserve 1 byte for short string length\n\n        var startPos = this.pos;\n        // write the string directly to the buffer and see how much was written\n        this.pos = writeUtf8(this.buf, str, this.pos);\n        var len = this.pos - startPos;\n\n        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);\n\n        // finally, write the message length in the reserved place and restore the position\n        this.pos = startPos - 1;\n        this.writeVarint(len);\n        this.pos += len;\n    },\n\n    writeFloat: function(val) {\n        this.realloc(4);\n        ieee754.write(this.buf, val, this.pos, true, 23, 4);\n        this.pos += 4;\n    },\n\n    writeDouble: function(val) {\n        this.realloc(8);\n        ieee754.write(this.buf, val, this.pos, true, 52, 8);\n        this.pos += 8;\n    },\n\n    writeBytes: function(buffer) {\n        var len = buffer.length;\n        this.writeVarint(len);\n        this.realloc(len);\n        for (var i = 0; i < len; i++) this.buf[this.pos++] = buffer[i];\n    },\n\n    writeRawMessage: function(fn, obj) {\n        this.pos++; // reserve 1 byte for short message length\n\n        // write the message directly to the buffer and see how much was written\n        var startPos = this.pos;\n        fn(obj, this);\n        var len = this.pos - startPos;\n\n        if (len >= 0x80) makeRoomForExtraLength(startPos, len, this);\n\n        // finally, write the message length in the reserved place and restore the position\n        this.pos = startPos - 1;\n        this.writeVarint(len);\n        this.pos += len;\n    },\n\n    writeMessage: function(tag, fn, obj) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeRawMessage(fn, obj);\n    },\n\n    writePackedVarint:   function(tag, arr) { this.writeMessage(tag, writePackedVarint, arr);   },\n    writePackedSVarint:  function(tag, arr) { this.writeMessage(tag, writePackedSVarint, arr);  },\n    writePackedBoolean:  function(tag, arr) { this.writeMessage(tag, writePackedBoolean, arr);  },\n    writePackedFloat:    function(tag, arr) { this.writeMessage(tag, writePackedFloat, arr);    },\n    writePackedDouble:   function(tag, arr) { this.writeMessage(tag, writePackedDouble, arr);   },\n    writePackedFixed32:  function(tag, arr) { this.writeMessage(tag, writePackedFixed32, arr);  },\n    writePackedSFixed32: function(tag, arr) { this.writeMessage(tag, writePackedSFixed32, arr); },\n    writePackedFixed64:  function(tag, arr) { this.writeMessage(tag, writePackedFixed64, arr);  },\n    writePackedSFixed64: function(tag, arr) { this.writeMessage(tag, writePackedSFixed64, arr); },\n\n    writeBytesField: function(tag, buffer) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeBytes(buffer);\n    },\n    writeFixed32Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeFixed32(val);\n    },\n    writeSFixed32Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeSFixed32(val);\n    },\n    writeFixed64Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeFixed64(val);\n    },\n    writeSFixed64Field: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeSFixed64(val);\n    },\n    writeVarintField: function(tag, val) {\n        this.writeTag(tag, Pbf.Varint);\n        this.writeVarint(val);\n    },\n    writeSVarintField: function(tag, val) {\n        this.writeTag(tag, Pbf.Varint);\n        this.writeSVarint(val);\n    },\n    writeStringField: function(tag, str) {\n        this.writeTag(tag, Pbf.Bytes);\n        this.writeString(str);\n    },\n    writeFloatField: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed32);\n        this.writeFloat(val);\n    },\n    writeDoubleField: function(tag, val) {\n        this.writeTag(tag, Pbf.Fixed64);\n        this.writeDouble(val);\n    },\n    writeBooleanField: function(tag, val) {\n        this.writeVarintField(tag, Boolean(val));\n    }\n};\n\nfunction readVarintRemainder(l, s, p) {\n    var buf = p.buf,\n        h, b;\n\n    b = buf[p.pos++]; h  = (b & 0x70) >> 4;  if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 3;  if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 10; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 17; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x7f) << 24; if (b < 0x80) return toNum(l, h, s);\n    b = buf[p.pos++]; h |= (b & 0x01) << 31; if (b < 0x80) return toNum(l, h, s);\n\n    throw new Error('Expected varint not more than 10 bytes');\n}\n\nfunction readPackedEnd(pbf) {\n    return pbf.type === Pbf.Bytes ?\n        pbf.readVarint() + pbf.pos : pbf.pos + 1;\n}\n\nfunction toNum(low, high, isSigned) {\n    if (isSigned) {\n        return high * 0x100000000 + (low >>> 0);\n    }\n\n    return ((high >>> 0) * 0x100000000) + (low >>> 0);\n}\n\nfunction writeBigVarint(val, pbf) {\n    var low, high;\n\n    if (val >= 0) {\n        low  = (val % 0x100000000) | 0;\n        high = (val / 0x100000000) | 0;\n    } else {\n        low  = ~(-val % 0x100000000);\n        high = ~(-val / 0x100000000);\n\n        if (low ^ 0xffffffff) {\n            low = (low + 1) | 0;\n        } else {\n            low = 0;\n            high = (high + 1) | 0;\n        }\n    }\n\n    if (val >= 0x10000000000000000 || val < -0x10000000000000000) {\n        throw new Error('Given varint doesn\\'t fit into 10 bytes');\n    }\n\n    pbf.realloc(10);\n\n    writeBigVarintLow(low, high, pbf);\n    writeBigVarintHigh(high, pbf);\n}\n\nfunction writeBigVarintLow(low, high, pbf) {\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos++] = low & 0x7f | 0x80; low >>>= 7;\n    pbf.buf[pbf.pos]   = low & 0x7f;\n}\n\nfunction writeBigVarintHigh(high, pbf) {\n    var lsb = (high & 0x07) << 4;\n\n    pbf.buf[pbf.pos++] |= lsb         | ((high >>>= 3) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f | ((high >>>= 7) ? 0x80 : 0); if (!high) return;\n    pbf.buf[pbf.pos++]  = high & 0x7f;\n}\n\nfunction makeRoomForExtraLength(startPos, len, pbf) {\n    var extraLen =\n        len <= 0x3fff ? 1 :\n        len <= 0x1fffff ? 2 :\n        len <= 0xfffffff ? 3 : Math.ceil(Math.log(len) / (Math.LN2 * 7));\n\n    // if 1 byte isn't enough for encoding message length, shift the data to the right\n    pbf.realloc(extraLen);\n    for (var i = pbf.pos - 1; i >= startPos; i--) pbf.buf[i + extraLen] = pbf.buf[i];\n}\n\nfunction writePackedVarint(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeVarint(arr[i]);   }\nfunction writePackedSVarint(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeSVarint(arr[i]);  }\nfunction writePackedFloat(arr, pbf)    { for (var i = 0; i < arr.length; i++) pbf.writeFloat(arr[i]);    }\nfunction writePackedDouble(arr, pbf)   { for (var i = 0; i < arr.length; i++) pbf.writeDouble(arr[i]);   }\nfunction writePackedBoolean(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeBoolean(arr[i]);  }\nfunction writePackedFixed32(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed32(arr[i]);  }\nfunction writePackedSFixed32(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed32(arr[i]); }\nfunction writePackedFixed64(arr, pbf)  { for (var i = 0; i < arr.length; i++) pbf.writeFixed64(arr[i]);  }\nfunction writePackedSFixed64(arr, pbf) { for (var i = 0; i < arr.length; i++) pbf.writeSFixed64(arr[i]); }\n\n// Buffer code below from https://github.com/feross/buffer, MIT-licensed\n\nfunction readUInt32(buf, pos) {\n    return ((buf[pos]) |\n        (buf[pos + 1] << 8) |\n        (buf[pos + 2] << 16)) +\n        (buf[pos + 3] * 0x1000000);\n}\n\nfunction writeInt32(buf, val, pos) {\n    buf[pos] = val;\n    buf[pos + 1] = (val >>> 8);\n    buf[pos + 2] = (val >>> 16);\n    buf[pos + 3] = (val >>> 24);\n}\n\nfunction readInt32(buf, pos) {\n    return ((buf[pos]) |\n        (buf[pos + 1] << 8) |\n        (buf[pos + 2] << 16)) +\n        (buf[pos + 3] << 24);\n}\n\nfunction readUtf8(buf, pos, end) {\n    var str = '';\n    var i = pos;\n\n    while (i < end) {\n        var b0 = buf[i];\n        var c = null; // codepoint\n        var bytesPerSequence =\n            b0 > 0xEF ? 4 :\n            b0 > 0xDF ? 3 :\n            b0 > 0xBF ? 2 : 1;\n\n        if (i + bytesPerSequence > end) break;\n\n        var b1, b2, b3;\n\n        if (bytesPerSequence === 1) {\n            if (b0 < 0x80) {\n                c = b0;\n            }\n        } else if (bytesPerSequence === 2) {\n            b1 = buf[i + 1];\n            if ((b1 & 0xC0) === 0x80) {\n                c = (b0 & 0x1F) << 0x6 | (b1 & 0x3F);\n                if (c <= 0x7F) {\n                    c = null;\n                }\n            }\n        } else if (bytesPerSequence === 3) {\n            b1 = buf[i + 1];\n            b2 = buf[i + 2];\n            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80) {\n                c = (b0 & 0xF) << 0xC | (b1 & 0x3F) << 0x6 | (b2 & 0x3F);\n                if (c <= 0x7FF || (c >= 0xD800 && c <= 0xDFFF)) {\n                    c = null;\n                }\n            }\n        } else if (bytesPerSequence === 4) {\n            b1 = buf[i + 1];\n            b2 = buf[i + 2];\n            b3 = buf[i + 3];\n            if ((b1 & 0xC0) === 0x80 && (b2 & 0xC0) === 0x80 && (b3 & 0xC0) === 0x80) {\n                c = (b0 & 0xF) << 0x12 | (b1 & 0x3F) << 0xC | (b2 & 0x3F) << 0x6 | (b3 & 0x3F);\n                if (c <= 0xFFFF || c >= 0x110000) {\n                    c = null;\n                }\n            }\n        }\n\n        if (c === null) {\n            c = 0xFFFD;\n            bytesPerSequence = 1;\n\n        } else if (c > 0xFFFF) {\n            c -= 0x10000;\n            str += String.fromCharCode(c >>> 10 & 0x3FF | 0xD800);\n            c = 0xDC00 | c & 0x3FF;\n        }\n\n        str += String.fromCharCode(c);\n        i += bytesPerSequence;\n    }\n\n    return str;\n}\n\nfunction writeUtf8(buf, str, pos) {\n    for (var i = 0, c, lead; i < str.length; i++) {\n        c = str.charCodeAt(i); // code point\n\n        if (c > 0xD7FF && c < 0xE000) {\n            if (lead) {\n                if (c < 0xDC00) {\n                    buf[pos++] = 0xEF;\n                    buf[pos++] = 0xBF;\n                    buf[pos++] = 0xBD;\n                    lead = c;\n                    continue;\n                } else {\n                    c = lead - 0xD800 << 10 | c - 0xDC00 | 0x10000;\n                    lead = null;\n                }\n            } else {\n                if (c > 0xDBFF || (i + 1 === str.length)) {\n                    buf[pos++] = 0xEF;\n                    buf[pos++] = 0xBF;\n                    buf[pos++] = 0xBD;\n                } else {\n                    lead = c;\n                }\n                continue;\n            }\n        } else if (lead) {\n            buf[pos++] = 0xEF;\n            buf[pos++] = 0xBF;\n            buf[pos++] = 0xBD;\n            lead = null;\n        }\n\n        if (c < 0x80) {\n            buf[pos++] = c;\n        } else {\n            if (c < 0x800) {\n                buf[pos++] = c >> 0x6 | 0xC0;\n            } else {\n                if (c < 0x10000) {\n                    buf[pos++] = c >> 0xC | 0xE0;\n                } else {\n                    buf[pos++] = c >> 0x12 | 0xF0;\n                    buf[pos++] = c >> 0xC & 0x3F | 0x80;\n                }\n                buf[pos++] = c >> 0x6 & 0x3F | 0x80;\n            }\n            buf[pos++] = c & 0x3F | 0x80;\n        }\n    }\n    return pos;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/WindshaftWorker.js\":\n/*!***************************************!*\\\n  !*** ./src/client/WindshaftWorker.js ***!\n  \\***************************************/\n/*! exports provided: WindshaftWorker */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"WindshaftWorker\", function() { return WindshaftWorker; });\n/* harmony import */ var _sources_MVTWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../sources/MVTWorker */ \"./src/sources/MVTWorker.js\");\n/* harmony import */ var _renderer_schema__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../renderer/schema */ \"./src/renderer/schema.js\");\n/* harmony import */ var _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../errors/carto-maps-api-error */ \"./src/errors/carto-maps-api-error.js\");\n\n\n\n\nclass WindshaftWorker extends _sources_MVTWorker__WEBPACK_IMPORTED_MODULE_0__[\"MVTWorker\"] {\n    decodeProperty (metadata, propertyName, propertyValue) {\n        const basename = _renderer_schema__WEBPACK_IMPORTED_MODULE_1__[\"default\"].column.getBase(propertyName);\n        const column = metadata.properties[basename];\n        if (!column) {\n            return;\n        }\n        switch (column.type) {\n            case 'date':\n                return decodeDate(column, propertyValue);\n            case 'category':\n                return metadata.categorizeString(basename, propertyValue);\n            case 'number':\n                return propertyValue;\n            default:\n                throw new _errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_2__[\"default\"](\n                    `${_errors_carto_maps_api_error__WEBPACK_IMPORTED_MODULE_2__[\"CartoMapsAPITypes\"].NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`\n                );\n        }\n    }\n}\n\nfunction decodeDate (column, propertyValue) {\n    const d = new Date();\n    d.setTime(1000 * propertyValue);\n    const { min, max } = column;\n    const n = (d - min) / (max.getTime() - min.getTime());\n    return n;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/mvt/feature-decoder.js\":\n/*!*******************************************!*\\\n  !*** ./src/client/mvt/feature-decoder.js ***!\n  \\*******************************************/\n/*! exports provided: Polygon, decodeLines, decodePolygons, signedPolygonArea, clipPolygon */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"Polygon\", function() { return Polygon; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeLines\", function() { return decodeLines; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePolygons\", function() { return decodePolygons; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"signedPolygonArea\", function() { return signedPolygonArea; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"clipPolygon\", function() { return clipPolygon; });\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/geometry */ \"./src/utils/geometry.js\");\n\nclass Polygon {\n    constructor () {\n        this.flat = [];\n        this.holes = [];\n        this.clipped = [];\n        this.clippedType = []; // Store a bitmask of the clipped half-planes\n    }\n}\n\nfunction decodeLines (geometries, mvtExtent) {\n    let decodedGeometries = [];\n    geometries.map(l => {\n        let line = [];\n        l.map(point => {\n            line.push([2 * point.x / mvtExtent - 1, 2 * (1 - point.y / mvtExtent) - 1]);\n        });\n        decodedGeometries.push(...clipLine(line));\n    });\n    return decodedGeometries;\n}\n\n/*\n    All this clockwise non-sense is needed because the MVT decoder dont decode the MVT fully.\n    It doesn't distinguish between internal polygon rings (which defines holes) or external ones, which defines more polygons (mulipolygons)\n    See:\n        https://github.com/mapbox/vector-tile-spec/tree/master/2.1\n        https://en.wikipedia.org/wiki/Shoelace_formula\n*/\nfunction decodePolygons (geometries, mvtExtent) {\n    let currentPolygon = null;\n    let decoded = [];\n    let invertedOrientation;\n    geometries.forEach(geom => {\n        let area = signedPolygonArea(geom);\n        if (area === 0) {\n            return;\n        }\n        if (invertedOrientation === undefined) {\n            // According to the MVT spec this condition cannot happen for\n            // MVT spec compliant tiles, but many buggy implementations\n            // don't comply with this rule when generating tiles\n            // Also, other implementations accept this out-of-the-spec condition\n            invertedOrientation = area > 0;\n        }\n        const isExternalPolygon = invertedOrientation ? area > 0 : area < 0;\n\n        const preClippedVertices = _getPreClippedVertices(geom, mvtExtent);\n\n        if (isExternalPolygon) {\n            if (currentPolygon) {\n                decoded.push(currentPolygon);\n            }\n\n            currentPolygon = new Polygon();\n        }\n\n        currentPolygon = clipPolygon(preClippedVertices, currentPolygon, !isExternalPolygon);\n    });\n\n    if (currentPolygon) {\n        decoded.push(currentPolygon);\n    }\n\n    return decoded;\n}\n\nfunction signedPolygonArea (vertices) {\n    // https://en.wikipedia.org/wiki/Shoelace_formula\n    let a = 0;\n    for (let i = 0; i < vertices.length; i++) {\n        let j = (i + 1) % vertices.length;\n        a += vertices[i].x * vertices[j].y;\n        a -= vertices[j].x * vertices[i].y;\n    }\n    return a / 2;\n}\n\nconst CLIPMAX = 1;\nconst CLIPMIN = -CLIPMAX;\n\nconst clippingEdges = [\n    {\n        // Right edge; x <= CLIPMAX for points inside\n        inside: p => p[0] <= CLIPMAX,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [CLIPMAX, -100], [CLIPMAX, 100])\n    },\n    {\n        // Top edge; y <= CLIPMAX for points inside\n        inside: p => p[1] <= CLIPMAX,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [-100, CLIPMAX], [100, CLIPMAX])\n    },\n    {\n        // Left edge; x >= CLIPMIN for points inside\n        inside: p => p[0] >= CLIPMIN,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [CLIPMIN, -100], [CLIPMIN, 100])\n    },\n    {\n        // Bottom edge; y >= CLIPMIN for points inside\n        inside: p => p[1] >= CLIPMIN,\n        intersect: (a, b) => _utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"default\"].intersect(a, b, [-100, CLIPMIN], [100, CLIPMIN])\n    }\n];\nconst numberOfEdges = clippingEdges.length;\n\nfunction clipPolygon (preClippedVertices, polygon, isHole) {\n    // Sutherland-Hodgman Algorithm to clip polygons to the tile\n    // https://www.cs.drexel.edu/~david/Classes/CS430/Lectures/L-05_Polygons.6.pdf\n\n    let clippedTypes = {};\n\n    // for each clipping edge\n    for (let i = 0; i < numberOfEdges; i++) {\n        const preClippedVertices2 = [];\n        const clippedTypes2 = {};\n\n        const setClippedType = (vertexIndex, oldVertexIndex, edge = -1) => {\n            let clippedType = 0;\n            if (oldVertexIndex >= 0) {\n                clippedType = clippedTypes[oldVertexIndex] || 0;\n            }\n            if (edge >= 0) {\n                clippedType = clippedType | (1 << edge);\n            }\n            if (clippedType) {\n                clippedTypes2[vertexIndex] = clippedType;\n            }\n        };\n\n        // for each edge on polygon\n        for (let k = 0; k < preClippedVertices.length - 1; k++) {\n            // clip polygon edge\n            const a = preClippedVertices[k];\n            const b = preClippedVertices[k + 1];\n\n            const insideA = clippingEdges[i].inside(a);\n            const insideB = clippingEdges[i].inside(b);\n\n            if (insideA && insideB) {\n                // case 1: both inside, push B vertex\n                setClippedType(preClippedVertices2.length, k + 1);\n                preClippedVertices2.push(b);\n            } else if (insideA) {\n                // case 2: just B outside, push intersection\n                const intersectionPoint = clippingEdges[i].intersect(a, b);\n                setClippedType(preClippedVertices2.length, k + 1, i);\n                preClippedVertices2.push(intersectionPoint);\n            } else if (insideB) {\n                // case 4: just A outside: push intersection, push B\n                const intersectionPoint = clippingEdges[i].intersect(a, b);\n                setClippedType(preClippedVertices2.length, k, i);\n                preClippedVertices2.push(intersectionPoint);\n                setClippedType(preClippedVertices2.length, k + 1);\n                preClippedVertices2.push(b);\n            } else {\n                // case 3: both outside: do nothing\n            }\n        }\n        if (preClippedVertices2.length) {\n            if (clippedTypes2[0]) {\n                clippedTypes2[preClippedVertices2.length] = clippedTypes2[0];\n            }\n            preClippedVertices2.push(preClippedVertices2[0]);\n        }\n        preClippedVertices = preClippedVertices2;\n        clippedTypes = clippedTypes2;\n    }\n\n    // rings with less than 3 vertices are degenerate\n    const MIN_VALID_NUM_VERTICES = 3;\n\n    // preClippedVertices is closed by repeating the first vertex\n    if (preClippedVertices.length >= MIN_VALID_NUM_VERTICES + 1) {\n        if (isHole) {\n            polygon.holes.push(polygon.flat.length / 2);\n        }\n        preClippedVertices.forEach(v => {\n            polygon.flat.push(v[0], v[1]);\n        });\n        Object.keys(clippedTypes).forEach(i => {\n            polygon.clipped.push(Number(i) * 2);\n            polygon.clippedType.push(clippedTypes[i]);\n        });\n    }\n\n    return polygon;\n}\n\nfunction _getPreClippedVertices (geom, mvtExtent) {\n    return geom.map((coord) => {\n        let x = coord.x;\n        let y = coord.y;\n\n        x = 2 * x / mvtExtent - 1;\n        y = 2 * (1 - y / mvtExtent) - 1;\n\n        return [x, y];\n    });\n}\n\nfunction clipLine (line) {\n    // linestring clipping based on the Cohen-Sutherland algorithm\n    // input is a single linestring [point0, point1, ...]\n    // output is an array of flat linestrings:\n    // [[p0x, p0y, p1x, p1y, ...], ...]\n    let clippedLine = [];\n    const clippedLines = [];\n    function clipType (point) {\n        let type = 0;\n        for (let i = 0; i < numberOfEdges; i++) {\n            type = type | (clippingEdges[i].inside(point) ? 0 : (1 << i));\n        }\n        return type;\n    }\n    function intersect (point1, point2, type) {\n        for (let i = 0; i < numberOfEdges; i++) {\n            const mask = 1 << i;\n            if (type & mask) {\n                const p = clippingEdges[i].intersect(point1, point2);\n                type = clipType(p) & ~mask;\n                return [p, type];\n            }\n        }\n    }\n    let point0 = line[0];\n    let type0 = clipType(point0);\n    for (let i = 1; i < line.length; ++i) {\n        let point1 = line[i];\n        let type1 = clipType(point1);\n        const nextType = type1;\n        const nextPoint = point1;\n\n        for (; ;) {\n            if (!(type0 | type1)) {\n                // both points inside\n                clippedLine.push(...point0);\n                if (type1 !== nextType) {\n                    clippedLine.push(...point1);\n                    if (i < line.length - 1) {\n                        // break line\n                        clippedLines.push(clippedLine);\n                        clippedLine = [];\n                    }\n                } else if (i === line.length - 1) {\n                    clippedLine.push(...point1);\n                }\n                break;\n            } else if (type0 & type1) {\n                // both points outside\n                break;\n            } else if (type0) {\n                // only point1 inside\n                [point0, type0] = intersect(point0, point1, type0);\n            } else {\n                // only point0 inside\n                [point1, type1] = intersect(point0, point1, type1);\n            }\n        }\n\n        point0 = nextPoint;\n        type0 = nextType;\n    }\n\n    clippedLine = _removeDuplicatedVerticesOnLine(clippedLine);\n    if (clippedLine.length > 0) {\n        clippedLines.push(clippedLine);\n    }\n\n    return clippedLines;\n}\n\nfunction _removeDuplicatedVerticesOnLine (line) {\n    const result = [];\n    let prevX;\n    let prevY;\n    for (let i = 0; i < line.length; i += 2) {\n        const x = line[i];\n        const y = line[i + 1];\n        if (x !== prevX || y !== prevY) {\n            result.push(x, y);\n            prevX = x;\n            prevY = y;\n        }\n    }\n    return result;\n}\n\n\n/***/ }),\n\n/***/ \"./src/client/rsys.js\":\n/*!****************************!*\\\n  !*** ./src/client/rsys.js ***!\n  \\****************************/\n/*! exports provided: wToR, rTiles, getRsysFromTile, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"wToR\", function() { return wToR; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"rTiles\", function() { return rTiles; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getRsysFromTile\", function() { return getRsysFromTile; });\n/**\n * An RSys defines a local coordinate system that maps the coordinates\n * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle\n * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)\n * It is the combination of a translation and anisotropic scaling.\n * @typedef {object} RSys - Renderer relative coordinate system\n * @property {RPoint} center - Position of the local system in external coordinates\n * @property {number} scale - Y-scale (local Y-distance / external Y-distance)\n*/\n\n/*\n * Random notes\n *\n * We can redefine Dataframe to use a Rsys instead of center, scale\n * and we can use an Rsys for the Renderer's canvas.\n *\n * Some interesting World coordinate systems:\n *\n * WM (Webmercator): represents a part of the world (excluding polar regions)\n * with coordinates in the range +/-WM_R for both X and Y. (positive orientation: E,N)\n *\n * NWMC (Normalized Webmercator Coordinates): represents the Webmercator *square*\n * with coordinates in the range +/-1. Results from dividing Webmercator coordinates\n * by WM_R. (positive orientation: E,N)\n *\n * TC (Tile coordinates): integers in [0, 2^Z) for zoom level Z. Example: the tile 0/0/0 (zoom, x, y) is the root tile.\n * (positive orientation: E,S)\n *\n * An RSys's rectangle (its bounds) is the area covered by the local coordinates in\n * the range +/-1.\n *\n * When an RSys external coordinate system is WM or NWMC, we can compute:\n * * Minimum zoom level for which tiles are no larger than the RSys rectangle:\n *   Math.ceil(Math.log2(1 / r.scale));\n * * Maximum zoom level for which tiles are no smaller than the rectangle:\n *   Math.floor(Math.log2(1 / r.scale));\n * (note that 1 / r.scale is the fraction of the World height that the local rectangle's height represents)\n *\n * We'll use the term World coordinates below for the *external* reference system\n * of an RSys (usually NWMC).\n */\n\n/* eslint no-unused-vars: [\"off\"] */\n\n/**\n * R coordinates to World\n * @param {RSys} r - ref. of the passed coordinates\n * @param {number} x - x coordinate in r\n * @param {number} y - y coordinate in r\n * @return {RPoint} World coordinates\n */\nfunction rToW (r, x, y) {\n    return { x: x * r.scale + r.center.x, y: y * r.scale + r.center.y };\n}\n\n/**\n * World coordinates to local RSys\n * @param {number} x - x W-coordinate\n * @param {number} y - y W-coordinate\n * @param {RSys} r - target ref. system\n * @return {RPoint} R coordinates\n */\nfunction wToR (x, y, r) {\n    return { x: (x - r.center.x) / r.scale, y: (y - r.center.y) / r.scale };\n}\n\n/**\n * RSys of a tile (mapping local tile coordinates in +/-1 to NWMC)\n * @param {number} x - TC x coordinate\n * @param {number} y - TC y coordinate\n * @param {number} z - Tile zoom level\n * @return {RSys}\n */\nfunction tileRsys (x, y, z) {\n    let max = Math.pow(2, z);\n    return { scale: 1 / max, center: { x: 2 * (x + 0.5) / max - 1, y: 1 - 2 * (y + 0.5) / max } };\n}\n\n/**\n * TC tiles that intersect the local rectangle of an RSys\n * (with the largest tile size no larger than the rectangle)\n * @param {RSys} rsys\n * @return {Array} - array of TC tiles {x, y, z}\n */\nfunction rTiles (zoom, bounds, viewportZoomToSourceZoom = Math.ceil) {\n    return wRectangleTiles(viewportZoomToSourceZoom(zoom), bounds);\n}\n\n/**\n * TC tiles of a given zoom level that intersect a W rectangle\n * @param {number} z\n * @param {Array} - rectangle extents [minx, miny, maxx, maxy]\n * @return {Array} - array of TC tiles {x, y, z}\n */\nfunction wRectangleTiles (z, wr) {\n    const [wMinx, wMiny, wMaxx, wMaxy] = wr;\n    const n = (1 << z); // for 0 <= z <= 30 equals Math.pow(2, z)\n\n    const clamp = x => Math.min(Math.max(x, 0), n - 1);\n    // compute tile coordinate ranges\n    const tMinx = clamp(Math.floor(n * (wMinx + 1) * 0.5));\n    const tMaxx = clamp(Math.ceil(n * (wMaxx + 1) * 0.5) - 1);\n    const tMiny = clamp(Math.floor(n * (1 - wMaxy) * 0.5));\n    const tMaxy = clamp(Math.ceil(n * (1 - wMiny) * 0.5) - 1);\n    let tiles = [];\n    for (let x = tMinx; x <= tMaxx; ++x) {\n        for (let y = tMiny; y <= tMaxy; ++y) {\n            tiles.push({ x: x, y: y, z: z });\n        }\n    }\n    return tiles;\n}\n\n/**\n * Get the Rsys of a tile where the Rsys's center is the tile center and the Rsys's scale is the tile extent.\n * @param {*} x\n * @param {*} y\n * @param {*} z\n * @returns {RSys}\n */\nfunction getRsysFromTile (x, y, z) {\n    return {\n        center: {\n            x: ((x + 0.5) / Math.pow(2, z)) * 2.0 - 1,\n            y: (1.0 - (y + 0.5) / Math.pow(2, z)) * 2.0 - 1.0\n        },\n        scale: 1 / Math.pow(2, z)\n    };\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({ rTiles, getRsysFromTile, wToR });\n\n\n/***/ }),\n\n/***/ \"./src/errors/carto-error.js\":\n/*!***********************************!*\\\n  !*** ./src/errors/carto-error.js ***!\n  \\***********************************/\n/*! exports provided: default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return CartoError; });\n/**\n * Represents an error in the carto library.\n *\n * @typedef {object} CartoError\n * @property {string} message - A short error description\n * @property {string} name - The name of the error \"CartoError\"\n * @property {object} originalError - An object containing the internal/original error\n *\n * @event CartoError\n * @api\n */\nclass CartoError extends Error {\n    /**\n     * Build a cartoError from a generic error.\n     * @constructor\n     *\n     * @return {CartoError} A well formed object representing the error.\n     */\n    constructor (error) {\n        if (!(error && error.message)) {\n            throw Error('Invalid CartoError, a message is mandatory');\n        }\n        super(error.message);\n        this.name = 'CartoError';\n        this.originalError = error;\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/errors/carto-maps-api-error.js\":\n/*!********************************************!*\\\n  !*** ./src/errors/carto-maps-api-error.js ***!\n  \\********************************************/\n/*! exports provided: default, CartoMapsAPITypes */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return CartoMapsAPIError; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CartoMapsAPITypes\", function() { return CartoMapsAPITypes; });\n/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ \"./src/errors/carto-error.js\");\n\n\n/**\n * Utility to build a cartoError related to MapsAPI errors.\n *\n * @return {CartoError} A well formed object representing the error.\n */\nclass CartoMapsAPIError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__[\"default\"] {\n    constructor (message) {\n        super({ message: message });\n        this.name = 'CartoMapsAPIError';\n    }\n}\n\nconst CartoMapsAPITypes = {\n    NOT_SUPPORTED: '[Not supported]:',\n    SECURITY: '[Security]:'\n};\n\n\n/***/ }),\n\n/***/ \"./src/errors/carto-runtime-error.js\":\n/*!*******************************************!*\\\n  !*** ./src/errors/carto-runtime-error.js ***!\n  \\*******************************************/\n/*! exports provided: default, CartoRuntimeTypes */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return CartoRuntimeError; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CartoRuntimeTypes\", function() { return CartoRuntimeTypes; });\n/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ \"./src/errors/carto-error.js\");\n\n\n/**\n * Utility to build a cartoError related to Runtime errors.\n *\n * @return {CartoError} A well formed object representing the error.\n */\nclass CartoRuntimeError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__[\"default\"] {\n    constructor (message) {\n        super({ message: message });\n        this.name = 'CartoRuntimeError';\n    }\n}\n\nconst CartoRuntimeTypes = {\n    NOT_SUPPORTED: '[Not supported]:',\n    WEB_GL: '[WebGL]:',\n    MVT: '[MVT]:'\n};\n\n\n/***/ }),\n\n/***/ \"./src/errors/carto-validation-error.js\":\n/*!**********************************************!*\\\n  !*** ./src/errors/carto-validation-error.js ***!\n  \\**********************************************/\n/*! exports provided: default, CartoValidationTypes */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return CartoValidationError; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CartoValidationTypes\", function() { return CartoValidationTypes; });\n/* harmony import */ var _carto_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./carto-error */ \"./src/errors/carto-error.js\");\n\n\n/**\n * Utility to build a cartoError related to validation errors.\n *\n * @return {CartoError} A well formed object representing the error.\n */\nclass CartoValidationError extends _carto_error__WEBPACK_IMPORTED_MODULE_0__[\"default\"] {\n    constructor (message) {\n        super({ message: message });\n        this.name = 'CartoValidationError';\n    }\n}\n\nconst CartoValidationTypes = {\n    MISSING_REQUIRED: '[Missing required property]:',\n    INCORRECT_TYPE: '[Property with an incorrect type]:',\n    INCORRECT_VALUE: '[Incorrect value]:',\n    TOO_MANY_ARGS: '[Too many arguments]:'\n};\n\n\n/***/ }),\n\n/***/ \"./src/renderer/DummyDataframe.js\":\n/*!****************************************!*\\\n  !*** ./src/renderer/DummyDataframe.js ***!\n  \\****************************************/\n/*! exports provided: default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return DummyDataframe; });\n/* harmony import */ var _decoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./decoder */ \"./src/renderer/decoder/index.js\");\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/geometry */ \"./src/utils/geometry.js\");\n\n\n\nclass DummyDataframe {\n    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {\n        this.active = active;\n        this.center = center;\n        this.properties = properties;\n        this.scale = scale;\n        this.type = type;\n        this.decodedGeom = Object(_decoder__WEBPACK_IMPORTED_MODULE_0__[\"decodeGeom\"])(type, geom);\n        this.numVertex = type === 'point'\n            ? size * 3\n            : this.decodedGeom.vertices.length / 2;\n        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;\n        this.propertyTex = [];\n        this.metadata = metadata;\n        this.propertyCount = 0;\n        this._aabb = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_1__[\"computeAABB\"])(geom, type);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/Metadata.js\":\n/*!**********************************!*\\\n  !*** ./src/renderer/Metadata.js ***!\n  \\**********************************/\n/*! exports provided: IDENTITY, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"IDENTITY\", function() { return IDENTITY; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return Metadata; });\n\n// The IDENTITY metadata contains zero properties\nconst IDENTITY = {\n    properties: {}\n};\n\nclass Metadata {\n    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {\n        this.properties = properties;\n        this.featureCount = featureCount;\n        this.sample = sample;\n        this.geomType = geomType;\n        this.isAggregated = isAggregated;\n        this.idProperty = idProperty || 'cartodb_id';\n\n        this.categoryToID = new Map();\n        this.IDToCategory = new Map();\n        this.numCategories = 0;\n\n        Object.values(properties).map(property => {\n            property.categories = property.categories || [];\n            property.categories.map(category => this.categorizeString(property, category.name, true));\n        });\n\n        this.propertyKeys = Object.keys(this.properties);\n    }\n    categorizeString (propertyName, category, init = false) {\n        if (category === undefined) {\n            category = null;\n        }\n        if (this.categoryToID.has(category)) {\n            return this.categoryToID.get(category);\n        }\n        if (!init) {\n            this.properties[propertyName].categories.push({\n                name: category,\n                frequency: Number.NaN\n            });\n        }\n        this.categoryToID.set(category, this.numCategories);\n        this.IDToCategory.set(this.numCategories, category);\n        this.numCategories++;\n        return this.numCategories - 1;\n    }\n    propertyNames (propertyName) {\n        const prop = this.properties[propertyName];\n        if (prop.aggregations) {\n            return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);\n        }\n        return [propertyName];\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/common.js\":\n/*!****************************************!*\\\n  !*** ./src/renderer/decoder/common.js ***!\n  \\****************************************/\n/*! exports provided: addLineString, resizeBuffer */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"addLineString\", function() { return addLineString; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"resizeBuffer\", function() { return resizeBuffer; });\n/* harmony import */ var _utils_geometry__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../utils/geometry */ \"./src/utils/geometry.js\");\n\n\n/**\n * Create a triangulated lineString: zero-sized, vertex-shader expanded triangle list\n * with `miter` joins. For angle < 60 joins are automatically adjusted to `bevel`.\n * https://github.com/CartoDB/carto-vl/wiki/Line-rendering\n */\nfunction addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {\n    let prevPoint, currentPoint, nextPoint;\n    let prevNormal, nextNormal;\n    let drawLine;\n\n    // We need at least two points\n    if (lineString.length >= 4) {\n        // Initialize the first two points\n        prevPoint = [lineString[0], lineString[1]];\n        currentPoint = [lineString[2], lineString[3]];\n        prevNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getLineNormal\"])(prevPoint, currentPoint);\n\n        for (let i = 4; i <= lineString.length; i += 2) {\n            drawLine = !(skipCallback && skipCallback(i));\n\n            if (drawLine) {\n                // First triangle\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n\n                // Second triangle\n                geomBuffer.vertices[index] = prevPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = prevPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = prevNormal[1];\n                geomBuffer.vertices[index] = currentPoint[0];\n                geomBuffer.normals[index++] = -prevNormal[0];\n                geomBuffer.vertices[index] = currentPoint[1];\n                geomBuffer.normals[index++] = -prevNormal[1];\n            }\n\n            // If there is a next point, compute its properties\n            if (i <= lineString.length - 2) {\n                nextPoint = [lineString[i], lineString[i + 1]];\n            } else if (isPolygon) {\n                nextPoint = [lineString[2], lineString[3]];\n            }\n\n            if (nextPoint) {\n                nextNormal = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getLineNormal\"])(currentPoint, nextPoint);\n\n                if (drawLine) {\n                    // `turnLeft` indicates that the nextLine turns to the left\n                    // `joinNormal` contains the direction and size for the `miter` vertex\n                    //  If this is not defined means that the join must be `bevel`.\n                    let {turnLeft, joinNormal} = Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"getJoinNormal\"])(prevNormal, nextNormal);\n\n                    let leftNormal = turnLeft ? prevNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"neg\"])(nextNormal);\n                    let rightNormal = turnLeft ? nextNormal : Object(_utils_geometry__WEBPACK_IMPORTED_MODULE_0__[\"neg\"])(prevNormal);\n\n                    // Third triangle\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = 0;\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    // Mark vertex to be stroke in PolygonShader with the\n                    // non-zero value 1e-37, so it validates the expression\n                    // `normal != vec2(0.)` without affecting the vertex position.\n                    geomBuffer.normals[index++] = isPolygon ? 1e-37 : 0;\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = leftNormal[0];\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    geomBuffer.normals[index++] = leftNormal[1];\n                    geomBuffer.vertices[index] = currentPoint[0];\n                    geomBuffer.normals[index++] = rightNormal[0];\n                    geomBuffer.vertices[index] = currentPoint[1];\n                    geomBuffer.normals[index++] = rightNormal[1];\n\n                    if (joinNormal) {\n                        // Forth triangle\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = joinNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = joinNormal[1];\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = rightNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = rightNormal[1];\n                        geomBuffer.vertices[index] = currentPoint[0];\n                        geomBuffer.normals[index++] = leftNormal[0];\n                        geomBuffer.vertices[index] = currentPoint[1];\n                        geomBuffer.normals[index++] = leftNormal[1];\n                    }\n                }\n            }\n\n            // Update the variables for the next iteration\n            prevPoint = currentPoint;\n            currentPoint = nextPoint;\n            prevNormal = nextNormal;\n            nextPoint = null;\n        }\n    }\n    return index;\n}\n\n/**\n * Resize a Float32Array buffer in an efficient way\n */\nfunction resizeBuffer (oldBuffer, newSize) {\n    const newBuffer = new Float32Array(newSize);\n    newBuffer.set(oldBuffer);\n    return newBuffer;\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/index.js\":\n/*!***************************************!*\\\n  !*** ./src/renderer/decoder/index.js ***!\n  \\***************************************/\n/*! exports provided: decodeGeom */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeGeom\", function() { return decodeGeom; });\n/* harmony import */ var _pointDecoder__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./pointDecoder */ \"./src/renderer/decoder/pointDecoder.js\");\n/* harmony import */ var _lineDecoder__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./lineDecoder */ \"./src/renderer/decoder/lineDecoder.js\");\n/* harmony import */ var _polygonDecoder__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./polygonDecoder */ \"./src/renderer/decoder/polygonDecoder.js\");\n/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../errors/carto-runtime-error */ \"./src/errors/carto-runtime-error.js\");\n\n\n\n\n\nfunction decodeGeom (geomType, geom) {\n    switch (geomType) {\n        case 'point':\n            return Object(_pointDecoder__WEBPACK_IMPORTED_MODULE_0__[\"decodePoint\"])(geom);\n        case 'line':\n            return Object(_lineDecoder__WEBPACK_IMPORTED_MODULE_1__[\"decodeLine\"])(geom);\n        case 'polygon':\n            return Object(_polygonDecoder__WEBPACK_IMPORTED_MODULE_2__[\"decodePolygon\"])(geom);\n        default:\n            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__[\"default\"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_3__[\"CartoRuntimeTypes\"].NOT_SUPPORTED} Unimplemented geometry type: '${geomType}'.`);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/lineDecoder.js\":\n/*!*********************************************!*\\\n  !*** ./src/renderer/decoder/lineDecoder.js ***!\n  \\*********************************************/\n/*! exports provided: decodeLine */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodeLine\", function() { return decodeLine; });\n/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./common */ \"./src/renderer/decoder/common.js\");\n\n\n// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.\n// The geom will be an array of coordinates in this case\n\nconst STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024; // 4 MB\nconst MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;\n\nlet index = 0;\nlet geomBuffer = {\n    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),\n    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)\n};\n\nfunction decodeLine (geometry) {\n    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature\n    let featureIDToVertexIndex = new Map();\n\n    index = 0;\n    for (let i = 0; i < geometry.length; i++) {\n        const feature = geometry[i];\n        for (let j = 0; j < feature.length; j++) {\n            // Increase buffers size if required\n            resizeBuffers(MAX_VERTICES_COORDINATES_PER_SEGMENT * feature[j].length);\n\n            // Add line string\n            index = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"addLineString\"])(feature[j], geomBuffer, index);\n        }\n\n        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0\n            ? { start: 0, end: index }\n            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });\n\n        breakpoints.push(index);\n    }\n\n    const verticesArrayBuffer = new ArrayBuffer(4 * index);\n    const normalsArrayBuffer = new ArrayBuffer(4 * index);\n    const vertices = new Float32Array(verticesArrayBuffer);\n    const normals = new Float32Array(normalsArrayBuffer);\n    for (let i = 0; i < index; i++) {\n        vertices[i] = geomBuffer.vertices[i];\n        normals[i] = geomBuffer.normals[i];\n    }\n    return {\n        vertices,\n        normals,\n        verticesArrayBuffer,\n        normalsArrayBuffer,\n        featureIDToVertexIndex,\n        breakpoints\n    };\n}\n\n// Resize buffers as needed if `additionalSize` floats overflow the current buffers.\nfunction resizeBuffers (additionalSize) {\n    const minimumNeededSize = index + additionalSize;\n    if (minimumNeededSize > geomBuffer.vertices.length) {\n        const newSize = 2 * minimumNeededSize;\n        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"resizeBuffer\"])(geomBuffer.vertices, newSize);\n        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_0__[\"resizeBuffer\"])(geomBuffer.normals, newSize);\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/pointDecoder.js\":\n/*!**********************************************!*\\\n  !*** ./src/renderer/decoder/pointDecoder.js ***!\n  \\**********************************************/\n/*! exports provided: decodePoint */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePoint\", function() { return decodePoint; });\n// If the geometry type is 'point' it will pass trough the geom (the vertex array)\n\nfunction decodePoint (verticesArrayBuffer) {\n    return {\n        verticesArrayBuffer: verticesArrayBuffer,\n        vertices: new Float32Array(verticesArrayBuffer),\n        breakpoints: []\n    };\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/decoder/polygonDecoder.js\":\n/*!************************************************!*\\\n  !*** ./src/renderer/decoder/polygonDecoder.js ***!\n  \\************************************************/\n/*! exports provided: decodePolygon */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"decodePolygon\", function() { return decodePolygon; });\n/* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! earcut */ \"./node_modules/earcut/src/earcut.js\");\n/* harmony import */ var earcut__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(earcut__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var _common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./common */ \"./src/renderer/decoder/common.js\");\n\n\n\n// If the geometry type is 'polygon' it will triangulate the polygon list (geom)\n// geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices\n// Example:\n/*   let geom = [{\n       flat: [\n         0.,0., 1.,0., 1.,1., 0.,1., 0.,0, //A square\n         0.25,0.25, 0.75,0.25, 0.75,0.75, 0.25,0.75, 0.25,0.25//A small square\n       ]\n       holes: [5]\n     }]\n*/\n\nconst STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024 * 2; // 8 MB\nconst VERTEX_COORDINATES_PER_TRIANGLE = 2;\nconst MAX_VERTICES_COORDINATES_PER_SEGMENT = 24;\n\nlet index = 0;\nlet geomBuffer = {\n    vertices: new Float32Array(STATIC_INITIAL_BUFFER_SIZE),\n    normals: new Float32Array(STATIC_INITIAL_BUFFER_SIZE)\n};\n\nfunction decodePolygon (geometry) {\n    let breakpoints = []; // Array of indices (to vertexArray) that separate each feature\n    let featureIDToVertexIndex = new Map();\n\n    index = 0;\n    for (let i = 0; i < geometry.length; i++) {\n        const feature = geometry[i];\n        for (let j = 0; j < feature.length; j++) {\n            const polygon = feature[j];\n            const triangles = earcut__WEBPACK_IMPORTED_MODULE_0__(polygon.flat, polygon.holes);\n\n            // Increase buffers size if required\n            resizeBuffers(VERTEX_COORDINATES_PER_TRIANGLE * triangles.length +\n                          MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);\n\n            // Add polygon\n            for (let k = 0; k < triangles.length; k++) {\n                addVertex(polygon.flat, 2 * triangles[k]);\n            }\n\n            // Add polygon stroke\n            index = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"addLineString\"])(polygon.flat, geomBuffer, index, true, (pointIndex) => {\n                // Skip adding the line which connects two rings OR is clipped\n                return polygon.holes.includes((pointIndex - 2) / 2) || isClipped(polygon, pointIndex - 4, pointIndex - 2);\n            });\n        }\n\n        featureIDToVertexIndex.set(breakpoints.length, breakpoints.length === 0\n            ? { start: 0, end: index }\n            : { start: featureIDToVertexIndex.get(breakpoints.length - 1).end, end: index });\n\n        breakpoints.push(index);\n    }\n\n    const verticesArrayBuffer = new ArrayBuffer(4 * index);\n    const normalsArrayBuffer = new ArrayBuffer(4 * index);\n    const vertices = new Float32Array(verticesArrayBuffer);\n    const normals = new Float32Array(normalsArrayBuffer);\n    for (let i = 0; i < index; i++) {\n        vertices[i] = geomBuffer.vertices[i];\n        normals[i] = geomBuffer.normals[i];\n    }\n    return {\n        vertices,\n        normals,\n        verticesArrayBuffer,\n        normalsArrayBuffer,\n        featureIDToVertexIndex,\n        breakpoints\n    };\n}\n\n// Resize buffers as needed if `additionalSize` floats overflow the current buffers\nfunction resizeBuffers (additionalSize) {\n    const minimumNeededSize = index + additionalSize;\n    if (minimumNeededSize > geomBuffer.vertices.length) {\n        const newSize = 2 * minimumNeededSize;\n        geomBuffer.vertices = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"resizeBuffer\"])(geomBuffer.vertices, newSize);\n        geomBuffer.normals = Object(_common__WEBPACK_IMPORTED_MODULE_1__[\"resizeBuffer\"])(geomBuffer.normals, newSize);\n    }\n}\n\n// Add vertex in triangles.\nfunction addVertex (array, vertexIndex) {\n    geomBuffer.vertices[index] = array[vertexIndex];\n    geomBuffer.normals[index++] = 0;\n    geomBuffer.vertices[index] = array[vertexIndex + 1];\n    geomBuffer.normals[index++] = 0;\n}\n\nfunction isClipped (polygon, i, j) {\n    if (polygon.clipped.includes(i) && polygon.clipped.includes(j)) {\n        if (polygon.clippedType[polygon.clipped.indexOf(i)] &\n            polygon.clippedType[polygon.clipped.indexOf(j)]) {\n            return true;\n        }\n    }\n    return false;\n}\n\n\n/***/ }),\n\n/***/ \"./src/renderer/schema.js\":\n/*!********************************!*\\\n  !*** ./src/renderer/schema.js ***!\n  \\********************************/\n/*! exports provided: IDENTITY, union, equals, CLUSTER_FEATURE_COUNT, column, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"IDENTITY\", function() { return IDENTITY; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"union\", function() { return union; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"equals\", function() { return equals; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"CLUSTER_FEATURE_COUNT\", function() { return CLUSTER_FEATURE_COUNT; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"column\", function() { return column; });\n\nconst IDENTITY = {};\n\n/*\nconst mns = {\n    price:  [{type: 'unaggregated'}],\n    amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}]\n};\n\n*/\n\nfunction union (a, b) {\n    const result = {};\n    const propertyNames = new Set(Object.keys(a).concat(Object.keys(b)));\n    propertyNames.forEach(propertyName => {\n        const aUsages = a[propertyName] || [];\n        const bUsages = b[propertyName] || [];\n        const combinedUsage = [...aUsages, ...bUsages];\n        result[propertyName] = combinedUsage;\n    });\n    return result;\n}\n\nfunction equals (a, b) {\n    if (!a || !b) {\n        return false;\n    }\n    return JSON.stringify(simplify(a)) === JSON.stringify(simplify(b));\n}\n\nfunction simplify (MNS) {\n    const result = {};\n    const propertyNames = Object.keys(MNS).sort();\n    propertyNames.forEach(propertyName => {\n        // Stringify and Set to remove duplicates\n        let usage = [...new Set(MNS[propertyName].map(u => JSON.stringify(u)))];\n        usage.sort();\n        usage = usage.map(u => JSON.parse(u));\n        result[propertyName] = usage;\n    });\n    return result;\n}\n\nconst AGG_PREFIX = '_cdb_agg_';\nconst AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');\n\nconst CLUSTER_FEATURE_COUNT = '_cdb_feature_count';\n\n// column information functions\nconst column = {\n    isAggregated: function isAggregated (name) {\n        return name.startsWith(AGG_PREFIX);\n    },\n    getBase: function getBase (name) {\n        return name.replace(AGG_PATTERN, '');\n    },\n    getAggFN: function getAggFN (name) {\n        let s = name.substr(AGG_PREFIX.length);\n        return s.substr(0, s.indexOf('_'));\n    },\n    aggColumn (name, aggFN) {\n        return `${AGG_PREFIX}${aggFN}_${name}`;\n    }\n};\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({ column, equals, union, IDENTITY, simplify });\n\n\n/***/ }),\n\n/***/ \"./src/sources/MVTWorker.js\":\n/*!**********************************!*\\\n  !*** ./src/sources/MVTWorker.js ***!\n  \\**********************************/\n/*! exports provided: MVTWorker */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"MVTWorker\", function() { return MVTWorker; });\n/* harmony import */ var _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @mapbox/vector-tile */ \"./node_modules/@mapbox/vector-tile/index.js\");\n/* harmony import */ var _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var pbf__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! pbf */ \"./node_modules/pbf/index.js\");\n/* harmony import */ var pbf__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(pbf__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _client_rsys__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../client/rsys */ \"./src/client/rsys.js\");\n/* harmony import */ var _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../client/mvt/feature-decoder */ \"./src/client/mvt/feature-decoder.js\");\n/* harmony import */ var _renderer_Metadata__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../renderer/Metadata */ \"./src/renderer/Metadata.js\");\n/* harmony import */ var _renderer_DummyDataframe__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../renderer/DummyDataframe */ \"./src/renderer/DummyDataframe.js\");\n/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../errors/carto-validation-error */ \"./src/errors/carto-validation-error.js\");\n/* harmony import */ var _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../errors/carto-runtime-error */ \"./src/errors/carto-runtime-error.js\");\n\n\n\n\n\n\n\n\n\n// TODO import correctly\nconst RTT_WIDTH = 1024;\n\n// Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39\nconst mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };\n\nconst geometryTypes = {\n    UNKNOWN: 'unknown',\n    POINT: 'point',\n    LINE: 'line',\n    POLYGON: 'polygon'\n};\n\nconst MVT_TO_CARTO_TYPES = {\n    1: geometryTypes.POINT,\n    2: geometryTypes.LINE,\n    3: geometryTypes.POLYGON\n};\n\nclass MVTWorker {\n    // Worker API\n    onmessage (event) {\n        this.processEvent(event).then(message => {\n            const transferables = [];\n            if (!message.dataframe.empty) {\n                transferables.push(this._propertiesArrayBuffer);\n                transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);\n                if (message.dataframe.decodedGeom.normalsArrayBuffer) {\n                    transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);\n                }\n            }\n            postMessage(message, transferables);\n        });\n    }\n    async processEvent (event) {\n        const params = event.data;\n        if (params.metadata) {\n            Object.setPrototypeOf(params.metadata, _renderer_Metadata__WEBPACK_IMPORTED_MODULE_4__[\"default\"].prototype);\n            this.metadata = params.metadata;\n        }\n        const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);\n        return {\n            mID: params.mID,\n            dataframe\n        };\n    }\n\n    async _requestDataframe (x, y, z, url, layerID, metadata) {\n        const response = await fetch(url);\n        const dataframe = await this.urlToDataframeTransformer(response, x, y, z, layerID, metadata);\n        return dataframe;\n    }\n\n    async urlToDataframeTransformer (response, x, y, z, layerID, metadata) {\n        const MVT_EXTENT = 4096;\n        const arrayBuffer = await response.arrayBuffer();\n        if (arrayBuffer.byteLength === 0 || response === 'null') {\n            return { empty: true };\n        }\n        const tile = new _mapbox_vector_tile__WEBPACK_IMPORTED_MODULE_0__[\"VectorTile\"](new pbf__WEBPACK_IMPORTED_MODULE_1__(arrayBuffer));\n\n        if (Object.keys(tile.layers).length > 1 && !layerID) {\n            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"default\"](\n                `${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"CartoValidationTypes\"].MISSING_REQUIRED} LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`\n            );\n        }\n\n        const mvtLayer = tile.layers[layerID || Object.keys(tile.layers)[0]]; // FIXME this!!!\n\n        if (!mvtLayer) {\n            return { empty: true };\n        }\n\n        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);\n        const rs = _client_rsys__WEBPACK_IMPORTED_MODULE_2__[\"getRsysFromTile\"](x, y, z);\n        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, metadata.geomType, metadata);\n\n        return dataframe;\n    }\n\n    _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {\n        if (!mvtLayer.length) {\n            return { properties: [], geometries: {}, numFeatures: 0 };\n        }\n        if (!metadata.geomType) {\n            metadata.geomType = this._autoDiscoverType(mvtLayer);\n        }\n        switch (metadata.geomType) {\n            case geometryTypes.POINT:\n                const arrayBuffer = new ArrayBuffer(mvtLayer.length * 2 * 3 * 4);// SIZEOF\n                return this._decode(mvtLayer, metadata, mvtExtent, arrayBuffer);\n            case geometryTypes.LINE:\n                return this._decode(mvtLayer, metadata, mvtExtent, [], _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__[\"decodeLines\"]);\n            case geometryTypes.POLYGON:\n                return this._decode(mvtLayer, metadata, mvtExtent, [], _client_mvt_feature_decoder__WEBPACK_IMPORTED_MODULE_3__[\"decodePolygons\"]);\n            default:\n                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"default\"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"CartoValidationTypes\"].INCORRECT_TYPE} MVT: invalid geometry type '${metadata.geomType}'`);\n        }\n    }\n\n    _autoDiscoverType (mvtLayer) {\n        const type = mvtLayer.feature(0).type;\n        switch (type) {\n            case mvtDecoderGeomTypes.point:\n                return geometryTypes.POINT;\n            case mvtDecoderGeomTypes.line:\n                return geometryTypes.LINE;\n            case mvtDecoderGeomTypes.polygon:\n                return geometryTypes.POLYGON;\n            default:\n                throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"default\"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_6__[\"CartoValidationTypes\"].INCORRECT_TYPE} MVT: invalid geometry type '${type}'`);\n        }\n    }\n\n    _decode (mvtLayer, metadata, mvtExtent, geometries, decodeFn) {\n        let numFeatures = 0;\n        let pointGeometries;\n        if (geometries) {\n            pointGeometries = new Float32Array(geometries);\n        }\n        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);\n        for (let i = 0; i < mvtLayer.length; i++) {\n            const f = mvtLayer.feature(i);\n            this._checkType(f, metadata.geomType);\n            const geom = f.loadGeometry();\n            if (decodeFn) {\n                const decodedPolygons = decodeFn(geom, mvtExtent);\n                geometries.push(decodedPolygons);\n            } else {\n                // TODO refactor\n                const x = 2 * (geom[0][0].x) / mvtExtent - 1.0;\n                const y = 2 * (1.0 - (geom[0][0].y) / mvtExtent) - 1.0;\n                // Tiles may contain points in the border;\n                // we'll avoid here duplicated points between tiles by excluding the 1-edge\n                if (x < -1 || x >= 1 || y < -1 || y >= 1) {\n                    continue;\n                }\n                pointGeometries[6 * numFeatures + 0] = x;\n                pointGeometries[6 * numFeatures + 1] = y;\n                pointGeometries[6 * numFeatures + 2] = x;\n                pointGeometries[6 * numFeatures + 3] = y;\n                pointGeometries[6 * numFeatures + 4] = x;\n                pointGeometries[6 * numFeatures + 5] = y;\n            }\n            if (f.properties[metadata.idProperty] === undefined) {\n                throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"default\"](\n                    `${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"CartoRuntimeTypes\"].MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`\n                );\n            }\n            this._decodeProperties(metadata, propertyNames, properties, f, numFeatures);\n            numFeatures++;\n        }\n\n        return { properties, geometries, numFeatures };\n    }\n\n    // Currently only mvtLayers with the same type in every feature are supported\n    _checkType (feature, expected) {\n        const type = feature.type;\n        const actual = MVT_TO_CARTO_TYPES[type];\n        if (actual !== expected) {\n            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"default\"](\n                `${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"CartoRuntimeTypes\"].MVT} MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`\n            );\n        }\n    }\n\n    _initializePropertyArrays (metadata, length) {\n        const propertyNames = this._getPropertyNamesFrom(metadata);\n        const properties = this._getPropertiesFor(propertyNames, length);\n        return { propertyNames, properties };\n    }\n\n    _getPropertyNamesFrom (metadata) {\n        const propertyNames = [];\n        for (let i = 0; i < metadata.propertyKeys.length; i++) {\n            const propertyName = metadata.propertyKeys[i];\n            if (metadata.properties[propertyName].type === 'geometry') {\n                continue;\n            }\n            propertyNames.push(...metadata.propertyNames(propertyName));\n        }\n        return propertyNames;\n    }\n\n    _getPropertiesFor (propertyNames, length) {\n        const properties = {};\n        const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;\n\n        const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);\n        this._propertiesArrayBuffer = arrayBuffer;\n        for (let i = 0; i < propertyNames.length; i++) {\n            const propertyName = propertyNames[i];\n            properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);\n        }\n\n        return properties;\n    }\n\n    _decodeProperties (metadata, propertyNames, properties, feature, i) {\n        const length = propertyNames.length;\n        for (let j = 0; j < length; j++) {\n            const propertyName = propertyNames[j];\n            const propertyValue = feature.properties[propertyName];\n            properties[propertyName][i] = this.decodeProperty(metadata, propertyName, propertyValue);\n        }\n    }\n\n    decodeProperty (metadata, propertyName, propertyValue) {\n        const metadataPropertyType = metadata.properties[propertyName].type;\n        if (typeof propertyValue === 'string') {\n            if (metadataPropertyType !== 'category') {\n                throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"default\"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"CartoRuntimeTypes\"].MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);\n            }\n            return metadata.categorizeString(propertyName, propertyValue);\n        } else if (typeof propertyValue === 'number') {\n            if (metadataPropertyType !== 'number') {\n                throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"default\"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"CartoRuntimeTypes\"].MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);\n            }\n            return propertyValue;\n        } else if (propertyValue === null || propertyValue === undefined) {\n            return Number.NaN;\n        } else {\n            throw new _errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"default\"](`${_errors_carto_runtime_error__WEBPACK_IMPORTED_MODULE_7__[\"CartoRuntimeTypes\"].MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);\n        }\n    }\n\n    _generateDataFrame (rs, geometry, properties, size, type, metadata) {\n        return new _renderer_DummyDataframe__WEBPACK_IMPORTED_MODULE_5__[\"default\"]({\n            active: false,\n            center: rs.center,\n            geom: geometry,\n            properties: properties,\n            scale: rs.scale,\n            size: size,\n            type: type,\n            metadata\n        });\n    }\n}\n\n\n/***/ }),\n\n/***/ \"./src/sources/MVTWorkers.worker.js\":\n/*!******************************************!*\\\n  !*** ./src/sources/MVTWorkers.worker.js ***!\n  \\******************************************/\n/*! no exports provided */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _MVTWorker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MVTWorker */ \"./src/sources/MVTWorker.js\");\n/* harmony import */ var _client_WindshaftWorker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../client/WindshaftWorker */ \"./src/client/WindshaftWorker.js\");\n\n\n\n// This file publishes a Web Worker onmessage function that will redirect incoming messages\n// based on an ID (`workerName`) defined by the message sender\n// to each different Worker implementation\n\nconst workers = {\n    MVT: new _MVTWorker__WEBPACK_IMPORTED_MODULE_0__[\"MVTWorker\"](),\n    windshaft: new _client_WindshaftWorker__WEBPACK_IMPORTED_MODULE_1__[\"WindshaftWorker\"]()\n};\n\nonmessage = function (event) {\n    return workers[event.data.workerName].onmessage(event);\n};\n\n\n/***/ }),\n\n/***/ \"./src/utils/geometry.js\":\n/*!*******************************!*\\\n  !*** ./src/utils/geometry.js ***!\n  \\*******************************/\n/*! exports provided: intersect, sub, dot, perpendicular, getLineNormal, getJoinNormal, neg, pointInTriangle, halfPlaneSign, equalPoints, pointInCircle, pointInRectangle, computeAABB, default */\n/***/ (function(module, __webpack_exports__, __webpack_require__) {\n\n\"use strict\";\n__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"intersect\", function() { return intersect; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"sub\", function() { return sub; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"dot\", function() { return dot; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"perpendicular\", function() { return perpendicular; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getLineNormal\", function() { return getLineNormal; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"getJoinNormal\", function() { return getJoinNormal; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"neg\", function() { return neg; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInTriangle\", function() { return pointInTriangle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"halfPlaneSign\", function() { return halfPlaneSign; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"equalPoints\", function() { return equalPoints; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInCircle\", function() { return pointInCircle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"pointInRectangle\", function() { return pointInRectangle; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"computeAABB\", function() { return computeAABB; });\n// If AB intersects CD => return intersection point\n// Intersection method from Real Time Rendering, Third Edition, page 780\nfunction intersect (a, b, c, d) {\n    const o1 = a;\n    const o2 = c;\n    const d1 = sub(b, a);\n    const d2 = sub(d, c);\n    const d1t = perpendicular(d1);\n    const d2t = perpendicular(d2);\n\n    const s = dot(sub(o2, o1), d2t) / dot(d1, d2t);\n    const t = dot(sub(o1, o2), d1t) / dot(d2, d1t);\n\n    if (s >= 0 && s <= 1 && t >= 0 && t <= 1) {\n        return [o1[0] + s * d1[0], o1[1] + s * d1[1]];\n    }\n}\n\nfunction sub ([ax, ay], [bx, by]) {\n    return ([ax - bx, ay - by]);\n}\n\nfunction dot ([ax, ay], [bx, by]) {\n    return (ax * bx + ay * by);\n}\n\nfunction perpendicular ([x, y]) {\n    return [-y, x];\n}\n\n/**\n * Compute the normal of a line AB.\n * By definition it is the unitary vector from B to A, rotated +90 degrees counter-clockwise\n */\nfunction getLineNormal (a, b) {\n    const u = normalize(a[0] - b[0], a[1] - b[1]);\n    return [-u[1], u[0]];\n}\n\n/**\n * Compute the normal of the join from the lines' normals.\n * By definition this is the sum of the unitary vectors `u` (from B to A) and `v` (from B to C)\n * multiplied by a factor of `1/sin(theta)` to reach the intersection of the wide lines.\n * Theta is the angle between the vectors `v` and `u`. But instead of computing the angle,\n * the `sin(theta)` (with sign) is obtained directly from the vectorial product of `v` and `u`\n */\nfunction getJoinNormal (prevNormal, nextNormal) {\n    const u = [prevNormal[1], -prevNormal[0]];\n    const v = [-nextNormal[1], nextNormal[0]];\n    const sin = v[0] * u[1] - v[1] * u[0];\n    const cos = v[0] * u[0] + v[1] * u[1];\n    const factor = Math.abs(sin);\n    const miterJoin = !(factor < 0.866 && cos > 0.5); // 60 deg\n    return {\n        turnLeft: sin > 0,\n        joinNormal: miterJoin && neg([\n            (u[0] + v[0]) / factor,\n            (u[1] + v[1]) / factor\n        ])\n    };\n}\n\n/**\n * Return the negative of the provided vector\n */\nfunction neg (v) {\n    return [-v[0], -v[1]];\n}\n\n/**\n * Return the vector scaled to length 1\n */\nfunction normalize (x, y) {\n    const s = Math.hypot(x, y);\n    return [x / s, y / s];\n}\n\n// Returns true if p is inside the triangle or on a triangle's edge, false otherwise\n// Parameters in {x: 0, y:0} form\nfunction pointInTriangle (p, v1, v2, v3) {\n    // https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle\n    // contains an explanation of both this algorithm and one based on barycentric coordinates,\n    // which could be faster, but, nevertheless, it is quite similar in terms of required arithmetic operations\n\n    if (equalPoints(v1, v2) || equalPoints(v2, v3) || equalPoints(v3, v1)) {\n        // Avoid zero area triangle\n        return false;\n    }\n\n    // A point is inside a triangle or in one of the triangles edges\n    // if the point is in the three half-plane defined by the 3 edges\n    const b1 = halfPlaneSign(p, v1, v2) < 0;\n    const b2 = halfPlaneSign(p, v2, v3) < 0;\n    const b3 = halfPlaneSign(p, v3, v1) < 0;\n\n    return (b1 === b2) && (b2 === b3);\n}\n\n// Tests if a point `p` is in the half plane defined by the line with points `a` and `b`\n// Returns a negative number if the result is INSIDE, returns 0 if the result is ON_LINE,\n// returns >0 if the point is OUTSIDE\n// Parameters in {x: 0, y:0} form\nfunction halfPlaneSign (p, a, b) {\n    // We use the cross product of `PB x AB` to get `sin(angle(PB, AB))`\n    // The result's sign is the half plane test result\n    return (p.x - b.x) * (a.y - b.y) - (a.x - b.x) * (p.y - b.y);\n}\n\nfunction equalPoints (a, b) {\n    return (a.x === b.x) && (a.y === b.y);\n}\n\nfunction pointInCircle (p, center, scale) {\n    const diff = {\n        x: p.x - center.x,\n        y: p.y - center.y\n    };\n    const lengthSquared = diff.x * diff.x + diff.y * diff.y;\n    return lengthSquared <= scale * scale;\n}\n\nfunction pointInRectangle (point, bbox) {\n    if (bbox === null) {\n        return false;\n    }\n    const p = {\n        x: point.x.toFixed(2),\n        y: point.y.toFixed(2)\n    };\n\n    return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));\n}\n\nfunction computeAABB (geometry, type) {\n    switch (type) {\n        case 'point':\n            return [];\n        case 'line':\n        case 'polygon':\n            const aabbList = [];\n\n            for (let i = 0; i < geometry.length; i++) {\n                const feature = geometry[i];\n\n                let aabb = {\n                    minx: Number.POSITIVE_INFINITY,\n                    miny: Number.POSITIVE_INFINITY,\n                    maxx: Number.NEGATIVE_INFINITY,\n                    maxy: Number.NEGATIVE_INFINITY\n                };\n\n                for (let j = 0; j < feature.length; j++) {\n                    aabb = _updateAABBForGeometry(feature[j], aabb, type);\n                }\n\n                if (aabb.minx === Number.POSITIVE_INFINITY) {\n                    aabb = null;\n                }\n\n                aabbList.push(aabb);\n            }\n\n            return aabbList;\n    }\n}\n\nfunction _updateAABBForGeometry (feature, aabb, geometryType) {\n    switch (geometryType) {\n        case 'line':\n            return _updateAABBLine(feature, aabb);\n        case 'polygon':\n            return _updateAABBPolygon(feature, aabb);\n    }\n}\n\nfunction _updateAABBLine (line, aabb) {\n    const vertices = line;\n    const numVertices = line.length;\n\n    for (let i = 0; i < numVertices; i += 2) {\n        aabb.minx = Math.min(aabb.minx, vertices[i + 0]);\n        aabb.miny = Math.min(aabb.miny, vertices[i + 1]);\n        aabb.maxx = Math.max(aabb.maxx, vertices[i + 0]);\n        aabb.maxy = Math.max(aabb.maxy, vertices[i + 1]);\n    }\n\n    return aabb;\n}\n\nfunction _updateAABBPolygon (polygon, aabb) {\n    const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];\n\n    for (let i = 0; i < numVertices; i++) {\n        aabb.minx = Math.min(aabb.minx, vertices[2 * i + 0]);\n        aabb.miny = Math.min(aabb.miny, vertices[2 * i + 1]);\n        aabb.maxx = Math.max(aabb.maxx, vertices[2 * i + 0]);\n        aabb.maxy = Math.max(aabb.maxy, vertices[2 * i + 1]);\n    }\n\n    return aabb;\n}\n\n/* harmony default export */ __webpack_exports__[\"default\"] = ({\n    intersect,\n    sub,\n    dot,\n    perpendicular,\n    getLineNormal,\n    getJoinNormal,\n    neg,\n    halfPlaneSign,\n    pointInTriangle,\n    equalPoints,\n    pointInCircle,\n    pointInRectangle\n});\n\n\n/***/ })\n\n/******/ });\n//# sourceMappingURL=e396fd0b112b6fc7099e.worker.js.map", "/dist/" + "e396fd0b112b6fc7099e.worker.js");
 };
 
 /***/ }),
@@ -22944,7 +23129,7 @@ module.exports = function() {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "default", function() { return SQL; });
-/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+/* harmony import */ var _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
 /* harmony import */ var _utils_util__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../utils/util */ "./src/utils/util.js");
 /* harmony import */ var _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./BaseWindshaft */ "./src/sources/BaseWindshaft.js");
 
@@ -23010,17 +23195,17 @@ class SQL extends _BaseWindshaft__WEBPACK_IMPORTED_MODULE_2__["default"] {
 
     _checkQuery (query) {
         if (_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isUndefined(query)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'queryRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].MISSING_REQUIRED} 'query'`);
         }
         if (!_utils_util__WEBPACK_IMPORTED_MODULE_1__["default"].isString(query)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'queryStringRequired');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_TYPE} 'query' property must be a string.`);
         }
         if (query === '') {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'nonValidQuery');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_VALUE} 'query' property must be not empty.`);
         }
         let sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
-            throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"]('source', 'nonValidSQLQuery');
+            throw new _src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_src_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_VALUE} 'query' property must be a SQL query.`);
         }
     }
 }
@@ -23255,6 +23440,8 @@ function _triangleLineSeparatesViewport (triangle, viewport) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "on", function() { return on; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "off", function() { return off; });
+/* harmony import */ var _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../errors/carto-validation-error */ "./src/errors/carto-validation-error.js");
+
 
 let registeredHandlers = [];
 
@@ -23301,7 +23488,7 @@ function on (eventName, layerList, callback) {
             internalCallbacks.push(internalCallback);
         });
     } else {
-        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
+        throw new _errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["default"](`${_errors_carto_validation_error__WEBPACK_IMPORTED_MODULE_0__["CartoValidationTypes"].INCORRECT_VALUE} Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`);
     }
     registeredHandlers.push({
         eventName,
@@ -23591,7 +23778,7 @@ function _updateAABBPolygon (polygon, aabb) {
 /*!***************************!*\
   !*** ./src/utils/util.js ***!
   \***************************/
-/*! exports provided: WM_R, WM_2R, isUndefined, isString, isNumber, isObject, castDate, isSetsEqual, equalArrays, projectToWebMercator, computeMapZoom, computeMapCenter, computeMatrixZoom, computeMatrixCenter, default */
+/*! exports provided: WM_R, WM_2R, isUndefined, isString, isNumber, isObject, regExpThatContains, castDate, isSetsEqual, equalArrays, projectToWebMercator, computeMapZoom, computeMapCenter, computeMatrixZoom, computeMatrixCenter, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -23602,6 +23789,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isString", function() { return isString; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isNumber", function() { return isNumber; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isObject", function() { return isObject; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "regExpThatContains", function() { return regExpThatContains; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "castDate", function() { return castDate; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "isSetsEqual", function() { return isSetsEqual; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "equalArrays", function() { return equalArrays; });
@@ -23634,6 +23822,11 @@ function isNumber (value) {
 function isObject (value) {
     const type = typeof value;
     return value !== null && (type === 'object' || type === 'function');
+}
+
+function regExpThatContains (text) {
+    const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // in case it has special symbols
+    return new RegExp(escaped);
 }
 
 /**
