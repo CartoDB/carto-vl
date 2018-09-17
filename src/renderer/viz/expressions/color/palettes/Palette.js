@@ -46,7 +46,9 @@ export default class Palette extends BaseExpression {
         this.name = name;
         this.subPalettes = new Proxy(subPalettes, {
             get: (target, name) => {
-                if (typeof name !== 'symbol' && Number.isSafeInteger(Number(name)) && Array.isArray(target[name])) {
+                if (name === '1') {
+                    return target['2'].filter((_, index) => index !== 1).map(hexToRgb);
+                } else if (typeof name !== 'symbol' && Number.isSafeInteger(Number(name)) && Array.isArray(target[name])) {
                     return target[name].map(hexToRgb);
                 }
             }
@@ -71,9 +73,6 @@ export default class Palette extends BaseExpression {
     }
 
     _getBestSubPalette (subPaletteIndex) {
-        subPaletteIndex = subPaletteIndex <= MIN_CARTOCOLOR_SUBPALETTE_SIZE
-            ? MIN_CARTOCOLOR_SUBPALETTE_SIZE
-            : subPaletteIndex;
         const longestSubPalette = this.getLongestSubPalette();
         const subPalette = (subPaletteIndex < longestSubPalette.length
             ? [...this.subPalettes[subPaletteIndex]]
