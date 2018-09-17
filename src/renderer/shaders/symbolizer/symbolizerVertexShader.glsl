@@ -26,7 +26,7 @@ float decodeWidth(vec2 enc) {
 
 $symbolPlacement_preface
 $propertyPreface
-$offset_preface
+$transform_preface
 
 void main(void) {
     featureIDVar = abs(featureID);
@@ -54,7 +54,7 @@ void main(void) {
     pointCoord.y = -pointCoord.y;
 
     p.xy += ($symbolPlacement_inline)*size/resolution;
-    p.xy += normalScale*($offset_inline);
+    p.xy += normalScale*($transform_inline);
 
     vec4 noOverrideColor = vec4(0.);
     if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){

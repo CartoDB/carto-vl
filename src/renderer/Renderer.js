@@ -412,12 +412,12 @@ export default class Renderer {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
             }
 
-            if (!viz.offset.default) {
+            if (!viz.transform.default) {
                 const textureId = renderer.textureIds.get(viz);
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+                viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.transform._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
