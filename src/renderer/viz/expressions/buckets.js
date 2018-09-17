@@ -148,7 +148,7 @@ export default class Buckets extends BaseExpression {
         };
     }
 
-    getLegendData (config) {
+    _getLegendData (config) {
         const name = this.toString();
         const list = this.list.elems.map(elem => elem.eval());
         const data = this.input.type === 'number'

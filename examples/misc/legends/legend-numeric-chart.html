@@ -88,7 +88,7 @@
       // Get the color ramp
       const colorRamp = layer.viz.color;
       // Get the viewport histogram
-      const histogram = layer.viz.variables.histogram.roundedValue;
+      const histogram = layer.viz.variables.histogram.value.map(roundedValue);
       // Get labels (x)
       const labels = histogram.map(value => value.x);
       // Get data (y)
@@ -154,6 +154,12 @@
 
     function computeColor(color) {
       return `rgba(${color.r},${color.g},${color.b},${color.a})`;
+    }
+
+    function roundedValue(value) {
+      const x = [Math.round(value.x[0]), Math.round(value.x[1])];
+      const y = value.y;
+      return { x, y };
     }
 
   </script>

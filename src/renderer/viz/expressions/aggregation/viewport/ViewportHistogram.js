@@ -58,16 +58,6 @@ export default class ViewportHistogram extends BaseExpression {
         }
     }
 
-    get sortedValue () {
-        return this.eval()
-            .sort(_sortNumerically);
-    }
-
-    get roundedValue () {
-        return this.eval()
-            .map(_roundValue);
-    }
-
     eval () {
         if (this._cached === null) {
             if (!this._histogram) {
@@ -133,7 +123,8 @@ function _getCategoryValue (histogram) {
     return [...histogram]
         .map(([x, y]) => {
             return { x, y };
-        });
+        })
+        .sort(_sortNumerically);
 }
 
 function _sortNumerically (a, b) {
@@ -142,10 +133,4 @@ function _sortNumerically (a, b) {
     }
 
     return b.y - a.y;
-}
-
-function _roundValue (value) {
-    const x = [Math.round(value.x[0]), Math.round(value.x[1])];
-    const y = value.y;
-    return { x, y };
 }
