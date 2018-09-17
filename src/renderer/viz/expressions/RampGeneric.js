@@ -80,6 +80,11 @@ export default class RampGeneric extends Base {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
         const { palette, others } = this._getPalette();
         const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
+        GLSLPalette.forEach(p => {
+            if (this.palette.type !== 'number-list') {
+                p.inline = `sRGBAToCieLAB(${p.inline})`;
+            }
+        });
         const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
         const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
         const inline = `ramp_color${this._uid}(${input.inline})`;
@@ -109,7 +114,7 @@ export default class RampGeneric extends Base {
                 }`).join('\n')
 }
 
-                return mix(min, max, m);
+                return ${this.palette.type !== 'number-list' ? 'cielabToSRGBA' : ''}(mix(min, max, m));
             }
 
             ${rampFnReturnType} ramp_color${this._uid}(float x){
