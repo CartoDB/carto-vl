@@ -566,8 +566,8 @@ function checkVizPropertyTypes (viz) {
     if (viz.symbolPlacement.type !== 'placement') {
         throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
     }
-    if (viz.transform.type !== 'translation') {
-        throw new Error(`Viz property 'transform:' must be of type 'translation' but it was of type ${viz.transform.type}`);
+    if (viz.transform.type !== 'transformation') {
+        throw new Error(`Viz property 'transform:' must be of type 'transformation' but it was of type ${viz.transform.type}`);
     }
 }
 
