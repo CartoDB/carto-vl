@@ -46,10 +46,12 @@ body {
     stroke-dasharray: 1, 150;
     stroke-dashoffset: 0
   }
+
   50% {
     stroke-dasharray: 90, 150;
     stroke-dashoffset: -35
   }
+
   100% {
     stroke-dasharray: 90, 150;
     stroke-dashoffset: -124
@@ -80,17 +82,11 @@ body {
 }
 
 .chart-toolbox {
-  position: absolute;
-  top: 24px;
-  right: 24px;
-  bottom: 24px;
-  overflow: scroll;
   min-width: 450px;
   max-width: 450px;
-  z-index: 2;
 }
 
-.chart-toolbox-large { 
+.chart-toolbox-large {
   min-width: 600px;
   max-width: 600px;
 }
@@ -241,6 +237,10 @@ body {
 
 .box section .description {
   margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.chart-box {
   margin-bottom: 0;
 }
 
