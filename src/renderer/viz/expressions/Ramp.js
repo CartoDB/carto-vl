@@ -151,7 +151,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -170,7 +170,7 @@ export default class Ramp extends BaseExpression {
      * ´);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -190,7 +190,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -209,7 +209,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -229,7 +229,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *      othersLabel: 'Other Vehicles'
      *   });
      *
@@ -251,7 +251,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *      othersLabel: 'Other Vehicles'
      *   });
      *
@@ -274,7 +274,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *       samples: 4
      *   });
      *
@@ -296,7 +296,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *       samples: 4
      *   });
      *
@@ -319,7 +319,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
@@ -340,7 +340,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
@@ -361,7 +361,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
@@ -382,7 +382,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
@@ -397,7 +397,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * @memberof carto.expressions.Ramp
-     * @name getLegend
+     * @name getLegendData
      * @instance
      * @api
      */

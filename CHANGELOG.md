@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Support feature-dependant arrays in combination with ramp
 - Add support to `.blendTo` with String API expressions
 - Support symbol and symbolPlacement in features
-- New method `ramp.getLegend`
+- New method `ramp.getLegendData`
 - Add expressions `toString()` method
 - Add viz `toString()` method
 - `ramp` with an image list defaults to `circle` for the `others` bucket

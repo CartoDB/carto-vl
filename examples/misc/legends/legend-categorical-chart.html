@@ -87,7 +87,7 @@
         const labels = histogram.map(value => value.x);
         const data = histogram.map(value => value.y);
         const backgroundColor = colorRamp
-          .getLegend()
+          .getLegendData()
           .data
           .map(legend => computeColor(legend.value));
 

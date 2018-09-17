@@ -961,7 +961,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
         });
     });
 
-    describe('.getLegend', () => {
+    describe('.getLegendData', () => {
         const red = namedColor('red');
         const blue = namedColor('blue');
         const yellow = namedColor('yellow');
@@ -990,7 +990,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegend().data;
+                    actual = r.getLegendData().data;
                     expected = [
                         {
                             key: [Number.NEGATIVE_INFINITY, 2.5],
@@ -1015,7 +1015,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegend().data;
+                    actual = r.getLegendData().data;
                     expected = [
                         {
                             key: [Number.NEGATIVE_INFINITY, 2.5],
@@ -1040,7 +1040,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegend({ samples: 3 }).data;
+                    actual = r.getLegendData({ samples: 3 }).data;
                     expected = [
                         {
                             key: 1,
@@ -1083,7 +1083,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     const r = ramp(top($grade, 2), [ red, blue ]);
 
                     r._bindMetadata(METADATA);
-                    actual = r.getLegend().data;
+                    actual = r.getLegendData().data;
                     expected = [
                         {
                             key: 'A',
@@ -1105,7 +1105,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegend().data;
+                    actual = r.getLegendData().data;
                     expected = [
                         {
                             key: 'A',
@@ -1131,7 +1131,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
 
-                    actual = r.getLegend().data;
+                    actual = r.getLegendData().data;
                     expected = [
                         {
                             key: 'A',

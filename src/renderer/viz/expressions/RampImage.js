@@ -42,7 +42,7 @@ export default class RampImage extends Base {
         return paletteValues[index] || this.others.eval();
     }
 
-    getLegend (options) {
+    getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
         const legendData = this.input.getLegendData(config);
