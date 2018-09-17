@@ -1,5 +1,6 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 /**
@@ -101,17 +102,23 @@ export default class Buckets extends BaseExpression {
         super._bindMetadata(metadata);
 
         if (this.input.type !== 'number' && this.input.type !== 'category') {
-            throw new Error(`buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`);
+            throw new CartoValidationError(
+                `${cvt.INCORRECT_TYPE} buckets(): invalid first parameter type\n\t'input' type was ${this.input.type}`
+            );
         }
 
         checkType('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
-                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`);
+                throw new CartoValidationError(
+                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type` +
+                    `\n\texpected type was ${this.input.type}\n\tactual type was ${item.type}`
+                );
             } else if (item.type !== 'number' && item.type !== 'category') {
-                throw new Error(`buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`);
+                throw new CartoValidationError(
+                    `${cvt.INCORRECT_TYPE} buckets(): invalid ${getOrdinalFromIndex(index + 1)} parameter type\n\ttype was ${item.type}`
+                );
             }
         });
 
@@ -165,7 +172,7 @@ function _getLegendDataNumeric (list) {
     for (let i = 0; i <= list.length; i++) {
         const min = i - 1 >= 0 ? list[i - 1] : Number.NEGATIVE_INFINITY;
         const max = i < list.length ? list[i] : Number.POSITIVE_INFINITY;
-        const key = [ min, max ];
+        const key = [min, max];
         const value = i / list.length;
         data.push({ key, value });
     }

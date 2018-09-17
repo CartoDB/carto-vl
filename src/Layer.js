@@ -4,7 +4,9 @@ import Viz from './Viz';
 import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
-import CartoValidationError from './errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoRuntimeError from '../src/errors/carto-runtime-error';
+
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
 
@@ -127,7 +129,7 @@ export default class Layer {
             map.addLayer(this, beforeLayerID);
         } catch (error) {
             if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
+                throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
 
             map.on('load', () => {
@@ -179,7 +181,7 @@ export default class Layer {
 
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoRuntimeError('Another atomic change was done before this one committed (1)');
         }
 
         // Everything was ok => commit changes
@@ -197,7 +199,7 @@ export default class Layer {
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
+            throw new CartoRuntimeError('Another atomic change was done before this one committed (2)');
         }
 
         if (this._viz) {
@@ -460,7 +462,7 @@ export default class Layer {
     async _requestVizChanges (viz) {
         await this._context;
         if (!this._source) {
-            throw new Error('A source is required before changing the viz');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} a 'source' is required before changing the viz.`);
         }
 
         const source = this._source;
@@ -469,7 +471,7 @@ export default class Layer {
         await loadImagesPromise;
 
         if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
+            throw new CartoRuntimeError('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
         this.metadata = metadata;
         this._compileShaders(viz, this.metadata);
@@ -479,34 +481,34 @@ export default class Layer {
 
     _checkId (id) {
         if (util.isUndefined(id)) {
-            throw new CartoValidationError('layer', 'idRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'id'`);
         }
         if (!util.isString(id)) {
-            throw new CartoValidationError('layer', 'idStringRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'id' property must be a string.`);
         }
         if (id === '') {
-            throw new CartoValidationError('layer', 'nonValidId');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'id' property must be not empty.`);
         }
     }
 
     _checkSource (source) {
         if (util.isUndefined(source)) {
-            throw new CartoValidationError('layer', 'sourceRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError('layer', 'nonValidSource');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source.Base".`);
         }
     }
 
     _checkViz (viz) {
         if (util.isUndefined(viz)) {
-            throw new CartoValidationError('layer', 'vizRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'viz'`);
         }
         if (!(viz instanceof Viz)) {
-            throw new CartoValidationError('layer', 'nonValidViz');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
-            throw new CartoValidationError('layer', 'sharedViz');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
     }
 

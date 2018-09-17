@@ -1,7 +1,8 @@
 import { Viz, expressions as s } from '../../src/index';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import { regExpThatContains as thatContains } from '../../src/utils/util';
 
 // Generic Style defaults
-
 const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_WIDTH_EXPRESSION = s.number(1);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
@@ -79,7 +80,7 @@ describe('api/viz', () => {
             it('should throw an error when parameter is not an object neither a string', function () {
                 expect(function () {
                     new Viz(1234);
-                }).toThrowError('viz definition should be a vizSpec object or a valid viz string.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_VALUE + ' viz \'definition\' should be a vizSpec object or a valid viz string.'));
             });
 
             it('should throw an error when resolution is not a number', () => {
@@ -88,7 +89,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be a number.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_TYPE + ' \'resolution\' property must be a number.');
             });
 
             it('should throw an error when resolution is too small', () => {
@@ -97,7 +98,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be greater than 0.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -106,7 +107,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be less than 256.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be less than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -115,7 +116,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`color` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'color\''));
             });
 
             it('should throw an error when width is not a valid expression', () => {
@@ -124,7 +125,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`width` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'width\''));
             });
 
             it('should throw an error when strokeColor is not a valid expression', () => {
@@ -133,7 +134,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeColor` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeColor\''));
             });
 
             it('should throw an error when strokeWidth is not a valid expression', () => {
@@ -142,7 +143,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeWidth` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeWidth\''));
             });
 
             it('should throw an error when order is not a valid expression', () => {
@@ -151,7 +152,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`order` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'order\''));
             });
 
             it('should add a console.warn when non supported properties are included', () => {

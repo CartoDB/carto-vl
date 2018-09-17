@@ -6,7 +6,8 @@ import BaseExpression from './renderer/viz/expressions/base';
 import { implicitCast } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
-import CartoValidationError from './errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
 import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
 import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexShader.glsl';
@@ -306,7 +307,7 @@ export default class Viz {
                 return;
             }
             if (temporarilyMarkedSet.has(node)) {
-                throw new Error('Viz contains a circular dependency');
+                throw new CartoRuntimeError('Viz contains a circular dependency');
             }
             temporarilyMarkedSet.add(node);
             node._getDependencies().forEach(visit);
@@ -396,7 +397,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            throw new Error('No child found');
+            throw new CartoRuntimeError('No child found');
         }
     }
 
@@ -419,7 +420,7 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError('viz', 'nonValidDefinition');
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
     }
 
     /**
@@ -474,41 +475,22 @@ export default class Viz {
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
-            throw new CartoValidationError('viz', 'resolutionNumberRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
         if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
         }
         if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
         }
-        if (!(vizSpec.color instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[color]');
-        }
-        if (!(vizSpec.strokeColor instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeColor]');
-        }
-        if (!(vizSpec.width instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[width]');
-        }
-        if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
-        }
-        if (!(vizSpec.order instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[order]');
-        }
-        if (!(vizSpec.filter instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[filter]');
-        }
-        if (!(vizSpec.symbol instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbol]');
-        }
-        if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
-        }
-        if (!(vizSpec.transform instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[transform]');
-        }
+
+        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
+            'symbol', 'symbolPlacement', 'transform'];
+        toCheck.forEach((parameter) => {
+            if (!(vizSpec[parameter] instanceof BaseExpression)) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+            }
+        });
 
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
@@ -542,33 +524,27 @@ export default class Viz {
 }
 
 function checkVizPropertyTypes (viz) {
-    if (viz.color.type !== 'color') {
-        throw new Error(`Viz property 'color:' must be of type 'color' but it was of type ${viz.color.type}`);
-    }
-    if (viz.strokeColor.type !== 'color') {
-        throw new Error(`Viz property 'strokeColor:' must be of type 'color' but it was of type ${viz.strokeColor.type}`);
-    }
-    if (viz.width.type !== 'number') {
-        throw new Error(`Viz property 'width:' must be of type 'number' but it was of type ${viz.width.type}`);
-    }
-    if (viz.strokeWidth.type !== 'number') {
-        throw new Error(`Viz property 'strokeWidth:' must be of type 'number' but it was of type ${viz.strokeWidth.type}`);
-    }
-    if (viz.order.type !== 'orderer') {
-        throw new Error(`Viz property 'order:' must be of type 'orderer' but it was of type ${viz.order.type}`);
-    }
-    if (viz.filter.type !== 'number') {
-        throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
-    }
-    if (viz.symbol.type !== 'image') {
-        throw new Error(`Viz property 'symbol:' must be of type 'image' but it was of type ${viz.symbol.type}`);
-    }
-    if (viz.symbolPlacement.type !== 'placement') {
-        throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
-    }
-    if (viz.transform.type !== 'transformation') {
-        throw new Error(`Viz property 'transform:' must be of type 'transformation' but it was of type ${viz.transform.type}`);
-    }
+    const expectedTypePerProperty = {
+        color: 'color',
+        strokeColor: 'color',
+        width: 'number',
+        strokeWidth: 'number',
+        order: 'orderer',
+        filter: 'number',
+        symbol: 'image',
+        symbolPlacement: 'placement',
+        transform: 'transformation'
+    };
+
+    Object.keys(expectedTypePerProperty).forEach((property) => {
+        const currentType = viz[property].type;
+        const expected = expectedTypePerProperty[property];
+        if (currentType !== expected) {
+            throw new CartoValidationError(
+                `${cvt.INCORRECT_TYPE} Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
+            );
+        }
+    });
 }
 
 /**

@@ -15,9 +15,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `categoryIndex` expression.
 - Add `rotate()`
 - Add transformation chaining by using lists
-  
+
 ### Changed
 - Use an optional third parameter in `ramp` expression to override the default value for "others"
+- Simplified `CartoError` and new specific error types
 
 ### Fixed
 - Fix symbol override

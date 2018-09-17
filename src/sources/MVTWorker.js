@@ -4,6 +4,8 @@ import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import Metadata from '../renderer/Metadata';
 import DummyDataframe from '../renderer/DummyDataframe';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -67,7 +69,9 @@ export class MVTWorker {
         const tile = new VectorTile(new Protobuf(arrayBuffer));
 
         if (Object.keys(tile.layers).length > 1 && !layerID) {
-            throw new Error(`LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}`);
+            throw new CartoValidationError(
+                `${cvt.MISSING_REQUIRED} LayerID parameter wasn't specified and the MVT tile contains multiple layers: ${JSON.stringify(Object.keys(tile.layers))}.`
+            );
         }
 
         const mvtLayer = tile.layers[layerID || Object.keys(tile.layers)[0]]; // FIXME this!!!
@@ -99,7 +103,7 @@ export class MVTWorker {
             case geometryTypes.POLYGON:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodePolygons);
             default:
-                throw new Error('MVT: invalid geometry type');
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${metadata.geomType}'`);
         }
     }
 
@@ -113,7 +117,7 @@ export class MVTWorker {
             case mvtDecoderGeomTypes.polygon:
                 return geometryTypes.POLYGON;
             default:
-                throw new Error('MVT: invalid geometry type');
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${type}'`);
         }
     }
 
@@ -148,7 +152,9 @@ export class MVTWorker {
                 pointGeometries[6 * numFeatures + 5] = y;
             }
             if (f.properties[metadata.idProperty] === undefined) {
-                throw new Error(`MVT feature with undefined idProperty '${metadata.idProperty}'`);
+                throw new CartoRuntimeError(
+                    `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
+                );
             }
             this._decodeProperties(metadata, propertyNames, properties, f, numFeatures);
             numFeatures++;
@@ -162,7 +168,9 @@ export class MVTWorker {
         const type = feature.type;
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
-            throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
+            throw new CartoRuntimeError(
+                `${crt.MVT} MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`
+            );
         }
     }
 
@@ -208,20 +216,21 @@ export class MVTWorker {
     }
 
     decodeProperty (metadata, propertyName, propertyValue) {
+        const metadataPropertyType = metadata.properties[propertyName].type;
         if (typeof propertyValue === 'string') {
-            if (metadata.properties[propertyName].type !== 'category') {
-                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type string: '${propertyValue}'`);
+            if (metadataPropertyType !== 'category') {
+                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);
             }
             return metadata.categorizeString(propertyName, propertyValue);
         } else if (typeof propertyValue === 'number') {
-            if (metadata.properties[propertyName].type !== 'number') {
-                throw new Error(`MVT decoding error. Metadata property '${propertyName}' is of type '${metadata.properties[propertyName].type}' but the MVT tile contained a feature property of type number: '${propertyValue}'`);
+            if (metadataPropertyType !== 'number') {
+                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);
             }
             return propertyValue;
         } else if (propertyValue === null || propertyValue === undefined) {
             return Number.NaN;
         } else {
-            throw new Error(`MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+            throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
         }
     }
 

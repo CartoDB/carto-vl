@@ -1,13 +1,14 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
 import { validateMaxArgumentsError, validateTypeErrors } from '../utils';
+import { CartoValidationTypes as cvt } from '../../../../../../src/errors/carto-validation-error';
 
 describe('src/renderer/viz/expressions/basic/list', () => {
     describe('error control', () => {
         validateMaxArgumentsError('list', ['number', 'number']);
-        validateTypeErrors('list', [], () => 'list(): invalid parameters: must receive at least one argument');
-        validateTypeErrors('list', [[]], () => 'list(): invalid parameters: must receive at least one argument');
+        validateTypeErrors('list', [], () => `${cvt.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
+        validateTypeErrors('list', [[]], () => `${cvt.MISSING_REQUIRED} list(): invalid parameters: must receive at least one argument.`);
         validateTypeErrors('list', [[1, 'a']]);
-        validateTypeErrors('list', [[function () {}]]);
+        validateTypeErrors('list', [[function () { }]]);
     });
 
     describe('.value', () => {
@@ -36,8 +37,8 @@ describe('src/renderer/viz/expressions/basic/list', () => {
             const actual = list.value;
 
             expect(actual).toEqual([
-                {r: 255, g: 0, b: 0, a: 1},
-                {r: 0, g: 0, b: 255, a: 1}]);
+                { r: 255, g: 0, b: 0, a: 1 },
+                { r: 0, g: 0, b: 255, a: 1 }]);
         });
 
         it('should return list of dates', () => {
