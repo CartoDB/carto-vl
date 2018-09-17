@@ -70,6 +70,44 @@
       strokeWidth: 0
     `
     );
+
+    // Draw chart using Chart.js library (https://www.chartjs.org/)
+    const chartOptionsDefault = {
+      animation: {
+        duration: 0
+      },
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            display: false
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            display: false
+          },
+          barPercentage: 1.0,
+          categoryPercentage: 1.0
+        }]
+      }
+    };
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      options: chartOptionsDefault
+    });
+
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
 
@@ -82,55 +120,24 @@
     layer.on('updated', drawHistogramLegend);
 
     function drawHistogramLegend() {
-        const histogram = layer.viz.variables.histogram.value;
-        const colorRamp = layer.viz.color;
-        const labels = histogram.map(value => value.x);
-        const data = histogram.map(value => value.y);
-        const backgroundColor = colorRamp
-          .getLegendData()
-          .data
-          .map(legend => computeColor(legend.value));
+      const histogram = layer.viz.variables.histogram.value;
+      const colorRamp = layer.viz.color;
+      const labels = histogram.map(value => value.x);
+      const data = histogram.map(value => value.y);
+      const backgroundColor = colorRamp
+        .getLegendData()
+        .data
+        .map(legend => computeColor(legend.value));
 
-        var myChart = new Chart(ctx, {
-          type: 'bar',
-          options: {
-            animation: {
-              duration: 0
-            },
-            legend: {
-              display: false
-            },
-            scales: {
-              yAxes: [{
-                gridLines: {
-                  drawBorder: false,
-                  display: false
-                },
-                ticks: {
-                  display: false
-                }
-              }],
-              xAxes: [{
-                gridLines: {
-                  drawBorder: false,
-                  display: false
-                },
-                ticks: {
-                  display: false
-                },
-                barPercentage: 1.0,
-                categoryPercentage: 1.0
-              }]
-            },
-          },
-          data: {
-            labels,
-            datasets: [{
-              data,
-              backgroundColor
-            }]
-          }
-        });
+      chart.data = {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor
+        }]
+      };
+
+      chart.update();
     }
 
     function hideLoader() {
