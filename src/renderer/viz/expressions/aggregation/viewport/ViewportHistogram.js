@@ -1,6 +1,6 @@
 import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
-import { checkMaxArguments } from '../../utils';
+import { checkMaxArguments, checkArray } from '../../utils';
 
 /**
  * Generates a histogram.
@@ -75,7 +75,7 @@ export default class ViewportHistogram extends BaseExpression {
     }
 
     /**
-     * Get an array of joined data sorted by frequency.
+     * Get an array of joined data by key and sorted by frequency.
      *
      * Note: It can be combined with a `ramp.getLegendData()` method. Take a look at the examples to see how it works.
      *
@@ -123,7 +123,6 @@ export default class ViewportHistogram extends BaseExpression {
      * // ]
      *
      * @example <caption>Get color values for the histogram when using a ramp.</caption>
-     *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
      *   @histogram: s.viewportHistogram(s.prop('vehicles'))
@@ -158,6 +157,8 @@ export default class ViewportHistogram extends BaseExpression {
      *
     */
     getJoinedValues (values) {
+        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
+
         if (!values.length) {
             return [];
         }
