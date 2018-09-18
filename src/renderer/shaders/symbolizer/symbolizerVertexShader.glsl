@@ -19,6 +19,7 @@ uniform sampler2D filterTex;
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
 varying highp vec2 pointCoord;
+varying highp float filtering;
 
 float decodeWidth(vec2 enc) {
   return enc.x*(255.*4.) + 4.*enc.y;
@@ -35,8 +36,7 @@ vec2 transform(vec2 p){
 void main(void) {
     featureIDVar = abs(featureID);
     color = texture2D(colorTex, abs(featureID));
-    float filtering = texture2D(filterTex, abs(featureID)).a;
-    color.a *= filtering;
+    filtering = texture2D(filterTex, abs(featureID)).a;
 
     float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);
     float fillSize = size;
@@ -65,5 +65,7 @@ void main(void) {
     if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
+
+
     gl_Position  = p;
 }
