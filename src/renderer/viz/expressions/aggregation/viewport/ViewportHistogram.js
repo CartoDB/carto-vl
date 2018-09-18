@@ -12,7 +12,7 @@ import { checkMaxArguments } from '../../utils';
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
  * @param {Number} input - expression to base the histogram
- * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, whioinch will generate a simple, non-weighted count.
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
  * @return {Histogram} Histogram
  *
@@ -218,7 +218,7 @@ function _getNumericValue (histogram, size) {
     });
 }
 
-function _getCategoryValue (histogram, input) {
+function _getCategoryValue (histogram) {
     return [...histogram]
         .map(([x, y]) => {
             return { x, y };
