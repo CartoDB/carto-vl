@@ -1,4 +1,5 @@
 import Feature from '../interactivity/feature';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 export default class RenderLayer {
     constructor () {
@@ -51,7 +52,7 @@ export default class RenderLayer {
 
     _checkDataframeType (dataframe) {
         if (this.type !== dataframe.type) {
-            throw new Error('Layer dataframes must always be of the same type');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Layer dataframes must always be of the same type`);
         }
     }
 

@@ -1,4 +1,4 @@
-import CartoValidationError from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import util from '../utils/util';
 import BaseWindshaft from './BaseWindshaft';
 
@@ -61,17 +61,17 @@ export default class SQL extends BaseWindshaft {
 
     _checkQuery (query) {
         if (util.isUndefined(query)) {
-            throw new CartoValidationError('source', 'queryRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'query'`);
         }
         if (!util.isString(query)) {
-            throw new CartoValidationError('source', 'queryStringRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'query' property must be a string.`);
         }
         if (query === '') {
-            throw new CartoValidationError('source', 'nonValidQuery');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'query' property must be not empty.`);
         }
         let sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
-            throw new CartoValidationError('source', 'nonValidSQLQuery');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'query' property must be a SQL query.`);
         }
     }
 }

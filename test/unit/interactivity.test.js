@@ -1,4 +1,6 @@
 import { Interactivity, Viz, Layer, source } from '../../src/index';
+import { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+
 const { Dataset } = source;
 
 describe('api/interactivity', () => {
@@ -40,15 +42,15 @@ describe('api/interactivity', () => {
         });
 
         it('should throw an error when the layer list is not an array', () => {
-            expect(() => new Interactivity('wadus')).toThrowError('Invalid layer list, parameter must be an array of carto.Layer objects');
+            expect(() => new Interactivity('wadus')).toThrowError(cvt.INCORRECT_TYPE + ' Invalid layer list, parameter must be an array of "carto.Layer" objects.');
         });
 
         it('should throw an error when the layer list is empty', () => {
-            expect(() => new Interactivity([])).toThrowError('Invalid argument, layer list must not be empty');
+            expect(() => new Interactivity([])).toThrowError(cvt.INCORRECT_VALUE + ' Invalid argument, layer list must not be empty.');
         });
 
         it('should throw an error when a layer is not a carto.Layer instance', () => {
-            expect(() => new Interactivity(['wadus'])).toThrowError('Invalid layer, layer must be an instance of carto.Layer');
+            expect(() => new Interactivity(['wadus'])).toThrowError(cvt.INCORRECT_TYPE + ' Invalid layer, layer must be an instance of "carto.Layer".');
         });
 
         xit('should throw an error when the layers have different map', () => {

@@ -7,6 +7,7 @@ attribute vec2 normal;
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 uniform vec2 normalScale;
+uniform vec2 resolution;
 
 uniform sampler2D colorTex;
 uniform sampler2D strokeColorTex;
@@ -20,7 +21,7 @@ float decodeWidth(vec2 enc) {
 }
 
 $propertyPreface
-$offset_preface
+$transform_preface
 
 void main(void) {
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
@@ -40,7 +41,7 @@ void main(void) {
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
     vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
-    p.xy += normalScale*($offset_inline);
+    p.xy = $transform_inline(p.xy*resolution)/resolution;
 
     if (c.a==0.){
         p.x=10000.;

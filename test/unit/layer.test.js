@@ -1,4 +1,5 @@
 import { Layer, Viz, source } from '../../src/index';
+import { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 const { Dataset, GeoJSON, SQL } = source;
 
 describe('api/layer', () => {
@@ -26,38 +27,42 @@ describe('api/layer', () => {
         it('should throw an error if id is not valid', () => {
             expect(() => {
                 new Layer();
-            }).toThrowError('`id` property required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'id\'');
+
             expect(() => {
                 new Layer({});
-            }).toThrowError('`id` property must be a string.');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' \'id\' property must be a string.');
+
             expect(() => {
                 new Layer('');
-            }).toThrowError('`id` property must be not empty.');
+            }).toThrowError(cvt.INCORRECT_VALUE + ' \'id\' property must be not empty.');
         });
 
         it('should throw an error if source is not valid', () => {
             expect(() => {
                 new Layer('layer0');
-            }).toThrowError('`source` property required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'source\'');
+
             expect(() => {
                 new Layer('layer0', {});
-            }).toThrowError('The given object is not a valid source. See "carto.source.Base".');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source.Base".');
         });
 
         it('should throw an error if viz is not valid', () => {
             expect(() => {
                 new Layer('layer0', source);
-            }).toThrowError('`viz` property required.');
+            }).toThrowError(cvt.MISSING_REQUIRED + ' \'viz\'');
+
             expect(() => {
                 new Layer('layer0', source, {});
-            }).toThrowError('The given object is not a valid viz. See "carto.Viz".');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
         });
 
         it('should throw an error if a viz is already added to another layer', () => {
             new Layer('layer1', source, viz);
             expect(() => {
                 new Layer('layer2', source, viz);
-            }).toThrowError('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
+            }).toThrowError(cvt.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
         });
     });
 
@@ -104,14 +109,14 @@ describe('api/layer', () => {
         it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
             layer.blendToViz().catch(error => {
-                expect(error.message).toBe('`viz` property required.');
+                expect(error.message).toBe(cvt.MISSING_REQUIRED + ' \'viz\'');
                 done();
             });
         });
         it('should reject the promise when viz is not a valid viz', (done) => {
             const layer = new Layer('layer0', source, viz);
             layer.blendToViz(2).catch(error => {
-                expect(error.message).toBe('The given object is not a valid viz. See "carto.Viz".');
+                expect(error.message).toBe(cvt.INCORRECT_TYPE + ' The given object is not a valid \'viz\'. See "carto.Viz".');
                 done();
             });
         });
@@ -119,7 +124,7 @@ describe('api/layer', () => {
             const layer = new Layer('layer0', source, viz);
             new Layer('layer1', source, viz2);
             layer.blendToViz(viz2).catch(error => {
-                expect(error.message).toBe('The given Viz object is already bound to another layer. Vizs cannot be shared between different layers');
+                expect(error.message).toBe(cvt.INCORRECT_VALUE + ' The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.');
                 done();
             });
         });
