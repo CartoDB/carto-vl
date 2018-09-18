@@ -157,9 +157,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: '$vehicles',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -176,9 +176,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: '$vehicles',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -238,9 +238,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'top($vehicles)',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -260,9 +260,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'top($vehicles)',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -283,9 +283,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'linear($numvehicles, 1, 100)',
      *   //    data: [
      *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -305,9 +305,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'linear($numvehicles, 1, 100)',
      *   //    data: [
      *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -326,9 +326,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'buckets($numvehicles, [1, 2, 3])',
      *   //    data: [
      *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -347,9 +347,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'buckets($numvehicles, [1, 2, 3])',
      *   //    data: [
      *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -368,9 +368,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'globalEqIntervals($numvehicles, 4)',
      *   //    data: [
      *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -389,9 +389,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'globalEqIntervals($numvehicles, 4)',
      *   //    data: [
      *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });

@@ -124,15 +124,20 @@
     function drawHistogramLegend() {
       const histogram = layer.viz.variables.histogram;
       const colorRamp = layer.viz.color;
-      const labels = histogram.value.map(value => value.x);
-      const data = histogram.value.map(value => value.y);
+
       const legendData = colorRamp.getLegendData().data;
       const histogramData = histogram.getAssingedData(legendData);
+      
+      const data = histogramData.map(elem => elem.frequency);
+      const labels = histogramData.map(elem => elem.key);
       const backgroundColor = histogramData.map(elem => computeColor(elem.value));
 
       chart.data = {
         labels,
-        datasets: [{ data, backgroundColor }]
+        datasets: [{
+          data,
+          backgroundColor
+        }]
       };
 
       chart.update();

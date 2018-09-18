@@ -37,9 +37,8 @@ import { checkMaxArguments } from '../../utils';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, input, weight = 1, size = 1000) {
+    constructor (x, weight = 1, size = 1000) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
-        // check input
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 
         this.type = 'histogram';
@@ -75,10 +74,102 @@ export default class ViewportHistogram extends BaseExpression {
         return this._cached;
     }
 
-    getAssingedData (values) { // { key, value } array
+    /**
+     * Get an array of joined data sorted by frequency.
+     *
+     * Note: It can be combined with a `ramp.getLegendData()` method. Take a look at the examples to see how it works.
+     *
+     * @param {Array} values - Array of { key, value } pairs
+     * @return {Array} - { frequency, key, value }
+     *
+     * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
+     * const numberOfWheels = [
+     *  { key: 'car', value: 4 },
+     *  { key: 'truck', value: 8 },
+     *  { key: 'bike', value: 2 }
+     * ];
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   @histogram: s.viewportHistogram(s.prop('vehicles))
+     * });
+     *
+     * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
+     * // returns an array with the following format:
+     * // [
+     * //   { frequency: 10, key: 'truck', value: 8 }
+     * //   { frequency: 20, key: 'bike', value: 2 }
+     * //   { frequency: 30, key: 'car', value: 4 }
+     * // ]
+     *
+     * @example <caption>Get joined data for a categorical property sorted by frequency. (String)</caption>
+     * const numberOfWheels = [
+     *  { key: 'car', value: 4 },
+     *  { key: 'truck', value: 8 },
+     *  { key: 'bike', value: 2 }
+     * ];
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: viewportHistogram($vehicles)
+     * `);
+     *
+     * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
+     * // returns an array with the following format:
+     * // [
+     * //   { frequency: 10, key: 'truck', value: 8 }
+     * //   { frequency: 20, key: 'bike', value: 2 }
+     * //   { frequency: 30, key: 'car', value: 4 }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram when using a ramp.</caption>
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
+     * `);
+     *
+     * const legendData = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: viewportHistogram($vehicles)
+     *   color: ramp($vehicles, Prism)
+     * `);
+     *
+     * const legendData = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
+     * // ]
+     *
+    */
+    getJoinedValues (values) {
+        if (!values.length) {
+            return [];
+        }
+
         return this.value.map(elem => {
             const data = values.find(value => value.key === elem.x);
-            return { key: elem.x, label: elem.y, value: data.value };
+
+            const frequency = elem.y;
+            const key = elem.x;
+            const value = data !== -1 ? data.value : null;
+
+            return { frequency, key, value };
         });
     }
 
