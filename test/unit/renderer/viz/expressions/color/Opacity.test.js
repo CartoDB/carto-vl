@@ -1,4 +1,4 @@
-import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from '../utils';
+import { validateMaxArgumentsError, validateTypeErrors, validateDynamicType } from '../utils';
 import { opacity, rgba, mul, variable, rgb } from '../../../../../../src/renderer/viz/expressions';
 
 describe('src/renderer/viz/expressions/opacity', () => {
@@ -11,7 +11,8 @@ describe('src/renderer/viz/expressions/opacity', () => {
     });
 
     describe('type', () => {
-        validateStaticType('opacity', ['color', 'number'], 'color');
+        validateDynamicType('opacity', ['color', 'number'], 'color');
+        validateDynamicType('opacity', ['image', 'number'], 'image');
     });
 
     describe('.value', () => {
