@@ -67,8 +67,8 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegend({othersLabel: 'Default'});
-      const colorLegend = layer.viz.color.getLegend();
+      const symbolLegend = layer.viz.symbol.getLegendData({othersLabel: 'Default'});
+      const colorLegend = layer.viz.color.getLegendData();
 
       let symbolLegendList = '';
 

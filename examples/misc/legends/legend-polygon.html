@@ -69,7 +69,7 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const colorLegend = layer.viz.color.getLegend({
+      const colorLegend = layer.viz.color.getLegendData({
         othersLabel: 'Default',
         samples: 20
       });

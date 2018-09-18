@@ -96,7 +96,7 @@ export default class Linear extends BaseExpression {
         }
     }
 
-    getLegendData (config) {
+    _getLegendData (config) {
         const min = this.min.eval();
         const max = this.max.eval();
         const INC = 1 / (config.samples - 1);

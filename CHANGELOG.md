@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
 - Add `globalStandardDev` and `viewportStandardDev` classification expressions
-- New method `ramp.getLegend`
+- New method `ramp.getLegendData`
 - Add expressions `toString()` method
 - Add viz `toString()` method
 - `ramp` with an image list defaults to `circle` for the `others` bucket
@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `categoryIndex` expression.
 - Add `rotate()`
 - Add transformation chaining by using lists
+- Add `getJoinedValues` method to `viewportHistogram` expression.
 - Add support for `opacity()` with images as first parameter
 
 ### Changed

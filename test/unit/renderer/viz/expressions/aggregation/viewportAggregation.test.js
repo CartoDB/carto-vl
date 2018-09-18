@@ -18,22 +18,22 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $cat = s.property('cat');
 
     describe('viewport filtering', () => {
-        function fakeDrawMetadata (expr) {
-            const METADATA = new Metadata({
-                properties: {
-                    numeric_with_nulls: { type: 'number' },
-                    price: { type: 'number' },
-                    cat: {
-                        type: 'category',
-                        categories: [
-                            { name: 'a' },
-                            { name: 'b' },
-                            { name: 'c' }
-                        ]
-                    }
+        const METADATA = new Metadata({
+            properties: {
+                numeric_with_nulls: { type: 'number' },
+                price: { type: 'number' },
+                cat: {
+                    type: 'category',
+                    categories: [
+                        { name: 'a' },
+                        { name: 'b' },
+                        { name: 'c' }
+                    ]
                 }
-            });
+            }
+        });
 
+        function fakeDrawMetadata (expr) {
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
@@ -181,6 +181,76 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                     y: 1
                 }
             ]);
+        });
+
+        it('viewportHistogram.getJoinedValues should be able to join data sorted by frequency', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            fakeDrawMetadata(viewportHistogram);
+            const fakeValues = [
+                {
+                    key: 'b',
+                    value: 10
+                },
+                {
+                    key: 'c',
+                    value: 20
+                },
+                {
+                    key: 'a',
+                    value: 30
+                }
+            ];
+
+            const joinedValues = viewportHistogram.getJoinedValues(fakeValues);
+            expect(joinedValues).toEqual(
+                [
+                    {
+                        frequency: 2,
+                        key: 'b',
+                        value: 10
+                    },
+                    {
+                        frequency: 1,
+                        key: 'a',
+                        value: 30
+                    },
+                    {
+                        frequency: 1,
+                        key: 'c',
+                        value: 20
+                    }
+                ]
+            );
+        });
+
+        it('viewportHistogram.getJoinedValues should be combined with ramp.getLegendData', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            const ramp = s.ramp($cat, s.palettes.PRISM);
+            ramp._bindMetadata(METADATA);
+            fakeDrawMetadata(viewportHistogram);
+
+            const values = ramp.getLegendData().data;
+            const joinedValues = viewportHistogram.getJoinedValues(values);
+
+            expect(joinedValues).toEqual(
+                [
+                    {
+                        frequency: 2,
+                        key: 'b',
+                        value: { r: 29, g: 105, b: 150, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'a',
+                        value: { r: 95, g: 70, b: 144, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'c',
+                        value: { r: 56, g: 166, b: 165, a: 1 }
+                    }
+                ]
+            );
         });
     });
 });

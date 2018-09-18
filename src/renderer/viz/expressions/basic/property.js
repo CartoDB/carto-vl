@@ -73,6 +73,7 @@ export default class Property extends BaseExpression {
 
     _bindMetadata (metadata) {
         const metaColumn = metadata.properties[this.name];
+
         if (!metaColumn) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Property '${this.name}' does not exist`);
         }

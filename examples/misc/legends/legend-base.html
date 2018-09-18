@@ -60,16 +60,16 @@
       width: 5
       strokeWidth: 0
     `);
-    
+
     // Create the layer
     const layer = new carto.Layer('layer', source, viz);
-    
+
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
     // Get the information for legend
-    const colorLegend = layer.viz.color.getLegend();
+    const colorLegend = layer.viz.color.getLegendData();
     
     let colorLegendList = '';
     colorLegend.data.forEach((legend) => {
@@ -81,12 +81,15 @@
     // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
     });
+
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
+
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
+
   </script>
 </body>
 
