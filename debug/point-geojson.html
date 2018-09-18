@@ -27,14 +27,14 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [0, 0],
       zoom: 5,
       scrollZoom: true,
       dragRotate: false,
       touchZoomRotate: false,
     });
-  
+
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
