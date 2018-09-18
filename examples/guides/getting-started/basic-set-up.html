@@ -30,28 +30,6 @@
             dragRotate: false,
         });
         map.touchZoomRotate.disableRotation();
-
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
-        map.addControl(nav, 'top-left');
-
-        // Autenticate the client
-        carto.setDefaultAuth({
-            user: 'cartovl',
-            apiKey: 'default_public'
-        });
-        // Create the source
-        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-        // Create a viz with some styles
-        const viz = new carto.Viz(`
-            color: red
-            width: 10
-        `);
-        // Create the layer
-        const layer = new carto.Layer('layer', source, viz);
-        // Add the layer to the map
-        layer.addTo(map);
     </script>
 </body>
 
