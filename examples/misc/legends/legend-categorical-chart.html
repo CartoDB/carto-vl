@@ -122,12 +122,17 @@
     layer.on('updated', drawHistogramLegend);
 
     function drawHistogramLegend() {
+      // Get histogram variable
       const histogram = layer.viz.variables.histogram;
+      // Get color ramp
       const colorRamp = layer.viz.color;
 
+      // Use getLegendData to get color values from the ramp
       const legendData = colorRamp.getLegendData().data;
-      const histogramData = histogram.getAssingedData(legendData);
+      // Use getJoinedValues to get sorted colors by frequency
+      const histogramData = histogram.getJoinedValues(legendData);
       
+      // Chart.js set up
       const data = histogramData.map(elem => elem.frequency);
       const labels = histogramData.map(elem => elem.key);
       const backgroundColor = histogramData.map(elem => computeColor(elem.value));
