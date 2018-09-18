@@ -28,7 +28,7 @@ Then, we will need to add Mapbox GL JavaScript and CSS files.
 
 This will add the `carto` and the `mapboxgl` objects to the global namespace.
 
-Not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination.
+> Note: Not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination. If you are importing CARTO VL from npm, you have to use our Mapbox GL fork. Read more about how to do this in [the advanced guide]((https://carto.com/developers/carto-vl/guides/advanced))
 
 Create a `div` where the map is going to be drawn.
 
