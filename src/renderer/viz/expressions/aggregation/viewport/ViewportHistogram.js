@@ -37,14 +37,15 @@ import { checkMaxArguments } from '../../utils';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, weight = 1, size = 1000) {
+    constructor (x, input, weight = 1, size = 1000) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
-
+        // check input
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 
         this.type = 'histogram';
         this._size = size;
         this._isViewport = true;
+
         this.inlineMaker = () => null;
     }
 
@@ -72,6 +73,13 @@ export default class ViewportHistogram extends BaseExpression {
         }
 
         return this._cached;
+    }
+
+    getAssingedData (values) { // { key, value } array
+        return this.value.map(elem => {
+            const data = values.find(value => value.key === elem.x);
+            return { key: elem.x, label: elem.y, value: data.value };
+        });
     }
 
     _bindMetadata (metadata) {
@@ -119,7 +127,7 @@ function _getNumericValue (histogram, size) {
     });
 }
 
-function _getCategoryValue (histogram) {
+function _getCategoryValue (histogram, input) {
     return [...histogram]
         .map(([x, y]) => {
             return { x, y };

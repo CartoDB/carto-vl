@@ -60,13 +60,13 @@
 
     const ctx = document.getElementById('histogram').getContext('2d');
     // Define the source
-    const source = new carto.source.Dataset('spend_data');
+    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     // Define the visualization
     const viz = new carto.Viz(
-      `
-      @histogram: viewportHistogram($daytime)
-      color: ramp($daytime, bold)
-      width: 5
+    ` @color: ramp($featurecla, bold) 
+      @histogram: viewportHistogram($featurecla, @color)
+      color: @color
+      width: 35
       strokeWidth: 0
     `
     );
@@ -86,6 +86,8 @@
             display: false
           },
           ticks: {
+            suggestedMin: 1,
+            beginAtZero: true,
             display: false
           }
         }],
@@ -120,21 +122,17 @@
     layer.on('updated', drawHistogramLegend);
 
     function drawHistogramLegend() {
-      const histogram = layer.viz.variables.histogram.value;
+      const histogram = layer.viz.variables.histogram;
       const colorRamp = layer.viz.color;
-      const labels = histogram.map(value => value.x);
-      const data = histogram.map(value => value.y);
-      const backgroundColor = colorRamp
-        .getLegendData()
-        .data
-        .map(legend => computeColor(legend.value));
+      const labels = histogram.value.map(value => value.x);
+      const data = histogram.value.map(value => value.y);
+      const legendData = colorRamp.getLegendData().data;
+      const histogramData = histogram.getAssingedData(legendData);
+      const backgroundColor = histogramData.map(elem => computeColor(elem.value));
 
       chart.data = {
         labels,
-        datasets: [{
-          data,
-          backgroundColor
-        }]
+        datasets: [{ data, backgroundColor }]
       };
 
       chart.update();
