@@ -38,14 +38,14 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [-105.048, 39.749],
       zoom: 15,
       scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
     });
-  
+
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
