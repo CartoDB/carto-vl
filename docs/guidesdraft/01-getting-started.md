@@ -112,7 +112,7 @@ carto.setDefaultAuth({
 });
 ```
 
-The next step is to define the [`source`](# TODO) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
+The next step is to define the [`source`](https://carto.com/developers/carto-vl/guides/using-data-in-your-visualization-with-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
 
 ```js
 const source = new carto.source.Dataset('populated_places');
