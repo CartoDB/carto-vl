@@ -15,6 +15,7 @@
             height: 100%;
             width: 100%;
         }
+
     </style>
 </head>
 
@@ -22,6 +23,7 @@
     <!-- Map goes here -->
     <div id="map"></div>
     <script>
+        // Define the basemap
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
@@ -30,6 +32,7 @@
             dragRotate: false,
         });
         map.touchZoomRotate.disableRotation();
+
     </script>
 </body>
 

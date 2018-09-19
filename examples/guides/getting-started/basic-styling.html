@@ -15,6 +15,7 @@
             height: 100%;
             width: 100%;
         }
+
     </style>
 </head>
 
@@ -22,6 +23,7 @@
     <!-- Map goes here -->
     <div id="map"></div>
     <script>
+        // Define the basemap
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -30,26 +32,27 @@
             dragRotate: false,
         });
 
-        // Autenticate the client
+        // Define the user
         carto.setDefaultAuth({
             user: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Create the source
+        // Define the source
         const source = new carto.source.Dataset('populated_places');
 
-        // Create a viz with some styles
+        // Define and style the Viz object
         const viz = new carto.Viz(`
-            color: red
-            width: 10
-        `);
+                color: red
+                width: 10
+            `);
 
-        // Create the layer
+        // Initialize the Layer
         const layer = new carto.Layer('layer', source, viz);
 
         // Add the layer to the map
         layer.addTo(map);
+
     </script>
 </body>
 

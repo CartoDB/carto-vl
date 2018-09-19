@@ -61,7 +61,7 @@ Style the `div` to ensure it will be displayed correctly.
 }
 ```
 
-#### Defining the basemap
+#### Define the basemap
 
 Once you have the `div`, you have use the `mapboxgl` object to initialize your map using the following parameters:
 
@@ -99,7 +99,7 @@ At this point you will have a basic map:
     </iframe>
 </div>
 
-### Defining the source
+### Define the user
 
 In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](https://carto.com/developers/fundamentals/authorization/).
 
@@ -112,13 +112,15 @@ carto.setDefaultAuth({
 });
 ```
 
+### Define the source
+
 The next step is to define the [`source`](https://carto.com/developers/carto-vl/guides/using-data-in-your-visualization-with-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
 
 ```js
 const source = new carto.source.Dataset('populated_places');
 ```
 
-### Defining the Viz object
+### Define the Viz object
 
 A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled, displayed, and processed. In this case you have to create an empty Viz object, that will use the style set by default.
 
@@ -126,7 +128,7 @@ A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is o
 const viz = new carto.Viz();
 ```
 
-### Defining the layer
+### Initialize the Layer
 
 Now that you have defined a `source` and a `Viz object`, you need to create a new [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be added to the map.
 
@@ -140,7 +142,7 @@ Once you have the layer, you need to use the [`addTo`](https://carto.com/develop
 layer.addTo(map);
 ```
 
-### Styling the map
+### Style the Viz object
 
 Using the Viz object you can decide how to visualize your data.
 
@@ -192,6 +194,7 @@ For more information about styling, check out the guide [Introduction to Styling
     <!-- Map goes here -->
     <div id="map"></div>
     <script>
+        // Define the basemap
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -200,22 +203,22 @@ For more information about styling, check out the guide [Introduction to Styling
             dragRotate: false,
         });
 
-        // Autenticate the client
+        // Define the user
         carto.setDefaultAuth({
             user: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Create the source
+        // Define the source
         const source = new carto.source.Dataset('populated_places');
 
-        // Create a viz with some styles
+        // Define and style the Viz object
         const viz = new carto.Viz(`
             color: red
             width: 10
         `);
 
-        // Create the layer
+        // Initialize the Layer
         const layer = new carto.Layer('layer', source, viz);
 
         // Add the layer to the map
