@@ -371,6 +371,7 @@ export default class Layer {
         // Call request data if the matrix has changed
         if (!util.equalArrays(this._matrix, matrix)) {
             this._matrix = matrix;
+            this.renderer.matrix = matrix;
             this.requestData(matrix);
         }
     }
@@ -534,7 +535,139 @@ export default class Layer {
     }
 
     _getViewport () {
-        return this.renderer.getBounds();
+        function invert (out, a) {
+            let a00 = a[0], a01 = a[1], a02 = a[2], a03 = a[3];
+            let a10 = a[4], a11 = a[5], a12 = a[6], a13 = a[7];
+            let a20 = a[8], a21 = a[9], a22 = a[10], a23 = a[11];
+            let a30 = a[12], a31 = a[13], a32 = a[14], a33 = a[15];
+
+            let b00 = a00 * a11 - a01 * a10;
+            let b01 = a00 * a12 - a02 * a10;
+            let b02 = a00 * a13 - a03 * a10;
+            let b03 = a01 * a12 - a02 * a11;
+            let b04 = a01 * a13 - a03 * a11;
+            let b05 = a02 * a13 - a03 * a12;
+            let b06 = a20 * a31 - a21 * a30;
+            let b07 = a20 * a32 - a22 * a30;
+            let b08 = a20 * a33 - a23 * a30;
+            let b09 = a21 * a32 - a22 * a31;
+            let b10 = a21 * a33 - a23 * a31;
+            let b11 = a22 * a33 - a23 * a32;
+
+            // Calculate the determinant
+            let det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
+
+            if (!det) {
+                return null;
+            }
+            det = 1.0 / det;
+
+            out[0] = (a11 * b11 - a12 * b10 + a13 * b09) * det;
+            out[1] = (a02 * b10 - a01 * b11 - a03 * b09) * det;
+            out[2] = (a31 * b05 - a32 * b04 + a33 * b03) * det;
+            out[3] = (a22 * b04 - a21 * b05 - a23 * b03) * det;
+            out[4] = (a12 * b08 - a10 * b11 - a13 * b07) * det;
+            out[5] = (a00 * b11 - a02 * b08 + a03 * b07) * det;
+            out[6] = (a32 * b02 - a30 * b05 - a33 * b01) * det;
+            out[7] = (a20 * b05 - a22 * b02 + a23 * b01) * det;
+            out[8] = (a10 * b10 - a11 * b08 + a13 * b06) * det;
+            out[9] = (a01 * b08 - a00 * b10 - a03 * b06) * det;
+            out[10] = (a30 * b04 - a31 * b02 + a33 * b00) * det;
+            out[11] = (a21 * b02 - a20 * b04 - a23 * b00) * det;
+            out[12] = (a11 * b07 - a10 * b09 - a12 * b06) * det;
+            out[13] = (a00 * b09 - a01 * b07 + a02 * b06) * det;
+            out[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
+            out[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
+
+            return out;
+        }
+        function transformMat4 (out, a, m) {
+            let x = a[0], y = a[1], z = a[2], w = a[3];
+            out[0] = m[0] * x + m[4] * y + m[8] * z + m[12] * w;
+            out[1] = m[1] * x + m[5] * y + m[9] * z + m[13] * w;
+            out[2] = m[2] * x + m[6] * y + m[10] * z + m[14] * w;
+            out[3] = m[3] * x + m[7] * y + m[11] * z + m[15] * w;
+            return out;
+        }
+
+        const inv = invert([], this._matrix);
+
+        // Compute the WebMercator position at projected (x,y) NDC (Normalized Device Coordinates) reversing the projection of the point
+        function unproject (x, y) {
+            // To unproject a point we need the 3 coordinates (x,y,z)
+            // The `z` coordinate can be computed by knowing that the unprojected `z` is equal to `0` (since the map is a 2D plane)
+            // defined at `z=0`
+
+            // Since a matrix-vector multiplication is a linear transform we know that
+            //      z = m * projectedZ + k
+            // Being `m` and `k` constants for a particular value of projected `x` and `y` coordinates
+
+            // With that equation and the inverse matrix of the projection we can establish an equation system of the form:
+            //      v1 = m * v2 + k
+            //      v3 = m * v4 + k
+            // Where `v2` and `v4` can be arbitrary values (but not equal to each other) and
+            // `v1` and `v3` can be computed by using the inverse matrix knowing that:
+            //      (_, _, v1,_) = inverse(projectionMatrix) * (projectedX, projectedY, v2, 1)
+            //      (_, _, v3,_) = inverse(projectionMatrix) * (projectedX, projectedY, v4, 1)
+
+            // By resolving the the equation system above computing `m` and `k` values
+            // we can compute the projected Z coordinate at the (x,y) NDC (projected) point
+
+            // With (projectedX, projectedY, projectedZ) we can compute the unprojected point by multiplying by the inverse matrix
+
+            // *** Implementation ***
+
+            // compute m, k for: [z = m*projectedZ + k]
+            const v2 = 1;
+            const v4 = 2;
+
+            const v1 = transformMat4([], [x, y, v2, 1], inv)[2];
+            const v3 = transformMat4([], [x, y, v4, 1], inv)[2];
+
+            // Solve the equation system by using the elimination method (subtraction of the equations)
+            //      (v1-v3) = (v2-v4)*m
+            //      m = (v1 - v3) / (v2 - v4)
+            const m = (v1 - v3) / (v2 - v4);
+            // Substituting in the first equation `m` and solving for `k`
+            const k = v1 - m * v2;
+
+            // compute projectedZ by solving `z = m * projectedZ + k` knwoing `z`, `m` and `k`
+            const projectedZ = -k / m;
+
+            // Inverse the projection and normalize by `p.w`
+            return transformMat4([], [x, y, projectedZ, 1], inv).map((v, _, point) => v / point[3]);
+        }
+        const corners = [
+            [-1, -1],
+            [-1, 1],
+            [1, -1],
+            [1, 1]
+        ].map(NDC =>
+            unproject(...NDC)
+        ).map(c =>
+            // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
+            c.map(x => x * 2 - 1)
+        );
+
+        // Rotation no longer gurantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
+        // we need to compute the AABB min/max by iterating
+        const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+        const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+        corners.forEach(corner => {
+            min[0] = Math.min(min[0], corner[0]);
+            min[1] = Math.min(min[1], corner[1]);
+            max[0] = Math.max(max[0], corner[0]);
+            max[1] = Math.max(max[1], corner[1]);
+        });
+
+        // Our API flips the `y` coordinate, we need to convert the values accordingly
+        min[1] = -min[1];
+        max[1] = -max[1];
+        const temp = min[1];
+        min[1] = max[1];
+        max[1] = temp;
+
+        return [...min, ...max];
     }
 
     _getZoom () {

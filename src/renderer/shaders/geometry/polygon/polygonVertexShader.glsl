@@ -13,6 +13,7 @@ uniform sampler2D colorTex;
 uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
+uniform mat4 matrix;
 
 varying lowp vec4 color;
 
@@ -40,7 +41,10 @@ void main(void) {
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
+    vec2 o = vertexScale * vertexPosition - vertexOffset;
+    o.y*=-1.;
+    vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);//vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
+    p/=p.w;
     p.xy = $transform_inline(p.xy*resolution)/resolution;
 
     if (c.a==0.){

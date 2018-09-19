@@ -336,11 +336,11 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (scale / aspect) * dataframe.scale,
-                scale * dataframe.scale);
+                dataframe.scale,
+                dataframe.scale);
             gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (scale / aspect) * (this._center.x - dataframe.center.x),
-                scale * (this._center.y - dataframe.center.y));
+                (-dataframe.center.x),
+                (-dataframe.center.y));
             gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
 
             dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
@@ -430,6 +430,7 @@ export default class Renderer {
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
+            gl.uniformMatrix4fv(renderer.matrix, false, this.matrix);
 
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
