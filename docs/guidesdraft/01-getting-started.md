@@ -74,7 +74,7 @@ Once you have the `div`, you have use the `mapboxgl` object to initialize your m
 ```js
 const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [0, 30],
       zoom: 2,
       dragRotate: false
@@ -83,9 +83,9 @@ const map = new mapboxgl.Map({
 
 For basemaps you can add [Mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or choose one of the three predefined styles offered by CARTO:
 
-- **Voyager:** https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json
-- **Positron:** https://basemaps.cartocdn.com/gl/positron-gl-style/style.json
-- **Dark Matter:** https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json
+- **Voyager:** `carto.basemaps.voyager` [https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json)
+- **Positron:** `carto.basemaps.positron` [https://basemaps.cartocdn.com/gl/positron-gl-style/style.json](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
+- **Dark Matter:** `carto.basemaps.darkmatter` [https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
 
 At this point you will have a basic map:
 
@@ -194,7 +194,7 @@ For more information about styling, check out the guide [Introduction to Styling
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            style: carto.basemaps.voyager,
             center: [0, 30],
             zoom: 2,
             dragRotate: false,
