@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add layer | CARTO</title>
+  <title>Style layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -21,10 +21,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Add layer</h1>
+        <h1>Style a layer</h1>
       </header>
       <section>
-        <p class="description open-sans">Add one CARTO layer to your map</p>
+        <p class="description open-sans">Apply custom styling to a point layer</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -40,7 +40,7 @@
       zoom: 2,
       scrollZoom: false,
       dragRotate: false,
-      touchZoomRotate: false
+      touchZoomRotate: false,
     });
 
     // Add zoom controls
@@ -58,13 +58,18 @@
     // Define source
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
 
-    // Define Viz object
-    const viz = new carto.Viz();
+    // Define Viz object and custom style
+    const viz = new carto.Viz(`
+      width: 8
+      color: #6A5ACD
+      strokeWidth: 0.5
+      strokeColor: #191970
+    `);
 
     // Define map layer
     const layer = new carto.Layer('layer', source, viz);
 
-    // Add map layer
+    // Add map layer 
     layer.addTo(map, 'watername_ocean');
 
   </script>
