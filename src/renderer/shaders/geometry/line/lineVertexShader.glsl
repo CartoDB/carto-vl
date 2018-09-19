@@ -1,3 +1,4 @@
+// Line Vertex Shader
 precision highp float;
 
 attribute vec2 vertexPosition;
@@ -6,8 +7,9 @@ attribute vec2 normal;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
-uniform vec2 normalScale;
+uniform float normalScale;
 uniform vec2 resolution;
+uniform mat4 matrix;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -36,10 +38,17 @@ void main(void) {
     // Set z range (-1, 1)
     z = z * 2. - 1.;
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
+    vec2 o = vertexScale * vertexPosition
+             + normal*size/normalScale
+             - vertexOffset;
+    o.y*=-1.;
+    vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);
+    p/=p.w;
+
     p.xy = $transform_inline(p.xy*resolution)/resolution;
     if (size==0. || color.a==0.){
         p.x=10000.;
     }
+    p.z=z;
     gl_Position  = p;
 }

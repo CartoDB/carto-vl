@@ -50,6 +50,7 @@ void main(void) {
     if (c.a==0.){
         p.x=10000.;
     }
+    p.z=z;
     color = vec4(c.rgb*c.a, c.a);
     gl_Position  = p;
 }
