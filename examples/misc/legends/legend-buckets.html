@@ -55,6 +55,7 @@
     // Add better styles
     const viz = new carto.Viz(`
       color: ramp(buckets($complaint,['Car','Bus','Building']), [#59ca22,#009fff,#f51ac4])
+      strokeColor: green
       width: 30
     `);
 
@@ -76,7 +77,7 @@
 
         if (color) {
           colorLegendList +=
-            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}</span></li>\n`;
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${color};"></span><span>${legend.key}</span></li>\n`;
         }
       });
 

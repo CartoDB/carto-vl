@@ -54,12 +54,11 @@
     });
 
     // Define the source
-    const source = new carto.source.Dataset('pop_density_points');
+    const source = new carto.source.Dataset('county_points_with_population');
 
     // Define visualization
     const viz = new carto.Viz(`
-      width: scaled(1,1)
-      color: ramp(globalEqIntervals($dn, 5), prism)
+      color: ramp(globalEqIntervals($estimate_total, 5), mint)
       strokeWidth: 0
     `);
 
