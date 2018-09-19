@@ -7,7 +7,6 @@ uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
-uniform vec2 normalScale;
 uniform vec2 resolution;
 uniform mat4 matrix;
 
@@ -58,7 +57,7 @@ void main(void) {
   o.y*=-1.;
   vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);
   p/=p.w;
-  vec2 size2 = (2.*size+4.)*normalScale;
+  vec2 size2 = (2.*size+4.)/resolution;
 
     if (featureID.y<0.){
         pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
