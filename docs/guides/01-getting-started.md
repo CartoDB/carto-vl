@@ -53,7 +53,7 @@ const map = new mapboxgl.Map({
       style: carto.basemaps.voyager,
       center: [0, 30],
       zoom: 2,
-      dragRotate: false
+
     });
 ```
 
