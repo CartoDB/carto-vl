@@ -194,7 +194,9 @@ export default class Layer {
         }
 
         this._source = source;
-        this.requestData();
+        if (this._matrix) {
+            this.requestData();
+        }
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
         await this._context;
