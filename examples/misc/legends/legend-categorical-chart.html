@@ -41,7 +41,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [5, 40.5],
       zoom: 5,
       dragRotate: false,
@@ -63,7 +63,7 @@
     const source = new carto.source.Dataset('ne_10m_populated_places_simple');
     // Define the visualization
     const viz = new carto.Viz(
-    ` @color: ramp($featurecla, bold) 
+    ` @color: ramp($featurecla, bold)
       @histogram: viewportHistogram($featurecla)
       color: @color
       width: 5
@@ -131,7 +131,7 @@
       const legendData = colorRamp.getLegendData().data;
       // Use getJoinedValues to get sorted colors by frequency
       const histogramData = histogram.getJoinedValues(legendData);
-      
+
       // Chart.js set up
       const data = histogramData.map(elem => elem.frequency);
       const labels = histogramData.map(elem => elem.key);

@@ -22,18 +22,18 @@
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            style: carto.basemaps.voyager,
             center: [-73.954323, 40.711743],
             zoom: 15.7,
             dragRotate: false
         });
         map.touchZoomRotate.disableRotation();
-        
+
         const nav = new mapboxgl.NavigationControl({
             showCompass: false
         });
         map.addControl(nav, 'top-left');
-        
+
         // Autenticate the client
         carto.setDefaultAuth({
             user: 'cartovl',

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add transformation chaining by using lists
 - Add `getJoinedValues` method to `viewportHistogram` expression.
 - Add support for `opacity()` with images as first parameter
+- Add `carto.basemaps` for easier use of CARTO styles
 
 ### Changed
 - Use an optional third parameter in `ramp` expression to override the default value for "others"
