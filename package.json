@@ -28,10 +28,7 @@
     "dist"
   ],
   "dependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
     "@mapbox/vector-tile": "^1.3.0",
-    "babel-loader": "^8.0.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
@@ -40,6 +37,9 @@
     "pbf": "^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babel-loader": "^8.0.0",
     "@carto/mapbox-gl": "0.48.0-carto1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
@@ -114,5 +114,8 @@
     "prepublishOnly": "./scripts/release.sh",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
     "loc": "sloc src/ examples/"
-  }
+  },
+  "browserslist": [
+    "defaults"
+  ]
 }
