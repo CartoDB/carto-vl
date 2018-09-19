@@ -5,15 +5,13 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../erro
 import CartRuntimeError from '../../../errors/carto-runtime-error';
 
 /**
- * Abstract expression class
+ * CARTO VL Expression
  *
- * All expressions listed in  {@link carto.expressions} inherit from this class so any of them
- * can be used where an Expression is required as long as the types match.
+ * An expression is a function that is used to modify the visualization. All expressions are listed in  {@link carto.expressions}.
  *
- * This means that you can't use a numeric expression where a color expression is expected.
+ * Any expression can be used where an expression is required as long as the types match. This means that you can't use a numeric expression where a color expression is expected.
  *
- * @memberof carto.expressions
- * @name Base
+ * @name Expression
  * @abstract
  * @hideconstructor
  * @class
@@ -38,11 +36,11 @@ export default class Base {
      * Evaluate the expression providing a feature.
      * This is particularly useful for making legends.
      *
-     * @api
-     * @memberof carto.expressions.Base
+     * @memberof Expression
      * @param {object} feature
-     * @returns {*} result - result of evaluating the expression for the input feature
-     *
+     * @returns {} result - result of evaluating the expression for the input feature
+     * @name eval
+     * @api
      * @example
      * const viz = new carto.Viz(`
      *      color: red
@@ -72,11 +70,24 @@ export default class Base {
     }
 
     /**
+     * Get the expression value
+     *
+     * @api
+     * @memberof Expression
+     * @name value
+     */
+    get value () {
+        return this.eval();
+    }
+
+    /**
      * Get the expression stringified
      *
      * @api
-     * @memberof carto.expressions.Base
-     * @returns {string}
+     * @returns {string} expression - stringified expression
+     * @memberof Expression
+     * @instance
+     * @name toString
      *
      * @example <caption>Get the stringified expression of the viz color property.</caption>
      * const s = carto.expressions;
@@ -100,9 +111,12 @@ export default class Base {
     }
 
     /**
+     *
      * @api
-     * @memberof carto.expressions.Base
      * @returns true if the evaluation of the expression may change without external action.
+     * @memberof Expression
+     * @instance
+     * @name isAnimated
      */
     isAnimated () {
         return this._getChildren().some(child => child.isAnimated());
@@ -114,7 +128,7 @@ export default class Base {
      * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
-     * @memberof carto.expressions.Base
+     * @memberof Expression
      * @instance
      * @name blendTo
      */
@@ -249,10 +263,6 @@ export default class Base {
     // Inform about a successful shader compilation. One-time post-compilation WebGL calls should be done here.
     _postShaderCompile (program, gl) {
         this.childrenNames.forEach(name => this[name]._postShaderCompile(program, gl));
-    }
-
-    get value () {
-        return this.eval();
     }
 
     _getBinding (shader) {

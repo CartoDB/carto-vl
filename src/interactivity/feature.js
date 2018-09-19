@@ -1,9 +1,71 @@
 import FeatureVizProperty from './featureVizProperty';
 
 /**
+ * @namespace Features
+ * @description CARTO VL Features are objects that contain information of the visualization.
+ * @api
+ */
+
+/**
+ *
+ * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
+ *
+ * @typedef {object} FeatureEvent
+ * @property {object} coordinates - LongLat coordinates in { lng, lat } form
+ * @property {object} position - Pixel coordinates in { x, y } form
+ * @property {Feature[]} features - Array of {@link Feature}
+ * @api
+ */
+
+/**
+ * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
+ *
+ * @event featureClick
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureClickOut events are fired when the user clicks outside a feature that was clicked in the last featureClick event.
+ * The list of features that were clicked before and that are no longer behind this new click is provided.
+ *
+ * @event featureClickOut
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature (as reported by featureHover or featureLeave) is now under the cursor.
+ * The list of features that are now behind the cursor and that weren't before is provided.
+ *
+ * @event featureEnter
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureHover events are fired when the user moves the cursor.
+ * The list of features behind the cursor is provided.
+ *
+ * @event featureHover
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
+ * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature (as reported by featureHover or featureEnter) is no longer behind the cursor.
+ * The list of features that are no longer behind the cursor and that were before is provided.
+ *
+ * @event featureLeave
+ * @type {FeatureEvent}
+ * @api
+ */
+
+/**
  *
  * Feature objects are provided by {@link FeatureEvent} events.
  *
+ * @constructor Feature
  * @typedef {object} Feature
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color

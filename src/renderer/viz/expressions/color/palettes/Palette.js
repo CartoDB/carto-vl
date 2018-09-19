@@ -33,11 +33,10 @@ const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
  *   color: ramp($type, PRISM)
  * `);
  *
- * @name carto.expressions.palettes
+ * @name palettes
  * @memberof carto.expressions
  * @api
  */
-
 export default class Palette extends BaseExpression {
     constructor (name, subPalettes) {
         super({});

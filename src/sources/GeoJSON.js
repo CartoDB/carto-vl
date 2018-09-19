@@ -33,9 +33,8 @@ export default class GeoJSON extends Base {
      *
      * @fires CartoError
      *
-     * @constructor GeoJSON
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name GeoJSON
      * @api
      */
     constructor (data, options = {}) {

@@ -36,9 +36,8 @@ export default class Dataset extends BaseWindshaft {
      *
      * @fires CartoError
      *
-     * @constructor Dataset
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name Dataset
      * @api
      */
     constructor (tableName, auth, config) {

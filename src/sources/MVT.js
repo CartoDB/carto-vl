@@ -86,9 +86,8 @@ export default class MVT extends Base {
      *
      * @fires CartoError
      *
-     * @constructor MVT
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name MVT
      * @api
      */
     constructor (templateURL, metadata = new Metadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {

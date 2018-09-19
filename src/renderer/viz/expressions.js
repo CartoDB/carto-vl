@@ -66,6 +66,13 @@
  */
 
 /**
+ * Depending on the output, each expression has a different type
+ *
+ * @namespace Types
+ * @api
+ */
+
+/**
  * Type of Numeric Expressions.
  *
  * Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.
@@ -73,6 +80,8 @@
  * JavaScript numbers are automatically converted to Numeric Expressions.
  *
  * @typedef {} Number
+ * @name Number
+ * @memberof Types
  * @api
  */
 
@@ -84,6 +93,8 @@
  * JavaScript strings are automatically converted to Category Expressions.
  *
  * @typedef {} Category
+ * @name Category
+ * @memberof Types
  * @api
  */
 
@@ -97,6 +108,8 @@
  * ```
  *
  * @typedef {} Color
+ * @name Color
+ * @memberof Types
  * @api
  */
 
@@ -104,6 +117,8 @@
  * Type of Date Expressions.
  *
  * @typedef {} Date
+ * @name Date
+ * @memberof Types
  * @api
  */
 
@@ -111,6 +126,8 @@
  * Type of Fade Expressions.
  *
  * @typedef {} Fade
+ * @name Fade
+ * @memberof Types
  * @api
  */
 
@@ -120,8 +137,290 @@
  * More information in {@link carto.expressions.palettes|carto.expressions.palettes}.
  *
  * @typedef {} Palette
+ * @name Palette
+ * @memberof Types
  * @api
  */
+
+/**
+ * Type of Image Expressions.
+ *
+ * More information in {@link carto.expressions.image|carto.expressions.image}.
+ *
+ * @typedef {} Image
+ * @name Image
+ * @memberof Types
+ * @api
+ */
+
+/**
+ * Type of Translate Expressions.
+ *
+ * More information in {@link carto.expressions.translate|carto.expressions.translate}.
+ *
+ * @typedef {} Transformation
+ * @name Transformation
+ * @memberof Types
+ * @api
+ */
+
+/**
+ * @namespace Constants
+ * @api
+ *
+*/
+
+/**
+ * Constant FALSE value. Equivalent to `carto.expressions.constant(0)`
+ *
+ * @name FALSE
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant TRUE value. Equivalent to `carto.expressions.constant(1)`
+ *
+ * @name TRUE
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant ALIGN_CENTER translation. Equivalent to `carto.expressions.translate(0, 0)`.
+ * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
+ *
+ * @name ALIGN_CENTER
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant ALIGN_BOTTOM translation. Equivalent to `carto.expressions.translate(0, 1)`.
+ * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
+ *
+ * @name ALIGN_BOTTOM
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant PI number.
+ *
+ * @name PI
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant E number.
+ *
+ * @name E
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant HOLD number. Max Safe Integer number to be used to "hold" the Fade expression.
+ * Read more about fading in {@link carto.expressions.fade|carto.expressions.fade}
+ *
+ * @name HOLD
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * @namespace Icons
+ * @api
+ *
+*/
+
+/**
+ * Constant BICYCLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name BICYCLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant BUILDING icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name BUILDING
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant BUS icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name BUS
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CAR icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name CAR
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CIRCLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name CIRCLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CIRCLE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name CIRCLE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CROSS icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name CROSS
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant FLAG icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name FLAG
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant HOUSE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name HOUSE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant MARKER icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name MARKER
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant MARKER_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name MARKER_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant SQUARE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name SQUARE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant SQUARE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name SQUARE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant STAR icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name STAR
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant STAR_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name STAR_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant TRIANGLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name TRIANGLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant TRIANGLE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name TRIANGLE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
 
 import Transition from './expressions/transition';
 

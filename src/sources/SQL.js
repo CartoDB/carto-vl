@@ -43,9 +43,8 @@ export default class SQL extends BaseWindshaft {
      *
      * @fires CartoError
      *
-     * @constructor SQL
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name SQL
      * @api
      */
     constructor (query, auth, config) {

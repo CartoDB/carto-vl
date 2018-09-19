@@ -18,24 +18,23 @@ const renderers = new WeakMap();
 *
 * A Layer is the primary way to visualize geospatial data.
 *
-* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+* To create a layer a {@link carto.source|source} and {@link carto.Viz|viz} are required:
 *
-* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
 * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-* @param {carto.source.Base} source - The source of the data
+* @param {carto.source} source - The source of the data
 * @param {carto.Viz} viz - The description of the visualization of the data
 *
 * @example
 * const layer = new carto.Layer('layer0', source, viz);
 *
-* @fires CartoError
-*
 * @constructor Layer
-* @memberof carto
+* @name carto.Layer
 * @api
 */
+
 export default class Layer {
     constructor (id, source, viz) {
         this._checkId(id);
@@ -157,7 +156,7 @@ export default class Layer {
      * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
      * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source.Base} source - The new Source object
+     * @param {carto.source} source - The new Source object
      * @param {carto.Viz?} viz - Optional. The new Viz object
      * @memberof carto.Layer
      * @instance
@@ -496,7 +495,7 @@ export default class Layer {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source.Base".`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source".`);
         }
     }
 
@@ -557,28 +556,3 @@ function _getRenderer (map, gl) {
     }
     return renderers.get(map);
 }
-
-/**
- *
- * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
- *
- * @typedef {object} LayerEvent
- * @api
- */
-
-/**
- * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
- *
- * @event loaded
- * @type {LayerEvent}
- * @api
- */
-
-/**
- * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
- * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
- *
- * @event updated
- * @type {LayerEvent}
- * @api
-*/

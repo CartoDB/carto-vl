@@ -50,18 +50,9 @@ const SUPPORTED_PROPERTIES = [
 /**
  * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
  * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
+ *
  * @typedef {object} VizSpec
- * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
- * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
- * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
- * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
- * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
- * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
- * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
- * @property {Translation} transform - translation to apply to the features in pixels
- * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
- * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
- * @property {object} variables - An object describing the variables used.
+ * @name vizSpec
  * @api
  */
 
@@ -86,9 +77,7 @@ export default class Viz {
     * @fires CartoError
     *
     * @constructor Viz
-    * @memberof carto
-    * @api
-    *
+    * @name carto.Viz
     * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
     * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
     * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
@@ -97,10 +86,10 @@ export default class Viz {
     * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
     * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
     * @property {Translation} transform - translation to apply to the features in pixels
-    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
     * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
     * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
     * @property {object} variables - An object describing the variables used.
+    * @api
     *
     */
     constructor (definition) {
@@ -128,6 +117,7 @@ export default class Viz {
     /**
      * Get the geometry type of the visualization.
      * @readonly
+     * @memberof carto.Viz
      * @api
      */
     get geometryType () {

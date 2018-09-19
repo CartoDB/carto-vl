@@ -32,8 +32,22 @@ import { checkMaxArguments, checkArray } from '../../utils';
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name ViewportHistogram
+ * @name viewportHistogram
  * @function
+ * @api
+ */
+
+ /**
+ * ViewportHistogram Class
+ *
+ * Generates a histogram.
+ * This class is instanced automatically by using the `viewportHistogram` function. It is documented for its methods.
+ * Read more about viewportHistogram expression at {@link carto.expressions.viewportHistogram}.
+ *
+ * @name s.ViewportHistogram
+ * @abstract
+ * @hideconstructor
+ * @class
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
@@ -81,7 +95,8 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     *
+     * @memberof s.ViewportHistogram
+     * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
      *  { key: 'car', value: 4 },

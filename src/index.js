@@ -5,18 +5,35 @@
  *  @description
  *  The CARTO VL functionality is exposed through the **carto** namespace including:
  *
+ * Current version:
  * - {@link carto.version|carto.version}
- * - {@link carto.source.Dataset|carto.source.Dataset}
- * - {@link carto.source.SQL|carto.source.SQL}
- * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
- * - {@link carto.source.MVT|carto.source.MVT}
- * - {@link carto.source.MVT.Metadata|carto.source.MVT.Metadata}
- * - {@link carto.expressions|carto.expressions}
- * - {@link carto.Layer|carto.Layer}
- * - {@link carto.Viz|carto.Viz}
- * - {@link carto.Interactivity|carto.Interactivity}
+ *
+ * Setup:
  * - {@link carto.setDefaultAuth|carto.setDefaultAuth}
  * - {@link carto.setDefaultConfig|carto.setDefaultConfig}
+ *
+ * CARTO Basemaps:
+ * - {@link carto.basemaps.voyager|carto.basemaps.voyager}
+ * - {@link carto.basemaps.darkmatter|carto.basemaps.darkmatter}
+ * - {@link carto.basemaps.positron|carto.basemaps.positron}
+ *
+ * Source:
+ * - {@link carto.source.Dataset|carto.source.Dataset}
+ * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - {@link carto.source.MVT|carto.source.MVT}
+ * - {@link carto.source.SQL|carto.source.SQL}
+ *
+ * Layer:
+ * - {@link carto.Layer|carto.Layer}
+ *
+ * Viz:
+ * - {@link carto.Viz|carto.Viz}
+ *
+ * Expressions:
+ * - {@link carto.expressions|carto.expressions}
+ *
+ * Interactivity:
+ * - {@link carto.Interactivity|carto.Interactivity}
  */
 
 import { setDefaultAuth } from './setup/auth-service';
@@ -33,6 +50,14 @@ import SQL from './sources/SQL';
 import { on, off } from './utils/events';
 
 /**
+ *  @namespace carto.basemaps
+ *  @description Use CARTO basemaps for your map visualization
+ *  @api
+ */
+
+import * as basemaps from './basemaps';
+
+/**
  * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
  *
  * @var {string} version
@@ -42,9 +67,7 @@ import { on, off } from './utils/events';
  */
 import { version } from '../package.json';
 
-// Namespaces
-
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
-export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity };
+export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };
+export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };

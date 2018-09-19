@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>US Population by County | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
-  <script src="../../dist/carto-vl.js"></script>
+  <script src="../../../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <div id="loader">
@@ -24,7 +26,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      style: carto.basemaps.darkmatter,
       center: [-99.6404893, 38.5480718],
       zoom: 4,
       scrollZoom: false,
@@ -62,4 +64,5 @@
     }
   </script>
 </body>
+
 </html>
