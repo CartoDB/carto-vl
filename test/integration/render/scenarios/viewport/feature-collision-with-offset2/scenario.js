@@ -17,8 +17,7 @@ const map = new mapboxgl.Map({
         }]
     },
     center: [0, 0],
-    zoom: 0,
-
+    zoom: 0
 });
 
 const source1 = new carto.source.GeoJSON(sources['triangle-collision']);
