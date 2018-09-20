@@ -38,11 +38,8 @@ void main(void) {
     // Set z range (-1, 1)
     z = z * 2. - 1.;
 
-    vec2 o = vertexScale * vertexPosition
-             + normal*size/normalScale
-             - vertexOffset;
-    o.y*=-1.;
-    vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);
+    vec2 n = normal*size/normalScale/vertexScale;
+    vec4 p =  matrix*vec4(vertexPosition+n, 0., 1.);
     p/=p.w;
 
     p.xy = $transform_inline(p.xy*resolution)/resolution;

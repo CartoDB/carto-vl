@@ -41,9 +41,7 @@ void main(void) {
     float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);
     float fillSize = size;
 
-    vec2 o = vertexScale * vertexPosition - vertexOffset;
-    o.y*=-1.;
-    vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);
+    vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
     p/=p.w;
     float sizeNormalizer = (size +2.)/size;
     vec2 size2 = (2.*size+4.)/resolution;

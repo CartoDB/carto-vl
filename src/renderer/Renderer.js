@@ -1,6 +1,7 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import { mat4 } from 'gl-matrix';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -430,7 +431,18 @@ export default class Renderer {
 
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
-            gl.uniformMatrix4fv(renderer.matrix, false, this.matrix);
+            let m2 = [];
+            let m3 = [];
+            mat4.copy(m2, this.matrix);
+            mat4.identity(m3);
+            mat4.translate(m3, m3, [0.5, 0.5, 0]);
+            mat4.scale(m3, m3, [0.5, -0.5, 1]);
+
+            mat4.translate(m3, m3, [dataframe.center.x, dataframe.center.y, 0]);
+            mat4.scale(m3, m3, [dataframe.scale, dataframe.scale, 1]);
+
+            mat4.multiply(m2, m2, m3);
+            gl.uniformMatrix4fv(renderer.matrix, false, m2);
 
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 

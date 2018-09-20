@@ -53,9 +53,7 @@ void main(void) {
   dp = 1.0 / (size + 1.);
   float sizeNormalizer = (size +1.)/size;
 
-  vec2 o = vertexScale * vertexPosition - vertexOffset;
-  o.y*=-1.;
-  vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);
+  vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
   p/=p.w;
   vec2 size2 = (2.*size+4.)/resolution;
 
