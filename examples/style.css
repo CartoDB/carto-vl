@@ -143,6 +143,16 @@ body {
   margin-bottom: 8px;
 }
 
+.toolbox-text {
+  color: #747D82;
+  font-size: 12px;
+  line-height: 16px;
+  font-family: 'Roboto', Arial, Helvetica, sans-serif;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .open-sans {
   color: #747D82;
   font-size: 12px;

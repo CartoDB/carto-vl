@@ -15,11 +15,14 @@
 <body>
   <!-- Map goes here -->
   <div id="map"></div>
+  
+
   <aside class="toolbox">
     <div class="box">
       <header>
         <h1>Tree Species in San Francisco</h1>
       </header>
+      add section for the legend list
       <section>
         <div id="controls">
           <ul id="content"></ul>
@@ -28,6 +31,7 @@
       <footer class="js-footer"></footer>
     </div>
   </aside>
+
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -86,6 +90,7 @@
       document.getElementById('loader').style.opacity = '0';
     }
 
+    // Returns the color value in rgba() format and converts to HEX
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
