@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="../../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Map goes here -->
+    <div id="map"></div>
+    <script>
+        // BASEMAP
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2,
+            dragRotate: false,
+        });
+        map.touchZoomRotate.disableRotation();
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+        // DATASET
+        // Add a Dataset
+        const citiesSource = new carto.source.Dataset('ne_10m_populated_places_simple', {
+            user: 'cartovl',
+            apiKey: 'default_public'
+        });
+        // Create a layer with default style and add it to the map
+        const citiesLayer = new carto.Layer('cities', citiesSource, new carto.Viz());
+        citiesLayer.addTo(map);
+
+        // GEOJSON
+        // Add GeoJSON
+        const geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-73.944158, 40.678178]
+                    },
+                    "properties": {
+                        "address": "Brooklyn, New York"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-3.70379, 40.416775]
+                    },
+                    "properties": {
+                        "address": "Madrid, Spain"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-0.127758, 51.507351]
+                    },
+                    "properties": {
+                        "address": "London, United Kingdom"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-77.036871, 38.907192]
+                    },
+                    "properties": {
+                        "address": "Washington, DC"
+                    }
+                }
+            ]
+        };
+        // Create a GeoJSON source
+        const geojsonSource = new carto.source.GeoJSON(geojson);
+        // Create a style for the geojson layer
+        const viz = new carto.Viz(`
+            color: red
+            width: 20
+        `);
+        // Create and add a layer with the geojson
+        const geojsonLayer = new carto.Layer('offices', geojsonSource, viz);
+        geojsonLayer.addTo(map);
+
+        // SQL... WIP
+        const query = 'SELECT * FROM ne_10m_populated_places_simple WHERE scalerank > 7';
+        const sqlSource = new carto.source.SQL(query, {
+            user: 'cartovl',
+            apiKey: 'default_public'
+        });
+        const sqlLayer = new carto.Layer('xxx', sqlSource, new carto.Viz(`color: blue`));
+        //sqlLayer.addTo(map, 'offices');
+        //sqlLayer.addTo(map);
+    </script>
+</body>
+
+</html>
