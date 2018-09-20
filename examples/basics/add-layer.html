@@ -26,7 +26,6 @@
       <section>
         <p class="description open-sans">Add one CARTO layer to your map</p>
       </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
 
@@ -48,6 +47,8 @@
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+
+    // CARTO VL Definitions begin here
 
     // Define user
     carto.setDefaultAuth({
