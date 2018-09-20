@@ -6,7 +6,7 @@ attribute vec2 normal;
 
 uniform vec2 vertexScale;
 uniform vec2 vertexOffset;
-uniform vec2 normalScale;
+uniform float normalScale;
 uniform vec2 resolution;
 
 uniform sampler2D colorTex;
@@ -41,7 +41,9 @@ void main(void) {
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
-    vec2 o = vertexScale * vertexPosition - vertexOffset;
+    vec2 o = vertexScale * vertexPosition
+             + normal*size/normalScale
+             - vertexOffset;
     o.y*=-1.;
     vec4 p =  matrix*vec4(o*0.5+vec2(0.5), 0., 1.);//vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
     p/=p.w;
