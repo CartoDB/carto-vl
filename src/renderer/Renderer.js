@@ -222,6 +222,7 @@ export default class Renderer {
     }
 
     renderLayer (renderLayer, drawMetadata) {
+        this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;

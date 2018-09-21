@@ -321,14 +321,14 @@ export default class Dataframe extends DummyDataframe {
         const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
-        return diameter / 2;
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * 512);
     }
 
     _computePolygonWidthScale (feature, viz) {
         const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
-        return diameter / 2;
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * 512);
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
@@ -372,7 +372,6 @@ export default class Dataframe extends DummyDataframe {
                     : this._computePolygonWidthScale(feature, viz);
             }
 
-            strokeWidthScale = 0;
             const v1 = vec4.transformMat4([], [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
                 vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
