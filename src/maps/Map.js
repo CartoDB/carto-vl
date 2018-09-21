@@ -207,5 +207,6 @@ export default class Map {
     }
 
     triggerRepaint () {
+        window.requestAnimationFrame(this._update.bind(this));
     }
 }

@@ -371,7 +371,12 @@ export default class Layer {
             this._matrix = matrix;
             this.renderer.matrix = matrix;
             this._setRendererZoomCenter(matrix);
+            if (this._source) {
+                this._source.requestData(this._getZoom(), this._getViewport());
+            }
+        } else if (!this._noFirstRequestData && this._source) {
             this._source.requestData(this._getZoom(), this._getViewport());
+            this._noFirstRequestData = true;
         }
     }
 
