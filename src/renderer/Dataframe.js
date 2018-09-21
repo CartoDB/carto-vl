@@ -393,15 +393,13 @@ export default class Dataframe extends DummyDataframe {
         const metadata = this.metadata;
         const getters = {};
 
-        function actualColumns(name, p) {
+        function actualColumns (name, p) {
             console.log(p);
             let columns = [name];
             if (p.aggregations) {
                 columns = Object.keys(p.aggregations).map(agg => p.aggregations[agg]);
             } else if (p.dimensions) {
-                console.log("DIMS");
                 columns = Object.keys(p.dimensions).map(dim => p.dimensions[dim]);
-                console.log(columns);
             }
             return columns;
         }

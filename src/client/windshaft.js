@@ -241,7 +241,7 @@ export default class Windshaft {
                             aggregation.dimensions[schema.column.dimColumn(propertyName, usage.op)] = {
                                 column: propertyName,
                                 group_by: usage.op
-                            }
+                            };
                         } else {
                             aggregation.dimensions[propertyName] = propertyName;
                         }

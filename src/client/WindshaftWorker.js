@@ -24,18 +24,18 @@ export class WindshaftWorker extends MVTWorker {
     }
 }
 
-function epochTo(t, unit) {
+function epochTo (t, unit) {
     switch (unit) {
         case 'second':
             return Math.floor(t);
         case 'minute':
-            return Math.floor(t/60);
+            return Math.floor(t / 60);
         case 'hour':
-            return Math.floor(t/3600);
+            return Math.floor(t / 3600);
         case 'day':
-            return Math.floor(t/86400);
+            return Math.floor(t / 86400);
         case 'week':
-            return Math.floor(t/(7*86400));
+            return Math.floor(t / (7 * 86400));
         // TODO:
         // case 'month':
         // case 'quarter':
@@ -47,7 +47,7 @@ function epochTo(t, unit) {
     }
 }
 
-function timeLimits(groupBy, limits) {
+function timeLimits (groupBy, limits) {
     const { min, max } = limits;
     switch (groupBy) {
         case 'minuteOfHour':

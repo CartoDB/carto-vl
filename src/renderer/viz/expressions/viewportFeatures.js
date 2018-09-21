@@ -1,8 +1,8 @@
 import BaseExpression from './base';
-import Property from './basic/property';
+// import Property from './basic/property';
 import { implicitCast } from './utils';
-import schema from '../../schema';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+// import schema from '../../schema';
+// import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 /**

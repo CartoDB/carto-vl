@@ -62,9 +62,7 @@ export const column = {
     isAggregated,
     isDimension,
     getBase: function getBase (name) {
-        const pattern = isAggregated(name) ? AGG_PATTERN
-                      : isDimension(name) ? DIM_PATTERN
-                      : '';
+        const pattern = isAggregated(name) ? AGG_PATTERN : isDimension(name) ? DIM_PATTERN : '';
         return name.replace(pattern, '');
     },
     getAggFN: function getAggFN (name) {
