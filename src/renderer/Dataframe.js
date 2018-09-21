@@ -317,12 +317,21 @@ export default class Dataframe extends DummyDataframe {
             : 1;
     }
 
-    _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const point = wToR(pos.x, pos.y, {
-            center: this.center,
-            scale: this.scale
-        });
+    _computeLineWidthScale (feature, viz) {
+        const SATURATION_PX = 1024;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
+        return diameter / 2;
+    }
+
+    _computePolygonWidthScale (feature, viz) {
+        const SATURATION_PX = 1024;
+        const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
+
+        return diameter / 2;
+    }
+
+    _getFeaturesFromTriangles (geometryType, pos, viz) {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
@@ -334,6 +343,9 @@ export default class Dataframe extends DummyDataframe {
         let strokeWidthScale;
         const widthScale = this.widthScale / 2;
         let pointWithOffset;
+
+        const WIDTH = this.renderer.gl.canvas.width;
+        const HEIGHT = this.renderer.gl.canvas.height;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
@@ -347,10 +359,10 @@ export default class Dataframe extends DummyDataframe {
                     offset.y = vizOffset[1] * widthScale;
                 }
 
-                pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
+                pointWithOffset = { x: pos.x - offset.x, y: pos.y - offset.y };
 
-                if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
-                    this._isFeatureFiltered(feature, viz.filter)) {
+                if (
+                    this._isFeatureFiltered(feature, viz.filter)) { //! pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -360,22 +372,41 @@ export default class Dataframe extends DummyDataframe {
                     : this._computePolygonWidthScale(feature, viz);
             }
 
-            const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            };
+            strokeWidthScale = 0;
+            const v1 = vec4.transformMat4([], [
+                vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+                vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
 
-            const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
-            };
+            const v2 = vec4.transformMat4([], [
+                vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+                vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
 
-            const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
-            };
+            const v3 = vec4.transformMat4([], [
+                vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+                vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
 
-            const inside = pointInTriangle(pointWithOffset, v1, v2, v3);
+            v1[0] *= 0.5;
+            v1[1] *= -0.5;
+            v1[0] += 0.5;
+            v1[1] += 0.5;
+
+            v2[0] *= 0.5;
+            v2[1] *= -0.5;
+            v2[0] += 0.5;
+            v2[1] += 0.5;
+
+            v3[0] *= 0.5;
+            v3[1] *= -0.5;
+            v3[0] += 0.5;
+            v3[1] += 0.5;
+
+            const inside = pointInTriangle(pointWithOffset,
+                {x: v1[0] * WIDTH, y: v1[1] * HEIGHT},
+                {x: v2[0] * WIDTH, y: v2[1] * HEIGHT},
+                {x: v3[0] * WIDTH, y: v3[1] * HEIGHT});
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -484,20 +515,6 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
-    }
-
-    _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
-    }
-
-    _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
     }
 }
 
