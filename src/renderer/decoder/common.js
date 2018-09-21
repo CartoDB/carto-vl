@@ -17,6 +17,10 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         currentPoint = [lineString[2], lineString[3]];
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
+        if (prevPoint[0] === currentPoint[0] && prevPoint[1] === currentPoint[1]) {
+            return index;
+        }
+
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
@@ -58,6 +62,9 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
             }
 
             if (nextPoint) {
+                if (nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1]) {
+                    return index;
+                }
                 nextNormal = getLineNormal(currentPoint, nextPoint);
 
                 if (drawLine) {
