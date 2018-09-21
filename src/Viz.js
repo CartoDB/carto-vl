@@ -56,42 +56,40 @@ const SUPPORTED_PROPERTIES = [
  * @api
  */
 
+/**
+* A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
+* displayed and processed. A Viz instance can only be bound to one layer.
+*
+*
+* @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
+*
+* @example <caption> Create a viz with black dots using the string constructor </caption>
+* const viz = new carto.Viz(`
+*   color: rgb(0,0,0)
+* `);
+*
+* @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
+* const viz = new carto.Viz({
+*   color: carto.expressions.rgb(0,0,0)
+* });
+*
+* @constructor Viz
+* @name carto.Viz
+* @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+* @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+* @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+* @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+* @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
+* @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
+* @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+* @property {Translation} transform - translation to apply to the features in pixels
+* @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+* @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+* @property {object} variables - An object describing the variables used.
+* @api
+*
+*/
 export default class Viz {
-    /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
-    * displayed and processed. A Viz instance can only be bound to one layer.
-    *
-    *
-    * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
-    *
-    * @example <caption> Create a viz with black dots using the string constructor </caption>
-    * const viz = new carto.Viz(`
-    *   color: rgb(0,0,0)
-    * `);
-    *
-    * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
-    * const viz = new carto.Viz({
-    *   color: carto.expressions.rgb(0,0,0)
-    * });
-    *
-    * @fires CartoError
-    *
-    * @constructor Viz
-    * @name carto.Viz
-    * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
-    * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
-    * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
-    * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
-    * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
-    * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-    * @property {Translation} transform - translation to apply to the features in pixels
-    * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
-    * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
-    * @property {object} variables - An object describing the variables used.
-    * @api
-    *
-    */
     constructor (definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
