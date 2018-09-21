@@ -318,16 +318,11 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData (matrix) {
-        // Set renderer zoom and center
-        this._setZoomCenter(matrix);
-
+    async requestData () {
         if (!this.metadata || !this._visible) {
             return;
         }
-
-        this._source.requestData(this._getZoom(), this._getViewport());
-        this._fireUpdateOnNextRender = true;
+        this._needRefresh();
     }
 
     hasDataframes () {
@@ -375,7 +370,8 @@ export default class Layer {
         if (!util.equalArrays(this._matrix, matrix)) {
             this._matrix = matrix;
             this.renderer.matrix = matrix;
-            this.requestData(matrix);
+            this._setRendererZoomCenter(matrix);
+            this._source.requestData(this._getZoom(), this._getViewport());
         }
     }
 
@@ -516,16 +512,11 @@ export default class Layer {
         }
     }
 
-    _setZoomCenter (matrix) {
+    _setRendererZoomCenter (matrix) {
         let zoom;
         let center;
 
         if (matrix) {
-            // Compute the zoom and center from the matrix.
-            // This is a solution to avoid subscribing to map events and
-            // make a better and efficient use of the Custom Layers interface.
-            // TODO: the best solution is to use the matrix at the shader
-            // level and remove the aspect and scale logic from the renderer
             zoom = util.computeMatrixZoom(matrix);
             center = util.computeMatrixCenter(matrix);
         } else {
