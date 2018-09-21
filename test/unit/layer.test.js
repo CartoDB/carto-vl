@@ -45,7 +45,7 @@ describe('api/layer', () => {
 
             expect(() => {
                 new Layer('layer0', {});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source.Base".');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source".');
         });
 
         it('should throw an error if viz is not valid', () => {
