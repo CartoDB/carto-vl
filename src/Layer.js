@@ -374,6 +374,7 @@ export default class Layer {
             if (this._source) {
                 this._source.requestData(this._getZoom(), this._getViewport());
             }
+            this._fireUpdateOnNextRender = true;
         } else if (!this._noFirstRequestData && this._source) {
             this._source.requestData(this._getZoom(), this._getViewport());
             this._noFirstRequestData = true;

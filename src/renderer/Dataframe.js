@@ -196,11 +196,17 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    _isPointInViewport (featureIndex, viewportAABB) {
-        const { minx, maxx, miny, maxy } = viewportAABB;
+    _isPointInViewport (featureIndex) {
+        if (!this.matrix) {
+            return false;
+        }
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
-        return x > minx && x < maxx && y > miny && y < maxy;
+        // Transform to Clip Space
+        const p = vec4.transformMat4([], [x, y, 0, 1], this.matrix);
+        // Check in Clip Space if the point is inside the viewport
+        // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
+        return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
     }
 
     _isPolygonInViewport (featureIndex, viewportAABB, strokeWidthScale) {
