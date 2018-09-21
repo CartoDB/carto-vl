@@ -2,6 +2,7 @@ import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
+import { vec4 } from 'gl-matrix';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -15,12 +16,6 @@ const AABBTestResults = {
 };
 
 export default class Dataframe extends DummyDataframe {
-    get widthScale () {
-        return this.renderer
-            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
-            : 1;
-    }
-
     setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
     }
@@ -257,28 +252,34 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _getPointsAtPosition (pos, viz) {
-        const p = wToR(pos.x, pos.y, {
-            center: this.center,
-            scale: this.scale
-        });
-
         const points = this.decodedGeom.vertices;
         const features = [];
 
         const widthScale = this.widthScale / 2;
 
+        const WIDTH = this.renderer.gl.canvas.width;
+        const HEIGHT = this.renderer.gl.canvas.height;
+
         for (let i = 0; i < points.length; i += 6) {
             const featureIndex = i / 6;
-            const center = {
-                x: points[i],
-                y: points[i + 1]
-            };
 
             const feature = this.getFeature(featureIndex);
 
             if (this._isFeatureFiltered(feature, viz.filter)) {
                 continue;
             }
+
+            const center = {
+                x: points[i],
+                y: points[i + 1]
+            };
+
+            const c = [center.x, center.y, 0, 1];
+            const c2 = vec4.transformMat4([], c, this.matrix).map((x, _, v) => x / v[3]);
+            c2[0] *= 0.5;
+            c2[1] *= -0.5;
+            c2[0] += 0.5;
+            c2[1] += 0.5;
 
             const strokeWidthScale = this._computePointWidthScale(feature, viz);
 
@@ -293,7 +294,7 @@ export default class Dataframe extends DummyDataframe {
                 center.y += vizOffset[1] * widthScale;
             }
 
-            const inside = pointInCircle(p, center, strokeWidthScale);
+            const inside = pointInCircle(pos, {x: c2[0] * WIDTH, y: c2[1] * HEIGHT}, strokeWidthScale);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -301,6 +302,19 @@ export default class Dataframe extends DummyDataframe {
         }
 
         return features;
+    }
+
+    _computePointWidthScale (feature, viz) {
+        const SATURATION_PX = 1024;
+        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
+
+        return diameter / 2;
+    }
+
+    get widthScale () {
+        return this.renderer
+            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
+            : 1;
     }
 
     _getFeaturesFromTriangles (geometryType, pos, viz) {
@@ -470,13 +484,6 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
-    }
-
-    _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
     }
 
     _computeLineWidthScale (feature, viz) {

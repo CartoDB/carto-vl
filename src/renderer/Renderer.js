@@ -444,6 +444,8 @@ export default class Renderer {
             mat4.multiply(m2, m2, m3);
             gl.uniformMatrix4fv(renderer.matrix, false, m2);
 
+            dataframe.matrix = m2;
+
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);

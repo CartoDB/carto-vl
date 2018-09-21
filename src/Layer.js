@@ -521,13 +521,8 @@ export default class Layer {
         let zoom;
         let center;
 
-        if (matrix) {
-            zoom = util.computeMatrixZoom(matrix);
-            center = util.computeMatrixCenter(matrix);
-        } else {
-            zoom = util.computeMapZoom(this.map);
-            center = util.computeMapCenter(this.map);
-        }
+        zoom = util.computeMapZoom(this.map);
+        center = util.computeMapCenter(this.map);
 
         this.renderer.setZoom(zoom);
         this.renderer.setCenter(center);
