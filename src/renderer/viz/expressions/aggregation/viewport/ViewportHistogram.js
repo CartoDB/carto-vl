@@ -37,7 +37,7 @@ import { checkMaxArguments, checkArray } from '../../utils';
  * @api
  */
 
- /**
+/**
  * ViewportHistogram Class
  *
  * Generates a histogram.
