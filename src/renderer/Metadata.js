@@ -46,6 +46,8 @@ export default class Metadata {
         const prop = this.properties[propertyName];
         if (prop.aggregations) {
             return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);
+        } else if (prop.dimensions) {
+            return Object.keys(prop.dimensions).map(gr => prop.dimensions[gr]);
         }
         return [propertyName];
     }

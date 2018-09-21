@@ -76,11 +76,11 @@ export default class Windshaft {
     _checkAcceptableMNS (MNS) {
         Object.keys(MNS).forEach(propertyName => {
             const usages = MNS[propertyName];
-            const aggregatedUsage = usages.some(x => x.type === 'aggregated');
+            const aggregatedUsage = usages.some(x => x.type !== 'unaggregated');
             const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
             if (aggregatedUsage && unAggregatedUsage) {
                 throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
-                    JSON.stringify(usages.filter(x => x.type === 'aggregated'))
+                    JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
                 }) with unaggregated usage for property '${propertyName}'`);
             }
         });
@@ -215,7 +215,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === 'aggregated'));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== 'unaggregated'));
     }
 
     _generateAggregation (MNS, resolution) {
@@ -237,6 +237,11 @@ export default class Windshaft {
                                 aggregate_function: usage.op,
                                 aggregated_column: propertyName
                             };
+                        } else if (usage.type === 'dimension') {
+                            aggregation.dimensions[schema.column.dimColumn(propertyName, usage.op)] = {
+                                column: propertyName,
+                                group_by: usage.op
+                            }
                         } else {
                             aggregation.dimensions[propertyName] = propertyName;
                         }
@@ -340,6 +345,16 @@ export default class Windshaft {
                 properties[basename].aggregations = {};
             }
             properties[basename].aggregations[fnName] = aggName;
+        });
+        Object.keys(agg.dimensions).forEach(dimName => {
+            // TODO: restrict to one grouping per dimension columns
+            // and simplify this...
+            const basename = schema.column.getBase(dimName);
+            const groupBy = schema.column.getGroupBy(dimName);
+            if (!properties[basename].dimensions) {
+                properties[basename].dimensions = {};
+            }
+            properties[basename].dimensions[groupBy] = dimName;
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

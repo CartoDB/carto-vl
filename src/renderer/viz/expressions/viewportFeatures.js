@@ -85,10 +85,12 @@ export default class ViewportFeatures extends BaseExpression {
 
     _resetViewportAgg () {
         if (!this._FeatureProxy) {
-            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
-            }
-            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
+            // TODO: allow properties & clustterAggr/Time expressions
+            // if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+            //     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
+            // }
+            // const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
+            const columns = this._requiredProperties.map(p => p.name);
             this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
         this.expr = [];

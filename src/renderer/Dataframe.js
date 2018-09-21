@@ -392,18 +392,34 @@ export default class Dataframe extends DummyDataframe {
 
         const metadata = this.metadata;
         const getters = {};
+
+        function actualColumns(name, p) {
+            console.log(p);
+            let columns = [name];
+            if (p.aggregations) {
+                columns = Object.keys(p.aggregations).map(agg => p.aggregations[agg]);
+            } else if (p.dimensions) {
+                console.log("DIMS");
+                columns = Object.keys(p.dimensions).map(dim => p.dimensions[dim]);
+                console.log(columns);
+            }
+            return columns;
+        }
+
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
-            getters[propertyName] = {
-                get: function () {
-                    const index = this._index;
-                    if (metadata.properties[propertyName].type === 'category') {
-                        return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
-                    } else {
-                        return this._dataframe.properties[propertyName][index];
+            actualColumns(propertyName, metadata.properties[propertyName]).forEach(colName => {
+                getters[colName] = {
+                    get: function () {
+                        const index = this._index;
+                        if (metadata.properties[propertyName].type === 'category') {
+                            return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
+                        } else {
+                            return this._dataframe.properties[colName][index];
+                        }
                     }
-                }
-            };
+                };
+            });
         }
 
         Object.defineProperties(cls.prototype, getters);

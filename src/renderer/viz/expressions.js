@@ -160,6 +160,8 @@ import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
+import ClusterDayOfWeek from './expressions/aggregation/cluster/ClusterDayOfWeek';
+
 import Constant from './expressions/basic/constant';
 
 import Hex from './expressions/color/hex';
@@ -299,6 +301,8 @@ export const clusterMin = (...args) => new ClusterMin(...args);
 export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
+
+export const clusterDayOfWeek = (...args) => new ClusterDayOfWeek(...args);
 
 export const constant = (...args) => new Constant(...args);
 

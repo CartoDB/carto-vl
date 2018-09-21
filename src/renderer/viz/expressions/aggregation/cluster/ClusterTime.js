@@ -3,39 +3,29 @@ import PropertyExpression from '../../basic/property';
 import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
 
-export default class ClusterAggregation extends BaseExpression {
-    constructor ({ property, expressionName, aggName, aggType }) {
+// TODO: generalize with base clusterDimension
+export default class clusterTime extends BaseExpression {
+    constructor ({ property, expressionName, groupBy, dimType }) {
         checkExpression(expressionName, 'property', 0, property);
-
         super({ property });
-        this._aggName = aggName;
+        this._groupBy = groupBy;
         this._expressionName = expressionName;
-        this.type = aggType;
+        this._baseType = dimType;
+        this.type = 'number';
     }
 
     get name () {
-        return schema.column.aggColumn(this.property.name, this._aggName);
-    }
-
-    get aggName () {
-        return this._aggName;
-    }
-
-    get numCategories () {
-        return this.property.numCategories;
-    }
-    get categories () {
-        return this.property.categories;
+        return schema.column.dimColumn(this.property.name, this._groupBy);
     }
 
     eval (feature) {
-        return feature[schema.column.aggColumn(this.property.name, this._aggName)];
+        return feature[schema.column.dimColumn(this.property.name, this._groupBy)];
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
-        checkType(this._expressionName, 'property', 0, this.type, this.property);
+        checkType(this._expressionName, 'property', 0, this._baseType, this.property);
     }
 
     _resolveAliases () {}
@@ -43,7 +33,7 @@ export default class ClusterAggregation extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, this._aggName))}`
+            inline: `${getGLSLforProperty(schema.column.dimColumn(this.property.name, this._groupBy))}`
         };
     }
 
@@ -52,8 +42,8 @@ export default class ClusterAggregation extends BaseExpression {
     _getMinimumNeededSchema () {
         return {
             [this.property.name]: [{
-                type: 'aggregated',
-                op: this._aggName
+                type: 'dimension',
+                op: this._groupBy
             }]
         };
     }
