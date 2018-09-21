@@ -43,7 +43,7 @@
             apiKey: 'default_public'
         });
         // Create a layer with default style and add it to the map
-        const citiesLayer = new carto.Layer('cities', citiesSource, new carto.Viz());
+        const citiesLayer = new carto.Layer('cities', citiesSource, new carto.Viz('color:grey width:4'));
         citiesLayer.addTo(map);
     </script>
 </body>

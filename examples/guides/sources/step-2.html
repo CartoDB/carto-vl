@@ -37,14 +37,15 @@
         map.addControl(nav, 'top-left');
 
         // DATASET
-        // Add a Dataset
+        // Add a Dataset with custom credentials
         const citiesSource = new carto.source.Dataset('ne_10m_populated_places_simple', {
             user: 'cartovl',
             apiKey: 'default_public'
         });
         // Create a layer with default style and add it to the map
-        const citiesLayer = new carto.Layer('cities', citiesSource, new carto.Viz());
+        const citiesLayer = new carto.Layer('cities', citiesSource, new carto.Viz('color:grey width:4'));
         citiesLayer.addTo(map);
+
 
         // GEOJSON
         // Add GeoJSON
@@ -95,24 +96,14 @@
         };
         // Create a GeoJSON source
         const geojsonSource = new carto.source.GeoJSON(geojson);
-        // Create a style for the geojson layer
+        // Create a style for the layer
         const viz = new carto.Viz(`
             color: red
             width: 20
         `);
-        // Create and add a layer with the geojson
+        // Create and add a layer to the map
         const geojsonLayer = new carto.Layer('offices', geojsonSource, viz);
         geojsonLayer.addTo(map);
-
-        // SQL... WIP
-        const query = 'SELECT * FROM ne_10m_populated_places_simple WHERE scalerank > 7';
-        const sqlSource = new carto.source.SQL(query, {
-            user: 'cartovl',
-            apiKey: 'default_public'
-        });
-        const sqlLayer = new carto.Layer('xxx', sqlSource, new carto.Viz(`color: blue`));
-        //sqlLayer.addTo(map, 'offices');
-        //sqlLayer.addTo(map);
     </script>
 </body>
 
