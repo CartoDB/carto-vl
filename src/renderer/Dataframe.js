@@ -214,51 +214,41 @@ export default class Dataframe extends DummyDataframe {
         return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
     }
 
-    _isPolygonInViewport (featureIndex, viewportAABB, strokeWidthScale) {
+    _isPolygonInViewport (featureIndex) {
         const featureAABB = this._aabb[featureIndex];
-        const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeWidthScale);
-        const vertices = this.decodedGeom.vertices;
-        const normals = this.decodedGeom.normals;
+        const aabbResult = this._compareAABBs(featureAABB);
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
+            const vertices = this.decodedGeom.vertices;
+            const normals = this.decodedGeom.normals;
             const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
-            return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
+            return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end);
         }
 
         return aabbResult === AABBTestResults.INSIDE;
     }
 
-    _compareAABBs (featureAABB, viewportAABB, stroke) {
+    _compareAABBs (featureAABB) {
         if (featureAABB === null || !this.matrix) {
             return AABBTestResults.OUTSIDE;
         }
 
-        // FIXME, also keep aspect ratio in mind when fixing
-        stroke = 0;
-
         const corners = [
-            this._projectToNDC(this.t1, [featureAABB.minx, featureAABB.miny, 0, 1]),
-            this._projectToNDC(this.t2, [featureAABB.minx, featureAABB.maxy, 0, 1]),
-            this._projectToNDC(this.t3, [featureAABB.maxx, featureAABB.miny, 0, 1]),
-            this._projectToNDC(this.t4, [featureAABB.maxx, featureAABB.maxy, 0, 1])
+            this._projectToNDC(this.t1, [featureAABB.minx, featureAABB.miny]),
+            this._projectToNDC(this.t2, [featureAABB.minx, featureAABB.maxy]),
+            this._projectToNDC(this.t3, [featureAABB.maxx, featureAABB.miny]),
+            this._projectToNDC(this.t4, [featureAABB.maxx, featureAABB.maxy])
         ];
 
         const featureStrokeAABB = {
-            minx: Number.POSITIVE_INFINITY,
-            miny: Number.POSITIVE_INFINITY,
-            maxx: Number.NEGATIVE_INFINITY,
-            maxy: Number.NEGATIVE_INFINITY
+            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
+            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
         };
 
-        for (let i = 0; i < 4; i++) {
-            featureStrokeAABB.minx = Math.min(featureStrokeAABB.minx, corners[i][0]);
-            featureStrokeAABB.miny = Math.min(featureStrokeAABB.minx, corners[i][1]);
-            featureStrokeAABB.maxx = Math.max(featureStrokeAABB.minx, corners[i][0]);
-            featureStrokeAABB.maxy = Math.max(featureStrokeAABB.minx, corners[i][1]);
-        }
-
         // NDC viewport (by definition)
-        viewportAABB = {
+        const viewportAABB = {
             minx: -1,
             miny: -1,
             maxx: 1,
@@ -273,6 +263,46 @@ export default class Dataframe extends DummyDataframe {
             default:
                 return AABBTestResults.INTERSECTS;
         }
+    }
+
+    _isPolygonCollidingViewport (vertices, normals, start, end) {
+        if (!this.matrix) {
+            return false;
+        }
+        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        for (let i = start; i < end; i += 6) {
+            const v1 = this._projectToNDC(this.t1, [
+                vertices[i + 0],
+                vertices[i + 1]
+            ]);
+
+            const v2 = this._projectToNDC(this.t2, [
+                vertices[i + 2],
+                vertices[i + 3]
+            ]);
+
+            const v3 = this._projectToNDC(this.t3, [
+                vertices[i + 4],
+                vertices[i + 5]
+            ]);
+
+            const triangle = [{
+                x: v1[0],
+                y: v1[1]
+            }, {
+                x: v2[0],
+                y: v2[1]
+            }, {
+                x: v3[0],
+                y: v3[1]
+            }];
+
+            if (triangleCollides(triangle, aabb)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     _projectToNDC (t, p) {
@@ -605,46 +635,6 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
-    }
-
-    _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
-        if (!this.matrix) {
-            return false;
-        }
-        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
-        for (let i = start; i < end; i += 6) {
-            const v1 = this._projectToNDC(this.t1, [
-                vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            ]);
-
-            const v2 = this._projectToNDC(this.t2, [
-                vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                vertices[i + 3] + normals[i + 3] * strokeWidthScale
-            ]);
-
-            const v3 = this._projectToNDC(this.t3, [
-                vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                vertices[i + 5] + normals[i + 5] * strokeWidthScale
-            ]);
-
-            const triangle = [{
-                x: v1[0],
-                y: v1[1]
-            }, {
-                x: v2[0],
-                y: v2[1]
-            }, {
-                x: v3[0],
-                y: v3[1]
-            }];
-
-            if (triangleCollides(triangle, aabb)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
 

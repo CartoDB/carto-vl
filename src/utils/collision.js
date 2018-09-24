@@ -4,13 +4,6 @@ const SEPARATING_LINE_FOUND = 'separatingLineFound';
 const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
 
 export function triangleCollides (triangle, viewportAABB) {
-    const viewport = [
-        { x: viewportAABB.minx, y: viewportAABB.miny },
-        { x: viewportAABB.minx, y: viewportAABB.maxy },
-        { x: viewportAABB.maxx, y: viewportAABB.miny },
-        { x: viewportAABB.maxx, y: viewportAABB.maxy }
-    ];
-
     /*
      * TODO
      *
@@ -24,11 +17,16 @@ export function triangleCollides (triangle, viewportAABB) {
      *   return true;
      * }
      */
-
     if (_viewportLineSeparatesTriangle(viewportAABB, triangle) === SEPARATING_LINE_FOUND) {
         return false;
     }
 
+    const viewport = [
+        { x: viewportAABB.minx, y: viewportAABB.miny },
+        { x: viewportAABB.minx, y: viewportAABB.maxy },
+        { x: viewportAABB.maxx, y: viewportAABB.miny },
+        { x: viewportAABB.maxx, y: viewportAABB.maxy }
+    ];
     if (_triangleLineSeparatesViewport(triangle, viewport) === SEPARATING_LINE_FOUND) {
         return false;
     }
