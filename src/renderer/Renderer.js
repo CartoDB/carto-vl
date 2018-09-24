@@ -164,10 +164,7 @@ export default class Renderer {
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
-        const aspect = this.gl.canvas.width / this.gl.canvas.height;
-        const scale = 1 / this._zoom;
         dataframes.forEach(dataframe => {
-            const aabb = dataframe.getViewportAABB(scale, this._center, aspect);
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 const featureId = dataframe.properties[metadata.idProperty][i];
 
@@ -176,7 +173,7 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!dataframe.inViewport(i, viz, aabb)) {
+                if (!dataframe.inViewport(i, viz)) {
                     continue;
                 }
 
@@ -338,10 +335,6 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * 512 * dataframe.scale));
-
-            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
-
-            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);

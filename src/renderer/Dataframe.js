@@ -114,39 +114,14 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    getViewportAABB (renderScale, center, aspect) {
-        return this._getBounds(renderScale, center, aspect);
-    }
-
-    inViewport (featureIndex, viz, viewportAABB) {
-        const feature = this.getFeature(featureIndex);
-        let strokeWidthScale = 1;
-
-        if (!viz.transform.default) {
-            const vizOffset = viz.transform.eval(feature);
-            const widthScale = this.widthScale / 2;
-            viewportAABB = {
-                minx: viewportAABB.minx,
-                miny: viewportAABB.miny,
-                maxx: viewportAABB.maxx,
-                maxy: viewportAABB.maxy
-            };
-
-            viewportAABB.minx -= vizOffset[0] * widthScale;
-            viewportAABB.maxx -= vizOffset[0] * widthScale;
-            viewportAABB.miny -= vizOffset[1] * widthScale;
-            viewportAABB.maxy -= vizOffset[1] * widthScale;
-        }
-
+    inViewport (featureIndex) {
         switch (this.type) {
             case 'point':
-                return this._isPointInViewport(featureIndex, viewportAABB);
+                return this._isPointInViewport(featureIndex);
             case 'line':
-                strokeWidthScale = this._computeLineWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+                return this._isPolygonInViewport(featureIndex);
             case 'polygon':
-                strokeWidthScale = this._computePolygonWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+                return this._isPolygonInViewport(featureIndex);
             default:
                 return false;
         }
@@ -208,7 +183,7 @@ export default class Dataframe extends DummyDataframe {
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
         // Transform to Clip Space
-        const p = vec4.transformMat4([], [x, y, 0, 1], this.matrix);
+        const p = transformMat4(this.t1, [x, y], this.matrix);
         // Check in Clip Space if the point is inside the viewport
         // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
         return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
@@ -307,21 +282,10 @@ export default class Dataframe extends DummyDataframe {
 
     _projectToNDC (t, p) {
         const p2 = transformMat4(t, p, this.matrix);
+        // Normalize by W
         p2[0] /= p2[3];
         p2[1] /= p2[3];
         return p2;
-    }
-
-    _getBounds (renderScale, center, aspect) {
-        this.vertexScale = [(renderScale / aspect) * this.scale, renderScale * this.scale];
-        this.vertexOffset = [(renderScale / aspect) * (center.x - this.center.x), renderScale * (center.y - this.center.y)];
-
-        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
-        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
-
-        return { minx, maxx, miny, maxy };
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -648,16 +612,13 @@ function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function normalizeXYByW (p) {
-    p[0] /= p[3];
-    p[1] /= p[3];
-    return p;
-}
-
-function transformMat4 (out, a, m) {
-    const x = a[0], y = a[1];
-    out[0] = m[0] * x + m[4] * y + m[12];
-    out[1] = m[1] * x + m[5] * y + m[13];
-    out[3] = m[3] * x + m[7] * y + m[15];
+// Multiply a vector of the form `vec4(a[0], a[1], 0, 1)` by a 4x4 matrix
+// Storing the result on `out`, returning `out`
+function transformMat4 (out, vector, matrix) {
+    const x = vector[0];
+    const y = vector[1];
+    out[0] = matrix[0] * x + matrix[4] * y + matrix[12];
+    out[1] = matrix[1] * x + matrix[5] * y + matrix[13];
+    out[3] = matrix[3] * x + matrix[7] * y + matrix[15];
     return out;
 }
