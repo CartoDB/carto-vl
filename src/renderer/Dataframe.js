@@ -415,20 +415,20 @@ export default class Dataframe extends DummyDataframe {
                     : this._computePolygonWidthScale(feature, viz);
             }
 
-            const v1 = vec4.transformMat4([], [
+            const v1 = this._projectToNDC(this.t1, [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
                 vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ]);
 
-            const v2 = vec4.transformMat4([], [
+            const v2 = this._projectToNDC(this.t2, [
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
                 vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ]);
 
-            const v3 = vec4.transformMat4([], [
+            const v3 = this._projectToNDC(this.t3, [
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
                 vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ]);
 
             v1[0] *= 0.5;
             v1[1] *= -0.5;
@@ -468,10 +468,10 @@ export default class Dataframe extends DummyDataframe {
             return false;
         }
         const corners = [
-            this._projectToNDC([aabb.minx, aabb.miny, 0, 1]),
-            this._projectToNDC([aabb.minx, aabb.maxy, 0, 1]),
-            this._projectToNDC([aabb.maxx, aabb.miny, 0, 1]),
-            this._projectToNDC([aabb.maxx, aabb.maxy, 0, 1])
+            this._projectToNDC(this.t1, [aabb.minx, aabb.miny, 0, 1]),
+            this._projectToNDC(this.t2, [aabb.minx, aabb.maxy, 0, 1]),
+            this._projectToNDC(this.t3, [aabb.maxx, aabb.miny, 0, 1]),
+            this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy, 0, 1])
         ];
 
         const WIDTH = this.renderer.gl.canvas.width;
@@ -498,7 +498,7 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _projectToPixelSpace (p) {
-        const ndc = this._projectToNDC(p);
+        const ndc = this._projectToNDC([0.1, 0.1, 0.1, 0.1], p);
 
         const WIDTH = this.renderer.gl.canvas.width;
         const HEIGHT = this.renderer.gl.canvas.height;
@@ -611,21 +611,22 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
+        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
         for (let i = start; i < end; i += 6) {
-            const v1 = normalizeXYByW(transformMat4(this.t1, [
+            const v1 = this._projectToNDC(this.t1, [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
-            ], this.matrix));
+                vertices[i + 1] + normals[i + 1] * strokeWidthScale
+            ]);
 
-            const v2 = normalizeXYByW(transformMat4(this.t2, [
+            const v2 = this._projectToNDC(this.t2, [
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
-            ], this.matrix));
+                vertices[i + 3] + normals[i + 3] * strokeWidthScale
+            ]);
 
-            const v3 = normalizeXYByW(transformMat4(this.t3, [
+            const v3 = this._projectToNDC(this.t3, [
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
-            ], this.matrix));
+                vertices[i + 5] + normals[i + 5] * strokeWidthScale
+            ]);
 
             const triangle = [{
                 x: v1[0],
@@ -636,12 +637,9 @@ export default class Dataframe extends DummyDataframe {
             }, {
                 x: v3[0],
                 y: v3[1]
-            }, {
-                x: v1[0],
-                y: v1[1]
             }];
 
-            if (triangleCollides(triangle, {minx: -1, miny: -1, maxx: 1, maxy: 1})) {
+            if (triangleCollides(triangle, aabb)) {
                 return true;
             }
         }
