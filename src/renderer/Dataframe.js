@@ -94,6 +94,11 @@ export default class Dataframe extends DummyDataframe {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
+
+        this.t1 = [0.1, 0.1, 0.1, 0.1];
+        this.t2 = [0.1, 0.1, 0.1, 0.1];
+        this.t3 = [0.1, 0.1, 0.1, 0.1];
+        this.t4 = [0.1, 0.1, 0.1, 0.1];
     }
 
     getFeaturesAtPosition (pos, viz) {
@@ -232,10 +237,10 @@ export default class Dataframe extends DummyDataframe {
         stroke = 0;
 
         const corners = [
-            this._projectToNDC([featureAABB.minx, featureAABB.miny, 0, 1]),
-            this._projectToNDC([featureAABB.minx, featureAABB.maxy, 0, 1]),
-            this._projectToNDC([featureAABB.maxx, featureAABB.miny, 0, 1]),
-            this._projectToNDC([featureAABB.maxx, featureAABB.maxy, 0, 1])
+            this._projectToNDC(this.t1, [featureAABB.minx, featureAABB.miny, 0, 1]),
+            this._projectToNDC(this.t2, [featureAABB.minx, featureAABB.maxy, 0, 1]),
+            this._projectToNDC(this.t3, [featureAABB.maxx, featureAABB.miny, 0, 1]),
+            this._projectToNDC(this.t4, [featureAABB.maxx, featureAABB.maxy, 0, 1])
         ];
 
         const featureStrokeAABB = {
@@ -270,8 +275,8 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    _projectToNDC (p) {
-        const p2 = vec4.transformMat4([0.1, 0.1, 0.1, 0.1], p, this.matrix);
+    _projectToNDC (t, p) {
+        const p2 = transformMat4(t, p, this.matrix);
         p2[0] /= p2[3];
         p2[1] /= p2[3];
         return p2;
@@ -400,7 +405,7 @@ export default class Dataframe extends DummyDataframe {
                 pointWithOffset = { x: pos.x - offset.x, y: pos.y - offset.y };
 
                 if (this._isFeatureFiltered(feature, viz.filter) ||
-                    this._isPointInAABB(pointWithOffset, featureIndex)) {
+                    !this._isPointInAABB(pointWithOffset, featureIndex)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -459,6 +464,9 @@ export default class Dataframe extends DummyDataframe {
     _isPointInAABB (point, featureIndex) {
         // Transform AABB from tile space to NDC space
         const aabb = this._aabb[featureIndex];
+        if (aabb === null) {
+            return false;
+        }
         const corners = [
             this._projectToNDC([aabb.minx, aabb.miny, 0, 1]),
             this._projectToNDC([aabb.minx, aabb.maxy, 0, 1]),
@@ -466,11 +474,27 @@ export default class Dataframe extends DummyDataframe {
             this._projectToNDC([aabb.maxx, aabb.maxy, 0, 1])
         ];
 
+        const WIDTH = this.renderer.gl.canvas.width;
+        const HEIGHT = this.renderer.gl.canvas.height;
+
+        const ndcPoint = {
+            x: point.x / WIDTH * 2 - 1,
+            y: -(point.y / HEIGHT * 2 - 1)
+        };
         // An AABB in world/tile space may no longer be an AABB in NDC space
         // Therefore, we'll need to check against the  quadrilateral
         // We perform that by cheking against two triangles by dividing the quadilateral with one of its diagonals
         // If and only if the point is in any of the triangles, the point is on the quadrilateral (i.e. on the original AABB)
-        return pointInTriangle(point, corners[0], corners[1], corners[2]) || pointInTriangle(point, corners[1], corners[2], corners[3]);
+
+        const result = pointInTriangle(ndcPoint,
+            {x: corners[0][0], y: corners[0][1]},
+            {x: corners[1][0], y: corners[1][1]},
+            {x: corners[2][0], y: corners[2][1]}) ||
+            pointInTriangle(ndcPoint,
+                {x: corners[1][0], y: corners[1][1]},
+                {x: corners[2][0], y: corners[2][1]},
+                {x: corners[3][0], y: corners[3][1]});
+        return result;
     }
 
     _projectToPixelSpace (p) {
@@ -587,21 +611,18 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
-        const t1 = [0.1, 0.1, 0.1, 0.1];
-        const t2 = [0.1, 0.1, 0.1, 0.1];
-        const t3 = [0.1, 0.1, 0.1, 0.1];
         for (let i = start; i < end; i += 6) {
-            const v1 = normalizeXYByW(vec4.transformMat4(t1, [
+            const v1 = normalizeXYByW(transformMat4(this.t1, [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
                 vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
             ], this.matrix));
 
-            const v2 = normalizeXYByW(vec4.transformMat4(t2, [
+            const v2 = normalizeXYByW(transformMat4(this.t2, [
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
                 vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
             ], this.matrix));
 
-            const v3 = normalizeXYByW(vec4.transformMat4(t3, [
+            const v3 = normalizeXYByW(transformMat4(this.t3, [
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
                 vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
             ], this.matrix));
@@ -643,4 +664,12 @@ function normalizeXYByW (p) {
     p[0] /= p[3];
     p[1] /= p[3];
     return p;
+}
+
+function transformMat4 (out, a, m) {
+    const x = a[0], y = a[1];
+    out[0] = m[0] * x + m[4] * y + m[12];
+    out[1] = m[1] * x + m[5] * y + m[13];
+    out[3] = m[3] * x + m[7] * y + m[15];
+    return out;
 }
