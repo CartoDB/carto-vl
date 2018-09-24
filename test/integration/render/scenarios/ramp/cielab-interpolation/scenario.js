@@ -3,11 +3,10 @@ const map = new carto.Map({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['points-repeated']);
-const viz = new carto.Viz('color: ramp(top($cat, @num), PRISM), width: 50, @num: 2');
+const source = new carto.source.GeoJSON(sources['points']);
+const viz = new carto.Viz('color: ramp(linear($numeric, 0, 10), [red, blue]), width: 50');
 const layer = new carto.Layer('layer', source, viz);
 
-viz.variables.num.blendTo(1, 0);
 layer.addTo(map);
 layer.on('loaded', () => {
     window.loaded = true;

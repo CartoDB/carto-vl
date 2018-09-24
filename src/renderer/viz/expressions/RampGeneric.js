@@ -80,24 +80,47 @@ export default class RampGeneric extends Base {
         const input = this.input._applyToShaderSource(getGLSLforProperty);
         const { palette, others } = this._getPalette();
         const GLSLPalette = palette.map(color => color._applyToShaderSource(getGLSLforProperty));
+        GLSLPalette.forEach(p => {
+            if (this.palette.type !== 'number-list') {
+                p.inline = `sRGBAToCieLAB(${p.inline})`;
+            }
+        });
         const GLSLOthers = others._applyToShaderSource(getGLSLforProperty);
-        const GLSLBlend = this.palette.type === 'number-list'
-            ? _getInlineGLSLBlend(GLSLPalette)
-            : _getInlineColorGLSLBlend(GLSLPalette);
-
         const rampFnReturnType = this.palette.type === 'number-list' ? 'float' : 'vec4';
         const inline = `ramp_color${this._uid}(${input.inline})`;
-
+        const maxValues = GLSLPalette.length - 1;
         const preface = this._prefaceCode(`
             ${input.preface}
             ${CIELabGLSL}
             ${GLSLPalette.map(elem => elem.preface).join('\n')}
             ${GLSLOthers.preface}
 
+            ${rampFnReturnType} ramp_colorBlend${this._uid}(float x){
+                x=clamp(x, 0., 1.);
+                float minIndex = floor(x*${maxValues.toFixed(20)});
+                float maxIndex = ceil(x*${maxValues.toFixed(20)});
+                float m = fract(x*${maxValues.toFixed(20)});
+                ${rampFnReturnType} min;
+                ${rampFnReturnType} max;
+
+                ${GLSLPalette.map((p, index) => `
+                    if (minIndex == ${index}.){
+                        min = ${p.inline};
+                }`).join('\n')
+}
+                ${GLSLPalette.map((p, index) => `
+                    if (maxIndex == ${index}.){
+                        max = ${p.inline};
+                }`).join('\n')
+}
+
+                return ${this.palette.type !== 'number-list' ? 'cielabToSRGBA' : ''}(mix(min, max, m));
+            }
+
             ${rampFnReturnType} ramp_color${this._uid}(float x){
                 return x==${OTHERS_GLSL_VALUE}
                     ? ${GLSLOthers.inline}
-                    : ${GLSLBlend};
+                    : ramp_colorBlend${this._uid}(x);
             }`
         );
 
@@ -118,32 +141,4 @@ export default class RampGeneric extends Base {
             others: this._defaultOthers && subPalette.othersColor ? subPalette.othersColor : this.others
         };
     }
-}
-
-function _getInlineGLSLBlend (GLSLPalette) {
-    return _generateGLSLBlend(GLSLPalette.map(elem => elem.inline));
-}
-
-function _getInlineColorGLSLBlend (GLSLPalette) {
-    return `cielabToSRGBA(${_generateGLSLBlend(GLSLPalette.map(elem => `sRGBAToCieLAB(${elem.inline})`))})`;
-}
-
-function _generateGLSLBlend (list, index = 0) {
-    const currentValue = list[index];
-
-    if (index === list.length - 1) {
-        return currentValue;
-    }
-
-    const nextBlend = _generateGLSLBlend(list, index + 1);
-
-    return _mixClampGLSL(currentValue, nextBlend, index, list.length);
-}
-
-function _mixClampGLSL (currentValue, nextBlend, index, listLength) {
-    const min = (index / (listLength - 1)).toFixed(20);
-    const max = (1 / (listLength - 1)).toFixed(20);
-    const clamp = `clamp((x - ${min})/${max}, 0., 1.)`;
-
-    return `mix(${currentValue}, ${nextBlend}, ${clamp})`;
 }

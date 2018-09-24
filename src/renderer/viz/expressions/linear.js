@@ -86,13 +86,13 @@ export default class Linear extends BaseExpression {
 
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
-            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+            this.inlineMaker = (inline) => `clamp((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}), 0., 1.)`;
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);
             checkType('linear', 'max', 2, 'number', this.max);
 
-            this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
+            this.inlineMaker = (inline) => `clamp((${inline.input}-${inline.min})/(${inline.max}-${inline.min}), 0., 1.)`;
         }
     }
 
