@@ -55,11 +55,12 @@
     // Define layer
     const source = new carto.source.Dataset('wwi');
     const viz = new carto.Viz(`
-        @avg: viewportAvg(clusterAvg($temp))
+        @avg: viewportAvg(($temp))
         width:  zoom() * (animation($day, 140, fade(0.05, 0.2)) + 0.5)
-        color:  ramp(linear(clusterAvg($temp), 0,30), tealrose)
+        color:  ramp(linear(($temp), 0,30), tealrose)
         strokeWidth: 0
         filter: animation($day, 140, fade(0.05, 0.2)) + 0.05
+        transform: translate(100, 50)
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.on('updated', ()=>{

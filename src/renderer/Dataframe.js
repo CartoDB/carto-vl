@@ -448,7 +448,7 @@ export default class Dataframe extends DummyDataframe {
     _isPointInAABB (point, featureIndex) {
         // Transform AABB from tile space to NDC space
         const aabb = this._aabb[featureIndex];
-        if (aabb === null) {
+        if (aabb === null || !this.matrix) {
             return false;
         }
         const corners = [
