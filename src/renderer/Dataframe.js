@@ -215,7 +215,7 @@ export default class Dataframe extends DummyDataframe {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
 
-        if (aabbResult === AABBTestResults.INTERSECTS && false) {
+        if (aabbResult === AABBTestResults.INTERSECTS) {
             const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
             return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
         }
@@ -224,19 +224,33 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _compareAABBs (featureAABB, viewportAABB, stroke) {
-        if (featureAABB === null) {
+        if (featureAABB === null || !this.matrix) {
             return AABBTestResults.OUTSIDE;
         }
 
         // FIXME, also keep aspect ratio in mind when fixing
         stroke = 0;
 
+        const corners = [
+            this._projectToNDC([featureAABB.minx, featureAABB.miny, 0, 1]),
+            this._projectToNDC([featureAABB.minx, featureAABB.maxy, 0, 1]),
+            this._projectToNDC([featureAABB.maxx, featureAABB.miny, 0, 1]),
+            this._projectToNDC([featureAABB.maxx, featureAABB.maxy, 0, 1])
+        ];
+
         const featureStrokeAABB = {
-            minx: this._projectToNDC(featureAABB.minx) - stroke,
-            miny: this._projectToNDC(featureAABB.miny) - stroke,
-            maxx: this._projectToNDC(featureAABB.maxx) + stroke,
-            maxy: this._projectToNDC(featureAABB.maxy) + stroke
+            minx: Number.POSITIVE_INFINITY,
+            miny: Number.POSITIVE_INFINITY,
+            maxx: Number.NEGATIVE_INFINITY,
+            maxy: Number.NEGATIVE_INFINITY
         };
+
+        for (let i = 0; i < 4; i++) {
+            featureStrokeAABB.minx = Math.min(featureStrokeAABB.minx, corners[i][0]);
+            featureStrokeAABB.miny = Math.min(featureStrokeAABB.minx, corners[i][1]);
+            featureStrokeAABB.maxx = Math.max(featureStrokeAABB.minx, corners[i][0]);
+            featureStrokeAABB.maxy = Math.max(featureStrokeAABB.minx, corners[i][1]);
+        }
 
         // NDC viewport (by definition)
         viewportAABB = {
@@ -257,7 +271,10 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _projectToNDC (p) {
-        return vec4.transformMat4([], p, this.matrix).map((x, _, v) => x / v[3]);
+        const p2 = vec4.transformMat4([0.1, 0.1, 0.1, 0.1], p, this.matrix);
+        p2[0] /= p2[3];
+        p2[1] /= p2[3];
+        return p2;
     }
 
     _getBounds (renderScale, center, aspect) {
@@ -382,8 +399,8 @@ export default class Dataframe extends DummyDataframe {
 
                 pointWithOffset = { x: pos.x - offset.x, y: pos.y - offset.y };
 
-                if (this._isFeatureFiltered(feature, viz.filter)
-                    || this._isPointInAABB(pointWithOffset, featureIndex)) {
+                if (this._isFeatureFiltered(feature, viz.filter) ||
+                    this._isPointInAABB(pointWithOffset, featureIndex)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -567,24 +584,27 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
-        if (!this.matrix){
+        if (!this.matrix) {
             return false;
         }
+        const t1 = [0.1, 0.1, 0.1, 0.1];
+        const t2 = [0.1, 0.1, 0.1, 0.1];
+        const t3 = [0.1, 0.1, 0.1, 0.1];
         for (let i = start; i < end; i += 6) {
-            const v1 = vec4.transformMat4([], [
+            const v1 = normalizeXYByW(vec4.transformMat4(t1, [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
                 vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ], this.matrix));
 
-            const v2 = vec4.transformMat4([], [
+            const v2 = normalizeXYByW(vec4.transformMat4(t2, [
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
                 vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ], this.matrix));
 
-            const v3 = vec4.transformMat4([], [
+            const v3 = normalizeXYByW(vec4.transformMat4(t3, [
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
                 vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
-            ], this.matrix).map((x, _, v) => x / v[3]);
+            ], this.matrix));
 
             const triangle = [{
                 x: v1[0],
@@ -617,4 +637,10 @@ function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
+}
+
+function normalizeXYByW (p) {
+    p[0] /= p[3];
+    p[1] /= p[3];
+    return p;
 }
