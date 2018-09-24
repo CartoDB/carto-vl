@@ -6,7 +6,6 @@ attribute vec2 featureID;
 attribute vec2 normal;
 
 uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
 uniform float normalScale;
 uniform vec2 resolution;
 uniform mat4 matrix;
