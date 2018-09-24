@@ -106,9 +106,9 @@ export default class Dataframe extends DummyDataframe {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
             case 'line':
-                return this._getFeaturesFromTriangles('line', pos, viz);
+                return this._getFeaturesAtPositionFromTriangles('line', pos, viz);
             case 'polygon':
-                return this._getFeaturesFromTriangles('polygon', pos, viz);
+                return this._getFeaturesAtPositionFromTriangles('polygon', pos, viz);
             default:
                 return [];
         }
@@ -183,7 +183,7 @@ export default class Dataframe extends DummyDataframe {
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
         // Transform to Clip Space
-        const p = transformMat4(this.t1, [x, y], this.matrix);
+        const p = transformMat4Vec2(this.t1, [x, y], this.matrix);
         // Check in Clip Space if the point is inside the viewport
         // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
         return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
@@ -240,7 +240,7 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    _isPolygonCollidingViewport (vertices, normals, start, end) {
+    _isPolygonCollidingViewport (vertices, normals, start, end) { // NORMALS??? FIXME TODO
         if (!this.matrix) {
             return false;
         }
@@ -281,7 +281,7 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _projectToNDC (t, p) {
-        const p2 = transformMat4(t, p, this.matrix);
+        const p2 = transformMat4Vec2(t, p, this.matrix);
         // Normalize by W
         p2[0] /= p2[3];
         p2[1] /= p2[3];
@@ -291,8 +291,6 @@ export default class Dataframe extends DummyDataframe {
     _getPointsAtPosition (pos, viz) {
         const points = this.decodedGeom.vertices;
         const features = [];
-
-        const widthScale = this.widthScale / 2;
 
         const WIDTH = this.renderer.gl.canvas.width;
         const HEIGHT = this.renderer.gl.canvas.height;
@@ -311,27 +309,25 @@ export default class Dataframe extends DummyDataframe {
                 y: points[i + 1]
             };
 
-            const c = [center.x, center.y, 0, 1];
-            const c2 = vec4.transformMat4([], c, this.matrix).map((x, _, v) => x / v[3]);
+            const c2 = this._projectToNDC(this.t1, [center.x, center.y]);
+
+            // Project to pixel space
             c2[0] *= 0.5;
             c2[1] *= -0.5;
             c2[0] += 0.5;
             c2[1] += 0.5;
+            c2[0] *= WIDTH;
+            c2[1] *= HEIGHT;
 
-            const strokeWidthScale = this._computePointWidthScale(feature, viz);
+            const radius = this._computePointRadius(feature, viz);
 
-            if (!viz.symbol.default) {
-                const symbolOffset = viz.symbolPlacement.eval(feature);
-                center.x += symbolOffset[0] * strokeWidthScale;
-                center.y += symbolOffset[1] * strokeWidthScale;
-            }
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
-                center.x += vizOffset[0] * widthScale;
-                center.y += vizOffset[1] * widthScale;
+                center.x += vizOffset[0];
+                center.y += vizOffset[1];
             }
 
-            const inside = pointInCircle(pos, { x: c2[0] * WIDTH, y: c2[1] * HEIGHT }, strokeWidthScale);
+            const inside = pointInCircle(pos, {x: c2[0], y: c2[1]}, radius);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -341,17 +337,11 @@ export default class Dataframe extends DummyDataframe {
         return features;
     }
 
-    _computePointWidthScale (feature, viz) {
+    _computePointRadius (feature, viz) {
         const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
         return diameter / 2;
-    }
-
-    get widthScale () {
-        return this.renderer
-            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
-            : 1;
     }
 
     _computeLineWidthScale (feature, viz) {
@@ -368,7 +358,7 @@ export default class Dataframe extends DummyDataframe {
         return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * 512);
     }
 
-    _getFeaturesFromTriangles (geometryType, pos, viz) {
+    _getFeaturesAtPositionFromTriangles (geometryType, pos, viz) {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
@@ -411,17 +401,17 @@ export default class Dataframe extends DummyDataframe {
 
             const v1 = this._projectToNDC(this.t1, [
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
+                vertices[i + 1] + normals[i + 1] * strokeWidthScale
             ]);
 
             const v2 = this._projectToNDC(this.t2, [
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
+                vertices[i + 3] + normals[i + 3] * strokeWidthScale
             ]);
 
             const v3 = this._projectToNDC(this.t3, [
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
+                vertices[i + 5] + normals[i + 5] * strokeWidthScale
             ]);
 
             v1[0] *= 0.5;
@@ -462,10 +452,10 @@ export default class Dataframe extends DummyDataframe {
             return false;
         }
         const corners = [
-            this._projectToNDC(this.t1, [aabb.minx, aabb.miny, 0, 1]),
-            this._projectToNDC(this.t2, [aabb.minx, aabb.maxy, 0, 1]),
-            this._projectToNDC(this.t3, [aabb.maxx, aabb.miny, 0, 1]),
-            this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy, 0, 1])
+            this._projectToNDC(this.t1, [aabb.minx, aabb.miny]),
+            this._projectToNDC(this.t2, [aabb.minx, aabb.maxy]),
+            this._projectToNDC(this.t3, [aabb.maxx, aabb.miny]),
+            this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy])
         ];
 
         const WIDTH = this.renderer.gl.canvas.width;
@@ -489,18 +479,6 @@ export default class Dataframe extends DummyDataframe {
                 {x: corners[2][0], y: corners[2][1]},
                 {x: corners[3][0], y: corners[3][1]});
         return result;
-    }
-
-    _projectToPixelSpace (p) {
-        const ndc = this._projectToNDC([0.1, 0.1, 0.1, 0.1], p);
-
-        const WIDTH = this.renderer.gl.canvas.width;
-        const HEIGHT = this.renderer.gl.canvas.height;
-
-        return [
-            WIDTH * (ndc[0] * 0.5 + 0.5),
-            HEIGHT * (-ndc[1] * 0.5 + 0.5)
-        ];
     }
 
     _isFeatureFiltered (feature, filterExpression) {
@@ -614,7 +592,7 @@ function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
 
 // Multiply a vector of the form `vec4(a[0], a[1], 0, 1)` by a 4x4 matrix
 // Storing the result on `out`, returning `out`
-function transformMat4 (out, vector, matrix) {
+function transformMat4Vec2 (out, vector, matrix) {
     const x = vector[0];
     const y = vector[1];
     out[0] = matrix[0] * x + matrix[4] * y + matrix[12];

@@ -110,13 +110,13 @@ export function equalPoints (a, b) {
     return (a.x === b.x) && (a.y === b.y);
 }
 
-export function pointInCircle (p, center, scale) {
+export function pointInCircle (p, center, radius) {
     const diff = {
         x: p.x - center.x,
         y: p.y - center.y
     };
     const lengthSquared = diff.x * diff.x + diff.y * diff.y;
-    return lengthSquared <= scale * scale;
+    return lengthSquared <= radius * radius;
 }
 
 export function pointInRectangle (point, bbox) {
