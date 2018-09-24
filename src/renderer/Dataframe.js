@@ -215,9 +215,9 @@ export default class Dataframe extends DummyDataframe {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
 
-        if (aabbResult === AABBTestResults.INTERSECTS) {
+        if (aabbResult === AABBTestResults.INTERSECTS && false) {
             const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
-            return _isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
+            return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
         }
 
         return aabbResult === AABBTestResults.INSIDE;
@@ -521,6 +521,48 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
     }
+
+    _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
+        if (!this.matrix){
+            return false;
+        }
+        for (let i = start; i < end; i += 6) {
+            const v1 = vec4.transformMat4([], [
+                vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+                vertices[i + 1] + normals[i + 1] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
+
+            const v2 = vec4.transformMat4([], [
+                vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+                vertices[i + 3] + normals[i + 3] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
+
+            const v3 = vec4.transformMat4([], [
+                vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+                vertices[i + 5] + normals[i + 5] * strokeWidthScale, 0, 1
+            ], this.matrix).map((x, _, v) => x / v[3]);
+
+            const triangle = [{
+                x: v1[0],
+                y: v1[1]
+            }, {
+                x: v2[0],
+                y: v2[1]
+            }, {
+                x: v3[0],
+                y: v3[1]
+            }, {
+                x: v1[0],
+                y: v1[1]
+            }];
+
+            if (triangleCollides(triangle, {minx: -1, miny: -1, maxx: 1, maxy: 1})) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
@@ -531,28 +573,4 @@ function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
-}
-
-function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
-    for (let i = start; i < end; i += 6) {
-        const triangle = [{
-            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-        }, {
-            x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-            y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
-        }, {
-            x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-            y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
-        }, {
-            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-        }];
-
-        if (triangleCollides(triangle, viewportAABB)) {
-            return true;
-        }
-    }
-
-    return false;
 }
