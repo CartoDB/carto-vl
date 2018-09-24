@@ -223,7 +223,6 @@ export default class Renderer {
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
-        const aspect = this._getAspect();
 
         this._runViewportAggregations(renderLayer);
 
@@ -303,8 +302,6 @@ export default class Renderer {
             gl.viewport(0, 0, w * antialiasingScale, h * antialiasingScale);
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
-
-        const scale = 1.0 / this._zoom;
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 

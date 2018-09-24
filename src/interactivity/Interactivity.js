@@ -1,7 +1,5 @@
 import mitt from 'mitt';
 import Layer from '../Layer';
-import { WM_R, projectToWebMercator } from '../utils/util';
-import { wToR } from '../client/rsys';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**

@@ -1,8 +1,6 @@
-import { wToR } from '../client/rsys';
-import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
+import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
-import { vec4 } from 'gl-matrix';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
