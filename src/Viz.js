@@ -491,7 +491,7 @@ export default class Viz {
      * Stringify the visualization
      *
      * @returns {string}
-     * @memberof carto
+     * @memberof carto.Viz
      * @api
      */
     toString () {
