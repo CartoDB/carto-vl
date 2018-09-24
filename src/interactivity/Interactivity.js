@@ -17,9 +17,9 @@ export default class Interactivity {
     *
     * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
     *
-    * To create a Interactivity object an array of {@link carto.Layer} is required.
-    * Events fired from interactivity objects will refer to the features of these layers and only these layers.
-    * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
+    * To create a Interactivity object a {@link carto.Layer} or an array with several {@link carto.Layer} is required.
+    * Events fired from interactivity objects will refer to the features of these layer/s and only these layer/s.
+    * Moreover, when using an array of layers, the order of the features in the events will be determined by the order of these layers in the layerList.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
     * @param {object} [options={}] - Object containing interactivity options
