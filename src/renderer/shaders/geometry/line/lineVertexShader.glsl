@@ -5,7 +5,6 @@ attribute vec2 vertexPosition;
 attribute vec2 featureID;
 attribute vec2 normal;
 
-uniform vec2 vertexScale;
 uniform float normalScale;
 uniform vec2 resolution;
 uniform mat4 matrix;
@@ -37,7 +36,7 @@ void main(void) {
     // Set z range (-1, 1)
     z = z * 2. - 1.;
 
-    vec2 n = normal*size/normalScale/vertexScale;
+    vec2 n = normal*size*normalScale;
     vec4 p =  matrix*vec4(vertexPosition+n, 0., 1.);
     p/=p.w;
 

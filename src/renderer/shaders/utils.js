@@ -77,7 +77,6 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
     shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
 
-    shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
     shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');

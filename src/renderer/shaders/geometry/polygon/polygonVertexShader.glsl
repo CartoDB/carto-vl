@@ -4,7 +4,6 @@ attribute vec2 vertexPosition;
 attribute vec2 featureID;
 attribute vec2 normal;
 
-uniform vec2 vertexScale;
 uniform float normalScale;
 uniform vec2 resolution;
 
@@ -40,7 +39,7 @@ void main(void) {
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
-    vec2 n = normal*size/normalScale/vertexScale;
+    vec2 n = normal*size*normalScale;
     vec4 p =  matrix*vec4(vertexPosition+n, 0., 1.);
     p/=p.w;
 
