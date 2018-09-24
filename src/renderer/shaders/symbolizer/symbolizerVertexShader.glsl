@@ -3,8 +3,6 @@ precision highp float;
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
 
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
 uniform float devicePixelRatio;

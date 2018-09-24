@@ -337,13 +337,7 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
-            gl.uniform2f(renderer.vertexScaleUniformLocation,
-                dataframe.scale,
-                dataframe.scale);
-            gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (-dataframe.center.x),
-                (-dataframe.center.y));
-            gl.uniform1f(renderer.normalScale, Math.pow(2, drawMetadata.zoomLevel) * 512);
+            gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * 512 * dataframe.scale));
 
             dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
 

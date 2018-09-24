@@ -228,11 +228,22 @@ export default class Dataframe extends DummyDataframe {
             return AABBTestResults.OUTSIDE;
         }
 
+        // FIXME, also keep aspect ratio in mind when fixing
+        stroke = 0;
+
         const featureStrokeAABB = {
-            minx: featureAABB.minx - stroke,
-            miny: featureAABB.miny - stroke,
-            maxx: featureAABB.maxx + stroke,
-            maxy: featureAABB.maxy + stroke
+            minx: this._projectToNDC(featureAABB.minx) - stroke,
+            miny: this._projectToNDC(featureAABB.miny) - stroke,
+            maxx: this._projectToNDC(featureAABB.maxx) + stroke,
+            maxy: this._projectToNDC(featureAABB.maxy) + stroke
+        };
+
+        // NDC viewport (by definition)
+        viewportAABB = {
+            minx: -1,
+            miny: -1,
+            maxx: 1,
+            maxy: 1
         };
 
         switch (true) {
@@ -243,6 +254,10 @@ export default class Dataframe extends DummyDataframe {
             default:
                 return AABBTestResults.INTERSECTS;
         }
+    }
+
+    _projectToNDC (p) {
+        return vec4.transformMat4([], p, this.matrix).map((x, _, v) => x / v[3]);
     }
 
     _getBounds (renderScale, center, aspect) {
@@ -300,7 +315,7 @@ export default class Dataframe extends DummyDataframe {
                 center.y += vizOffset[1] * widthScale;
             }
 
-            const inside = pointInCircle(pos, {x: c2[0] * WIDTH, y: c2[1] * HEIGHT}, strokeWidthScale);
+            const inside = pointInCircle(pos, { x: c2[0] * WIDTH, y: c2[1] * HEIGHT }, strokeWidthScale);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -367,8 +382,8 @@ export default class Dataframe extends DummyDataframe {
 
                 pointWithOffset = { x: pos.x - offset.x, y: pos.y - offset.y };
 
-                if (
-                    this._isFeatureFiltered(feature, viz.filter)) { //! pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
+                if (this._isFeatureFiltered(feature, viz.filter)
+                    || this._isPointInAABB(pointWithOffset, featureIndex)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -409,9 +424,9 @@ export default class Dataframe extends DummyDataframe {
             v3[1] += 0.5;
 
             const inside = pointInTriangle(pointWithOffset,
-                {x: v1[0] * WIDTH, y: v1[1] * HEIGHT},
-                {x: v2[0] * WIDTH, y: v2[1] * HEIGHT},
-                {x: v3[0] * WIDTH, y: v3[1] * HEIGHT});
+                { x: v1[0] * WIDTH, y: v1[1] * HEIGHT },
+                { x: v2[0] * WIDTH, y: v2[1] * HEIGHT },
+                { x: v3[0] * WIDTH, y: v3[1] * HEIGHT });
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -422,6 +437,35 @@ export default class Dataframe extends DummyDataframe {
         }
 
         return features;
+    }
+
+    _isPointInAABB (point, featureIndex) {
+        // Transform AABB from tile space to NDC space
+        const aabb = this._aabb[featureIndex];
+        const corners = [
+            this._projectToNDC([aabb.minx, aabb.miny, 0, 1]),
+            this._projectToNDC([aabb.minx, aabb.maxy, 0, 1]),
+            this._projectToNDC([aabb.maxx, aabb.miny, 0, 1]),
+            this._projectToNDC([aabb.maxx, aabb.maxy, 0, 1])
+        ];
+
+        // An AABB in world/tile space may no longer be an AABB in NDC space
+        // Therefore, we'll need to check against the  quadrilateral
+        // We perform that by cheking against two triangles by dividing the quadilateral with one of its diagonals
+        // If and only if the point is in any of the triangles, the point is on the quadrilateral (i.e. on the original AABB)
+        return pointInTriangle(point, corners[0], corners[1], corners[2]) || pointInTriangle(point, corners[1], corners[2], corners[3]);
+    }
+
+    _projectToPixelSpace (p) {
+        const ndc = this._projectToNDC(p);
+
+        const WIDTH = this.renderer.gl.canvas.width;
+        const HEIGHT = this.renderer.gl.canvas.height;
+
+        return [
+            WIDTH * (ndc[0] * 0.5 + 0.5),
+            HEIGHT * (-ndc[1] * 0.5 + 0.5)
+        ];
     }
 
     _isFeatureFiltered (feature, filterExpression) {
