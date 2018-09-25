@@ -1,6 +1,7 @@
 import carto from '../../../../src/';
 import { layerVisibility } from '../../../../src/constants/layer';
 import * as util from '../../util';
+import { mat4 } from 'gl-matrix';
 
 const featureData = {
     type: 'Feature',
@@ -147,6 +148,8 @@ describe('Layer', () => {
                     layer.hide();
                     layer.show();
                     layer.requestData();
+                    layer._matrix = mat4.identity([]);
+                    layer.prerender(undefined, mat4.identity([]));
 
                     expect(requestDataSourceSpy).toHaveBeenCalled();
                     done();

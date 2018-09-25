@@ -292,6 +292,7 @@ export default class Layer {
     show () {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
+        this._noFirstRequestData = false;
         this.requestData();
     }
 
@@ -371,11 +372,11 @@ export default class Layer {
             this._matrix = matrix;
             this.renderer.matrix = matrix;
             this._setRendererZoomCenter(matrix);
-            if (this._source) {
+            if (this._source && this._visible) {
                 this._source.requestData(this._getZoom(), this._getViewport());
             }
             this._fireUpdateOnNextRender = true;
-        } else if (!this._noFirstRequestData && this._source) {
+        } else if (!this._noFirstRequestData && this._source && this._visible) {
             this._source.requestData(this._getZoom(), this._getViewport());
             this._noFirstRequestData = true;
         }

@@ -191,7 +191,6 @@ export default class Map {
     }
 
     _createMatrix () {
-        // This matrix generates proper values of zoom and _center
         const ratio = this._canvas.width / this._canvas.height;
 
         const m = [];
