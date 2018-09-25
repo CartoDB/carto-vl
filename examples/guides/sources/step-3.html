@@ -44,12 +44,15 @@
 
         // DATASET
         // Define Dataset source with custom credentials
-        const citiesSource = new carto.source.Dataset('ne_10m_populated_places_simple', {
+        const citiesSource = new carto.source.Dataset('populated_places', {
             user: 'cartovl',
             apiKey: 'default_public'
         });
         // Define Viz object with custom style
-        const citiesViz = new carto.Viz('color:grey width:4');
+        const citiesViz = new carto.Viz(`
+            color: grey
+            width: 4
+        `);
         // Define map Layer
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
         // Add map Layer
@@ -115,8 +118,8 @@
         officesLayer.addTo(map);
 
         // SQL
-        // Define a query
-        const query = 'SELECT * FROM ne_10m_populated_places_simple WHERE megacity = 1';
+        // Define query
+        const query = 'SELECT * FROM populated_places WHERE megacity = 1';
         // Define SQL source with query and custom credentials
         const megacitiesSource = new carto.source.SQL(query, {
             user: 'cartovl',

@@ -1,7 +1,7 @@
 ## Getting data using Sources
 In this guide you will learn how to use different data sources for your CARTO VL visualizations. After practicing with it, you will be able to connect to your datasets in several ways, and you will know which is the better option for you.
 
-This guide assumes that you have previously gone through the [Getting Started guide](https://carto.com/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
+This guide assumes that you have previously gone through the [Getting Started Guide](https://carto.com/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
 
 
 ### How to get data
@@ -14,7 +14,7 @@ Our library currently supports these three options:
 
 Every option is a different kind of **Source**, and CARTO VL provides you with a suitable object in its API to connect to them under the namespace `carto.source` (for example `carto.source.Dataset`).
 
-Both *Dataset* and *SQL* are based in *Vector Tiles*, following *Mapbox Vector Tile Specification* (MVT). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and powerful dynamic styling.
+Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vector-tile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and powerful dynamic styling.
 > In fact, there is a fourth type of source in CARTO VL called [MVT](https://carto.com/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advance cases.
 
 
@@ -33,15 +33,18 @@ const aSource = new carto.source.Dataset('name_of_your_dataset');
 ```
 That was using `carto.setDefaultAuth` method, but now you will see how to include custom credentials for an specific dataset. Add this to your current working file (*sources.html* if you followed our suggestion), just after map creation.
 ```js
-const citiesSource = new carto.source.Dataset('ne_10m_populated_places_simple', {
+const citiesSource = new carto.source.Dataset('populated_places', {
     user: 'cartovl',
     apiKey: 'default_public'
 });
 ```
 
-As with any source, you should then pass it to a `Layer` to visualize it, but first let's create its Viz with a style:
+As with any `Source`, you should then pass it to a `Layer` to visualize it, but first let's create its Viz with a style:
 ```js
-const citiesViz = new carto.Viz('color:grey width:4');
+const citiesViz = new carto.Viz(`
+    color: grey
+    width: 4
+`);
 ```
 
 Now you're ready for the layer creation
@@ -122,7 +125,7 @@ const offices = {
     ]
 };
 ```
-> If your dataset is much bigger, you'd probably store that content in an external file (see more Advanced examples)
+> If your dataset is much bigger, you would probably store that content in an external file (see this [External GeoJSON layer](https://carto.com/developers/carto-vl/examples/#example-external-geojson-layer) example).
 
 And then use it within a GeoJSON source, like this:
 ```js
@@ -165,9 +168,9 @@ You already have your data in that format, and you currently don't have access t
 ### SQL
 SQL is a very common language to make queries in databases and geospatial software. It provides a flexible mechanism to adapt your dataset to your specific needs. Let's use it now in your map!
 
-Define a query, to select just the biggest cities in the world
+Define query, to select just the biggest cities in the world
 ```js
-const query = 'SELECT * FROM ne_10m_populated_places_simple WHERE megacity = 1';
+const query = 'SELECT * FROM populated_places WHERE megacity = 1';
 ```
 > This is a very simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
 
@@ -201,7 +204,7 @@ You have a CARTO account, with several custom datasets, and you want to visualiz
 
 ### All together
 
-Congrats!, you have finished this guide. The final map should look like this:
+Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-source-sql"
@@ -261,12 +264,15 @@ This is the complete code:
 
         // DATASET
         // Define Dataset source with custom credentials
-        const citiesSource = new carto.source.Dataset('ne_10m_populated_places_simple', {
+        const citiesSource = new carto.source.Dataset('populated_places', {
             user: 'cartovl',
             apiKey: 'default_public'
         });
         // Define Viz object with custom style
-        const citiesViz = new carto.Viz('color:grey width:4');
+        const citiesViz = new carto.Viz(`
+            color: grey
+            width: 4
+        `);
         // Define map Layer
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
         // Add map Layer
@@ -332,8 +338,8 @@ This is the complete code:
         officesLayer.addTo(map);
 
         // SQL
-        // Define a query
-        const query = 'SELECT * FROM ne_10m_populated_places_simple WHERE megacity = 1';
+        // Define query
+        const query = 'SELECT * FROM populated_places WHERE megacity = 1';
         // Define SQL source with query and custom credentials
         const megacitiesSource = new carto.source.SQL(query, {
             user: 'cartovl',
