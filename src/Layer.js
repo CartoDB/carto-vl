@@ -293,6 +293,7 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
         this._noFirstRequestData = false;
+        this._fireUpdateOnNextRender = true;
         this.requestData();
     }
 
@@ -308,6 +309,7 @@ export default class Layer {
     hide () {
         this.map.setLayoutProperty(this.id, 'visibility', 'none');
         this._visible = false;
+        this._fireUpdateOnNextRender = true;
         this._fire('updated');
     }
 
@@ -405,7 +407,6 @@ export default class Layer {
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-
             if (!this._isLoaded && this._state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
@@ -427,16 +428,17 @@ export default class Layer {
      */
     _onDataframeAdded (dataframe) {
         dataframe.setFreeObserver(() => {
-            this._needRefresh();
+            this.map.triggerRepaint();
         });
         this._renderLayer.addDataframe(dataframe);
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._needRefresh();
+        this.map.triggerRepaint();
     }
 
     _needRefresh () {
+        this._fireUpdateOnNextRender = true;
         this.map.triggerRepaint();
     }
 
