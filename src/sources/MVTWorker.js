@@ -54,7 +54,7 @@ export class MVTWorker {
         };
     }
 
-    castMetadata(metadata) {
+    castMetadata (metadata) {
         Object.setPrototypeOf(metadata, MVTMetadata.prototype);
     }
 

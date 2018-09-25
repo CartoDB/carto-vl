@@ -71,13 +71,12 @@ export default class Metadata {
     }
 
     // convert source values to internal representation
-    decode(propertyName, propertyValue) {
-       throw new Error(`Undefined decode called for ${propertyName} ${propertyValue}`)
+    decode (propertyName, propertyValue) {
+        throw new Error(`Undefined decode called for ${propertyName} ${propertyValue}`);
     }
 
     // convert internal representation to user
-    encode(propertyName, propertyValue) {
-        return propertyValue;
-        throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`)
+    encode (propertyName, propertyValue) {
+        throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`);
     }
 }

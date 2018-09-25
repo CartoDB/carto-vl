@@ -239,7 +239,7 @@ export default class Windshaft {
                             };
                         } else if (usage.type === 'dimension') {
                             const grouping = usage.grouping;
-                            const parameters = Object.assign( { column: propertyName }, grouping);
+                            const parameters = Object.assign({ column: propertyName }, grouping);
                             aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.group_by)] = parameters;
                         } else {
                             // automatic ungrouped dimension
@@ -345,7 +345,7 @@ export default class Windshaft {
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
             const basename = agg.columns[aggName].aggregated_column;
-            const fnName =   agg.columns[aggName].aggregate_function;
+            const fnName = agg.columns[aggName].aggregate_function;
             if (!properties[basename].aggregations) {
                 properties[basename].aggregations = {};
             }

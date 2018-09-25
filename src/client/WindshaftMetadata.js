@@ -1,7 +1,8 @@
 import MVTMetadata from '../sources/MVTMetadata';
+import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 
 export default class WindshaftMetadata extends MVTMetadata {
-    decode(propertyName, propertyValue) {
+    decode (propertyName, propertyValue) {
         const basename = this.baseName(propertyName);
         const column = this.properties[basename];
         if (!column) {
@@ -21,7 +22,7 @@ export default class WindshaftMetadata extends MVTMetadata {
         }
     }
 
-    encode(propertyName, propertyValue) {
+    encode (propertyName, propertyValue) {
         const basename = this.baseName(propertyName);
 
         switch (this.properties[basename].type) {
@@ -33,7 +34,7 @@ export default class WindshaftMetadata extends MVTMetadata {
                 return propertyValue;
         }
     }
-};
+}
 
 function epochTo (t, grouping) {
     // TODO: support grouping.offset, grouping.timezone
