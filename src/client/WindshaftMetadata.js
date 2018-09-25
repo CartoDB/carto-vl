@@ -89,16 +89,15 @@ function timeLimits (groupBy, limits) {
 }
 
 function decodeDate (propertyName, column, propertyValue) {
-    if (column.dimensions) {
+    if (column.dimension && column.dimension.grouping) {
+        // TODO: assert column.dimension.propertyName === propertyName
         // classified date
         // obtain time classification
-        // we could also find the entry in column.dimensions which has the value propertyName
-        const groupBy = schema.column.getGroupBy(propertyName);
+        // TODO: use other parameters: timezone, offset
+        const groupBy = column.dimension.grouping.group_by;
         // now we have metadata in column about the base column;
         // and we have to derive from it the limits of the classified column
         const { min, max } = timeLimits(groupBy, column);
-        console.log(column,column.dimensions);
-        console.log("DD CLASSIFIED", propertyValue, min, max);
         return (propertyValue - min) / (max - min); // TODO: handle max === min
     } else {
         // unclassified date (epoch)
@@ -106,16 +105,18 @@ function decodeDate (propertyName, column, propertyValue) {
         d.setTime(1000 * propertyValue);
         const { min, max } = column;
         const n = (d - min) / (max.getTime() - min.getTime());
-        console.log("DD EPOCH", propertyValue, d, min, max);
         return n;
     }
 }
 
 function encodeDate (propertyName, column, propertyValue) {
-    if (column.dimensions) { // more specifically if there's a dimension mapped to propertyName
+    if (column.dimension && column.dimension.grouping) {
+        // TODO: assert column.dimension.propertyName === propertyName
         // TODO: un map from 0,1... need to use the limits computed from metadata (maybe move that function to metadata?)
-        const groupBy = schema.column.getGroupBy(propertyName);
-        // TODO:...
+        // TODO: use other parameters: timezone, offset
+        const groupBy = column.dimension.grouping.group_by;
+        const { min, max } = timeLimits(groupBy, column);
+        return Math.round((max - min) * propertyValue + min);
     } else {
         let value = propertyValue;
         const { min, max } = column;

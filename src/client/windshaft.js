@@ -243,7 +243,9 @@ export default class Windshaft {
                                 group_by: usage.op
                             };
                         } else {
-                            aggregation.dimensions[propertyName] = propertyName;
+                            aggregation.dimensions[propertyName] = {
+                                column: propertyName
+                            };
                         }
                     });
                 }
@@ -339,24 +341,24 @@ export default class Windshaft {
 
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
-            const basename = schema.column.getBase(aggName);
-            const fnName = schema.column.getAggFN(aggName);
+            const basename = agg.columns[aggName].aggregated_column;
+            const fnName =   agg.columns[aggName].aggregate_function;
             if (!properties[basename].aggregations) {
                 properties[basename].aggregations = {};
             }
             properties[basename].aggregations[fnName] = aggName;
         });
         Object.keys(agg.dimensions).forEach(dimName => {
-            // TODO: restrict to one grouping per dimension columns
-            // and simplify this...
-            const basename = schema.column.getBase(dimName);
-            const groupBy = schema.column.getGroupBy(dimName);
-            if (groupBy) {
-                if (!properties[basename].dimensions) {
-                    properties[basename].dimensions = {};
-                }
-                properties[basename].dimensions[groupBy] = dimName;
+            const dimension = agg.dimensions[dimName];
+            const { column, ...params } = dimension;
+            if (properties[column].dimension) {
+                // TODO: proper error
+                throw new Error(`Multiple dimensions based on same column ${column}`);
             }
+            properties[column].dimension = {
+                propertyName: dimName,
+                grouping: params
+            };
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

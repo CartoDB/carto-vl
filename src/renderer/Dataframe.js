@@ -393,20 +393,8 @@ export default class Dataframe extends DummyDataframe {
         const metadata = this.metadata;
         const getters = {};
 
-        function actualColumns (name, p) {
-            console.log(p);
-            let columns = [name];
-            if (p.aggregations) {
-                columns = Object.keys(p.aggregations).map(agg => p.aggregations[agg]);
-            } else if (p.dimensions) {
-                columns = Object.keys(p.dimensions).map(dim => p.dimensions[dim]);
-            }
-            return columns;
-        }
-
-        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
-            const propertyName = this.metadata.propertyKeys[i];
-            actualColumns(propertyName, metadata.properties[propertyName]).forEach(colName => {
+        this.metadata.propertyKeys.forEach(baseName => {
+            this.metadata.propertyNames(baseName).forEach(colName => {
                 getters[colName] = {
                     get: function () {
                         const index = this._index;
@@ -414,7 +402,7 @@ export default class Dataframe extends DummyDataframe {
                     }
                 };
             });
-        }
+        });
 
         Object.defineProperties(cls.prototype, getters);
 

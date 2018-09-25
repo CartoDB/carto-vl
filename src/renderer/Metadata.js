@@ -30,10 +30,8 @@ export default class Metadata {
                 Object.values(prop.aggregations).forEach(propName => {
                     this.baseNames[propName] = baseName;
                 });
-            } else if (property.dimensions) {
-                Object.values(property.dimensions).forEach(propName => {
-                    this.baseNames[propName] = baseName;
-                });
+            } else if (property.dimension) {
+                this.baseNames[property.dimension.propertyName] = baseName;
             } else {
                 this.baseNames[baseName] = baseName;
             }
@@ -57,12 +55,13 @@ export default class Metadata {
         this.numCategories++;
         return this.numCategories - 1;
     }
+
     propertyNames (baseName) {
         const prop = this.properties[baseName];
         if (prop.aggregations) {
-            return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);
-        } else if (prop.dimensions) {
-            return Object.keys(prop.dimensions).map(gr => prop.dimensions[gr]);
+            return Object.values(prop.aggregations);
+        } else if (prop.dimension) {
+            return [prop.dimension.propertyName];
         }
         return [baseName];
     }
