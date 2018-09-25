@@ -38,7 +38,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [-73.954323, 40.711743],
       zoom: 15.7,
       dragRotate: false
@@ -66,7 +66,7 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const colorLegend = layer.viz.color.getLegend();
+      const colorLegend = layer.viz.color.getLegendData();
       let colorLegendList = '';
 
       colorLegend.data.forEach((legend, index) => {

@@ -40,7 +40,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [0, 0],
       zoom: 0,
       dragRotate: false,
@@ -71,7 +71,7 @@
       hideLoader();
 
       // Get the legend
-      const colorLegend = layer.viz.color.getLegend();
+      const colorLegend = layer.viz.color.getLegendData();
 
       let colorLegendList = '';
 

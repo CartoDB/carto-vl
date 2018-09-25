@@ -1,9 +1,9 @@
 import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
-import { checkMaxArguments } from '../../utils';
+import { checkMaxArguments, checkArray } from '../../utils';
 
 /**
- * Generates an histogram.
+ * Generates a histogram.
  *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  * The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
@@ -12,7 +12,7 @@ import { checkMaxArguments } from '../../utils';
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
  * @param {Number} input - expression to base the histogram
- * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
+ * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, whioinch will generate a simple, non-weighted count.
  * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
  * @return {Histogram} Histogram
  *
@@ -39,12 +39,12 @@ import { checkMaxArguments } from '../../utils';
 export default class ViewportHistogram extends BaseExpression {
     constructor (x, weight = 1, size = 1000) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
-
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 
         this.type = 'histogram';
         this._size = size;
         this._isViewport = true;
+
         this.inlineMaker = () => null;
     }
 
@@ -58,7 +58,7 @@ export default class ViewportHistogram extends BaseExpression {
         }
     }
 
-    get value () {
+    eval () {
         if (this._cached === null) {
             if (!this._histogram) {
                 return null;
@@ -74,8 +74,104 @@ export default class ViewportHistogram extends BaseExpression {
         return this._cached;
     }
 
-    eval () {
-        return this.value;
+    /**
+     * Get an array of joined data by key and sorted by frequency.
+     *
+     * Note: It can be combined with a `ramp.getLegendData()` method. Take a look at the examples to see how it works.
+     *
+     * @param {Array} values - Array of { key, value } pairs
+     * @return {Array} - { frequency, key, value }
+     *
+     * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
+     * const numberOfWheels = [
+     *  { key: 'car', value: 4 },
+     *  { key: 'truck', value: 8 },
+     *  { key: 'bike', value: 2 }
+     * ];
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   @histogram: s.viewportHistogram(s.prop('vehicles))
+     * });
+     *
+     * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
+     * // returns an array with the following format:
+     * // [
+     * //   { frequency: 10, key: 'truck', value: 8 }
+     * //   { frequency: 20, key: 'bike', value: 2 }
+     * //   { frequency: 30, key: 'car', value: 4 }
+     * // ]
+     *
+     * @example <caption>Get joined data for a categorical property sorted by frequency. (String)</caption>
+     * const numberOfWheels = [
+     *  { key: 'car', value: 4 },
+     *  { key: 'truck', value: 8 },
+     *  { key: 'bike', value: 2 }
+     * ];
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: viewportHistogram($vehicles)
+     * `);
+     *
+     * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
+     * // returns an array with the following format:
+     * // [
+     * //   { frequency: 10, key: 'truck', value: 8 }
+     * //   { frequency: 20, key: 'bike', value: 2 }
+     * //   { frequency: 30, key: 'car', value: 4 }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram when using a ramp.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
+     * `);
+     *
+     * const legendData = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: viewportHistogram($vehicles)
+     *   color: ramp($vehicles, Prism)
+     * `);
+     *
+     * const legendData = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
+     * // ]
+     *
+    */
+    getJoinedValues (values) {
+        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        return this.value.map(elem => {
+            const data = values.find(value => value.key === elem.x);
+
+            const frequency = elem.y;
+            const key = elem.x;
+            const value = data !== -1 ? data.value : null;
+
+            return { frequency, key, value };
+        });
     }
 
     _bindMetadata (metadata) {
@@ -128,10 +224,10 @@ function _getCategoryValue (histogram) {
         .map(([x, y]) => {
             return { x, y };
         })
-        .sort(_sortFirstNumerically);
+        .sort(_sortNumerically);
 }
 
-function _sortFirstNumerically (a, b) {
+function _sortNumerically (a, b) {
     if (b.y - a.y === 0) {
         return a.x.localeCompare(b.x);
     }

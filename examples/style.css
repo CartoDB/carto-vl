@@ -46,10 +46,12 @@ body {
     stroke-dasharray: 1, 150;
     stroke-dashoffset: 0
   }
+
   50% {
     stroke-dasharray: 90, 150;
     stroke-dashoffset: -35
   }
+
   100% {
     stroke-dasharray: 90, 150;
     stroke-dashoffset: -124
@@ -69,7 +71,7 @@ body {
   z-index: 0;
 }
 
-aside.toolbox {
+.toolbox {
   position: absolute;
   top: 24px;
   right: 24px;
@@ -77,6 +79,16 @@ aside.toolbox {
   max-width: 250px;
   z-index: 2;
   overflow-wrap: break-word;
+}
+
+.chart-toolbox {
+  min-width: 450px;
+  max-width: 450px;
+}
+
+.chart-toolbox-large {
+  min-width: 600px;
+  max-width: 600px;
 }
 
 /* UTILITIES */
@@ -225,6 +237,10 @@ aside.toolbox {
 
 .box section .description {
   margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.chart-box {
   margin-bottom: 0;
 }
 

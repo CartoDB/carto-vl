@@ -3,11 +3,11 @@ import { number } from '../../expressions';
 import { checkType, checkMaxArguments, checkExpression } from '../utils';
 
 /**
- * Override the input color opacity.
+ * Override the input opacity.
  *
- * @param {Color} color - Color expression to apply the opacity
+ * @param {Color | Image} color - Color or image expression to apply the opacity
  * @param {Number} alpha - Number expression with the alpha (transparency) value
- * @return {Color}
+ * @return {Color | Image}
  *
  * @example <caption>Display blue points with 50% opacity.</caption>
  * const s = carto.expressions;
@@ -26,35 +26,30 @@ import { checkType, checkMaxArguments, checkExpression } from '../utils';
  * @api
  */
 export default class Opacity extends BaseExpression {
-    /**
-     * @description Override the input color opacity
-     * @param {*} color input color
-     * @param {*} alpha new opacity
-     */
-    constructor (color, alpha) {
+    constructor (input, alpha) {
         checkMaxArguments(arguments, 2, 'opacity');
 
         if (Number.isFinite(alpha)) {
             alpha = number(alpha);
         }
-        checkExpression('opacity', 'color', 0, color);
+        checkExpression('opacity', 'input', 0, input);
         checkExpression('opacity', 'alpha', 1, alpha);
-        super({ color, alpha });
-        this.type = 'color';
-        this.inlineMaker = inline => `vec4((${inline.color}).rgb, ${inline.alpha})`;
+        super({ input, alpha });
+        this.inlineMaker = inline => `vec4((${inline.input}).rgb, ${inline.alpha})`;
     }
     get value () {
         return this.eval();
     }
     eval (f) {
-        const color = this.color.eval(f);
+        const input = this.input.eval(f);
         const alpha = this.alpha.eval(f);
-        color.a = alpha;
-        return color;
+        input.a = alpha;
+        return input;
     }
     _bindMetadata (meta) {
         super._bindMetadata(meta);
-        checkType('opacity', 'color', 0, 'color', this.color);
+        checkType('opacity', 'input', 0, ['color', 'image'], this.input);
         checkType('opacity', 'alpha', 1, 'number', this.alpha);
+        this.type = this.input.type;
     }
 }
