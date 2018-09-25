@@ -35,10 +35,6 @@ describe('api', () => {
         expect(carto.Viz).toBeDefined();
     });
 
-    it('should exist `Map`', () => {
-        expect(carto.Map).toBeDefined();
-    });
-
     it('should exist `Interactivity`', () => {
         expect(carto.Interactivity).toBeDefined();
     });

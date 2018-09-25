@@ -22,7 +22,6 @@
 import { setDefaultAuth } from './setup/auth-service';
 import { setDefaultConfig } from './setup/config-service';
 import Viz from './Viz';
-import Map from './maps/Map';
 import Interactivity from './interactivity/Interactivity';
 import Layer from './Layer';
 import * as expressions from './renderer/viz/expressions';
@@ -47,5 +46,5 @@ import { version } from '../package.json';
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };
-export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };
+export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
+export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
