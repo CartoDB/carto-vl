@@ -92,11 +92,6 @@ export default class Dataframe extends DummyDataframe {
 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.featureIDBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, ids, gl.STATIC_DRAW);
-
-        this.t1 = [0.1, 0.1, 0.1, 0.1];
-        this.t2 = [0.1, 0.1, 0.1, 0.1];
-        this.t3 = [0.1, 0.1, 0.1, 0.1];
-        this.t4 = [0.1, 0.1, 0.1, 0.1];
     }
 
     getFeaturesAtPosition (pos, viz) {
@@ -306,7 +301,6 @@ export default class Dataframe extends DummyDataframe {
                 x: points[i],
                 y: points[i + 1]
             };
-
             const c2 = this._projectToNDC(this.t1, [center.x, center.y]);
 
             // Project to pixel space
@@ -382,15 +376,21 @@ export default class Dataframe extends DummyDataframe {
                     offset.y = vizOffset[1];
                 }
 
-                if (this._isFeatureFiltered(feature, viz.filter) ||
-                !this._isPointInAABB(pos, offset, featureIndex)) {
-                    i = breakpoints[featureIndex] - 6;
-                    continue;
-                }
-
                 strokeWidthScale = geometryType === 'line'
                     ? this._computeLineWidthScale(feature, viz)
                     : this._computePolygonWidthScale(feature, viz);
+
+                if (this._isFeatureFiltered(feature, viz.filter) ||
+                !this._isPointInAABB(pos, offset,
+                    geometryType === 'line'
+                        ? viz.width.eval(feature)
+                        : viz.strokeWidth.eval(feature)
+                    ,
+                    featureIndex)
+                ) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
             }
 
             const v1 = this._projectToNDC(this.t1, [
@@ -439,7 +439,7 @@ export default class Dataframe extends DummyDataframe {
         return features;
     }
 
-    _isPointInAABB (point, offset, featureIndex) {
+    _isPointInAABB (point, offset, widthScale, featureIndex) {
         // Transform AABB from tile space to NDC space
         const aabb = this._aabb[featureIndex];
         if (aabb === null || !this.matrix) {
@@ -452,38 +452,30 @@ export default class Dataframe extends DummyDataframe {
             this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy])
         ];
 
+        const ndcAABB = {
+            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
+            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
+        };
+
         const WIDTH = this.renderer.gl.canvas.width;
         const HEIGHT = this.renderer.gl.canvas.height;
 
         const ox = 2 * offset.x / WIDTH;
         const oy = 2 * offset.y / HEIGHT;
-        corners[0][0] += ox;
-        corners[0][1] += oy;
-        corners[1][0] += ox;
-        corners[1][1] += oy;
-        corners[2][0] += ox;
-        corners[2][1] += oy;
-        corners[3][0] += ox;
-        corners[3][1] += oy;
-
         const ndcPoint = {
             x: point.x / WIDTH * 2 - 1,
             y: -(point.y / HEIGHT * 2 - 1)
         };
-        // An AABB in world/tile space may no longer be an AABB in NDC space
-        // Therefore, we'll need to check against the  quadrilateral
-        // We perform that by cheking against two triangles by dividing the quadilateral with one of its diagonals
-        // If and only if the point is in any of the triangles, the point is on the quadrilateral (i.e. on the original AABB)
+        const pointAABB = {
+            minx: ndcPoint.x + ox - widthScale * 2 / WIDTH,
+            miny: ndcPoint.y + oy - widthScale * 2 / HEIGHT,
+            maxx: ndcPoint.x + ox + widthScale * 2 / WIDTH,
+            maxy: ndcPoint.y + oy + widthScale * 2 / HEIGHT
+        };
 
-        const result = pointInTriangle(ndcPoint,
-            {x: corners[0][0], y: corners[0][1]},
-            {x: corners[1][0], y: corners[1][1]},
-            {x: corners[2][0], y: corners[2][1]}) ||
-            pointInTriangle(ndcPoint,
-                {x: corners[1][0], y: corners[1][1]},
-                {x: corners[2][0], y: corners[2][1]},
-                {x: corners[3][0], y: corners[3][1]});
-        return result;
+        return !_isFeatureAABBOutsideViewport(ndcAABB, pointAABB);
     }
 
     _isFeatureFiltered (feature, filterExpression) {
