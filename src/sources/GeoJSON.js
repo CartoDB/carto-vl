@@ -1,6 +1,6 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
-import Metadata from '../renderer/Metadata';
+import Metadata from './GeoJSONMetadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
@@ -270,28 +270,16 @@ export default class GeoJSON extends Base {
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
+        const fields = [...catFields, ...numFields, ...dateFields];
 
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
-
-            catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
-            });
-            numFields.forEach(name => {
+            fields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                properties[name][i] = Number(f.properties[name]);
-            });
-            dateFields.forEach(name => {
-                const property = this._properties[name];
-                // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d = util.castDate(f.properties[name]).getTime();
-                const min = property.min;
-                const max = property.max;
-                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[name][i] = n;
+                properties[name][i] = this._metadata.decode(name, f.properties[name]);
             });
         }
         return properties;

@@ -23,6 +23,21 @@ export default class Metadata {
         });
 
         this.propertyKeys = Object.keys(this.properties);
+        this.baseNames = {};
+        this.propertyKeys.forEach(baseName => {
+            const property = properties[baseName];
+            if (property.aggregations) {
+                Object.values(prop.aggregations).forEach(propName => {
+                    this.baseNames[propName] = baseName;
+                });
+            } else if (property.dimensions) {
+                Object.values(property.dimensions).forEach(propName => {
+                    this.baseNames[propName] = baseName;
+                });
+            } else {
+                this.baseNames[baseName] = baseName;
+            }
+        });
     }
     categorizeString (propertyName, category, init = false) {
         if (category === undefined) {
@@ -42,13 +57,29 @@ export default class Metadata {
         this.numCategories++;
         return this.numCategories - 1;
     }
-    propertyNames (propertyName) {
-        const prop = this.properties[propertyName];
+    propertyNames (baseName) {
+        const prop = this.properties[baseName];
         if (prop.aggregations) {
             return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);
         } else if (prop.dimensions) {
             return Object.keys(prop.dimensions).map(gr => prop.dimensions[gr]);
         }
-        return [propertyName];
+        return [baseName];
+    }
+
+    baseName (propertyName) {
+        return this.baseNames[propertyName];
+    }
+    // TODO: other attributes (aggr function...)
+
+    // convert source values to internal representation
+    decode(propertyName, propertyValue) {
+       throw new Error(`Undefined decode called for ${propertyName} ${propertyValue}`)
+    }
+
+    // convert internal representation to user
+    encode(propertyName, propertyValue) {
+        return propertyValue;
+        throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`)
     }
 }

@@ -42,6 +42,9 @@ function simplify (MNS) {
     return result;
 }
 
+// all this is WIndsshaft-relative,
+// => move to WIndshaftMetadata or elsewhere
+
 const AGG_PREFIX = '_cdb_agg_';
 const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
 const DIM_PREFIX = '_cdb_dim_';
@@ -61,11 +64,11 @@ function isDimension (name) {
 export const column = {
     isAggregated,
     isDimension,
-    getBase: function getBase (name) {
+    getBase: function getBase (name) { // TODO: remove => metadata (?)
         const pattern = isAggregated(name) ? AGG_PATTERN : isDimension(name) ? DIM_PATTERN : '';
         return name.replace(pattern, '');
     },
-    getAggFN: function getAggFN (name) {
+    getAggFN: function getAggFN (name) { // TODO: remove => metadata
         let s = name.substr(AGG_PREFIX.length);
         return s.substr(0, s.indexOf('_'));
     },
@@ -75,7 +78,7 @@ export const column = {
     dimColumn (name, groupBy) {
         return `${DIM_PREFIX}${groupBy}_${name}`;
     },
-    getGroupBy: function getGroupBy (name) {
+    getGroupBy: function getGroupBy (name) { // TODO: remove => metadata
         let s = name.substr(DIM_PREFIX.length);
         return s.substr(0, s.indexOf('_'));
     }

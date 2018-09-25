@@ -410,11 +410,7 @@ export default class Dataframe extends DummyDataframe {
                 getters[colName] = {
                     get: function () {
                         const index = this._index;
-                        if (metadata.properties[propertyName].type === 'category') {
-                            return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
-                        } else {
-                            return this._dataframe.properties[colName][index];
-                        }
+                        return metadata.encode(colName, this._dataframe.properties[colName][index]);
                     }
                 };
             });

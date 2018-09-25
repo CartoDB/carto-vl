@@ -1,6 +1,6 @@
 import { version } from '../../package';
 import MVT from '../sources/MVT';
-import Metadata from '../renderer/Metadata';
+import Metadata from './WindshaftMetadata';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
@@ -351,10 +351,12 @@ export default class Windshaft {
             // and simplify this...
             const basename = schema.column.getBase(dimName);
             const groupBy = schema.column.getGroupBy(dimName);
-            if (!properties[basename].dimensions) {
-                properties[basename].dimensions = {};
+            if (groupBy) {
+                if (!properties[basename].dimensions) {
+                    properties[basename].dimensions = {};
+                }
+                properties[basename].dimensions[groupBy] = dimName;
             }
-            properties[basename].dimensions[groupBy] = dimName;
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

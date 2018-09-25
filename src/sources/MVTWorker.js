@@ -2,7 +2,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
 import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
-import Metadata from '../renderer/Metadata';
+import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
@@ -44,7 +44,7 @@ export class MVTWorker {
     async processEvent (event) {
         const params = event.data;
         if (params.metadata) {
-            Object.setPrototypeOf(params.metadata, Metadata.prototype);
+            this.castMetadata(params.metadata);
             this.metadata = params.metadata;
         }
         const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);
@@ -52,6 +52,10 @@ export class MVTWorker {
             mID: params.mID,
             dataframe
         };
+    }
+
+    castMetadata(metadata) {
+        Object.setPrototypeOf(metadata, MVTMetadata.prototype);
     }
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {
@@ -216,22 +220,7 @@ export class MVTWorker {
     }
 
     decodeProperty (metadata, propertyName, propertyValue) {
-        const metadataPropertyType = metadata.properties[propertyName].type;
-        if (typeof propertyValue === 'string') {
-            if (metadataPropertyType !== 'category') {
-                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);
-            }
-            return metadata.categorizeString(propertyName, propertyValue);
-        } else if (typeof propertyValue === 'number') {
-            if (metadataPropertyType !== 'number') {
-                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);
-            }
-            return propertyValue;
-        } else if (propertyValue === null || propertyValue === undefined) {
-            return Number.NaN;
-        } else {
-            throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
-        }
+        return metadata.decode(propertyName, propertyValue);
     }
 
     _generateDataFrame (rs, geometry, properties, size, type, metadata) {
