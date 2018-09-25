@@ -1,7 +1,7 @@
 import MVTMetadata from '../sources/MVTMetadata';
 
 // TODO: remove
-const schema = '../renderer/schema';
+import schema from '../renderer/schema';
 
 export default class WindshaftMetadata extends MVTMetadata {
     decode(propertyName, propertyValue) {
