@@ -118,6 +118,8 @@
     "loc": "sloc src/ examples/"
   },
   "browserslist": [
-    "defaults"
+    "defaults",
+    "not ie <12",
+    "not edge <17"
   ]
 }
