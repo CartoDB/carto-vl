@@ -2,6 +2,7 @@ import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import { mat4 } from 'gl-matrix';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -346,7 +347,8 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
-            gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * 512 * dataframe.scale));
+            gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
+            console.log(1 / (Math.pow(2, drawMetadata.zoomLevel) * dataframe.scale));
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);

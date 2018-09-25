@@ -1,6 +1,7 @@
 import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -340,14 +341,14 @@ export default class Dataframe extends DummyDataframe {
         const SATURATION_PX = 1024;
         const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
 
-        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * 512);
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     _computePolygonWidthScale (feature, viz) {
         const SATURATION_PX = 1024;
         const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
 
-        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * 512);
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     _getFeaturesAtPositionFromTriangles (geometryType, pos, viz) {

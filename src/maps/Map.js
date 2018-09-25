@@ -1,4 +1,4 @@
-import { layerVisibility } from '../constants/layer';
+import { layerVisibility, RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import { mat4 } from 'gl-matrix';
 
@@ -63,7 +63,7 @@ export default class Map {
     }
 
     getZoom () {
-        return Math.log2(this._canvas.height / 512);
+        return Math.log2(this._canvas.height / RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     getCenter () {
