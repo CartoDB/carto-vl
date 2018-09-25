@@ -10,6 +10,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
 import { mat4, vec4 } from 'gl-matrix';
+import { unproject } from './utils/geometry';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -535,58 +536,13 @@ export default class Layer {
     _getViewport () {
         const inv = mat4.invert([], this._matrix);
 
-        // Compute the WebMercator position at projected (x,y) NDC (Normalized Device Coordinates) reversing the projection of the point
-        function unproject (x, y) {
-            // To unproject a point we need the 3 coordinates (x,y,z)
-            // The `z` coordinate can be computed by knowing that the unprojected `z` is equal to `0` (since the map is a 2D plane)
-            // defined at `z=0`
-
-            // Since a matrix-vector multiplication is a linear transform we know that
-            //      z = m * projectedZ + k
-            // Being `m` and `k` constants for a particular value of projected `x` and `y` coordinates
-
-            // With that equation and the inverse matrix of the projection we can establish an equation system of the form:
-            //      v1 = m * v2 + k
-            //      v3 = m * v4 + k
-            // Where `v2` and `v4` can be arbitrary values (but not equal to each other) and
-            // `v1` and `v3` can be computed by using the inverse matrix knowing that:
-            //      (_, _, v1,_) = inverse(projectionMatrix) * (projectedX, projectedY, v2, 1)
-            //      (_, _, v3,_) = inverse(projectionMatrix) * (projectedX, projectedY, v4, 1)
-
-            // By resolving the the equation system above computing `m` and `k` values
-            // we can compute the projected Z coordinate at the (x,y) NDC (projected) point
-
-            // With (projectedX, projectedY, projectedZ) we can compute the unprojected point by multiplying by the inverse matrix
-
-            // *** Implementation ***
-
-            // compute m, k for: [z = m*projectedZ + k]
-            const v2 = 1;
-            const v4 = 2;
-
-            const v1 = vec4.transformMat4([], [x, y, v2, 1], inv)[2];
-            const v3 = vec4.transformMat4([], [x, y, v4, 1], inv)[2];
-
-            // Solve the equation system by using the elimination method (subtraction of the equations)
-            //      (v1-v3) = (v2-v4)*m
-            //      m = (v1 - v3) / (v2 - v4)
-            const m = (v1 - v3) / (v2 - v4);
-            // Substituting in the first equation `m` and solving for `k`
-            const k = v1 - m * v2;
-
-            // compute projectedZ by solving `z = m * projectedZ + k` knwoing `z`, `m` and `k`
-            const projectedZ = -k / m;
-
-            // Inverse the projection and normalize by `p.w`
-            return vec4.transformMat4([], [x, y, projectedZ, 1], inv).map((v, _, point) => v / point[3]);
-        }
         const corners = [
             [-1, -1],
             [-1, 1],
             [1, -1],
             [1, 1]
         ].map(NDC =>
-            unproject(...NDC)
+            unproject(inv, ...NDC)
         ).map(c =>
             // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
             c.map(x => x * 2 - 1)
