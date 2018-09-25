@@ -33,7 +33,7 @@ export default class GeoJSONMetadata extends Metadata {
                 value *= (max.getTime() - min.getTime());
                 value += min.getTime();
                 const d = new Date();
-                d.setTime(1000 * value);
+                d.setTime(value);
                 return d;
             default:
                 return propertyValue;

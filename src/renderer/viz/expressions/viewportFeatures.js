@@ -1,7 +1,6 @@
 import BaseExpression from './base';
 // import Property from './basic/property';
 import { implicitCast } from './utils';
-// import schema from '../../schema';
 // import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
@@ -89,8 +88,7 @@ export default class ViewportFeatures extends BaseExpression {
             // if (!this._requiredProperties.every(p => (p.isA(Property)))) {
             //     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             // }
-            // const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            const columns = this._requiredProperties.map(p => p.name);
+            const columns = this._requiredProperties.map(p => p.propertyName);
             this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
         this.expr = [];

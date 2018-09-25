@@ -27,7 +27,7 @@ export default class Metadata {
         this.propertyKeys.forEach(baseName => {
             const property = properties[baseName];
             if (property.aggregations) {
-                Object.values(prop.aggregations).forEach(propName => {
+                Object.values(property.aggregations).forEach(propName => {
                     this.baseNames[propName] = baseName;
                 });
             } else if (property.dimension) {
@@ -69,7 +69,6 @@ export default class Metadata {
     baseName (propertyName) {
         return this.baseNames[propertyName];
     }
-    // TODO: other attributes (aggr function...)
 
     // convert source values to internal representation
     decode(propertyName, propertyValue) {

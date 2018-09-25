@@ -14,6 +14,10 @@ export default class ClusterAggregation extends BaseExpression {
     }
 
     get name () {
+        return this.property.name;
+    }
+
+    get propertyName () {
         return schema.column.aggColumn(this.property.name, this._aggName);
     }
 
@@ -29,7 +33,7 @@ export default class ClusterAggregation extends BaseExpression {
     }
 
     eval (feature) {
-        return feature[schema.column.aggColumn(this.property.name, this._aggName)];
+        return feature[this.propertyName];
     }
 
     _bindMetadata (metadata) {
@@ -43,7 +47,7 @@ export default class ClusterAggregation extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: `${getGLSLforProperty(schema.column.aggColumn(this.property.name, this._aggName))}`
+            inline: `${getGLSLforProperty(this.propertyName)}`
         };
     }
 

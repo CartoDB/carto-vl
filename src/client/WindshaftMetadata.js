@@ -1,8 +1,5 @@
 import MVTMetadata from '../sources/MVTMetadata';
 
-// TODO: remove
-import schema from '../renderer/schema';
-
 export default class WindshaftMetadata extends MVTMetadata {
     decode(propertyName, propertyValue) {
         const basename = this.baseName(propertyName);
@@ -27,19 +24,23 @@ export default class WindshaftMetadata extends MVTMetadata {
     encode(propertyName, propertyValue) {
         const basename = this.baseName(propertyName);
 
-        if (this.properties[basename].type === 'category') {
-            return this.IDToCategory.get(propertyValue);
-        } else if (this.properties[basename].type === 'date') {
-            return encodeDate(propertyName, this.properties[basename], propertyValue);
-        } else {
-            return propertyValue;
+        switch (this.properties[basename].type) {
+            case 'date':
+                return encodeDate(propertyName, this.properties[basename], propertyValue);
+            case 'category':
+                return this.IDToCategory.get(propertyValue);
+            default:
+                return propertyValue;
         }
     }
 };
 
-
-function epochTo (t, unit) {
-    switch (unit) {
+function epochTo (t, grouping) {
+    // TODO: support grouping.offset, grouping.timezone
+    // which are currently ignored
+    // Note that supporting timezone for other than fixed offsets
+    // (i.e. with DST) would require a largish time library
+    switch (grouping.group_by) {
         case 'second':
             return Math.floor(t);
         case 'minute':
@@ -50,6 +51,8 @@ function epochTo (t, unit) {
             return Math.floor(t / 86400);
         case 'week':
             return Math.floor(t / (7 * 86400));
+        default:
+            throw new Error(`Time grouped by ${grouping.group_by} not yet supported`);
         // TODO:
         // case 'month':
         // case 'quarter':
@@ -61,9 +64,11 @@ function epochTo (t, unit) {
     }
 }
 
-function timeLimits (groupBy, limits) {
+// derive the limits of a grouped time dimension from
+// the limits of the base column
+function timeLimits (grouping, limits) {
     const { min, max } = limits;
-    switch (groupBy) {
+    switch (grouping.group_by) {
         case 'minuteOfHour':
             return { min: 0, max: 59 };
         case 'hourOfDay':
@@ -85,19 +90,20 @@ function timeLimits (groupBy, limits) {
         case 'semesterOfYear':
             return { min: 1, max: 2 };
     }
-    return { min: epochTo(min, groupBy), max: epochTo(max, groupBy) };
+    return { min: epochTo(min, grouping), max: epochTo(max, grouping) };
 }
+
+const UNIT_DECODING = false; // DEBUGGING
 
 function decodeDate (propertyName, column, propertyValue) {
     if (column.dimension && column.dimension.grouping) {
-        // TODO: assert column.dimension.propertyName === propertyName
+        if (!UNIT_DECODING) {
+            return propertyValue;
+        }
         // classified date
-        // obtain time classification
-        // TODO: use other parameters: timezone, offset
-        const groupBy = column.dimension.grouping.group_by;
-        // now we have metadata in column about the base column;
-        // and we have to derive from it the limits of the classified column
-        const { min, max } = timeLimits(groupBy, column);
+        // column.dimension.propertyName === propertyName
+        const grouping = column.dimension.grouping;
+        const { min, max } = timeLimits(grouping, column);
         return (propertyValue - min) / (max - min); // TODO: handle max === min
     } else {
         // unclassified date (epoch)
@@ -111,11 +117,14 @@ function decodeDate (propertyName, column, propertyValue) {
 
 function encodeDate (propertyName, column, propertyValue) {
     if (column.dimension && column.dimension.grouping) {
-        // TODO: assert column.dimension.propertyName === propertyName
+        if (!UNIT_DECODING) {
+            return propertyValue;
+        }
         // TODO: un map from 0,1... need to use the limits computed from metadata (maybe move that function to metadata?)
         // TODO: use other parameters: timezone, offset
-        const groupBy = column.dimension.grouping.group_by;
-        const { min, max } = timeLimits(groupBy, column);
+        // column.dimension.propertyName === propertyName
+        const grouping = column.dimension.grouping;
+        const { min, max } = timeLimits(grouping, column);
         return Math.round((max - min) * propertyValue + min);
     } else {
         let value = propertyValue;
@@ -123,7 +132,7 @@ function encodeDate (propertyName, column, propertyValue) {
         value *= (max.getTime() - min.getTime());
         value += min.getTime();
         const d = new Date();
-        d.setTime(1000 * value);
+        d.setTime(value);
         return d;
     }
 }

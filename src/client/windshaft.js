@@ -238,11 +238,14 @@ export default class Windshaft {
                                 aggregated_column: propertyName
                             };
                         } else if (usage.type === 'dimension') {
-                            aggregation.dimensions[schema.column.dimColumn(propertyName, usage.op)] = {
-                                column: propertyName,
-                                group_by: usage.op
-                            };
+                            const grouping = usage.grouping;
+                            const parameters = Object.assign( { column: propertyName }, grouping);
+                            aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.group_by)] = parameters;
                         } else {
+                            // automatic ungrouped dimension
+                            // TODO:
+                            // we should consider eliminating this and requiring
+                            // all dimensions to be used through clusterXXX functions
                             aggregation.dimensions[propertyName] = {
                                 column: propertyName
                             };
@@ -357,7 +360,7 @@ export default class Windshaft {
             }
             properties[column].dimension = {
                 propertyName: dimName,
-                grouping: params
+                grouping: Object.keys(params).length === 0 ? undefined : params
             };
         });
         Object.values(properties).map(property => {

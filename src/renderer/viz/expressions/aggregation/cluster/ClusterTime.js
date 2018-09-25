@@ -5,21 +5,25 @@ import * as schema from '../../../../schema';
 
 // TODO: generalize with base clusterDimension
 export default class clusterTime extends BaseExpression {
-    constructor ({ property, expressionName, groupBy, dimType }) {
+    constructor ({ property, expressionName, grouping, dimType }) {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
-        this._groupBy = groupBy;
+        this._grouping = grouping;
         this._expressionName = expressionName;
         this._baseType = dimType;
         this.type = 'number';
     }
 
     get name () {
-        return schema.column.dimColumn(this.property.name, this._groupBy);
+        return this.property.name;
+    }
+
+    get propertyName () {
+        return schema.column.dimColumn(this.property.name, this._grouping.group_by);
     }
 
     eval (feature) {
-        return feature[schema.column.dimColumn(this.property.name, this._groupBy)];
+        return feature[schema.column.dimColumn(this.property.name, this._grouping.group_by)];
     }
 
     _bindMetadata (metadata) {
@@ -33,7 +37,7 @@ export default class clusterTime extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: `${getGLSLforProperty(schema.column.dimColumn(this.property.name, this._groupBy))}`
+            inline: `${getGLSLforProperty(this.propertyName)}`
         };
     }
 
@@ -43,7 +47,7 @@ export default class clusterTime extends BaseExpression {
         return {
             [this.property.name]: [{
                 type: 'dimension',
-                op: this._groupBy
+                grouping: this._grouping
             }]
         };
     }
