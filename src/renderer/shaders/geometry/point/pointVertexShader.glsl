@@ -30,7 +30,7 @@ $propertyPreface
 $transform_preface
 
 vec2 transform(vec2 p){
-    return $transform_inline(p*resolution)/resolution;
+    return $transform_inline(p*resolution*0.5)/resolution*2.;
 }
 
 void main(void) {

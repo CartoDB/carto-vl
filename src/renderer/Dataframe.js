@@ -321,8 +321,8 @@ export default class Dataframe extends DummyDataframe {
 
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
-                center.x += vizOffset[0];
-                center.y += vizOffset[1];
+                c2[0] += vizOffset[0];
+                c2[1] -= vizOffset[1];
             }
 
             const inside = pointInCircle(pos, {x: c2[0], y: c2[1]}, radius);
