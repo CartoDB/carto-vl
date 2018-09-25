@@ -366,8 +366,7 @@ export default class Dataframe extends DummyDataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
-        const widthScale = this.widthScale / 2;
-        let pointWithOffset;
+        const offset = { x: 0, y: 0 };
 
         const WIDTH = this.renderer.gl.canvas.width;
         const HEIGHT = this.renderer.gl.canvas.height;
@@ -376,18 +375,15 @@ export default class Dataframe extends DummyDataframe {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                let offset = { x: 0, y: 0 };
 
                 if (!viz.transform.default) {
                     const vizOffset = viz.transform.eval(feature);
-                    offset.x = vizOffset[0] * widthScale;
-                    offset.y = vizOffset[1] * widthScale;
+                    offset.x = vizOffset[0];
+                    offset.y = vizOffset[1];
                 }
 
-                pointWithOffset = { x: pos.x - offset.x, y: pos.y - offset.y };
-
                 if (this._isFeatureFiltered(feature, viz.filter) ||
-                    !this._isPointInAABB(pointWithOffset, featureIndex)) {
+                !this._isPointInAABB(pos, offset, featureIndex)) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
                 }
@@ -427,10 +423,10 @@ export default class Dataframe extends DummyDataframe {
             v3[0] += 0.5;
             v3[1] += 0.5;
 
-            const inside = pointInTriangle(pointWithOffset,
-                { x: v1[0] * WIDTH, y: v1[1] * HEIGHT },
-                { x: v2[0] * WIDTH, y: v2[1] * HEIGHT },
-                { x: v3[0] * WIDTH, y: v3[1] * HEIGHT });
+            const inside = pointInTriangle(pos,
+                { x: v1[0] * WIDTH + offset.x, y: v1[1] * HEIGHT - offset.y },
+                { x: v2[0] * WIDTH + offset.x, y: v2[1] * HEIGHT - offset.y },
+                { x: v3[0] * WIDTH + offset.x, y: v3[1] * HEIGHT - offset.y });
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -443,7 +439,7 @@ export default class Dataframe extends DummyDataframe {
         return features;
     }
 
-    _isPointInAABB (point, featureIndex) {
+    _isPointInAABB (point, offset, featureIndex) {
         // Transform AABB from tile space to NDC space
         const aabb = this._aabb[featureIndex];
         if (aabb === null || !this.matrix) {
@@ -458,6 +454,17 @@ export default class Dataframe extends DummyDataframe {
 
         const WIDTH = this.renderer.gl.canvas.width;
         const HEIGHT = this.renderer.gl.canvas.height;
+
+        const ox = 2 * offset.x / WIDTH;
+        const oy = 2 * offset.y / HEIGHT;
+        corners[0][0] += ox;
+        corners[0][1] += oy;
+        corners[1][0] += ox;
+        corners[1][1] += oy;
+        corners[2][0] += ox;
+        corners[2][1] += oy;
+        corners[3][0] += ox;
+        corners[3][1] += oy;
 
         const ndcPoint = {
             x: point.x / WIDTH * 2 - 1,

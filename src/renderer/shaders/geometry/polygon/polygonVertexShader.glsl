@@ -43,7 +43,7 @@ void main(void) {
     vec4 p =  matrix*vec4(vertexPosition+n, 0., 1.);
     p/=p.w;
 
-    p.xy = $transform_inline(p.xy*resolution)/resolution;
+    p.xy = $transform_inline(p.xy*resolution*0.5)/resolution*2.;
 
     if (c.a==0.){
         p.x=10000.;
