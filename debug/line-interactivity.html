@@ -73,13 +73,17 @@
     // Define layer
     const source = new carto.source.Dataset('sf_stclines');
     const viz = new carto.Viz(`
-
-
       width: 10
       color: ramp($st_type, prism)
       strokeColor: opacity(BlueViolet, 0.8)
+      @v: viewportHistogram($st_type)
+      @t: $st_type
     `);
     const layer = new carto.Layer('layer', source, viz);
+
+    layer.on('updated', ()=>{
+      console.log(viz.variables.v.value);
+    })
 
     // Define interactivity
     const interactivity = new carto.Interactivity(layer);
@@ -140,8 +144,7 @@
         const vars = event.features[0].variables;
         popup.setHTML(`
         <div>
-          <h3 class ="h3">${vars.country_name.value}</h3>
-          <p class="description open-sans">Population: ${vars.pop_2015.value}</h3>
+          <p class="description open-sans">Population: ${vars.t.value}</h3>
         </div>
         `);
         popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
