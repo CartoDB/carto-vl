@@ -29,6 +29,7 @@ import * as expressions from './renderer/viz/expressions';
 import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
+import RT3 from './sources/RT3';
 import SQL from './sources/SQL';
 import { on, off } from './utils/events';
 import * as basemaps from './basemaps';
@@ -45,7 +46,7 @@ import { version } from '../package.json';
 
 // Namespaces
 
-const source = { Dataset, SQL, GeoJSON, MVT };
+const source = { Dataset, SQL, GeoJSON, MVT, RT3 };
 
 export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };
 export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };

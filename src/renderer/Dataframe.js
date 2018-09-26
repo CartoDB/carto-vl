@@ -2,6 +2,7 @@ import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
+import { projectToWebMercator, WM_R } from '../utils/util';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -174,6 +175,76 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return this.propertyTex[propertyName];
+    }
+
+    updateGeom (setVertexCallback) {
+        const vertices = this.decodedGeom.vertices;
+        setVertexCallback((i, x, y) => {
+            vertices[6 * i + 0] = x;
+            vertices[6 * i + 2] = x;
+            vertices[6 * i + 4] = x;
+
+            vertices[6 * i + 1] = y;
+            vertices[6 * i + 3] = y;
+            vertices[6 * i + 5] = y;
+        });
+
+        const gl = this.renderer.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.vertices, gl.STREAM_DRAW);
+    }
+
+    updateProperty (propertyName, setPropertyCallback) {
+        const propertiesFloat32Array = this.properties[propertyName];
+        setPropertyCallback(propertiesFloat32Array);
+
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        const gl = this.renderer.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.FLOAT,
+            propertiesFloat32Array);
+    }
+
+    addPoint ({lat, lng}, properties, id) {
+        if (this._idToIndex[id] !== undefined) {
+            this.removePoint(this._idToIndex[id]);
+        }
+        const index = this._idToIndex[id] === undefined
+            ? this._getNewPointIndex()
+            : this._idToIndex[id];
+        this._idToIndex[id] = index;
+        const wm = projectToWebMercator({ lat, lng });
+        const p = wToR(wm.x, wm.y, { scale: WM_R, center: this.center });
+        this.updateGeom(f => {
+            f(index, p.x, p.y);
+        });
+        Object.keys(properties).forEach(propertyName => {
+            this.updateProperty(propertyName, propertiesFloat32Array => {
+                if (this.metadata.properties[propertyName].type === 'category') {
+                    propertiesFloat32Array[index] = this._metadata.categorizeString(properties[propertyName]);
+                } else {
+                    propertiesFloat32Array[index] = properties[propertyName];
+                }
+            });
+        });
+    }
+    _getNewPointIndex () {
+        if (this._freeIndex.length) {
+            return this._freeIndex.pop();
+        }
+        const index = this._lastIndex;
+        this._lastIndex++;
+        return index;
+    }
+    removePoint (id) {
+        const index = this._idToIndex[id];
+        this.updateGeom(setVertexCallback => {
+            setVertexCallback(index, Number.NaN, Number.NaN);
+        });
+        this._freeIndex.push(index);
     }
 
     free () {
