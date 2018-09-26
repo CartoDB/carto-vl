@@ -29,7 +29,8 @@ export default class Grid extends Base {
         this._checkUrl(url);
 
         this._url = url;
-        // this._properties = {};
+        this._gridFields = new Set();
+        this._properties = {};
         // this._boundBands = new Set(); // might be interesting.
         this.initializationPromise = this._initializeRasterDataset(this._url);
     }
@@ -42,9 +43,6 @@ export default class Grid extends Base {
     async _loadFrom (url) {
         const tiff = await GeoTIFF.fromUrl(url);
         const image = await tiff.getImage();
-        const width = image.getWidth();
-        const height = image.getHeight();
-
         const data = await image.readRasters();
 
         // const firstBand = data[0]; // TODO FIX me with options
@@ -57,8 +55,8 @@ export default class Grid extends Base {
         const grid = {
             data,
             bbox: image.getBoundingBox(),
-            width,
-            height
+            width: image.getWidth(),
+            height: image.getHeight()
         };
 
         return grid;
@@ -149,9 +147,11 @@ export default class Grid extends Base {
 
     _getProperties () {
         const properties = {};
-        const data = this._grid.data;
-        for (let i = 0; i <= data.length; i++) {
-            properties[`band${i}`] = data[i];
+        if (this._grid && this._grid.data) {
+            const data = this._grid.data;
+            for (let i = 0; i <= data.length; i++) {
+                properties[`band${i}`] = data[i];
+            }
         }
         return properties;
     }
@@ -197,6 +197,13 @@ export default class Grid extends Base {
 
         // const property = this._properties['band0'];
 
+        if (this._grid && this._grid.data) {
+            const data = this._grid.data;
+            for (let i = 0; i <= data.length; i++) {
+                this._addGridProperty(`band${i}`);
+            }
+        }
+
         this._metadata = new Metadata({
             properties: this._properties,
             featureCount: 0,
@@ -207,6 +214,20 @@ export default class Grid extends Base {
         });
 
         return this._metadata;
+    }
+
+    _addGridProperty (propertyName) {
+        if (!this._gridFields.has(propertyName)) {
+            this._gridFields.add(propertyName);
+            this._properties[propertyName] = {
+                type: 'grid',
+                min: Number.POSITIVE_INFINITY,
+                max: Number.NEGATIVE_INFINITY,
+                avg: Number.NaN,
+                sum: 0,
+                count: 0
+            };
+        }
     }
 
     // // _sampleFeatureOnMetadata (properties, sample, featureCount) {
