@@ -253,11 +253,19 @@ export default class Renderer {
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            Object.keys(textureId).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
-                gl.uniform1i(textureId[name], i);
-            });
+            if (viz.geometryType === 'grid') {
+                Object.keys(textureId).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getGridPropertyTexture(name));
+                    gl.uniform1i(textureId[name], i);
+                });
+            } else {
+                Object.keys(textureId).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], i);
+                });
+            }
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
@@ -326,6 +334,8 @@ export default class Renderer {
                 renderer = viz.pointShader;
             } else if (dataframe.type === 'line') {
                 renderer = viz.lineShader;
+            } else if (dataframe.type === 'grid') {
+                renderer = viz.gridShader;
             } else {
                 renderer = viz.polygonShader;
             }
@@ -439,6 +449,12 @@ export default class Renderer {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
             }
+
+            // FIXME: if we stop shaaring the symbolizer uniforms:
+            // if (dataframe.type === 'grid') {
+            //     gl.uniform2f(renderer.vertexScale, dataframe.vertexScaleX??, dataframe.vertexScaleY??);
+            //     gl.uniform2f(renderer.vertexOffset, dataframe.vertexOffsetX??, dataframe.vertexOffsetY??);
+            // }
         });
         orderingMins.map((_, orderingIndex) => {
             renderDrawPass(orderingIndex);
