@@ -177,27 +177,32 @@ export default class Dataframe extends DummyDataframe {
         return this.propertyTex[propertyName];
     }
 
-    updateGeom (setVertexCallback) {
+    _updatePointGeom (i, x, y) {
         const vertices = this.decodedGeom.vertices;
-        setVertexCallback((i, x, y) => {
-            vertices[6 * i + 0] = x;
-            vertices[6 * i + 2] = x;
-            vertices[6 * i + 4] = x;
-
-            vertices[6 * i + 1] = y;
-            vertices[6 * i + 3] = y;
-            vertices[6 * i + 5] = y;
-        });
-
+        vertices[6 * i + 0] = x;
+        vertices[6 * i + 1] = y;
+        vertices[6 * i + 2] = x;
+        vertices[6 * i + 3] = y;
+        vertices[6 * i + 4] = x;
+        vertices[6 * i + 5] = y;
+    }
+    _updateGeomOnGPU () {
         const gl = this.renderer.gl;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
         gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.vertices, gl.STREAM_DRAW);
     }
 
-    updateProperty (propertyName, setPropertyCallback) {
+    _updateProperty (propertyName, index, value) {
         const propertiesFloat32Array = this.properties[propertyName];
-        setPropertyCallback(propertiesFloat32Array);
-
+        if (this.metadata.properties[propertyName].type === 'category') {
+            propertiesFloat32Array[index] = this.metadata.categorizeString(propertyName,
+                value);
+        } else {
+            propertiesFloat32Array[index] = value;
+        }
+    }
+    _updatePropertyOnGPU (propertyName) {
+        const propertiesFloat32Array = this.properties[propertyName];
         const width = this.renderer.RTT_WIDTH;
         const height = Math.ceil(this.numFeatures / width);
 
@@ -215,17 +220,11 @@ export default class Dataframe extends DummyDataframe {
         this._idToIndex[id] = index;
         const wm = projectToWebMercator({ lat, lng });
         const p = wToR(wm.x, wm.y, { scale: WM_R, center: this.center });
-        this.updateGeom(f => {
-            f(index, p.x, p.y);
-        });
+        this._updatePointGeom(index, p.x, p.y);
+        this._updateGeomOnGPU();
         Object.keys(properties).forEach(propertyName => {
-            this.updateProperty(propertyName, propertiesFloat32Array => {
-                if (this.metadata.properties[propertyName].type === 'category') {
-                    propertiesFloat32Array[index] = this.metadata.categorizeString(propertyName, properties[propertyName]);
-                } else {
-                    propertiesFloat32Array[index] = properties[propertyName];
-                }
-            });
+            this._updateProperty(propertyName, properties[propertyName]);
+            this._updatePropertyOnGPU(propertyName);
         });
     }
     _getNewPointIndex () {
