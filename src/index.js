@@ -9,6 +9,7 @@
  * - {@link carto.source.Dataset|carto.source.Dataset}
  * - {@link carto.source.SQL|carto.source.SQL}
  * - {@link carto.source.GeoJSON|carto.source.GeoJSON}
+ * - {@link carto.source.Grid|carto.source.Grid}
  * - {@link carto.source.MVT|carto.source.MVT}
  * - {@link carto.source.MVT.Metadata|carto.source.MVT.Metadata}
  * - {@link carto.expressions|carto.expressions}
@@ -30,6 +31,7 @@ import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import SQL from './sources/SQL';
+import Grid from './sources/Grid';
 import { on, off } from './utils/events';
 import * as basemaps from './basemaps';
 
@@ -45,7 +47,7 @@ import { version } from '../package.json';
 
 // Namespaces
 
-const source = { Dataset, SQL, GeoJSON, MVT };
+const source = { Dataset, SQL, GeoJSON, MVT, Grid };
 
 export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };
 export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Map, Interactivity, basemaps };

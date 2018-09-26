@@ -1,5 +1,5 @@
-// import * as rsys from '../client/rsys';
-// import Dataframe from '../renderer/Dataframe';
+import * as rsys from '../client/rsys';
+import Dataframe from '../renderer/Dataframe';
 // import Metadata from '../renderer/Metadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 // import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
@@ -33,10 +33,8 @@ export default class Grid extends Base {
     }
 
     async _initializeRasterDataset (url) {
-        const grid = await this._loadFrom(url);
-        this._grid = grid;
-
-        // this._setCoordinatesCenter();
+        this._grid = await this._loadFrom(url);
+        this._setCoordinatesCenter();
     }
 
     async _loadFrom (url) {
@@ -47,14 +45,18 @@ export default class Grid extends Base {
 
         const data = await image.readRasters();
 
-        const firstBand = data[0]; // TODO FIX with options
+        const firstBand = data[0]; // TODO FIX me with options
         const band = firstBand;
+
+        // const origin = image.getOrigin();
+        // const resolution = image.getResolution();
+        // const bbox = image.getBoundingBox();
+
         const grid = {
             data: band,
-            metadata: {
-                width,
-                height
-            }
+            bbox: image.getBoundingBox(),
+            width,
+            height
         };
 
         return grid;
@@ -69,38 +71,51 @@ export default class Grid extends Base {
         }
     }
 
-    // bindLayer (addDataframe, dataLoadedCallback) {
-    //     this._addDataframe = addDataframe;
-    //     this._dataLoadedCallback = dataLoadedCallback;
-    // }
+    // sets this._center, this._dataframeCenter
+    _setCoordinatesCenter () {
+        // TODO Asuming the raster is already in WebMercator
+        const [xmin, ymin, xmax, ymax] = this._grid.bbox;
+        const x = (xmin + xmax) / 2.0;
+        const y = (ymin + ymax) / 2.0;
+
+        this._center = { x, y };
+        this._dataframeCenter = rsys.wToR(
+            this._center.x, this._center.y,
+            { scale: util.WM_R, center: { x: 0, y: 0 } });
+    }
+
+    requestData () {
+        if (this._dataframe) {
+            // const newProperties = this._decodeUnboundProperties();
+            // this._dataframe.addProperties(newProperties);
+            // Object.keys(newProperties).forEach(propertyName => {
+            //     this._boundColumns.add(propertyName);
+            // });
+            return;
+        }
+        const dataframe = new Dataframe({
+            active: true,
+            center: this._dataframeCenter,
+            geom: this._decodeGeometry(),
+            properties: this._decodeUnboundProperties(),
+            scale: 1,
+            // size: this._features.length,
+            // type: this._getDataframeType(this._type),
+            metadata: this._metadata
+        });
+        // this._boundColumns = new Set(Object.keys(dataframe.properties));
+        this._dataframe = dataframe;
+        this._addDataframe(dataframe);
+        this._dataLoadedCallback();
+    }
+
+    bindLayer (addDataframe, dataLoadedCallback) {
+        this._addDataframe = addDataframe;
+        this._dataLoadedCallback = dataLoadedCallback;
+    }
 
     // requestMetadata (viz) {
     //     return Promise.resolve(this._computeMetadata(viz));
-    // }
-
-    // requestData () {
-    //     if (this._dataframe) {
-    //         const newProperties = this._decodeUnboundProperties();
-    //         this._dataframe.addProperties(newProperties);
-    //         Object.keys(newProperties).forEach(propertyName => {
-    //             this._boundColumns.add(propertyName);
-    //         });
-    //         return;
-    //     }
-    //     const dataframe = new Dataframe({
-    //         active: true,
-    //         center: this._dataframeCenter,
-    //         geom: this._decodeGeometry(),
-    //         properties: this._decodeUnboundProperties(),
-    //         scale: 1,
-    //         size: this._features.length,
-    //         type: this._getDataframeType(this._type),
-    //         metadata: this._metadata
-    //     });
-    //     this._boundColumns = new Set(Object.keys(dataframe.properties));
-    //     this._dataframe = dataframe;
-    //     this._addDataframe(dataframe);
-    //     this._dataLoadedCallback();
     // }
 
     // requiresNewMetadata () {
@@ -439,30 +454,6 @@ export default class Grid extends Base {
     //     } else if (type === 'MultiPolygon') {
     //         return coordinates[0][0][0];
     //     }
-    // }
-
-    // // sets this._type, this._center, this._dataframeCenter
-    // _setCoordinatesCenter () {
-    //     let x = 0;
-    //     let y = 0;
-    //     let nPoints = 0;
-    //     this._fetchFeatureGeometry({ sample: 10 }, (_, geometry) => {
-    //         if (!this._type) {
-    //             this._type = geometry.type;
-    //         }
-    //         const samplePoint = this._samplePoint(geometry);
-    //         const sampleXY = util.projectToWebMercator({ lng: samplePoint[0], lat: samplePoint[1] });
-    //         x += sampleXY.x;
-    //         y += sampleXY.y;
-    //         nPoints += 1;
-    //     });
-    //     if (nPoints > 1) {
-    //         x /= nPoints;
-    //         y /= nPoints;
-    //     }
-
-    //     this._center = { x, y };
-    //     this._dataframeCenter = rsys.wToR(this._center.x, this._center.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     // }
 
     free () {

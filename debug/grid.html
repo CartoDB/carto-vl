@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Feature Lists</title> | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,11 +13,13 @@
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
     #timer {
       position: absolute;
       top: '20px', left: '20px';
@@ -26,6 +29,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="timer"></div>
@@ -45,39 +49,48 @@
 
     map.on('load', () => {
       Promise.all([
-          fetch('http://127.0.0.1:8080/examples/raster/corners.json'),
-          fetch('http://127.0.0.1:8080/examples/raster/pixels.json')
+        fetch('http://127.0.0.1:8080/examples/raster/corners.json'),
+        fetch('http://127.0.0.1:8080/examples/raster/pixels.json')
       ]).then(results => Promise.all(results.map(r => r.json())).then(([corners, pixels]) => {
-            const sourcec = new carto.source.GeoJSON(corners);
-            const sourcep = new carto.source.GeoJSON(pixels);
-            let vizc = new carto.Viz(`
+        const sourcec = new carto.source.GeoJSON(corners);
+        const sourcep = new carto.source.GeoJSON(pixels);
+        const sourceg = new carto.source.Grid('http://127.0.0.1:8080/examples/raster/small_3857.tiff');
+
+        let vizc = new carto.Viz(`
                 @n: $name
                 width: 15
                 color: red
             `);
-            const layerc = new carto.Layer('corners', sourcec, vizc);
-            let vizp = new carto.Viz(`
+        const layerc = new carto.Layer('corners', sourcec, vizc);
+
+        let vizp = new carto.Viz(`
                 @v: $value
                 width: 8
                 color: ramp($value, CB_GREYS)
             `);
-            const layerp = new carto.Layer('pixels', sourcep, vizp);
+        const layerp = new carto.Layer('pixels', sourcep, vizp);
 
-            layerp.addTo(map, 'watername_ocean');
-            layerc.addTo(map, 'watername_ocean');
+        const vizg = new carto.Viz();
+        const layerg = new carto.Layer('grid', sourceg, vizg);
 
-            const interactivity = new carto.Interactivity(layerp);
-            interactivity.on('featureClick', event => {
-              if (event.features.length > 0) {
-                const feature = event.features[0];
-                console.log(feature.variables.v.value);
-              }
-            });
 
-            // TODO
-            // const gridSource = new carto.source.Grid(...)
+        layerp.addTo(map, 'watername_ocean');
+        layerc.addTo(map, 'watername_ocean');
+        layerg.addTo(map, 'watername_ocean');
+
+        const interactivity = new carto.Interactivity(layerp);
+        interactivity.on('featureClick', event => {
+          if (event.features.length > 0) {
+            const feature = event.features[0];
+            console.log(feature.variables.v.value);
+          }
+        });
+
+        // TODO
+        // const gridSource = new carto.source.Grid(...)
       }));
     });
   </script>
 </body>
+
 </html>
