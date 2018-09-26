@@ -1,6 +1,6 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
-// import Metadata from '../renderer/Metadata';
+import Metadata from '../renderer/Metadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 // import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import util from '../utils/util';
@@ -29,6 +29,8 @@ export default class Grid extends Base {
         this._checkUrl(url);
 
         this._url = url;
+        // this._properties = {};
+        // this._boundBands = new Set(); // might be interesting.
         this.initializationPromise = this._initializeRasterDataset(this._url);
     }
 
@@ -45,15 +47,15 @@ export default class Grid extends Base {
 
         const data = await image.readRasters();
 
-        const firstBand = data[0]; // TODO FIX me with options
-        const band = firstBand;
+        // const firstBand = data[0]; // TODO FIX me with options
+        // const band = firstBand;
 
         // const origin = image.getOrigin();
         // const resolution = image.getResolution();
         // const bbox = image.getBoundingBox();
 
         const grid = {
-            data: band,
+            data,
             bbox: image.getBoundingBox(),
             width,
             height
@@ -93,20 +95,24 @@ export default class Grid extends Base {
             // });
             return;
         }
-        const dataframe = new Dataframe({
-            active: true,
-            center: this._dataframeCenter,
-            geom: this._decodeGeometry(),
-            properties: this._decodeUnboundProperties(),
-            scale: 1,
-            // size: this._features.length,
-            // type: this._getDataframeType(this._type),
-            metadata: this._metadata
-        });
-        // this._boundColumns = new Set(Object.keys(dataframe.properties));
+        const dataframe = this._buildDataFrame();
+        // this._boundBands = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
         this._dataLoadedCallback();
+    }
+
+    _buildDataFrame () {
+        return new Dataframe({
+            active: true,
+            center: this._dataframeCenter,
+            geom: this._getGeometry(),
+            properties: this._getProperties(),
+            scale: 1,
+            // size: this._features.length,
+            type: 'grid',
+            metadata: this._metadata
+        });
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
@@ -114,61 +120,94 @@ export default class Grid extends Base {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    // requestMetadata (viz) {
-    //     return Promise.resolve(this._computeMetadata(viz));
-    // }
+    requestMetadata (viz) {
+        return Promise.resolve(this._computeMetadata(viz));
+    }
 
-    // requiresNewMetadata () {
-    //     return false;
-    // }
+    requiresNewMetadata () {
+        return false;
+    }
 
-    // _clone () {
-    //     return new Grid(this._url);
-    // }
+    _clone () {
+        return this;
+    }
 
-    // _initializeFeatureProperties (features) {
+    _getGeometry () {
+        // const [xmin, ymin, xmax, ymax] = this._grid.bbox;
+
+        // These are texture coordinates... not refering to WebMercator, nor WebGL space
+        const coordinates = new Float32Array([
+            0.0, 0.0,
+            1.0, 0.0,
+            0.0, 1.0,
+            0.0, 1.0,
+            1.0, 0.0,
+            1.0, 1.0]
+        );
+        return coordinates;
+    }
+
+    _getProperties () {
+        const properties = {};
+        const data = this._grid.data;
+        for (let i = 0; i <= data.length; i++) {
+            properties[`band${i}`] = data[i];
+        }
+        return properties;
+    }
+
+    // _initializeFeatureProperties (features) {.
     //     for (let i = 0; i < features.length; i++) {
     //         features[i].properties = features[i].properties || {};
     //     }
     //     return features;
     // }
 
-    // _computeMetadata (viz) {
-    //     // const sample = [];
-    //     // this._addNumericColumnField('cartodb_id');
+    _computeMetadata (viz) {
+        // const sample = [];
+        // this._addNumericColumnField('cartodb_id');
 
-    //     // const featureCount = this._features.length;
-    //     // const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
-    //     // for (let i = 0; i < this._features.length; i++) {
-    //     //     const properties = this._features[i].properties;
-    //     //     const keys = Object.keys(properties);
-    //     //     for (let j = 0, len = keys.length; j < len; j++) {
-    //     //         const name = keys[j];
-    //     //         if (!requiredColumns.has(name) || this._boundColumns.has(name)) {
-    //     //             continue;
-    //     //         }
-    //     //         const value = properties[name];
-    //     //         this._addPropertyToMetadata(name, value);
-    //     //     }
-    //     //     this._sampleFeatureOnMetadata(properties, sample, this._features.length);
-    //     // }
+        // const featureCount = this._features.length;
+        // const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
+        // for (let i = 0; i < this._features.length; i++) {
+        //     const properties = this._features[i].properties;
+        //     const keys = Object.keys(properties);
+        //     for (let j = 0, len = keys.length; j < len; j++) {
+        //         const name = keys[j];
+        //         if (!requiredColumns.has(name) || this._boundColumns.has(name)) {
+        //             continue;
+        //         }
+        //         const value = properties[name];
+        //         this._addPropertyToMetadata(name, value);
+        //     }
+        //     this._sampleFeatureOnMetadata(properties, sample, this._features.length);
+        // }
 
-    //     // this._numFields.forEach(name => {
-    //     //     const property = this._properties[name];
-    //     //     property.avg = property.sum / property.count;
-    //     // });
+        // this._numFields.forEach(name => {
+        //     const property = this._properties[name];
+        //     property.avg = property.sum / property.count;
+        // });
 
-    //     // let geomType = '';
-    //     // if (featureCount > 0) {
-    //     //     // Set the geomType of the first feature to the metadata
-    //     //     geomType = this._getDataframeType(this._features[0].geometry.type);
-    //     // }
-    //     // const idProperty = 'cartodb_id';
+        // let geomType = '';
+        // if (featureCount > 0) {
+        //     // Set the geomType of the first feature to the metadata
+        //     geomType = this._getDataframeType(this._features[0].geometry.type);
+        // }
+        // const idProperty = 'cartodb_id';
 
-    //     this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
+        // const property = this._properties['band0'];
 
-    //     return this._metadata;
-    // }
+        this._metadata = new Metadata({
+            properties: this._properties,
+            featureCount: 0,
+            sample: [],
+            geomType: 'grid',
+            isAggregated: false,
+            idProperty: ''
+        });
+
+        return this._metadata;
+    }
 
     // // _sampleFeatureOnMetadata (properties, sample, featureCount) {
     // //     if (featureCount > SAMPLE_TARGET_SIZE) {
@@ -326,41 +365,6 @@ export default class Grid extends Base {
     // //     }
     // //     return [];
     // // }
-
-    // _decodeGeometry () {
-    //     let geometries = this._allocGeometry();
-
-    //     this._fetchFeatureGeometry({}, (i, geometry) => {
-    //         const type = geometry.type;
-    //         const coordinates = geometry.coordinates;
-    //         if (this._type !== type) {
-    //             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
-    //         }
-    //         if (type === 'Point') {
-    //             const point = this._computePointGeometry(coordinates);
-    //             geometries[6 * i + 0] = point.x;
-    //             geometries[6 * i + 1] = point.y;
-    //             geometries[6 * i + 2] = point.x;
-    //             geometries[6 * i + 3] = point.y;
-    //             geometries[6 * i + 4] = point.x;
-    //             geometries[6 * i + 5] = point.y;
-    //         } else if (type === 'LineString') {
-    //             const line = this._computeLineStringGeometry(coordinates);
-    //             geometries.push([line]);
-    //         } else if (type === 'MultiLineString') {
-    //             const multiline = this._computeMultiLineStringGeometry(coordinates);
-    //             geometries.push(multiline);
-    //         } else if (type === 'Polygon') {
-    //             const polygon = this._computePolygonGeometry(coordinates);
-    //             geometries.push([polygon]);
-    //         } else if (type === 'MultiPolygon') {
-    //             const multipolygon = this._computeMultiPolygonGeometry(coordinates);
-    //             geometries.push(multipolygon);
-    //         }
-    //     });
-
-    //     return geometries;
-    // }
 
     // _computePointGeometry (data) {
     //     const lat = data[1];
