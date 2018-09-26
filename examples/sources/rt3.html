@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Add layer | CARTO</title>
+  <title>Click | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -12,15 +13,19 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Add layer</h1>
+        <h1>Feature click</h1>
       </header>
       <section>
-        <p class="description open-sans">Add one CARTO layer to your map</p>
+        <p class="description open-sans">Click on the polygons</p>
+        <div id="controls">
+          <div id="content"></div>
+        </div>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -38,8 +43,9 @@
       style: carto.basemaps.voyager,
       center: [0, 0],
       zoom: 0,
+      scrollZoom: false,
       dragRotate: false,
-      touchZoomRotate: false
+      touchZoomRotate: false,
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -53,13 +59,32 @@
       apiKey: 'default_public'
     });
 
-    // Define layer
-    const source = new carto.source.RT3('ws://10.0.32.102:3333');
+    // Define layer and variables for interactivity
+    const source = new carto.source.RT3('ws://10.0.32.99:3333');
     const viz = new carto.Viz(`
-      // color: rgb(($cartodb_id%1)*255, 0, $auxNumber*255);
-      color: ramp(linear($foo, 0, 50), prism)
+      width: 3
+      strokeWidth: 0
+      color: ramp(linear($foo, 0, 1), prism)
+      @foo: $foo
     `);
     const layer = new carto.Layer('layer', source, viz);
+
+    // Define interactivity
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event=>{
+      console.log(event)
+      let content = '';
+      for (let feature of event.features) {
+        content += `
+          <div class="container">
+            <h3 class="h3">${feature.variables.foo.value}</h3>
+            <p class="open-sans">Latitude: ${event.coordinates.lat.toFixed(4)}</p>
+            <p class="open-sans">Longitude: ${event.coordinates.lng.toFixed(4)}</p>
+          </div>
+        `;
+      }
+      document.getElementById('content').innerHTML = content;
+    });
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
@@ -69,4 +94,5 @@
     }
   </script>
 </body>
+
 </html>

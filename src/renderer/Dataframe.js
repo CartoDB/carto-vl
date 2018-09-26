@@ -209,9 +209,6 @@ export default class Dataframe extends DummyDataframe {
     }
 
     addPoint ({lat, lng}, properties, id) {
-        if (this._idToIndex[id] !== undefined) {
-            this.removePoint(this._idToIndex[id]);
-        }
         const index = this._idToIndex[id] === undefined
             ? this._getNewPointIndex()
             : this._idToIndex[id];
@@ -245,6 +242,7 @@ export default class Dataframe extends DummyDataframe {
             setVertexCallback(index, Number.NaN, Number.NaN);
         });
         this._freeIndex.push(index);
+        this._idToIndex[id] = undefined;
     }
 
     free () {

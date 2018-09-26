@@ -1,12 +1,10 @@
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
 import Base from './Base';
-import { projectToWebMercator, WM_R } from '../utils/util';
-import { wToR } from '../client/rsys';
 
 import RT3Consumer from 'rt3-consumer';
 
-const DATAFRAME_MAX_FEATURES = 64 * 1024;
+const DATAFRAME_MAX_FEATURES = 100 * 1024;
 
 export default class RT3 extends Base {
     /**
