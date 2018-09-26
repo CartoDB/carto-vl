@@ -50,7 +50,7 @@ export default class RT3 extends Base {
             // TODO Read header
             const properties = {
                 foo: {
-                    type: 'number'
+                    type: 'category'
                 },
                 auxNumber: {
                     type: 'number'

@@ -62,9 +62,9 @@
     // Define layer and variables for interactivity
     const source = new carto.source.RT3('ws://10.0.32.99:3333');
     const viz = new carto.Viz(`
-      width: 3
+      width: 30
       strokeWidth: 0
-      color: ramp(linear($foo, 0, 1), prism)
+      // color: ramp(linear($foo, 0, 1), prism)
       @foo: $foo
     `);
     const layer = new carto.Layer('layer', source, viz);

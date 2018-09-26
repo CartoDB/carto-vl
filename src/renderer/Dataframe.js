@@ -221,7 +221,7 @@ export default class Dataframe extends DummyDataframe {
         Object.keys(properties).forEach(propertyName => {
             this.updateProperty(propertyName, propertiesFloat32Array => {
                 if (this.metadata.properties[propertyName].type === 'category') {
-                    propertiesFloat32Array[index] = this._metadata.categorizeString(properties[propertyName]);
+                    propertiesFloat32Array[index] = this.metadata.categorizeString(propertyName, properties[propertyName]);
                 } else {
                     propertiesFloat32Array[index] = properties[propertyName];
                 }
