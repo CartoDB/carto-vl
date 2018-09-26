@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Feature Lists</title> | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: '20px', left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    map.on('load', () => {
+      Promise.all([
+          fetch('http://127.0.0.1:8080/examples/raster/corners.json'),
+          fetch('http://127.0.0.1:8080/examples/raster/pixels.json')
+      ]).then(results => Promise.all(results.map(r => r.json())).then(([corners, pixels]) => {
+            const sourcec = new carto.source.GeoJSON(corners);
+            const sourcep = new carto.source.GeoJSON(pixels);
+            let vizc = new carto.Viz(`
+                @n: $name
+                width: 15
+                color: red
+            `);
+            const layerc = new carto.Layer('corners', sourcec, vizc);
+            let vizp = new carto.Viz(`
+                @v: $value
+                width: 8
+                color: ramp($value, CB_GREYS)
+            `);
+            const layerp = new carto.Layer('pixels', sourcep, vizp);
+
+            layerp.addTo(map, 'watername_ocean');
+            layerc.addTo(map, 'watername_ocean');
+
+            const interactivity = new carto.Interactivity(layerp);
+            interactivity.on('featureClick', event => {
+              if (event.features.length > 0) {
+                const feature = event.features[0];
+                console.log(feature.variables.v.value);
+              }
+            });
+
+            // TODO
+            // const gridSource = new carto.source.Grid(...)
+      }));
+    });
+  </script>
+</body>
+</html>
