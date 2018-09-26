@@ -1,13 +1,13 @@
 // import * as rsys from '../client/rsys';
 // import Dataframe from '../renderer/Dataframe';
 // import Metadata from '../renderer/Metadata';
-// import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 // import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
-// import util from '../utils/util';
+import util from '../utils/util';
 import Base from './Base';
 // import schema from '../renderer/schema';
 
-import GeoTIFF from 'geotiff';
+import * as GeoTIFF from 'geotiff';
 
 // const SAMPLE_TARGET_SIZE = 1000;
 
@@ -24,51 +24,50 @@ export default class Grid extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor(url) {
+    constructor (url) {
         super();
-        // this._checkUrl(url);
+        this._checkUrl(url);
 
         this._url = url;
-        this.lib = GeoTIFF;
-        // this.initializationPromise = this._initializeRasterDataset(this._url);
+        this.initializationPromise = this._initializeRasterDataset(this._url);
     }
 
-    // async _initializeRasterDataset (url) {
-    //     const grid = await this._loadFrom(url);
-    //     this._grid = grid;
+    async _initializeRasterDataset (url) {
+        const grid = await this._loadFrom(url);
+        this._grid = grid;
 
-    //     // this._setCoordinatesCenter();
-    // }
+        // this._setCoordinatesCenter();
+    }
 
-    // async _loadFrom (url) {
-    //     const tiff = await GeoTIFF.fromUrl(url);
-    //     const image = await tiff.getImage();
-    //     const width = image.getWidth();
-    //     const height = image.getHeight();
+    async _loadFrom (url) {
+        const tiff = await GeoTIFF.fromUrl(url);
+        const image = await tiff.getImage();
+        const width = image.getWidth();
+        const height = image.getHeight();
 
-    //     const data = await image.readRasters();
+        const data = await image.readRasters();
 
-    //     const firstBand = data[0]; // TODO FIX with options
-    //     const band = firstBand;
-    //     const grid = {
-    //         data: band,
-    //         metadata: {
-    //             width,
-    //             height
-    //         }
-    //     };
+        const firstBand = data[0]; // TODO FIX with options
+        const band = firstBand;
+        const grid = {
+            data: band,
+            metadata: {
+                width,
+                height
+            }
+        };
 
-    //     return grid;
-    // }
+        return grid;
+    }
 
-    // _checkUrl (url) {
-    //     if (util.isUndefined(url)) {
-    //         throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'url'`);
-    //     }
-    //     if (!util.isString(url)) {
-    //         throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'url' property must be a string.`);
-    //     }
-    // }
+    _checkUrl (url) {
+        if (util.isUndefined(url)) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'url'`);
+        }
+        if (!util.isString(url)) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'url' property must be a string.`);
+        }
+    }
 
     // bindLayer (addDataframe, dataLoadedCallback) {
     //     this._addDataframe = addDataframe;
@@ -466,6 +465,6 @@ export default class Grid extends Base {
     //     this._dataframeCenter = rsys.wToR(this._center.x, this._center.y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     // }
 
-    free() {
+    free () {
     }
 }
