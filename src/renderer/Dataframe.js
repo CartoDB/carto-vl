@@ -223,7 +223,7 @@ export default class Dataframe extends DummyDataframe {
         this._updatePointGeom(index, p.x, p.y);
         this._updateGeomOnGPU();
         Object.keys(properties).forEach(propertyName => {
-            this._updateProperty(propertyName, properties[propertyName]);
+            this._updateProperty(propertyName, index, properties[propertyName]);
             this._updatePropertyOnGPU(propertyName);
         });
     }

@@ -64,7 +64,10 @@
       width: 30
       strokeWidth: 0
       // color: ramp(linear($foo, 0, 1), prism)
-      @foo: $foo
+      @id: $id
+      @name: $name
+      @speed: $speed
+      @vehicle: $vehicle
     `);
     const layer = new carto.Layer('layer', source, viz);
 
@@ -74,9 +77,13 @@
       console.log(event)
       let content = '';
       for (let feature of event.features) {
+        const title = Object.keys(feature.variables).map(name => {
+          return `<p  class="open-sans"> <strong>${name}:</strong> ${feature.variables[name].value}</p>`
+        }).join('');
+
         content += `
           <div class="container">
-            <h3 class="h3">${feature.variables.foo.value}</h3>
+            <h3 class="h3">${title}</h3>
             <p class="open-sans">Latitude: ${event.coordinates.lat.toFixed(4)}</p>
             <p class="open-sans">Longitude: ${event.coordinates.lng.toFixed(4)}</p>
           </div>

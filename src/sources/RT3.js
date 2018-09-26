@@ -45,29 +45,18 @@ export default class RT3 extends Base {
         this._dataLoadedCallback = dataLoadedCallback;
     }
 
-    requestMetadata (viz) {
-        if (!this._metadataPromise) {
-            // TODO Read header
-            const properties = {
-                foo: {
-                    type: 'category'
-                },
-                auxNumber: {
-                    type: 'number'
-                },
-                auxCategory: {
-                    type: 'category'
-                }
-            };
-            this._metadataPromise = new Metadata({
-                properties,
+    async requestMetadata (viz) {
+        if (!this._rt3Client) {
+            this._rt3Client = new RT3Consumer(this._URL, {});
+            const r3tMetadata = await this._rt3Client.getMetadata();
+
+            this._metadata = new Metadata({
+                properties: r3tMetadata.properties,
                 featureCount: Number.NaN,
-                idProperty: 'foo'
+                idProperty: 'id'
             });
         }
-        this._metadata = this._metadataPromise;
-        this._freeIndex = [];
-        return this._metadataPromise;
+        return this._metadata;
     }
 
     requestData () {
@@ -76,7 +65,7 @@ export default class RT3 extends Base {
             Object.keys(this._metadata.properties).forEach(propertyName => {
                 properties[propertyName] = new Float32Array(DATAFRAME_MAX_FEATURES);
             });
-            this._center = {x: 0, y: 0};
+            this._center = { x: 0, y: 0 };
             const dataframe = new Dataframe({
                 active: true,
                 center: this._center,
@@ -92,9 +81,9 @@ export default class RT3 extends Base {
 
             this._addDataframe(dataframe);
 
-            new RT3Consumer(this._URL, {
+            this._rt3Client.setCallbacks({
                 onSet: point => {
-                    dataframe.addPoint({lat: point.lat, lng: point.lon}, point.data, point.id);
+                    dataframe.addPoint({ lat: point.lat, lng: point.lon }, point.data, point.id);
                     this._dataLoadedCallback();
                 },
                 onDelete: point => {
@@ -102,6 +91,7 @@ export default class RT3 extends Base {
                     this._dataLoadedCallback();
                 }
             });
+
             this._dataLoadedCallback();
         }
     }
