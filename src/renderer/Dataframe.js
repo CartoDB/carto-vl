@@ -176,6 +176,34 @@ export default class Dataframe extends DummyDataframe {
         return this.propertyTex[propertyName];
     }
 
+    getGridPropertyTexture (propertyName) {
+        if (this.propertyTex[propertyName]) {
+            return this.propertyTex[propertyName];
+        }
+
+        const propertiesFloat32Array = this.properties[propertyName];
+        // Dataframe is already bound to this context, "hot update" it
+        const gl = this.renderer.gl;
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+        this.height = height;
+
+        this.propertyTex[propertyName] = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.FLOAT,
+            propertiesFloat32Array);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        // TODO: pad the property to a power of 2 size in both dimensions, then
+        // use MIPMAP in the MAG FILTER and do this to activate it:
+        // gl.generateMipMap...
+        // Note that UV coordinates will need to be adjusted, to leave the padding out
+        return this.propertyTex[propertyName];
+    }
+
     free () {
         if (this.propertyTex) {
             const gl = this.renderer.gl;
