@@ -8,6 +8,8 @@
   <script src="../dist/carto-vl.js"></script>
   <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
   <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://unpkg.com/geotiff@latest/dist/geotiff.bundle.min.js"></script>
+
   <style>
     body {
       margin: 0;
@@ -48,6 +50,30 @@
       apiKey: 'default_public'
     });
 
+
+    function loadGrid() {
+      const tiff = 'http://127.0.0.1:8080/examples/raster/small_3857.tiff';
+      fetch(tiff)
+        .then(r => r.arrayBuffer())
+        .then(buffer => GeoTIFF.fromArrayBuffer(buffer))
+        .then(tiff => tiff.getImage())
+        .then(image => {
+          image.readRasters().then(data => {
+            const grid = {
+              data,
+              bbox: image.getBoundingBox(),
+              width: image.getWidth(),
+              height: image.getHeight()
+            };
+
+            const sourceg = new carto.source.Grid(grid);
+            const vizg = new carto.Viz();
+            const layerg = new carto.Layer('grid', sourceg, vizg);
+            layerg.addTo(map, 'watername_ocean');
+          });
+        });
+    }
+
     map.on('load', () => {
       Promise.all([
         fetch('http://127.0.0.1:8080/examples/raster/corners.json'),
@@ -55,7 +81,6 @@
       ]).then(results => Promise.all(results.map(r => r.json())).then(([corners, pixels]) => {
         const sourcec = new carto.source.GeoJSON(corners);
         const sourcep = new carto.source.GeoJSON(pixels);
-        const sourceg = new carto.source.Grid('http://127.0.0.1:8080/examples/raster/small_3857.tiff');
 
         let vizc = new carto.Viz(`
                 @n: $name
@@ -71,13 +96,11 @@
             `);
         const layerp = new carto.Layer('pixels', sourcep, vizp);
 
-        const vizg = new carto.Viz();
-        const layerg = new carto.Layer('grid', sourceg, vizg);
-
 
         layerp.addTo(map, 'watername_ocean');
         layerc.addTo(map, 'watername_ocean');
-        layerg.addTo(map, 'watername_ocean');
+
+        loadGrid();
 
         const interactivity = new carto.Interactivity(layerp);
         interactivity.on('featureClick', event => {

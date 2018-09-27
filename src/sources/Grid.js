@@ -1,13 +1,11 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+// import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 // import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
 // import schema from '../renderer/schema';
-
-import * as GeoTIFF from 'geotiff';
 
 // const SAMPLE_TARGET_SIZE = 1000;
 
@@ -24,51 +22,12 @@ export default class Grid extends Base {
      * @memberof carto.source
      * @api
      */
-    constructor (url) {
+    constructor (grid) {
         super();
-        this._checkUrl(url);
-
-        this._url = url;
+        this._grid = grid;
         this._gridFields = new Set();
         this._properties = {};
-        // this._boundBands = new Set(); // might be interesting.
-        this.initializationPromise = this._initializeRasterDataset(this._url);
-    }
-
-    async _initializeRasterDataset (url) {
-        this._grid = await this._loadFrom(url);
         this._setCoordinates();
-    }
-
-    async _loadFrom (url) {
-        const tiff = await GeoTIFF.fromUrl(url);
-        const image = await tiff.getImage();
-        const data = await image.readRasters();
-
-        // const firstBand = data[0]; // TODO FIX me with options
-        // const band = firstBand;
-
-        // const origin = image.getOrigin();
-        // const resolution = image.getResolution();
-        // const bbox = image.getBoundingBox();
-
-        const grid = {
-            data,
-            bbox: image.getBoundingBox(),
-            width: image.getWidth(),
-            height: image.getHeight()
-        };
-
-        return grid;
-    }
-
-    _checkUrl (url) {
-        if (util.isUndefined(url)) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'url'`);
-        }
-        if (!util.isString(url)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'url' property must be a string.`);
-        }
     }
 
     // sets this._center, this._dataframeCenter and this._size
@@ -94,8 +53,7 @@ export default class Grid extends Base {
         return rsys.wToR(x, y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    async requestData () {
-        await this.initializationPromise;
+    requestData () {
         if (this._dataframe) {
             // const newProperties = this._decodeUnboundProperties();
             // this._dataframe.addProperties(newProperties);
@@ -162,8 +120,8 @@ export default class Grid extends Base {
         return coordinates;
     }
 
-    async _getProperties () {
-        await this.initializationPromise;
+    _getProperties () {
+        this.initializationPromise;
         const properties = {};
         const data = this._grid.data;
         for (let i = 0; i < data.length; i++) {
@@ -179,7 +137,7 @@ export default class Grid extends Base {
     //     return features;
     // }
 
-    async _computeMetadata (viz) {
+    _computeMetadata (viz) {
         // const sample = [];
         // this._addNumericColumnField('cartodb_id');
 
@@ -212,7 +170,7 @@ export default class Grid extends Base {
         // const idProperty = 'cartodb_id';
 
         // const property = this._properties['band0'];
-        await this.initializationPromise;
+
         if (this._grid && this._grid.data) {
             const data = this._grid.data;
             for (let i = 0; i < data.length; i++) {

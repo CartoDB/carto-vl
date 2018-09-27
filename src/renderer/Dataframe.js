@@ -154,7 +154,7 @@ export default class Dataframe extends DummyDataframe {
 
     getPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
-           return this.propertyTex[propertyName];
+            return this.propertyTex[propertyName];
         }
         if (this.type === 'grid') {
             return this._getGridPropertyTexture(propertyName);
@@ -178,13 +178,12 @@ export default class Dataframe extends DummyDataframe {
         return this.propertyTex[propertyName];
     }
 
-    async _getGridPropertyTexture (propertyName) {
+    _getGridPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
             return this.propertyTex[propertyName];
         }
 
-        const properties = await this.properties;
-        const propertiesFloat32Array = properties[propertyName];
+        const propertiesFloat32Array = this.properties[propertyName];
         // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
 
