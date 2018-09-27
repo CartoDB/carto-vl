@@ -4,6 +4,8 @@ uniform sampler2D tex;
 
 varying highp vec2 uv;
 
+varying highp vec2 featureIDVar;
+
 void main(void) {
     // FIXME: hardcoded values!
     float scale = 1.0/0.22;
