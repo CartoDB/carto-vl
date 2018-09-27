@@ -3,7 +3,7 @@ import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
-import { castDate } from '../../../utils/util';
+import Util from '../../../utils/util';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -175,7 +175,7 @@ export class Animation extends BaseExpression {
     eval (feature) {
         const input = this._input.eval(feature);
 
-        if (Number.isNaN(input)) {
+        if (Util.isNaN(input)) {
             return 0;
         }
 
@@ -237,7 +237,7 @@ export class Animation extends BaseExpression {
      * @param {Date|number} value - A JavaScript Date object with the new animation time
      */
     setTimestamp (timestamp) {
-        const date = castDate(timestamp);
+        const date = Util.castDate(timestamp);
         const tmin = this._input.min.eval();
         const tmax = this._input.max.eval();
 

@@ -24,6 +24,11 @@ export function isObject (value) {
     return value !== null && (type === 'object' || type === 'function');
 }
 
+export function isNaN (value) {
+    // eslint-disable-next-line
+    return typeof value === 'number' && value !== value;
+}
+
 export function regExpThatContains (text) {
     const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // in case it has special symbols
     return new RegExp(escaped);
@@ -107,6 +112,7 @@ export default {
     isString,
     isNumber,
     isObject,
+    isNaN,
     castDate,
     isSetsEqual,
     equalArrays,

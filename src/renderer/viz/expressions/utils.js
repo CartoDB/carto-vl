@@ -3,6 +3,7 @@ import BaseExpression from './base';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoParsingError from '../../../errors/carto-parsing-error';
 import { interpolateRGBAinCieLAB } from '../colorspaces';
+import Util from '../../../utils/util';
 
 export const DEFAULT = undefined;
 
@@ -199,5 +200,5 @@ export function fract (x) {
 }
 
 function _isNumber (value) {
-    return Number.isFinite(value) || value === Infinity || value === -Infinity || Number.isNaN(value);
+    return Number.isFinite(value) || value === Infinity || value === -Infinity || Util.isNaN(value);
 }

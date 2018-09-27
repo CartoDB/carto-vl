@@ -1,5 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { checkMaxArguments } from '../../utils';
+import Util from '../../../../../utils/util';
 
 /**
  * Return the minimum value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -44,7 +45,7 @@ export default class ViewportMin extends ViewportAggregation {
     accumViewportAgg (feature) {
         const propertyValue = this.property.eval(feature);
 
-        if (!Number.isNaN(propertyValue)) {
+        if (!Util.isNaN(propertyValue)) {
             this._value = Math.min(this._value, propertyValue);
         }
     }
