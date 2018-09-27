@@ -82,8 +82,8 @@ export default class Grid extends Base {
         });
         // extra options
         df.gridSize = this._gridSize;
-        df.width = this._grid.width;
-        df.height = this._grid.height;
+        df.gridWidth = this._grid.width;
+        df.gridHeight = this._grid.height;
 
         return df;
     }

@@ -184,6 +184,8 @@ export default class Dataframe extends DummyDataframe {
         }
 
         const propertiesFloat32Array = this.properties[propertyName];
+
+        console.log(propertiesFloat32Array[0]);
         // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
 
