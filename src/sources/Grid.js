@@ -160,13 +160,12 @@ export default class Grid extends Base {
         return coordinates;
     }
 
-    _getProperties () {
+    async _getProperties () {
+        await this.initializationPromise;
         const properties = {};
-        if (this._grid && this._grid.data) {
-            const data = this._grid.data;
-            for (let i = 0; i <= data.length; i++) {
-                properties[`band${i}`] = data[i];
-            }
+        const data = this._grid.data;
+        for (let i = 0; i < data.length; i++) {
+            properties[`band${i}`] = data[i];
         }
         return properties;
     }
@@ -178,7 +177,7 @@ export default class Grid extends Base {
     //     return features;
     // }
 
-    _computeMetadata (viz) {
+    async _computeMetadata (viz) {
         // const sample = [];
         // this._addNumericColumnField('cartodb_id');
 
@@ -211,10 +210,10 @@ export default class Grid extends Base {
         // const idProperty = 'cartodb_id';
 
         // const property = this._properties['band0'];
-
+        await this.initializationPromise;
         if (this._grid && this._grid.data) {
             const data = this._grid.data;
-            for (let i = 0; i <= data.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 this._addGridProperty(`band${i}`);
             }
         }
@@ -235,7 +234,7 @@ export default class Grid extends Base {
         if (!this._gridFields.has(propertyName)) {
             this._gridFields.add(propertyName);
             this._properties[propertyName] = {
-                type: 'grid',
+                type: 'number',
                 min: Number.POSITIVE_INFINITY,
                 max: Number.NEGATIVE_INFINITY,
                 avg: Number.NaN,
