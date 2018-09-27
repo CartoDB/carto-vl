@@ -89,5 +89,8 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
 
+    shader.gridScale = gl.getUniformLocation(shader.program, 'gridScale');
+    shader.gridOffset = gl.getUniformLocation(shader.program, 'gridOffset');
+
     return shader;
 }
