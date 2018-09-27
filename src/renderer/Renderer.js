@@ -253,19 +253,11 @@ export default class Renderer {
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            if (viz.geometryType === 'grid') {
-                Object.keys(textureId).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE0 + i);
-                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getGridPropertyTexture(name));
-                    gl.uniform1i(textureId[name], i);
-                });
-            } else {
-                Object.keys(textureId).forEach((name, i) => {
-                    gl.activeTexture(gl.TEXTURE0 + i);
-                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
-                    gl.uniform1i(textureId[name], i);
-                });
-            }
+            Object.keys(textureId).forEach((name, i) => {
+                gl.activeTexture(gl.TEXTURE0 + i);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
+                gl.uniform1i(textureId[name], i);
+            });
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
