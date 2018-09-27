@@ -365,6 +365,24 @@ export default class Renderer {
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
+
+            // =====>>>>
+            if (dataframe.type === 'grid') {
+                const propertiesFloat32Array = dataframe.properties['band0'];
+                // Dataframe is already bound to this context, "hot update" it
+
+                dataframe.propertyTex['band0'] = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex['band0']);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+                    10, 10, 0, gl.ALPHA, gl.FLOAT, // TODO: height is used for something else, rename!
+                    propertiesFloat32Array);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+            }
+
             gl.uniform1i(renderer.colorTexture, freeTexUnit);
             freeTexUnit++;
 
