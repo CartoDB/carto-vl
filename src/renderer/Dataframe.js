@@ -193,7 +193,7 @@ export default class Dataframe extends DummyDataframe {
         this.propertyTex[propertyName] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-            this.width, this.height, 0, gl.ALPHA, gl.FLOAT, // TODO: height is used for something else, rename!
+            this.gridWidth, this.gridHeight, 0, gl.ALPHA, gl.FLOAT,
             propertiesFloat32Array);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
