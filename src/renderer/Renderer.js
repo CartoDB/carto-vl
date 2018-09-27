@@ -349,6 +349,13 @@ export default class Renderer {
 
             dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
 
+            if (dataframe.type === 'grid') {
+                const offsetX = this._center.x - (dataframe.center.x - 0.5*dataframe.gridSize.width);
+                const offsetY = this._center.y - (dataframe.center.y - 0.5*dataframe.gridSize.height);
+                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
+                gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
+            }
+
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
             gl.vertexAttribPointer(renderer.vertexPositionAttribute, 2, gl.FLOAT, false, 0, 0);
@@ -458,13 +465,6 @@ export default class Renderer {
             if (dataframe.type === 'line' || dataframe.type === 'polygon') {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
-            }
-
-            if (dataframe.type === 'grid') {
-                const offsetX = this._center.x - (dataframe.center.x - 0.5*dataframe.gridSize.width);
-                const offsetY = this._center.y - (dataframe.center.y - 0.5*dataframe.gridSize.height);
-                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
-                gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
             }
         });
         orderingMins.map((_, orderingIndex) => {
