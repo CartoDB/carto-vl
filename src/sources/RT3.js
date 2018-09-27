@@ -4,7 +4,7 @@ import Base from './Base';
 
 import RT3Consumer from 'rt3-consumer';
 
-const DATAFRAME_MAX_FEATURES = 100 * 1024;
+const DATAFRAME_MAX_FEATURES = 10 * 1024;
 
 export default class RT3 extends Base {
     /**
@@ -81,14 +81,36 @@ export default class RT3 extends Base {
 
             this._addDataframe(dataframe);
 
+            let total = 0;
+            let points = [];
+            let pointsToDelete = [];
+            setInterval(() => {
+                console.log(total);
+                total = 0;
+            }, 1000);
+            setInterval(() => {
+                dataframe.removePoints(pointsToDelete);
+                dataframe.addPoints(points);
+                points = [];
+                pointsToDelete = [];
+                this._dataLoadedCallback();
+            }, 80);
             this._rt3Client.setCallbacks({
                 onSet: point => {
-                    dataframe.addPoint({ lat: point.lat, lng: point.lon }, point.data, point.id);
-                    this._dataLoadedCallback();
+                    console.log(point);
+                    total++;
+                    if (point.lat > 180 || point.lat < -180 || point.lon > 190 || point.lon < -190) {
+                        return;
+                    }
+                    points.push({
+                        lat: point.lat,
+                        lng: point.lon,
+                        properties: point.data,
+                        id: point.id
+                    });
                 },
                 onDelete: point => {
-                    dataframe.removePoint(point.id);
-                    this._dataLoadedCallback();
+                    pointsToDelete.push(point.id);
                 }
             });
 

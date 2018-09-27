@@ -59,13 +59,16 @@
     });
 
     // Define layer and variables for interactivity
-    const source = new carto.source.RT3('ws://10.0.32.102:3333/bicing');
+    const source = new carto.source.RT3('ws://10.0.32.102:3333/birds?api_key=1234');
     const viz = new carto.Viz(`
-      width: $bikes
+      width: $size
       strokeWidth: 1
-      strokeColor: blend(white, red, $status=='CLS')
-      color: ramp($type, bold)
-      @status: $status
+      // strokeColor: blend(white, red, $status=='CLS')
+      // ramp(linear(sin(now()), -1, 1), prism)
+      color: rgba($r, $g, $b, $ttl/100)
+      symbol: image('./bird.png')
+      transform: rotate(-$dir*360/2/3.14)
+      @username: $username
     `);
     const layer = new carto.Layer('layer', source, viz);
 

@@ -213,7 +213,7 @@ export default class Dataframe extends DummyDataframe {
             propertiesFloat32Array);
     }
 
-    addPoint ({lat, lng}, properties, id) {
+    addPoint ({ lat, lng }, properties, id) {
         const index = this._idToIndex[id] === undefined
             ? this._getNewPointIndex()
             : this._idToIndex[id];
@@ -221,12 +221,23 @@ export default class Dataframe extends DummyDataframe {
         const wm = projectToWebMercator({ lat, lng });
         const p = wToR(wm.x, wm.y, { scale: WM_R, center: this.center });
         this._updatePointGeom(index, p.x, p.y);
-        this._updateGeomOnGPU();
         Object.keys(properties).forEach(propertyName => {
             this._updateProperty(propertyName, index, properties[propertyName]);
-            this._updatePropertyOnGPU(propertyName);
         });
     }
+
+    addPoints (points) {
+        points.forEach(point => {
+            this.addPoint(point, point.properties, point.id);
+        });
+        if (points.length) {
+            this._updateGeomOnGPU();
+            Object.keys(points[0].properties).forEach(propertyName => {
+                this._updatePropertyOnGPU(propertyName);
+            });
+        }
+    }
+
     _getNewPointIndex () {
         if (this._freeIndex.length) {
             return this._freeIndex.pop();
@@ -235,13 +246,16 @@ export default class Dataframe extends DummyDataframe {
         this._lastIndex++;
         return index;
     }
-    removePoint (id) {
-        const index = this._idToIndex[id];
-        this.updateGeom(setVertexCallback => {
-            setVertexCallback(index, Number.NaN, Number.NaN);
+    removePoints (IDs) {
+        IDs.forEach(id => {
+            const index = this._idToIndex[id];
+            this._updatePointGeom(index, Number.NaN, Number.NaN);
+            this._freeIndex.push(index);
+            this._idToIndex[id] = undefined;
         });
-        this._freeIndex.push(index);
-        this._idToIndex[id] = undefined;
+        if (IDs) {
+            this._updateGeomOnGPU();
+        }
     }
 
     free () {
