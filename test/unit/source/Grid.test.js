@@ -1,20 +1,41 @@
 import Grid from '../../../src/sources/Grid';
 import Viz from '../../../src/Viz';
 
+import * as GeoTIFF from 'geotiff';
+
 fdescribe('sources/Grid', () => {
-    const urlGeotiff = 'http://127.0.0.1:8080/examples/raster/small_3857.tiff';
+    const tiff = 'http://127.0.0.1:8080/examples/raster/small_3857.tiff';
+
+    let grid;
+
+    beforeEach(function (tiffLoaded) {
+        fetch(tiff)
+            .then(r => r.arrayBuffer())
+            .then(buffer => GeoTIFF.fromArrayBuffer(buffer))
+            .then(tiff => tiff.getImage())
+            .then(image => {
+                image.readRasters().then(data => {
+                    grid = {
+                        data,
+                        bbox: image.getBoundingBox(),
+                        width: image.getWidth(),
+                        height: image.getHeight()
+                    };
+                    tiffLoaded();
+                });
+            });
+    });
 
     describe('constructor', () => {
         it('should build a new Source with an URL', async () => {
-            const source = new Grid(urlGeotiff);
+            const source = new Grid(grid);
             await source.initializationPromise;
 
             expect(source._grid).toBeTruthy();
         });
 
         it('should get coordinates from new Source', async () => {
-            const source = new Grid(urlGeotiff);
-            await source.initializationPromise;
+            const source = new Grid(grid);
 
             expect(source._center).toBeDefined();
             expect(source._center.x).toBe(-419334.36645);
@@ -30,10 +51,10 @@ fdescribe('sources/Grid', () => {
             });
         });
     });
+
     describe('dataframe', () => {
         it('should build a DataFrame', async () => {
-            const source = new Grid(urlGeotiff);
-            await source.initializationPromise;
+            const source = new Grid(grid);
 
             const dataframe = source._buildDataFrame();
 
@@ -41,8 +62,7 @@ fdescribe('sources/Grid', () => {
         });
 
         it('should build a DataFrame with one property per band', async () => {
-            const source = new Grid(urlGeotiff);
-            await source.initializationPromise;
+            const source = new Grid(grid);
 
             const dataframe = source._buildDataFrame();
 
@@ -52,15 +72,14 @@ fdescribe('sources/Grid', () => {
         });
 
         it('should build Metadata from a viz', async () => {
-            const source = new Grid(urlGeotiff);
-            await source.initializationPromise;
+            const source = new Grid(grid);
 
             const metadata = source._computeMetadata(new Viz());
             expect(source._metadata).toBe(metadata);
 
             expect(metadata).toBeTruthy();
             expect(metadata.properties['band0']).toBeTruthy();
-            expect(metadata.properties['band0'].type).toBe('grid');
+            expect(metadata.properties['band0'].type).toBe('number');
         });
     });
 });
