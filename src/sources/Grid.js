@@ -37,7 +37,7 @@ export default class Grid extends Base {
 
     async _initializeRasterDataset (url) {
         this._grid = await this._loadFrom(url);
-        this._setCoordinatesCenter();
+        this._setCoordinates();
     }
 
     async _loadFrom (url) {
@@ -71,17 +71,27 @@ export default class Grid extends Base {
         }
     }
 
-    // sets this._center, this._dataframeCenter
-    _setCoordinatesCenter () {
+    // sets this._center, this._dataframeCenter and this._size
+    _setCoordinates () {
         // TODO Asuming the raster is already in WebMercator
         const [xmin, ymin, xmax, ymax] = this._grid.bbox;
-        const x = (xmin + xmax) / 2.0;
-        const y = (ymin + ymax) / 2.0;
+        this._center = {
+            x: (xmin + xmax) / 2.0,
+            y: (ymin + ymax) / 2.0
+        };
 
-        this._center = { x, y };
-        this._dataframeCenter = rsys.wToR(
-            this._center.x, this._center.y,
-            { scale: util.WM_R, center: { x: 0, y: 0 } });
+        this._dataframeCenter = this._webMercatorToR(this._center.x, this._center.y);
+
+        const lowerLeft = this._webMercatorToR(xmin, ymin);
+        const upperRight = this._webMercatorToR(xmax, ymax);
+        this._gridSize = {
+            width: upperRight.x - lowerLeft.x,
+            height: upperRight.y - lowerLeft.y
+        };
+    }
+
+    _webMercatorToR (x, y) {
+        return rsys.wToR(x, y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
     requestData () {
@@ -104,6 +114,7 @@ export default class Grid extends Base {
         return new Dataframe({
             active: true,
             center: this._dataframeCenter,
+            gridSize: this._gridSize,
             geom: this._getGeometry(),
             properties: this._getProperties(),
             scale: 1,
@@ -226,7 +237,7 @@ export default class Grid extends Base {
                 avg: Number.NaN,
                 sum: 0,
                 count: 0
-            };
+            }; // TODO metadata stats
         }
     }
 
