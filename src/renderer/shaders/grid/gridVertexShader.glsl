@@ -13,5 +13,5 @@ varying highp vec2 featureIDVar;
 void main(void) {
     featureIDVar = abs(featureID);
     uv = vertexPosition;
-    gl_Position = vec4(vertexPosition*gridScale + gridOffset, 0.5, 1.);
+    gl_Position = vec4(vertexPosition*gridScale - gridOffset, 0.5, 1.);
 }

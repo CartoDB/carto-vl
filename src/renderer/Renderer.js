@@ -451,8 +451,10 @@ export default class Renderer {
             }
 
             if (dataframe.type === 'grid') {
-                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width, dataframe.gridSize.height);
-                gl.uniform2f(renderer.gridOffset, dataframe.center.x - 0.5*dataframe.gridSize.width, dataframe.center.y - 0.5*dataframe.gridSize.height);
+                const offsetX = this._center.x - (dataframe.center.x - 0.5*dataframe.gridSize.width);
+                const offsetY = this._center.y - (dataframe.center.y - 0.5*dataframe.gridSize.height);
+                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
+                gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
             }
         });
         orderingMins.map((_, orderingIndex) => {
