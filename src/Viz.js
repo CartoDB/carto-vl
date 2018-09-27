@@ -357,9 +357,7 @@ export default class Viz {
                 { transform: this.transform }, this);
         }
         if (!this._geomType || this._geomType === 'grid') {
-            this.gridShader = compileShader(gl,
-                { vertexShader: gridVertexShaderGLSL, fragmentShader: gridFragmentShaderGLSL },
-                { transform: this.transform }, this);
+            this.gridShader = compileShader(gl, shaders.grid, { transform: this.transform }, this);
         }
     }
 

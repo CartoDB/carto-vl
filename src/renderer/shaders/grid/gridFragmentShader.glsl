@@ -10,6 +10,6 @@ void main(void) {
     float offset = 0.0;
 
     // use single band texture as gray level
-    float value = scale*(texture2d(tex, uv).a - offset);
-    gl_FragColor = vec4(value, value, value, 0);
+    float value = scale*(texture2D(tex, uv).a - offset);
+    gl_FragColor = vec4(value, value, value, 1);
 }

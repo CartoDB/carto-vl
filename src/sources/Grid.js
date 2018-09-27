@@ -94,7 +94,8 @@ export default class Grid extends Base {
         return rsys.wToR(x, y, { scale: util.WM_R, center: { x: 0, y: 0 } });
     }
 
-    requestData () {
+    async requestData () {
+        await this.initializationPromise;
         if (this._dataframe) {
             // const newProperties = this._decodeUnboundProperties();
             // this._dataframe.addProperties(newProperties);

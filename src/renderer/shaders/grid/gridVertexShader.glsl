@@ -9,5 +9,5 @@ varying highp vec2 uv;
 
 void main(void) {
     uv = vertexPosition;
-    gl_position = vertexPosition*gridScale + gridOffset;
+    gl_Position = vec4(vertexPosition*gridScale + gridOffset, 0.5, 1.);
 }
