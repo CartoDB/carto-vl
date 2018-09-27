@@ -197,7 +197,7 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-export const IsNaN = genUnaryOp('isNaN', x => Util.isNaN(x) ? 1 : 0, x => `((${x} <= 0.0 || 0.0 <= ${x}) ? 0. : 1.)`);
+export const IsNaN = genUnaryOp('isNaN', x => Util.isNaN(x) ? 1 : 0, x => `((${x} < 0.0 || 0.0 < ${x} || ${x} == 0.0) ? 0. : 1.`);
 
 /**
  * Compute the logical negation of the given expression.
