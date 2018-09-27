@@ -450,11 +450,10 @@ export default class Renderer {
                 gl.disable(gl.DEPTH_TEST);
             }
 
-            // FIXME: if we stop shaaring the symbolizer uniforms:
-            // if (dataframe.type === 'grid') {
-            //     gl.uniform2f(renderer.vertexScale, dataframe.vertexScaleX??, dataframe.vertexScaleY??);
-            //     gl.uniform2f(renderer.vertexOffset, dataframe.vertexOffsetX??, dataframe.vertexOffsetY??);
-            // }
+            if (dataframe.type === 'grid') {
+                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width, dataframe.gridSize.height);
+                gl.uniform2f(renderer.gridOffset, dataframe.center.x - 0.5*dataframe.gridSize.width, dataframe.center.y - 0.5*dataframe.gridSize.height);
+            }
         });
         orderingMins.map((_, orderingIndex) => {
             renderDrawPass(orderingIndex);
