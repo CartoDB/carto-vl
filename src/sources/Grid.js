@@ -167,7 +167,7 @@ export default class Grid extends Base {
         const properties = {};
         const data = this._grid.data;
         for (let i = 0; i < data.length; i++) {
-            properties[`band${i}`] = data[i];
+            properties[`band${i}`] = new Float32Array(data[i]);
         }
         return properties;
     }
