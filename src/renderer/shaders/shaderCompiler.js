@@ -23,6 +23,10 @@ export function compileShader (gl, template, expressions, viz) {
         // Note: for single grid feature we'd need to change the abs(featureID) to the uv coordinates corresponding to each triangle vertex
         // for feature-per-pixel grids, this could work as is by using uv as the featureID
         // but, to be precise, the uv coordinates should vary per vertex, not per feature.
+        // if (isGridShader(template)) {
+        //     return `texture2D(propertyTex${tid[name]}, uv).a`;
+        // }
+
         return `texture2D(propertyTex${tid[name]}, abs(featureID)).a`;
     };
 

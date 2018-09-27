@@ -11,7 +11,10 @@ attribute vec2 featureID;
 varying highp vec2 featureIDVar;
 
 void main(void) {
+    // WebGL complains if we don't reference and use featureID
     featureIDVar = abs(featureID);
-    uv = vertexPosition;
+
+    // The order of the grid pixels is from N to S => we must flip the v coordinate
+    uv = vec2(vertexPosition[0], 1.0 - vertexPosition[1]);
     gl_Position = vec4(vertexPosition*gridScale - gridOffset, 0.5, 1.);
 }

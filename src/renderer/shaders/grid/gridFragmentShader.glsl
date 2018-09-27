@@ -14,5 +14,4 @@ void main(void) {
     // use single band texture as gray level
     float value = scale*(texture2D(propertyTex0, uv).a - offset);
     gl_FragColor = vec4(value, value, value, 1.0);
-    // gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
 }
