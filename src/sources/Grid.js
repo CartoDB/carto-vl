@@ -112,10 +112,9 @@ export default class Grid extends Base {
     }
 
     _buildDataFrame () {
-        return new Dataframe({
+        let df = new Dataframe({
             active: true,
             center: this._dataframeCenter,
-            gridSize: this._gridSize,
             geom: this._getGeometry(),
             properties: this._getProperties(),
             scale: 1,
@@ -123,6 +122,10 @@ export default class Grid extends Base {
             type: 'grid',
             metadata: this._metadata
         });
+        // extra options
+        df.gridSize = this._gridSize;
+
+        return df;
     }
 
     bindLayer (addDataframe, dataLoadedCallback) {
