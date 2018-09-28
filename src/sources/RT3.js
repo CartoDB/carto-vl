@@ -97,7 +97,6 @@ export default class RT3 extends Base {
             }, 80);
             this._rt3Client.setCallbacks({
                 onSet: point => {
-                    console.log(point);
                     total++;
                     if (point.lat > 180 || point.lat < -180 || point.lon > 190 || point.lon < -190) {
                         return;
