@@ -59,6 +59,11 @@
             </li>
             <li>
               <label>
+                <input type="radio" name="style" onclick="setWithOpacity()">
+                With opacity</label>
+            </li>
+            <li>
+              <label>
                 <input type="radio" name="style" onclick="setLinearRed()">
                 Ramp + linear
               </label>
@@ -135,6 +140,11 @@
 
     function setGrays() {
       const expr = 'ramp(linear($band0, 15, 35), [#000000, #ffffff])';
+      viz.color.blendTo(expr);
+    }
+
+    function setWithOpacity() {
+      const expr = 'opacity(hsl(0, 0, ($band0 - 15) / 35), 0.5)';
       viz.color.blendTo(expr);
     }
 
