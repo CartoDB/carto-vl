@@ -157,8 +157,7 @@ export default class Dataframe extends DummyDataframe {
             return this.propertyTex[propertyName];
         }
         if (this.type === 'grid') {
-            return;
-            // return this._getGridPropertyTexture(propertyName);
+            return this.getGridPropertyTexture(propertyName);
         }
         const propertiesFloat32Array = this.properties[propertyName];
         // Dataframe is already bound to this context, "hot update" it
