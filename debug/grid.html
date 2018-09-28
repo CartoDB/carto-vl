@@ -67,7 +67,9 @@
             };
 
             const sourceg = new carto.source.Grid(grid);
-            const vizg = new carto.Viz();
+            const vizg = new carto.Viz(`
+              color: opacity(hsl(0.3, 1, 4*$band0), 0.5)
+            `);
             const layerg = new carto.Layer('grid', sourceg, vizg);
             layerg.addTo(map, 'watername_ocean');
           });
