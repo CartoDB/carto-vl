@@ -438,6 +438,7 @@ export default class Layer {
      */
     _onDataLoaded () {
         this._state = 'dataLoaded';
+        this._fireUpdateOnNextRender = true;
         this._needRefresh();
     }
 

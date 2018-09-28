@@ -251,7 +251,7 @@ export default class Dataframe extends DummyDataframe {
             const index = this._idToIndex[id];
             this._updatePointGeom(index, Number.NaN, Number.NaN);
             this._freeIndex.push(index);
-            this._idToIndex[id] = undefined;
+            delete this._idToIndex[id];
         });
         if (IDs) {
             this._updateGeomOnGPU();

@@ -85,7 +85,6 @@ export default class RT3 extends Base {
             let points = [];
             let pointsToDelete = [];
             setInterval(() => {
-                console.log(total);
                 total = 0;
             }, 1000);
             setInterval(() => {
@@ -101,6 +100,7 @@ export default class RT3 extends Base {
                     if (point.lat > 180 || point.lat < -180 || point.lon > 190 || point.lon < -190) {
                         return;
                     }
+                    point.data.id = point.id;
                     points.push({
                         lat: point.lat,
                         lng: point.lon,
