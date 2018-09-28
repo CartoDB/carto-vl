@@ -354,6 +354,13 @@ export default class Renderer {
                 const offsetY = this._center.y - (dataframe.center.y - 0.5*dataframe.gridSize.height);
                 gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
                 gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
+
+                // grid is a hybrid styling-geometry shader and we need to prepare the
+                // uniforms used in the expressions
+                const textureId = renderer.textureIds.get(viz);
+                drawMetadata.freeTexUnit = Object.keys(textureId).length;
+                viz.color._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.color._preDraw(renderer.program, drawMetadata, gl);
             }
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
@@ -373,8 +380,8 @@ export default class Renderer {
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
 
-            // =====>>>>
             if (dataframe.type === 'grid') {
+
                 const propertiesFloat32Array = dataframe.properties['band0'];
                 // Dataframe is already bound to this context, "hot update" it
 

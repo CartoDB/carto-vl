@@ -68,8 +68,7 @@
 
             const sourceg = new carto.source.Grid(grid);
             const vizg = new carto.Viz(`
-              // color: opacity(hsl(0, 1, $band0),0.2)
-              color: hsl(constant(0.2), constant(1), constant(4)*$band0)
+               color: opacity(hsl(0.3, 1, 4*$band0), 0.5)
             `);
             const layerg = new carto.Layer('grid', sourceg, vizg);
             layerg.addTo(map, 'watername_ocean');
