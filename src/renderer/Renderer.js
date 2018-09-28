@@ -253,11 +253,13 @@ export default class Renderer {
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            Object.keys(textureId).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
-                gl.uniform1i(textureId[name], i);
-            });
+            if (dataframe.type !== 'grid') {
+                Object.keys(textureId).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], i);
+                });
+            }
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
@@ -381,20 +383,13 @@ export default class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
 
             if (dataframe.type === 'grid') {
-
-                const propertiesFloat32Array = dataframe.properties['band0'];
-                // Dataframe is already bound to this context, "hot update" it
-
-                dataframe.propertyTex['band0'] = gl.createTexture();
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.propertyTex['band0']);
-                gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-                    dataframe.gridWidth, dataframe.gridHeight, 0, gl.ALPHA, gl.FLOAT,
-                    propertiesFloat32Array);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
+                const textureId = renderer.textureIds.get(viz);
+                Object.keys(textureId).forEach(name => {
+                    // gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getGridPropertyTexture(name));
+                    // gl.uniform1i(textureId[name], freeTexUnit);
+                    // freeTexUnit++;
+                });
             }
 
             gl.uniform1i(renderer.colorTexture, freeTexUnit);

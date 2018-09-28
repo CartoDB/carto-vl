@@ -19,7 +19,6 @@ function isGridShader(template) {
 }
 
 export function compileShader (gl, template, expressions, viz) {
-    const isGrid = isGridShader(template);
     let tid = {};
     const getPropertyAccessCode = name => {
         if (tid[name] === undefined) {
@@ -46,7 +45,6 @@ export function compileShader (gl, template, expressions, viz) {
         codes[exprName + '_preface'] = exprCodes.preface;
         codes[exprName + '_inline'] = exprCodes.inline;
     });
-
 
     codes.propertyPreface = Object.keys(tid).map(name => `uniform sampler2D propertyTex${tid[name]};`).join('\n');
 

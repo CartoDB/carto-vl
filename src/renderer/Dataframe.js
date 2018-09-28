@@ -157,7 +157,6 @@ export default class Dataframe extends DummyDataframe {
             return this.propertyTex[propertyName];
         }
         if (this.type === 'grid') {
-            return;
             // return this._getGridPropertyTexture(propertyName);
         }
         const propertiesFloat32Array = this.properties[propertyName];
@@ -179,14 +178,13 @@ export default class Dataframe extends DummyDataframe {
         return this.propertyTex[propertyName];
     }
 
-    _getGridPropertyTexture (propertyName) {
+    getGridPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
             return this.propertyTex[propertyName];
         }
 
         const propertiesFloat32Array = this.properties[propertyName];
 
-        console.log(propertiesFloat32Array[0]);
         // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
 
@@ -197,8 +195,12 @@ export default class Dataframe extends DummyDataframe {
             propertiesFloat32Array);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+        // We can't use gl.LINEAR with ALPHA (or LUMINANCE) textures;
+        // we'd need to use a RGBA texture instead (and wast 3 components);
+        // So we use gl.NEAREST instead at the moment
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         // TODO: pad the property to a power of 2 size in both dimensions, then
         // use MIPMAP in the MAG FILTER and do this to activate it:
         // gl.generateMipMap...
