@@ -357,6 +357,8 @@ export default class Renderer {
                 gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
                 gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
 
+
+
                 // grid is a hybrid styling-geometry shader and we need to prepare the
                 // uniforms used in the expressions
                 const textureId = renderer.textureIds.get(viz);
@@ -385,10 +387,10 @@ export default class Renderer {
             if (dataframe.type === 'grid') {
                 const textureId = renderer.textureIds.get(viz);
                 Object.keys(textureId).forEach(name => {
-                    // gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                     gl.bindTexture(gl.TEXTURE_2D, dataframe.getGridPropertyTexture(name));
-                    // gl.uniform1i(textureId[name], freeTexUnit);
-                    // freeTexUnit++;
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
                 });
             }
 

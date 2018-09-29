@@ -109,7 +109,13 @@
         const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 150, 200);
         const sourceg = new carto.source.Grid(grid)
         const vizg = new carto.Viz(`
-          color: hsv(0, 0, $band1/100);
+          // color: hsv($band0/100, 1, $band1/100);
+          // color: hsv(0, 0, sqrt($band1/100));
+          // color: rgb((sqrt($band1/100)>0.5)*255, 255-$band2*255/100, $band2*255/100);
+          //color: rgb((sqrt($band1/100)>0.5)*255, 0, 0);
+          // color: rgb(0, 255-$band2*255/100, $band2*255/100);
+          color: rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100, $band2*255/100);
+          // color: hsv(0, 0, sqrt($band1/100)>0.5);
         `);
         const layerg = new carto.Layer('grid', sourceg, vizg);
         layerg.addTo(map, 'watername_ocean');
