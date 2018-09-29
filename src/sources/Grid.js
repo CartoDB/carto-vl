@@ -11,6 +11,54 @@ import schema from '../renderer/schema';
 
 const DEFAULT_SRID = 3857;
 const SUPPORTED_SRIDS = [3857, 4326];
+const WM_LAT_LIMIT = 85.051128779806592;
+
+function adjustGrid (grid) {
+    grid.srid = grid.srid || DEFAULT_SRID;
+    if (!SUPPORTED_SRIDS.includes(grid.srid)) {
+        throw new Error(`Unsupported grid srid ${grid.srid}`);
+    }
+    let [xmin, ymin, xmax, ymax] = grid.bbox;
+    if (grid.srid === 4326 && (ymin < -WM_LAT_LIMIT || ymax > WM_LAT_LIMIT)) {
+        if (ymax < -WM_LAT_LIMIT || ymin > WM_LAT_LIMIT) {
+            throw new Error(`Grid is completely out of Web-Mercator area`);
+        }
+
+        // The grid must be cropped vertically and an offset.
+        // TODO: it would be more efficient
+        // (and more precise, since it avoids whole pixel cropping)
+        // to retain the original band data and use some offset
+        // to access pixels (or perhaps to compute UV coordinates)
+        let height = grid.height;
+        const width = grid.width;
+        const pixelHeight = (ymax - ymin) / height;
+        let firstRow = 0;
+        let lastRow = height - 1;
+
+        if (ymax > WM_LAT_LIMIT) {
+            const n = Math.ceil((ymax - WM_LAT_LIMIT)/pixelHeight);
+            // remove n rows from the top (N) of the grid
+            firstRow += n;
+            height -= n;
+            ymax -= n*pixelHeight;
+        }
+        if (ymin < -WM_LAT_LIMIT) {
+            const n = Math.ceil((-ymin - WM_LAT_LIMIT)/pixelHeight);
+            // remove n rows from the bottom (S) of the grid
+            lastRow -= n;
+            height -= n;
+            ymin += n*pixelHeight;
+        }
+        grid = {
+            srid: grid.srid,
+            bbox: [xmin, ymin, xmax, ymax],
+            width,
+            height,
+            data: grid.data.map(band => band.slice(firstRow*width, (lastRow+1)*width))
+        }
+    }
+    return grid;
+}
 
 export default class Grid extends Base {
     /**
@@ -27,22 +75,17 @@ export default class Grid extends Base {
      */
     constructor (grid) {
         super();
-        this._grid = grid;
+        this._grid = adjustGrid(grid);
         this._gridFields = new Set();
         this._properties = {};
         this._setCoordinates();
     }
 
-
-
-
     // sets this._center, this._dataframeCenter and this._size
     _setCoordinates () {
-        this._srid = this._grid.srid || DEFAULT_SRID;
-        if (!SUPPORTED_SRIDS.includes(this._srid)) {
-            throw new Error(`Unsupported grid srid ${this._srid}`);
-        }
+        this._srid = this._grid.srid;
         const [xmin, ymin, xmax, ymax] = this._grid.bbox;
+
         this._sridBounds =  {
             xMin: xmin,
             yMin: ymin,
@@ -95,7 +138,6 @@ export default class Grid extends Base {
             return;
         }
         const dataframe = this._buildDataFrame();
-        console.log(dataframe);
         // this._boundBands = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
