@@ -5,7 +5,7 @@ import Metadata from '../renderer/Metadata';
 // import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
-// import schema from '../renderer/schema';
+import schema from '../renderer/schema';
 
 // const SAMPLE_TARGET_SIZE = 1000;
 
@@ -130,13 +130,22 @@ export default class Grid extends Base {
         return Float32Array(band);
     }
 
+    _getPropertyIndex(name) {
+        const match = name.match(/^band(\d+)$/);
+        if (!match) {
+            throw new Error(`Property name "${name}" is not a valid Grid band name`);
+        }
+        return Number(match[1]);
+    }
+
     _getProperties () {
         this.initializationPromise;
         const properties = {};
         const data = this._grid.data;
-        for (let i = 0; i < data.length; i++) {
+        Object.keys(this._metadata.properties).forEach(name => {
+            const i = this._getPropertyIndex(name);
             properties[`band${i}`] = this._adaptDataBand(data[i]);
-        }
+        });
         return properties;
     }
 
@@ -183,8 +192,12 @@ export default class Grid extends Base {
 
         if (this._grid && this._grid.data) {
             const data = this._grid.data;
+            const requiredColumns = new Set(Object.keys(schema.simplify(viz.getMinimumNeededSchema())));
             for (let i = 0; i < data.length; i++) {
-                this._addGridProperty(`band${i}`);
+                const propName = `band${i}`;
+                if (requiredColumns.has(propName)) {
+                    this._addGridProperty(`band${i}`);
+                }
             }
         }
 
