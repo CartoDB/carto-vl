@@ -357,6 +357,14 @@ export default class Renderer {
                 gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
                 gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
 
+                if (dataframe.gridSRID === 4326) {
+                    // Set up uniforms with parameters for grid transformation
+                    gl.uniform1f(renderer.gMinWM, dataframe.gridBoundsWM.yMin);
+                    gl.uniform1f(renderer.gMaxWM, dataframe.gridBoundsWM.yMax);
+                    gl.uniform1f(renderer.gMinLL, dataframe.gridBounds.yMin);
+                    gl.uniform1f(renderer.gMaxLL, dataframe.gridBounds.yMax);
+                }
+
 
 
                 // grid is a hybrid styling-geometry shader and we need to prepare the

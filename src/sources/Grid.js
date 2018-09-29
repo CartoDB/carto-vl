@@ -9,6 +9,9 @@ import schema from '../renderer/schema';
 
 // const SAMPLE_TARGET_SIZE = 1000;
 
+const DEFAULT_SRID = 3857;
+const SUPPORTED_SRIDS = [3857, 4326];
+
 export default class Grid extends Base {
     /**
      * Create a carto.source.Grid source from a GeoTIFF file
@@ -30,19 +33,40 @@ export default class Grid extends Base {
         this._setCoordinates();
     }
 
+
+
+
     // sets this._center, this._dataframeCenter and this._size
     _setCoordinates () {
-        // TODO Asuming the raster is already in WebMercator
+        this._srid = this._grid.srid || DEFAULT_SRID;
+        if (!SUPPORTED_SRIDS.includes(this._srid)) {
+            throw new Error(`Unsupported grid srid ${this._srid}`);
+        }
         const [xmin, ymin, xmax, ymax] = this._grid.bbox;
+        this._sridBounds =  {
+            xMin: xmin,
+            yMin: ymin,
+            xMax: xmax,
+            yMax: ymax
+        };
+        const [wmXmin, wmYmin] = this._webMercator(xmin, ymin);
+        const [wmXmax, wmYmax] = this._webMercator(xmax, ymax);
+        this._wmBounds =  {
+            xMin: wmXmin,
+            yMin: wmYmin,
+            xMax: wmXmax,
+            yMax: wmYmax
+        };
+
         this._center = {
-            x: (xmin + xmax) / 2.0,
-            y: (ymin + ymax) / 2.0
+            x: (wmXmin + wmXmax) / 2.0,
+            y: (wmYmin + wmYmax) / 2.0
         };
 
         this._dataframeCenter = this._webMercatorToR(this._center.x, this._center.y);
 
-        const lowerLeft = this._webMercatorToR(xmin, ymin);
-        const upperRight = this._webMercatorToR(xmax, ymax);
+        const lowerLeft = this._webMercatorToR(wmXmin, wmYmin);
+        const upperRight = this._webMercatorToR(wmXmax, wmYmax);
         this._gridSize = {
             width: upperRight.x - lowerLeft.x,
             height: upperRight.y - lowerLeft.y
@@ -51,6 +75,14 @@ export default class Grid extends Base {
 
     _webMercatorToR (x, y) {
         return rsys.wToR(x, y, { scale: util.WM_R, center: { x: 0, y: 0 } });
+    }
+
+    _webMercator (x, y) {
+        if (this._srid === 4326) {
+            const wm = util.projectToWebMercator({ lng: x, lat: y});
+            return [wm.x, wm.y];
+        }
+        return [x, y];
     }
 
     requestData () {
@@ -63,6 +95,7 @@ export default class Grid extends Base {
             return;
         }
         const dataframe = this._buildDataFrame();
+        console.log(dataframe);
         // this._boundBands = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
@@ -84,7 +117,9 @@ export default class Grid extends Base {
         df.gridSize = this._gridSize;
         df.gridWidth = this._grid.width;
         df.gridHeight = this._grid.height;
-
+        df.gridSRID = this._srid;
+        df.gridBounds = this._sridBounds;
+        df.gridBoundsWM = this._wmBounds;
         return df;
     }
 
@@ -144,7 +179,7 @@ export default class Grid extends Base {
         const data = this._grid.data;
         Object.keys(this._metadata.properties).forEach(name => {
             const i = this._getPropertyIndex(name);
-            properties[`band${i}`] = this._adaptDataBand(data[i]);
+            properties[name] = this._adaptDataBand(data[i]);
         });
         return properties;
     }
@@ -222,7 +257,8 @@ export default class Grid extends Base {
                 max: Number.NEGATIVE_INFINITY,
                 avg: Number.NaN,
                 sum: 0,
-                count: 0
+                count: 0,
+                isLngLat: this._srid === 4326
             }; // TODO metadata stats
         }
     }
