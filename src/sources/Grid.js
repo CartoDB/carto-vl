@@ -127,7 +127,7 @@ export default class Grid extends Base {
         if (band instanceof Float32Array) {
             return band;
         }
-        return Float32Array(band);
+        return new Float32Array(band);
     }
 
     _getPropertyIndex(name) {
