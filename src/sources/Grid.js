@@ -120,12 +120,22 @@ export default class Grid extends Base {
         return coordinates;
     }
 
+    _adaptDataBand(band) {
+        // TODO:
+        // here we could convert the band to 4 components (RGBA) is LINEAR filtering is desired,
+        // and pad the band to power of two dimensions to use MIP mapping.
+        if (band instanceof Float32Array) {
+            return band;
+        }
+        return Float32Array(band);
+    }
+
     _getProperties () {
         this.initializationPromise;
         const properties = {};
         const data = this._grid.data;
         for (let i = 0; i < data.length; i++) {
-            properties[`band${i}`] = new Float32Array(data[i]);
+            properties[`band${i}`] = this._adaptDataBand(data[i]);
         }
         return properties;
     }
