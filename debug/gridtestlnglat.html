@@ -62,25 +62,14 @@
 
     function genGrid(x0, y0, x1, y1, width, height) {
         bands = [];
-        const i0 = Math.floor(width/2);
-        const j0 = Math.floor(height/2);
-        const max = 100.0
         bands.push(genBand(width, height, (i, j) => {
-          // Band0: Saddle
-          const x = (i - i0)/i0;
-          const y = (j - j0)/j0;
-          return max*((Math.pow(x,3)-3*x*Math.pow(y,2))/4+0.5);
+          // Band0: stripes
+          return j % 2;
         }));
         const r = Math.min(width,height)*3/4;
         bands.push(genBand(width, height, (i, j) => {
-          // Band1: Mountain
-          const x = (i - i0)*2/r;
-          const y = (j - j0)*2/r;
-          return max*(Math.exp(-Math.pow(x,2)-Math.pow(y,2)));
-        }));
-        bands.push(genBand(width, height, (i, j) => {
-          // Band2: Ramp
-          return max*(i/width + j/height)/2;
+          // Band1: checkboard
+          return (i % 2) ^ (j % 2);
         }));
 
         return {
@@ -104,19 +93,12 @@
     }
 
     map.on('load', () => {
-        const sw = projectToWebMercator({ lng: -10, lat: 20 });
-        const ne = projectToWebMercator({ lng: 10, lat: 50 });
-        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 150, 200);
+        const sw = projectToWebMercator({ lng: -50, lat: 0 });
+        const ne = projectToWebMercator({ lng: 50, lat: 84 });
+        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20);
         const sourceg = new carto.source.Grid(grid)
         const vizg = new carto.Viz(`
-          // color: hsv($band0/100, 1, $band1/100);
-          // color: hsv(0, 0, sqrt($band1/100));
-          // color: rgb((sqrt($band1/100)>0.5)*255, 255-$band2*255/100, $band2*255/100);
-          //color: rgb((sqrt($band1/100)>0.5)*255, 0, 0);
-          // color: rgb(0, 255-$band2*255/100, $band2*255/100);
-          // color: rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100, $band2*255/100);
-          // color: hsv(0, 0, sqrt($band1/100)>0.5);
-          color: opacity(rgb((sqrt($band1/100))*255,  255-$band2*255/100, $band0*255/100*(1-$band1/100)),0.5);
+          color: hsv(0, 0, $band1);
         `);
         const layerg = new carto.Layer('grid', sourceg, vizg);
         layerg.addTo(map, 'watername_ocean');
