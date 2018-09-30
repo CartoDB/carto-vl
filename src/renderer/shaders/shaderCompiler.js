@@ -33,10 +33,6 @@ export function compileShader (gl, template, expressions, viz) {
             return `texture2D(propertyTex${tid[name]}, ${uv}).a`;
         }
 
-        if (isGridShader(template)) {
-            return `texture2D(propertyTex${tid[name]}, uv).a`;
-        }
-
         return `texture2D(propertyTex${tid[name]}, abs(featureID)).a`;
     };
 
