@@ -60,7 +60,7 @@
         return band;
     }
 
-    function genGrid(x0, y0, x1, y1, width, height) {
+    function genGrid(x0, y0, x1, y1, width, height, srid) {
         bands = [];
         bands.push(genBand(width, height, (i, j) => {
           // Band0: stripes
@@ -76,7 +76,8 @@
           data: bands,
           bbox: [x0, y0, x1, y1],
           width: width,
-          height: height
+          height: height,
+          srid
         };
     }
 
@@ -93,9 +94,12 @@
     }
 
     map.on('load', () => {
-        const sw = projectToWebMercator({ lng: -50, lat: 0 });
-        const ne = projectToWebMercator({ lng: 50, lat: 84 });
-        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20);
+        // const sw = projectToWebMercator({ lng: -50, lat: 0 });
+        // const ne = projectToWebMercator({ lng: 50, lat: 84 });
+        const sw = { x: -50, y: 0 };
+        const ne = { x: 50, y: 84 };
+        // const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20);
+        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20, 4326);
         const sourceg = new carto.source.Grid(grid)
         const vizg = new carto.Viz(`
           color: hsv(0, 0, $band1);

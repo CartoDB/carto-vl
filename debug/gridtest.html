@@ -10,6 +10,8 @@
   <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
   <script src="https://unpkg.com/geotiff@latest/dist/geotiff.bundle.min.js"></script>
 
+  <link href='../examples/style.css' rel='stylesheet' />
+
   <style>
     body {
       margin: 0;
@@ -21,27 +23,43 @@
       height: 100%;
       width: 100%;
     }
-
-    #timer {
-      position: absolute;
-      top: '20px';
-      left: '20px';
-      color: white;
-      font-family: Arial;
-      font-size: 20pt;
-    }
   </style>
 </head>
 
 <body>
   <div id="map"></div>
-  <div id="timer"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Color expressions</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <ul>
+            <li>
+              <label>
+                <input type="button" name="style" onclick="prevExpr()" checked>
+                Prev</label>
+            </li>
+            <li>
+              <label>
+                <input type="button" name="style" onclick="nextExpr()">
+                Next</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 30],
-      zoom: 1,
+      center: [20, 35],
+      zoom: 3,
       dragRotate: false
     });
 
@@ -60,7 +78,7 @@
         return band;
     }
 
-    function genGrid(x0, y0, x1, y1, width, height) {
+    function genGrid(x0, y0, x1, y1, width, height, srid) {
         bands = [];
         const i0 = Math.floor(width/2);
         const j0 = Math.floor(height/2);
@@ -82,12 +100,22 @@
           // Band2: Ramp
           return max*(i/width + j/height)/2;
         }));
+        const n = 20; // pixels per stripe/square
+        bands.push(genBand(width, height, (i, j) => {
+          // Band3: stripes
+          return Math.floor(j/n) % 2;
+        }));
+        bands.push(genBand(width, height, (i, j) => {
+          // Band4: checkboard
+          return (Math.floor(i/n) % 2) ^ (Math.floor(j/n) % 2);
+        }));
 
         return {
           data: bands,
           bbox: [x0, y0, x1, y1],
           width: width,
-          height: height
+          height: height,
+          srid
         };
     }
 
@@ -103,25 +131,68 @@
         };
     }
 
+    const expressions = [
+        'hsv($band0/100, $band1/100, $band2/100 + 0*$band3 + 0*$band4)',
+        'hsv($band0/100, 1, $band1/100)',
+        'hsv(1-$band0/100, 1, $band1/100)',
+        'hsv($band0/100, 1, 1-$band1/100)',
+        'hsv(1-$band0/100, 1, 1-$band1/100)',
+        'hsv(0, 0, sqrt($band1/100))',
+        'rgb((sqrt($band1/100)>0.5)*255, 255-$band2*255/100, $band2*255/100)',
+        'rgb((sqrt($band1/100)>0.5)*255, 0, 0)',
+        'rgb(0, 255-$band2*255/100, $band2*255/100)',
+        'rgb($band4*255, 255-$band2*255/100, $band2*255/100)',
+        'rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100, $band2*255/100)',
+        'rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100*$band4, $band2*255/100)',
+        'hsv(0, 0, sqrt($band1/100)>0.5)',
+        'opacity(rgb((sqrt($band1/100))*255,  255-$band2*255/100, $band0*255/100*(1-$band1/100)),0.5)',
+        'hsv(0,0,$band3)',
+        'hsv(0,0,$band4)',
+        'hsv(0,$band3,$band1)',
+        'hsv(0,$band3,$band1)'
+    ];
+    let currentExpr = 0;
+    let vizg, vizgwm;
+
     map.on('load', () => {
         const sw = projectToWebMercator({ lng: -10, lat: 20 });
         const ne = projectToWebMercator({ lng: 10, lat: 50 });
-        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 150, 200);
+        const gridwm = genGrid(sw.x, sw.y, ne.x, ne.y, 150, 200, 3857);
+        const grid = genGrid(10, 20, 30, 50, 150, 200, 4326);
+
+        const sourcegwm = new carto.source.Grid(gridwm)
+        vizgwm = new carto.Viz(`color: ${expressions[currentExpr]}`);
+        const layergwm = new carto.Layer('gridwm', sourcegwm, vizgwm);
+        layergwm.addTo(map, 'watername_ocean');
+
         const sourceg = new carto.source.Grid(grid)
-        const vizg = new carto.Viz(`
-          // color: hsv($band0/100, 1, $band1/100);
-          // color: hsv(0, 0, sqrt($band1/100));
-          // color: rgb((sqrt($band1/100)>0.5)*255, 255-$band2*255/100, $band2*255/100);
-          //color: rgb((sqrt($band1/100)>0.5)*255, 0, 0);
-          // color: rgb(0, 255-$band2*255/100, $band2*255/100);
-          // color: rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100, $band2*255/100);
-          // color: hsv(0, 0, sqrt($band1/100)>0.5);
-          color: opacity(rgb((sqrt($band1/100))*255,  255-$band2*255/100, $band0*255/100*(1-$band1/100)),0.5);
-        `);
+        vizg = new carto.Viz(`color: ${expressions[currentExpr]}`);
         const layerg = new carto.Layer('grid', sourceg, vizg);
         layerg.addTo(map, 'watername_ocean');
-
     });
+
+    function mod(x, n) {
+      while (x < 0) {
+        x += n;
+      }
+      return x % n;
+    }
+
+    function setExpr(i) {
+        currentExpr = mod(i, expressions.length);
+        const expr = expressions[currentExpr];
+        vizgwm.color.blendTo(expr);
+        vizg.color.blendTo(expr);
+        console.log(currentExpr, expr)
+    }
+
+    function nextExpr() {
+        setExpr(currentExpr + 1);
+    }
+    function prevExpr() {
+        setExpr(currentExpr - 1);
+    }
+
   </script>
 </body>
 
