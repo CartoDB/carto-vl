@@ -365,7 +365,8 @@ export default class Renderer {
                     gl.uniform1f(renderer.gMaxLL, dataframe.gridBounds.yMax);
                 }
 
-
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.enable(gl.BLEND);
 
                 // grid is a hybrid styling-geometry shader and we need to prepare the
                 // uniforms used in the expressions
