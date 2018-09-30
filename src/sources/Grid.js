@@ -54,6 +54,8 @@ function adjustGrid (grid) {
             bbox: [xmin, ymin, xmax, ymax],
             width,
             height,
+            // TODO: be more lazy so that we don't need to slice unused bands
+            // and avoid slicing then casting. This could be done at _adaptDataBand
             data: grid.data.map(band => band.slice(firstRow*width, (lastRow+1)*width))
         }
     }
