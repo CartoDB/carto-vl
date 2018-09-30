@@ -21,7 +21,7 @@ function adjustGrid (grid) {
     let [xmin, ymin, xmax, ymax] = grid.bbox;
     if (grid.srid === 4326 && (ymin < -WM_LAT_LIMIT || ymax > WM_LAT_LIMIT)) {
         if (ymax < -WM_LAT_LIMIT || ymin > WM_LAT_LIMIT) {
-            throw new Error(`Grid is completely out of Web-Mercator area`);
+            throw new Error('Grid is completely out of Web-Mercator area');
         }
 
         // The grid must be cropped vertically and an offset.
@@ -36,18 +36,18 @@ function adjustGrid (grid) {
         let lastRow = height - 1;
 
         if (ymax > WM_LAT_LIMIT) {
-            const n = Math.ceil((ymax - WM_LAT_LIMIT)/pixelHeight);
+            const n = Math.ceil((ymax - WM_LAT_LIMIT) / pixelHeight);
             // remove n rows from the top (N) of the grid
             firstRow += n;
             height -= n;
-            ymax -= n*pixelHeight;
+            ymax -= n * pixelHeight;
         }
         if (ymin < -WM_LAT_LIMIT) {
-            const n = Math.ceil((-ymin - WM_LAT_LIMIT)/pixelHeight);
+            const n = Math.ceil((-ymin - WM_LAT_LIMIT) / pixelHeight);
             // remove n rows from the bottom (S) of the grid
             lastRow -= n;
             height -= n;
-            ymin += n*pixelHeight;
+            ymin += n * pixelHeight;
         }
         grid = {
             srid: grid.srid,
@@ -56,8 +56,8 @@ function adjustGrid (grid) {
             height,
             // TODO: be more lazy so that we don't need to slice unused bands
             // and avoid slicing then casting. This could be done at _adaptDataBand
-            data: grid.data.map(band => band.slice(firstRow*width, (lastRow+1)*width))
-        }
+            data: grid.data.map(band => band.slice(firstRow * width, (lastRow + 1) * width))
+        };
     }
     return grid;
 }
@@ -88,7 +88,7 @@ export default class Grid extends Base {
         this._srid = this._grid.srid;
         const [xmin, ymin, xmax, ymax] = this._grid.bbox;
 
-        this._sridBounds =  {
+        this._sridBounds = {
             xMin: xmin,
             yMin: ymin,
             xMax: xmax,
@@ -96,7 +96,7 @@ export default class Grid extends Base {
         };
         const [wmXmin, wmYmin] = this._webMercator(xmin, ymin);
         const [wmXmax, wmYmax] = this._webMercator(xmax, ymax);
-        this._wmBounds =  {
+        this._wmBounds = {
             xMin: wmXmin,
             yMin: wmYmin,
             xMax: wmXmax,
@@ -124,7 +124,7 @@ export default class Grid extends Base {
 
     _webMercator (x, y) {
         if (this._srid === 4326) {
-            const wm = util.projectToWebMercator({ lng: x, lat: y});
+            const wm = util.projectToWebMercator({ lng: x, lat: y });
             return [wm.x, wm.y];
         }
         return [x, y];
@@ -199,7 +199,7 @@ export default class Grid extends Base {
         return coordinates;
     }
 
-    _adaptDataBand(band) {
+    _adaptDataBand (band) {
         // TODO:
         // here we could convert the band to 4 components (RGBA) is LINEAR filtering is desired,
         // and pad the band to power of two dimensions to use MIP mapping.
@@ -209,7 +209,7 @@ export default class Grid extends Base {
         return new Float32Array(band);
     }
 
-    _getPropertyIndex(name) {
+    _getPropertyIndex (name) {
         const match = name.match(/^band(\d+)$/);
         if (!match) {
             throw new Error(`Property name "${name}" is not a valid Grid band name`);
@@ -218,7 +218,6 @@ export default class Grid extends Base {
     }
 
     _getProperties () {
-        this.initializationPromise;
         const properties = {};
         const data = this._grid.data;
         Object.keys(this._metadata.properties).forEach(name => {

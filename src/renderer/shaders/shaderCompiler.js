@@ -14,7 +14,7 @@ class IDGenerator {
     }
 }
 
-function isGridShader(template) {
+function isGridShader (template) {
     return template.fragmentShader.match(/GRID!!!/);
 }
 

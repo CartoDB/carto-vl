@@ -352,8 +352,8 @@ export default class Renderer {
             dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
 
             if (dataframe.type === 'grid') {
-                const offsetX = this._center.x - (dataframe.center.x - 0.5*dataframe.gridSize.width);
-                const offsetY = this._center.y - (dataframe.center.y - 0.5*dataframe.gridSize.height);
+                const offsetX = this._center.x - (dataframe.center.x - 0.5 * dataframe.gridSize.width);
+                const offsetY = this._center.y - (dataframe.center.y - 0.5 * dataframe.gridSize.height);
                 gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
                 gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
 
