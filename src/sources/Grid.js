@@ -9,7 +9,7 @@ import schema from '../renderer/schema';
 
 // const SAMPLE_TARGET_SIZE = 1000;
 
-const DEFAULT_SRID = 3857;
+const DEFAULT_SRID = 4326;
 const SUPPORTED_SRIDS = [3857, 4326];
 const WM_LAT_LIMIT = 85.051128779806592;
 
