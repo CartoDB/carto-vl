@@ -63,7 +63,8 @@
               data,
               bbox: image.getBoundingBox(),
               width: image.getWidth(),
-              height: image.getHeight()
+              height: image.getHeight(),
+              srid: 3857
             };
 
             const sourceg = new carto.source.Grid(grid);

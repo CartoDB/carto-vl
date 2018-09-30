@@ -116,7 +116,8 @@
               data,
               bbox: image.getBoundingBox(),
               width: image.getWidth(),
-              height: image.getHeight()
+              height: image.getHeight(),
+              srid: 3857
             };
 
             source = new carto.source.Grid(grid);

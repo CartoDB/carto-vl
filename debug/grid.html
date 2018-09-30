@@ -63,12 +63,13 @@
               data,
               bbox: image.getBoundingBox(),
               width: image.getWidth(),
-              height: image.getHeight()
+              height: image.getHeight(),
+              srid: 3857
             };
 
             const sourceg = new carto.source.Grid(grid);
             const vizg = new carto.Viz(`
-              color: opacity(hsl(0.3, 1, 4*$band0), 0.5)
+              color: opacity(hsl(0.3, 1, 4*$band0), 0.7)
             `);
             const layerg = new carto.Layer('grid', sourceg, vizg);
             layerg.addTo(map, 'watername_ocean');
