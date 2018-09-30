@@ -145,11 +145,11 @@
         'rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100, $band2*255/100)',
         'rgb((sqrt($band1/100)<0.5)*255,  255-$band2*255/100*$band4, $band2*255/100)',
         'hsv(0, 0, sqrt($band1/100)>0.5)',
-        'opacity(rgb((sqrt($band1/100))*255,  255-$band2*255/100, $band0*255/100*(1-$band1/100)),0.5)',
-        'hsv(0,0,$band3)',
-        'hsv(0,0,$band4)',
-        'hsv(0,$band3,$band1)',
-        'hsv(0,$band3,$band1)'
+        'opacity(rgb((sqrt($band1/100))*255,  255-$band2*255/100, $band0*255/100*(1-$band1/100)),0.85)',
+        'opacity(hsv(0,0,$band3),0.6)',
+        'opacity(hsv(0,0,$band4),0.6)',
+        'opacity(hsv(0,$band3,$band0),0.7)',
+        'opacity(hsv(0,$band4,$band0),0.7)'
     ];
     let currentExpr = 0;
     let vizg, vizgwm;
