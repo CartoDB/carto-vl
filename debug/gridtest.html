@@ -149,7 +149,15 @@
         'opacity(hsv(0,0,$band3),0.6)',
         'opacity(hsv(0,0,$band4),0.6)',
         'opacity(hsv(0,$band3,$band0),0.7)',
-        'opacity(hsv(0,$band4,$band0),0.7)'
+        'opacity(hsv(0,$band4,$band0),0.7)',
+        'ramp(linear($band0, 0, 100), [#ffff00, #ff0000])',
+        'ramp(linear($band0, 0, 100), [#FFFFAA, #AA0000])',
+        'ramp(linear(100-$band2, 0, 100), [#FFFFAA, #AA0000])',
+        'ramp(linear($band2, 0, 100), [#FFFFAA, #AA0000])',
+        'ramp(linear($band1, 0, 100), [#FFFFAA, #AA0000])',
+        'ramp(linear($band1, 0, 100), [#009955, #ffff00, #ff0000])',
+        'ramp(linear($band1, 0, 100), [#0055AA, #009955, #ffff00, #ff0000])',
+        'ramp(sqrt(linear($band1, 0, 100)), [#0055AA, #009955, #ffff00, #ff0000])'
     ];
     let currentExpr = 0;
     let vizg, vizgwm;
