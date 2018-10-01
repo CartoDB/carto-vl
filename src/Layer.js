@@ -9,7 +9,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
-import { mat4, vec4 } from 'gl-matrix';
+import { mat4 } from 'gl-matrix';
 import { unproject } from './utils/geometry';
 
 // There is one renderer per map, so the layers added to the same map
