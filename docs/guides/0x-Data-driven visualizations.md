@@ -1,67 +1,37 @@
-## Introduction to Styling
+# Data-driven visualizations
 
-This guide walks through making a variety of visualizations for points, lines, and polygons using CARTO VL.
+## What is a ramp?
 
-### Supported Color Spaces
+`ramp` is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
+- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($electionWinner, ['conservatives', 'progressives', 'liberals']), [red, blue, orange])`
+- Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `ramp($temperature, [blue, red])` will assign the color blue to the "cold" features and red to the "hot" ones.
 
-CARTO VL's supported color spaces are [HEX](https://carto.com/developers/carto-vl/reference/#cartoexpressionshex), [RGB](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgb), [RGBA](https://carto.com/developers/carto-vl/reference/#cartoexpressionsrgba), [Named Colors](https://carto.com/developers/carto-vl/reference/#cartoexpressionsnamedcolor), [HSV](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsv), [HSVA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsva), [HSL](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsl), [HSLA](https://carto.com/developers/carto-vl/reference/#cartoexpressionshsla), [CIELAB](https://carto.com/developers/carto-vl/reference/#cartoexpressionscielab).
+TODO maybe the map examples with the previous cases
 
-In addition to these, you can also use our [CARTOcolors](https://carto.com/carto-colors/) schemes directly.
+`ramp` values don't need to be colors, but for simplicity's shake will stick to that until the "Ramp Values" section.
 
-### Styling Properties
+## Ramp inputs
 
-#### Color
-Use the `color` property to define the fill color of a point, line or polygon.
+### Numerical properties
 
-```js
-color: #F24440
-```
+linear, classifiers
 
-#### Width
-Use the `width` property to define a point size or line width.
+### Categorical properties
 
-```js
-width: 5
-```
+buckets, top, raw
 
-#### Stroke Color
-Use the `strokeColor` property to define the color of a point or polygon stroke.
 
-```js
-strokeColor: #F24440
-```
+## Ramp values
 
-#### Stroke Width
-Use the `strokeWidth` property to define the size of a point or polygon stroke width.
+color list, number color, cartocolors, colorbrewer, images
 
-```js
-strokeWidth: 3
-```
+## Generating legends with ramps
 
-#### Opacity
 
-Set a feature's [`opacity`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsopacity) with the alpha channel (see [supported Color Spaces](https://carto.com/developers/carto-vl/guides/introduction-to-styling/#supported-color-spaces)) or inside of a `ramp` expression.
 
-```js
-color: rgba(232,66,244,0.5)
-```
-```js
-color: opacity(ramp($animals,Prism),0.5)
-```
 
-#### Resolution
-Use `resolution` to aggregate points into clusters.
 
-```js
-resolution: 5
-```
 
-#### Filter
-Use `filter` to show only the features that match the specified [expression](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/).
-
-```js
-filter: between($numfloors, 10, 120)
-```
 
 ### Style Color by Category
 
