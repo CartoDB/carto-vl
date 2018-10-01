@@ -6,8 +6,8 @@ Welcome to the CARTO VL guides! This documentation is meant to lead you from the
 
 <div class="example-map">
     <iframe
-        id="getting-started-basic-styling-map"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basic-styling.html" 
+        id="getting-started-final-result"
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
         height="500" 
         frameBorder="0">
@@ -93,8 +93,8 @@ At this point you will have a basic map:
 
 <div class="example-map">
     <iframe 
-        id="getting-started-basic-styling-map"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basic-setup.html" 
+        id="getting-started-step-1"
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-1.html" 
         width="100%"
         height="500" 
         frameBorder="0">
@@ -163,9 +163,9 @@ For more information about styling, check out the guide [Introduction to Styling
 ### All together
 
 <div class="example-map">
-    <iframe 
-        id="getting-started-basic-styling-map"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basic-styling.html" 
+    <iframe
+        id="getting-started-step-2"
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html" 
         width="100%"
         height="500" 
         frameBorder="0">

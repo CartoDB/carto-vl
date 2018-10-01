@@ -26,12 +26,34 @@
         // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+            style: carto.basemaps.voyager,
             center: [0, 30],
             zoom: 2,
             dragRotate: false,
         });
-        map.touchZoomRotate.disableRotation();
+
+        //** CARTO VL functionality begins here **//
+
+        // Define the user
+        carto.setDefaultAuth({
+            user: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const source = new carto.source.Dataset('populated_places');
+
+        // Define and style Viz object
+        const viz = new carto.Viz(`
+                color: red
+                width: 10
+            `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add map layer
+        layer.addTo(map);
 
     </script>
 </body>
