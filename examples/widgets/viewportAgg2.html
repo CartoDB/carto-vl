@@ -20,7 +20,7 @@
         <h1>Add layer</h1>
       </header>
       <section>
-        <p class="description open-sans">Add one CARTO layer to your map</p>
+        <p class="description open-sans">Show viewport aggregations</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -36,8 +36,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 0],
-      zoom: 0,
+      center: [-73.98076101209858, 40.751681063],
+      zoom: 13,
       scrollZoom: false,
     });
 
@@ -53,9 +53,15 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
-    const viz = new carto.Viz();
+    const source = new carto.source.Dataset('mnmappluto');
+    const viz = new carto.Viz(`
+        @avg: viewportMax($numfloors)
+        transform: translate(100, 50)
+    `);
     const layer = new carto.Layer('layer', source, viz);
+    layer.on('updated', ()=>{
+        console.log(viz.variables.avg.value);
+    });
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
