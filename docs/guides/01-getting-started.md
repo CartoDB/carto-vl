@@ -5,7 +5,7 @@
 Welcome to the CARTO VL guides! This documentation is meant to lead you from the basics of creating a map to advanced techniques for developing powerful interactive visualizations. After reading this guide, you will be able to create your first CARTO VL map!
 
 <div class="example-map">
-    <iframe 
+    <iframe
         id="getting-started-basic-styling-map"
         src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/basic-styling.html" 
         width="100%"
