@@ -227,7 +227,6 @@ export default class Renderer {
         const aspect = this._getAspect();
 
         this._runViewportAggregations(renderLayer);
-
         if (!dataframes.length) {
             return;
         }

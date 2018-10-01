@@ -2,6 +2,7 @@ import { wToR } from '../client/rsys';
 import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
+import { projectToWebMercator, WM_R } from '../utils/util';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -174,6 +175,87 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return this.propertyTex[propertyName];
+    }
+
+    _updatePointGeom (i, x, y) {
+        const vertices = this.decodedGeom.vertices;
+        vertices[6 * i + 0] = x;
+        vertices[6 * i + 1] = y;
+        vertices[6 * i + 2] = x;
+        vertices[6 * i + 3] = y;
+        vertices[6 * i + 4] = x;
+        vertices[6 * i + 5] = y;
+    }
+    _updateGeomOnGPU () {
+        const gl = this.renderer.gl;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, this.decodedGeom.vertices, gl.STREAM_DRAW);
+    }
+
+    _updateProperty (propertyName, index, value) {
+        const propertiesFloat32Array = this.properties[propertyName];
+        if (this.metadata.properties[propertyName].type === 'category') {
+            propertiesFloat32Array[index] = this.metadata.categorizeString(propertyName,
+                value);
+        } else {
+            propertiesFloat32Array[index] = value;
+        }
+    }
+    _updatePropertyOnGPU (propertyName) {
+        const propertiesFloat32Array = this.properties[propertyName];
+        const width = this.renderer.RTT_WIDTH;
+        const height = Math.ceil(this.numFeatures / width);
+
+        const gl = this.renderer.gl;
+        gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
+            width, height, 0, gl.ALPHA, gl.FLOAT,
+            propertiesFloat32Array);
+    }
+
+    addPoint ({ lat, lng }, properties, id) {
+        const index = this._idToIndex[id] === undefined
+            ? this._getNewPointIndex()
+            : this._idToIndex[id];
+        this._idToIndex[id] = index;
+        const wm = projectToWebMercator({ lat, lng });
+        const p = wToR(wm.x, wm.y, { scale: WM_R, center: this.center });
+        this._updatePointGeom(index, p.x, p.y);
+        Object.keys(properties).forEach(propertyName => {
+            this._updateProperty(propertyName, index, properties[propertyName]);
+        });
+    }
+
+    addPoints (points) {
+        points.forEach(point => {
+            this.addPoint(point, point.properties, point.id);
+        });
+        if (points.length) {
+            this._updateGeomOnGPU();
+            Object.keys(points[0].properties).forEach(propertyName => {
+                this._updatePropertyOnGPU(propertyName);
+            });
+        }
+    }
+
+    _getNewPointIndex () {
+        if (this._freeIndex.length) {
+            return this._freeIndex.pop();
+        }
+        const index = this._lastIndex;
+        this._lastIndex++;
+        return index;
+    }
+    removePoints (IDs) {
+        IDs.forEach(id => {
+            const index = this._idToIndex[id];
+            this._updatePointGeom(index, Number.NaN, Number.NaN);
+            this._freeIndex.push(index);
+            delete this._idToIndex[id];
+        });
+        if (IDs) {
+            this._updateGeomOnGPU();
+        }
     }
 
     free () {

@@ -17,5 +17,9 @@ export default class DummyDataframe {
         this.metadata = metadata;
         this.propertyCount = 0;
         this._aabb = computeAABB(geom, type);
+
+        this._freeIndex = [];
+        this._lastIndex = 0;
+        this._idToIndex = {};
     }
 }
