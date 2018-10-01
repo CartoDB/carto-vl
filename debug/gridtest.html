@@ -165,8 +165,8 @@
     map.on('load', () => {
         const sw = projectToWebMercator({ lng: -10, lat: 20 });
         const ne = projectToWebMercator({ lng: 10, lat: 50 });
-        const gridwm = genGrid(sw.x, sw.y, ne.x, ne.y, 150, 200, 3857);
-        const grid = genGrid(10, 20, 30, 50, 150, 200, 4326);
+        const gridwm = genGrid(sw.x, sw.y, ne.x, ne.y, 1000, 2000, 3857);
+        const grid = genGrid(10, 20, 30, 50, 1000, 2000, 4326);
 
         const sourcegwm = new carto.source.Grid(gridwm)
         vizgwm = new carto.Viz(`color: ${expressions[currentExpr]}`);
