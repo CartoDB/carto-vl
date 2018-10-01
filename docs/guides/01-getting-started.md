@@ -9,7 +9,7 @@ Welcome to the CARTO VL guides! This documentation is meant to lead you from the
         id="getting-started-final-result"
         src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
-        height="500" 
+        height="500"
         frameBorder="0">
     </iframe>
 </div>
@@ -92,11 +92,11 @@ For basemaps you can add [Mapbox custom styles](https://www.mapbox.com/mapbox-gl
 At this point you will have a basic map:
 
 <div class="example-map">
-    <iframe 
+    <iframe
         id="getting-started-step-1"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-1.html" 
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-1.html"
         width="100%"
-        height="500" 
+        height="500"
         frameBorder="0">
     </iframe>
 </div>
@@ -116,7 +116,7 @@ carto.setDefaultAuth({
 
 ### Define source
 
-The next step is to define the [`source`](https://carto.com/developers/carto-vl/guides/using-data-in-your-visualization-with-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
+The next step is to define the [`source`](https://carto.com/developers/carto-vl/guides/02-using-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
 
 ```js
 const source = new carto.source.Dataset('populated_places');
@@ -165,9 +165,9 @@ For more information about styling, check out the guide [Introduction to Styling
 <div class="example-map">
     <iframe
         id="getting-started-step-2"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html" 
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
-        height="500" 
+        height="500"
         frameBorder="0">
     </iframe>
 </div>
@@ -223,10 +223,10 @@ For more information about styling, check out the guide [Introduction to Styling
             width: 10
         `);
 
-        // Define map layer 
+        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
 
-        // Add map layer 
+        // Add map layer
         layer.addTo(map);
     </script>
 </body>
