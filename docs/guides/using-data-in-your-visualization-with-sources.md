@@ -1,4 +1,4 @@
-## Getting data using Sources
+## Using data in your visualization with Sources
 In this guide you will learn how to use different data sources for your CARTO VL visualizations. After practicing with it, you will be able to connect to your datasets in several ways, and you will know which is the better option for you.
 
 This guide assumes that you have previously gone through the [Getting Started Guide](https://carto.com/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
