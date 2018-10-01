@@ -4,6 +4,7 @@ attribute vec2 vertexPosition;
 
 uniform vec2 gridScale;
 uniform vec2 gridOffset;
+uniform mat4 matrix;
 
 varying highp vec2 uv;
 
@@ -16,5 +17,8 @@ void main(void) {
 
     // The order of the grid pixels is from N to S => we must flip the v coordinate
     uv = vec2(vertexPosition[0], 1.0 - vertexPosition[1]);
-    gl_Position = vec4(vertexPosition*gridScale - gridOffset, 0.5, 1.);
+
+    vec4 p =  matrix*vec4(vertexPosition*gridScale + gridOffset, 0.0, 1.);
+    // p/=p.w;
+    gl_Position = p;
 }
