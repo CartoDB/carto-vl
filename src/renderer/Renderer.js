@@ -354,17 +354,10 @@ export default class Renderer {
             gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
 
             if (dataframe.type === 'grid') {
-                // const offsetX = this._center.x - (dataframe.center.x - 0.5 * dataframe.gridSize.width);
-                // const offsetY = this._center.y - (dataframe.center.y - 0.5 * dataframe.gridSize.height);
-                // gl.uniform2f(renderer.gridScale, dataframe.gridSize.width * scale / aspect, dataframe.gridSize.height * scale);
-                // gl.uniform2f(renderer.gridOffset, offsetX * scale / aspect, offsetY * scale);
-
-                const offsetX = dataframe.center.x - 0.5 * dataframe.gridSize.width;
-                const offsetY = dataframe.center.y - 0.5 * dataframe.gridSize.height;
+                const offsetX = dataframe.gridCenter.x - 0.5 * dataframe.gridSize.width;
+                const offsetY = dataframe.gridCenter.y - 0.5 * dataframe.gridSize.height;
                 gl.uniform2f(renderer.gridScale, dataframe.gridSize.width, dataframe.gridSize.height);
                 gl.uniform2f(renderer.gridOffset, offsetX, offsetY);
-                console.log('OFF', offsetX, offsetY);
-                console.log('SC', dataframe.gridSize.width, dataframe.gridSize.height);
 
                 if (dataframe.gridSRID === 4326) {
                     // Set up uniforms with parameters for grid transformation

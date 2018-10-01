@@ -19,6 +19,5 @@ void main(void) {
     uv = vec2(vertexPosition[0], 1.0 - vertexPosition[1]);
 
     vec4 p =  matrix*vec4(vertexPosition*gridScale + gridOffset, 0.0, 1.);
-    // p/=p.w;
     gl_Position = p;
 }

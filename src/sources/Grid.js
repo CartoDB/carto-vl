@@ -83,7 +83,7 @@ export default class Grid extends Base {
         this._setCoordinates();
     }
 
-    // sets this._center, this._dataframeCenter and this._size
+    // sets this._center, this._gridCenter and this._size
     _setCoordinates () {
         this._srid = this._grid.srid;
         const [xmin, ymin, xmax, ymax] = this._grid.bbox;
@@ -108,7 +108,7 @@ export default class Grid extends Base {
             y: (wmYmin + wmYmax) / 2.0
         };
 
-        this._dataframeCenter = this._webMercatorToR(this._center.x, this._center.y);
+        this._gridCenter = this._webMercatorToR(this._center.x, this._center.y);
 
         const lowerLeft = this._webMercatorToR(wmXmin, wmYmin);
         const upperRight = this._webMercatorToR(wmXmax, wmYmax);
@@ -149,7 +149,7 @@ export default class Grid extends Base {
     _buildDataFrame () {
         let df = new Dataframe({
             active: true,
-            center: this._dataframeCenter,
+            center: { x: 0, y: 0 },
             geom: this._getGeometry(),
             properties: this._getProperties(),
             scale: 1,
@@ -164,6 +164,7 @@ export default class Grid extends Base {
         df.gridSRID = this._srid;
         df.gridBounds = this._sridBounds;
         df.gridBoundsWM = this._wmBounds;
+        df.gridCenter = this._gridCenter;
         return df;
     }
 
