@@ -1,6 +1,6 @@
 # Styling your visualization using Expressions
 
-CARTO VL styling is based on the concept of visualizations. A visualization is a set of styling properties and variables with assigned expressions. Visualizations allow you to control from the color of the features to the available properties on interactivity events.
+CARTO VL styling is based on the concept of visualizations. A visualization is a set of styling properties and variables with assigned expressions. Visualizations allow you to control everything from the color of features to the available properties on interactivity events.
 
 ## Styling properties
 Visualizations have a fixed set of styling properties like `color` or `width`. In contrast with cascading languages like CSS and CSS-derived languages, CARTO VL styling properties cannot be redefined based on selectors. Instead, CARTO VL expressions like `ramp` are used to select the expected values based on some input (the selector).
