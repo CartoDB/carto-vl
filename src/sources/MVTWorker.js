@@ -163,7 +163,7 @@ export class MVTWorker {
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
             debugger;
-            // throw new Error(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
+            console.log(`MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`);
         }
         type = 3;
     }

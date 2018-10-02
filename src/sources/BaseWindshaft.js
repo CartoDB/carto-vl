@@ -3,7 +3,7 @@ import Windshaft from '../client/windshaft';
 import { getDefaultAuth, checkAuth } from '../setup/auth-service';
 import { getDefaultConfig, checkConfig } from '../setup/config-service';
 
-const DEFAULT_SERVER_URL_TEMPLATE = 'https://changepgmvt.carto-staging.com';
+const DEFAULT_SERVER_URL_TEMPLATE = 'https://pg2444.carto-staging.com';
 
 export default class BaseWindshaft extends Base {
     constructor () {
