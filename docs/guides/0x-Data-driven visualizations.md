@@ -8,13 +8,17 @@
 
 TODO maybe the map examples with the previous cases
 
-`ramp` values don't need to be colors, but for simplicity's shake will stick to that until the "Ramp Values" section.
+It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types or maps like bubble-maps. But, for simplicity's shake, we will stick to colors until the "Ramp Values" section.
 
 ## Ramp inputs
 
+On the previous section, we talked about how `ramp` can be used to match *inputs* with *values*. In general, `ramp` allows to match most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call "Style by value".
+
+The following sections will cover "Style by value" with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the price of each feature, or by categorical data like the method of payment (credit card, cash...).
+
 ### Numerical properties
 
-linear, classifiers
+linear, classifiers, raw
 
 ### Categorical properties
 
