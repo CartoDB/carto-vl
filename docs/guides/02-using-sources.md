@@ -208,7 +208,7 @@ Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-source-sql"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/sources/source-3-sql.html"
+        src="https://carto.com/developers/carto-vl/examples/maps/guides/sources/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
