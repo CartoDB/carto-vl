@@ -18,7 +18,55 @@ The following sections will cover "Style by value" with different property types
 
 ### Numerical properties
 
-linear, classifiers, raw
+#### Showing raw / unclassified numerical data
+
+Going back to our previous example, it's common to want to map a continuos range of numeric data like temperature data, to a continuos range of colors, for example, the range of colors between blue and red.
+
+This is very easy to do with CARTO VL, as shown before you just need use:
+ ```CARTOVL_Viz
+ color: ramp($temperature, [blue, red])
+ ```
+
+ This will map the coldest feature in the Source data to *blue* and the hottest feature to *red*. You can even set intermediate colors in the color list like `[white, blue, red, purple]`.
+
+ Matching the input with the context of the coldest and hottest feature is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($temperature, [blue, red])` to `ramp(linear($temperature), [blue, red])`. This transformations are what we call *implicit casts* and are a common topic in CARTO VL.
+
+#### Overriding the default range and avoiding outliers
+
+ Let's see another *implicit cast*, this time one a little bit more interesting.
+
+ The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($temperature)` to things like `linear($temperature, globalMin($temperature), globalMax($temperature))`. This is what sets the context of the coldest and hottest features for `ramp`.
+
+ Sometimes, the data has outliers (features with data that is very far away from the norm). In this cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
+
+TODO Let's see it with one example.
+TODO we could add an example with outliers and show different vizs:
+TODO maybe temperature is a bad example because some people will think about Celsius and other about Fahrenheit
+ ```CARTOVL_Viz
+ // This will be implicitly casted to `ramp(linear($temperature), [blue, red])` which will be implcitly casted to
+ // ramp(linear($temperature, globalMin($temperature), globalMax($temperature)), [blue, red])
+ color: ramp($temperature, [blue, red])
+ ```
+ ```CARTOVL_Viz
+ // the same as above due to implicit casts
+ color: ramp(linear($temperature), [blue, red])
+ ```
+```CARTOVL_Viz
+ // the same as the two above due to implicit casts
+ color: ramp(linear($temperature, globalMin($temperature), globalMax($temperature)), [blue, red])
+ ```
+ ```CARTOVL_Viz
+ // The data range has been fixed to the [-10, 40] range
+ color: ramp(linear($temperature, -10, 40, [blue, red])
+ ```
+  ```CARTOVL_Viz
+  // The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
+  // For dynamic datasets this is better than the previous fixed approach
+ color: ramp(linear($temperature, globalPercentile($temperature, 1), globalPercentile($temperature, 99), [blue, red])
+ ```
+
+ TODO add implicit cast to glossary
+ TODO add outliers to glossary
 
 ### Categorical properties
 
