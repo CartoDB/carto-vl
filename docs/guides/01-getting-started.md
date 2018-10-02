@@ -43,7 +43,7 @@ The easiest way to use CARTO VL is to include the required files from our CDN as
 
 Then, you will need to add Mapbox GL JavaScript and CSS files. This will let you use both `carto` and `mapboxgl` in your code.
 
-> Currently, not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination. If you are importing CARTO VL from npm, you have to use our Mapbox GL fork. Read more about how to do this in [the advanced guide](https://carto.com/developers/carto-vl/guides/advanced)
+> Currently, not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination. If you are importing CARTO VL from npm, you have to use our Mapbox GL fork. Read more about how to do this in [the advanced guide](/developers/carto-vl/guides/advanced)
 
 #### Add map container
 
@@ -94,7 +94,7 @@ At this point you will have a basic map:
 <div class="example-map">
     <iframe
         id="getting-started-step-1"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/getting-started/step-1.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -103,9 +103,9 @@ At this point you will have a basic map:
 
 ### Define user
 
-In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](https://carto.com/developers/fundamentals/authorization/).
+In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](/developers/fundamentals/authorization/).
 
-The first thing you need to do is [authenticate the client](https://carto.com/developers/carto-vl/reference/#cartosetdefaultauth) with your `user` and `apiKey`. For guides and examples, we provide a public CARTO account that you can use to try out the library:
+The first thing you need to do is [authenticate the client](/developers/carto-vl/reference/#cartosetdefaultauth) with your `user` and `apiKey`. For guides and examples, we provide a public CARTO account that you can use to try out the library:
 
 ```js
 carto.setDefaultAuth({
@@ -116,7 +116,7 @@ carto.setDefaultAuth({
 
 ### Define source
 
-The next step is to define the [`source`](https://carto.com/developers/carto-vl/guides/02-using-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
+The next step is to define the [`source`](/developers/carto-vl/guides/02-using-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world.
 
 ```js
 const source = new carto.source.Dataset('populated_places');
@@ -124,7 +124,7 @@ const source = new carto.source.Dataset('populated_places');
 
 ### Define Viz object
 
-A [`Viz object`](https://carto.com/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled, displayed, and processed. In this case you have to create an empty Viz object, that will use the style set by default.
+A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled, displayed, and processed. In this case you have to create an empty Viz object, that will use the style set by default.
 
 ```js
 const viz = new carto.Viz();
@@ -132,14 +132,14 @@ const viz = new carto.Viz();
 
 ### Define map layer
 
-Now that you have defined a `source` and a `Viz object`, you need to create a new [`layer`](https://carto.com/developers/carto-vl/reference/#cartolayer) that can be added to the map.
+Now that you have defined a `source` and a `Viz object`, you need to create a new [`layer`](/developers/carto-vl/reference/#cartolayer) that can be added to the map.
 
 ```js
 const layer = new carto.Layer('layer', source, viz);
 ```
 
 ### Add map layer
-Once you have the layer, you need to use the [`addTo`](https://carto.com/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
+Once you have the layer, you need to use the [`addTo`](/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
 
 ```js
 layer.addTo(map);
@@ -158,14 +158,14 @@ const viz = new carto.Viz(`
 `);
 ```
 
-For more information about styling, check out the guide [Introduction to Styling](https://carto.com/developers/carto-vl/guides/introduction-to-styling/).
+For more information about styling, check out the guide [Introduction to Styling](/developers/carto-vl/guides/introduction-to-styling/).
 
 ### All together
 
 <div class="example-map">
     <iframe
         id="getting-started-step-2"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
