@@ -68,7 +68,30 @@ TODO maybe temperature is a bad example because some people will think about Cel
  TODO add implicit cast to glossary
  TODO add outliers to glossary
 
+ #### Classifying numerical properties
+
+ Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small difference in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
+
+There are multiple classifying methods (quantiles, equal intervals...) and the classification can be applied to two different samples:
+- The entire dataset. `global*` classifiers will apply the classification to the all source data. Ignoring filters or the presence of each feature in the viewport.
+- Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by the checking that the feature is within the region covered by the screen at each moment. Changes on the view (map center / map zoom) will trigger an automatic re-computation of the classification.
+
+Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
+
+TODO add example with legend
+
+##### A note about `filter:`
+
+`filter:` is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
+
 ### Categorical properties
+
+Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map we only have a fixe number of political parties. And in each region, only one party can win. This kind of data is what we call "categorical data".
+
+#### A note about encodings
+
+Within CARTO VL we follow and enforce one condition:
+**categorical properties comes from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and categorical
 
 buckets, top, raw
 
