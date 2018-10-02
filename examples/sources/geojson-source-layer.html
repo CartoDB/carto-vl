@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Query layer | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -15,67 +15,74 @@
 </head>
 
 <body>
+
+  <!-- Add map container -->
   <div id="map"></div>
+
+  <!-- Add title/legend box -->
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>SQL Source layer</h1>
+        <h1>GeoJSON</h1>
       </header>
       <section>
-        <p class="description open-sans">Use a SQL query as a source</p>
+        <p class="description open-sans">Load a GeoJSON Source</p>
       </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
+
   <script>
+
+    // Add basemap and set properties
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 30],
-      zoom: 3,
+      center: [-73.97720677029952, 40.77784846220871],
+      zoom: 13,
       scrollZoom: false,
       dragRotate: false,
       touchZoomRotate: false,
     });
 
+    // Add zoom controls
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
-    carto.setDefaultAuth({
-      user: 'cartovl',
-      apiKey: 'default_public'
-    });
+    // Load geojson source
+    const geojson = {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-73.97720677029952, 40.77784846220871]
+      },
+      "properties": {
+        "name": "Dinagat Islands"
+      }
+    };
 
-    // Define layer
-    const source = new carto.source.SQL(`
-      SELECT *
-        FROM ne_10m_populated_places_simple
-        WHERE adm0name = 'Spain'
-    `);
-    const viz = new carto.Viz(`
-      width: 8
-      color: #6A5ACD
-      strokeWidth: 0.5
-      strokeColor: #191970
-    `);
+    // Load properties
+    const metadata = {
+      properties: {
+        numfloors: { type: 'number' }
+      }
+    };
+
+    //** CARTO VL functionality begins here **//
+
+    // Define source
+    const source = new carto.source.GeoJSON(geojson, metadata);
+
+    // Define Viz object
+    const viz = new carto.Viz(`width: 40`);
+
+    // Define map layer
     const layer = new carto.Layer('layer', source, viz);
 
+    // Add layer to map
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', hideLoader);
 
-    function hideLoader() {
-      document.getElementById('loader').style.opacity = '0';
-    }
   </script>
 </body>
 

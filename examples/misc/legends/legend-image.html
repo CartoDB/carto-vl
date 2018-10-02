@@ -53,7 +53,7 @@
     const source = new carto.source.Dataset('table_311_complaints');
     // Add better styles
     const viz = new carto.Viz(`
-      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
+      symbol: star
       color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
       symbolPlacement: align_bottom
       width: 30
