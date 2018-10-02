@@ -7,6 +7,8 @@ import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
 
+const SIZE_SATURATION_PX = 1024;
+
 const featureClassCache = new Map();
 const AABBTestResults = {
     INSIDE: 1,
@@ -331,22 +333,19 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _computePointRadius (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
+        const diameter = Math.min(viz.width.eval(feature), SIZE_SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SIZE_SATURATION_PX);
 
         return diameter / 2;
     }
 
     _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
+        const diameter = Math.min(viz.width.eval(feature), SIZE_SATURATION_PX);
 
         return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
+        const diameter = Math.min(viz.strokeWidth.eval(feature), SIZE_SATURATION_PX);
 
         return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
     }

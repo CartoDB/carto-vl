@@ -67,9 +67,8 @@ void main(void) {
     }
 
   if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {
-    p.x = 10000.;
+    p.z = p.w; // Force clipping
   }
-  p.z=0.9999;
 
   gl_Position = p;
 }
