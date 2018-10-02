@@ -228,7 +228,7 @@ export class MVTWorker {
             }
             return propertyValue;
         } else if (propertyValue === null || propertyValue === undefined) {
-            return Number.NaN;
+            return Number.MIN_SAFE_INTEGER;
         } else {
             throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
         }
