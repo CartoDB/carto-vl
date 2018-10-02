@@ -3,16 +3,16 @@
 ## What is a ramp?
 
 `ramp` is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
-- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($electionWinner, ['conservatives', 'progressives', 'liberals']), [red, blue, orange])`
+- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($electionWinner, [conservatives', 'progressives', 'liberals']), [red, blue, orange])`
 - Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `ramp($temperature, [blue, red])` will assign the color blue to the "cold" features and red to the "hot" ones.
 
 TODO maybe the map examples with the previous cases
 
-It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types or maps like bubble-maps. But, for simplicity's shake, we will stick to colors until the "Ramp Values" section.
+It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types or maps like bubble-maps. But, for simplicity's sake, we will stick to colors until the "Ramp Values" section.
 
 ## Ramp inputs
 
-On the previous section, we talked about how `ramp` can be used to match *inputs* with *values*. In general, `ramp` allows to match most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call "Style by value".
+On the previous section, we talked about how `ramp` can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call "Style by value".
 
 The following sections will cover "Style by value" with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the price of each feature, or by categorical data like the method of payment (credit card, cash...).
 
@@ -20,7 +20,7 @@ The following sections will cover "Style by value" with different property types
 
 #### Showing raw / unclassified numerical data
 
-Going back to our previous example, it's common to want to map a continuos range of numeric data like temperature data, to a continuos range of colors, for example, the range of colors between blue and red.
+Going back to our previous example, it's common to want to map a continuous range of numeric data like temperature data, to a continuous range of colors, for example, the range of colors between blue and red.
 
 This is very easy to do with CARTO VL, as shown before you just need use:
  ```CARTOVL_Viz
@@ -29,7 +29,7 @@ This is very easy to do with CARTO VL, as shown before you just need use:
 
  This will map the coldest feature in the Source data to *blue* and the hottest feature to *red*. You can even set intermediate colors in the color list like `[white, blue, red, purple]`.
 
- Matching the input with the context of the coldest and hottest feature is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($temperature, [blue, red])` to `ramp(linear($temperature), [blue, red])`. This transformations are what we call *implicit casts* and are a common topic in CARTO VL.
+ Matching the input with the context of the coldest and hottest feature is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($temperature, [blue, red])` to `ramp(linear($temperature), [blue, red])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
 
 #### Overriding the default range and avoiding outliers
 
