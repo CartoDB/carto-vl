@@ -286,8 +286,8 @@ export default class Dataframe extends DummyDataframe {
         const points = this.decodedGeom.vertices;
         const features = [];
 
-        const WIDTH = this.renderer.gl.canvas.width;
-        const HEIGHT = this.renderer.gl.canvas.height;
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
         for (let i = 0; i < points.length; i += 6) {
             const featureIndex = i / 6;
@@ -363,8 +363,8 @@ export default class Dataframe extends DummyDataframe {
         let strokeWidthScale;
         const offset = { x: 0, y: 0 };
 
-        const WIDTH = this.renderer.gl.canvas.width;
-        const HEIGHT = this.renderer.gl.canvas.height;
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
@@ -460,8 +460,8 @@ export default class Dataframe extends DummyDataframe {
             maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
         };
 
-        const WIDTH = this.renderer.gl.canvas.width;
-        const HEIGHT = this.renderer.gl.canvas.height;
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
         const ox = 2 * offset.x / WIDTH;
         const oy = 2 * offset.y / HEIGHT;
