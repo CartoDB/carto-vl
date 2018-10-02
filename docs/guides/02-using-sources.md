@@ -1,7 +1,7 @@
 ## Using data in your visualization with Sources
 In this guide you will learn how to use different data sources for your CARTO VL visualizations. After practicing with it, you will be able to connect to your datasets in several ways, and you will know which is the better option for you.
 
-This guide assumes that you have previously gone through the [Getting Started Guide](https://carto.com/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
+This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
 
 
 ### How to get data
@@ -15,16 +15,16 @@ Our library currently supports these three options:
 Every option is a different kind of **Source**, and CARTO VL provides you with a suitable object in its API to connect to them under the namespace `carto.source` (for example `carto.source.Dataset`).
 
 Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vector-tile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and powerful dynamic styling.
-> In fact, there is a fourth type of source in CARTO VL called [MVT](https://carto.com/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advance cases.
+> In fact, there is a fourth type of source in CARTO VL called [MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advance cases.
 
 
 Now you will see how to use the main three type of sources, but first let's create a basic map.
 
-You can start from this [basemap](https://carto.com/developers/carto-vl/examples/getting-started/basemap). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
+You can start from this [basemap](/developers/carto-vl/examples/getting-started/basemap). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
 
 
 ### Dataset
-A `Dataset` can be managed using [carto.source.Dataset](https://carto.com/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a simple table at the server, with a geometry field you can map.
+A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a simple table at the server, with a geometry field you can map.
 
 #### Add a Dataset
 You already know how to add a `Dataset` thanks to *Getting Started* guide:
@@ -61,7 +61,7 @@ The result should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-step-1"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/sources/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/sources/step-1.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -73,7 +73,7 @@ You have a CARTO account, with several custom datasets, and you want to easily v
 
 
 ### GeoJSON
-A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](https://carto.com/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can easily create some *.geojson* contents online at [geojson.io](http://geojson.io/).
+A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can easily create some *.geojson* contents online at [geojson.io](http://geojson.io/).
 
 With the next steps, you'll create a new layer with this format, in this case visualizing the main *CARTO offices*.
 
@@ -125,7 +125,7 @@ const offices = {
     ]
 };
 ```
-> If your dataset is much bigger, you would probably store that content in an external file (see this [External GeoJSON layer](https://carto.com/developers/carto-vl/examples/#example-external-geojson-layer) example).
+> If your dataset is much bigger, you would probably store that content in an external file (see this [External GeoJSON layer](/developers/carto-vl/examples/#example-external-geojson-layer) example).
 
 And then use it within a GeoJSON source, like this:
 ```js
@@ -154,7 +154,7 @@ Now the map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-source-geojson"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/sources/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/sources/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -208,7 +208,7 @@ Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-source-sql"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/sources/source-3-sql.html"
+        src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
