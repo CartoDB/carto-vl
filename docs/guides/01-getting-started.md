@@ -7,7 +7,7 @@ Welcome to the CARTO VL guides! This documentation is meant to lead you from the
 <div class="example-map">
     <iframe
         id="getting-started-final-result"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
