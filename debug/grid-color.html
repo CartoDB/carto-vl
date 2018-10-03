@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Grid styles | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://unpkg.com/geotiff@latest/dist/geotiff.bundle.min.js"></script>
+
+  <link href='../examples/style.css' rel='stylesheet' />
+
+</head>
+<style>
+  body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    #timer {
+      position: absolute;
+      top: '20px';
+      left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Color expressions</h1>
+      </header>
+      <section>
+        <p class="description open-sans">How to use apply color expressions to a Grid (raster)</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <label>
+                <input type="radio" name="style" onclick="setDefault()" checked>
+                No expression</label>
+            </li>
+            <li>
+              <label>
+                <input type="radio" name="style" onclick="setGrays()">
+                Black to White</label>
+            </li>
+            <li>
+              <label>
+                <input type="radio" name="style" onclick="setWithOpacity()">
+                With opacity</label>
+            </li>
+            <li>
+              <label>
+                <input type="radio" name="style" onclick="setLinearRed()">
+                Ramp + linear
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="radio" name="style" onclick="setHSV()">
+                HSV
+              </label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [50.537009375, 20.96143961409684],
+      zoom: 3,
+      dragRotate: false
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    let source = null;
+    let viz = null;
+
+
+    function loadGrid() {
+      const tiff = 'http://127.0.0.1:8080/examples/raster/temp_3857.tif';
+      fetch(tiff)
+        .then(r => r.arrayBuffer())
+        .then(buffer => GeoTIFF.fromArrayBuffer(buffer))
+        .then(tiff => tiff.getImage())
+        .then(image => {
+          image.readRasters().then(data => {
+            const grid = {
+              data,
+              bbox: image.getBoundingBox(),
+              width: image.getWidth(),
+              height: image.getHeight(),
+              srid: 3857
+            };
+
+            source = new carto.source.Grid(grid);
+            viz = new carto.Viz();
+            const layer = new carto.Layer('grid', source, viz);
+            layer.addTo(map, 'watername_ocean');
+          });
+        });
+    }
+
+    loadGrid();
+
+
+
+    // Expressions
+
+    function setDefault() {
+      const expr = 'black';
+      viz.color.blendTo(expr);
+    }
+
+    function setGrays() {
+      const expr = 'ramp(linear($band0, 15, 35), [#000000, #ffffff])';
+      viz.color.blendTo(expr);
+    }
+
+    function setWithOpacity() {
+      const expr = 'opacity(hsl(0, 0, ($band0 - 15) / 35), 0.5)';
+      viz.color.blendTo(expr);
+    }
+
+    function setLinearRed() {
+      const expr = 'ramp(linear($band0, 15, 35), [#ffff00, #ff0000])';
+      viz.color.blendTo(expr);
+    }
+
+    function setHSV() {
+      const expr = 'hsv(($band0 - 15.0) / 25.0, 1, 1)';
+      viz.color.blendTo(expr);
+    }
+  </script>
+</body>
+
+</html>

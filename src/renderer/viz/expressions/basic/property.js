@@ -49,6 +49,10 @@ export default class Property extends BaseExpression {
         return true;
     }
 
+    _isLngLat () {
+        return this._metadata.properties[this.name].isLngLat;
+    }
+
     get value () {
         return this.eval();
     }
@@ -58,7 +62,9 @@ export default class Property extends BaseExpression {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
 
-        return feature[this.name];
+        return feature[this.name] && feature[this.name] === Number.MIN_SAFE_INTEGER
+            ? Number.NaN
+            : feature[this.name];
     }
 
     toString () {
@@ -93,7 +99,7 @@ export default class Property extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: getGLSLforProperty(this.name)
+            inline: getGLSLforProperty(this.name, this._isLngLat())
         };
     }
 

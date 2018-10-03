@@ -356,6 +356,9 @@ export default class Viz {
                 { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
                 { transform: this.transform }, this);
         }
+        if (!this._geomType || this._geomType === 'grid') {
+            this.gridShader = compileShader(gl, shaders.grid, { color: this.color }, this);
+        }
     }
 
     replaceChild (toReplace, replacer) {

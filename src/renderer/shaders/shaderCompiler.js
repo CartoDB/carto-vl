@@ -14,12 +14,25 @@ class IDGenerator {
     }
 }
 
+function isGridShader (template) {
+    return template.fragmentShader.match(/GRID!!!/);
+}
+
 export function compileShader (gl, template, expressions, viz) {
     let tid = {};
-    const getPropertyAccessCode = name => {
+    const getPropertyAccessCode = (name, isLngLat = false) => {
         if (tid[name] === undefined) {
             tid[name] = Object.keys(tid).length;
         }
+
+        if (isGridShader(template)) {
+            let uv = 'uv';
+            if (isLngLat) {
+                uv = 'LNGLAT_WM_UV(uv, gMinWM, gMaxWM, gMinLL, gMaxLL)';
+            }
+            return `texture2D(propertyTex${tid[name]}, ${uv}).a`;
+        }
+
         return `texture2D(propertyTex${tid[name]}, abs(featureID)).a`;
     };
 

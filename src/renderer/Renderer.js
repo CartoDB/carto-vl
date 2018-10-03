@@ -254,11 +254,13 @@ export default class Renderer {
             vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
-            Object.keys(textureId).forEach((name, i) => {
-                gl.activeTexture(gl.TEXTURE0 + i);
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
-                gl.uniform1i(textureId[name], i);
-            });
+            if (dataframe.type !== 'grid') {
+                Object.keys(textureId).forEach((name, i) => {
+                    gl.activeTexture(gl.TEXTURE0 + i);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getPropertyTexture(name));
+                    gl.uniform1i(textureId[name], i);
+                });
+            }
 
             gl.enableVertexAttribArray(shader.vertexAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, this.bigTriangleVBO);
@@ -325,6 +327,8 @@ export default class Renderer {
                 renderer = viz.pointShader;
             } else if (dataframe.type === 'line') {
                 renderer = viz.lineShader;
+            } else if (dataframe.type === 'grid') {
+                renderer = viz.gridShader;
             } else {
                 renderer = viz.polygonShader;
             }
@@ -335,6 +339,31 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
             gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
+
+            if (dataframe.type === 'grid') {
+                const offsetX = dataframe.gridCenter.x - 0.5 * dataframe.gridSize.width;
+                const offsetY = dataframe.gridCenter.y - 0.5 * dataframe.gridSize.height;
+                gl.uniform2f(renderer.gridScale, dataframe.gridSize.width, dataframe.gridSize.height);
+                gl.uniform2f(renderer.gridOffset, offsetX, offsetY);
+
+                if (dataframe.gridSRID === 4326) {
+                    // Set up uniforms with parameters for grid transformation
+                    gl.uniform1f(renderer.gMinWM, dataframe.gridBoundsWM.yMin);
+                    gl.uniform1f(renderer.gMaxWM, dataframe.gridBoundsWM.yMax);
+                    gl.uniform1f(renderer.gMinLL, dataframe.gridBounds.yMin);
+                    gl.uniform1f(renderer.gMaxLL, dataframe.gridBounds.yMax);
+                }
+
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+                gl.enable(gl.BLEND);
+
+                // grid is a hybrid styling-geometry shader and we need to prepare the
+                // uniforms used in the expressions
+                const textureId = renderer.textureIds.get(viz);
+                drawMetadata.freeTexUnit = Object.keys(textureId).length;
+                viz.color._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.color._preDraw(renderer.program, drawMetadata, gl);
+            }
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -352,6 +381,17 @@ export default class Renderer {
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
+
+            if (dataframe.type === 'grid') {
+                const textureId = renderer.textureIds.get(viz);
+                Object.keys(textureId).forEach(name => {
+                    gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                    gl.bindTexture(gl.TEXTURE_2D, dataframe.getGridPropertyTexture(name));
+                    gl.uniform1i(textureId[name], freeTexUnit);
+                    freeTexUnit++;
+                });
+            }
+
             gl.uniform1i(renderer.colorTexture, freeTexUnit);
             freeTexUnit++;
 

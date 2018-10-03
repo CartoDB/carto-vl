@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>RASTER GRIDS | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://unpkg.com/geotiff@latest/dist/geotiff.bundle.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    #timer {
+      position: absolute;
+      top: '20px';
+      left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-3.767, 43.463],
+      zoom: 15,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+
+    function loadGrid() {
+      const tiff = 'http://127.0.0.1:8080/examples/raster/small_3857.tiff';
+      fetch(tiff)
+        .then(r => r.arrayBuffer())
+        .then(buffer => GeoTIFF.fromArrayBuffer(buffer))
+        .then(tiff => tiff.getImage())
+        .then(image => {
+          image.readRasters().then(data => {
+            const grid = {
+              data,
+              bbox: image.getBoundingBox(),
+              width: image.getWidth(),
+              height: image.getHeight(),
+              srid: 3857
+            };
+
+            const sourceg = new carto.source.Grid(grid);
+            const vizg = new carto.Viz(`
+               color: opacity(hsl(0.3, 1, 4*$band0), 0.5)
+            `);
+            const layerg = new carto.Layer('grid', sourceg, vizg);
+            layerg.addTo(map, 'watername_ocean');
+          });
+        });
+    }
+
+    map.on('load', () => {
+      Promise.all([
+        fetch('http://127.0.0.1:8080/examples/raster/corners.json'),
+        fetch('http://127.0.0.1:8080/examples/raster/pixels.json')
+      ]).then(results => Promise.all(results.map(r => r.json())).then(([corners, pixels]) => {
+        const sourcec = new carto.source.GeoJSON(corners);
+        const sourcep = new carto.source.GeoJSON(pixels);
+
+        let vizc = new carto.Viz(`
+                @n: $name
+                width: 15
+                color: red
+            `);
+        const layerc = new carto.Layer('corners', sourcec, vizc);
+
+        let vizp = new carto.Viz(`
+                @v: $value
+                width: 8
+                color: ramp($value, CB_GREYS)
+            `);
+        const layerp = new carto.Layer('pixels', sourcep, vizp);
+
+
+        layerp.addTo(map, 'watername_ocean');
+        layerc.addTo(map, 'watername_ocean');
+
+        loadGrid();
+
+        const interactivity = new carto.Interactivity(layerp);
+        interactivity.on('featureClick', event => {
+          if (event.features.length > 0) {
+            const feature = event.features[0];
+            console.log(feature.variables.v.value);
+          }
+        });
+      }));
+    });
+  </script>
+</body>
+
+</html>
