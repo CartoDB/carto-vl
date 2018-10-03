@@ -179,13 +179,18 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
+        const matrix = this.matrix;
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
+
+        const ox = matrix[0] * x + matrix[4] * y + matrix[12];
+        const oy = matrix[1] * x + matrix[5] * y + matrix[13];
+        const ow = matrix[3] * x + matrix[7] * y + matrix[15];
+
         // Transform to Clip Space
-        const p = transformMat4Vec2(this.t1, [x, y], this.matrix);
         // Check in Clip Space if the point is inside the viewport
         // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
-        return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
+        return ox > -ow && ox < ow && oy > -ow && oy < ow;
     }
 
     _isPolygonInViewport (featureIndex) {
