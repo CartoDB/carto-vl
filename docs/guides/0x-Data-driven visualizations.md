@@ -39,7 +39,7 @@ This is very easy to do with CARTO VL, as shown before you just need use:
 
  Sometimes, the data has outliers (features with data that is very far away from the norm). In these cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
 
-TODO Let's see it with one example.
+TODO Let's see it with one example. re use https://carto.com/developers/carto-vl/examples/#example-style-by-number ?
 TODO we could add an example with outliers and show different vizs:
 TODO maybe temperature is a bad example because some people will think about Celsius and other about Fahrenheit
  ```CARTOVL_Viz
@@ -133,7 +133,7 @@ If we don't care about which colors get each category, but we don't want to colo
 
 `top($cause, 5)` function will keep the five most common categories (regarding the entire dataset) and will group the rest into the *others bucket*.
 
-TODO example
+TODO example, re use https://carto.com/developers/carto-vl/examples/#example-style-by-category ?
 
 #### Showing every category without selecting each color
 
@@ -248,80 +248,3 @@ symbol: ramp(buckets($category, ['Salud', 'Moda y calzado']), [
 ## Generating legends with ramps
 
 
-
-
-
-
-
-### Style Color by Category
-
-[Live example](https://carto.com/developers/carto-vl/examples/#example-style-by-category)
-
-#### All categories
-Use the [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) expression to style your points, lines or polygons by categories. The example below assigns a unique color to each type of animal using the CARTOColor scheme `Prism`.
-
-```js
-color: ramp($animals,Prism)
-```
-
-#### Manual
-To map colors to particular categories, use [`buckets`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets). In the example below the manually defined types of animals are assigned a unique color and all the other features are colored as other.
-
-```js
-color: ramp(buckets($animals, ["dogs", "cats", "birds"]),[red, orange, blue, grey])
-```
-
-#### Top categories
-To color features by the most common category, you can use the expression [`top`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstop). In the example below we are using it to retrieve the top 4 values in the `$animals` column. Each category is colored with a unique color and all the other features are colored as other.
-
-```js
-color: ramp(top($animals, 4),Prism)
-```
-
-### Style Color by Number
-
-[Live example](https://carto.com/developers/carto-vl/examples/#example-style-by-number)
-
-#### Quantiles
-Use [`quantiles`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsquantiles) or other available classification methods to group features into a defined set of bins and color them using a sequential color scheme.
-
-```js
-color: ramp(viewportQuantiles($price, 5), Prism)
-```
-
-#### Interpolate
-Use [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) to linearly [interpolate](https://carto.com/developers/carto-vl/guides/introduction-to-interpolation/) the value of a given input between min and max.
-
-```js
-color: ramp(linear($price, 10000, 500000), Prism)
-```
-
-#### Manual
-To map colors to particular categories, use [`buckets`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets). In the example below the manually defined prices are assigned a unique color and all the other features are colored as other.
-
-```js
-color: ramp(buckets($price, [50, 100, 500, 1000]), [purple, red, orange, yellow, grey])
-```
-
-### Style Size by Number
-
-#### By attribute value
-Use the `width` property to define a point size or line width by an attribute value. The example below will assign different sizes to the geometry depending of the price value associated to each one.
-
-```js
-width: $price
-```
-
-#### Interpolate
-Use [`blend`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsblend) to linearly [interpolate](https://carto.com/developers/carto-vl/guides/introduction-to-interpolation/) the value of a given input between min and max.
-
-```js
-width: blend(5,20,$price/100)
-```
-
-#### Manual
-To map sizes to particular categories, use [`buckets`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets). In the example below the manually defined prices are assigned a unique color and all the other features are colored as other.
-
-```js
-width: ramp(buckets($price, [50, 100, 500, 1000]), [5, 10, 15, 20, 2])
-```
