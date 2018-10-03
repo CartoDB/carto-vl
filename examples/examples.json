@@ -7,24 +7,37 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add CARTO dataset layer",
-                    "file": "basics/add-layer.html"
+                    "title": "Map Setup",
+                    "file": "basics/map-setup.html"
                 },
                 {
-                    "title": "Style layer",
-                    "file": "basics/basic-style.html"
+                    "title": "Add a CARTO source layer",
+                    "file": "basics/add-carto-layer.html"
                 },
                 {
-                    "title": "SQL Source layer",
+                    "title": "Style a Layer",
+                    "file": "basics/style-layer.html"
+                },
+            ]
+        },
+        {
+            "title": "Sources",
+            "samples": [
+                {
+                    "title": "Add a CARTO source layer with SQL",
                     "file": "basics/query-layer.html"
                 },
                 {
-                    "title": "Add multiple layers",
+                    "title": "Add multiple CARTO source layers",
                     "file": "basics/multiple-layers.html"
+                }
+                {
+                    "title": "Add a GeoJSON source layer",
+                    "file": "basics/style-layer.html"
                 },
                 {
-                    "title": "Select layer",
-                    "file": "basics/select-layer.html"
+                    "title": "Add a MVT source layer",
+                    "file": "basics/mvt-source-layer.html"
                 }
             ]
         },
