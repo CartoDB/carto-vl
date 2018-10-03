@@ -222,13 +222,13 @@ export class MVTWorker {
                 throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);
             }
             return metadata.categorizeString(propertyName, propertyValue);
+        } else if (propertyValue === null || propertyValue === undefined || Number.isNaN(propertyValue)) {
+            return Number.MIN_SAFE_INTEGER;
         } else if (typeof propertyValue === 'number') {
             if (metadataPropertyType !== 'number') {
                 throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);
             }
             return propertyValue;
-        } else if (propertyValue === null || propertyValue === undefined) {
-            return Number.MIN_SAFE_INTEGER;
         } else {
             throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
         }
