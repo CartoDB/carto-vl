@@ -62,20 +62,15 @@
       }
     };
 
-    // Load properties
-    const metadata = {
-      properties: {
-        numfloors: { type: 'number' }
-      }
-    };
-
     //** CARTO VL functionality begins here **//
 
     // Define source
     const source = new carto.source.GeoJSON(geojson, metadata);
 
-    // Define Viz object
-    const viz = new carto.Viz(`width: 40`);
+    // Define Viz object and custom style
+    const viz = new carto.Viz(`
+      width: 40
+    `);
 
     // Define map layer
     const layer = new carto.Layer('layer', source, viz);
