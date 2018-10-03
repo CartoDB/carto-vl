@@ -464,9 +464,9 @@ export default class Dataframe extends DummyDataframe {
         };
         const pointAABB = {
             minx: ndcPoint.x + ox - widthScale * 2 / WIDTH,
-            miny: ndcPoint.y + oy - widthScale * 2 / HEIGHT,
+            miny: ndcPoint.y - oy - widthScale * 2 / HEIGHT,
             maxx: ndcPoint.x + ox + widthScale * 2 / WIDTH,
-            maxy: ndcPoint.y + oy + widthScale * 2 / HEIGHT
+            maxy: ndcPoint.y - oy + widthScale * 2 / HEIGHT
         };
 
         return !_isFeatureAABBOutsideViewport(ndcAABB, pointAABB);
