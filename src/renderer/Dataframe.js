@@ -1,11 +1,13 @@
-import { wToR } from '../client/rsys';
-import { pointInTriangle, pointInCircle, pointInRectangle } from '../../src/utils/geometry';
+import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
+
+const SIZE_SATURATION_PX = 1024;
 
 const featureClassCache = new Map();
 const AABBTestResults = {
@@ -15,12 +17,6 @@ const AABBTestResults = {
 };
 
 export default class Dataframe extends DummyDataframe {
-    get widthScale () {
-        return this.renderer
-            ? (2 / this.renderer.gl.canvas.clientHeight) / this.scale * this.renderer._zoom
-            : 1;
-    }
-
     setFreeObserver (freeObserver) {
         this.freeObserver = freeObserver;
     }
@@ -106,47 +102,22 @@ export default class Dataframe extends DummyDataframe {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
             case 'line':
-                return this._getFeaturesFromTriangles('line', pos, viz);
+                return this._getFeaturesAtPositionFromTriangles('line', pos, viz);
             case 'polygon':
-                return this._getFeaturesFromTriangles('polygon', pos, viz);
+                return this._getFeaturesAtPositionFromTriangles('polygon', pos, viz);
             default:
                 return [];
         }
     }
 
-    getViewportAABB (renderScale, center, aspect) {
-        return this._getBounds(renderScale, center, aspect);
-    }
-
-    inViewport (featureIndex, viz, viewportAABB) {
-        const feature = this.getFeature(featureIndex);
-        let strokeWidthScale = 1;
-
-        if (!viz.transform.default) {
-            const vizOffset = viz.transform.eval(feature);
-            const widthScale = this.widthScale / 2;
-            viewportAABB = {
-                minx: viewportAABB.minx,
-                miny: viewportAABB.miny,
-                maxx: viewportAABB.maxx,
-                maxy: viewportAABB.maxy
-            };
-
-            viewportAABB.minx -= vizOffset[0] * widthScale;
-            viewportAABB.maxx -= vizOffset[0] * widthScale;
-            viewportAABB.miny -= vizOffset[1] * widthScale;
-            viewportAABB.maxy -= vizOffset[1] * widthScale;
-        }
-
+    inViewport (featureIndex) {
         switch (this.type) {
             case 'point':
-                return this._isPointInViewport(featureIndex, viewportAABB);
+                return this._isPointInViewport(featureIndex);
             case 'line':
-                strokeWidthScale = this._computeLineWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+                return this._isPolygonInViewport(featureIndex);
             case 'polygon':
-                strokeWidthScale = this._computePolygonWidthScale(feature, viz);
-                return this._isPolygonInViewport(featureIndex, viewportAABB, strokeWidthScale);
+                return this._isPolygonInViewport(featureIndex);
             default:
                 return false;
         }
@@ -201,37 +172,58 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    _isPointInViewport (featureIndex, viewportAABB) {
-        const { minx, maxx, miny, maxy } = viewportAABB;
+    _isPointInViewport (featureIndex) {
+        if (!this.matrix) {
+            return false;
+        }
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
-        return x > minx && x < maxx && y > miny && y < maxy;
+        // Transform to Clip Space
+        const p = transformMat4Vec2(this.t1, [x, y], this.matrix);
+        // Check in Clip Space if the point is inside the viewport
+        // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
+        return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
     }
 
-    _isPolygonInViewport (featureIndex, viewportAABB, strokeWidthScale) {
+    _isPolygonInViewport (featureIndex) {
         const featureAABB = this._aabb[featureIndex];
-        const aabbResult = this._compareAABBs(featureAABB, viewportAABB, strokeWidthScale);
-        const vertices = this.decodedGeom.vertices;
-        const normals = this.decodedGeom.normals;
+        const aabbResult = this._compareAABBs(featureAABB);
 
         if (aabbResult === AABBTestResults.INTERSECTS) {
+            const vertices = this.decodedGeom.vertices;
+            const normals = this.decodedGeom.normals;
             const range = this.decodedGeom.featureIDToVertexIndex.get(featureIndex);
-            return _isPolygonCollidingViewport(vertices, normals, range.start, range.end, strokeWidthScale, viewportAABB);
+            return this._isPolygonCollidingViewport(vertices, normals, range.start, range.end);
         }
 
         return aabbResult === AABBTestResults.INSIDE;
     }
 
-    _compareAABBs (featureAABB, viewportAABB, stroke) {
-        if (featureAABB === null) {
+    _compareAABBs (featureAABB) {
+        if (featureAABB === null || !this.matrix) {
             return AABBTestResults.OUTSIDE;
         }
 
+        const corners = [
+            this._projectToNDC(this.t1, [featureAABB.minx, featureAABB.miny]),
+            this._projectToNDC(this.t2, [featureAABB.minx, featureAABB.maxy]),
+            this._projectToNDC(this.t3, [featureAABB.maxx, featureAABB.miny]),
+            this._projectToNDC(this.t4, [featureAABB.maxx, featureAABB.maxy])
+        ];
+
         const featureStrokeAABB = {
-            minx: featureAABB.minx - stroke,
-            miny: featureAABB.miny - stroke,
-            maxx: featureAABB.maxx + stroke,
-            maxy: featureAABB.maxy + stroke
+            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
+            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
+        };
+
+        // NDC viewport (by definition)
+        const viewportAABB = {
+            minx: -1,
+            miny: -1,
+            maxx: 1,
+            maxy: 1
         };
 
         switch (true) {
@@ -244,35 +236,63 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    _getBounds (renderScale, center, aspect) {
-        this.vertexScale = [(renderScale / aspect) * this.scale, renderScale * this.scale];
-        this.vertexOffset = [(renderScale / aspect) * (center.x - this.center.x), renderScale * (center.y - this.center.y)];
+    _isPolygonCollidingViewport (vertices, normals, start, end) { // NORMALS??? FIXME TODO
+        if (!this.matrix) {
+            return false;
+        }
+        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        for (let i = start; i < end; i += 6) {
+            const v1 = this._projectToNDC(this.t1, [
+                vertices[i + 0],
+                vertices[i + 1]
+            ]);
 
-        const minx = (-1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const maxx = (1 + this.vertexOffset[0]) / this.vertexScale[0];
-        const miny = (-1 + this.vertexOffset[1]) / this.vertexScale[1];
-        const maxy = (1 + this.vertexOffset[1]) / this.vertexScale[1];
+            const v2 = this._projectToNDC(this.t2, [
+                vertices[i + 2],
+                vertices[i + 3]
+            ]);
 
-        return { minx, maxx, miny, maxy };
+            const v3 = this._projectToNDC(this.t3, [
+                vertices[i + 4],
+                vertices[i + 5]
+            ]);
+
+            const triangle = [{
+                x: v1[0],
+                y: v1[1]
+            }, {
+                x: v2[0],
+                y: v2[1]
+            }, {
+                x: v3[0],
+                y: v3[1]
+            }];
+
+            if (triangleCollides(triangle, aabb)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    _projectToNDC (t, p) {
+        const p2 = transformMat4Vec2(t, p, this.matrix);
+        // Normalize by W
+        p2[0] /= p2[3];
+        p2[1] /= p2[3];
+        return p2;
     }
 
     _getPointsAtPosition (pos, viz) {
-        const p = wToR(pos.x, pos.y, {
-            center: this.center,
-            scale: this.scale
-        });
-
         const points = this.decodedGeom.vertices;
         const features = [];
 
-        const widthScale = this.widthScale / 2;
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
         for (let i = 0; i < points.length; i += 6) {
             const featureIndex = i / 6;
-            const center = {
-                x: points[i],
-                y: points[i + 1]
-            };
 
             const feature = this.getFeature(featureIndex);
 
@@ -280,20 +300,29 @@ export default class Dataframe extends DummyDataframe {
                 continue;
             }
 
-            const strokeWidthScale = this._computePointWidthScale(feature, viz);
+            const center = {
+                x: points[i],
+                y: points[i + 1]
+            };
+            const c2 = this._projectToNDC(this.t1, [center.x, center.y]);
 
-            if (!viz.symbol.default) {
-                const symbolOffset = viz.symbolPlacement.eval(feature);
-                center.x += symbolOffset[0] * strokeWidthScale;
-                center.y += symbolOffset[1] * strokeWidthScale;
-            }
+            // Project to pixel space
+            c2[0] *= 0.5;
+            c2[1] *= -0.5;
+            c2[0] += 0.5;
+            c2[1] += 0.5;
+            c2[0] *= WIDTH;
+            c2[1] *= HEIGHT;
+
+            const radius = this._computePointRadius(feature, viz);
+
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
-                center.x += vizOffset[0] * widthScale;
-                center.y += vizOffset[1] * widthScale;
+                c2[0] += vizOffset[0];
+                c2[1] -= vizOffset[1];
             }
 
-            const inside = pointInCircle(p, center, strokeWidthScale);
+            const inside = pointInCircle(pos, {x: c2[0], y: c2[1]}, radius);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -303,12 +332,25 @@ export default class Dataframe extends DummyDataframe {
         return features;
     }
 
-    _getFeaturesFromTriangles (geometryType, pos, viz) {
-        const point = wToR(pos.x, pos.y, {
-            center: this.center,
-            scale: this.scale
-        });
+    _computePointRadius (feature, viz) {
+        const diameter = Math.min(viz.width.eval(feature), SIZE_SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SIZE_SATURATION_PX);
 
+        return diameter / 2;
+    }
+
+    _computeLineWidthScale (feature, viz) {
+        const diameter = Math.min(viz.width.eval(feature), SIZE_SATURATION_PX);
+
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
+    }
+
+    _computePolygonWidthScale (feature, viz) {
+        const diameter = Math.min(viz.strokeWidth.eval(feature), SIZE_SATURATION_PX);
+
+        return diameter / 2 / this.scale / (Math.pow(2, this.renderer.drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO);
+    }
+
+    _getFeaturesAtPositionFromTriangles (geometryType, pos, viz) {
         const vertices = this.decodedGeom.vertices;
         const normals = this.decodedGeom.normals;
         const breakpoints = this.decodedGeom.breakpoints;
@@ -318,50 +360,73 @@ export default class Dataframe extends DummyDataframe {
         // Moreover, with an acceleration structure and triangle testing features could be subdivided easily
         let featureIndex = -1;
         let strokeWidthScale;
-        const widthScale = this.widthScale / 2;
-        let pointWithOffset;
+        const offset = { x: 0, y: 0 };
+
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
         for (let i = 0; i < vertices.length; i += 6) {
             if (i === 0 || i >= breakpoints[featureIndex]) {
                 featureIndex++;
                 const feature = this.getFeature(featureIndex);
-                let offset = { x: 0, y: 0 };
 
                 if (!viz.transform.default) {
                     const vizOffset = viz.transform.eval(feature);
-                    offset.x = vizOffset[0] * widthScale;
-                    offset.y = vizOffset[1] * widthScale;
-                }
-
-                pointWithOffset = { x: point.x - offset.x, y: point.y - offset.y };
-
-                if (!pointInRectangle(pointWithOffset, this._aabb[featureIndex]) ||
-                    this._isFeatureFiltered(feature, viz.filter)) {
-                    i = breakpoints[featureIndex] - 6;
-                    continue;
+                    offset.x = vizOffset[0];
+                    offset.y = vizOffset[1];
                 }
 
                 strokeWidthScale = geometryType === 'line'
                     ? this._computeLineWidthScale(feature, viz)
                     : this._computePolygonWidthScale(feature, viz);
+
+                if (this._isFeatureFiltered(feature, viz.filter) ||
+                !this._isPointInAABB(pos, offset,
+                    geometryType === 'line'
+                        ? viz.width.eval(feature)
+                        : viz.strokeWidth.eval(feature)
+                    ,
+                    featureIndex)
+                ) {
+                    i = breakpoints[featureIndex] - 6;
+                    continue;
+                }
             }
 
-            const v1 = {
-                x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-                y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            };
+            const v1 = this._projectToNDC(this.t1, [
+                vertices[i + 0] + normals[i + 0] * strokeWidthScale,
+                vertices[i + 1] + normals[i + 1] * strokeWidthScale
+            ]);
 
-            const v2 = {
-                x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-                y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
-            };
+            const v2 = this._projectToNDC(this.t2, [
+                vertices[i + 2] + normals[i + 2] * strokeWidthScale,
+                vertices[i + 3] + normals[i + 3] * strokeWidthScale
+            ]);
 
-            const v3 = {
-                x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-                y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
-            };
+            const v3 = this._projectToNDC(this.t3, [
+                vertices[i + 4] + normals[i + 4] * strokeWidthScale,
+                vertices[i + 5] + normals[i + 5] * strokeWidthScale
+            ]);
 
-            const inside = pointInTriangle(pointWithOffset, v1, v2, v3);
+            v1[0] *= 0.5;
+            v1[1] *= -0.5;
+            v1[0] += 0.5;
+            v1[1] += 0.5;
+
+            v2[0] *= 0.5;
+            v2[1] *= -0.5;
+            v2[0] += 0.5;
+            v2[1] += 0.5;
+
+            v3[0] *= 0.5;
+            v3[1] *= -0.5;
+            v3[0] += 0.5;
+            v3[1] += 0.5;
+
+            const inside = pointInTriangle(pos,
+                { x: v1[0] * WIDTH + offset.x, y: v1[1] * HEIGHT - offset.y },
+                { x: v2[0] * WIDTH + offset.x, y: v2[1] * HEIGHT - offset.y },
+                { x: v3[0] * WIDTH + offset.x, y: v3[1] * HEIGHT - offset.y });
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -372,6 +437,45 @@ export default class Dataframe extends DummyDataframe {
         }
 
         return features;
+    }
+
+    _isPointInAABB (point, offset, widthScale, featureIndex) {
+        // Transform AABB from tile space to NDC space
+        const aabb = this._aabb[featureIndex];
+        if (aabb === null || !this.matrix) {
+            return false;
+        }
+        const corners = [
+            this._projectToNDC(this.t1, [aabb.minx, aabb.miny]),
+            this._projectToNDC(this.t2, [aabb.minx, aabb.maxy]),
+            this._projectToNDC(this.t3, [aabb.maxx, aabb.miny]),
+            this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy])
+        ];
+
+        const ndcAABB = {
+            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
+            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
+            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
+        };
+
+        const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
+        const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
+
+        const ox = 2 * offset.x / WIDTH;
+        const oy = 2 * offset.y / HEIGHT;
+        const ndcPoint = {
+            x: point.x / WIDTH * 2 - 1,
+            y: -(point.y / HEIGHT * 2 - 1)
+        };
+        const pointAABB = {
+            minx: ndcPoint.x + ox - widthScale * 2 / WIDTH,
+            miny: ndcPoint.y + oy - widthScale * 2 / HEIGHT,
+            maxx: ndcPoint.x + ox + widthScale * 2 / WIDTH,
+            maxy: ndcPoint.y + oy + widthScale * 2 / HEIGHT
+        };
+
+        return !_isFeatureAABBOutsideViewport(ndcAABB, pointAABB);
     }
 
     _isFeatureFiltered (feature, filterExpression) {
@@ -471,27 +575,6 @@ export default class Dataframe extends DummyDataframe {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         return texture;
     }
-
-    _computePointWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX) + Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
-    }
-
-    _computeLineWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.width.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
-    }
-
-    _computePolygonWidthScale (feature, viz) {
-        const SATURATION_PX = 1024;
-        const diameter = Math.min(viz.strokeWidth.eval(feature), SATURATION_PX);
-
-        return diameter / 2 * this.widthScale;
-    }
 }
 
 function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
@@ -504,26 +587,13 @@ function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
 
-function _isPolygonCollidingViewport (vertices, normals, start, end, strokeWidthScale, viewportAABB) {
-    for (let i = start; i < end; i += 6) {
-        const triangle = [{
-            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-        }, {
-            x: vertices[i + 2] + normals[i + 2] * strokeWidthScale,
-            y: vertices[i + 3] + normals[i + 3] * strokeWidthScale
-        }, {
-            x: vertices[i + 4] + normals[i + 4] * strokeWidthScale,
-            y: vertices[i + 5] + normals[i + 5] * strokeWidthScale
-        }, {
-            x: vertices[i + 0] + normals[i + 0] * strokeWidthScale,
-            y: vertices[i + 1] + normals[i + 1] * strokeWidthScale
-        }];
-
-        if (triangleCollides(triangle, viewportAABB)) {
-            return true;
-        }
-    }
-
-    return false;
+// Multiply a vector of the form `vec4(a[0], a[1], 0, 1)` by a 4x4 matrix
+// Storing the result on `out`, returning `out`
+function transformMat4Vec2 (out, vector, matrix) {
+    const x = vector[0];
+    const y = vector[1];
+    out[0] = matrix[0] * x + matrix[4] * y + matrix[12];
+    out[1] = matrix[1] * x + matrix[5] * y + matrix[13];
+    out[3] = matrix[3] * x + matrix[7] * y + matrix[15];
+    return out;
 }
