@@ -239,6 +239,7 @@ export default class Windshaft {
                             };
                         } else if (usage.type === 'dimension') {
                             const grouping = usage.grouping;
+                            // grouping.format = 'iso';
                             const parameters = Object.assign({ column: propertyName }, grouping);
                             aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.group_by)] = parameters;
                         } else {

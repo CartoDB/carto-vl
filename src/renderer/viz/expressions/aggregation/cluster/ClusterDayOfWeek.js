@@ -1,13 +1,14 @@
 import ClusterTime from './ClusterTime';
 import { checkMaxArguments } from '../../utils';
 export default class ClusterDayOfWeek extends ClusterTime {
-    constructor (property) {
-        checkMaxArguments(arguments, 1, 'clusterDayOfWeek');
+    constructor (property, timezone) {
+        checkMaxArguments(arguments, 2, 'clusterDayOfWeek');
         super({
             property,
             expressionName: 'clusterDayOfWeek',
             grouping: {
-                group_by: 'dayOfWeek'
+                group_by: 'dayOfWeek',
+                timezone
             },
             dimType: 'date'
         });
