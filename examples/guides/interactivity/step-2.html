@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="../../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Add map container -->
+    <div id="map"></div>
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2,
+            dragRotate: false,
+        });
+        map.touchZoomRotate.disableRotation();
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+        // MAP EVENTS
+        // Wait for the map to render for the first time
+        map.on('load', () => {
+            console.log('Map has loaded!');
+        });
+        // Listen to every move event caused by the user
+        const displayCenter = () => {
+            const center = map.getCenter();
+            const longitude = center.lng.toFixed(6);
+            const latitude = center.lat.toFixed(6);
+            const zoom = map.getZoom();
+            console.log(`Center: [${longitude}, ${latitude}] & Zoom: ${zoom}`);
+        };
+        map.on('move', displayCenter);
+
+        //** CARTO VL functionality begins here **//
+
+        // LAYER EVENTS
+        // Add layer as usual
+        carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
+        const source = new carto.source.Dataset('populated_places');
+        const viz = new carto.Viz();
+        const layer = new carto.Layer('Cities', source, viz);
+        layer.addTo(map);
+        // Add on 'loaded' event handler to layer
+        layer.on('loaded', () => {
+            console.log('Cities layer has been loaded!');
+        });
+
+    </script>
+</body>
+
+</html>
