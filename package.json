@@ -34,6 +34,7 @@
     "babel-loader": "^8.0.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
+    "gl-matrix": "^2.8.1",
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
     "lru-cache": "^4.1.1",
     "mitt": "^1.1.3",

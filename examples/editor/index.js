@@ -95,8 +95,7 @@ let map = new mapboxgl.Map({
     container: 'map',
     style: { version: 8, sources: {}, layers: [] },
     center: [0, 0],
-    zoom: 0,
-    dragRotate: false
+    zoom: 0
 });
 
 map.touchZoomRotate.disableRotation();

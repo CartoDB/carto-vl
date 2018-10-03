@@ -1,6 +1,8 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import { mat4 } from 'gl-matrix';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 
 const INITIAL_TIMESTAMP = Date.now();
 
@@ -163,10 +165,7 @@ export default class Renderer {
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
-        const aspect = this.gl.canvas.width / this.gl.canvas.height;
-        const scale = 1 / this._zoom;
         dataframes.forEach(dataframe => {
-            const aabb = dataframe.getViewportAABB(scale, this._center, aspect);
             for (let i = 0; i < dataframe.numFeatures; i++) {
                 const featureId = dataframe.properties[metadata.idProperty][i];
 
@@ -175,7 +174,7 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!dataframe.inViewport(i, viz, aabb)) {
+                if (!dataframe.inViewport(i, viz)) {
                     continue;
                 }
 
@@ -221,10 +220,12 @@ export default class Renderer {
     }
 
     renderLayer (renderLayer, drawMetadata) {
+        this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
         const gl = this.gl;
-        const aspect = this._getAspect();
+
+        this._updateDataframeMatrices(dataframes);
 
         this._runViewportAggregations(renderLayer);
 
@@ -305,8 +306,6 @@ export default class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const scale = 1.0 / this._zoom;
-
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
         if (dataframes[0].type === 'line' || dataframes[0].type === 'polygon') {
@@ -335,17 +334,7 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
-            gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (scale / aspect) * dataframe.scale,
-                scale * dataframe.scale);
-            gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (scale / aspect) * (this._center.x - dataframe.center.x),
-                scale * (this._center.y - dataframe.center.y));
-            gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-
-            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
-
-            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
+            gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -431,6 +420,8 @@ export default class Renderer {
                 gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
 
+            gl.uniformMatrix4fv(renderer.matrix, false, dataframe.matrix);
+
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
@@ -463,6 +454,23 @@ export default class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
+    }
+
+    _updateDataframeMatrices (dataframes) {
+        dataframes.forEach(dataframe => {
+            let m2 = [];
+            let m3 = [];
+            mat4.copy(m2, this.matrix);
+            mat4.identity(m3);
+            mat4.translate(m3, m3, [0.5, 0.5, 0]);
+            mat4.scale(m3, m3, [0.5, -0.5, 1]);
+
+            mat4.translate(m3, m3, [dataframe.center.x, dataframe.center.y, 0]);
+            mat4.scale(m3, m3, [dataframe.scale, dataframe.scale, 1]);
+
+            mat4.multiply(m2, m2, m3);
+            dataframe.matrix = m2;
+        });
     }
 
     /**
