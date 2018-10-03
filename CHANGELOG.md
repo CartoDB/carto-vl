@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `getJoinedValues` method to `viewportHistogram` expression.
 - Add support for `opacity()` with images as first parameter
 - Add `carto.basemaps` for easier use of CARTO styles
+- Support pitch and bearing (aka rotation/tilt)
 
 ### Changed
 - Use an optional third parameter in `ramp` expression to override the default value for "others"
