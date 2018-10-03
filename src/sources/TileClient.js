@@ -6,6 +6,7 @@ export default class TileClient {
         if (!Array.isArray(templateURLs)) {
             templateURLs = [templateURLs];
         }
+
         this._templateURLs = templateURLs;
         this._requestGroupID = 0;
         this._oldDataframes = [];
@@ -43,6 +44,7 @@ export default class TileClient {
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
+
         tiles.forEach(({ x, y, z }) => {
             this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(
                 dataframe => {
@@ -65,6 +67,7 @@ export default class TileClient {
                 });
         });
     }
+
     async _requestDataframe (x, y, z, urlToDataframeTransformer) {
         const url = this._getTileUrl(x, y, z);
         const dataframe = await urlToDataframeTransformer(x, y, z, url);
