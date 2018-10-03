@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `blendTo` with `circle` SVG
 - Fix small error with color output in `ramp`
 - Fix `top()` with non MapsAPI sources
+- Fix `isNaN` expression failing in Windows 10
 
 ## [0.8.0] - 2018-09-07
 ### Added
