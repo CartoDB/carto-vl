@@ -108,6 +108,7 @@ export default class Ramp extends BaseExpression {
         checkExpression('ramp', 'palette', 1, palette);
 
         if (others !== DEFAULT_RAMP_OTHERS) {
+            others = implicitCast(others);
             checkExpression('ramp', 'others', 2, others);
         }
 
