@@ -22,7 +22,9 @@ export default class RampGeneric extends Base {
             this.others = this.palette.type === 'number-list'
                 ? DEFAULT_RAMP_OTHERS_NUMBER
                 : DEFAULT_RAMP_OTHERS_COLOR;
+            this.others._bindMetadata(metadata);
         } else {
+            this.others._bindMetadata(metadata);
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
         }
 
@@ -36,7 +38,6 @@ export default class RampGeneric extends Base {
 
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
 
-        this.others._bindMetadata(metadata);
         this.childrenNames.push('others');
         this._metadata = metadata;
     }

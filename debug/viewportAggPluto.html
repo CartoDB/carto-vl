@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
-  <script src="../../dist/carto-vl.js"></script>
+  <script src="../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
 <body>
   <div id="map"></div>
@@ -55,10 +55,15 @@
     // Define layer
     const source = new carto.source.Dataset('mnmappluto');
     const viz = new carto.Viz(`
+        color: ramp(linear(log($numfloors), 1, 4), Earth)
         @avg: viewportMax($numfloors)
-        transform: translate(100, 50)
+        filter: 0.51
     `);
     const layer = new carto.Layer('layer', source, viz);
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureHover', f=>{
+      console.log(f);
+    });
     layer.on('updated', ()=>{
         console.log(viz.variables.avg.value);
     });

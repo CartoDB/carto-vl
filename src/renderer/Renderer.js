@@ -225,20 +225,7 @@ export default class Renderer {
         const viz = renderLayer.viz;
         const gl = this.gl;
 
-        dataframes.forEach(dataframe => {
-            let m2 = [];
-            let m3 = [];
-            mat4.copy(m2, this.matrix);
-            mat4.identity(m3);
-            mat4.translate(m3, m3, [0.5, 0.5, 0]);
-            mat4.scale(m3, m3, [0.5, -0.5, 1]);
-
-            mat4.translate(m3, m3, [dataframe.center.x, dataframe.center.y, 0]);
-            mat4.scale(m3, m3, [dataframe.scale, dataframe.scale, 1]);
-
-            mat4.multiply(m2, m2, m3);
-            dataframe.matrix = m2;
-        });
+        this._updateDataframeMatrices(dataframes);
 
         this._runViewportAggregations(renderLayer);
 
@@ -507,6 +494,23 @@ export default class Renderer {
         }
 
         gl.disable(gl.CULL_FACE);
+    }
+
+    _updateDataframeMatrices (dataframes) {
+        dataframes.forEach(dataframe => {
+            let m2 = [];
+            let m3 = [];
+            mat4.copy(m2, this.matrix);
+            mat4.identity(m3);
+            mat4.translate(m3, m3, [0.5, 0.5, 0]);
+            mat4.scale(m3, m3, [0.5, -0.5, 1]);
+
+            mat4.translate(m3, m3, [dataframe.center.x, dataframe.center.y, 0]);
+            mat4.scale(m3, m3, [dataframe.scale, dataframe.scale, 1]);
+
+            mat4.multiply(m2, m2, m3);
+            dataframe.matrix = m2;
+        });
     }
 
     /**
