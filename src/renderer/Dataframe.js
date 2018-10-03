@@ -98,6 +98,9 @@ export default class Dataframe extends DummyDataframe {
     }
 
     getFeaturesAtPosition (pos, viz) {
+        if (!this.matrix) {
+            return [];
+        }
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
