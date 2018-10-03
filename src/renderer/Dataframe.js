@@ -580,14 +580,3 @@ function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
 }
-
-// Multiply a vector of the form `vec4(a[0], a[1], 0, 1)` by a 4x4 matrix
-// Storing the result on `out`, returning `out`
-function transformMat4Vec2 (out, vector, matrix) {
-    const x = vector[0];
-    const y = vector[1];
-    out[0] = matrix[0] * x + matrix[4] * y + matrix[12];
-    out[1] = matrix[1] * x + matrix[5] * y + matrix[13];
-    out[3] = matrix[3] * x + matrix[7] * y + matrix[15];
-    return out;
-}
