@@ -151,7 +151,99 @@ The interpolation made by `ramp` is always done in the CieLAB color space. This 
 
 ## Ramp values
 
-color list, number color, cartocolors, colorbrewer, images
+In the previous section we talked about using different types of input for ramp, but we always output colors picked from list. `ramp` supports to use other types of outputs and also includes some fixed constant palettes of colors. Let's see it!
+
+### Color values
+
+One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($temperature, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
+`ramp($temperature, [rgb(200,220,222), rgba(200,120,22, 0.8)])`, `ramp($temperature, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($temperature, [#00F, #F00])`, `ramp($temperature, [blue, #F00])`, `ramp($temperature, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
+
+There is another way to specify colors, and that is to use one of the built-in color palettes. We have built-in all the CARTOColors and ColorBrewer palettes. You can use them like this:
+
+ramp($temperature, emrld)
+ramp($temperature, tealrose)
+ramp($temperature, cb_blues)
+
+The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
+
+### Numeric values / Bubble-maps
+
+When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map each point has a width that depends on an feature property.
+
+Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections will see both approaches.
+
+### The `ramp` way
+
+`ramp` can be used in the same way it can be used with colors changing the color values to numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
+```
+width: ramp($number, [0, 50])
+```
+file:///home/dmanzanares/github/renderer-prototype/examples/editor/index.html#eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogcmFtcCgkbnVtYmVyLCBbMCwgNTBdKVxuXG5cbmNvbG9yOiBvcGFjaXR5KHJhbXAobGluZWFyKCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoKCRudW1iZXIpXjAuNSwwLCA1MCksIFN1bnNldClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTAuNTUyMTAzODYzNzM0MiwibGF0IjozNi4yMzI2NTM2ODcxOTUyN30sImciOjMuOTc0MjExNzAxODU5NDMyNywiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9
+
+Classified numerical properties are similar too:
+```
+width: ramp(globalQuantiles($number, 7), [1, 50])
+```
+
+
+Categorical properties can be used like before too:
+```
+width: ramp(buckets($cat, 'Salud'), prism)
+```
+
+#### Size perception
+Using `ramp($number, [0, 50])` works, and it probably works as expected. If $number is a property with a minimum of 0 and a maximum of 300 in the dataset, a feature with `$number=150` is halfway in the `linear` range. Therefore, ramp will output `50%*0+50%*50` (25).
+
+However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. The basic geometry just tells us that the area of a circle is proportional to the square of its radius.
+
+If we don't want to accentuate differences we'll need to take the square root. This can be done with the a little bit uglier:
+```
+// We'll need to take the square of the output values to specify the widths and not the areas
+width: sqrt(ramp($number, [0, 50^2]))
+```
+Similarly, classifiers can be re-mapped in the same way:
+```
+width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
+```
+
+### Direct approach when styling by a numerical property
+
+`ramp` is useful because it allows to map most input to most values, interpolating the values if needed and providing implicit casts if they are convenient. However, it can be overkill when the matching is done from a numerical property to a numeric list.
+
+For this case, using regular math is probably simpler and easier, while having the same, correct, results.
+
+For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])` is equivalent to `width: sqrt($number/globalMax($number))*50`. And since sometimes we don't want to normalize by the maximum value in the dataset, this could be reduced further to get `width: sqrt($number)`.
+
+TODO example with the 3 approaches
+
+### Images values
+
+The last supported type of value for `ramp` is the `Image` type. Let's see some examples:
+
+```
+color:  ramp(buckets($category, ['Salud', 'Moda y calzado']), [
+    green,
+    red
+])
+width: 30
+symbol: ramp(buckets($category, ['Salud', 'Moda y calzado']), [
+    image('../styling/marker.svg'),
+    image('../styling/star.svg')
+])
+```
+
+As you can see, the features that weren't specified in the `buckets` list received the color gray and were represented with circles. As discussed above, this *others bucket* receive default values, but they can be overridden, even when working with images. Let's see that:
+```
+color:  ramp(buckets($category, ['Salud', 'Moda y calzado']), [
+    green,
+    red
+], white)
+width: 30
+symbol: ramp(buckets($category, ['Salud', 'Moda y calzado']), [
+    image('../styling/marker.svg'),
+    image('../styling/star.svg')
+], car)
+```
 
 ## Generating legends with ramps
 
