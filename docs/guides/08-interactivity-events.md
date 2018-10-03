@@ -1,5 +1,5 @@
 ## Interactivity and events
-In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful vizs. You will also learn how to build very common add-ons such as *pop-ups* and legends.
+In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful visualizations. You will also learn how to build very common add-ons such as *pop-ups* and legends.
 
 At the end of the guide you will have built a visualization like this:
 <div class="example-map">
@@ -57,7 +57,7 @@ The result should look like this:
 
 
 ### Layer events
-Once you have your basemap, you can start to work with your layers. And all `carto.Layer` objects have two events to listen to: `loaded` and `updated`.
+Once you have your basemap, you can start to work with your layers. And all [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events to listen to: `loaded` and `updated`.
 
 The use of the `loaded` event is pretty common, due to in most cases you need to load the data from an external server and that can take some time.
 
@@ -94,34 +94,35 @@ If you check your work now, it should look like this:
 </div>
 
 
-### Using Variables
+### Using dynamic variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
-First you are going to add a variable whose value depends solely on the current map extent. Replace your current <del>`const viz = new carto.Viz();`</del>, with this code that grabs the current displayed features using the *String API*:
+First you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();`, with this code that grabs the current displayed features using the *String API*:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
 `);
 ```
 
-And then you should add this to handle the updates after each change, when you change the map's extent:
+And then you should add this to handle the updates after you change the map's extent:
 ```js
-layer.on('updated', () => {
+const displayNumberOfCities = () => {
     const numberOfFeatures = viz.variables.currentFeatures.value.length;
     console.log(`Now you can see ${numberOfFeatures} cities`);
-});
+};
+layer.on('updated', displayNumberOfCities);
 ```
-> Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol and using `.value`. This is possible cause it has no `properties` related to the features themselves.
+> Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible cause the expression has no `properties` related to the features themselves.
 
-You can imagine previous `layer:updated` event is a kind of `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
+You can imagine `layer:updated` event as a kind of `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
 
-If you want to reduce the number of `console.log` entries, caused by the `map:move`, you can remove its handler with:
+If you want to reduce the number of current `console.log` entries, to better see the new one, you can remove the previous handler on `map:move` with:
 ```js
 map.off('move', displayCenter);
 ```
 
-You have already advanced a lot in this guide, take a rest and check your work against this:
+You have already advanced a lot in this guide. Now take a small rest and check your work with this:
 <div class="example-map">
     <iframe
         id="guides-interactivity-events-step-3"
@@ -133,46 +134,122 @@ You have already advanced a lot in this guide, take a rest and check your work a
 </div>
 
 #### Data-driven variables
-If the data you are interested in is some kind of feature property, such as the name of each city or its population, then you can use variables to store them, and that variables will change their contents for each of the cities as you interact with them.
+If the data you are interested in for your interaction is a feature `property`, such as the _name_ of the city or its _population_, then you can also use some variables to store them. Those are called _data-driven variables_, cause their values change as you interact with each of the features (in our example, with each city).
 
-Edit again your viz, so it looks like this:
+To test them you should edit again your viz, so it looks like this:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
     @name: $name
-    @pop: $
+    @popK: $pop_max / 1000.0
 `);
 ```
+> Both properties, $name and $pop_max are columns in the original dataset.
 
-
-
+As the variables depend on properties, you can't just access them using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
 
 
 ### Feature events
+All feature interactions are ruled by the `carto.Interactivity`, so let's create an object of this type, associating it with the current layer.
 
+Add this line:
+```js
+const interactivity = new carto.Interactivity(layer);
+```
 
+Then use its `featureClick` event to react when you click on a city:
+```js
+interactivity.on('featureClick', featureEvent => {
+    featureEvent.features.forEach((feature) => {
+        const name = feature.variables.name.value;
+        const popK = feature.variables.popK.value.toFixed(0);
+        console.log(`You have clicked on ${name} with a population of ${popK}K`);
+    });
+});
+```
+> Notice how `carto.Interactivity` provides you for free with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection, cause you can click on several features at the same time if they are near enough.
 
+The `carto.Interactivity` can handle different events:
+- `featureClick`: Fired when the user clicks on features.
+- `featureClickOut`: Fired when the user clicks outside a feature that was clicked in the last featureClick event.
+- `featureHover`: Fired when the user moves the cursor over a feature.
+- `featureEnter`: Fired the first time the user moves the cursor inside a feature.
+- `featureLeave`: Fired the first time the user moves the cursor outside a feature.
 
-
-
-
-
+In every callback a single parameter of type [featureEvent](/developers/carto-vl/reference/#featureevent) will be received. This object will have the `position` and `coordinates` where the
+event happened (we didn't use that so far) and the list of [Features](/developers/carto-vl/reference/#feature) that have been interacted.
 
 
 ### Adding pop-ups
-Pop-ups are merging little windows with feature information.
+A very common case is to display pop-ups, little emerging windows with information on the features.
+
+You can build the pop-up yourself if you want, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup).
+
+So let's adapt a bit the previous 'featureClick' handler. You're going to add some code inside the current handler:
+```js
+interactivity.on('featureClick', featureEvent => {
+    // ...existing code...
+    // Add more code HERE
+});
+```
+
+First just grab the first feature in the interaction, if exists, with this:
+```js
+const feature = featureEvent.features[0];
+if (!feature) {
+    return;
+}
+```
+
+And then you can create the pop-up with this code:
+```js
+const coords = featureEvent.coordinates;
+const html = `
+    <h1>${feature.variables.name.value}</h1>
+    <p>Population: ${feature.variables.popK.value.toFixed(0)}K</p>
+`;
+new mapboxgl.Popup()
+    .setLngLat([coords.lng, coords.lat])
+    .setHTML(html)
+    .addTo(map);
+```
+> For simplicity, we have created a pop-up just linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
+
+At this point, your map looks like:
+<div class="example-map">
+    <iframe
+        id="guides-interactivity-events-step-4"
+        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
 
 ### Interactive-based styling
 
----
+TODO:
+// Handle 'featureEnter' and 'featureLeave' to alter features style
+interactivity.on('featureEnter', featureEvent => {
+    featureEvent.features.forEach((feature) => {
+        feature.color.blendTo('rgba(0, 255, 0, 0.8)', 100);
+    });
+});
+interactivity.on('featureLeave', featureEvent => {
+    featureEvent.features.forEach((feature) => {
+        feature.color.reset();
+    });
+});
+
 
 ### All together
 
 Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
-        id="guides-sources-source-sql"
-        src="https://carto.com/developers/carto-vl/examples/maps/guides/interactivity/XXXXX.html"
+        id="interactivity-events-final-result"
+        src="/developers/carto-vl/examples/maps/guides/interactivity/step-N.html"
         width="100%"
         height="500"
         frameBorder="0">

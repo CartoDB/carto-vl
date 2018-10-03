@@ -61,6 +61,8 @@
         // Viz using a dynamic variable
         const viz = new carto.Viz(`
             @currentFeatures: viewportFeatures()
+            @name: $name
+            @popK: $pop_max / 1000.0
         `);
         const layer = new carto.Layer('Cities', source, viz);
         layer.addTo(map);
@@ -69,7 +71,7 @@
             console.log('Cities layer has been loaded!');
         });
 
-        // Disable map move listener
+        // Disable previous listeners just for clarity
         map.off('move', displayCenter);
         // Add on 'updated' event handler to layer
         const displayNumberOfCities = () => {
@@ -77,6 +79,33 @@
             console.log(`Now you can see ${numberOfFeatures} cities`);
         };
         layer.on('updated', displayNumberOfCities);
+
+
+        // DATA-DRIVEN VARIABLES & carto.Interactivity
+        const interactivity = new carto.Interactivity(layer);
+        // Handle 'featureClick' to display city name and population
+        interactivity.on('featureClick', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                const name = feature.variables.name.value;
+                const popK = feature.variables.popK.value.toFixed(0);
+                console.log(`You have clicked on ${name} with a population of ${popK}K`);
+            });
+            // Get the first feature
+            const feature = featureEvent.features[0];
+            if (!feature) {
+                return;
+            }
+            // Add pop-up using mapboxgl
+            const coords = featureEvent.coordinates;
+            const html = `
+                <h1>${feature.variables.name.value}</h1>
+                <p>Population: ${feature.variables.popK.value.toFixed(0)}K</p>
+            `;
+            new mapboxgl.Popup()
+                .setLngLat([coords.lng, coords.lat])
+                .setHTML(html)
+                .addTo(map);
+        });
 
     </script>
 </body>
