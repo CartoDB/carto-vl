@@ -49,6 +49,10 @@ export default class Property extends BaseExpression {
         return true;
     }
 
+    _isLngLat () {
+        return this._metadata.properties[this.name].isLngLat;
+    }
+
     get value () {
         return this.eval();
     }
@@ -95,7 +99,7 @@ export default class Property extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: getGLSLforProperty(this.name)
+            inline: getGLSLforProperty(this.name, this._isLngLat())
         };
     }
 

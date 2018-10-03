@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>RASTER GRIDS | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://unpkg.com/geotiff@latest/dist/geotiff.bundle.min.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    #timer {
+      position: absolute;
+      top: '20px';
+      left: '20px';
+      color: white;
+      font-family: Arial;
+      font-size: 20pt;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [0, 30],
+      zoom: 1,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    function genBand(width, height, fn) {
+        const band = new Float32Array(width*height);
+        for (let i=0; i<width; ++i) {
+            for (let j=0; j<height; ++j) {
+                band[i + j*width] = fn(i, j);
+            }
+        }
+        return band;
+    }
+
+    function genGrid(x0, y0, x1, y1, width, height, srid) {
+        bands = [];
+        bands.push(genBand(width, height, (i, j) => {
+          // Band0: stripes
+          return j % 2;
+        }));
+        const r = Math.min(width,height)*3/4;
+        bands.push(genBand(width, height, (i, j) => {
+          // Band1: checkboard
+          return (i % 2) ^ (j % 2);
+        }));
+
+        return {
+          data: bands,
+          bbox: [x0, y0, x1, y1],
+          width: width,
+          height: height,
+          srid
+        };
+    }
+
+    const DEG2RAD = Math.PI / 180;
+    const EARTH_RADIUS = 6378137;
+
+    function projectToWebMercator (latLng) {
+        let lat = latLng.lat * DEG2RAD;
+        let lng = latLng.lng * DEG2RAD;
+        return {
+            x: lng * EARTH_RADIUS,
+            y: Math.log(Math.tan(lat / 2 + Math.PI / 4)) * EARTH_RADIUS
+        };
+    }
+
+    map.on('load', () => {
+        // const sw = projectToWebMercator({ lng: -50, lat: 0 });
+        // const ne = projectToWebMercator({ lng: 50, lat: 84 });
+        const sw = { x: -50, y: 0 };
+        const ne = { x: 50, y: 84 };
+        // const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20);
+        const grid = genGrid(sw.x, sw.y, ne.x, ne.y, 10, 20, 4326);
+        const sourceg = new carto.source.Grid(grid)
+        const vizg = new carto.Viz(`
+          color: hsv(0, 0, $band1);
+        `);
+        const layerg = new carto.Layer('grid', sourceg, vizg);
+        layerg.addTo(map, 'watername_ocean');
+
+    });
+  </script>
+</body>
+
+</html>

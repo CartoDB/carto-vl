@@ -9,10 +9,16 @@ export default class DummyDataframe {
         this.scale = scale;
         this.type = type;
         this.decodedGeom = decodeGeom(type, geom);
+
         this.numVertex = type === 'point'
             ? size * 3
             : this.decodedGeom.vertices.length / 2;
+
         this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
+        if (type === 'grid') {
+            this.numFeatures = 1;
+        }
+
         this.propertyTex = [];
         this.metadata = metadata;
         this.propertyCount = 0;

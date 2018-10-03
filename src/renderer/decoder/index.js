@@ -11,6 +11,12 @@ export function decodeGeom (geomType, geom) {
             return decodeLine(geom);
         case 'polygon':
             return decodePolygon(geom);
+        case 'grid':
+            return {
+                vertices: geom,
+                verticesArrayBuffer: geom,
+                breakpoints: []
+            };
         default:
             throw new CartoRuntimeError(`${crt.NOT_SUPPORTED} Unimplemented geometry type: '${geomType}'.`);
     }

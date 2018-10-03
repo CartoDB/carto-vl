@@ -88,5 +88,13 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
     shader.matrix = gl.getUniformLocation(shader.program, 'matrix');
 
+    shader.gridScale = gl.getUniformLocation(shader.program, 'gridScale');
+    shader.gridOffset = gl.getUniformLocation(shader.program, 'gridOffset');
+
+    shader.gMinWM = gl.getUniformLocation(shader.program, 'gMinWM');
+    shader.gMaxWM = gl.getUniformLocation(shader.program, 'gMaxWM');
+    shader.gMinLL = gl.getUniformLocation(shader.program, 'gMinLL');
+    shader.gMaxLL = gl.getUniformLocation(shader.program, 'gMaxLL');
+
     return shader;
 }
