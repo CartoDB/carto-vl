@@ -202,11 +202,10 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-export const IsNaN = genUnaryOp('isNaN', x => {
-    return Number.isNaN(x) ? 1 : 0;
-}, x => {
-    return `((${x} == ${Number.MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`;
-});
+export const IsNaN = genUnaryOp('isNaN',
+    x => Number.isNaN(x) ? 1 : 0,
+    x => `((${x} == ${Number.MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`
+);
 
 /**
  * Compute the logical negation of the given expression.
@@ -292,9 +291,9 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  */
 export const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 
-function genUnaryOp(name, jsFn, glsl) {
+function genUnaryOp (name, jsFn, glsl) {
     return class UnaryOperation extends BaseExpression {
-        constructor(a) {
+        constructor (a) {
             checkMaxArguments(arguments, 1, name);
 
             a = implicitCast(a);
@@ -305,13 +304,13 @@ function genUnaryOp(name, jsFn, glsl) {
             this.expressionName = name;
             this.inlineMaker = inlines => glsl(inlines.a);
         }
-        get value() {
+        get value () {
             return this.eval();
         }
-        eval(feature) {
+        eval (feature) {
             return jsFn(this.a.eval(feature));
         }
-        _bindMetadata(meta) {
+        _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'x', 0, 'number', this.a);
             if (this.a.type !== 'number') {
