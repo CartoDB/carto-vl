@@ -20,8 +20,8 @@ Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glos
 
 Now you will see how to use the main three type of sources, but first let's create a basic map.
 
-You can start from this [basemap](/developers/carto-vl/examples/getting-started/basemap). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
-
+You can start from this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
+> To copy the source code from an example, you just have to navigate to it with your browser, click right button > `View source` and copy the whole text, from `<html>` to `</html>` tags
 
 ### Dataset
 A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a simple table at the server, with a geometry field you can map.
