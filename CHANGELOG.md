@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Use an optional third parameter in `ramp` expression to override the default value for "others"
 - Simplified `CartoError` and new specific error types
 - Remove `carto.Map` (used just for tests).
-- New build system using Babel.
+- New build using Babel.
 
 ### Fixed
 - Fix symbol override
