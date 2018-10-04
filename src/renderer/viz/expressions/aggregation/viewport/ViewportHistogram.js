@@ -44,7 +44,7 @@ import { checkMaxArguments, checkArray } from '../../utils';
  * This class is instanced automatically by using the `viewportHistogram` function. It is documented for its methods.
  * Read more about viewportHistogram expression at {@link carto.expressions.viewportHistogram}.
  *
- * @name s.ViewportHistogram
+ * @name expressions.ViewportHistogram
  * @abstract
  * @hideconstructor
  * @class
@@ -95,7 +95,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof s.ViewportHistogram
+     * @memberof expressions.ViewportHistogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [

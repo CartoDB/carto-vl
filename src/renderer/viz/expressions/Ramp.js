@@ -105,7 +105,7 @@ import { DEFAULT_RAMP_OTHERS } from './constants';
  * This class is instanced automatically by using the `ramp` function. It is documented for its methods.
  * Read more about ramp expression at {@link carto.expressions.ramp}.
  *
- * @name s.Ramp
+ * @name expressions.Ramp
  * @abstract
  * @hideconstructor
  * @class
@@ -411,7 +411,7 @@ export default class Ramp extends BaseExpression {
      *   // }
      * });
      *
-     * @memberof s.Ramp
+     * @memberof expressions.Ramp
      * @name getLegendData
      * @instance
      * @api
