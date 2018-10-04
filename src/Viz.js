@@ -48,10 +48,10 @@ const SUPPORTED_PROPERTIES = [
 ];
 
 /**
- * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
+ * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
  * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
  *
- * @typedef {object} VizSpec
+ * @typedef {object} vizSpec
  * @name vizSpec
  * @api
  */
@@ -61,7 +61,7 @@ const SUPPORTED_PROPERTIES = [
 * displayed and processed. A Viz instance can only be bound to one layer.
 *
 *
-* @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
+* @param {string|vizSpec} definition - The definition of a viz. This parameter could be a `string` or a {@link vizSpec|vizSpec}  object
 *
 * @example <caption> Create a viz with black dots using the string constructor </caption>
 * const viz = new carto.Viz(`
@@ -82,10 +82,10 @@ const SUPPORTED_PROPERTIES = [
 * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
 * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
 * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-* @property {Translation} transform - translation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.
+* @property {Tranformation} transform - transformation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.
 * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
-* @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
-* @property {object} variables - An object describing the variables used.
+* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+* @property {Object} variables - An object describing the variables used.
 * @api
 *
 */
@@ -396,7 +396,7 @@ export default class Viz {
      * Otherwise it throws an error.
      *
      * @param  {string|object} definition
-     * @return {VizSpec}
+     * @return {vizSpec}
      */
     _getVizDefinition (definition) {
         if (util.isUndefined(definition)) {
@@ -414,8 +414,8 @@ export default class Viz {
     /**
      * Add default values to a vizSpec object.
      *
-     * @param {VizSpec} vizSpec
-     * @return {VizSpec}
+     * @param {vizSpec} vizSpec
+     * @return {vizSpec}
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
