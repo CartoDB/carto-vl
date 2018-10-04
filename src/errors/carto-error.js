@@ -1,10 +1,10 @@
 /**
  * Represents an error in the carto library.
  *
- * @typedef {object} CartoError
- * @property {string} message - A short error description
- * @property {string} name - The name of the error "CartoError"
- * @property {object} originalError - An object containing the internal/original error
+ * @typedef {Object} CartoError
+ * @property {String} message - A short error description
+ * @property {String} name - The name of the error "CartoError"
+ * @property {Object} originalError - An object containing the internal/original error
  *
  * @event CartoError
  * @api

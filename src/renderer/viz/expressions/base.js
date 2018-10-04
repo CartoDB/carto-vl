@@ -37,7 +37,7 @@ export default class Base {
      * This is particularly useful for making legends.
      *
      * @memberof Expression
-     * @param {object} feature
+     * @param {Object} feature
      * @returns {} result - result of evaluating the expression for the input feature
      * @name eval
      * @api
@@ -84,7 +84,7 @@ export default class Base {
      * Get the expression stringified
      *
      * @api
-     * @returns {string} expression - stringified expression
+     * @returns {String} Stringified expression
      * @memberof Expression
      * @instance
      * @name toString
@@ -113,7 +113,7 @@ export default class Base {
     /**
      *
      * @api
-     * @returns true if the evaluation of the expression may change without external action.
+     * @returns `true` if the evaluation of the expression may change without external action, `false` otherwise.
      * @memberof Expression
      * @instance
      * @name isAnimated

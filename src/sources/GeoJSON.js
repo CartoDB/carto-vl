@@ -13,8 +13,8 @@ export default class GeoJSON extends Base {
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
-     * @param {object} data - A GeoJSON data object
-     * @param {object} options - Options
+     * @param {Object} data - A GeoJSON data object
+     * @param {Object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.

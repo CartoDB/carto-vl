@@ -10,9 +10,9 @@ import FeatureVizProperty from './featureVizProperty';
  *
  * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
  *
- * @typedef {object} FeatureEvent
- * @property {object} coordinates - LongLat coordinates in { lng, lat } form
- * @property {object} position - Pixel coordinates in { x, y } form
+ * @typedef {Object} FeatureEvent
+ * @property {Object} coordinates - LongLat coordinates in { lng, lat } form
+ * @property {Object} position - Pixel coordinates in { x, y } form
  * @property {Feature[]} features - Array of {@link Feature}
  * @api
  */
@@ -66,7 +66,7 @@ import FeatureVizProperty from './featureVizProperty';
  * Feature objects are provided by {@link FeatureEvent} events.
  *
  * @constructor Feature
- * @typedef {object} Feature
+ * @typedef {Object} Feature
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
  * @property {FeatureVizProperty} width

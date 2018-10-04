@@ -28,12 +28,12 @@ export default class SQL extends BaseWindshaft {
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
-     * @param {string} query - A SQL query containing a SELECT statement
-     * @param {object} auth
-     * @param {string} auth.apiKey - API key used to authenticate against CARTO
-     * @param {string} auth.user - Name of the user
-     * @param {object} config
-     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {String} query - A SQL query containing a SELECT statement
+     * @param {Object} auth
+     * @param {String} auth.apiKey - API key used to authenticate against CARTO
+     * @param {String} auth.user - Name of the user
+     * @param {Object} config
+     * @param {String} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
      *
      * @example
      * const source = new carto.source.SQL('SELECT * FROM european_cities', {

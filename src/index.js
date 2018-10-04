@@ -60,7 +60,7 @@ import * as basemaps from './basemaps';
 /**
  * The version of CARTO VL in use as specified in `package.json` and the GitHub release.
  *
- * @var {string} version
+ * @var {String} version
  *
  * @memberof carto
  * @api

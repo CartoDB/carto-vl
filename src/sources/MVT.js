@@ -7,8 +7,8 @@ import Worker from './MVTWorkers.worker';
 
 /**
  * A MVTOptions object declares a MVT configuration
- * @typedef {object} MVTOptions
- * @property {string} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer
+ * @typedef {Object} MVTOptions
+ * @property {String} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer
  * @property {function} [viewportZoomToSourceZoom=Math.ceil] - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, undefined defaults to `Math.ceil`
  * @property {number} maxZoom - limit MVT tile requests to this zoom level, undefined defaults to no limit
  *
@@ -36,9 +36,9 @@ import Worker from './MVTWorkers.worker';
 /**
  * An MVTMetadata object declares metadata information of a a carto.Source.
  *
- * @typedef {object} MVTMetadata
+ * @typedef {Object} MVTMetadata
  * @property {MVTProperty} properties - property names, types and optionally ranges
- * @property {string} [idProperty='cartodb_id'] - property name of the property that should be used as ID
+ * @property {String} [idProperty='cartodb_id'] - property name of the property that should be used as ID
  *
  * @example <caption> Creating a MVTMetadata object</caption>
  * const metadata = {
@@ -55,8 +55,8 @@ import Worker from './MVTWorkers.worker';
 /**
  * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
  *
- * @typedef {object} MVTProperty
- * @property {string} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
+ * @typedef {Object} MVTProperty
+ * @property {String} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
  * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
  * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
  *

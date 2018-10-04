@@ -154,10 +154,10 @@ export default class Ramp extends BaseExpression {
      * - This works: `ramp($price, [5, 15])`
      * - This does not work: `ramp($price, [5, $amount])`
      *
-     * @param {object} config - Optional configuration
-     * @param {string} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
-     * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
-     * @return {object} - { type, data }. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
+     * @param {Object} config - Optional configuration
+     * @param {String} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
+     * @param {Number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
+     * @return {Object} - `{ type, data }`. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
      * @api
      * @example <caption>Get legend for a color ramp of a categorical property.</caption>
      * const s = carto.expressions;

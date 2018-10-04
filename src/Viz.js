@@ -51,7 +51,7 @@ const SUPPORTED_PROPERTIES = [
  * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
  * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
  *
- * @typedef {object} vizSpec
+ * @typedef {Object} vizSpec
  * @name vizSpec
  * @api
  */
@@ -490,7 +490,7 @@ export default class Viz {
     /**
      * Stringify the visualization
      *
-     * @returns {string}
+     * @returns {String}
      * @memberof carto.Viz
      * @api
      */

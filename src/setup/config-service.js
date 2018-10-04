@@ -6,8 +6,8 @@ let defaultConfig;
 /**
  * Set default configuration parameters
  *
- * @param {object} config
- * @param {string} config.serverURL - Template URL of the CARTO Maps API server: `https://{user}.carto.com`
+ * @param {Object} config
+ * @param {String} config.serverURL - Template URL of the CARTO Maps API server: `https://{user}.carto.com`
  *
  * @memberof carto
  * @api
@@ -19,7 +19,7 @@ function setDefaultConfig (config) {
 
 /**
  * Get default config
- * @return {object}
+ * @return {Object}
  */
 function getDefaultConfig () {
     return defaultConfig;
@@ -35,7 +35,7 @@ function cleanDefaultConfig () {
 /**
  * Check a valid config parameter.
  *
- * @param  {object} config
+ * @param  {Object} config
  */
 function checkConfig (config) {
     if (config) {

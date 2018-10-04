@@ -20,7 +20,7 @@ export default class Interactivity {
     * Moreover, when using an array of layers, the order of the features in the events will be determined by the order of these layers in the layerList.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
-    * @param {object} [options={}] - Object containing interactivity options
+    * @param {Object} [options={}] - Object containing interactivity options
     * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
     *
     * @example
@@ -53,7 +53,7 @@ export default class Interactivity {
     /**
      * Register an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to listen for
+     * @param {String} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
      * @memberof carto.Interactivity
      * @instance
@@ -68,7 +68,7 @@ export default class Interactivity {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Interactivity
      * @instance

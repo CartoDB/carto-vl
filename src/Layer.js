@@ -25,7 +25,7 @@ const renderers = new WeakMap();
 * - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
-* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source} source - The source of the data
 * @param {carto.Viz} viz - The description of the visualization of the data
 * @throws CartoError
@@ -92,7 +92,7 @@ export default class Layer {
     /**
      * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
      *
-     * @param {string} eventName - Type of event to listen for
+     * @param {String} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -105,7 +105,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
