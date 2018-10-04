@@ -4,8 +4,8 @@ In this guide you will learn how to deal with user interactions within your visu
 At the end of the guide you will have built a visualization like this:
 <div class="example-map">
     <iframe
-        id="interactivity-events-final-result"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-N.html"
+        id="guides-interactivity-step-final"
+        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -17,9 +17,7 @@ To start grab the source from a working template like this [basemap](/developers
 Add a navigation control to the map, with:
 ```js
 // Add zoom controls
-const nav = new mapboxgl.NavigationControl({
-    showCompass: false
-});
+const nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-left');
 ```
 
@@ -37,8 +35,9 @@ const displayCenter = () => {
     const center = map.getCenter();
     const longitude = center.lng.toFixed(6);
     const latitude = center.lat.toFixed(6);
-    const zoom = map.getZoom();
-    console.log(`Center: [${longitude}, ${latitude}] & Zoom: ${zoom}`);
+    const bearing = map.getBearing().toFixed(0);
+    const zoom = map.getZoom().toFixed(2);
+    console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
 };
 map.on('move', displayCenter);
 ```
@@ -47,7 +46,7 @@ map.on('move', displayCenter);
 The result should look like this:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-events-step-1"
+        id="guides-interactivity-step-1"
         src="/developers/carto-vl/examples/maps/guides/interactivity/step-1.html"
         width="100%"
         height="500"
@@ -85,7 +84,7 @@ Regarding to the `updated` event, it can be useful for some other cases, where t
 If you check your work now, it should look like this:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-events-step-2"
+        id="guides-interactivity-step-2"
         src="/developers/carto-vl/examples/maps/guides/interactivity/step-2.html"
         width="100%"
         height="500"
@@ -125,7 +124,7 @@ map.off('move', displayCenter);
 You have already advanced a lot in this guide. Now take a small rest and check your work with this:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-events-step-3"
+        id="guides-interactivity-step-3"
         src="/developers/carto-vl/examples/maps/guides/interactivity/step-3.html"
         width="100%"
         height="500"
@@ -218,7 +217,7 @@ new mapboxgl.Popup()
 At this point, your map looks like:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-events-step-4"
+        id="guides-interactivity-step-4"
         src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
         width="100%"
         height="500"
@@ -228,28 +227,39 @@ At this point, your map looks like:
 
 
 ### Interactive-based styling
+Interactivity also can help you to define your styles dynamically.
 
-TODO:
-// Handle 'featureEnter' and 'featureLeave' to alter features style
+For example with the next code you'll learn something very useful and common: how to style your features when you interact with them, to give more emphasis to the selected ones.
+
+First you have to set up a listener for the `featureEnter` in the current `Interactivity` object. This listener will change the color and size of the features included in the `features` array.
+```js
 interactivity.on('featureEnter', featureEvent => {
     featureEvent.features.forEach((feature) => {
         feature.color.blendTo('rgba(0, 255, 0, 0.8)', 100);
+        feature.width.blendTo(20, 100);
     });
 });
+```
+> [blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increase the size of the symbols.
+
+When the `featureLeave` event is fired you can tell your callback to `reset` the color & size of the features
+
+```js
 interactivity.on('featureLeave', featureEvent => {
     featureEvent.features.forEach((feature) => {
         feature.color.reset();
+        feature.width.reset();
     });
 });
-
+```
 
 ### All together
 
 Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
-        id="interactivity-events-final-result"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-N.html"
+        id="guides-interactivity-step-final"
+        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -282,28 +292,118 @@ This is the complete code:
 <body>
     <!-- Add map container -->
     <div id="map"></div>
-
     <script>
         // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
-            zoom: 2,
-            scrollZoom: false,
-            dragRotate: false,
-            touchZoomRotate: false,
+            zoom: 2
         });
+
         // Add zoom controls
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+
+
+        // MAP EVENTS
+        // Wait for the map to render for the first time
+        map.on('load', () => {
+            console.log('Map has loaded!');
+        });
+
+        // Listen to every move event caused by the user
+        const displayCenter = () => {
+            const center = map.getCenter();
+            const longitude = center.lng.toFixed(6);
+            const latitude = center.lat.toFixed(6);
+            const bearing = map.getBearing().toFixed(0);
+            const zoom = map.getZoom().toFixed(2);
+            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
+        };
+        map.on('move', displayCenter);
 
 
         //** CARTO VL functionality begins here **//
 
 
+        // LAYER EVENTS & VARIABLES
+        // Add layer as usual
+        carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
+        const source = new carto.source.Dataset('populated_places');
+
+        // Viz using a dynamic variable
+        const viz = new carto.Viz(`
+            @currentFeatures: viewportFeatures()
+            @name: $name
+            @popK: $pop_max / 1000.0
+        `);
+        const layer = new carto.Layer('Cities', source, viz);
+        layer.addTo(map);
+
+        // Add on 'loaded' event handler to layer
+        layer.on('loaded', () => {
+            console.log('Cities layer has been loaded!');
+        });
+
+        // Disable previous listener on map:move just for clarity
+        map.off('move', displayCenter);
+
+        // Add on 'updated' event handler to layer
+        const displayNumberOfCities = () => {
+            const numberOfFeatures = viz.variables.currentFeatures.value.length;
+            console.log(`Now you can see ${numberOfFeatures} cities`);
+        };
+        layer.on('updated', displayNumberOfCities);
+
+
+        // DATA-DRIVEN VARIABLES & carto.Interactivity
+        const interactivity = new carto.Interactivity(layer);
+
+        // Handle 'featureClick' to display city name and population
+        interactivity.on('featureClick', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                const name = feature.variables.name.value;
+                const popK = feature.variables.popK.value.toFixed(0);
+                console.log(`You have clicked on ${name} with a population of ${popK}K`);
+            });
+
+            // Get the first feature
+            const feature = featureEvent.features[0];
+            if (!feature) {
+                return;
+            }
+
+            // Add pop-up using mapboxgl
+            const coords = featureEvent.coordinates;
+            const html = `
+                <h1>${feature.variables.name.value}</h1>
+                <p>Population: ${feature.variables.popK.value.toFixed(0)}K</p>
+            `;
+            new mapboxgl.Popup()
+                .setLngLat([coords.lng, coords.lat])
+                .setHTML(html)
+                .addTo(map);
+        });
+
+        // Disable previous listener on layer:updated just for clarity
+        layer.off('updated', displayNumberOfCities);
+
+        // Change style on 'featureEnter'
+        interactivity.on('featureEnter', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                feature.color.blendTo('rgba(0, 255, 0, 0.8)', 100);
+                feature.width.blendTo(20, 100);
+            });
+        });
+
+        // Reset to previous style on 'featureLeave'
+        interactivity.on('featureLeave', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                feature.color.reset();
+                feature.width.reset();
+            });
+        });
     </script>
 </body>
 

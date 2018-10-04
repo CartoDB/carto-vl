@@ -34,27 +34,33 @@
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
+
         // MAP EVENTS
         // Wait for the map to render for the first time
         map.on('load', () => {
             console.log('Map has loaded!');
         });
+
         // Listen to every move event caused by the user
         const displayCenter = () => {
             const center = map.getCenter();
             const longitude = center.lng.toFixed(6);
             const latitude = center.lat.toFixed(6);
-            const zoom = map.getZoom();
-            console.log(`Center: [${longitude}, ${latitude}] & Zoom: ${zoom}`);
+            const bearing = map.getBearing().toFixed(0);
+            const zoom = map.getZoom().toFixed(2);
+            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
         };
         map.on('move', displayCenter);
 
+
         //** CARTO VL functionality begins here **//
+
 
         // LAYER EVENTS & VARIABLES
         // Add layer as usual
         carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
+
         // Viz using a dynamic variable
         const viz = new carto.Viz(`
             @currentFeatures: viewportFeatures()
@@ -63,13 +69,15 @@
         `);
         const layer = new carto.Layer('Cities', source, viz);
         layer.addTo(map);
+
         // Add on 'loaded' event handler to layer
         layer.on('loaded', () => {
             console.log('Cities layer has been loaded!');
         });
 
-        // Disable previous listeners just for clarity
+        // Disable previous listener on map:move just for clarity
         map.off('move', displayCenter);
+
         // Add on 'updated' event handler to layer
         const displayNumberOfCities = () => {
             const numberOfFeatures = viz.variables.currentFeatures.value.length;
@@ -80,6 +88,7 @@
 
         // DATA-DRIVEN VARIABLES & carto.Interactivity
         const interactivity = new carto.Interactivity(layer);
+
         // Handle 'featureClick' to display city name and population
         interactivity.on('featureClick', featureEvent => {
             featureEvent.features.forEach((feature) => {
@@ -87,11 +96,13 @@
                 const popK = feature.variables.popK.value.toFixed(0);
                 console.log(`You have clicked on ${name} with a population of ${popK}K`);
             });
+
             // Get the first feature
             const feature = featureEvent.features[0];
             if (!feature) {
                 return;
             }
+
             // Add pop-up using mapboxgl
             const coords = featureEvent.coordinates;
             const html = `
@@ -104,6 +115,24 @@
                 .addTo(map);
         });
 
+        // Disable previous listener on layer:updated just for clarity
+        layer.off('updated', displayNumberOfCities);
+
+        // Change style on 'featureEnter'
+        interactivity.on('featureEnter', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                feature.color.blendTo('rgba(0, 255, 0, 0.8)', 100);
+                feature.width.blendTo(20, 100);
+            });
+        });
+
+        // Reset to previous style on 'featureLeave'
+        interactivity.on('featureLeave', featureEvent => {
+            featureEvent.features.forEach((feature) => {
+                feature.color.reset();
+                feature.width.reset();
+            });
+        });
     </script>
 </body>
 
