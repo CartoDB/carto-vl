@@ -57,6 +57,9 @@ export default class Metadata {
     }
 
     propertyNames (baseName) {
+        // TODO: aggregations and dimensions are specific of Windshaft;
+        // move this method there (and baseNames too?) and leave a
+        // generic method here returning [baseName]
         const prop = this.properties[baseName];
         if (prop.aggregations) {
             return Object.values(prop.aggregations);
@@ -78,5 +81,9 @@ export default class Metadata {
     // convert internal representation to user
     encode (propertyName, propertyValue) {
         throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`);
+    }
+
+    stats (propertyName) {
+        return this.properties[propertyName];
     }
 }

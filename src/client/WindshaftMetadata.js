@@ -34,6 +34,19 @@ export default class WindshaftMetadata extends MVTMetadata {
                 return propertyValue;
         }
     }
+
+    stats(propertyName) {
+        const baseName = this.baseName(propertyName);
+        if (baseName !== propertyName) {
+            const column = this.properties[baseName];
+            if (column.dimension && column.dimension.grouping) { // TODO && check propertyName
+                // TODO: when backend dim stats are implemented,
+                // keep them here and use them.
+                return timeLimits(column.dimension.grouping, column);
+            }
+        }
+        return super.stats(propertyName);
+    }
 }
 
 function epochTo (t, grouping) {
@@ -137,3 +150,5 @@ function encodeDate (propertyName, column, propertyValue) {
         return d;
     }
 }
+
+

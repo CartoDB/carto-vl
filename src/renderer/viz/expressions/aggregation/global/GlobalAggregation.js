@@ -35,11 +35,13 @@ export default class GlobalAggregation extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this.property._bindMetadata(metadata);
+        const propertyName = this.property.propertyName || this.property.name;
+        const stats = metadata.stats(propertyName);
         // TODO improve type check
-        if (metadata.properties[this.property.name][this._name] === undefined) {
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Metadata ${this._name} for property ${this.property.name} is not defined`);
+        if (!stats || stats[this._name] === undefined) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Metadata ${this._name} for property ${propertyName} is not defined`);
         }
-        this._value.expr = metadata.properties[this.property.name][this._name];
+        this._value.expr = stats[this._name];
     }
 
     _getMinimumNeededSchema () {
