@@ -5,64 +5,6 @@ import Base from './Base';
 import TileClient from './TileClient';
 import Worker from './MVTWorkers.worker';
 
-/**
- * A MVTOptions object declares a MVT configuration
- * @typedef {Object} MVTOptions
- * @property {String} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer
- * @property {function} [viewportZoomToSourceZoom=Math.ceil] - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, undefined defaults to `Math.ceil`
- * @property {number} maxZoom - limit MVT tile requests to this zoom level, undefined defaults to no limit
- *
- * @example <caption>Use layer `myAwesomeLayer` and request tiles up to zoom level 12.</caption>
- * const options = {
- *     layerID: 'myAwesomeLayer',
- *     maxZoom: 12
- * };
- *
- * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</caption>
- * const options = {
- *     layerID: 'myAwesomeLayer',
- *     viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 4), 6)
- * };
- *
- * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 0,3,6,9...</caption>
- * const options = {
- *     layerID: 'myAwesomeLayer',
- *     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
- * };
- *
- * @api
- */
-
-/**
- * An MVTMetadata object declares metadata information of a a carto.Source.
- *
- * @typedef {Object} MVTMetadata
- * @property {MVTProperty} properties - property names, types and optionally ranges
- * @property {String} [idProperty='cartodb_id'] - property name of the property that should be used as ID
- *
- * @example <caption> Creating a MVTMetadata object</caption>
- * const metadata = {
-        properties: {
-          numfloors: { type: 'number' },
-          cartodb_id: { type: 'number' }
-        },
-        idProperty: 'cartodb_id',
-      };
- *
- * @api
- */
-
-/**
- * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
- *
- * @typedef {Object} MVTProperty
- * @property {String} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
- * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
- * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
- *
- * @api
- */
-
 export default class MVT extends Base {
     /**
      * Create a carto.source.MVT.
@@ -73,16 +15,18 @@ export default class MVT extends Base {
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
-     * @example Usage with multiple templateURLs as recommended
+     * @example
+     * // Usage with multiple templateURLs as recommended
      * const metadata = new carto.source.mvt.Metadata([{ type: 'number', name: 'total_pop'}])
-     * new carto.source.MVT([
-     *                       "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
-     *                       "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
-     *                       "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
-     *                       "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
-     *                      ],
-     *                      metadata
-     *                     );
+     * const source = new carto.source.MVT(
+     *     [
+     *         "https://server-a.tileserver.com/{z}/{x}/{y}.mvt",
+     *         "https://server-b.tileserver.com/{z}/{x}/{y}.mvt",
+     *         "https://server-c.tileserver.com/{z}/{x}/{y}.mvt",
+     *         "https://server-d.tileserver.com/{z}/{x}/{y}.mvt"
+     *    ],
+     *    metadata
+     *);
      *
      * @throws CartoError
      *
@@ -176,3 +120,62 @@ export default class MVT extends Base {
         this._tileClient.free();
     }
 }
+
+/**
+ * A MVTOptions object declares a MVT configuration
+ *
+ * @typedef {Object} MVTOptions
+ * @property {String} layerID - layerID on the MVT tiles to decode, the parameter is optional if the MVT tiles only contain one layer
+ * @property {function} [viewportZoomToSourceZoom=Math.ceil] - function to transform the viewport zoom into a zoom value to replace `{z}` in the MVT URL template, undefined defaults to `Math.ceil`
+ * @property {number} maxZoom - limit MVT tile requests to this zoom level, undefined defaults to no limit
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles up to zoom level 12.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     maxZoom: 12
+ * };
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 4, 5 and 6.</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 4), 6)
+ * };
+ *
+ * @example <caption>Use layer `myAwesomeLayer` and request tiles only at zoom levels 0,3,6,9...</caption>
+ * const options = {
+ *     layerID: 'myAwesomeLayer',
+ *     viewportZoomToSourceZoom: zoom => Math.round(zoom / 3) * 3
+ * };
+ *
+ * @api
+ */
+
+/**
+ * An MVTMetadata object declares metadata information of a a carto.Source.
+ *
+ * @typedef {Object} MVTMetadata
+ * @property {MVTProperty} properties - property names, types and optionally ranges
+ * @property {String} [idProperty='cartodb_id'] - property name of the property that should be used as ID
+ *
+ * @example <caption> Creating a MVTMetadata object</caption>
+ * const metadata = {
+        properties: {
+          numfloors: { type: 'number' },
+          cartodb_id: { type: 'number' }
+        },
+        idProperty: 'cartodb_id',
+      };
+ *
+ * @api
+ */
+
+/**
+ * MVTProperty objects declare a property type and, optionally, additional information like numeric ranges.
+ *
+ * @typedef {Object} MVTProperty
+ * @property {String} type - Valid values are 'number' and 'category', 'category' must be used if the MVT encodes the property as strings, regardless of the real type
+ * @property {Number} min - With `type='number'` min specifies the minimum value in the dataset, this is used in global aggregation expressions
+ * @property {Number} max - With `type='number'` max specifies the maximum value in the dataset, this is used in global aggregation expressions
+ *
+ * @api
+ */
