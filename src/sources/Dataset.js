@@ -21,12 +21,12 @@ export default class Dataset extends BaseWindshaft {
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
-     * @param {string} tableName - The name of an existing table
-     * @param {object} auth
-     * @param {string} auth.apiKey - API key used to authenticate against CARTO
-     * @param {string} auth.user - Name of the user
-     * @param {object} config
-     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {String} tableName - The name of an existing table
+     * @param {Object} auth
+     * @param {String} auth.apiKey - API key used to authenticate against CARTO
+     * @param {String} auth.user - Name of the user
+     * @param {Object} config
+     * @param {String} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
      *
      * @example
      * const source = new carto.source.Dataset('european_cities', {
@@ -34,11 +34,10 @@ export default class Dataset extends BaseWindshaft {
      *   user: 'YOUR_USERNAME_HERE'
      * });
      *
-     * @fires CartoError
+     * @throws CartoError
      *
-     * @constructor Dataset
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name Dataset
      * @api
      */
     constructor (tableName, auth, config) {
