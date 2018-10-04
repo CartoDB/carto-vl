@@ -119,8 +119,8 @@ export default class GeoJSON extends Base {
     _initializeFeatureProperties (features) {
         for (let i = 0; i < features.length; i++) {
             features[i].properties = features[i].properties || {};
-            features[i].coordinates = 
         }
+
         return features;
     }
 
