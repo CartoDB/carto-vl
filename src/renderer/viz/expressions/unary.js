@@ -1,6 +1,12 @@
-import { implicitCast, checkType, checkMaxArguments } from './utils';
+import {
+    implicitCast,
+    checkType,
+    checkMaxArguments
+} from './utils';
 import BaseExpression from './base';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoValidationError, {
+    CartoValidationTypes as cvt
+} from '../../../errors/carto-validation-error';
 
 /**
  * Compute the natural logarithm (base e) of a number x.
@@ -196,7 +202,10 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  * @function
  * @api
  */
-export const IsNaN = genUnaryOp('isNaN', x => Number.isNaN(x) ? 1 : 0, x => `((${x} <= 0.0 || 0.0 <= ${x}) ? 0. : 1.)`);
+export const IsNaN = genUnaryOp('isNaN',
+    x => Number.isNaN(x) ? 1 : 0,
+    x => `((${x} == ${Number.MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`
+);
 
 /**
  * Compute the logical negation of the given expression.
@@ -288,7 +297,9 @@ function genUnaryOp (name, jsFn, glsl) {
             checkMaxArguments(arguments, 1, name);
 
             a = implicitCast(a);
-            super({ a });
+            super({
+                a
+            });
             this.type = 'number';
             this.expressionName = name;
             this.inlineMaker = inlines => glsl(inlines.a);

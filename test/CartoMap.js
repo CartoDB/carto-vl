@@ -1,3 +1,12 @@
+import { mat4 } from 'gl-matrix';
+
+// Constants extracted from /carto-vl/src/constants/layer.js
+const RESOLUTION_ZOOMLEVEL_ZERO = 512;
+const layerVisibility = Object.freeze({
+    VISIBLE: 'visible',
+    HIDDEN: 'none'
+});
+
 /**
  * @description A simple non-interactive map used for tests
  */
@@ -29,7 +38,6 @@ class CartoMap { // eslint-disable-line no-unused-vars
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl');
-        this._matrix = this._createMatrix();
         this._resizeCanvas(this._containerDimensions());
     }
 
@@ -58,7 +66,7 @@ class CartoMap { // eslint-disable-line no-unused-vars
     }
 
     getZoom () {
-        return 0;
+        return Math.log2(this._canvas.height / RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     getCenter () {
@@ -74,10 +82,10 @@ class CartoMap { // eslint-disable-line no-unused-vars
 
     changeVisibility (layer) {
         switch (layer.visibility) {
-            case 'visible':
+            case layerVisibility.VISIBLE:
                 this.show(layer);
                 break;
-            case 'none':
+            case layerVisibility.HIDDEN:
                 this.hide(layer);
                 break;
         }
@@ -113,6 +121,7 @@ class CartoMap { // eslint-disable-line no-unused-vars
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.isAnimated();
+            layer.prerender(this._gl, this._matrix);
 
             if (hasData || hasAnimation) {
                 layer.render(this._gl, this._matrix);
@@ -180,19 +189,26 @@ class CartoMap { // eslint-disable-line no-unused-vars
 
         this._canvas.style.width = `${size.width}px`;
         this._canvas.style.height = `${size.height}px`;
+
+        this._matrix = this._createMatrix();
     }
 
     _createMatrix () {
-        // This matrix generates proper values of zoom and _center
-        const m = new Array(16);
-        m[0] = -2;
-        m[5] = -2;
-        m[12] = 1;
-        m[13] = 1;
-        m[15] = 1;
+        const ratio = this._canvas.width / this._canvas.height;
+
+        const m = [];
+        mat4.identity(m);
+        mat4.scale(m, m, [2, 1, 1]);
+        mat4.translate(m, m, [-0.5, 0, 0]);
+
+        const m2 = [];
+        mat4.ortho(m2, -ratio, ratio, 1, 0, 0, 1);
+        mat4.multiply(m, m2, m);
+
         return m;
     }
 
     triggerRepaint () {
+        window.requestAnimationFrame(this._update.bind(this));
     }
 }
