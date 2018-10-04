@@ -1,20 +1,22 @@
-import { layerVisibility, RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
-import { mat4 } from 'gl-matrix';
+// CartoMap depends on gl-matrix, which after imported is globally available as 'mat4'
+// Constants extracted from /carto-vl/src/constants/layer.js
+const RESOLUTION_ZOOMLEVEL_ZERO = 512;
+const layerVisibility = Object.freeze({
+    VISIBLE: 'visible',
+    HIDDEN: 'none'
+});
 
 /**
- * @description A simple non-interactive map.
+ * @description A simple non-interactive map used for tests
  */
-
-export default class Map {
+class CartoMap { // eslint-disable-line no-unused-vars
     /**
-     * Create a simple carto.Map by specifying a container `id`.
+     * Create a simple CartoMap by specifying a container `id`.
      *
      * @param  {Object} options
      * @param  {String} options.container The element's string `id`.
      *
-     * @constructor Map
-     * @memberof carto
+     * @constructor CartoMap
      */
     constructor (options) {
         options = options || {};
@@ -22,7 +24,7 @@ export default class Map {
         if (typeof options.container === 'string') {
             const container = window.document.getElementById(options.container);
             if (!container) {
-                throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Container '${options.container}' not found.`);
+                throw new Error(`CartoValidation: Missing required container '${options.container}' not found.`);
             } else {
                 this._container = container;
             }
@@ -153,7 +155,7 @@ export default class Map {
                 this._gl.clear(this._gl.COLOR_BUFFER_BIT);
                 break;
             default:
-                // white
+            // white
         }
     }
 

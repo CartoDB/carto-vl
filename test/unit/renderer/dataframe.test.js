@@ -51,7 +51,7 @@ describe('src/renderer/Dataframe', () => {
                 symbol: { default: true },
                 transform: { default: true }
             };
-            dataframe.renderer = { _zoom: 1, gl: { canvas: {width: 1024, height: 1024} } };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } } };
             dataframe.matrix = m;
 
             it('should return an empty list when there are no points at the given position', () => {
@@ -118,7 +118,7 @@ describe('src/renderer/Dataframe', () => {
             };
 
             dataframe.matrix = m;
-            dataframe.renderer = { _zoom: 1, gl: { canvas: {width: 1024, height: 1024} }, drawMetadata: {zoomLevel: 0} };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
 
             it('should return an empty list when there are no lines at the given position', () => {
                 expect(dataframe.getFeaturesAtPosition({ x: 5 * 1024, y: 1.001 }, viz)).toEqual([]);
@@ -181,7 +181,8 @@ describe('src/renderer/Dataframe', () => {
                 transform: { default: true }
             };
             dataframe.matrix = m;
-            dataframe.renderer = { _zoom: 1, gl: { canvas: {width: 1024, height: 1024} }, drawMetadata: {zoomLevel: 0} };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
+
             const feature1 = {
                 numeric_property: 0,
                 cartodb_id: 0
