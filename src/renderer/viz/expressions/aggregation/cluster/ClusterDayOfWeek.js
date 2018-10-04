@@ -10,7 +10,7 @@ export default class ClusterDayOfWeek extends ClusterTime {
                 group_by: 'dayOfWeek',
                 timezone
             },
-            dimType: 'date'
+            type: 'number'
         });
     }
 }

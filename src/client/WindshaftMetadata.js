@@ -2,18 +2,36 @@ import MVTMetadata from '../sources/MVTMetadata';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 
 export default class WindshaftMetadata extends MVTMetadata {
+
+    _dimensionInfo (propertyName) {
+        const baseName = this.baseName(propertyName);
+        const column = this.properties[baseName];
+        let dimension = null;
+        if (baseName !== propertyName) {
+            if (column.dimension && column.dimension.propertyName === propertyName) {
+                dimension = column.dimension;
+            }
+        }
+        const baseType = column.type;
+        const type = dimension ? dimension.type : baseType;
+        return { baseName, column, dimension, type, baseType };
+    }
+
     decode (propertyName, propertyValue) {
-        const basename = this.baseName(propertyName);
-        const column = this.properties[basename];
+        const { baseName, column, type, baseType, dimension } = this._dimensionInfo(propertyName);
         if (!column) {
             return;
         }
-        switch (column.type) {
+
+        switch (type) {
             case 'date':
-                return decodeDate(propertyName, column, propertyValue);
+                return decodeDate(propertyValue, this.stats(propertyName));
             case 'category':
-                return this.categorizeString(basename, propertyValue);
+                return this.categorizeString(baseName, propertyValue);
             case 'number':
+                if (baseType === 'date') {
+                    return decodeTimeDim(propertyValue, this.stats(propertyName), dimension.grouping);
+                }
                 return propertyValue;
             default:
                 throw new CartoMapsAPIError(
@@ -23,27 +41,27 @@ export default class WindshaftMetadata extends MVTMetadata {
     }
 
     encode (propertyName, propertyValue) {
-        const basename = this.baseName(propertyName);
+        const { dimension, type, baseType } = this._dimensionInfo(propertyName);
 
-        switch (this.properties[basename].type) {
+        switch (type) {
             case 'date':
-                return encodeDate(propertyName, this.properties[basename], propertyValue);
+                return encodeDate(propertyValue, this.stats(propertyName));
             case 'category':
                 return this.IDToCategory.get(propertyValue);
             default:
+                if (type === 'number' && baseType === 'date') {
+                    return encodeTimeDim(propertyValue, this.stats(propertyName), dimension.grouping);
+                }
                 return propertyValue;
         }
     }
 
     stats(propertyName) {
-        const baseName = this.baseName(propertyName);
-        if (baseName !== propertyName) {
-            const column = this.properties[baseName];
-            if (column.dimension && column.dimension.grouping) { // TODO && check propertyName
-                // TODO: when backend dim stats are implemented,
-                // keep them here and use them.
-                return timeLimits(column.dimension.grouping, column);
-            }
+        const { column, dimension } = this._dimensionInfo(propertyName);
+        if (dimension && dimension.grouping) {
+            // TODO: when backend dim stats are implemented,
+            // keep them here and use them.
+            return timeLimits(dimension.grouping, column);
         }
         return super.stats(propertyName);
     }
@@ -65,6 +83,10 @@ function epochTo (t, grouping) {
             return Math.floor(t / 86400);
         case 'week':
             return Math.floor(t / (7 * 86400));
+
+        case 'month':
+            return 1000; // debugging
+
         default:
             throw new Error(`Time grouped by ${grouping.group_by} not yet supported`);
         // TODO:
@@ -109,46 +131,42 @@ function timeLimits (grouping, limits) {
 
 const UNIT_DECODING = false; // DEBUGGING
 
-function decodeDate (propertyName, column, propertyValue) {
-    if (column.dimension && column.dimension.grouping) {
-        if (!UNIT_DECODING) {
-            return propertyValue;
-        }
-        // classified date
-        // column.dimension.propertyName === propertyName
-        const grouping = column.dimension.grouping;
-        const { min, max } = timeLimits(grouping, column);
-        return (propertyValue - min) / (max - min); // TODO: handle max === min
-    } else {
-        // unclassified date (epoch)
-        const d = new Date();
-        d.setTime(1000 * propertyValue);
-        const { min, max } = column;
-        const n = (d - min) / (max.getTime() - min.getTime());
-        return n;
-    }
+function decodeDate (propertyValue, stats) {
+    // unclassified date (epoch)
+    const d = new Date();
+    d.setTime(1000 * propertyValue);
+    const { min, max } = stats;
+    const n = (d - min) / (max.getTime() - min.getTime());
+    return n;
 }
 
-function encodeDate (propertyName, column, propertyValue) {
-    if (column.dimension && column.dimension.grouping) {
-        if (!UNIT_DECODING) {
-            return propertyValue;
-        }
-        // TODO: un map from 0,1... need to use the limits computed from metadata (maybe move that function to metadata?)
-        // TODO: use other parameters: timezone, offset
-        // column.dimension.propertyName === propertyName
-        const grouping = column.dimension.grouping;
-        const { min, max } = timeLimits(grouping, column);
-        return Math.round((max - min) * propertyValue + min);
-    } else {
-        let value = propertyValue;
-        const { min, max } = column;
-        value *= (max.getTime() - min.getTime());
-        value += min.getTime();
-        const d = new Date();
-        d.setTime(value);
-        return d;
+function decodeTimeDim (propertyValue, stats, _grouping) {
+    // TODO: only needed for some _grouping.group_by cases
+    if (!UNIT_DECODING) {
+        return propertyValue;
     }
+    // classified date
+    const { min, max } = stats;
+    return (propertyValue - min) / (max - min); // TODO: handle max === min
+
 }
 
+function encodeDate (propertyValue, stats) {
+    let value = propertyValue;
+    const { min, max } = stats;
+    value *= (max.getTime() - min.getTime());
+    value += min.getTime();
+    const d = new Date();
+    d.setTime(value);
+    return d;
+}
+
+function encodeTimeDim (propertyValue, stats, _grouping) {
+    // TODO: only needed for some _grouping.group_by cases
+    if (!UNIT_DECODING) {
+        return propertyValue;
+    }
+    const { min, max } = stats;
+    return Math.round((max - min) * propertyValue + min);
+}
 

@@ -5,13 +5,13 @@ import * as schema from '../../../../schema';
 
 // TODO: generalize with base clusterDimension
 export default class clusterTime extends BaseExpression {
-    constructor ({ property, expressionName, grouping, dimType }) {
+    constructor ({ property, expressionName, grouping, type }) {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
         this._grouping = grouping;
         this._expressionName = expressionName;
-        this._baseType = dimType;
-        this.type = 'number';
+        // this._baseType = dimType;
+        this.type = type;
     }
 
     get name () {
@@ -29,7 +29,7 @@ export default class clusterTime extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
-        checkType(this._expressionName, 'property', 0, this._baseType, this.property);
+        checkType(this._expressionName, 'property', 0, 'date', this.property);
     }
 
     _resolveAliases () {}

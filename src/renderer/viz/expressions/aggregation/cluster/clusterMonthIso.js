@@ -1,8 +1,8 @@
 import ClusterTime from './ClusterTime';
 import { checkMaxArguments } from '../../utils';
-export default class ClusterMonth extends ClusterTime {
+export default class ClusterMonthIso extends ClusterTime {
     constructor (property, timezone, count, starting) {
-        checkMaxArguments(arguments, 4, 'clusterMonth');
+        checkMaxArguments(arguments, 4, 'clusterMonthIso');
         super({
             property,
             expressionName: 'clusterMonth',
@@ -10,9 +10,10 @@ export default class ClusterMonth extends ClusterTime {
                 group_by: 'month',
                 group_by_count: count,
                 starting,
-                timezone
+                timezone,
+                format: 'iso'
             },
-            type: 'number'
+            type: 'category'
         });
     }
 }

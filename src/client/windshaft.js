@@ -239,7 +239,6 @@ export default class Windshaft {
                             };
                         } else if (usage.type === 'dimension') {
                             const grouping = usage.grouping;
-                            // grouping.format = 'iso';
                             const parameters = Object.assign({ column: propertyName }, grouping);
                             aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.group_by)] = parameters;
                         } else {
@@ -359,9 +358,21 @@ export default class Windshaft {
                 // TODO: proper error
                 throw new Error(`Multiple dimensions based on same column ${column}`);
             }
+
+            // TODO: we should get the type from the dimensions information
+            //   const dimType = adaptColumnType(meta.dimensions[dimName].type)
+            // Meanwhile, we could had place that information in the MNS by the clusterTime expressions
+            // but as propagating it to here seems not straightforward, we'll replicate the type
+            // determination here:
+            const dimType = Object.keys(params).length === 0
+                ? adaptColumnType(properties[column].type)
+                : params.format === 'iso' ? 'category' : 'number';
+
             properties[column].dimension = {
                 propertyName: dimName,
-                grouping: Object.keys(params).length === 0 ? undefined : params
+                grouping: Object.keys(params).length === 0 ? undefined : params,
+                type: dimType
+                // TODO: keep backend dimension metadata here when available
             };
         });
         Object.values(properties).map(property => {
