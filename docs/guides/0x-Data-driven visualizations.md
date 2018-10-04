@@ -3,10 +3,28 @@
 ## What is a ramp?
 
 [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
-- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($electionWinner, [conservatives', 'progressives', 'liberals']), [red, blue, orange])`
-- Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `ramp($temperature, [blue, red])` will assign the color blue to the "cold" features and red to the "hot" ones.
+- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])`
+- Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `color: ramp($population_density, [black, yellow])` will assign the color black to the features with low population density and yellow to the ones with a high population density.
 
-TODO maybe the map examples with the previous cases
+<div class="example-map">
+    <iframe
+        id="election-basic"
+        src="/developers/carto-vl/examples/guides/ramp/election-basic.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
+<div class="example-map">
+    <iframe
+        id="population-density-basic"
+        src="/developers/carto-vl/examples/guides/ramp/population-density-basic.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types or maps like bubble-maps. But, for simplicity's sake, we will stick to colors until the [Ramp Values section](#Ramp-values).
 
@@ -20,22 +38,22 @@ The following sections will cover "Style by value" with different property types
 
 #### Showing raw / unclassified numerical data
 
-Going back to our previous example, it's common to want to map a continuous range of numeric data like temperature data, to a continuous range of colors, for example, the range of colors between blue and red.
+Going back to our previous example, it's common to want to map a continuous range of numeric data like population density data, to a continuous range of colors, for example, the range of colors between black and yellow.
 
 This is very easy to do with CARTO VL, as shown before you just need use:
  ```CARTOVL_Viz
- color: ramp($temperature, [blue, red])
+color: ramp($population_density, [black, yellow])
  ```
 
- This will map the coldest feature in the Source data to *blue* and the hottest feature to *red*. You can even set intermediate colors in the color list like `[white, blue, red, purple]`.
+ This will map the feature with the lowest population density in the Source data to *black* and the feature with the highest population density to *yellow*. You can even set intermediate colors in the color list like `[black, gray, yellow]`.
 
- Matching the input with the context of the coldest and hottest feature is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($temperature, [blue, red])` to `ramp(linear($temperature), [blue, red])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
+ Matching the input with the context of the lowest population density and highest population density is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($population_density, [black, yellow])` to `ramp(linear($population_density), [black, yellow])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
 
 #### Overriding the default range and avoiding outliers
 
  Let's see another *implicit cast*, this time one a little bit more interesting.
 
- The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($temperature)` to things like `linear($temperature, globalMin($temperature), globalMax($temperature))`. This is what sets the context of the coldest and hottest features for `ramp`.
+ The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. This is what sets the context of the coldest and hottest features for `ramp`.
 
  Sometimes, the data has outliers (features with data that is very far away from the norm). In these cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
 
@@ -43,26 +61,26 @@ TODO Let's see it with one example. re use https://carto.com/developers/carto-vl
 TODO we could add an example with outliers and show different vizs:
 TODO maybe temperature is a bad example because some people will think about Celsius and other about Fahrenheit
  ```CARTOVL_Viz
- // This will be implicitly casted to `ramp(linear($temperature), [blue, red])` which will be implcitly casted to
- // ramp(linear($temperature, globalMin($temperature), globalMax($temperature)), [blue, red])
- color: ramp($temperature, [blue, red])
+ // This will be implicitly casted to `ramp(linear($population_density), [blue, red])` which will be implcitly casted to
+ // ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [blue, red])
+ color: ramp($population_density, [blue, red])
  ```
  ```CARTOVL_Viz
  // the same as above due to implicit casts
- color: ramp(linear($temperature), [blue, red])
+ color: ramp(linear($population_density), [blue, red])
  ```
 ```CARTOVL_Viz
  // the same as the two above due to implicit casts
- color: ramp(linear($temperature, globalMin($temperature), globalMax($temperature)), [blue, red])
+ color: ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [blue, red])
  ```
  ```CARTOVL_Viz
  // The data range has been fixed to the [-10, 40] range
- color: ramp(linear($temperature, -10, 40, [blue, red])
+ color: ramp(linear($population_density, -10, 40, [blue, red])
  ```
   ```CARTOVL_Viz
   // The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
   // For dynamic datasets this is better than the previous fixed approach
- color: ramp(linear($temperature, globalPercentile($temperature, 1), globalPercentile($temperature, 99), [blue, red])
+ color: ramp(linear($population_density, globalPercentile($population_density, 1), globalPercentile($population_density, 99), [blue, red])
  ```
 
  TODO add implicit cast to glossary
@@ -123,7 +141,15 @@ In the previous example, we could have regions in which the 'socialist' party wo
 
 The `others` bucket will be colored gray by default. However, it's possible to override this behavior by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives', 'liberals'], [red, blue, green], yellow)`.
 
-TODO example
+<div class="example-map">
+    <iframe
+        id="population-density-basic"
+        src="/developers/carto-vl/examples/guides/ramp/election-others-bucket.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 TODO add *others bucket* to the glossary
 
