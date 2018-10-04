@@ -49,7 +49,6 @@ const SUPPORTED_PROPERTIES = [
 
 /**
  * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
- * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
  *
  * @typedef {Object} vizSpec
  * @name vizSpec
