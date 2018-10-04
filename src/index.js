@@ -51,7 +51,7 @@ import { on, off } from './utils/events';
 
 /**
  *  @namespace carto.basemaps
- *  @description Use CARTO basemaps for your map visualization. Here you have more information about our {@link https://carto.com/location-data-services/basemaps/|basemaps}
+ *  @description Use CARTO basemaps for your map visualization. Here you have more information about our {@link https://carto.com/location-data-services/basemaps/|basemaps}.
  *  @api
  */
 

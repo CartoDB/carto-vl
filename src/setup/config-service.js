@@ -7,7 +7,7 @@ let defaultConfig;
  * Set default configuration parameters
  *
  * @param {object} config
- * @param {string} config.serverURL='https://{user}.carto.com' - Template URL of the CARTO Maps API server
+ * @param {string} config.serverURL - Template URL of the CARTO Maps API server: `https://{user}.carto.com`
  *
  * @memberof carto
  * @api
