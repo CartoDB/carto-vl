@@ -33,13 +33,13 @@ const viz1 = new carto.Viz(`
 `);
 
 const viz2 = new carto.Viz(`
-    strokeColor: blend(red, green, viewportCount() == 3)
+    strokeColor: blend(blue, green, viewportCount() == 2)
     strokeWidth: 30,
     @list: viewportFeatures($value);
 `);
 
 const viz3 = new carto.Viz(`
-    color: blend(blue, yellow, viewportCount() == 2)
+    color: blend(violet, green, viewportCount() == 2)
     width: 50
     @list: viewportFeatures();
 `);

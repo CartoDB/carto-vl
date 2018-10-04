@@ -3,12 +3,10 @@ precision highp float;
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
 
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
-uniform vec2 normalScale;
 uniform vec2 resolution;
+uniform mat4 matrix;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
@@ -32,7 +30,7 @@ $propertyPreface
 $transform_preface
 
 vec2 transform(vec2 p){
-    return $transform_inline(p*resolution)/resolution;
+    return $transform_inline(p*resolution*0.5)/resolution*2.;
 }
 
 void main(void) {
@@ -53,10 +51,9 @@ void main(void) {
   dp = 1.0 / (size + 1.);
   float sizeNormalizer = (size +1.)/size;
 
-
-  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
-
-  vec2 size2 = (2.*size+4.)*normalScale;
+  vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
+  p/=p.w;
+  vec2 size2 = (2.*size+4.)/resolution;
 
     if (featureID.y<0.){
         pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
@@ -70,7 +67,7 @@ void main(void) {
     }
 
   if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {
-    p.x = 10000.;
+    p.z = p.w*2.;
   }
 
   gl_Position = p;

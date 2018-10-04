@@ -15,13 +15,15 @@
             height: 100%;
             width: 100%;
         }
+
     </style>
 </head>
 
 <body>
-    <!-- Map goes here -->
+    <!-- Add map container -->
     <div id="map"></div>
     <script>
+        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -29,12 +31,30 @@
             zoom: 2,
             dragRotate: false,
         });
-        map.touchZoomRotate.disableRotation();
 
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
+        //** CARTO VL functionality begins here **//
+
+        // Define the user
+        carto.setDefaultAuth({
+            user: 'cartovl',
+            apiKey: 'default_public'
         });
-        map.addControl(nav, 'top-left');
+
+        // Define source
+        const source = new carto.source.Dataset('populated_places');
+
+        // Define and style Viz object
+        const viz = new carto.Viz(`
+                color: red
+                width: 10
+            `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add map layer
+        layer.addTo(map);
+
     </script>
 </body>
 
