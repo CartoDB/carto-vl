@@ -28,6 +28,10 @@ export default class GlobalAggregation extends BaseExpression {
         return this._value.expr;
     }
 
+    _resolveAliases (aliases) {
+        this.property._resolveAliases(aliases);
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this.property._bindMetadata(metadata);
