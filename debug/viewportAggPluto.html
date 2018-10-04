@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Ocean bathymetry | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
-  <script src="../../dist/carto-vl.js"></script>
+  <script src="../dist/carto-vl.js"></script>
   <!-- Include Mapbox GL JS -->
   <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
   <!-- Include Mapbox GL CSS -->
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Ocean bathymetry</h1>
+        <h1>Add layer</h1>
       </header>
       <section>
-        <p class="description open-sans">Since the ocean is forever active, and moving, we wanted to demonstrate how we could animate the points to give that sense of movement</p>
+        <p class="description open-sans">Show viewport aggregations</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -35,12 +35,10 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.darkmatter,
-      center: [-20, 20],
-      zoom: 2,
+      style: carto.basemaps.voyager,
+      center: [-73.98076101209858, 40.751681063],
+      zoom: 13,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -55,16 +53,20 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset('bathy_points');
+    const source = new carto.source.Dataset('mnmappluto');
     const viz = new carto.Viz(`
-      @speed : 3*now()+$dn
-
-      width: 5
-      color: ramp(linear($dn,0,255),teal)
-      filter: sin(@speed)*0.5+0.5
-      strokeWidth: 0
+        color: ramp(linear(log($numfloors), 1, 4), Earth)
+        @avg: viewportMax($numfloors)
+        filter: 0.51
     `);
     const layer = new carto.Layer('layer', source, viz);
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureHover', f=>{
+      console.log(f);
+    });
+    layer.on('updated', ()=>{
+        console.log(viz.variables.avg.value);
+    });
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
