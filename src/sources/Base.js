@@ -2,12 +2,9 @@ export default class Base {
     /**
      * Base data source object.
      *
-     * The methods listed in the {@link carto.source} object are available in all source objects.
+     * The current {@link carto.source|sources} available are: {@link carto.source.Dataset|Dataset}, {@link carto.source.SQL|SQL}, {@link carto.source.GeoJSON|GeoJSON} and {@link carto.source.MVT|MVT}
      *
      * Use a source to reference the data used in a {@link carto.Layer|layer}.
-     *
-     * {@link carto.source} should not be used directly use {@link carto.source.Dataset}, {@link carto.source.SQL} of {@link carto.source.GeoJSON} instead.
-     *
      *
      * @constructor Base
      * @namespace carto.source

@@ -2,7 +2,7 @@ import { implicitCast } from './utils';
 import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
-import CartRuntimeError from '../../../errors/carto-runtime-error';
+import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 /**
  * CARTO VL Expression
@@ -66,7 +66,7 @@ export default class Base {
      *
      */
     eval (feature) {
-        throw new CartRuntimeError('Unimplemented');
+        throw new CartoRuntimeError('Unimplemented');
     }
 
     /**

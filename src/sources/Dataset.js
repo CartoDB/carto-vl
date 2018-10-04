@@ -34,7 +34,7 @@ export default class Dataset extends BaseWindshaft {
      *   user: 'YOUR_USERNAME_HERE'
      * });
      *
-     * @fires CartoError
+     * @throws CartoError
      *
      * @memberof carto.source
      * @name Dataset

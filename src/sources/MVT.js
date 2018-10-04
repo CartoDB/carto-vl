@@ -84,7 +84,7 @@ export default class MVT extends Base {
      *                      metadata
      *                     );
      *
-     * @fires CartoError
+     * @throws CartoError
      *
      * @memberof carto.source
      * @name MVT

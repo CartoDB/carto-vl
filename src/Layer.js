@@ -28,6 +28,7 @@ const renderers = new WeakMap();
 * @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source} source - The source of the data
 * @param {carto.Viz} viz - The description of the visualization of the data
+* @throws CartoError
 *
 * @example
 * const layer = new carto.Layer('layer0', source, viz);

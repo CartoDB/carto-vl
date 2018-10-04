@@ -35,7 +35,7 @@ export default class Interactivity {
     * @fires featureHover
     * @fires featureEnter
     * @fires featureLeave
-    * @fires CartoError
+    * @throws CartoError
     *
     * @constructor Interactivity
     * @name carto.Interactivity

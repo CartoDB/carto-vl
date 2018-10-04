@@ -154,9 +154,9 @@
  */
 
 /**
- * Type of Translate Expressions.
+ * Type of Transformation expressions.
  *
- * More information in {@link carto.expressions.translate|carto.expressions.translate}.
+ * More information in {@link carto.expressions.rotate|carto.expressions.rotate} and {@link carto.expressions.translate|carto.expressions.translate} expressions.
  *
  * @typedef {} Transformation
  * @name Transformation
