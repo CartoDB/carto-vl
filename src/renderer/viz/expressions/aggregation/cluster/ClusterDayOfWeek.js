@@ -7,7 +7,7 @@ export default class ClusterDayOfWeek extends ClusterTime {
             property,
             expressionName: 'clusterDayOfWeek',
             grouping: {
-                group_by: 'dayOfWeek',
+                grouping: 'dayOfWeek',
                 timezone
             },
             type: 'number'

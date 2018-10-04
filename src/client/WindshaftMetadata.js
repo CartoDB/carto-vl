@@ -59,9 +59,7 @@ export default class WindshaftMetadata extends MVTMetadata {
     stats(propertyName) {
         const { column, dimension } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
-            // TODO: when backend dim stats are implemented,
-            // keep them here and use them.
-            return timeLimits(dimension.grouping, column);
+            return dimension;
         }
         return super.stats(propertyName);
     }
@@ -72,7 +70,7 @@ function epochTo (t, grouping) {
     // which are currently ignored
     // Note that supporting timezone for other than fixed offsets
     // (i.e. with DST) would require a largish time library
-    switch (grouping.group_by) {
+    switch (grouping.grouping) {
         case 'second':
             return Math.floor(t);
         case 'minute':
@@ -88,7 +86,7 @@ function epochTo (t, grouping) {
             return 1000; // debugging
 
         default:
-            throw new Error(`Time grouped by ${grouping.group_by} not yet supported`);
+            throw new Error(`Time grouped by ${grouping.grouping} not yet supported`);
         // TODO:
         // case 'month':
         // case 'quarter':
@@ -104,7 +102,7 @@ function epochTo (t, grouping) {
 // the limits of the base column
 function timeLimits (grouping, limits) {
     const { min, max } = limits;
-    switch (grouping.group_by) {
+    switch (grouping.grouping) {
         case 'minuteOfHour':
             return { min: 0, max: 59 };
         case 'hourOfDay':
@@ -141,7 +139,7 @@ function decodeDate (propertyValue, stats) {
 }
 
 function decodeTimeDim (propertyValue, stats, _grouping) {
-    // TODO: only needed for some _grouping.group_by cases
+    // TODO: only needed for some _grouping.grouping cases
     if (!UNIT_DECODING) {
         return propertyValue;
     }
@@ -162,7 +160,7 @@ function encodeDate (propertyValue, stats) {
 }
 
 function encodeTimeDim (propertyValue, stats, _grouping) {
-    // TODO: only needed for some _grouping.group_by cases
+    // TODO: only needed for some _grouping.grouping cases
     if (!UNIT_DECODING) {
         return propertyValue;
     }

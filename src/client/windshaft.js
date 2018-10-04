@@ -240,7 +240,7 @@ export default class Windshaft {
                         } else if (usage.type === 'dimension') {
                             const grouping = usage.grouping;
                             const parameters = Object.assign({ column: propertyName }, grouping);
-                            aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.group_by)] = parameters;
+                            aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.grouping)] = parameters;
                         } else {
                             // automatic ungrouped dimension
                             // TODO:
@@ -305,6 +305,7 @@ export default class Windshaft {
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
+                dimensions: true,
                 sample: {
                     num_rows: SAMPLE_ROWS,
                     include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
@@ -353,27 +354,22 @@ export default class Windshaft {
         });
         Object.keys(agg.dimensions).forEach(dimName => {
             const dimension = agg.dimensions[dimName];
+            const dimensionStats = stats.dimensions[dimName];
+            const dimType = adaptColumnType(dimensionStats.type);
             const { column, ...params } = dimension;
             if (properties[column].dimension) {
                 // TODO: proper error
                 throw new Error(`Multiple dimensions based on same column ${column}`);
             }
-
-            // TODO: we should get the type from the dimensions information
-            //   const dimType = adaptColumnType(meta.dimensions[dimName].type)
-            // Meanwhile, we could had place that information in the MNS by the clusterTime expressions
-            // but as propagating it to here seems not straightforward, we'll replicate the type
-            // determination here:
-            const dimType = Object.keys(params).length === 0
-                ? adaptColumnType(properties[column].type)
-                : params.format === 'iso' ? 'category' : 'number';
-
             properties[column].dimension = {
                 propertyName: dimName,
-                grouping: Object.keys(params).length === 0 ? undefined : params,
-                type: dimType
-                // TODO: keep backend dimension metadata here when available
+                grouping: Object.keys(params).length === 0 ? undefined : dimensionStats.params,
+                type: dimType,
+                // TODO: merge all properties of dimensionStats except params, type
+                min: dimensionStats.min,
+                max: dimensionStats.max
             };
+            console.log("COL", column, "DIM", properties[column].dimension);
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

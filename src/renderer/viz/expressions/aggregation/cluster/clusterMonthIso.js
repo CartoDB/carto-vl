@@ -7,8 +7,8 @@ export default class ClusterMonthIso extends ClusterTime {
             property,
             expressionName: 'clusterMonth',
             grouping: {
-                group_by: 'month',
-                group_by_count: count,
+                grouping: 'month',
+                count: count,
                 starting,
                 timezone,
                 format: 'iso'

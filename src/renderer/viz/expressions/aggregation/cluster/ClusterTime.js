@@ -19,11 +19,11 @@ export default class clusterTime extends BaseExpression {
     }
 
     get propertyName () {
-        return schema.column.dimColumn(this.property.name, this._grouping.group_by);
+        return schema.column.dimColumn(this.property.name, this._grouping.grouping);
     }
 
     eval (feature) {
-        return feature[schema.column.dimColumn(this.property.name, this._grouping.group_by)];
+        return feature[schema.column.dimColumn(this.property.name, this._grouping.grouping)];
     }
 
     _bindMetadata (metadata) {
