@@ -165,6 +165,17 @@
  */
 
 /**
+ * Type of Placement expressions.
+ *
+ * More information in {@link carto.expressions.placement|carto.expressions.placement} expression.
+ *
+ * @typedef {} Placement
+ * @name Placement
+ * @memberof Types
+ * @api
+ */
+
+/**
  * Type of Ordered Expressions.
  *
  * Order expressions are {@link carto.expressions.asc|carto.expressions.asc}, {@link carto.expressions.desc|carto.expressions.desc} and {@link carto.expressions.noOrder|carto.expressions.noOrder}.
