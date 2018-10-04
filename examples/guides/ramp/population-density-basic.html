@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Select Visualization</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Change the visualization of the layer</p>
+                <div id="controls">
+                    <ul class="actions">
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, yellow])')" id="viz1" checked>
+                            <label for="viz1">ramp($dn, [transparent, yellow])</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [transparent, yellow])')" id="viz2" checked>
+                            <label for="viz2">ramp(linear($dn), [transparent, yellow])</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])')" id="viz3" checked>
+                            <label for="viz3">'ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])'</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, 0, 160), [transparent, yellow])')" id="viz4" checked>
+                            <label for="viz4">'ramp(linear($dn, 0, 160), [transparent, yellow])'</label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])')" id="viz5" checked>
+                            <label for="viz5">'ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])'</label>
+                        </li>
+                    </ul>
+                    <div id="info"></div>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [8, 20],
+            zoom: 2.2,
+        });
+
+        carto.setDefaultAuth({
+            user: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("pop_density_points");
+        const viz = new carto.Viz(`
+            width: 2
+            color: ramp($dn, [transparent, yellow])
+            strokeWidth: 0
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>
