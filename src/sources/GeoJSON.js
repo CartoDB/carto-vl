@@ -282,7 +282,10 @@ export default class GeoJSON extends Base {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                properties[name][i] = Number(f.properties[name]);
+                const numericValue = Number(f.properties[name]);
+                properties[name][i] = Number.isNaN(numericValue)
+                    ? Number.MIN_SAFE_INTEGER
+                    : numericValue;
             });
             dateFields.forEach(name => {
                 const property = this._properties[name];

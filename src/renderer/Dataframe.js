@@ -98,6 +98,9 @@ export default class Dataframe extends DummyDataframe {
     }
 
     getFeaturesAtPosition (pos, viz) {
+        if (!this.matrix) {
+            return [];
+        }
         switch (this.type) {
             case 'point':
                 return this._getPointsAtPosition(pos, viz);
@@ -111,6 +114,9 @@ export default class Dataframe extends DummyDataframe {
     }
 
     inViewport (featureIndex) {
+        if (!this.matrix) {
+            return false;
+        }
         switch (this.type) {
             case 'point':
                 return this._isPointInViewport(featureIndex);
@@ -173,16 +179,18 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _isPointInViewport (featureIndex) {
-        if (!this.matrix) {
-            return false;
-        }
+        const matrix = this.matrix;
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
         const y = this.decodedGeom.vertices[6 * featureIndex + 1];
+
+        const ox = matrix[0] * x + matrix[4] * y + matrix[12];
+        const oy = matrix[1] * x + matrix[5] * y + matrix[13];
+        const ow = matrix[3] * x + matrix[7] * y + matrix[15];
+
         // Transform to Clip Space
-        const p = transformMat4Vec2(this.t1, [x, y], this.matrix);
         // Check in Clip Space if the point is inside the viewport
         // See https://www.khronos.org/opengl/wiki/Vertex_Post-Processing#Clipping
-        return p[0] > -p[3] && p[0] < p[3] && p[1] > -p[3] && p[1] < p[3];
+        return ox > -ow && ox < ow && oy > -ow && oy < ow;
     }
 
     _isPolygonInViewport (featureIndex) {
@@ -200,32 +208,28 @@ export default class Dataframe extends DummyDataframe {
     }
 
     _compareAABBs (featureAABB) {
-        if (featureAABB === null || !this.matrix) {
+        if (featureAABB === null) {
             return AABBTestResults.OUTSIDE;
         }
 
-        const corners = [
-            this._projectToNDC(this.t1, [featureAABB.minx, featureAABB.miny]),
-            this._projectToNDC(this.t2, [featureAABB.minx, featureAABB.maxy]),
-            this._projectToNDC(this.t3, [featureAABB.maxx, featureAABB.miny]),
-            this._projectToNDC(this.t4, [featureAABB.maxx, featureAABB.maxy])
-        ];
+        const corners1 = this._projectToNDC(featureAABB.minx, featureAABB.miny);
+        const corners2 = this._projectToNDC(featureAABB.minx, featureAABB.maxy);
+        const corners3 = this._projectToNDC(featureAABB.maxx, featureAABB.miny);
+        const corners4 = this._projectToNDC(featureAABB.maxx, featureAABB.maxy);
 
         const featureStrokeAABB = {
-            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
-            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
-            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
-            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
+            minx: Math.min(corners1.x, corners2.x, corners3.x, corners4.x),
+            miny: Math.min(corners1.y, corners2.y, corners3.y, corners4.y),
+            maxx: Math.max(corners1.x, corners2.x, corners3.x, corners4.x),
+            maxy: Math.max(corners1.y, corners2.y, corners3.y, corners4.y)
         };
 
-        // NDC viewport (by definition)
         const viewportAABB = {
             minx: -1,
             miny: -1,
             maxx: 1,
             maxy: 1
         };
-
         switch (true) {
             case _isFeatureAABBInsideViewport(featureStrokeAABB, viewportAABB):
                 return AABBTestResults.INSIDE;
@@ -242,30 +246,19 @@ export default class Dataframe extends DummyDataframe {
         }
         const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
         for (let i = start; i < end; i += 6) {
-            const v1 = this._projectToNDC(this.t1, [
-                vertices[i + 0],
-                vertices[i + 1]
-            ]);
-
-            const v2 = this._projectToNDC(this.t2, [
-                vertices[i + 2],
-                vertices[i + 3]
-            ]);
-
-            const v3 = this._projectToNDC(this.t3, [
-                vertices[i + 4],
-                vertices[i + 5]
-            ]);
+            const v1 = this._projectToNDC(vertices[i + 0], vertices[i + 1]);
+            const v2 = this._projectToNDC(vertices[i + 2], vertices[i + 3]);
+            const v3 = this._projectToNDC(vertices[i + 4], vertices[i + 5]);
 
             const triangle = [{
-                x: v1[0],
-                y: v1[1]
+                x: v1.x,
+                y: v1.y
             }, {
-                x: v2[0],
-                y: v2[1]
+                x: v2.x,
+                y: v2.y
             }, {
-                x: v3[0],
-                y: v3[1]
+                x: v3.x,
+                y: v3.y
             }];
 
             if (triangleCollides(triangle, aabb)) {
@@ -276,12 +269,14 @@ export default class Dataframe extends DummyDataframe {
         return false;
     }
 
-    _projectToNDC (t, p) {
-        const p2 = transformMat4Vec2(t, p, this.matrix);
+    _projectToNDC (x, y) {
+        const matrix = this.matrix;
+        const ox = matrix[0] * x + matrix[4] * y + matrix[12];
+        const oy = matrix[1] * x + matrix[5] * y + matrix[13];
+        const ow = matrix[3] * x + matrix[7] * y + matrix[15];
+
         // Normalize by W
-        p2[0] /= p2[3];
-        p2[1] /= p2[3];
-        return p2;
+        return {x: ox / ow, y: oy / ow};
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -304,25 +299,25 @@ export default class Dataframe extends DummyDataframe {
                 x: points[i],
                 y: points[i + 1]
             };
-            const c2 = this._projectToNDC(this.t1, [center.x, center.y]);
+            const c2 = this._projectToNDC(center.x, center.y);
 
             // Project to pixel space
-            c2[0] *= 0.5;
-            c2[1] *= -0.5;
-            c2[0] += 0.5;
-            c2[1] += 0.5;
-            c2[0] *= WIDTH;
-            c2[1] *= HEIGHT;
+            c2.x *= 0.5;
+            c2.y *= -0.5;
+            c2.x += 0.5;
+            c2.y += 0.5;
+            c2.x *= WIDTH;
+            c2.y *= HEIGHT;
 
             const radius = this._computePointRadius(feature, viz);
 
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
-                c2[0] += vizOffset[0];
-                c2[1] -= vizOffset[1];
+                c2.x += vizOffset.x;
+                c2.y -= vizOffset.y;
             }
 
-            const inside = pointInCircle(pos, {x: c2[0], y: c2[1]}, radius);
+            const inside = pointInCircle(pos, c2, radius);
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -393,40 +388,40 @@ export default class Dataframe extends DummyDataframe {
                 }
             }
 
-            const v1 = this._projectToNDC(this.t1, [
+            const v1 = this._projectToNDC(
                 vertices[i + 0] + normals[i + 0] * strokeWidthScale,
                 vertices[i + 1] + normals[i + 1] * strokeWidthScale
-            ]);
+            );
 
-            const v2 = this._projectToNDC(this.t2, [
+            const v2 = this._projectToNDC(
                 vertices[i + 2] + normals[i + 2] * strokeWidthScale,
                 vertices[i + 3] + normals[i + 3] * strokeWidthScale
-            ]);
+            );
 
-            const v3 = this._projectToNDC(this.t3, [
+            const v3 = this._projectToNDC(
                 vertices[i + 4] + normals[i + 4] * strokeWidthScale,
                 vertices[i + 5] + normals[i + 5] * strokeWidthScale
-            ]);
+            );
 
-            v1[0] *= 0.5;
-            v1[1] *= -0.5;
-            v1[0] += 0.5;
-            v1[1] += 0.5;
+            v1.x *= 0.5;
+            v1.y *= -0.5;
+            v1.x += 0.5;
+            v1.y += 0.5;
 
-            v2[0] *= 0.5;
-            v2[1] *= -0.5;
-            v2[0] += 0.5;
-            v2[1] += 0.5;
+            v2.x *= 0.5;
+            v2.y *= -0.5;
+            v2.x += 0.5;
+            v2.y += 0.5;
 
-            v3[0] *= 0.5;
-            v3[1] *= -0.5;
-            v3[0] += 0.5;
-            v3[1] += 0.5;
+            v3.x *= 0.5;
+            v3.y *= -0.5;
+            v3.x += 0.5;
+            v3.y += 0.5;
 
             const inside = pointInTriangle(pos,
-                { x: v1[0] * WIDTH + offset.x, y: v1[1] * HEIGHT - offset.y },
-                { x: v2[0] * WIDTH + offset.x, y: v2[1] * HEIGHT - offset.y },
-                { x: v3[0] * WIDTH + offset.x, y: v3[1] * HEIGHT - offset.y });
+                { x: v1.x * WIDTH + offset.x, y: v1.y * HEIGHT - offset.y },
+                { x: v2.x * WIDTH + offset.x, y: v2.y * HEIGHT - offset.y },
+                { x: v3.x * WIDTH + offset.x, y: v3.y * HEIGHT - offset.y });
 
             if (inside) {
                 features.push(this.getFeature(featureIndex));
@@ -445,18 +440,17 @@ export default class Dataframe extends DummyDataframe {
         if (aabb === null || !this.matrix) {
             return false;
         }
-        const corners = [
-            this._projectToNDC(this.t1, [aabb.minx, aabb.miny]),
-            this._projectToNDC(this.t2, [aabb.minx, aabb.maxy]),
-            this._projectToNDC(this.t3, [aabb.maxx, aabb.miny]),
-            this._projectToNDC(this.t4, [aabb.maxx, aabb.maxy])
-        ];
+
+        const corners1 = this._projectToNDC(aabb.minx, aabb.miny);
+        const corners2 = this._projectToNDC(aabb.minx, aabb.maxy);
+        const corners3 = this._projectToNDC(aabb.maxx, aabb.miny);
+        const corners4 = this._projectToNDC(aabb.maxx, aabb.maxy);
 
         const ndcAABB = {
-            minx: Math.min(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
-            miny: Math.min(corners[0][1], corners[1][1], corners[2][1], corners[3][1]),
-            maxx: Math.max(corners[0][0], corners[1][0], corners[2][0], corners[3][0]),
-            maxy: Math.max(corners[0][1], corners[1][1], corners[2][1], corners[3][1])
+            minx: Math.min(corners1.x, corners2.x, corners3.x, corners4.x),
+            miny: Math.min(corners1.y, corners2.y, corners3.y, corners4.y),
+            maxx: Math.max(corners1.x, corners2.x, corners3.x, corners4.x),
+            maxy: Math.max(corners1.y, corners2.y, corners3.y, corners4.y)
         };
 
         const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
@@ -470,9 +464,9 @@ export default class Dataframe extends DummyDataframe {
         };
         const pointAABB = {
             minx: ndcPoint.x + ox - widthScale * 2 / WIDTH,
-            miny: ndcPoint.y + oy - widthScale * 2 / HEIGHT,
+            miny: ndcPoint.y - oy - widthScale * 2 / HEIGHT,
             maxx: ndcPoint.x + ox + widthScale * 2 / WIDTH,
-            maxy: ndcPoint.y + oy + widthScale * 2 / HEIGHT
+            maxy: ndcPoint.y - oy + widthScale * 2 / HEIGHT
         };
 
         return !_isFeatureAABBOutsideViewport(ndcAABB, pointAABB);
@@ -585,15 +579,4 @@ function _isFeatureAABBInsideViewport (featureAABB, viewportAABB) {
 function _isFeatureAABBOutsideViewport (featureAABB, viewportAABB) {
     return (featureAABB.minx > viewportAABB.maxx || featureAABB.miny > viewportAABB.maxy ||
         featureAABB.maxx < viewportAABB.minx || featureAABB.maxy < viewportAABB.miny);
-}
-
-// Multiply a vector of the form `vec4(a[0], a[1], 0, 1)` by a 4x4 matrix
-// Storing the result on `out`, returning `out`
-function transformMat4Vec2 (out, vector, matrix) {
-    const x = vector[0];
-    const y = vector[1];
-    out[0] = matrix[0] * x + matrix[4] * y + matrix[12];
-    out[1] = matrix[1] * x + matrix[5] * y + matrix[13];
-    out[3] = matrix[3] * x + matrix[7] * y + matrix[15];
-    return out;
 }
