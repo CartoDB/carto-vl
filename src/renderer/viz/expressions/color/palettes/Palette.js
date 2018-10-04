@@ -9,9 +9,9 @@ const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
  * Color palettes.
  *
  * Palettes are constants that allow to use {@link https://carto.com/carto-colors/|CARTOColors} and {@link https://github.com/axismaps/colorbrewer/|ColorBrewer} palettes easily.
- * Use them with a {@link carto.expressions.ramp|ramp}
+ * Use them with a {@link carto.expressions.ramp|ramp}.
  *
- * The following palettes are available in the namespace {@link carto.expressions.palettes|carto.expressions.palettes}.
+ * The following palettes are available in the namespace {@link carto.expressions|carto.expressions}.
  *
  *  ```
  *  BURG, BURGYL, REDOR, ORYEL, PEACH, PINKYL, MINT, BLUGRN, DARKMINT, EMRLD, AG_GRNYL, BLUYL, TEAL, TEALGRN,
@@ -33,11 +33,10 @@ const MIN_CARTOCOLOR_SUBPALETTE_SIZE = 2;
  *   color: ramp($type, PRISM)
  * `);
  *
- * @name carto.expressions.palettes
+ * @name palettes
  * @memberof carto.expressions
  * @api
  */
-
 export default class Palette extends BaseExpression {
     constructor (name, subPalettes) {
         super({});

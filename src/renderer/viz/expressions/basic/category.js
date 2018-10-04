@@ -4,7 +4,7 @@ import { checkString, checkMaxArguments } from '../utils';
 /**
  * Wrapper around category names. Explicit usage is unnecessary since CARTO VL will wrap implicitly all strings using this function.
  *
- * @param {string} categoryName
+ * @param {String} categoryName
  * @returns {Category} category expression with the name provided
  *
  * @memberof carto.expressions

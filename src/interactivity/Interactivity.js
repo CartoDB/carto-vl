@@ -2,61 +2,6 @@ import mitt from 'mitt';
 import Layer from '../Layer';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
-/**
- *
- * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
- *
- * @typedef {object} FeatureEvent
- * @property {object} coordinates - LongLat coordinates in { lng, lat } form
- * @property {object} position - Pixel coordinates in { x, y } form
- * @property {Feature[]} features - Array of {@link Feature}
- * @api
- */
-
-/**
- * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
- *
- * @event featureClick
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureClickOut events are fired when the user clicks outside a feature that was clicked in the last featureClick event.
- * The list of features that were clicked before and that are no longer behind this new click is provided.
- *
- * @event featureClickOut
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature (as reported by featureHover or featureLeave) is now under the cursor.
- * The list of features that are now behind the cursor and that weren't before is provided.
- *
- * @event featureEnter
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureHover events are fired when the user moves the cursor.
- * The list of features behind the cursor is provided.
- *
- * @event featureHover
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature (as reported by featureHover or featureEnter) is no longer behind the cursor.
- * The list of features that are no longer behind the cursor and that were before is provided.
- *
- * @event featureLeave
- * @type {FeatureEvent}
- * @api
- */
-
 const EVENTS = [
     'featureClick',
     'featureClickOut',
@@ -70,12 +15,12 @@ export default class Interactivity {
     *
     * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
     *
-    * To create a Interactivity object an array of {@link carto.Layer} is required.
-    * Events fired from interactivity objects will refer to the features of these layers and only these layers.
-    * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
+    * To create a Interactivity object a {@link carto.Layer} or an array with several {@link carto.Layer} is required.
+    * Events fired from interactivity objects will refer to the features of these layer/s and only these layer/s.
+    * Moreover, when using an array of layers, the order of the features in the events will be determined by the order of these layers in the layerList.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
-    * @param {object} [options={}] - Object containing interactivity options
+    * @param {Object} [options={}] - Object containing interactivity options
     * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
     *
     * @example
@@ -90,10 +35,10 @@ export default class Interactivity {
     * @fires featureHover
     * @fires featureEnter
     * @fires featureLeave
-    * @fires CartoError
+    * @throws CartoError
     *
     * @constructor Interactivity
-    * @memberof carto
+    * @name carto.Interactivity
     * @api
     */
     constructor (layerList, options = { autoChangePointer: true }) {
@@ -108,7 +53,7 @@ export default class Interactivity {
     /**
      * Register an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to listen for
+     * @param {String} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
      * @memberof carto.Interactivity
      * @instance
@@ -123,7 +68,7 @@ export default class Interactivity {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Interactivity
      * @instance

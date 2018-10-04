@@ -5,7 +5,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
 /**
  * Create a color from its hexadecimal description.
  *
- * @param {string} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
+ * @param {String} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>

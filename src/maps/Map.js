@@ -10,8 +10,8 @@ export default class Map {
     /**
      * Create a simple carto.Map by specifying a container `id`.
      *
-     * @param  {object} options
-     * @param  {string} options.container The element's string `id`.
+     * @param  {Object} options
+     * @param  {String} options.container The element's string `id`.
      *
      * @constructor Map
      * @memberof carto

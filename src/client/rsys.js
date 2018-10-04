@@ -3,7 +3,7 @@
  * in the range -1 <= x <= +1; -1 <= y <= +1 to an arbitrary rectangle
  * in an external coordinate system. (e.g. Dataframe coordinates to World coordinates)
  * It is the combination of a translation and anisotropic scaling.
- * @typedef {object} RSys - Renderer relative coordinate system
+ * @typedef {Object} RSys - Renderer relative coordinate system
  * @property {RPoint} center - Position of the local system in external coordinates
  * @property {number} scale - Y-scale (local Y-distance / external Y-distance)
 */
