@@ -13,8 +13,8 @@ class CartoMap { // eslint-disable-line no-unused-vars
     /**
      * Create a simple CartoMap by specifying a container `id`.
      *
-     * @param  {object} options
-     * @param  {string} options.container The element's string `id`.
+     * @param  {Object} options
+     * @param  {String} options.container The element's string `id`.
      *
      * @constructor CartoMap
      */

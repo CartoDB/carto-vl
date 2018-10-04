@@ -12,7 +12,7 @@ const INITIAL_TIMESTAMP = Date.now();
 const FILTERING_THRESHOLD = 0.5;
 
 /**
- * @typedef {object} RPoint - Point in renderer coordinates space
+ * @typedef {Object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
  */

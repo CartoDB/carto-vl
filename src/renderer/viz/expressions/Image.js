@@ -6,7 +6,7 @@ import { checkString, checkMaxArguments } from './utils';
  *
  * Note: image RGB color will be overridden if the viz `color` property is set.
  *
- * @param {string} url - Image path
+ * @param {String} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
  * const s = carto.expressions;
