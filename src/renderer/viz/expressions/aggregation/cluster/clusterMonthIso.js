@@ -5,7 +5,7 @@ export default class ClusterMonthIso extends ClusterTime {
         checkMaxArguments(arguments, 4, 'clusterMonthIso');
         super({
             property,
-            expressionName: 'clusterMonth',
+            expressionName: 'clusterMonthIso',
             grouping: {
                 grouping: 'month',
                 count: count,
