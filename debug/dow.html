@@ -52,7 +52,8 @@
     });
 
     const animStart = '2018-04-11T12:00:00Z';
-    const animEnd = '2018-04-18T12:00:00Z';
+    // const animEnd = '2018-04-18T12:00:00Z';
+    const animEnd = '2019-12-18T12:00:00Z';
     const animDuration = 10;
     const lineLength = 600000;
 
@@ -79,20 +80,76 @@
         ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
         ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
         FROM params, positions
-    `);
+    `, {
+      apiKey: '47507760c82bfd39eb9e52f00b6770f6b1a4d81f',
+      // apiKey: 'default_public',
+      user: 'cdb'
+    });
     const viz = new carto.Viz(`
-      @dow: clusterDayOfWeek($sim_time)
+      width: 20
+
+      // Example 1: (legacy) ungrouped time as dates
+      // @dow: $sim_time
+      // color: ramp(linear(@dow), SUNSET)
+      // filter: animation(linear(@dow), 5, fade(2,2))
+
+      // Example 2: numeric time dimensions
+      // @dow: clusterDayOfWeek($sim_time, 'Europe/Madrid')
+      // @dow: clusterMonth($sim_time, 'Europe/Madrid', 1, '2017')
+      // color: ramp(linear(@dow), SUNSET)
+      // filter: animation(linear(@dow), 5, fade(2,2))
+
+      // Example 3: categorical time dimension
+      // @dow: clusterMonthIso($sim_time, 'Europe/Madrid')
+      // @months: buckets(@dow, ['2018-04', '2018-06', '2018-07', '2018-09'])
+      // color: ramp(@months, SUNSET) // // if 0-1 decoding in WindshaftMetadata
+      // filter: animation(linear(@months), 5, fade(2,2)) // causes undefined column request
+
+      // Example 4: Start/End dates
+      @dow: clusterMonthStart($sim_time, 'Europe/Madrid')
+      color: ramp(linear(@dow), SUNSET)
+      // filter: animation(linear(@dow), 5, fade(2,2))
+      @dowend: clusterMonthEnd($sim_time, 'Europe/Madrid')
+      strokeWidth: 4
+      strokeColor: ramp(linear(@dowend), SUNSET)
+      @anim: animation(linear(@dowend), 5, fade(10,0.1))
+      filter: animation(linear(@dow), 5, fade(0.1,10))*@anim
+
       @list: viewportFeatures(@dow)
-      color: ramp(@dow, SUNSET)
-      width: 10
+
+      @maxDow: globalMax(@dow)
+      @minDow: globalMin(@dow)
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     layer.on('updated', () => {
-      console.log('Features:',viz.variables.list.value.map(f => f[viz.variables.dow.name]));
+      if (viz.filter.expressionName === 'animation') {
+          const time = viz.filter.getProgressValue();
+          document.getElementById("timer").textContent = time;
+      } else if (viz.variables.anim) {
+          const time = viz.variables.anim.getProgressValue();
+          document.getElementById("timer").textContent = time;
+      } else {
+          console.log("Min", viz.variables.minDow.eval());
+          console.log("Max", viz.variables.maxDow.eval());
+          console.log('dow var:',viz.variables.list.value.map(f => viz.variables.dow.eval(f)));
+          console.log('dow prop:',viz.variables.list.value.map(f => f[viz.variables.dow.propertyName]));
+      }
+
+      // console.log('dow var:',viz.variables.list.value.map(f => f.variables.dow.value));  // <- f is not a viz feature!
+    });
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event => {
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        if (feature.variables.dowend) {
+          console.log('Click:',feature.variables.dow.value, feature.variables.dowend.value);
+        }
+        else {
+          console.log('Click:',feature.variables.dow.value);
+        }
+      }
     });
   </script>
 </body>
 </html>
-
-
