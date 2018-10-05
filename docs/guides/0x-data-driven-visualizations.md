@@ -9,7 +9,7 @@
 <div class="example-map">
     <iframe
         id="election-basic"
-        src="/developers/carto-vl/examples/guides/ramp/election-basic.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -19,7 +19,7 @@
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/guides/ramp/population-density-basic.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -141,7 +141,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
 <div class="example-map">
     <iframe
         id="election-others-bucket"
-        src="/developers/carto-vl/examples/guides/ramp/election-others-bucket.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/election-others-bucket.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -157,7 +157,7 @@ If we don't care about which colors get each category, but we don't want to colo
 <div class="example-map">
     <iframe
         id="accidents-top"
-        src="/developers/carto-vl/examples/guides/ramp/accidents-top.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-top.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -173,7 +173,7 @@ For this case, we can request to see every category by putting the property as t
 <div class="example-map">
     <iframe
         id="accidents-all"
-        src="/developers/carto-vl/examples/guides/ramp/accidents-all.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-all.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -215,7 +215,7 @@ In the following subsections we'll learn how to create bubble maps like this:
 <div class="example-map">
     <iframe
         id="accidents-bubblemap"
-        src="/developers/carto-vl/examples/guides/ramp/accidents-bubblemap.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -286,7 +286,7 @@ You can also combine this with `top` like in the previous example of the railroa
 <div class="example-map">
     <iframe
         id="accidents-bubblemap"
-        src="/developers/carto-vl/examples/guides/ramp/accidents-bubblemap.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
         width="100%"
         height="500"
         frameBorder="0">
