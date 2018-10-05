@@ -61,7 +61,7 @@ TODO Let's see it with one example. re use https://carto.com/developers/carto-vl
 TODO we could add an example with outliers and show different vizs:
 TODO maybe temperature is a bad example because some people will think about Celsius and other about Fahrenheit
  ```CARTOVL_Viz
- // This will be implicitly casted to `ramp(linear($population_density), [blue, red])` which will be implcitly casted to
+ // This will be implicitly casted to `ramp(linear($population_density), [blue, red])` which will be implicitly casted to
  // ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [blue, red])
  color: ramp($population_density, [blue, red])
  ```
@@ -267,30 +267,31 @@ For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])`
 
 The last supported type of value for `ramp` is the `Image` type. Let's see some examples:
 
-```
-color:  ramp(buckets($category, ['Salud', 'Moda y calzado']), [
-    green,
-    red
-])
-width: 30
-symbol: ramp(buckets($category, ['Salud', 'Moda y calzado']), [
-    image('../styling/marker.svg'),
-    image('../styling/star.svg')
-])
-```
+<div class="example-map">
+    <iframe
+        id="image-multiple"
+        src="/developers/carto-vl/examples/styling/image-multiple.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 As you can see, the features that weren't specified in the `buckets` list received the color gray and were represented with circles. As discussed above, this *others bucket* receive default values, but they can be overridden, even when working with images. Let's see that:
 ```
-color:  ramp(buckets($category, ['Salud', 'Moda y calzado']), [
-    green,
-    red
-], white)
-width: 30
-symbol: ramp(buckets($category, ['Salud', 'Moda y calzado']), [
-    image('../styling/marker.svg'),
-    image('../styling/star.svg')
-], car)
+symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [star,triangle,marker], square)
 ```
+
+You can also combine this with `top` like in the previous example of the railroad accidents dataset:
+<div class="example-map">
+    <iframe
+        id="accidents-bubblemap"
+        src="/developers/carto-vl/examples/guides/ramp/accidents-bubblemap.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 ## Generating legends with ramps
 
