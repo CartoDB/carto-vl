@@ -54,7 +54,12 @@
         const viz = new carto.Viz(`
             width: 10
             strokeWidth: 0.2
-            color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
+            color: ramp($accident_type, [#7F3C8D,
+            #11A579,
+            #3969AC,
+            #F2B701,
+            #E73F74,
+            #80BA5A])
 `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -79,7 +84,7 @@
 
                 if (color) {
                     colorLegendList +=
-                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Rest of types')}</span></li>\n`;
+                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
                 }
             });
 

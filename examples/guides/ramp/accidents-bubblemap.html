@@ -19,13 +19,43 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Type of accident</h1>
+                <h1>Legend</h1>
             </header>
+            <p class="description open-sans">Type of accident</p>
             <section>
                 <div id="controls">
                     <ul id="content"></ul>
                 </div>
             </section>
+            <header>
+                <h1>Visualizations</h1>
+            </header>
+            <p class="description open-sans">Change the visualization of the layer</p>
+            <div id="controls">
+                <ul class="actions">
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp($total_damage, [0, 50])')"
+                            id="viz0" checked>
+                        <label for="viz0">width: ramp($total_damage, [0, 50])</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('sqrt(ramp($total_damage, [0, 50^2]))')"
+                            id="viz1">
+                        <label for="viz1">width: sqrt(ramp($total_damage, [0, 50^2]))</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('sqrt($total_damage/globalMax($total_damage))*50')"
+                            id="viz4">
+                        <label for="viz4">sqrt($total_damage/globalMax($total_damage))*50')</label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp(globalEqIntervals($total_damage, 5), [0, 25])')"
+                            id="viz2">
+                        <label for="viz2">ramp(globalEqIntervals($total_damage, 5), [0, 25])</label>
+                    </li>
+                </ul>
+                <div id="info"></div>
+            </div>
             <footer class="js-footer"></footer>
         </div>
     </aside>
@@ -52,7 +82,7 @@
 
         const source = new carto.source.Dataset("dot_rail_safety_data ");
         const viz = new carto.Viz(`
-            width: 10
+            width: ramp($total_damage, [0, 50])
             strokeWidth: 0.2
             color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
 `);

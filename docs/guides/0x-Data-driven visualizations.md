@@ -140,7 +140,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
+        id="election-others-bucket"
         src="/developers/carto-vl/examples/guides/ramp/election-others-bucket.html"
         width="100%"
         height="500"
@@ -154,7 +154,15 @@ If we don't care about which colors get each category, but we don't want to colo
 
 `top($cause, 5)` function will keep the five most common categories (regarding the entire dataset) and will group the rest into the *others bucket*.
 
-TODO example
+<div class="example-map">
+    <iframe
+        id="accidents-top"
+        src="/developers/carto-vl/examples/guides/ramp/accidents-top.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 #### Showing every category without selecting each color
 
@@ -162,7 +170,15 @@ Sometimes, we don't care about the correspondence between colors and categories 
 
 For this case, we can request to see every category by putting the property as the `ramp` input without enclosing it in a function like `buckets`.
 
-TODO example with `ramp($cat, [yellow, blue, red])`
+<div class="example-map">
+    <iframe
+        id="accidents-all"
+        src="/developers/carto-vl/examples/guides/ramp/accidents-all.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input.
 
@@ -185,6 +201,8 @@ ramp($temperature, emrld)
 ramp($temperature, tealrose)
 ramp($temperature, cb_blues)
 
+TODO example
+
 The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
 
 ### Numeric values / Bubble-maps
@@ -193,13 +211,23 @@ When dealing with point data, an interesting visualization is the bubble-map. In
 
 Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections will see both approaches.
 
+In the following subsections we'll learn how to create bubble maps like this:
+<div class="example-map">
+    <iframe
+        id="accidents-bubblemap"
+        src="/developers/carto-vl/examples/guides/ramp/accidents-bubblemap.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
 #### The `ramp` way
 
 `ramp` can be used in the same way it can be used with colors changing the color values to numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
 ```
 width: ramp($number, [0, 50])
 ```
-file:///home/dmanzanares/github/renderer-prototype/examples/editor/index.html#eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogcmFtcCgkbnVtYmVyLCBbMCwgNTBdKVxuXG5cbmNvbG9yOiBvcGFjaXR5KHJhbXAobGluZWFyKCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoKCRudW1iZXIpXjAuNSwwLCA1MCksIFN1bnNldClcbnN0cm9rZVdpZHRoOiAxXG5cblxuXG5cbiIsImYiOnsibG5nIjotOTAuNTUyMTAzODYzNzM0MiwibGF0IjozNi4yMzI2NTM2ODcxOTUyN30sImciOjMuOTc0MjExNzAxODU5NDMyNywiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9
 
 Classified numerical properties are similar too:
 ```
@@ -207,9 +235,9 @@ width: ramp(globalQuantiles($number, 7), [1, 50])
 ```
 
 
-Categorical properties can be used like before too:
+Categorical properties can be used like before too, although normally, it doesn't make sense to set the width by a categorical property:
 ```
-width: ramp(buckets($cat, 'Salud'), prism)
+width: ramp(buckets($cat, 'categoryA', 'categoryB'), [1, 50])
 ```
 
 #### Size perception
@@ -234,8 +262,6 @@ width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 For this case, using regular math is probably simpler and easier, while having the same, correct, results.
 
 For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])` is equivalent to `width: sqrt($number/globalMax($number))*50`. And since sometimes we don't want to normalize by the maximum value in the dataset, this could be reduced further to get `width: sqrt($number)`.
-
-TODO example with the 3 approaches
 
 ### Images values
 
