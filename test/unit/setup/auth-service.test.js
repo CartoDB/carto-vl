@@ -3,7 +3,7 @@ import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validatio
 
 describe('api/setup/auth-service', () => {
     const auth = {
-        user: 'test',
+        username: 'test',
         apiKey: '1234567890'
     };
 
@@ -48,13 +48,18 @@ describe('api/setup/auth-service', () => {
                 checkAuth({ apiKey: '123456789' });
             }).toThrowError(cvt.MISSING_REQUIRED + ' \'username\'');
 
-            expect(function () {
-                checkAuth({ user: 1234, apiKey: '123456789' });
-            }).toThrowError(cvt.INCORRECT_TYPE + ' \'username\' property must be a string.');
+            const userMustBeString = cvt.INCORRECT_TYPE + ' \'username\' property must be a string.';
+            expect(function () { checkAuth({ username: 1234, apiKey: '123456789' }); }).toThrowError(userMustBeString);
+            expect(function () { checkAuth({ user: 1234, apiKey: '123456789' }); }).toThrowError(userMustBeString);
 
-            expect(function () {
-                checkAuth({ user: '', apiKey: '123456789' });
-            }).toThrowError(cvt.INCORRECT_VALUE + ' \'username\' property must be not empty.');
+            const userMustBeNotEmpty = cvt.INCORRECT_VALUE + ' \'username\' property must be not empty.';
+            expect(function () { checkAuth({ username: '', apiKey: '123456789' }); }).toThrowError(userMustBeNotEmpty);
+            expect(function () { checkAuth({ user: '', apiKey: '123456789' }); }).toThrowError(userMustBeNotEmpty);
+        });
+
+        it('should allow the use of \'username\' or \'user\'', function () {
+            expect(function () { checkAuth({ apiKey: '123456789', username: 'aUser' }); }).not.toThrow();
+            expect(function () { checkAuth({ apiKey: '123456789', user: 'aUser' }); }).not.toThrow();
         });
     });
 
