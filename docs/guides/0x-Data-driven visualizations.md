@@ -26,17 +26,17 @@
     </iframe>
 </div>
 
-It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types or maps like bubble-maps. But, for simplicity's sake, we will stick to colors until the [Ramp Values section](#Ramp-values).
+It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types of maps like bubble-maps. But, for simplicity's sake, we will stick to colors until the [Ramp Values section](#Ramp-values).
 
 ## Ramp inputs
 
 On the previous section, we talked about how `ramp` can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call "Style by value".
 
-The following sections will cover "Style by value" with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the price of each feature, or by categorical data like the method of payment (credit card, cash...).
+The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the price of each feature, or by categorical data like the method of payment (credit card, cash...).
 
 ### Numerical properties
 
-#### Showing raw / unclassified numerical data
+#### Showing unclassified numerical data
 
 Going back to our previous example, it's common to want to map a continuous range of numeric data like population density data, to a continuous range of colors, for example, the range of colors between black and yellow.
 
@@ -53,9 +53,9 @@ color: ramp($population_density, [black, yellow])
 
  Let's see another *implicit cast*, this time one a little bit more interesting.
 
- The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. This is what sets the context of the coldest and hottest features for `ramp`.
+ The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. This is what sets the context of the lowest and highest population densities for `ramp`.
 
- Sometimes, the data has outliers (features with data that is very far away from the norm). In these cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
+ Sometimes, the data has [outliers](https://en.wikipedia.org/wiki/Outlier) (features with data that is very far away from the norm). In these cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
 
 TODO Let's see it with one example. re use https://carto.com/developers/carto-vl/examples/#example-style-by-number ?
 TODO we could add an example with outliers and show different vizs:
@@ -83,9 +83,6 @@ TODO maybe temperature is a bad example because some people will think about Cel
  color: ramp(linear($population_density, globalPercentile($population_density, 1), globalPercentile($population_density, 99), [blue, red])
  ```
 
- TODO add implicit cast to glossary
- TODO add outliers to glossary
-
  #### Classifying numerical properties
 
  Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small difference in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
@@ -96,7 +93,7 @@ There are multiple classifying methods (quantiles, equal intervals...) and the c
 
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
-TODO add example with legend
+TODO add population density example with legend
 
 ##### A note about `filter:`
 
@@ -198,7 +195,7 @@ When dealing with point data, an interesting visualization is the bubble-map. In
 
 Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections will see both approaches.
 
-### The `ramp` way
+#### The `ramp` way
 
 `ramp` can be used in the same way it can be used with colors changing the color values to numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
 ```
@@ -232,7 +229,7 @@ Similarly, classifiers can be re-mapped in the same way:
 width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 ```
 
-### Direct approach when styling by a numerical property
+#### Direct approach when styling by a numerical property
 
 `ramp` is useful because it allows to map most input to most values, interpolating the values if needed and providing implicit casts if they are convenient. However, it can be overkill when the matching is done from a numerical property to a numeric list.
 
