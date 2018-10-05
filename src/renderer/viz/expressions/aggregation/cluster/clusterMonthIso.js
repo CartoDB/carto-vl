@@ -6,11 +6,13 @@ export default class ClusterMonthIso extends ClusterTime {
         super({
             property,
             expressionName: 'clusterMonthIso',
-            grouping: {
-                grouping: 'month',
-                count: count,
-                starting,
-                timezone,
+            dimension: {
+                group: {
+                    units: 'month',
+                    count: count,
+                    starting,
+                    timezone
+                },
                 format: 'iso'
             },
             type: 'category'

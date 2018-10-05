@@ -6,11 +6,13 @@ export default class ClusterMonthEnd extends ClusterTime {
         super({
             property,
             expressionName: 'clusterMonthEnd',
-            grouping: {
-                grouping: 'month',
-                count: count,
-                starting,
-                timezone,
+            dimension: {
+                group: {
+                    units: 'month',
+                    count: count,
+                    starting,
+                    timezone
+                },
                 format: 'iso'
             },
             type: 'date',

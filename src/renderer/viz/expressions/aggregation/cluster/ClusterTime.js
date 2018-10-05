@@ -5,10 +5,11 @@ import * as schema from '../../../../schema';
 
 // TODO: generalize with base clusterDimension
 export default class clusterTime extends BaseExpression {
-    constructor ({ property, expressionName, grouping, type, mode }) {
+    constructor ({ property, expressionName, dimension, type, mode }) {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
-        this._grouping = grouping;
+        this._dimension = dimension;
+        this._dimension.propertyName = schema.column.dimColumn(this.property.name, this._dimension.group.units);
         this._expressionName = expressionName;
         this.type = type;
         this._mode = mode;
@@ -20,7 +21,7 @@ export default class clusterTime extends BaseExpression {
     }
 
     get propertyName () {
-        let name = schema.column.dimColumn(this.property.name, this._grouping.grouping);
+        let name = this._dimension.propertyName;
         if (this._mode) {
             name = name + '_' + this._mode
         }
@@ -52,7 +53,7 @@ export default class clusterTime extends BaseExpression {
         return {
             [this.property.name]: [{
                 type: 'dimension',
-                grouping: this._grouping,
+                dimension: this._dimension,
                 mode: this._mode
             }]
         };

@@ -6,9 +6,8 @@ export default class ClusterDayOfWeek extends ClusterTime {
         super({
             property,
             expressionName: 'clusterDayOfWeek',
-            grouping: {
-                grouping: 'dayOfWeek',
-                timezone
+            dimension: {
+                group: { units: 'dayOfWeek', timezone },
             },
             type: 'number'
         });

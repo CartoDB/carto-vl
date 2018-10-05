@@ -5,7 +5,7 @@ export const IDENTITY = {};
 const mns = {
     price:  [{type: 'unaggregated'}],
     amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}],
-    dow:    [{type: 'dimension', grouping: {group_by: 'dayOfWeek'}}]
+    dow:    [{type: 'dimension', dimension: { group: {units: 'dayOfWeek'}}}]
 };
 
 */

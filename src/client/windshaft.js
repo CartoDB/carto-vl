@@ -238,9 +238,10 @@ export default class Windshaft {
                                 aggregated_column: propertyName
                             };
                         } else if (usage.type === 'dimension') {
-                            const grouping = usage.grouping;
-                            const parameters = Object.assign({ column: propertyName }, grouping);
-                            aggregation.dimensions[schema.column.dimColumn(propertyName, grouping.grouping)] = parameters;
+                            const dimension = usage.dimension;
+                            const { group, format } = dimension;
+                            const parameters = { column: propertyName, group, format };
+                            aggregation.dimensions[dimension.propertyName] = parameters;
                         } else {
                             // automatic ungrouped dimension
                             // TODO:

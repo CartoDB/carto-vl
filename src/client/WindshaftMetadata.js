@@ -185,7 +185,7 @@ function decodeTimeDim (propertyName, propertyValue, stats, dimension) {
             max = max.getTime() / 1000;
         }
     }
-    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.grouping);
+    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.units);
     if (shouldRemap) {
         // the magnitude of the values is potentially large;
         // to prevent loss of precision in the GPU we'll remap
@@ -224,7 +224,7 @@ function encodeTimeDim (propertyName, propertyValue, stats, dimension) {
             castDate = true;
         }
     }
-    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.grouping);
+    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.units);
     if (shouldRemap) {
         const { min, max } = stats;
         if (min !== max) {
