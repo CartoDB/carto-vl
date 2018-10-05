@@ -6,5 +6,7 @@ const map = new mapboxgl.Map({
 });
 
 map.on('load', () => {
-    window.loaded = true;
+    setTimeout(() => {
+        window.loaded = true;
+    }, 3000);
 });
