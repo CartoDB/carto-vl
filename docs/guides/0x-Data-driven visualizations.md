@@ -40,7 +40,7 @@ The following sections will cover *Style by value* with different property types
 
 Going back to our previous example, it's common to want to map a continuous range of numeric data like population density data, to a continuous range of colors, for example, the range of colors between black and yellow.
 
-This is very easy to do with CARTO VL, as shown before you just need use:
+This is very easy to do with CARTO VL, as shown before you just need to use:
  ```CARTOVL_Viz
 color: ramp($population_density, [black, yellow])
  ```
@@ -85,11 +85,11 @@ TODO maybe temperature is a bad example because some people will think about Cel
 
  #### Classifying numerical properties
 
- Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small difference in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
+ Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
 
 There are multiple classifying methods (quantiles, equal intervals...) and the classification can be applied to two different samples:
-- The entire dataset. `global*` classifiers will apply the classification to the all source data. Ignoring filters or the presence of each feature in the viewport.
-- Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by the checking that the feature is within the region covered by the screen at each moment. Changes on the view (map center / map zoom) will trigger an automatic re-computation of the classification.
+- The entire dataset. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
+- Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes on the view (map center / map zoom) will trigger an automatic re-computation of the classification.
 
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
@@ -101,7 +101,7 @@ TODO add population density example with legend
 
 ### Categorical properties
 
-Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map we only have a fixe number of political parties. And in each region, only one party can win. This kind of data is what we call "categorical data".
+Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
 
 #### A note about encodings
 
