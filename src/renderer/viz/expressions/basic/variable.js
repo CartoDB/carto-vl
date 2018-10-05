@@ -5,7 +5,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
 /**
  * Alias to a named variable defined in the Viz.
  *
- * @param {string} name - The variable name that is going to be evaluated
+ * @param {String} name - The variable name that is going to be evaluated
  * @return {Number|Category|Color|Date}
  *
  * @example <caption></caption>

@@ -6,9 +6,9 @@ let defaultAuth;
 /**
  * Set default authentication parameters: user and apiKey.
  *
- * @param {object} auth
- * @param {string} auth.user - Name of the user
- * @param {string} auth.apiKey - API key used to authenticate against CARTO
+ * @param {Object} auth
+ * @param {String} auth.user - Name of the user
+ * @param {String} auth.apiKey - API key used to authenticate against CARTO
  *
  * @memberof carto
  * @api
@@ -20,7 +20,7 @@ function setDefaultAuth (auth) {
 
 /**
  * Get default authentication
- * @return {object}
+ * @return {Object}
  */
 function getDefaultAuth () {
     return defaultAuth;
@@ -36,7 +36,7 @@ function cleanDefaultAuth () {
 /**
  * Check a valid auth parameter.
  *
- * @param  {object} auth
+ * @param  {Object} auth
  */
 function checkAuth (auth) {
     if (util.isUndefined(auth)) {
