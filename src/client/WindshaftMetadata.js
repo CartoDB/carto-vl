@@ -65,70 +65,6 @@ export default class WindshaftMetadata extends MVTMetadata {
     }
 }
 
-function epochTo (t, grouping) {
-    // TODO: support grouping.offset, grouping.timezone
-    // which are currently ignored
-    // Note that supporting timezone for other than fixed offsets
-    // (i.e. with DST) would require a largish time library
-    switch (grouping.grouping) {
-        case 'second':
-            return Math.floor(t);
-        case 'minute':
-            return Math.floor(t / 60);
-        case 'hour':
-            return Math.floor(t / 3600);
-        case 'day':
-            return Math.floor(t / 86400);
-        case 'week':
-            return Math.floor(t / (7 * 86400));
-
-        case 'month':
-            return 1000; // debugging
-
-        default:
-            throw new Error(`Time grouped by ${grouping.grouping} not yet supported`);
-        // TODO:
-        // case 'month':
-        // case 'quarter':
-        // case 'year':
-        // case 'century':
-        // case 'millenium':
-        // case 'semester':
-        // case 'trimester':
-    }
-}
-
-// derive the limits of a grouped time dimension from
-// the limits of the base column
-function timeLimits (grouping, limits) {
-    const { min, max } = limits;
-    switch (grouping.grouping) {
-        case 'minuteOfHour':
-            return { min: 0, max: 59 };
-        case 'hourOfDay':
-            return { min: 0, max: 23 };
-        case 'dayOfWeek':
-            return { min: 0, max: 6 };
-        case 'dayOfMonth':
-            return { min: 1, max: 31 };
-        case 'dayOfYear':
-            return { min: 1, max: 366 };
-        case 'weekOfYear':
-            return { min: 1, max: 52 };
-        case 'monthOfYear':
-            return { min: 1, max: 12 };
-        case 'quarterOfYear':
-            return { min: 1, max: 4 };
-        case 'trimesterOfYear':
-            return { min: 1, max: 3 };
-        case 'semesterOfYear':
-            return { min: 1, max: 2 };
-    }
-    return { min: epochTo(min, grouping), max: epochTo(max, grouping) };
-}
-
-const UNIT_DECODING = false; // DEBUGGING
-
 function decodeDate (propertyValue, stats) {
     // unclassified date (epoch)
     const d = new Date();
@@ -138,15 +74,17 @@ function decodeDate (propertyValue, stats) {
     return n;
 }
 
-function decodeTimeDim (propertyValue, stats, _grouping) {
-    // TODO: only needed for some _grouping.grouping cases
-    if (!UNIT_DECODING) {
-        return propertyValue;
+function decodeTimeDim (propertyValue, stats, grouping) {
+    if (['seconds', 'minutes'].includes(grouping.grouping)) {
+        // the magnitude of the values is potentially large;
+        // to prevent loss of precision in the GPU we'll remap
+        // the range to 0:1
+        const { min, max } = stats;
+        if (min !== max) {
+            return (propertyValue - min) / (max - min);
+        }
     }
-    // classified date
-    const { min, max } = stats;
-    return (propertyValue - min) / (max - min); // TODO: handle max === min
-
+    return propertyValue;
 }
 
 function encodeDate (propertyValue, stats) {
@@ -159,12 +97,13 @@ function encodeDate (propertyValue, stats) {
     return d;
 }
 
-function encodeTimeDim (propertyValue, stats, _grouping) {
-    // TODO: only needed for some _grouping.grouping cases
-    if (!UNIT_DECODING) {
-        return propertyValue;
+function encodeTimeDim (propertyValue, stats, grouping) {
+    if (['seconds', 'minutes'].includes(grouping.grouping)) {
+        const { min, max } = stats;
+        if (min !== max) {
+            return Math.round((max - min) * propertyValue + min);
+        }
     }
-    const { min, max } = stats;
-    return Math.round((max - min) * propertyValue + min);
+    return propertyValue;
 }
 
