@@ -1,7 +1,7 @@
 ## Interactivity and events
 In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful visualizations. You will also learn how to build very common add-ons such as *pop-ups* and legends.
 
-At the end of the guide you will have built a visualization like this:
+At the end of the guide you will have built a visualization like this one:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
@@ -12,7 +12,7 @@ At the end of the guide you will have built a visualization like this:
     </iframe>
 </div>
 
-To start grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Copy its source code into a new file called `interactivity.html` and test it is working fine before going on.
+In order to start, grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Copy its source code into a new file called `interactivity.html` and test it is working fine before going on.
 
 Add a navigation control to the map, with:
 ```js
@@ -22,7 +22,7 @@ map.addControl(nav, 'top-left');
 ```
 
 ### Map events
-It all begins with the map and sometimes you are interested in listening to some relevant events from to the **map** itself. For example you want to wait for it to load or maybe display the current map's center coordinates. In those cases, you can use a set of events already provided by the `Mapbox GL JS Map`, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach some callback functions to react on them.
+It all begins with the map and sometimes you are interested in listening to some relevant events from to the **map** itself. For example you want to wait for it to load or maybe display the current map's center coordinates. In those cases, you can use a set of events already provided by the **Mapbox GL JS Map**, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach callback functions to react on them.
 
 Add this pair of listeners to your code to test map events, just after the map initialization:
 ```js
@@ -240,10 +240,9 @@ interactivity.on('featureEnter', featureEvent => {
     });
 });
 ```
-> [blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increase the size of the symbols.
+> [blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increases the size of the symbols.
 
-When the `featureLeave` event is fired you can tell your callback to `reset` the color & size of the features
-
+When the `featureLeave` event is fired you can tell your callback to `reset` the color and size for each feature:
 ```js
 interactivity.on('featureLeave', featureEvent => {
     featureEvent.features.forEach((feature) => {
@@ -255,7 +254,7 @@ interactivity.on('featureLeave', featureEvent => {
 
 ### All together
 
-Congrats! You have finished this guide. The final map should look like this:
+Congrats! You've finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
@@ -267,7 +266,7 @@ Congrats! You have finished this guide. The final map should look like this:
 </div>
 
 
-This is the complete code:
+Here it is the full example:
 ```html
 <!DOCTYPE html>
 <html>

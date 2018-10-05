@@ -3,7 +3,7 @@ In this guide you will learn how to use different data sources for your CARTO VL
 
 This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
 
-After practicing this guide, you will create this CARTO VL map!
+After practicing with this guide, you will be able to create this CARTO VL map:
 
 <div class="example-map">
     <iframe

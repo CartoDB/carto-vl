@@ -75,7 +75,7 @@
             console.log('Cities layer has been loaded!');
         });
 
-        // Disable previous listener on map:move just for clarity
+        // Disable previous listener on map:move
         map.off('move', displayCenter);
 
         // Add on 'updated' event handler to layer
@@ -115,7 +115,7 @@
                 .addTo(map);
         });
 
-        // Disable previous listener on layer:updated just for clarity
+        // Disable previous listener on layer:updated
         layer.off('updated', displayNumberOfCities);
 
         // Change style on 'featureEnter'
