@@ -7,7 +7,7 @@ let defaultAuth;
  * Set default authentication parameters: [user or username] and apiKey.
  *
  * @param {Object} auth
- * @param {{String} auth.username|{String auth.user}} - Name of the user
+ * @param {String} auth.username - Name of the user. For backwards compatibility also `auth.user` is allowed
  * @param {String} auth.apiKey - API key used to authenticate against CARTO
  *
  * @memberof carto
