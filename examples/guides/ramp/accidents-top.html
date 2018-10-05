@@ -32,8 +32,8 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-            center: [-3, 55.8],
-            zoom: 5.55,
+            center: [-96, 41],
+            zoom: 4,
         });
 
         carto.setDefaultAuth({
@@ -41,11 +41,12 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("uk_elections ");
+        const source = new carto.source.Dataset("dot_rail_safety_data ");
         const viz = new carto.Viz(`
-            color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red], rgba(255,255,255, 0.2))
-            strokeColor: opacity(white, 0.6)`
-        );
+            width: 9
+            strokeWidth: 0.2
+            color: ramp(top($cause, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
+`);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');

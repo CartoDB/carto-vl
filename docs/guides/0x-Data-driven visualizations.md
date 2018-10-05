@@ -148,15 +148,13 @@ The `others` bucket will be colored gray by default. However, it's possible to o
     </iframe>
 </div>
 
-TODO add *others bucket* to the glossary
-
 #### Showing the most common categories: `top`
 
 If we don't care about which colors get each category, but we don't want to color every category in the dataset, we can use `top` to group all uncommon categories in the *others bucket*.
 
 `top($cause, 5)` function will keep the five most common categories (regarding the entire dataset) and will group the rest into the *others bucket*.
 
-TODO example, re use https://carto.com/developers/carto-vl/examples/#example-style-by-category ?
+TODO example
 
 #### Showing every category without selecting each color
 
