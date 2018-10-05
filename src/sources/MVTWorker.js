@@ -188,10 +188,11 @@ export class MVTWorker {
         const propertyNames = [];
         for (let i = 0; i < metadata.propertyKeys.length; i++) {
             const propertyName = metadata.propertyKeys[i];
-            if (metadata.properties[propertyName].type === 'geometry') {
+            const baseName = metadata.baseName(propertyName);
+            if (metadata.properties[baseName].type === 'geometry') {
                 continue;
             }
-            propertyNames.push(...metadata.propertyNames(propertyName));
+            propertyNames.push(propertyName);
         }
         return propertyNames;
     }
@@ -214,7 +215,8 @@ export class MVTWorker {
         const length = propertyNames.length;
         for (let j = 0; j < length; j++) {
             const propertyName = propertyNames[j];
-            const propertyValue = feature.properties[propertyName];
+            const sourcePropertyName = metadata.sourcePropertyName(propertyName);
+            const propertyValue = feature.properties[sourcePropertyName];
             properties[propertyName][i] = this.decodeProperty(metadata, propertyName, propertyValue);
         }
     }

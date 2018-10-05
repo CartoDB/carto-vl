@@ -157,7 +157,7 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
+        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplates };
@@ -283,7 +283,7 @@ export default class Windshaft {
         }
     }
 
-    async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata = null) {
+    async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata, MNS) {
         const mapConfigAgg = {
             buffersize: {
                 mvt: 1
@@ -333,11 +333,11 @@ export default class Windshaft {
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg, MNS)
         };
     }
 
-    _adaptMetadata (meta, agg) {
+    _adaptMetadata (meta, agg, MNS) {
         meta.datesAsNumbers = meta.dates_as_numbers;
         const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
@@ -369,7 +369,17 @@ export default class Windshaft {
                 min: dimensionStats.min,
                 max: dimensionStats.max
             };
-            console.log("COL", column, "DIM", properties[column].dimension);
+            const modes = MNS[column].map(c => c.mode).filter(m => m);
+            if (modes.length > 0) {
+                // This is an ISO dimension which will be decoded as
+                // one or two internal properties (start & end timedates)
+                // Leave propertyName as the column name for decoding, but
+                // internally we'll keep the properties for each mode.
+                properties[column].dimension.modes = {};
+                modes.forEach(mode => {
+                    properties[column].dimension.modes[mode] = `${dimName}_${mode}`;
+                });
+            }
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);

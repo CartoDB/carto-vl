@@ -39,12 +39,15 @@ export function castDate (date) {
         return date;
     }
     if (typeof (date) === 'number') {
-        const msEpoch = date;
-        date = new Date(0);
-        date.setUTCMilliseconds(msEpoch);
-        return date;
+        return msToDate(date);
     }
     return new Date(date);
+}
+
+export function msToDate (msEpoch) {
+    const date = new Date(0);
+    date.setUTCMilliseconds(msEpoch);
+    return date;
 }
 
 export function isSetsEqual (a, b) {

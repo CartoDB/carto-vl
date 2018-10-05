@@ -75,17 +75,14 @@ export default class Linear extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        if (this.input.type === 'date') {
-            const min = this.min.eval().getTime();
-            const max = this.max.eval().getTime();
-
+        if (this.input.type === 'date')
+        {
+            const min = this.min.eval();
+            const max = this.max.eval();
+            const smin = metadata.decode(this.input.propertyName, min);
+            const smax = metadata.decode(this.input.propertyName, max);
             this._metadata = metadata;
-            const inputMin = metadata.properties[this.input.name].min.getTime();
-            const inputMax = metadata.properties[this.input.name].max.getTime();
-            const inputDiff = inputMax - inputMin;
 
-            const smin = (min - inputMin) / inputDiff;
-            const smax = (max - inputMin) / inputDiff;
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else {
             checkType('linear', 'input', 0, 'number', this.input);

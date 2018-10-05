@@ -163,6 +163,8 @@ import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 import ClusterDayOfWeek from './expressions/aggregation/cluster/ClusterDayOfWeek';
 import ClusterMonth from './expressions/aggregation/cluster/ClusterMonth';
 import ClusterMonthIso from './expressions/aggregation/cluster/ClusterMonthIso';
+import ClusterMonthStart from './expressions/aggregation/cluster/ClusterMonthStart';
+import ClusterMonthEnd from './expressions/aggregation/cluster/ClusterMonthEnd';
 
 import Constant from './expressions/basic/constant';
 
@@ -307,6 +309,8 @@ export const clusterCount = (...args) => new ClusterCount(...args);
 export const clusterDayOfWeek = (...args) => new ClusterDayOfWeek(...args);
 export const clusterMonth = (...args) => new ClusterMonth(...args);
 export const clusterMonthIso = (...args) => new ClusterMonthIso(...args);
+export const clusterMonthStart = (...args) => new ClusterMonthStart(...args);
+export const clusterMonthEnd = (...args) => new ClusterMonthEnd(...args);
 
 export const constant = (...args) => new Constant(...args);
 

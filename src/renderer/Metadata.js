@@ -22,21 +22,33 @@ export default class Metadata {
             property.categories.map(category => this.categorizeString(property, category.name, true));
         });
 
-        this.propertyKeys = Object.keys(this.properties);
+        this.propertyKeys = [];
         this.baseNames = {};
-        this.propertyKeys.forEach(baseName => {
+        Object.keys(this.properties).forEach(baseName => {
             const property = properties[baseName];
             if (property.aggregations) {
                 Object.values(property.aggregations).forEach(propName => {
-                    this.baseNames[propName] = baseName;
+                    this._addProperty(baseName, propName);
                 });
             } else if (property.dimension) {
-                this.baseNames[property.dimension.propertyName] = baseName;
+                if (property.dimension.modes) {
+                    Object.values(property.dimension.modes).forEach(modePropertyName => {
+                        this._addProperty(baseName, modePropertyName);
+                    });
+                } else {
+                    this._addProperty(baseName, property.dimension.propertyName);
+                }
             } else {
-                this.baseNames[baseName] = baseName;
+                this._addProperty(baseName, baseName);
             }
         });
     }
+
+    _addProperty(baseName, propertyName) {
+        this.baseNames[propertyName] = baseName;
+        this.propertyKeys.push(propertyName);
+    }
+
     categorizeString (propertyName, category, init = false) {
         if (category === undefined) {
             category = null;
@@ -64,6 +76,9 @@ export default class Metadata {
         if (prop.aggregations) {
             return Object.values(prop.aggregations);
         } else if (prop.dimension) {
+            if (prop.dimension.modes) {
+                return Object.values(prop.dimension.modes);
+            }
             return [prop.dimension.propertyName];
         }
         return [baseName];
@@ -71,6 +86,15 @@ export default class Metadata {
 
     baseName (propertyName) {
         return this.baseNames[propertyName];
+    }
+
+    sourcePropertyName (propertyName) {
+        const baseName = this.baseName(propertyName);
+        const dimension = this.properties[baseName].dimension;
+        if (dimension && dimension.modes) {
+            return dimension.propertyName;
+        }
+        return propertyName;
     }
 
     // convert source values to internal representation
