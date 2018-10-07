@@ -247,9 +247,11 @@ export default class Windshaft {
                             // TODO:
                             // we should consider eliminating this and requiring
                             // all dimensions to be used through clusterXXX functions
-                            aggregation.dimensions[propertyName] = {
-                                column: propertyName
-                            };
+                            // aggregation.dimensions[propertyName] = {
+                            //     column: propertyName
+                            // };
+                            // Old style definition, for compatibility with old tilers
+                            aggregation.dimensions[propertyName] = propertyName;
                         }
                     });
                 }
@@ -355,31 +357,34 @@ export default class Windshaft {
         });
         Object.keys(agg.dimensions).forEach(dimName => {
             const dimension = agg.dimensions[dimName];
-            const dimensionStats = stats.dimensions[dimName];
-            const dimType = adaptColumnType(dimensionStats.type);
-            const { column, ...params } = dimension;
-            if (properties[column].dimension) {
-                // TODO: proper error
-                throw new Error(`Multiple dimensions based on same column ${column}`);
-            }
-            properties[column].dimension = {
-                propertyName: dimName,
-                grouping: Object.keys(params).length === 0 ? undefined : dimensionStats.params,
-                type: dimType,
-                // TODO: merge all properties of dimensionStats except params, type
-                min: dimensionStats.min,
-                max: dimensionStats.max
-            };
-            const modes = MNS[column].map(c => c.mode).filter(m => m);
-            if (modes.length > 0) {
-                // This is an ISO dimension which will be decoded as
-                // one or two internal properties (start & end timedates)
-                // Leave propertyName as the column name for decoding, but
-                // internally we'll keep the properties for each mode.
-                properties[column].dimension.modes = {};
-                modes.forEach(mode => {
-                    properties[column].dimension.modes[mode] = `${dimName}_${mode}`;
-                });
+            if (stats.dimensions) {
+                // otherwise, the dimension is a (legacy) ungrouped dimension
+                const dimensionStats = stats.dimensions[dimName];
+                const dimType = adaptColumnType(dimensionStats.type);
+                const { column, ...params } = dimension;
+                if (properties[column].dimension) {
+                    // TODO: proper error
+                    throw new Error(`Multiple dimensions based on same column ${column}`);
+                }
+                properties[column].dimension = {
+                    propertyName: dimName,
+                    grouping: Object.keys(params).length === 0 ? undefined : dimensionStats.params,
+                    type: dimType,
+                    // TODO: merge all properties of dimensionStats except params, type
+                    min: dimensionStats.min,
+                    max: dimensionStats.max
+                };
+                const modes = MNS[column].map(c => c.mode).filter(m => m);
+                if (modes.length > 0) {
+                    // This is an ISO dimension which will be decoded as
+                    // one or two internal properties (start & end timedates)
+                    // Leave propertyName as the column name for decoding, but
+                    // internally we'll keep the properties for each mode.
+                    properties[column].dimension.modes = {};
+                    modes.forEach(mode => {
+                        properties[column].dimension.modes[mode] = `${dimName}_${mode}`;
+                    });
+                }
             }
         });
         Object.values(properties).map(property => {
