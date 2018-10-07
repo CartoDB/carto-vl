@@ -44,7 +44,7 @@ export default class Metadata {
         });
     }
 
-    _addProperty(baseName, propertyName) {
+    _addProperty (baseName, propertyName) {
         this.baseNames[propertyName] = baseName;
         this.propertyKeys.push(propertyName);
     }

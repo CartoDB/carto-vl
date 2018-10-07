@@ -120,7 +120,7 @@ export default {
     computeMatrixCenter
 };
 
-function setField(parsed, level, value, defaultValue) {
+function setField (parsed, level, value, defaultValue) {
     if (value) {
         parsed[level] = Number(value);
         parsed.level = level;
@@ -129,11 +129,11 @@ function setField(parsed, level, value, defaultValue) {
     }
 }
 
-function parseIso(iso) {
+function parseIso (iso) {
     // TODO: support YYYY-Www (week), YYYY-Qq (quarter), YYYYSs (semester), YYYYtT (trimester)
     // Dddd (decade), Ccc (century), Mm (millennium)
     const format = /^(\d\d\d\d)(?:\-?(\d\d)(?:\-?(\d\d)(?:[T\s]?(\d\d)(?:(\d\d)(?:\:(\d\d))?)?)?)?)?$/;
-    const match  = (iso || '').match(format) || [];
+    const match = (iso || '').match(format) || [];
     const parsed = {};
     setField(parsed, 'year', match[1], 1);
     setField(parsed, 'month', match[2], 1);
@@ -144,19 +144,19 @@ function parseIso(iso) {
     return parsed;
 }
 
-function timeValue(parsed) {
-    return Date.UTC(parsed.year, parsed.month-1, parsed.day, parsed.hour, parsed.minute, parsed.second);
+function timeValue (parsed) {
+    return Date.UTC(parsed.year, parsed.month - 1, parsed.day, parsed.hour, parsed.minute, parsed.second);
 }
 
-function nextTimeValue(parsed) {
+function nextTimeValue (parsed) {
     parsed[parsed.level]++;
     return timeValue(parsed);
 }
 
-export function startTimeValue(iso) {
+export function startTimeValue (iso) {
     return timeValue(parseIso(iso));
 }
 
-export function endTimeValue(iso) {
+export function endTimeValue (iso) {
     return nextTimeValue(parseIso(iso));
 }

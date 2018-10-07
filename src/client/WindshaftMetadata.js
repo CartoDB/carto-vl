@@ -64,7 +64,6 @@ import * as util from '../utils/util';
 // }
 
 export default class WindshaftMetadata extends MVTMetadata {
-
     _dimensionInfo (propertyName) {
         const baseName = this.baseName(propertyName);
         const column = this.properties[baseName];
@@ -84,7 +83,7 @@ export default class WindshaftMetadata extends MVTMetadata {
     }
 
     decode (propertyName, propertyValue) {
-        const { baseName, column, type, sourceType, baseType, dimension } = this._dimensionInfo(propertyName);
+        const { baseName, column, type, baseType, dimension } = this._dimensionInfo(propertyName);
         if (!column) {
             return;
         }
@@ -122,12 +121,12 @@ export default class WindshaftMetadata extends MVTMetadata {
         }
     }
 
-    stats(propertyName) {
+    stats (propertyName) {
         const { dimension } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
             if (dimension.modes) { // and propertyName is one of the modes
-                 const mode = propertyMode(dimension.modes, propertyName);
-                 if (mode) {
+                const mode = propertyMode(dimension.modes, propertyName);
+                if (mode) {
                     const { min, max } = dimension;
                     return {
                         min: asDate(decodeModal(mode, min)),
@@ -137,7 +136,7 @@ export default class WindshaftMetadata extends MVTMetadata {
                         // min: asDate(decodeModal('start', min)),
                         // max: asDate(decodeModal('end', max))
                     };
-                 }
+                }
             }
             return dimension;
         }
@@ -155,7 +154,7 @@ function decodeDate (propertyValue, stats) {
     return n;
 }
 
-function decodeModal(mode, propertyValue) {
+function decodeModal (mode, propertyValue) {
     if (propertyValue instanceof Date) {
         // Support Date because stats are stored so, rather that in source encoding
         return propertyValue.getTime() / 1000;
@@ -168,7 +167,7 @@ function decodeModal(mode, propertyValue) {
     }
 }
 
-function propertyMode(modes, propertyName) {
+function propertyMode (modes, propertyName) {
     return Object.keys(modes).find(mode => modes[mode] === propertyName);
 }
 
@@ -208,7 +207,7 @@ function encodeDate (propertyValue, stats) {
 }
 
 // convert seconds epoch (source encoding) or Date to Date
-function asDate(value) {
+function asDate (value) {
     if (value instanceof Date) {
         return value;
     }
@@ -216,7 +215,8 @@ function asDate(value) {
 }
 
 function encodeTimeDim (propertyName, propertyValue, stats, dimension) {
-    let shouldRemap = false, castDate = false;
+    let shouldRemap = false;
+    let castDate = false;
     if (dimension.modes) {
         const mode = propertyMode(dimension.modes, propertyName);
         if (mode) {
@@ -241,6 +241,6 @@ function dimensionType (dimension) {
     return dimension.modes ? 'date' : dimension.type;
 }
 
-function dimensionBaseType(dimension) {
+function dimensionBaseType (dimension) {
     return dimension.type;
 }

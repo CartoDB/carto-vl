@@ -13,7 +13,6 @@ export default class clusterTime extends BaseExpression {
         this._expressionName = expressionName;
         this.type = type;
         this._mode = mode;
-
     }
 
     get name () {
@@ -23,7 +22,7 @@ export default class clusterTime extends BaseExpression {
     get propertyName () {
         let name = this._dimension.propertyName;
         if (this._mode) {
-            name = name + '_' + this._mode
+            name = name + '_' + this._mode;
         }
         return name;
     }

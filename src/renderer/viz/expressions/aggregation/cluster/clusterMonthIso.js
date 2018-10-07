@@ -1,7 +1,7 @@
 import ClusterTime from './ClusterTime';
 import { checkMaxArguments } from '../../utils';
 export default class ClusterMonthIso extends ClusterTime {
-    constructor (property, timezone, count, starting) {
+    constructor (property, timezone) {
         checkMaxArguments(arguments, 4, 'clusterMonthIso');
         super({
             property,
@@ -9,8 +9,6 @@ export default class ClusterMonthIso extends ClusterTime {
             dimension: {
                 group: {
                     units: 'month',
-                    count: count,
-                    starting,
                     timezone
                 },
                 format: 'iso'

@@ -75,8 +75,7 @@ export default class Linear extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        if (this.input.type === 'date')
-        {
+        if (this.input.type === 'date') {
             const min = this.min.eval();
             const max = this.max.eval();
             const smin = metadata.decode(this.input.propertyName, min);
