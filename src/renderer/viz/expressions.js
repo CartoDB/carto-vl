@@ -161,10 +161,30 @@ import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
 import ClusterDayOfWeek from './expressions/aggregation/cluster/ClusterDayOfWeek';
+import ClusterDayOfMonth from './expressions/aggregation/cluster/ClusterDayOfMonth';
+import ClusterDayOfYear from './expressions/aggregation/cluster/ClusterDayOfYear';
+import ClusterHourOfDay from './expressions/aggregation/cluster/ClusterHourOfDay';
+import ClusterMonthOfYear from './expressions/aggregation/cluster/ClusterMonthOfYear';
+import ClusterQuarterOfYear from './expressions/aggregation/cluster/ClusterQuarterOfYear';
+import ClusterWeekOfYear from './expressions/aggregation/cluster/ClusterWeekOfYear';
+import ClusterMinuteOfHour from './expressions/aggregation/cluster/ClusterMinuteOfHour';
+
+import ClusterYear from './expressions/aggregation/cluster/ClusterYear';
+import ClusterYearIso from './expressions/aggregation/cluster/ClusterYearIso';
+import ClusterYearStart from './expressions/aggregation/cluster/ClusterYearStart';
+import ClusterYearEnd from './expressions/aggregation/cluster/ClusterYearEnd';
 import ClusterMonth from './expressions/aggregation/cluster/ClusterMonth';
 import ClusterMonthIso from './expressions/aggregation/cluster/ClusterMonthIso';
 import ClusterMonthStart from './expressions/aggregation/cluster/ClusterMonthStart';
 import ClusterMonthEnd from './expressions/aggregation/cluster/ClusterMonthEnd';
+import ClusterDay from './expressions/aggregation/cluster/ClusterDay';
+import ClusterDayIso from './expressions/aggregation/cluster/ClusterDayIso';
+import ClusterDayStart from './expressions/aggregation/cluster/ClusterDayStart';
+import ClusterDayEnd from './expressions/aggregation/cluster/ClusterDayEnd';
+import ClusterHour from './expressions/aggregation/cluster/ClusterHour';
+import ClusterHourIso from './expressions/aggregation/cluster/ClusterHourIso';
+import ClusterHourStart from './expressions/aggregation/cluster/ClusterHourStart';
+import ClusterHourEnd from './expressions/aggregation/cluster/ClusterHourEnd';
 
 import Constant from './expressions/basic/constant';
 
@@ -307,10 +327,30 @@ export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
 export const clusterDayOfWeek = (...args) => new ClusterDayOfWeek(...args);
+export const clusterDayOfMonth = (...args) => new ClusterDayOfMonth(...args);
+export const clusterDayOfYear = (...args) => new ClusterDayOfYear(...args);
+export const clusterHourOfDay = (...args) => new ClusterHourOfDay(...args);
+export const clusterMonthOfYear = (...args) => new ClusterMonthOfYear(...args);
+export const clusterQuarterOfYear = (...args) => new ClusterQuarterOfYear(...args);
+export const clusterWeekOfYear = (...args) => new ClusterWeekOfYear(...args);
+export const clusterMinuteOfHour = (...args) => new ClusterMinuteOfHour(...args);
+
+export const clusterYear = (...args) => new ClusterYear(...args);
+export const clusterYearIso = (...args) => new ClusterYearIso(...args);
+export const clusterYearStart = (...args) => new ClusterYearStart(...args);
+export const clusterYearEnd = (...args) => new ClusterYearEnd(...args);
 export const clusterMonth = (...args) => new ClusterMonth(...args);
 export const clusterMonthIso = (...args) => new ClusterMonthIso(...args);
 export const clusterMonthStart = (...args) => new ClusterMonthStart(...args);
 export const clusterMonthEnd = (...args) => new ClusterMonthEnd(...args);
+export const clusterDay = (...args) => new ClusterDay(...args);
+export const clusterDayIso = (...args) => new ClusterDayIso(...args);
+export const clusterDayStart = (...args) => new ClusterDayStart(...args);
+export const clusterDayEnd = (...args) => new ClusterDayEnd(...args);
+export const clusterHour = (...args) => new ClusterHour(...args);
+export const clusterHourIso = (...args) => new ClusterHourIso(...args);
+export const clusterHourStart = (...args) => new ClusterHourStart(...args);
+export const clusterHourEnd = (...args) => new ClusterHourEnd(...args);
 
 export const constant = (...args) => new Constant(...args);
 
