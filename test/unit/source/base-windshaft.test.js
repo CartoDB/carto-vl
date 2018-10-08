@@ -3,7 +3,7 @@ import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validatio
 
 describe('sources/base-windshaft', () => {
     const auth = {
-        user: 'test',
+        username: 'test',
         apiKey: '1234567890'
     };
     const config = {
@@ -69,11 +69,11 @@ describe('sources/base-windshaft', () => {
             }).toThrowError(cvt.MISSING_REQUIRED + ' \'username\'');
 
             expect(function () {
-                source.initialize({ user: 1234, apiKey: '123456789' });
+                source.initialize({ username: 1234, apiKey: '123456789' });
             }).toThrowError(cvt.INCORRECT_TYPE + ' \'username\' property must be a string.');
 
             expect(function () {
-                source.initialize({ user: '', apiKey: '123456789' });
+                source.initialize({ username: '', apiKey: '123456789' });
             }).toThrowError(cvt.INCORRECT_VALUE + ' \'username\' property must be not empty.');
         });
 
