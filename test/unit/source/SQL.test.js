@@ -4,7 +4,7 @@ import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validatio
 describe('sources/SQL', () => {
     const query = 'SELECT * from table0';
     const auth = {
-        user: 'test',
+        username: 'test',
         apiKey: '1234567890'
     };
     const options = {

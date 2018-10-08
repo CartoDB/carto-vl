@@ -244,7 +244,7 @@ function setConfig (input) {
 const superRefresh = (opts) => {
     const sourceType = document.querySelector('input[name="source"]:checked').value;
     const sourceAuth = {
-        user: document.getElementById('user').value,
+        username: document.getElementById('user').value,
         apiKey: 'default_public'
     };
 
@@ -466,7 +466,7 @@ function generateSnippet (config) {
             });
 
             carto.setDefaultAuth({
-                user: '${username}',
+                username: '${username}',
                 apiKey: '${apiKey}'
             });
 
