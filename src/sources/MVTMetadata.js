@@ -17,8 +17,6 @@ export default class MVTMetadata extends Metadata {
                 throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);
             }
             return propertyValue;
-        } else if (propertyValue === null || propertyValue === undefined) {
-            return Number.NaN;
         } else {
             throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
         }
