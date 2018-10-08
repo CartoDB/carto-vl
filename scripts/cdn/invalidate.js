@@ -17,7 +17,7 @@ if (!secrets ||
 
 let fastly = require('fastly')(secrets.FASTLY_API_KEY);
 
-console.log('Invalidate CDN');
+console.log('Invalidating CDN cache');
 fastly.purgeAll(secrets.FASTLY_CARTODB_SERVICE, function (err) {
     if (err) return console.error(err);
     console.log('Done');
