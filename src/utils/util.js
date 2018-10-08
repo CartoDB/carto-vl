@@ -11,10 +11,6 @@ export function isUndefined (value) {
     return value === undefined;
 }
 
-export function isDefined (value) {
-    return !isUndefined(value);
-}
-
 export function isString (value) {
     return typeof value === 'string';
 }

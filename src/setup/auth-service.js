@@ -45,7 +45,7 @@ function checkAuth (auth) {
     if (!util.isObject(auth)) {
         throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'auth' property must be an object.`);
     }
-    auth.username = util.isDefined(auth.username) ? auth.username : auth.user; // backwards compatibility
+    auth.username = util.isUndefined(auth.username) ? auth.user : auth.username; // backwards compatibility
     checkApiKey(auth.apiKey);
     checkUsername(auth.username);
 }
