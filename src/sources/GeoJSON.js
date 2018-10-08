@@ -280,19 +280,6 @@ export default class GeoJSON extends Base {
                     f.properties.cartodb_id = -i;
                 }
                 properties[name][i] = this._metadata.decode(name, f.properties[name]);
-                const numericValue = Number(f.properties[name]);
-                properties[name][i] = Number.isNaN(numericValue)
-                    ? Number.MIN_SAFE_INTEGER
-                    : numericValue;
-            });
-            dateFields.forEach(name => {
-                const property = this._properties[name];
-                // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d = util.castDate(f.properties[name]).getTime();
-                const min = property.min;
-                const max = property.max;
-                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[name][i] = n;
             });
         }
         return properties;
@@ -331,7 +318,7 @@ export default class GeoJSON extends Base {
         if (this._type === 'Point') {
             return new Float32Array(this._features.length * 6);
         }
-        return [];
+        return ([]);
     }
 
     _decodeGeometry () {
