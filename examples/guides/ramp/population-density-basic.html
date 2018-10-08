@@ -47,38 +47,38 @@
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, yellow])')" id="viz1" checked>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')" id="viz1" checked>
                             <label for="viz1">
-                                <h2>ramp($dn, [transparent, yellow])</h2>
-                                <p class="description open-sans">This will be implicitly casted to `ramp(linear($population_density), [transparent, yellow])` which will be implicitly casted to ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [transparent, yellow])</p>
+                                <h2>ramp($dn, [green, yellow, red])</h2>
+                                <p class="description open-sans">This will be implicitly casted to `ramp(linear($population_density), [green, yellow, red])` which will be implicitly casted to ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [green, yellow, red])</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [transparent, yellow])')" id="viz2" checked>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [green, yellow, red])')" id="viz2" checked>
                             <label for="viz2">
-                                <h2>ramp(linear($dn), [transparent, yellow])</h2>
-                                <p class="description open-sans">the same as above due to implicit casts</p>
+                                <h2>ramp(linear($dn), [green, yellow, red])</h2>
+                                <p class="description open-sans">Equivalent to the above example due to implicit casts</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])')" id="viz3" checked>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [green, yellow, red])')" id="viz3" checked>
                             <label for="viz3">
-                                <h2>'ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])'</h2>
-                                <p  class="description open-sans">the same as the two above due to implicit casts</p>
+                                <h2>'ramp(linear($dn, globalMin($dn), globalMax($dn)), [green, yellow, red])'</h2>
+                                <p  class="description open-sans">Equivalent to the above examples due to implicit casts</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, 0, 160), [transparent, yellow])')" id="viz4" checked>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, 0, 160), [green, yellow, red])')" id="viz4" checked>
                             <label for="viz4">
-                                <h2>'ramp(linear($dn, 0, 160), [transparent, yellow])'</h2>
-                                <p class="description open-sans">The data range has been fixed to the [-10, 40] range</p>
+                                <h2>'ramp(linear($dn, 0, 160), [green, yellow, red])'</h2>
+                                <p class="description open-sans">The data range has been fixed to the [0, 160] range</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])')" id="viz5" checked>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [green, yellow, red])')" id="viz5" checked>
                             <label for="viz5">
-                                <h2>'ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])'</h2>
-                                <p  class="description open-sans">The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data. For dynamic datasets this is better than the previous fixed approach</p>
+                                <h2>'ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [green, yellow, red])'</h2>
+                                <p  class="description open-sans">The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data. For dynamic datasets this is better than the previous fixed approach.</p>
                             </h2>
                         </li>
                     </ul>
@@ -105,7 +105,7 @@
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
             width: 2
-            color: ramp($dn, [transparent, yellow])
+            color: ramp($dn, [green, yellow, red])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
