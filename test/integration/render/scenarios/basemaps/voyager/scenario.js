@@ -8,5 +8,5 @@ const map = new mapboxgl.Map({
 map.on('load', () => {
     setTimeout(() => {
         window.loaded = true;
-    }, 3000);
+    }, 4000);
 });
