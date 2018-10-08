@@ -36,22 +36,34 @@
                     <li>
                         <input type="radio" name="source" onclick="viz.width.blendTo('ramp($total_damage, [0, 50])')"
                             id="viz0" checked>
-                        <label for="viz0">width: ramp($total_damage, [0, 50])</label>
+                        <label for="viz0">
+                            <h2>ramp($total_damage, [0, 50])</h2>
+                            <p class="description open-sans">This will set a 0 pixel width to accidents with the minimum amount of damage in the dataset and 50 pixels to the one with the most damage.</span></p>
+                        </label>
                     </li>
                     <li>
                         <input type="radio" name="source" onclick="viz.width.blendTo('sqrt(ramp($total_damage, [0, 50^2]))')"
                             id="viz1">
-                        <label for="viz1">width: sqrt(ramp($total_damage, [0, 50^2]))</label>
+                        <label for="viz1">
+                            <h2>sqrt(ramp($total_damage, [0, 50^2]))</h2>
+                            <p class="description open-sans">The same as before for the extreme points, but the interpolation will be linear in area, not in width. An intermediate accident with half the damage of the worst accident will get half the area of the worst (50²/2), but not half its width. Unless you want to accentuate differences, this is usually the proper way to make a bubble map</span></p>
+                        </label>
                     </li>
                     <li>
                         <input type="radio" name="source" onclick="viz.width.blendTo('sqrt($total_damage/globalMax($total_damage))*50')"
                             id="viz4">
-                        <label for="viz4">sqrt($total_damage/globalMax($total_damage))*50')</label>
+                        <label for="viz4">
+                            <h2>sqrt($total_damage/globalMax($total_damage))*50')</h2>
+                            <p class="description open-sans">The same as before since the dataset has accidents with zero damage.</span></p>
+                        </label>
                     </li>
                     <li>
-                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp(globalEqIntervals($total_damage, 5), [0, 25])')"
+                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp(globalEqIntervals($total_damage, 3), [0.5, 50])')"
                             id="viz2">
-                        <label for="viz2">ramp(globalEqIntervals($total_damage, 5), [0, 25])</label>
+                        <label for="viz2">
+                            <h2>ramp(globalEqIntervals($total_damage, 3), [1, 25])</h2>
+                            <p class="description open-sans">Classifiers can be used too. In this example, the "Equal Intervals" method allows to detect the outliers quickly.</span></p>
+                        </label>
                     </li>
                 </ul>
                 <div id="info"></div>

@@ -42,7 +42,7 @@ Going back to our previous example, it's common to want to map a continuous rang
 
 This is very easy to do with CARTO VL, as shown before you just need to use:
  ```CARTOVL_Viz
-color: ramp($population_density, [green, yellow, red])
+color: ramp($population_density, [black, yellow])
  ```
 
  This will map the feature with the lowest population density in the Source data to *black* and the feature with the highest population density to *yellow*. You can even set intermediate colors in the color list like `[black, gray, yellow]`.
@@ -291,18 +291,5 @@ As you can see, the features that weren't specified in the `buckets` list receiv
 ```
 symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [star,triangle,marker], square)
 ```
-
-You can also combine this with `top` like in the previous example of the railroad accidents dataset:
-<div class="example-map">
-    <iframe
-        id="accidents-bubblemap"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
-        width="100%"
-        height="500"
-        frameBorder="0">
-    </iframe>
-</div>
-
 ## Generating legends with ramps
-
 
