@@ -45,7 +45,7 @@
         // DATASET
         // Define Dataset source with custom credentials
         const citiesSource = new carto.source.Dataset('populated_places', {
-            user: 'cartovl',
+            username: 'cartovl',
             apiKey: 'default_public'
         });
         // Define Viz object with custom style
@@ -122,7 +122,7 @@
         const query = 'SELECT * FROM populated_places WHERE megacity = 1';
         // Define SQL source with query and custom credentials
         const megacitiesSource = new carto.source.SQL(query, {
-            user: 'cartovl',
+            username: 'cartovl',
             apiKey: 'default_public'
         });
         // Define Viz object with custom style
