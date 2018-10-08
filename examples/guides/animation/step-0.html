@@ -40,11 +40,13 @@
             username: 'cartovl',
             apiKey: 'default_public'
         });
+        
         // Create the source
         const source = new carto.source.Dataset('bird_journey');
+        
         // Add better styles
         const viz = new carto.Viz(`
-            filter: animation($date_time, 30, fade(1,1))
+            filter: animation($date_time, 30)
         `);
         // Create the layer
         const layer = new carto.Layer('layer', source, viz);
