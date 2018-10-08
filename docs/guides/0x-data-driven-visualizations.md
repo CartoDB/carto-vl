@@ -293,3 +293,12 @@ symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populate
 ```
 ## Generating legends with ramps
 
+In the previous examples we had displayed multiple legends to better understand the other concepts, but we didn't talked about the legends themselves.
+
+CARTO VL provides some facilities to create legends the advanced `eval()` method, which won't be covered by this guide, and the user friendly `getLegendData()` method, which is what we will use here.
+
+However, in any case, CARTO VL itself doesn't provide functionality to display legends, it provides functionality to built them upon them. CARTO VL provides the necessary data to create the legends, but using that data to draw the legends on the screen is left as a responsibility of the developer. The reason for this is that in this way, you'll be able to customize much more your application.
+
+With that said, we provide some examples of this, so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
+
+
