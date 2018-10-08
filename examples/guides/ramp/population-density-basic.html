@@ -32,6 +32,14 @@
         #controls .actions .description {
             margin-top: 4px;
         }
+        #controls .actions .description span {
+            background: #f5f5f5;
+            padding: 6px;
+            font-family: 'Roboto Mono';
+            display: block;
+            margin: 2px 0;
+        }
+
     </style>
 </head>
 
@@ -50,7 +58,7 @@
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')" id="viz1" checked>
                             <label for="viz1">
                                 <h2>ramp($dn, [green, yellow, red])</h2>
-                                <p class="description open-sans">This will be implicitly casted to `ramp(linear($population_density), [green, yellow, red])` which will be implicitly casted to ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [green, yellow, red])</p>
+                                <p class="description open-sans">This will be implicitly casted to <span>`ramp(linear($population_density), [green, yellow, red])`</span> which will be implicitly <span>casted to ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [green, yellow, red])</span></p>
                             </label>
                         </li>
                         <li>
