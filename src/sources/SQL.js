@@ -11,7 +11,7 @@ export default class SQL extends BaseWindshaft {
      * ```javascript
      * const source = new carto.source.SQL(`SELECT * FROM european_cities WHERE country like 'europe' AND population > 10000`, {
      *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     *   username: 'YOUR_USERNAME_HERE'
      * });
      * ````
      *
@@ -38,7 +38,7 @@ export default class SQL extends BaseWindshaft {
      * @example
      * const source = new carto.source.SQL('SELECT * FROM european_cities', {
      *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     *   username: 'YOUR_USERNAME_HERE'
      * });
      *
      * @throws CartoError
@@ -52,6 +52,10 @@ export default class SQL extends BaseWindshaft {
         this._checkQuery(query);
         this._query = query;
         this.initialize(auth, config);
+    }
+
+    _getFromClause () {
+        return `(${this._query}) as _cdb_query_wrapper`;
     }
 
     _clone () {

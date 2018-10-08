@@ -37,16 +37,6 @@
         #controls .actions .description {
             margin-top: 4px;
         }
-        #content, #controls {
-            font-family: 'Open Sans';
-        }
-        #controls .actions .description span {
-            background: #f5f5f5;
-            padding: 6px;
-            font-family: 'Roboto Mono';
-            display: block;
-            margin: 2px 0;
-        }
     </style>
 </head>
 
@@ -62,49 +52,41 @@
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [green, yellow, red])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')"
                                 id="viz1" checked>
                             <label for="viz1">
-                                <h2>ramp(globalQuantiles($dn, 3), [green, yellow, red])</h2>
-                                <p class="description open-sans"> Classify by dividing the dataset in three quantiles.
-                                    The first bucket will contain the lower 33% of the data samples, the second the
-                                    middle 33%, and the last one the last 33%. </p>
+                                <h2>ramp($dn, [green, yellow, red])</h2>
+                                <p class="description open-sans"> Take colors from a color list. Since the input is an unclassified numeric property, interpolation of the colors values will be performed.</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [green, yellow, red])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')"
                                 id="viz2">
                             <label for="viz2">
-                                <h2>ramp(globalEqIntervals($dn, 3), [green, yellow, red])</h2>
-                                <p class="description open-sans">Classify by getting the minimum and maximum values on
-                                    the entire dataset and setting the buckets <span>as [MIN, MIN*66%+MAX*33%],
-                                    [MIN*66%+MAX*33%, MIN*33%+MAX*66%], [MIN*33%+MAX*66%, MAX].</span> </p>
+                                <h2>ramp($dn, temps)</h2>
+                                <p class="description open-sans"> Use the "temps" CARTOColors palette.</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [green, yellow, red])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])')"
                                 id="viz3">
                             <label for="viz3">
-                                <h2>'ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow,
-                                    red])'</h2>
-                                <p class="description open-sans">Equivalent to <span>`ramp(globalQuantiles($dn, 3), [green,
-                                    yellow, red])`</span> but by only using the samples that are shown on the viewport. Zoom
-                                    in to see the dynamic effect. Note that the legend is updated accordingly.</p>
+                                <h2>'ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])'</h2>
+                                <p class="description open-sans">Take colors from a color list with HSV color constructors.</p>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [green, yellow, red])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
                                 id="viz4">
                             <label for="viz4">
-                                <h2>'ramp(viewportEqIntervals($dn, 3), 0, 160), [green, yellow, red])'</h2>
-                                <p class="description open-sans">Equivalent to <span>`ramp(globalEqIntervals($dn, 3), [green, yellow, red])`</span> but by only using the samples that are shown on the viewport. Zoom
-                                    in to see the dynamic effect. Note that the legend is updated accordingly.</p>
+                                <h2>'ramp($dn, [transparent, gray, yellow])'</h2>
+                                <p class="description open-sans">The same as the first example, but showing that `ramp` supports transparency too.</p>
                             </label>
                         </li>
                     </ul>
                     <div id="info"></div>
-                    <h1 id="content-title"></h1>
-                    <ul id="content" class="description open-sans"></ul>
+                    <p id="content-title"></p>
+                    <ul id="content"></ul>
                 </div>
             </section>
             <footer class="js-footer"></footer>
@@ -127,7 +109,7 @@
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
             width: scaled(0.7)
-            color: ramp(globalQuantiles($dn, 3), [green, yellow, red])
+            color: ramp($dn, [green, yellow, red])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
@@ -146,11 +128,10 @@
 
             colorLegend.data.forEach((legend) => {
                 const colorHex = rgbToHex(legend.value);
-                const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
-                const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
+                const key = legend.key.toFixed(2);
 
                 colorLegendList +=
-                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
+                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
             });
             // Update the information
             document.getElementById('content').innerHTML = colorLegendList;
