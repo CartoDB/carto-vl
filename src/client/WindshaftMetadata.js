@@ -241,7 +241,7 @@ const MODE_TYPES = {
     'start': 'date',
     'end': 'date',
     'iso': 'category'
-}
+};
 
 function dimensionType (dimension, propertyName) {
     if (dimension.modes) {

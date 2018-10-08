@@ -385,7 +385,6 @@ export default class Windshaft {
                     properties[column].dimension.modes = {};
                     modes.forEach(mode => {
                         const name = mode === 'iso' ? dimName : `${dimName}_${mode}`;
-                        console.log('MODE',mode,name);
                         properties[column].dimension.modes[mode] = name;
                     });
                 }
