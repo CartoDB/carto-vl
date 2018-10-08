@@ -3,7 +3,7 @@
 ## What is a ramp?
 
 [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
-- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example: `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])`
+- One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue,
 - Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `color: ramp($population_density, [black, yellow])` will assign the color black to the features with low population density and yellow to the ones with a high population density.
 
 <div class="example-map">
