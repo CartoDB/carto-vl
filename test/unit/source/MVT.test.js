@@ -38,7 +38,7 @@ describe('sources/MVT', () => {
             const metadata = new MVTMetadata({
                 properties: {
                     wadus: {
-                        type: 'number',
+                        type: 'number'
                     }
                 },
                 idProperty: 'id'
@@ -52,7 +52,7 @@ describe('sources/MVT', () => {
             const metadata = new MVTMetadata({
                 properties: {
                     wadus: {
-                        type: 'category',
+                        type: 'category'
                     }
                 },
                 idProperty: 'id'

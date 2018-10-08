@@ -182,6 +182,6 @@ class MockMetadata {
     }
 }
 
-export function mockMetadata(properties) {
+export function mockMetadata (properties) {
     return new MockMetadata(properties);
 }

@@ -45,7 +45,6 @@ describe('src/renderer/viz/expressions/linear', () => {
     describe('regression', () => {
         it('should eval correctly with date properties', () => {
             const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
-            const y = mockMetadata({});
             l._bindMetadata(
                 mockMetadata({
                     wadus: {
