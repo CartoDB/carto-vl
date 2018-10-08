@@ -58,7 +58,7 @@ The result should look like this:
 ### Layer events
 Once you have your basemap, you can start to work with your layers. And all [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events to listen to: `loaded` and `updated`.
 
-The use of the `loaded` event is pretty common, due to in most cases you need to load the data from an external server and that can take some time.
+The use of the `loaded` event is pretty common, due to the fact that in most cases you need to load the data from an external server and that can take some time.
 
 Add this to your code to create a layer as usual, and add it to your map:
 ```js
@@ -75,11 +75,11 @@ layer.on('loaded', () => {
     console.log('Cities layer has been loaded!');
 });
 ```
-> This event could be useful for example to display some kind of loading animation over your map and then hiding it after the layer has loaded. Notice how the name of the event is `loaded`, not `load`.
+> This event could be useful for example to display some kind of loading animation over your map and then hiding it after the layer has loaded (see for example this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). Notice how the name of the event is `loaded`, not `load`.
 
-If you were using several layers, you could also have a single function to handle them all. For this case, **on** & **off** are available at `carto` namespace, expecting a list of layers like this: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })`.
+If you were using several layers, you could also have a single function to handle them all. For this case, **on** and **off** are available at `carto` namespace, expecting a list of layers like in this code: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })`.
 
-Regarding to the `updated` event, it can be useful for some other cases, where the layer's viz changes, for example when you are building an animation. See the [Playing with animations guide](/developers/carto-vl/guides/playing-with-animations).
+Regarding to the `updated` event, it can be useful for the cases where the layer's viz changes, for example when you are building an animation. See the [Playing with animations guide](/developers/carto-vl/guides/playing-with-animations).
 
 If you check your work now, it should look like this:
 <div class="example-map">
@@ -97,14 +97,14 @@ If you check your work now, it should look like this:
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
-First you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();`, with this code that grabs the current displayed features using the *String API*:
+First, you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();`, with this code that grabs the current displayed features using the *String API*:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
 `);
 ```
 
-And then you should add this to handle the updates after you change the map's extent:
+And finally, you should add this to handle the updates after you change the map's extent:
 ```js
 const displayNumberOfCities = () => {
     const numberOfFeatures = viz.variables.currentFeatures.value.length;
@@ -112,9 +112,9 @@ const displayNumberOfCities = () => {
 };
 layer.on('updated', displayNumberOfCities);
 ```
-> Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible cause the expression has no `properties` related to the features themselves.
+> Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible because the expression has no `properties` related to the features themselves.
 
-You can imagine `layer:updated` event as a kind of `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
+You can imagine `layer:updated` event as a "kind of" `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
 
 If you want to reduce the number of current `console.log` entries, to better see the new one, you can remove the previous handler on `map:move` with:
 ```js
@@ -133,9 +133,9 @@ You have already advanced a lot in this guide. Now take a small rest and check y
 </div>
 
 #### Data-driven variables
-If the data you are interested in for your interaction is a feature `property`, such as the _name_ of the city or its _population_, then you can also use some variables to store them. Those are called _data-driven variables_, cause their values change as you interact with each of the features (in our example, with each city).
+If the data you are interested in for your interaction is a feature `property`, such as the _name_ of the city or its _population_, then you can also use some variables to store them. Those are called _data-driven variables_, because their values change as you interact with each of the features (in our example, with each city).
 
-To test them you should edit again your viz, so it looks like this:
+To test them you should edit again your viz as follows:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
@@ -145,7 +145,7 @@ const viz = new carto.Viz(`
 ```
 > Both properties, $name and $pop_max are columns in the original dataset.
 
-As the variables depend on properties, you can't just access them using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
+As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
 
 
 ### Feature events
@@ -166,7 +166,7 @@ interactivity.on('featureClick', featureEvent => {
     });
 });
 ```
-> Notice how `carto.Interactivity` provides you for free with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection, cause you can click on several features at the same time if they are near enough.
+> Notice how `carto.Interactivity` provides you with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection, because you can click on several features at the same time if they are near enough.
 
 The `carto.Interactivity` can handle different events:
 - `featureClick`: Fired when the user clicks on features.
@@ -182,7 +182,7 @@ event happened (we didn't use that so far) and the list of [Features](/developer
 ### Adding pop-ups
 A very common case is to display pop-ups, little emerging windows with information on the features.
 
-You can build the pop-up yourself if you want, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup).
+You can build the pop-up yourself if you want to, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup).
 
 So let's adapt a bit the previous 'featureClick' handler. You're going to add some code inside the current handler:
 ```js
@@ -212,7 +212,7 @@ new mapboxgl.Popup()
     .setHTML(html)
     .addTo(map);
 ```
-> For simplicity, we have created a pop-up just linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
+> For simplicity, we have created a pop-up linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
 
 At this point, your map looks like:
 <div class="example-map">
@@ -229,7 +229,7 @@ At this point, your map looks like:
 ### Interactive-based styling
 Interactivity also can help you to define your styles dynamically.
 
-For example with the next code you'll learn something very useful and common: how to style your features when you interact with them, to give more emphasis to the selected ones.
+For example, with the next code you'll learn something very useful and common: how to style your features when you interact with them, to give more emphasis to the selected ones.
 
 First you have to set up a listener for the `featureEnter` in the current `Interactivity` object. This listener will change the color and size of the features included in the `features` array.
 ```js
