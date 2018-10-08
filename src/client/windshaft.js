@@ -374,6 +374,9 @@ export default class Windshaft {
                     max: dimensionStats.max
                 };
                 const modes = MNS[column].map(c => c.mode).filter(m => m);
+                if (MNS[column].filter(c => !c.mode && c.dimension.format === 'iso').length > 0) {
+                    modes.push('iso');
+                }
                 if (modes.length > 0) {
                     // This is an ISO dimension which will be decoded as
                     // one or two internal properties (start & end timedates)
@@ -381,7 +384,9 @@ export default class Windshaft {
                     // internally we'll keep the properties for each mode.
                     properties[column].dimension.modes = {};
                     modes.forEach(mode => {
-                        properties[column].dimension.modes[mode] = `${dimName}_${mode}`;
+                        const name = mode === 'iso' ? dimName : `${dimName}_${mode}`;
+                        console.log('MODE',mode,name);
+                        properties[column].dimension.modes[mode] = name;
                     });
                 }
             }

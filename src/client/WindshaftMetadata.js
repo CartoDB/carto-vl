@@ -78,7 +78,7 @@ export default class WindshaftMetadata extends MVTMetadata {
         // type of the source property
         const sourceType = dimension ? dimensionBaseType(dimension) : baseType;
         // type of the dataframe properties
-        const type = dimension ? dimensionType(dimension) : sourceType;
+        const type = dimension ? dimensionType(dimension, propertyName) : sourceType;
         return { baseName, column, dimension, type, baseType, sourceType };
     }
 
@@ -237,8 +237,18 @@ function encodeTimeDim (propertyName, propertyValue, stats, dimension) {
     return propertyValue;
 }
 
-function dimensionType (dimension) {
-    return dimension.modes ? 'date' : dimension.type;
+const MODE_TYPES = {
+    'start': 'date',
+    'end': 'date',
+    'iso': 'category'
+}
+
+function dimensionType (dimension, propertyName) {
+    if (dimension.modes) {
+        const mode = Object.keys(dimension.modes).find(mode => dimension.modes[mode] === propertyName);
+        return MODE_TYPES[mode];
+    }
+    return dimension.type;
 }
 
 function dimensionBaseType (dimension) {
