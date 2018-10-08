@@ -31,7 +31,7 @@ export default class Dataset extends BaseWindshaft {
      * @example
      * const source = new carto.source.Dataset('european_cities', {
      *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     *   username: 'YOUR_USERNAME_HERE'
      * });
      *
      * @throws CartoError
