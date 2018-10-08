@@ -43,14 +43,31 @@
             apiKey: 'default_public'
         });
 
-        // DATASET
+
+        // GLOBAL AGGREGATIONS
         const citiesSource = new carto.source.Dataset('populated_places');
         const citiesViz = new carto.Viz(`
             color: grey
             width: 4
+            @min: globalMin($pop_max)
+            @max: globalMax($pop_max)
+            @avg: globalAvg($pop_max)
         `);
+
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
         citiesLayer.addTo(map);
+
+        console.log(`
+            Min: ${citiesViz.variables.min.eval()}
+            Max:
+        `);;
+        citiesViz.variables.max.eval();
+        citiesViz.variables.avg.eval();
+
+
+        // citiesLayer.on('loaded', () => {
+        //     console.log(`N cities: ` + );
+        // })
 
     </script>
 </body>
