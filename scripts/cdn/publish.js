@@ -2,11 +2,8 @@
  * Publish packages to our CDN
  */
 
-// Load secrets file
+const secrets = require('../../secrets.json');
 
-let fs = require('fs');
-
-let secrets = JSON.parse(fs.readFileSync('secrets.json'));
 if (!secrets ||
     !secrets.AWS_USER_S3_KEY ||
     !secrets.AWS_USER_S3_SECRET ||
@@ -17,8 +14,8 @@ if (!secrets ||
 // Load package version
 
 let semver = require('semver');
+let version = require('../../package.json').version;
 
-let version = JSON.parse(fs.readFileSync('package.json')).version;
 if (!version || !semver.valid(version)) {
     throw Error('package.json version is not valid');
 }

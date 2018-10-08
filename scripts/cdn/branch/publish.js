@@ -2,11 +2,8 @@
  * Publish packages to our CDN
  */
 
-// Load secrets file
+const secrets = require('../../../secrets.json');
 
-let fs = require('fs');
-
-let secrets = JSON.parse(fs.readFileSync('secrets.json'));
 if (!secrets ||
     !secrets.AWS_USER_S3_KEY ||
     !secrets.AWS_USER_S3_SECRET ||
@@ -15,9 +12,9 @@ if (!secrets ||
 }
 
 const currentGitBranch = require('current-git-branch');
+const s3 = require('s3');
 const branch = currentGitBranch();
-let s3 = require('s3');
-let client = s3.createClient({
+const client = s3.createClient({
     s3Options: {
         accessKeyId: secrets.AWS_USER_S3_KEY,
         secretAccessKey: secrets.AWS_USER_S3_SECRET
@@ -34,7 +31,7 @@ function uploadFiles (branch) {
         s3Params: {
             ACL: 'public-read',
             Bucket: secrets.AWS_S3_BUCKET,
-            Prefix: 'carto-vl/' + branch + '/'
+            Prefix: 'carto-vl/branches/' + branch + '/'
         }
     });
 
@@ -43,7 +40,11 @@ function uploadFiles (branch) {
     });
 
     uploader.on('progress', function () {
-        console.log('Uploading...', `${uploader.progressAmount / uploader.progressTotal}%`);
+        const progress = uploader.progressTotal !== 0
+            ? ((uploader.progressAmount / uploader.progressTotal) * 100).toFixed(2)
+            : 0;
+
+        console.log('Uploading...', `${progress}%`);
     });
 
     uploader.on('end', function () {

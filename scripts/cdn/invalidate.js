@@ -2,11 +2,8 @@
  * Purge our CDN fastly cache
  */
 
-// Load secrets file
+const secrets = require('../../secrets.json');
 
-let fs = require('fs');
-
-let secrets = JSON.parse(fs.readFileSync('secrets.json'));
 if (!secrets ||
     !secrets.FASTLY_API_KEY ||
     !secrets.FASTLY_CARTODB_SERVICE) {

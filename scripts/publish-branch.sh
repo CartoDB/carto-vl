@@ -1,9 +1,9 @@
 #!/bin/bash
 
-BRANCH=$(node --eval "console.log(require('./package.json').branch);")
+BRANCH=$(git branch | grep -e "^*" | tr -d '* ';)
 
 # TODO check branch exists
-echo "Ready to publish CARTO VL branch $BRANCH"
+echo "Ready to publish CARTO VL branch '$BRANCH'"
 echo "Do you want to continue?"
 read -n1 -r -p "Press Ctrl+C to cancel, or any other key to continue." key
 
