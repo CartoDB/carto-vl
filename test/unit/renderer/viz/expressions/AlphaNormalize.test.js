@@ -1,5 +1,6 @@
 import { validateStaticType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 import { alphaNormalize, rgb, property } from '../../../../../src/renderer/viz/expressions';
+import { mockMetadata } from './utils';
 
 describe('src/renderer/viz/expressions/AlphaNormalize', () => {
     describe('type', () => {
@@ -14,14 +15,14 @@ describe('src/renderer/viz/expressions/AlphaNormalize', () => {
     describe('eval', () => {
         it('should return a normalized color', () => {
             const expr = alphaNormalize(rgb(255, 128, 0), property('price'));
-            expr._bindMetadata({
-                properties: {
+            expr._bindMetadata(
+                mockMetadata({
                     price: {
                         type: 'number',
                         max: 10
                     }
-                }
-            });
+                })
+            );
             expect(expr.eval({price: 5})).toEqual({r: 255, g: 128, b: 0, a: 0.5});
         });
     });

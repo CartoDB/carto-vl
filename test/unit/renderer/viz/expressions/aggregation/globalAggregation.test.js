@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateMaxArgumentsError } from '../utils';
+import { validateMaxArgumentsError, mockMetadata } from '../utils';
 
 describe('src/renderer/viz/expressions/globalAggregation', () => {
     describe('error control', () => {
@@ -13,18 +13,16 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
 
     const $price = s.property('price');
     describe('global filtering', () => {
-        const fakeMetadata = {
-            properties: {
-                price: {
-                    type: 'number',
-                    min: 0,
-                    avg: 1,
-                    max: 2,
-                    sum: 3,
-                    count: 4
-                }
+        const fakeMetadata = mockMetadata({
+            price: {
+                type: 'number',
+                min: 0,
+                avg: 1,
+                max: 2,
+                sum: 3,
+                count: 4
             }
-        };
+        });
 
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);

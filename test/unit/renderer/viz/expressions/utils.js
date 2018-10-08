@@ -165,3 +165,23 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
         }).toThrowError(regex);
     });
 }
+
+class MockMetadata {
+    constructor (properties, idProperty) {
+        this.properties = properties;
+        this.idProperty = idProperty;
+    }
+    stats (propertyName) {
+        return this.properties[propertyName];
+    }
+    decode (propertyName, propertyValue) {
+        return propertyValue;
+    }
+    encode (propertyName, propertyValue) {
+        return propertyValue;
+    }
+}
+
+export function mockMetadata(properties) {
+    return new MockMetadata(properties);
+}

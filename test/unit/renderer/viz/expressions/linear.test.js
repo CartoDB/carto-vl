@@ -2,6 +2,7 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 import GlobalMin from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMin';
 import GlobalMax from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMax';
+import { mockMetadata } from './utils';
 
 describe('src/renderer/viz/expressions/linear', () => {
     describe('error control', () => {
@@ -44,15 +45,16 @@ describe('src/renderer/viz/expressions/linear', () => {
     describe('regression', () => {
         it('should eval correctly with date properties', () => {
             const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
-            l._bindMetadata({
-                properties: {
+            const y = mockMetadata({});
+            l._bindMetadata(
+                mockMetadata({
                     wadus: {
                         type: 'date',
                         min: new Date('1880-01-01T00:00:07Z'),
                         max: new Date('1880-01-01T00:00:09Z')
                     }
-                }
-            });
+                })
+            );
             expect(l.eval({
                 wadus: 0.5
             })).toEqual(0.5);
