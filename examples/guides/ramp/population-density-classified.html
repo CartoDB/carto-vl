@@ -49,8 +49,8 @@
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [green, yellow, red])')"
                                 id="viz3">
                             <label for="viz3">
-                                <h2>'ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow,
-                                    red])'</h2>
+                                <h2>ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow,
+                                    red])</h2>
                                 <p class="description open-sans">Equivalent to <span>ramp(globalQuantiles($dn, 3), [green,
                                     yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom
                                     in to see the dynamic effect. Note that the legend is updated accordingly.</p>
@@ -60,9 +60,19 @@
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [green, yellow, red])')"
                                 id="viz4">
                             <label for="viz4">
-                                <h2>'ramp(viewportEqIntervals($dn, 3), 0, 160), [green, yellow, red])'</h2>
+                                <h2>ramp(viewportEqIntervals($dn, 3), 0, 160), [green, yellow, red])</h2>
                                 <p class="description open-sans">Equivalent to <span>ramp(globalEqIntervals($dn, 3), [green, yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom
                                     in to see the dynamic effect. Note that the legend is updated accordingly.</p>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(buckets($dn, [80, 160]), [green, yellow, red])')"
+                                id="viz5">
+                            <label for="viz5">
+                                <h2>ramp(buckets($dn, [80, 160]), [green, yellow, red])</h2>
+                                <p class="description open-sans">Cities with a population density less than 80 will be set green, between 80 and 160
+                                    will be set yellow, and greater than 160 will be set red.
+                                </p>
                             </label>
                         </li>
                     </ul>

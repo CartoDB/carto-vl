@@ -75,6 +75,8 @@ There are multiple classifying methods (quantiles, equal intervals...) and the c
 - The entire dataset. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes on the view (map center / map zoom) will trigger an automatic re-computation of the classification.
 
+On top on that, you can also classify the data by a fixed list of breakpoints with the [`buckets()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify the features by its price into 3 different categories (buckets): the features that have a price less than 10, the features that have a price between 10 and 200, and the features that have a price higher than 200. It's important to note that there is always one more category than breakpoint. The `buckets` function can also be used with categorical inputs, we'll see that on the [next section](#One_to_one_mapping._One_category_-_one_color.).
+
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
 <div class="example-map">
@@ -301,4 +303,12 @@ However, in any case, CARTO VL itself doesn't provide functionality to display l
 
 With that said, we provide some examples of this, so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
 
+### Unclassified numerical data
 
+
+
+### Categorical data
+
+legend-buckets.html
+
+#### Showing images
