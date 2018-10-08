@@ -58,7 +58,7 @@
 
         // LAYER EVENTS
         // Add layer as usual
-        carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
+        carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
         const viz = new carto.Viz();
         const layer = new carto.Layer('Cities', source, viz);

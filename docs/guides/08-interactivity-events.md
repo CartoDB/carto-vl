@@ -62,7 +62,7 @@ The use of the `loaded` event is pretty common, due to the fact that in most cas
 
 Add this to your code to create a layer as usual, and add it to your map:
 ```js
-carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
+carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
 const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz();
 const layer = new carto.Layer('Cities', source, viz);
@@ -328,7 +328,7 @@ Here it is the full example:
 
         // LAYER EVENTS & VARIABLES
         // Add layer as usual
-        carto.setDefaultAuth({ user: 'cartovl', apiKey: 'default_public' });
+        carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
 
         // Viz using a dynamic variable
