@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html>
 
 <head>
@@ -12,6 +12,27 @@
     <!-- Include Mapbox GL CSS -->
     <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style type="text/css">
+        .toolbox {
+            max-width: 350px;
+        }
+        #controls .actions li h2 {
+            font: 12px/16px 'Open Sans';
+            margin: 0;
+        }
+        #controls .actions li {
+            margin-bottom: 24px;
+        }
+        #controls .actions input {
+            margin-top: 4px;
+        }
+        #controls .actions input:checked + label h2 {
+            font-weight: 600;
+        }
+        #controls .actions .description {
+            margin-top: 4px;
+        }
+    </style>
 </head>
 
 <body>
@@ -27,23 +48,38 @@
                     <ul class="actions">
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, yellow])')" id="viz1" checked>
-                            <label for="viz1">ramp($dn, [transparent, yellow])</label>
+                            <label for="viz1">
+                                <h2>ramp($dn, [transparent, yellow])</h2>
+                                <p class="description open-sans">This will be implicitly casted to `ramp(linear($population_density), [transparent, yellow])` which will be implicitly casted to ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [transparent, yellow])</p>
+                            </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [transparent, yellow])')" id="viz2" checked>
-                            <label for="viz2">ramp(linear($dn), [transparent, yellow])</label>
+                            <label for="viz2">
+                                <h2>ramp(linear($dn), [transparent, yellow])</h2>
+                                <p class="description open-sans">the same as above due to implicit casts</p>
+                            </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])')" id="viz3" checked>
-                            <label for="viz3">'ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])'</label>
+                            <label for="viz3">
+                                <h2>'ramp(linear($dn, globalMin($dn), globalMax($dn)), [transparent, yellow])'</h2>
+                                <p  class="description open-sans">the same as the two above due to implicit casts</p>
+                            </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, 0, 160), [transparent, yellow])')" id="viz4" checked>
-                            <label for="viz4">'ramp(linear($dn, 0, 160), [transparent, yellow])'</label>
+                            <label for="viz4">
+                                <h2>'ramp(linear($dn, 0, 160), [transparent, yellow])'</h2>
+                                <p class="description open-sans">The data range has been fixed to the [-10, 40] range</p>
+                            </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])')" id="viz5" checked>
-                            <label for="viz5">'ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])'</label>
+                            <label for="viz5">
+                                <h2>'ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [transparent, yellow])'</h2>
+                                <p  class="description open-sans">The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data. For dynamic datasets this is better than the previous fixed approach</p>
+                            </h2>
                         </li>
                     </ul>
                     <div id="info"></div>
