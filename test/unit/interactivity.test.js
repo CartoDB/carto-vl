@@ -9,7 +9,7 @@ describe('api/interactivity', () => {
 
         beforeEach(() => {
             source = new Dataset('ne_10m_populated_places_simple', {
-                user: 'test',
+                username: 'test',
                 apiKey: '1234567890'
             });
             viz = new Viz();

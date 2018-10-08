@@ -52,7 +52,7 @@ const aSource = new carto.source.Dataset('name_of_your_dataset');
 That was using `carto.setDefaultAuth` method, but now you will see how to include custom credentials for an specific dataset. Add this to your current working file (*sources.html* if you followed our suggestion), just after map creation.
 ```js
 const citiesSource = new carto.source.Dataset('populated_places', {
-    user: 'cartovl',
+    username: 'cartovl',
     apiKey: 'default_public'
 });
 ```
@@ -196,7 +196,7 @@ const query = 'SELECT * FROM populated_places WHERE megacity = 1';
 Create a SQL source:
 ```js
 const megacitiesSource = new carto.source.SQL(query, {
-    user: 'cartovl',
+    username: 'cartovl',
     apiKey: 'default_public'
 });
 ```
@@ -280,7 +280,7 @@ This is the complete code:
         // DATASET
         // Define Dataset source with custom credentials
         const citiesSource = new carto.source.Dataset('populated_places', {
-            user: 'cartovl',
+            username: 'cartovl',
             apiKey: 'default_public'
         });
 
@@ -367,7 +367,7 @@ This is the complete code:
 
         // Define SQL source with query and custom credentials
         const megacitiesSource = new carto.source.SQL(query, {
-            user: 'cartovl',
+            username: 'cartovl',
             apiKey: 'default_public'
         });
 
