@@ -54,6 +54,10 @@ export default class SQL extends BaseWindshaft {
         this.initialize(auth, config);
     }
 
+    _getFromClause () {
+        return `(${this._query}) as _cdb_query_wrapper`;
+    }
+
     _clone () {
         return new SQL(this._query, this._auth, this._config);
     }
