@@ -18,7 +18,7 @@ export default class GeoJSONMetadata extends Metadata {
             default:
                 const numericValue = Number(propertyValue);
                 return Number.isNaN(numericValue) ? Number.MIN_SAFE_INTEGER : numericValue;
-    }
+        }
     }
 
     // convert internal representation to user
