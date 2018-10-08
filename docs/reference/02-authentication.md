@@ -10,7 +10,7 @@ The examples in this documentation include a placeholder for the API Key. Ensure
 
 ```javascript
 carto.setDefaultAuth({
-    user: 'YOUR_USERNAME_HERE',
+    username: 'YOUR_USERNAME_HERE',
     apiKey: 'YOUR_API_KEY_HERE'
 });
 ```

@@ -16,8 +16,9 @@ export default class GeoJSONMetadata extends Metadata {
                 const d = util.castDate(propertyValue).getTime();
                 return (d - min.getTime()) / (max.getTime() - min.getTime());
             default:
-                return propertyValue;
-        }
+                const numericValue = Number(propertyValue);
+                return Number.isNaN(numericValue) ? Number.MIN_SAFE_INTEGER : numericValue;
+    }
     }
 
     // convert internal representation to user
@@ -35,6 +36,9 @@ export default class GeoJSONMetadata extends Metadata {
                 d.setTime(value);
                 return d;
             default:
+                if (propertyValue === Number.MIN_SAFE_INTEGER) {
+                    propertyValue = Number.NaN;
+                }
                 return propertyValue;
         }
     }

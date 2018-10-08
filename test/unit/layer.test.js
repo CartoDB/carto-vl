@@ -8,7 +8,7 @@ describe('api/layer', () => {
 
     beforeEach(() => {
         source = new Dataset('ne_10m_populated_places_simple', {
-            user: 'test',
+            username: 'test',
             apiKey: '1234567890'
         });
         viz = new Viz();
@@ -45,7 +45,7 @@ describe('api/layer', () => {
 
             expect(() => {
                 new Layer('layer0', {});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source.Base".');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source".');
         });
 
         it('should throw an error if viz is not valid', () => {
@@ -69,7 +69,7 @@ describe('api/layer', () => {
     describe('cloning the source', () => {
         it('should be done with Dataset sources', () => {
             const source = new Dataset('ne_10m_populated_places_simple', {
-                user: 'test',
+                username: 'test',
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());
@@ -77,7 +77,7 @@ describe('api/layer', () => {
         });
         it('should be done with SQL sources', () => {
             const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
-                user: 'test',
+                username: 'test',
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());

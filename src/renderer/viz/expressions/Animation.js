@@ -9,7 +9,7 @@ let waitingForLayer = new Set();
 let waitingForOthers = new Set();
 
 /**
- * Create an animated temporal filter (animation).
+ * Create an animated temporal filter (animation). Read more about the {@link expression.Animation|Animation Class}
  *
  * @param {Number} input input to base the temporal filter,
  * if input is a property, the beginning and end of the animation will be determined by the minimum and maximum timestamps of the property on the dataset,
@@ -49,20 +49,22 @@ let waitingForOthers = new Set();
  *   color: ramp(linear(clusterAvg($temp), 0,30), tealrose)
  *   filter: animation(linear($date, time('2022-03-09T00:00:00Z'), time('2033-08-12T00:00:00Z')), 40, fade(0.1, 0.3))
  * `);
+ * Animation class
+ *
+ * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
  * @memberof carto.expressions
  * @name animation
  * @function
  * @api
 */
+
 /**
  * Animation class
  *
  * This class is instanced automatically by using the `animation` function. It is documented for its methods.
  *
- * @memberof carto.expressions
- * @extends carto.source.Base
- * @name Animation
+ * @name expressions.Animation
  * @abstract
  * @hideconstructor
  * @class
@@ -207,7 +209,7 @@ export class Animation extends BaseExpression {
      *   document.getElementById('timestamp').innerHTML = currTime;
      * });
      *
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @name getProgressValue
      * @instance
      * @api
@@ -231,7 +233,7 @@ export class Animation extends BaseExpression {
     /**
      * Set the time stamp of the animation
      * @api
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @instance
      * @name setCurrent
      * @param {Date|number} value - A JavaScript Date object with the new animation time
@@ -257,7 +259,7 @@ export class Animation extends BaseExpression {
      * @returns {Number} A number representing the progress. 0 when the animation just started and 1 at the end of the cycle.
      * @api
      * @instance
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @name getProgressPct
      */
     getProgressPct () {
@@ -269,7 +271,7 @@ export class Animation extends BaseExpression {
      * @param {number} progress - A number in the [0-1] range setting the animation progress.
      * @api
      * @instance
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @name setProgressPct
      */
     setProgressPct (progress) {
@@ -286,7 +288,7 @@ export class Animation extends BaseExpression {
      * Pause the animation
      *
      * @api
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @instance
      * @name pause
      */
@@ -298,7 +300,7 @@ export class Animation extends BaseExpression {
      * Play/resume the animation
      *
      * @api
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @instance
      * @name play
      */
@@ -310,7 +312,7 @@ export class Animation extends BaseExpression {
      * Stops the animation
      *
      * @api
-     * @memberof carto.expressions.Animation
+     * @memberof expressions.Animation
      * @instance
      * @name stop
      */

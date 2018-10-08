@@ -5,7 +5,7 @@ import { parseVizExpression } from '../renderer/viz/parser';
  *
  * FeatureVizProperty objects can be accessed through {@link Feature} objects.
  *
- * @typedef {object} FeatureVizProperty
+ * @typedef {Object} FeatureVizProperty
  * @property {function} blendTo - Change the feature viz by blending to a destination viz expression `expr` in `duration` milliseconds, where `expr` is the first parameter and `duration` the last one
  * @property {function} reset - Reset custom feature viz property by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @property {function} value - Getter that evaluates the property and returns the computed value

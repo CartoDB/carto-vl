@@ -41,8 +41,8 @@
       center: [0, 30],
       zoom: 3,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+
+
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -51,7 +51,7 @@
     map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 

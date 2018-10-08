@@ -19,8 +19,11 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
     describe('type', () => {
         validateDynamicType('ramp', ['number', 'palette'], 'color');
+        validateDynamicType('ramp', ['number', 'number-list', 'number'], 'number');
         validateDynamicType('ramp', ['category', 'palette'], 'color');
+        validateDynamicType('ramp', ['category', 'palette', 'color'], 'color');
         validateDynamicType('ramp', ['category', 'color-list'], 'color');
+        validateDynamicType('ramp', ['category', 'color-list', 'color'], 'color');
         validateDynamicType('ramp', ['category', 'number-list'], 'number');
         validateDynamicType('ramp', ['category', 'image-list'], 'image');
     });

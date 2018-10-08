@@ -6,7 +6,7 @@ const map = new mapboxgl.Map({
 });
 
 carto.setDefaultAuth({
-    user: 'localhost',
+    username: 'localhost',
     apiKey: '1234'
 });
 carto.setDefaultConfig({

@@ -6,7 +6,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
 /**
  * Create a color from its name.
  *
- * @param {string} name - The name of the color
+ * @param {String} name - The name of the color
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
