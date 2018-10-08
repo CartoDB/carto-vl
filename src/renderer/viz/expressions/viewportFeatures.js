@@ -1,7 +1,9 @@
 import BaseExpression from './base';
-// import Property from './basic/property';
+import Property from './basic/property';
+import ClusterTime from './aggregation/cluster/ClusterTime'
+import ClusterAggregation from './aggregation/cluster/ClusterAggregation'
 import { implicitCast } from './utils';
-// import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 /**
@@ -84,10 +86,9 @@ export default class ViewportFeatures extends BaseExpression {
 
     _resetViewportAgg () {
         if (!this._FeatureProxy) {
-            // TODO: allow properties & clustterAggr/Time expressions
-            // if (!this._requiredProperties.every(p => (p.isA(Property)))) {
-            //     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
-            // }
+            if (!this._requiredProperties.every(p => validProperty(p))) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
+            }
             const columns = this._requiredProperties.map(p => p.propertyName);
             this._FeatureProxy = this.genViewportFeatureClass(columns);
         }
@@ -122,4 +123,8 @@ function _childrenFromProperties (properties) {
         childContainer['p' + ++i] = property;
     });
     return childContainer;
+}
+
+function validProperty(property) {
+    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTime);
 }
