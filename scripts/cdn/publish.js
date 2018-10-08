@@ -72,11 +72,15 @@ function uploadFiles (version) {
             Prefix: 'carto-vl/' + version + '/'
         }
     });
+
     uploader.on('error', function (err) {
         console.error('Error: unable to upload:', err.stack);
     });
+
     uploader.on('progress', function () {
+        console.log('Uploading...', `${uploader.progressAmount / uploader.progressTotal}%`);
     });
+
     uploader.on('end', function () {
         console.log('Done', version);
     });

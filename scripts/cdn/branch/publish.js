@@ -14,9 +14,8 @@ if (!secrets ||
     throw Error('secrets.json content is not valid');
 }
 
-const branchName = require('current-git-branch');
-const branch = JSON.parse(fs.readFileSync('package.json')).branch || branchName();
-
+const currentGitBranch = require('current-git-branch');
+const branch = currentGitBranch();
 let s3 = require('s3');
 let client = s3.createClient({
     s3Options: {
@@ -32,7 +31,6 @@ function uploadFiles (branch) {
 
     let uploader = client.uploadDir({
         localDir: 'dist',
-        deleteRemoved: true,
         s3Params: {
             ACL: 'public-read',
             Bucket: secrets.AWS_S3_BUCKET,
