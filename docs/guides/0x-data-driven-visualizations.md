@@ -77,8 +77,15 @@ There are multiple classifying methods (quantiles, equal intervals...) and the c
 
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
-TODO add population density example with legend
-
+<div class="example-map">
+    <iframe
+        id="population-density-classified"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 ##### A note about `filter:`
 
 `filter:` is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
@@ -108,11 +115,19 @@ Buckets allows to pick some or all categories from a categorical property in a p
 //
 // We can create a choropleth map by matching the winners of each region to one color by using buckets
 // This will create the following correspondence:
-//      'conservatives' <=> red
+//      'conservatives' <=> blue
 //      'progressives'  <=> red
-//      'liberals'      <=> green
-color: ramp(buckets($winner, ['conservatives', 'progressives', 'liberals'], [red, blue, green])
+color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])
 ```
+<div class="example-map">
+    <iframe
+        id="election-basic"
+        src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 #### *Others*
 
@@ -120,7 +135,7 @@ When working with categories, the concept of the *others bucket* arises. For exa
 
 In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function, so it will fallback to the `others` bucket.
 
-The `others` bucket will be colored gray by default. However, it's possible to override this behavior by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives', 'liberals'], [red, blue, green], yellow)`.
+The `others` bucket will be colored gray by default. However, it's possible to override this behavior by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives'], [red, blue], white)`.
 
 <div class="example-map">
     <iframe
@@ -137,6 +152,8 @@ The `others` bucket will be colored gray by default. However, it's possible to o
 If we don't care about which colors get each category, but we don't want to color every category in the dataset, we can use `top` to group all uncommon categories in the *others bucket*.
 
 `top($cause, 5)` function will keep the five most common categories (regarding the entire dataset) and will group the rest into the *others bucket*.
+
+Let's see this with a dataset of US railroad accidents.
 
 <div class="example-map">
     <iframe
@@ -172,20 +189,29 @@ The interpolation made by `ramp` is always done in the CieLAB color space. This 
 
 ## Ramp values
 
-In the previous section we talked about using different types of input for ramp, but we always output colors picked from list. `ramp` supports to use other types of outputs and also includes some fixed constant palettes of colors. Let's see it!
+In the previous section we talked about using different types of input for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
 
 ### Color values
 
-One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($temperature, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
-`ramp($temperature, [rgb(200,220,222), rgba(200,120,22, 0.8)])`, `ramp($temperature, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($temperature, [#00F, #F00])`, `ramp($temperature, [blue, #F00])`, `ramp($temperature, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
+One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($dn, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
+`ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`, `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($dn, [#00F, #F00])`, `ramp($dn, [blue, #F00])`, `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
 
 There is another way to specify colors, and that is to use one of the built-in color palettes. We have built-in all the CARTOColors and ColorBrewer palettes. You can use them like this:
 
-ramp($temperature, emrld)
-ramp($temperature, tealrose)
-ramp($temperature, cb_blues)
+ramp($dn, temps)
+ramp($dn, tealrose)
+ramp($dn, cb_blues)
 
-TODO example
+
+<div class="example-map">
+    <iframe
+        id="population-density-colors"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-colors.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
 
