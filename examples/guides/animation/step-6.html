@@ -26,6 +26,7 @@
     <!-- Map goes here -->
     <div id="map"></div>
     <script>
+        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
@@ -40,12 +41,15 @@
         });
         map.addControl(nav, 'top-left');
 
+        //** CARTO VL functionality begins here **//
+
         // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        // Create the source
+
+        // Define source
         const source = new carto.source.Dataset('bird_journey');
         
         // Define and style Viz object
@@ -58,8 +62,9 @@
           strokeWidth: 0
         `);
         
-        // Create the layer
+        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
+
         // Add the layer to the map
         layer.addTo(map);
     </script>

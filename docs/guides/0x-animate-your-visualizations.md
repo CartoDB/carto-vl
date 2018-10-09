@@ -2,6 +2,16 @@
 
 Using CARTO VL you can make animated maps of points, lines, and polygons using the [`animation`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsanimation) expression. In this guide, you will learn how to make animations in your maps from scratch!
 
+<div class="example-map">
+    <iframe
+        id="animation-step-7"
+        src="/developers/carto-vl/examples/maps/guides/animation/step-7.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
 ### Creating a basic animation
 
 Let's start creating a simple animation showing and hiding dots in a map. The general syntax for animating data in CARTO VL is:
@@ -244,7 +254,7 @@ setInterval(updateProgress, 100);
 
 #### All together
 
-Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. There is a more complete example [here](//TODO)
+Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. Thes styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section](//TODO).
 
 <div class="example-map">
     <iframe
@@ -345,8 +355,6 @@ const viz = new carto.Viz(`
 
 > Note: Values outside of the specified range will not appear in the animation.
 
-// TODO
-
 ```js
 const viz = new carto.Viz(`
     @duration: 10
@@ -357,3 +365,15 @@ const viz = new carto.Viz(`
     strokeWidth: 0
 `);
 ```
+
+You can apply the animation to the color property by using it in the `ramp` expression. Take a look at the result!
+
+<div class="example-map">
+    <iframe
+        id="animation-step-6"
+        src="/developers/carto-vl/examples/maps/guides/animation/step-6.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
