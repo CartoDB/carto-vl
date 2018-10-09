@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
+    <title>Popups | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
     <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-    <!-- Make the map visible -->
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
+
 <body>
-    <!-- Map goes here -->
     <div id="map"></div>
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
-            center: [-73.954323, 40.711743],
-            zoom: 15.7,
+            center: [-2, 40],
+            zoom: 5,
 
         });
         map.touchZoomRotate.disableRotation();
@@ -28,23 +31,33 @@
         });
         map.addControl(nav, 'top-left');
 
-        // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        // Create the source
-        const source = new carto.source.Dataset('table_311_complaints');
-        // Add better styles
+
+        const source = new carto.source.Dataset('ne_10m_populated_places_simple');
         const viz = new carto.Viz(`
-            symbol: ramp(buckets($complaint,['Car','Bus','Building']), [car,bus,house])
-            color: blue
-            width: 30
+            @name: $name
+            width: 20
         `);
-        // Create the layer
         const layer = new carto.Layer('layer', source, viz);
-        // Add the layer to the map
+
+        const interactivity = new carto.Interactivity(layer);
+        interactivity.on('featureClick', featureEvent => {
+            const coords = featureEvent.coordinates;
+            const feature = featureEvent.features[0];
+            if (!feature) {
+                return;
+            }
+            new mapboxgl.Popup()
+                .setLngLat([coords.lng, coords.lat])
+                .setHTML(`<h1>${feature.variables.name.value}</h1>`)
+                .addTo(map);
+        });
+
         layer.addTo(map);
     </script>
 </body>
+
 </html>
