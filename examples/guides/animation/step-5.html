@@ -23,7 +23,7 @@
             width: 100%;
         }
 
-        aside {
+        aside.toolbox {
           background-color: rgba(255, 255, 255, 0.9);
           border-radius: 5px;
           display: block;
@@ -34,6 +34,140 @@
           right: 12px;
           top: 12px;
           width: 250px;
+          font-size: 12px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            border: 1px solid white;
+            background: transparent;
+            border: none;
+
+            cursor: pointer;
+            flex: 1;
+            padding: auto 10px;
+
+            margin: auto 5px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+            margin-top: -4px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-moz-range-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+
+        input[type=range].white-thumb::-moz-range-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range].white-thumb::-webkit-slider-thumb {
+            border-radius: 50%;
+            border: 3px solid #1785FB;
+            background: white;
+            height: 15px;
+            width: 15px;
+            margin-top: -6px;
+        }
+
+        input[type=range].white-thumb::-ms-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range]:-moz-focusring {
+            outline: 1px solid white;
+            outline-offset: -1px;
+        }
+
+        input[type=range]::-ms-track {
+            height: 3px;
+            background: transparent;
+            border-color: transparent;
+            border-width: 6px 0;
+            color: transparent;
+        }
+
+        input[type=range]::-ms-fill-lower {
+            background: #1785FB;
+        }
+
+        input[type="range"]::-moz-range-progress {
+            background: #1785FB;
+        }
+
+        input[type=range]::-ms-fill-upper {
+            background: #ccc;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: #ccc;
+        }
+
+        input[type=range]::-ms-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+
+        button.toolbox-button {
+            border-radius: 4px;
+            border: 0;
+            box-shadow: none;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            font: 500 12px/20px 'Roboto';
+            margin: 12px 12px 0 0;
+            padding: 4px 20px;
+        }
+
+        #js-play-button {
+            background-color: #1785FB;
+            background-position: center;
+        }
+
+        #js-pause-button {
+            background-color: #1785FB;
+            background-position: center;
         }
     </style>
 </head>
@@ -43,19 +177,17 @@
     <div id="map"></div>
 
     <!-- Animation control elements -->
-    <aside>
+    <aside class="toolbox">
         <header>
             <h1>Animation controls</h1>
         </header>
         <section>
-            <p>Progress</p>
-            <input type="range" id="js-progress-range" min="0" max="1" step="0.01">
+            <p>Progress: <input type="range" id="js-progress-range" min="0" max="1" step="0.01"></p>
+            <p>Duration <input type="range" id="js-duration-range" class="white-thumb" min="0" max="30" step="1"></p>
         </section>
         <section>
-            <button id="js-play-button">Play</button>
-            <button id="js-pause-button">Pause</button>
-            <p>Duration</p>
-            <input type="range" id="js-duration-range" min="0" max="30" step="1">
+            <button id="js-play-button" class="toolbox-button">Play</button>
+            <button id="js-pause-button" class="toolbox-button">Pause</button>
         </section>
     </aside>
 
@@ -64,7 +196,8 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-7.7, 38],
+            center: [-22.6995, 41.94674],
+            center: [-22.6995, 41.94674],
             zoom: 2.8,
             scrollZoom: false
         });

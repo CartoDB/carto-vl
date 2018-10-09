@@ -254,7 +254,7 @@ setInterval(updateProgress, 100);
 
 #### All together
 
-Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. These styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section]((http://carto.com/developers/carto-vl/examples/#example-animation-controls).
+Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. These styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section](http://carto.com/developers/carto-vl/examples/#example-animation-controls).
 
 <div class="example-map">
     <iframe
