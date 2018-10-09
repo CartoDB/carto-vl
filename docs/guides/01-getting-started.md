@@ -177,6 +177,8 @@ For more information about styling, check out the guide [Introduction to Styling
 <html>
 
 <head>
+    <meta charset="utf-8">
+
     <!-- Include CARTO VL JS -->
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <!-- Include Mapbox GL JS -->
