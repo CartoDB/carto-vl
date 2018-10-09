@@ -6,13 +6,13 @@ Using CARTO VL you can make animated maps of points, lines, and polygons using t
 
 Let's start creating a simple animation showing and hiding dots in a map. The general syntax for animating data in CARTO VL is:
 
-```
+```js
 filter: animation(input, duration)
 ```
 
 In this first example, the `input` parameter is one of the columns name (`$date_time`) of the dataset (`bird_journey`). The duration is set to `30` seconds:
 
-```
+```js
 filter: animation($date_time, 30)
 ```
 
@@ -26,9 +26,9 @@ filter: animation($date_time, 30)
     </iframe>
 </div>
 
-Easy, right? Now it is time to understand deeply the animation expression.
-
 #### The filter property
+
+Easy, right? Now it is time to understand deeply the animation expression.
 
 In the example above, the animation expression is set to the `filter` property, defined in the [vizSpec](https://carto.com/developers/carto-vl/reference/#vizspec). The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). When the expression assigned to `filter` (`animation` in our case) has the value `0` for a given feature, that feature will be filtered-out and not be shown. If the value is `1`, the feature will be visible.
 
@@ -63,7 +63,7 @@ This parameter defines the duration of the animation progress in seconds. As sta
 
 The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durations in seconds. These parameters allow for smooth transitions between features during an animation's duration. During the *`fadeIn`* phase, all features with a match will fade-in to the animation, transitioning from `0` (invisible) to `1` (visible). During the *`fadeOut`* phase features will transition from `1` back to `0` and the next set of features will begin to fade-in.
 
-### Example
+### Styling and configuring the animation
 
 To illustrate these concepts, let's animate the journey of three birds from January to April of 2014 using data from [movebank.org](https://www.movebank.org/).
 
@@ -143,3 +143,4 @@ strokeWidth: 0
     </iframe>
 </div>
 
+Congratulations!
