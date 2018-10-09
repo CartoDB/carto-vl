@@ -129,6 +129,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 - [Elena Torro](https://github.com/elenatorro)
 - [Raúl Ochoa](https://github.com/rochoa)
 - [Mamata Akella](https://github.com/makella)
+- [Víctor Velarde](https://github.com/VictorVelarde)
 - [Ariana Escobar](https://github.com/arianaescobar)
 
 ## License
