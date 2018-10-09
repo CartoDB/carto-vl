@@ -481,15 +481,6 @@ import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
-import ClusterDayOfWeek from './expressions/aggregation/cluster/ClusterDayOfWeek';
-import ClusterDayOfMonth from './expressions/aggregation/cluster/ClusterDayOfMonth';
-import ClusterDayOfYear from './expressions/aggregation/cluster/ClusterDayOfYear';
-import ClusterHourOfDay from './expressions/aggregation/cluster/ClusterHourOfDay';
-import ClusterMonthOfYear from './expressions/aggregation/cluster/ClusterMonthOfYear';
-import ClusterQuarterOfYear from './expressions/aggregation/cluster/ClusterQuarterOfYear';
-import ClusterWeekOfYear from './expressions/aggregation/cluster/ClusterWeekOfYear';
-import ClusterMinuteOfHour from './expressions/aggregation/cluster/ClusterMinuteOfHour';
-
 import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
 import ClusterTimeStart from './expressions/aggregation/cluster/ClusterTimeStart';
 import ClusterTimeEnd from './expressions/aggregation/cluster/ClusterTimeEnd';
@@ -633,15 +624,6 @@ export const clusterMin = (...args) => new ClusterMin(...args);
 export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
-
-export const clusterDayOfWeek = (...args) => new ClusterDayOfWeek(...args);
-export const clusterDayOfMonth = (...args) => new ClusterDayOfMonth(...args);
-export const clusterDayOfYear = (...args) => new ClusterDayOfYear(...args);
-export const clusterHourOfDay = (...args) => new ClusterHourOfDay(...args);
-export const clusterMonthOfYear = (...args) => new ClusterMonthOfYear(...args);
-export const clusterQuarterOfYear = (...args) => new ClusterQuarterOfYear(...args);
-export const clusterWeekOfYear = (...args) => new ClusterWeekOfYear(...args);
-export const clusterMinuteOfHour = (...args) => new ClusterMinuteOfHour(...args);
 
 export const clusterTime = (...args) => new ClusterTime(...args);
 export const clusterTimeStart = (...args) => new ClusterTimeStart(...args);

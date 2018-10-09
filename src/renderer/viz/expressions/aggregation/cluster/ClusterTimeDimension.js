@@ -10,6 +10,12 @@ const SERIAL_UNITS = [
     'decade', 'century', 'millennium'
 ];
 
+const CYCLIC_UNITS = [
+    'dayOfYear', 'weekOfYear', 'monthOfYear', 'quarterOfYear',
+    'dayOfMonth', 'dayOfWeek',
+    'hourOfDay', 'minuteOfHour'
+];
+
 // TODO: generalize with base clusterDimension
 export default class clusterTimeDimension extends BaseExpression {
     constructor ({ property, expressionName, dimension, type, mode }) {
@@ -24,6 +30,10 @@ export default class clusterTimeDimension extends BaseExpression {
 
     static get serialUnits () {
         return SERIAL_UNITS;
+    }
+
+    static get cyclicUnits () {
+        return CYCLIC_UNITS;
     }
 
     get name () {

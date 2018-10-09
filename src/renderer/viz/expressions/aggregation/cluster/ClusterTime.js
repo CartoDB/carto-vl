@@ -3,8 +3,9 @@ import { checkMaxArguments, checkStringValue } from '../../utils';
 
 export default class ClusterTime extends ClusterTimeDimension {
     constructor (property, timeUnits, timezone) {
+        const isCyclic = ClusterTimeDimension.cyclicUnits.includes(timeUnits);
         checkMaxArguments(arguments, 3, 'clusterTime');
-        const validUnits = ClusterTimeDimension.serialUnits;
+        const validUnits = isCyclic ? ClusterTimeDimension.cyclicUnits : ClusterTimeDimension.serialUnits;
         checkStringValue('clusterTime', 'timeUnits', 1, timeUnits, validUnits);
         super({
             property,
@@ -14,9 +15,9 @@ export default class ClusterTime extends ClusterTimeDimension {
                     units: timeUnits,
                     timezone
                 },
-                format: 'iso'
+                format: isCyclic ? 'number' : 'iso'
             },
-            type: 'category'
+            type: isCyclic ? 'number' : 'category'
         });
     }
 }
