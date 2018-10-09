@@ -26,8 +26,8 @@ Our library currently supports these three options:
 
 Every option is a different kind of **Source**, and CARTO VL provides you with a suitable object in its API to connect to them under the namespace `carto.source` (for example `carto.source.Dataset`).
 
-Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vector-tile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and a powerful dynamic styling.
-> In fact, there is a fourth type of source in CARTO VL called [MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advanced cases.
+Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vectortile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and a powerful dynamic styling.
+> In fact, there is a fourth type of source in CARTO VL called [carto.source.MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advanced cases.
 
 
 Now you will see how to use the main three type of sources, but first let's create a basic map.
@@ -234,6 +234,7 @@ Congrats! You have finished this guide. The final map should look like this:
     </iframe>
 </div>
 
+
 This is the complete code:
 ```html
 <!DOCTYPE html>
@@ -241,7 +242,7 @@ This is the complete code:
 
 <head>
     <!-- Include CARTO VL JS -->
-    <script src="../../../../dist/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
