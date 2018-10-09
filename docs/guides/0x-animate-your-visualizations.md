@@ -45,24 +45,6 @@ The next set of animation parameters are used to define the property, speed, and
 The first animation parameter (input), is the attribute that you want to animate. By default, the cyclic animation progress varies from the attributes's minimum value
 to its maximum.
 
-You can change this range of values by using a `linear` expression, and thus visualize a subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
-
-```js
-const viz = new carto.Viz(`
-    animation(linear($month, 2, 6))
-`);
-```
-
-Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression:
-
-```js
-const viz = new carto.Viz(`
-    animation(linear($date, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
-`);
-```
-
-Values outside of the specified range will not appear in the animation.
-
 #### Duration
 
 This parameter defines the duration of the animation progress in seconds. As stated above, during the animation cycle, all possible input values are evaluated. When an input value is matched, animation returns a value of `1` for the feature and it is drawn.
@@ -345,4 +327,33 @@ layer.addTo(map);
 
 ### Advanced animations
 
-In this section, you will learn other properties that can be used to animate the visualization.
+In this section, you will learn other properties that can be used to animate the visualization. You can change the input range of values by using a `linear` expression, and thus visualize a subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
+
+```js
+const viz = new carto.Viz(`
+    animation(linear($month, 2, 6))
+`);
+```
+
+Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression:
+
+```js
+const viz = new carto.Viz(`
+    animation(linear($date_time, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
+`);
+```
+
+> Note: Values outside of the specified range will not appear in the animation.
+
+// TODO
+
+```js
+const viz = new carto.Viz(`
+    @duration: 10
+    @linearAnimation: animation(linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z')), @duration)
+    color: ramp(@linearAnimation, Oryel)
+    filter: @linearAnimation
+    width: 10
+    strokeWidth: 0
+`);
+```

@@ -36,7 +36,7 @@
         map.touchZoomRotate.disableRotation();
 
         const nav = new mapboxgl.NavigationControl({
-            showCompass: false
+        showCompass: false
         });
         map.addControl(nav, 'top-left');
 
@@ -47,10 +47,17 @@
         });
         // Create the source
         const source = new carto.source.Dataset('bird_journey');
-        // Add better styles
+        
+        // Define and style Viz object
         const viz = new carto.Viz(`
-            filter: animation($date_time,10,fade(0,0.5))
+          @duration: 10
+          @linearAnimation: animation(linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z')), @duration)
+          color: ramp(@linearAnimation, Oryel)
+          filter: @linearAnimation
+          width: 10
+          strokeWidth: 0
         `);
+        
         // Create the layer
         const layer = new carto.Layer('layer', source, viz);
         // Add the layer to the map
