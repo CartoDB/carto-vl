@@ -3,6 +3,13 @@ import PropertyExpression from '../../basic/property';
 import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
 
+const SERIAL_UNITS = [
+    'second', 'minute', 'hour',
+    'day', 'month', 'year',
+    'week', 'quarter', 'trimester', 'semester',
+    'decade', 'century', 'millennium'
+];
+
 // TODO: generalize with base clusterDimension
 export default class clusterTimeDimension extends BaseExpression {
     constructor ({ property, expressionName, dimension, type, mode }) {
@@ -13,6 +20,10 @@ export default class clusterTimeDimension extends BaseExpression {
         this._expressionName = expressionName;
         this.type = type;
         this._mode = mode;
+    }
+
+    static get serialUnits () {
+        return SERIAL_UNITS;
     }
 
     get name () {

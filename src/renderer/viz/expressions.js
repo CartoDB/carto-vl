@@ -490,6 +490,10 @@ import ClusterQuarterOfYear from './expressions/aggregation/cluster/ClusterQuart
 import ClusterWeekOfYear from './expressions/aggregation/cluster/ClusterWeekOfYear';
 import ClusterMinuteOfHour from './expressions/aggregation/cluster/ClusterMinuteOfHour';
 
+import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
+import ClusterTimeStart from './expressions/aggregation/cluster/ClusterTimeStart';
+import ClusterTimeEnd from './expressions/aggregation/cluster/ClusterTimeEnd';
+
 import Constant from './expressions/basic/constant';
 
 import Hex from './expressions/color/hex';
@@ -638,6 +642,10 @@ export const clusterMonthOfYear = (...args) => new ClusterMonthOfYear(...args);
 export const clusterQuarterOfYear = (...args) => new ClusterQuarterOfYear(...args);
 export const clusterWeekOfYear = (...args) => new ClusterWeekOfYear(...args);
 export const clusterMinuteOfHour = (...args) => new ClusterMinuteOfHour(...args);
+
+export const clusterTime = (...args) => new ClusterTime(...args);
+export const clusterTimeStart = (...args) => new ClusterTimeStart(...args);
+export const clusterTimeEnd = (...args) => new ClusterTimeEnd(...args);
 
 export const constant = (...args) => new Constant(...args);
 
