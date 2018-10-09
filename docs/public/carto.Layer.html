@@ -51,9 +51,9 @@
 
 <div class="description">
     <p>A Layer is the primary way to visualize geospatial data.</p>
-<p>To create a layer a <a href="carto.source.Base.html">source</a> and <a href="carto.Viz.html">viz</a> are required:</p>
+<p>To create a layer a <a href="carto.source.html">source</a> and <a href="carto.Viz.html">viz</a> are required:</p>
 <ul>
-<li>The <a href="carto.source.Base.html">source</a> is used to know <strong>what</strong> data will be displayed in the Layer.</li>
+<li>The <a href="carto.source.html">source</a> is used to know <strong>what</strong> data will be displayed in the Layer.</li>
 <li>The <a href="carto.Viz.html">viz</a> is used to know <strong>how</strong> to draw the data in the Layer, Viz instances can only be bound to one single layer.</li>
 </ul>
 </div>
@@ -97,7 +97,7 @@
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -120,7 +120,7 @@
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.source.Base.html">carto.source.Base</a></span>
+<span class="param-type"><a href="carto.source.html">carto.source</a></span>
 
 
             
@@ -204,17 +204,24 @@
 
 
 
-<h5>Fires:</h5>
-<ul>
-    <li><a href="global.html#event:CartoError">event:CartoError</a></li>
-</ul>
 
 
 
 
 
 
+<h5>Throws:</h5>
 
+        
+
+    <div class="param-desc">
+    
+        <p>CartoError</p>
+    
+    </div>
+
+
+    
 
 
 
@@ -754,7 +761,7 @@ layer.blendToViz(viz1, 500);</code></pre>
 
 <h5>Fires:</h5>
 <ul>
-    <li><a href="global.html#event:updated">event:updated</a></li>
+    <li>event:updated</li>
 </ul>
 
 
@@ -826,7 +833,7 @@ layer.blendToViz(viz1, 500);</code></pre>
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -979,7 +986,7 @@ layer.blendToViz(viz1, 500);</code></pre>
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -1227,7 +1234,7 @@ layer.blendToViz(viz1, 500);</code></pre>
 
 <h5>Fires:</h5>
 <ul>
-    <li><a href="global.html#event:updated">event:updated</a></li>
+    <li>event:updated</li>
 </ul>
 
 
@@ -1305,7 +1312,7 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="carto.source.Base.html">carto.source.Base</a></span>
+<span class="param-type"><a href="carto.source.html">carto.source</a></span>
 
 
             
@@ -1436,13 +1443,13 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3>Global</h3><ul><li><a href="global.html#geometryType">geometryType</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 17 2018 18:12:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 15:30:59 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

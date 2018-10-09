@@ -38,19 +38,43 @@
     
         
             <div class="description"><p>The CARTO VL functionality is exposed through the <strong>carto</strong> namespace including:</p>
+<p>Current version:</p>
 <ul>
 <li><a href="carto.html#.version">carto.version</a></li>
-<li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li>
-<li><a href="carto.source.SQL.html">carto.source.SQL</a></li>
-<li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li>
-<li><a href="carto.source.MVT.html">carto.source.MVT</a></li>
-<li>carto.source.MVT.Metadata</li>
-<li><a href="carto.expressions.html">carto.expressions</a></li>
-<li><a href="carto.Layer.html">carto.Layer</a></li>
-<li><a href="carto.Viz.html">carto.Viz</a></li>
-<li><a href="carto.Interactivity.html">carto.Interactivity</a></li>
+</ul>
+<p>Setup:</p>
+<ul>
 <li><a href="carto.html#.setDefaultAuth">carto.setDefaultAuth</a></li>
 <li><a href="carto.html#.setDefaultConfig">carto.setDefaultConfig</a></li>
+</ul>
+<p>CARTO Basemaps:</p>
+<ul>
+<li><a href="carto.basemaps.html#.voyager">carto.basemaps.voyager</a></li>
+<li><a href="carto.basemaps.html#.darkmatter">carto.basemaps.darkmatter</a></li>
+<li><a href="carto.basemaps.html#.positron">carto.basemaps.positron</a></li>
+</ul>
+<p>Source:</p>
+<ul>
+<li><a href="carto.source.html#.Dataset">carto.source.Dataset</a></li>
+<li><a href="carto.source.html#.GeoJSON">carto.source.GeoJSON</a></li>
+<li><a href="carto.source.html#.MVT">carto.source.MVT</a></li>
+<li><a href="carto.source.html#.SQL">carto.source.SQL</a></li>
+</ul>
+<p>Layer:</p>
+<ul>
+<li><a href="carto.Layer.html">carto.Layer</a></li>
+</ul>
+<p>Viz:</p>
+<ul>
+<li><a href="carto.Viz.html">carto.Viz</a></li>
+</ul>
+<p>Expressions:</p>
+<ul>
+<li><a href="carto.expressions.html">carto.expressions</a></li>
+</ul>
+<p>Interactivity:</p>
+<ul>
+<li><a href="carto.Interactivity.html">carto.Interactivity</a></li>
 </ul></div>
         
 
@@ -124,7 +148,13 @@
         <h3 class="subsection-title">Namespaces</h3>
 
         <dl>
+            <dt><a href="carto.basemaps.html">basemaps</a></dt>
+            <dd></dd>
+        
             <dt><a href="carto.expressions.html">expressions</a></dt>
+            <dd></dd>
+        
+            <dt><a href="carto.source.html">source</a></dt>
             <dd></dd>
         </dl>
     
@@ -134,7 +164,7 @@
 
         
             
-<h4 class="name" id=".version"><span class="type-signature">(static) </span>version<span class="type-signature"> :string</span></h4>
+<h4 class="name" id=".version"><span class="type-signature">(static) </span>version<span class="type-signature"> :String</span></h4>
 
 
 
@@ -149,7 +179,7 @@
     <ul>
         <li>
             
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
         </li>
@@ -261,7 +291,7 @@
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -440,7 +470,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -551,7 +581,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
 
 
 <div class="description">
-    <p>Set default authentication parameters: user and apiKey.</p>
+    <p>Set default authentication parameters: [user or username] and apiKey.</p>
 </div>
 
 
@@ -593,7 +623,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -629,13 +659,13 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
 
         <tr>
             
-                <td class="name"><code>user</code></td>
+                <td class="name"><code>username</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -645,7 +675,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
 
             
 
-            <td class="description last"><p>Name of the user</p></td>
+            <td class="description last"><p>Name of the user. For backwards compatibility also <code>auth.user</code> is allowed</p></td>
         </tr>
 
     
@@ -658,7 +688,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -795,7 +825,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -821,8 +851,6 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
         
 
         
-        <th>Default</th>
-        
 
         <th class="last">Description</th>
     </tr>
@@ -839,7 +867,7 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -848,14 +876,8 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
             
 
             
-                <td class="default">
-                
-                    'https://{user}.carto.com'
-                
-                </td>
-            
 
-            <td class="description last"><p>Template URL of the CARTO Maps API server</p></td>
+            <td class="description last"><p>Template URL of the CARTO Maps API server: <code>https://{user}.carto.com</code></p></td>
         </tr>
 
     
@@ -921,105 +943,6 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
 
 
 
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id=".toString"><span class="type-signature">(static) </span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {string}</span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    <p>Stringify the visualization</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">string</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -1041,13 +964,13 @@ but throttled by requestAnimationFrame to return a maximum of one event per fram
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3>Global</h3><ul><li><a href="global.html#geometryType">geometryType</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 17 2018 18:12:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 15:30:59 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

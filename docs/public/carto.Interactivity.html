@@ -51,9 +51,9 @@
 
 <div class="description">
     <p>Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.</p>
-<p>To create a Interactivity object an array of <a href="carto.Layer.html">carto.Layer</a> is required.
-Events fired from interactivity objects will refer to the features of these layers and only these layers.
-Moreover, the order of the features in the events will be determined by the order of the layers in this list.</p>
+<p>To create a Interactivity object a <a href="carto.Layer.html">carto.Layer</a> or an array with several <a href="carto.Layer.html">carto.Layer</a> is required.
+Events fired from interactivity objects will refer to the features of these layer/s and only these layer/s.
+Moreover, when using an array of layers, the order of the features in the events will be determined by the order of these layers in the layerList.</p>
 </div>
 
 
@@ -137,7 +137,7 @@ Moreover, the order of the features in the events will be determined by the orde
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -294,8 +294,6 @@ Moreover, the order of the features in the events will be determined by the orde
     <li><a href="global.html#event:featureEnter">event:featureEnter</a></li>
 
     <li><a href="global.html#event:featureLeave">event:featureLeave</a></li>
-
-    <li><a href="global.html#event:CartoError">event:CartoError</a></li>
 </ul>
 
 
@@ -304,6 +302,18 @@ Moreover, the order of the features in the events will be determined by the orde
 
 
 
+<h5>Throws:</h5>
+
+        
+
+    <div class="param-desc">
+    
+        <p>CartoError</p>
+    
+    </div>
+
+
+    
 
 
 
@@ -396,7 +406,7 @@ interactivity.on('click', event => {
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -549,7 +559,7 @@ interactivity.on('click', event => {
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">String</span>
 
 
             
@@ -662,13 +672,13 @@ interactivity.on('click', event => {
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3>Global</h3><ul><li><a href="global.html#geometryType">geometryType</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 17 2018 18:12:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 15:30:59 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>

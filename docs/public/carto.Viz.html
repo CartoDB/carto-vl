@@ -96,7 +96,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
 <span class="param-type">string</span>
 |
 
-<span class="param-type"><a href="global.html#VizSpec">VizSpec</a></span>
+<span class="param-type"><a href="global.html#vizSpec">vizSpec</a></span>
 
 
             
@@ -106,7 +106,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
 
             
 
-            <td class="description last"><p>The definition of a viz. This parameter could be a <code>string</code> or a <code>VizSpec</code> object</p></td>
+            <td class="description last"><p>The definition of a viz. This parameter could be a <code>string</code> or a <a href="global.html#vizSpec">vizSpec</a>  object</p></td>
         </tr>
 
     
@@ -150,7 +150,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Color">Color</a></span>
+<span class="param-type">Color</span>
 
 
             
@@ -173,7 +173,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Number">Number</a></span>
+<span class="param-type">Number</span>
 
 
             
@@ -196,7 +196,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Color">Color</a></span>
+<span class="param-type">Color</span>
 
 
             
@@ -219,7 +219,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Number">Number</a></span>
+<span class="param-type">Number</span>
 
 
             
@@ -242,7 +242,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type"><a href="global.html#Number">Number</a></span>
+<span class="param-type">Number</span>
 
 
             
@@ -311,7 +311,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type">Translation</span>
+<span class="param-type">Transformation</span>
 
 
             
@@ -321,7 +321,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
 
             
 
-            <td class="description last"><p>translation to apply to the features in pixels</p></td>
+            <td class="description last"><p>transformation to apply to the features in pixels. We can assign a <a href="carto.expressions.html#.translate">translation</a>, a <a href="carto.expressions.html#.rotate">rotation</a>, or a chain of those two.</p></td>
         </tr>
 
     
@@ -357,7 +357,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Number</span>
 
 
             
@@ -380,7 +380,7 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Object</span>
 
 
             
@@ -439,11 +439,6 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
 
 
 
-<h5>Fires:</h5>
-<ul>
-    <li><a href="global.html#event:CartoError">event:CartoError</a></li>
-</ul>
-
 
 
 
@@ -488,7 +483,171 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
     
 
     
+        <h3 class="subsection-title">Members</h3>
 
+        
+            
+<h4 class="name" id=".geometryType"><span class="type-signature">(static, readonly) </span>geometryType<span class="type-signature"></span></h4>
+
+
+
+
+<div class="description">
+    <p>Get the geometry type of the visualization.</p>
+</div>
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".toString"><span class="type-signature">(static) </span>toString<span class="signature">()</span><span class="type-signature"> &rarr; {String}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Stringify the visualization</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">String</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
     
 
     
@@ -504,13 +663,13 @@ displayed and processed. A Viz instance can only be bound to one layer.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.expressions.Animation.html">carto.expressions.Animation</a></li><li><a href="carto.expressions.Base.html">carto.expressions.Base</a></li><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.source.Base.html">carto.source.Base</a></li><li><a href="carto.source.Dataset.html">carto.source.Dataset</a></li><li><a href="carto.source.GeoJSON.html">carto.source.GeoJSON</a></li><li><a href="carto.source.MVT.html">carto.source.MVT</a></li><li><a href="carto.source.SQL.html">carto.source.SQL</a></li><li><a href="carto.Viz.html">carto.Viz</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li><li><a href="global.html#event:loaded">loaded</a></li><li><a href="global.html#event:updated">updated</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.expressions.html">carto.expressions</a></li></ul><h3>Global</h3><ul><li><a href="global.html#geometryType">geometryType</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Sep 17 2018 18:12:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 15:30:59 GMT+0200 (CEST)
 </footer>
 
 <script> prettyPrint(); </script>
