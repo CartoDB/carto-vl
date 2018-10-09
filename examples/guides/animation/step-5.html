@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="../../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Include 'Roboto' font -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
+    <!-- Make the map visible -->
+    <style>
+        body {
+          margin: 0;
+        }
+
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+
+        aside {
+          background-color: rgba(255, 255, 255, 0.9);
+          border-radius: 5px;
+          color: #1785FB;
+          display: block;
+          font-family: 'Roboto';
+          height: auto;
+          padding: 0 24px 24px 24px;
+          position: absolute;
+          right: 12px;
+          top: 12px;
+          width: 250px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Map goes here -->
+    <div id="map"></div>
+
+    <!-- Animation control elements -->
+    <aside>
+        <header>
+            <h1>Animation controls</h1>
+        </header>
+        <section>
+            <p>Progress</p>
+            <input type="range" id="js-progress-range" min="0" max="1" step="0.01">
+        </section>
+        <section>
+            <button id="js-play-button">Play</button>
+            <button id="js-pause-button">Pause</button>
+            <p>Duration</p>
+            <input type="range" id="js-duration-range" min="0" max="30" step="1">
+        </section>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-8.291255, 33.684553],
+            zoom: 2.8,
+            scrollZoom: false
+        });
+        map.touchZoomRotate.disableRotation();
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+
+        map.addControl(nav, 'top-left');
+
+        // Autenticate the client
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+        
+        // Create the source
+        const source = new carto.source.Dataset('bird_journey');
+        
+        // Add better styles
+        const viz = new carto.Viz(`
+            @duration: 30
+            @animation: animation($date_time, @duration, fade(1, 1))
+            filter: @animation
+            width: 4
+            strokeWidth: 0
+            color: #1785FB
+        `);
+
+        // Create the layer
+        const layer = new carto.Layer('layer', source, viz);
+        
+        // Get animation control elements
+        const $progressRange = document.getElementById('js-progress-range');
+        const $playButton = document.getElementById('js-play-button');
+        const $pauseButton = document.getElementById('js-pause-button');
+        const $durationRange = document.getElementById('js-duration-range');
+
+        // Listen to interaction events
+        $playButton.addEventListener('click', () => {
+          viz.variables.animation.play();
+        });
+
+        $pauseButton.addEventListener('click', () => {
+          viz.variables.animation.pause();
+        });
+
+        $durationRange.addEventListener('change', () => {
+          viz.variables.duration = parseInt($durationRange.value, 10);
+        });
+
+        // Update progress each 100 milliseconds
+        function updateProgress () {
+          $progressRange.value = viz.variables.animation.getProgressPct();
+        }
+
+        setInterval(updateProgress, 100);
+
+        // Add the layer to the map
+        layer.addTo(map);
+    </script>
+</body>
+
+</html>
