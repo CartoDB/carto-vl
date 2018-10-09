@@ -50,7 +50,7 @@
             const latitude = center.lat.toFixed(6);
             const bearing = map.getBearing().toFixed(0);
             const zoom = map.getZoom().toFixed(2);
-            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
+            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing} degrees`);
         };
         map.on('move', displayCenter);
 

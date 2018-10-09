@@ -1,7 +1,7 @@
 ## Interactivity and events
-In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful visualizations. You will also learn how to build very common add-ons such as *pop-ups* and legends.
+In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful visualizations. You will also learn how to build very common add-ons such as *pop-ups*.
 
-At the end of the guide you will have built a visualization like this one:
+At the end of the guide you will have built a visualization like this one. Move your mouse over the cities and click on them to display a pop-up:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
@@ -37,22 +37,13 @@ const displayCenter = () => {
     const latitude = center.lat.toFixed(6);
     const bearing = map.getBearing().toFixed(0);
     const zoom = map.getZoom().toFixed(2);
-    console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
+    console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing} degrees`);
 };
 map.on('move', displayCenter);
 ```
 > Check the console after loading your file in the browser, to see the first message: 'Map has loaded'. Then, interact with the map control and see the updated values for center & zoom. You can check Mapbox [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map) for more information on map events.
 
-The result should look like this:
-<div class="example-map">
-    <iframe
-        id="guides-interactivity-step-1"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-1.html"
-        width="100%"
-        height="500"
-        frameBorder="0">
-    </iframe>
-</div>
+The result should look like this [map](/developers/carto-vl/examples/maps/guides/interactivity/step-1.html). Open it, change the extent and read the messages in the console (enable browser _Developer tools_):
 
 
 ### Layer events
@@ -91,20 +82,21 @@ If you check your work now, it should look like this:
         frameBorder="0">
     </iframe>
 </div>
+> You should open the [map](/developers/carto-vl/examples/maps/guides/interactivity/step-2.html) and explore the _console_ to check the current events.
 
 
 ### Using dynamic variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
-First, you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();`, with this code that grabs the current displayed features using the *String API*:
+First, you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();` with this code that grabs the current displayed features using the *String API*:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
 `);
 ```
 
-And finally, you should add this to handle the updates after you change the map's extent:
+And then add this code to handle the updates after you change the map's extent:
 ```js
 const displayNumberOfCities = () => {
     const numberOfFeatures = viz.variables.currentFeatures.value.length;
@@ -131,11 +123,12 @@ You have already advanced a lot in this guide. Now take a small rest and check y
         frameBorder="0">
     </iframe>
 </div>
+> Open the map at [this step](/developers/carto-vl/examples/maps/guides/interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
 
 #### Data-driven variables
 If the data you are interested in for your interaction is a feature `property`, such as the _name_ of the city or its _population_, then you can also use some variables to store them. Those are called _data-driven variables_, because their values change as you interact with each of the features (in our example, with each city).
 
-To test them you should edit again your viz as follows:
+To test them you should edit again your `viz` as follows:
 ```js
 const viz = new carto.Viz(`
     @currentFeatures: viewportFeatures()
@@ -151,7 +144,7 @@ As the variables depend on properties, you can't just access them by using somet
 ### Feature events
 All feature interactions are ruled by the `carto.Interactivity`, so let's create an object of this type, associating it with the current layer.
 
-Add this line:
+Add this line to your code:
 ```js
 const interactivity = new carto.Interactivity(layer);
 ```
@@ -166,9 +159,9 @@ interactivity.on('featureClick', featureEvent => {
     });
 });
 ```
-> Notice how `carto.Interactivity` provides you with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection, because you can click on several features at the same time if they are near enough.
+> Notice how `carto.Interactivity` provides you with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection (because you can click on several features at the same time if they are near enough).
 
-The `carto.Interactivity` can handle different events:
+The **carto.Interactivity** can handle different events:
 - `featureClick`: Fired when the user clicks on features.
 - `featureClickOut`: Fired when the user clicks outside a feature that was clicked in the last featureClick event.
 - `featureHover`: Fired when the user moves the cursor over a feature.
@@ -180,19 +173,19 @@ event happened (we didn't use that so far) and the list of [Features](/developer
 
 
 ### Adding pop-ups
-A very common case is to display pop-ups, little emerging windows with information on the features.
+A very common case when creating dynamic visualizations is to display pop-ups, little emerging windows with information on the features.
 
-You can build the pop-up yourself if you want to, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup).
+You can build the pop-up yourself if you want to, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup) in this case.
 
-So let's adapt a bit the previous 'featureClick' handler. You're going to add some code inside the current handler:
+So let's adapt a bit the previous `featureClick` handler. You're going to add some code inside the current handler:
 ```js
 interactivity.on('featureClick', featureEvent => {
     // ...existing code...
-    // Add more code HERE
+    // Add more code <HERE>
 });
 ```
 
-First just grab the first feature in the interaction, if exists, with this:
+Just grab the first feature in the interaction, if exists, with this code:
 ```js
 const feature = featureEvent.features[0];
 if (!feature) {
@@ -200,7 +193,7 @@ if (!feature) {
 }
 ```
 
-And then you can create the pop-up with this code:
+And then you can create the pop-up with this:
 ```js
 const coords = featureEvent.coordinates;
 const html = `
@@ -213,17 +206,6 @@ new mapboxgl.Popup()
     .addTo(map);
 ```
 > For simplicity, we have created a pop-up linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
-
-At this point, your map looks like:
-<div class="example-map">
-    <iframe
-        id="guides-interactivity-step-4"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
-        width="100%"
-        height="500"
-        frameBorder="0">
-    </iframe>
-</div>
 
 
 ### Interactive-based styling
@@ -264,6 +246,7 @@ Congrats! You've finished this guide. The final map should look like this:
         frameBorder="0">
     </iframe>
 </div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/interactivity/step-4.html)
 
 
 Here it is the full example:
@@ -272,8 +255,10 @@ Here it is the full example:
 <html>
 
 <head>
+    <meta charset="utf-8">
+
     <!-- Include CARTO VL JS -->
-    <script src="../../../../dist/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
@@ -318,7 +303,7 @@ Here it is the full example:
             const latitude = center.lat.toFixed(6);
             const bearing = map.getBearing().toFixed(0);
             const zoom = map.getZoom().toFixed(2);
-            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing}º`);
+            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing} degrees`);
         };
         map.on('move', displayCenter);
 
