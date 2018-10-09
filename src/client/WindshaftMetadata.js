@@ -125,18 +125,18 @@ export default class WindshaftMetadata extends MVTMetadata {
         const { dimension, type } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
             if (dimension.modes && type === 'date') {
-                const mode = propertyMode(dimension.modes, propertyName);
-                if (mode) {
-                    const { min, max } = dimension;
-                    return {
-                        min: asDate(decodeModal(mode, min)),
-                        max: asDate(decodeModal(mode, max))
-                        // instead of the strict limits for this property
-                        // we could extend them always for the pair of start/end properties:
-                        // min: asDate(decodeModal('start', min)),
-                        // max: asDate(decodeModal('end', max))
-                    };
-                }
+                // For Start/End properties we don't return
+                // individual limits corresponding to specified property,
+                // which could be computing using propertyMode(dimension.modes, propertyName)
+                // for the value of the first argument to decodeModal.
+                // We instead compute always the limits of both Start and End,
+                // so that these pairs of properties use the same numerical scale
+                // (internally or when `linear` is applied without arguments)
+                const { min, max } = dimension;
+                return {
+                    min: asDate(decodeModal('start', min)),
+                    max: asDate(decodeModal('end', max))
+                };
             }
             return dimension;
         }
