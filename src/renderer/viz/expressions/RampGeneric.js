@@ -9,6 +9,7 @@ import Palette from './color/palettes/Palette';
 import Base from './base';
 import Constant from './basic/constant';
 import NamedColor from './color/NamedColor';
+import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 
 export default class RampGeneric extends Base {
     _bindMetadata (metadata) {
@@ -28,7 +29,7 @@ export default class RampGeneric extends Base {
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
         }
 
-        if (this.input.isA(Property)) {
+        if (this.input.isA(Property) || this.input.isA(ClusterAggregation)) {
             this.input = this.input.type === 'number'
                 ? new Linear(this.input)
                 : new CategoryIndex(this.input);
