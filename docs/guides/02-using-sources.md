@@ -233,6 +233,7 @@ Congrats! You have finished this guide. The final map should look like this:
         frameBorder="0">
     </iframe>
 </div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
 
 
 This is the complete code:
