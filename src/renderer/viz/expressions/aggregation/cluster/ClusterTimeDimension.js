@@ -4,7 +4,7 @@ import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
 
 // TODO: generalize with base clusterDimension
-export default class clusterTime extends BaseExpression {
+export default class clusterTimeDimension extends BaseExpression {
     constructor ({ property, expressionName, dimension, type, mode }) {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
