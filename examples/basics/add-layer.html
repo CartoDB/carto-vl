@@ -35,12 +35,10 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [0, 30],
-      zoom: 2,
+      style: carto.basemaps.voyager,
+      center: [0, 0],
+      zoom: 0,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -50,7 +48,7 @@
 
     // Define user
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 

@@ -37,10 +37,10 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      style: carto.basemaps.darkmatter,
       center: [-95.907985, 37.746163],
       zoom: 4,
-      dragRotate: false
+
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -49,7 +49,7 @@
     map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 

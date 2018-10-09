@@ -1,18 +1,22 @@
-import { layerVisibility } from '../constants/layer';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
-/**
- * @description A simple non-interactive map.
- */
+// CartoMap depends on gl-matrix, which after imported is globally available as 'mat4'
+// Constants extracted from /carto-vl/src/constants/layer.js
+const RESOLUTION_ZOOMLEVEL_ZERO = 512;
+const layerVisibility = Object.freeze({
+    VISIBLE: 'visible',
+    HIDDEN: 'none'
+});
 
-export default class Map {
+/**
+ * @description A simple non-interactive map used for tests
+ */
+class CartoMap { // eslint-disable-line no-unused-vars
     /**
-     * Create a simple carto.Map by specifying a container `id`.
+     * Create a simple CartoMap by specifying a container `id`.
      *
-     * @param  {object} options
-     * @param  {string} options.container The element's string `id`.
+     * @param  {Object} options
+     * @param  {String} options.container The element's string `id`.
      *
-     * @constructor Map
-     * @memberof carto
+     * @constructor CartoMap
      */
     constructor (options) {
         options = options || {};
@@ -20,7 +24,7 @@ export default class Map {
         if (typeof options.container === 'string') {
             const container = window.document.getElementById(options.container);
             if (!container) {
-                throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Container '${options.container}' not found.`);
+                throw new Error(`CartoValidation: Missing required container '${options.container}' not found.`);
             } else {
                 this._container = container;
             }
@@ -33,7 +37,6 @@ export default class Map {
         this._canvas = this._createCanvas();
         this._container.appendChild(this._canvas);
         this._gl = this._canvas.getContext('webgl');
-        this._matrix = this._createMatrix();
         this._resizeCanvas(this._containerDimensions());
     }
 
@@ -62,7 +65,7 @@ export default class Map {
     }
 
     getZoom () {
-        return 0;
+        return Math.log2(this._canvas.height / RESOLUTION_ZOOMLEVEL_ZERO);
     }
 
     getCenter () {
@@ -117,6 +120,7 @@ export default class Map {
         this._layers.forEach((layer) => {
             const hasData = layer.hasDataframes();
             const hasAnimation = layer.isAnimated();
+            layer.prerender(this._gl, this._matrix);
 
             if (hasData || hasAnimation) {
                 layer.render(this._gl, this._matrix);
@@ -151,7 +155,7 @@ export default class Map {
                 this._gl.clear(this._gl.COLOR_BUFFER_BIT);
                 break;
             default:
-                // white
+            // white
         }
     }
 
@@ -184,19 +188,26 @@ export default class Map {
 
         this._canvas.style.width = `${size.width}px`;
         this._canvas.style.height = `${size.height}px`;
+
+        this._matrix = this._createMatrix();
     }
 
     _createMatrix () {
-        // This matrix generates proper values of zoom and _center
-        const m = new Array(16);
-        m[0] = -2;
-        m[5] = -2;
-        m[12] = 1;
-        m[13] = 1;
-        m[15] = 1;
+        const ratio = this._canvas.width / this._canvas.height;
+
+        const m = [];
+        mat4.identity(m);
+        mat4.scale(m, m, [2, 1, 1]);
+        mat4.translate(m, m, [-0.5, 0, 0]);
+
+        const m2 = [];
+        mat4.ortho(m2, -ratio, ratio, 1, 0, 0, 1);
+        mat4.multiply(m, m2, m);
+
         return m;
     }
 
     triggerRepaint () {
+        window.requestAnimationFrame(this._update.bind(this));
     }
 }

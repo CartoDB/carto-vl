@@ -127,7 +127,7 @@ export default class CategoryIndex extends BaseExpression {
         }
     }
 
-    getLegendData () {
+    _getLegendData () {
         const categories = this._metadata.properties[this.property.name].categories;
         const categoriesLength = categories.length;
         const divisor = categoriesLength - 1;

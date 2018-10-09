@@ -30,13 +30,13 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+      style: carto.basemaps.darkmatter,
       center: [-104.93637263263889, 39.72562104533162],
       zoom: 11
     });
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 

@@ -105,6 +105,8 @@ function getSimpleArg (type) {
             return [s.list(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'image':
+            return [s.HOUSE, 'house'];
         case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:
@@ -131,6 +133,8 @@ function getPropertyArg (type) {
             return [s.list(s.hsv(0, 0, 0)), '[hsv(0, 0, 0)]'];
         case 'palette':
             return [s.palettes.PRISM, 'PRISM'];
+        case 'image':
+            return [s.HOUSE, 'house'];
         case 'image-list':
             return [[s.image('wadus.svg')], '[image(\'wadus\')]'];
         default:

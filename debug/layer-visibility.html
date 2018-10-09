@@ -53,18 +53,18 @@
     let layer2;
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [0, 43],
       zoom: 4,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+
+
     });
 
     const nav = new mapboxgl.NavigationControl({

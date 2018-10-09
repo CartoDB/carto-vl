@@ -3,6 +3,7 @@ precision highp float;
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
 varying highp vec2 pointCoord;
+varying highp float filtering;
 
 $symbol_preface
 $propertyPreface
@@ -19,6 +20,7 @@ void main(void) {
     }else{
         c = symbolColor;
     }
+    c.a *= filtering;
     if (imageUV!=clamp(imageUV, 0.,1.)){
         c.a = 0.;
     }

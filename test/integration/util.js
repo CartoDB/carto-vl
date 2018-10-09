@@ -47,7 +47,6 @@ export function simulateMove (coordinates) {
     const params = { clientX: position.x, clientY: position.y };
 
     const mousemove = new MouseEvent('mousemove', params);
-
     if (el) {
         el.dispatchEvent(mousemove);
     }

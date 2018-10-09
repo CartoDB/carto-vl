@@ -14,6 +14,18 @@ module.exports = {
     mode: 'production',
     module: {
         rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            '@babel/preset-env'
+                        ]
+                    }
+                }
+            },
             { test: /\.glsl$/, use: 'webpack-glsl-loader' },
             { test: /\.svg$/, use: 'svg-inline-loader' },
             {
@@ -32,7 +44,7 @@ module.exports = {
         new webpack.BannerPlugin(banner)
     ],
     performance: {
-        maxEntrypointSize: 266240,
-        maxAssetSize: 266240
+        maxEntrypointSize: 409600,
+        maxAssetSize: 409600
     }
 };

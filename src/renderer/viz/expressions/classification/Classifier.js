@@ -68,7 +68,7 @@ export default class Classifier extends BaseExpression {
         super._preDraw(program, drawMetadata, gl);
     }
 
-    getLegendData () {
+    _getLegendData () {
         const breakpoints = this.getBreakpointList();
         const breakpointsLength = breakpoints.length;
         const name = this.toString();

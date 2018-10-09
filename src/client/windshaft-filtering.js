@@ -436,7 +436,7 @@ const SQLGenerators = {
     'greaterThan': f => sqlSep(' > ', f.left, f.right),
     'greaterThanOrEqualTo': f => sqlSep(' >= ', f.left, f.right),
     'property': f => sqlId(f.property),
-    'value': f => sqlQ(f.input)
+    'value': f => sqlQ(f.value)
 };
 
 /**

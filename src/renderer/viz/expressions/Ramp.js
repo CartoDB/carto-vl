@@ -97,6 +97,20 @@ import { DEFAULT_RAMP_OTHERS } from './constants';
 * @function
 * @api
 */
+
+/**
+ * Ramp Class
+ *
+ * A mapping between an input (numeric or categorical) and an output (number, colors and/or images)
+ * This class is instanced automatically by using the `ramp` function. It is documented for its methods.
+ * Read more about ramp expression at {@link carto.expressions.ramp}.
+ *
+ * @name expressions.Ramp
+ * @abstract
+ * @hideconstructor
+ * @class
+ * @api
+ */
 export default class Ramp extends BaseExpression {
     constructor (input, palette, others = DEFAULT_RAMP_OTHERS) {
         checkMaxArguments(arguments, 3, 'ramp');
@@ -108,6 +122,7 @@ export default class Ramp extends BaseExpression {
         checkExpression('ramp', 'palette', 1, palette);
 
         if (others !== DEFAULT_RAMP_OTHERS) {
+            others = implicitCast(others);
             checkExpression('ramp', 'others', 2, others);
         }
 
@@ -139,11 +154,11 @@ export default class Ramp extends BaseExpression {
      * - This works: `ramp($price, [5, 15])`
      * - This does not work: `ramp($price, [5, $amount])`
      *
-     * @param {object} config - Optional configuration
-     * @param {string} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
-     * @param {number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
-     * @return {object} - { type, data }. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
-     *
+     * @param {Object} config - Optional configuration
+     * @param {String} config.othersLabel - Name for other category values. Defaults to 'CARTO_VL_OTHERS'.
+     * @param {Number} config.samples - Number of samples for numeric values to be returned. Defaults to 10. The maximum number of samples is 100.
+     * @return {Object} - `{ type, data }`. 'type' could be category or number. Data is an array of { key, value } objects. 'key' depends on the expression type. 'value' is the result evaluated by the ramp. There is more information in the examples.
+     * @api
      * @example <caption>Get legend for a color ramp of a categorical property.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz({
@@ -151,15 +166,15 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -170,15 +185,15 @@ export default class Ramp extends BaseExpression {
      * ´);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'CARTO_VL_OTHERS', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -190,7 +205,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -209,7 +224,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.symbol.getLegend();
+     *   const legend = layer.viz.symbol.getLegendData();
      *   // legend = {
      *   //    type: 'category',
      *   //    name: '$vehicles',
@@ -229,7 +244,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *      othersLabel: 'Other Vehicles'
      *   });
      *
@@ -238,9 +253,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'top($vehicles)',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -251,7 +266,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *      othersLabel: 'Other Vehicles'
      *   });
      *
@@ -260,9 +275,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'top($vehicles)',
      *   //    data: [
      *   //       { key: 'Bicycle', value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 'Car', value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 'Bus', value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 'Other Vehicles', value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -274,7 +289,7 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *       samples: 4
      *   });
      *
@@ -283,9 +298,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'linear($numvehicles, 1, 100)',
      *   //    data: [
      *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -296,7 +311,7 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend({
+     *   const legend = layer.viz.color.getLegendData({
      *       samples: 4
      *   });
      *
@@ -305,9 +320,9 @@ export default class Ramp extends BaseExpression {
      *   //    name: 'linear($numvehicles, 1, 100)',
      *   //    data: [
      *   //       { key: 25, value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: 50, value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: 75, value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: 100, value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -319,16 +334,16 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
      *   //    name: 'buckets($numvehicles, [1, 2, 3])',
      *   //    data: [
      *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -340,16 +355,16 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
      *   //    name: 'buckets($numvehicles, [1, 2, 3])',
      *   //    data: [
      *   //       { key: [-Infinity, 1], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [1, 2], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [2, 3], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [3, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -361,16 +376,16 @@ export default class Ramp extends BaseExpression {
      * });
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
      *   //    name: 'globalEqIntervals($numvehicles, 4)',
      *   //    data: [
      *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
@@ -382,22 +397,22 @@ export default class Ramp extends BaseExpression {
      * `);
      *
      * layer.on('loaded', () => {
-     *   const legend = layer.viz.color.getLegend();
+     *   const legend = layer.viz.color.getLegendData();
      *
      *   // legend = {
      *   //    type: 'number',
      *   //    name: 'globalEqIntervals($numvehicles, 4)',
      *   //    data: [
      *   //       { key: [-Infinity, 25], value: { r: 95, g: 70, b: 144, a: 1 } },
-     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 ] },
-     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 ] },
-     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 ] }
+     *   //       { key: [25, 50], value: { r: 29, g: 105, b: 150, a: 1 } },
+     *   //       { key: [50, 75], value: { r: 56, g: 166, b: 165, a: 1 } },
+     *   //       { key: [100, +Infinity], value: { r: 15, g: 133, b: 84, a: 1 } }
      *   //     ]
      *   // }
      * });
      *
-     * @memberof carto.expressions.Ramp
-     * @name getLegend
+     * @memberof expressions.Ramp
+     * @name getLegendData
      * @instance
      * @api
      */

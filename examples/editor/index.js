@@ -75,9 +75,9 @@ const examples = [
 ];
 
 const BASEMAPS = {
-    DarkMatter: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-    Voyager: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-    Positron: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
+    DarkMatter: carto.basemaps.darkmatter,
+    Voyager: carto.basemaps.voyager,
+    Positron: carto.basemaps.positron
 };
 
 const DEFAULT_BASEMAP = 'DarkMatter';
@@ -95,8 +95,7 @@ let map = new mapboxgl.Map({
     container: 'map',
     style: { version: 8, sources: {}, layers: [] },
     center: [0, 0],
-    zoom: 0,
-    dragRotate: false
+    zoom: 0
 });
 
 map.touchZoomRotate.disableRotation();
@@ -245,7 +244,7 @@ function setConfig (input) {
 const superRefresh = (opts) => {
     const sourceType = document.querySelector('input[name="source"]:checked').value;
     const sourceAuth = {
-        user: document.getElementById('user').value,
+        username: document.getElementById('user').value,
         apiKey: 'default_public'
     };
 
@@ -458,8 +457,8 @@ function generateSnippet (config) {
                 style: '${basemap}',
                 center: [${center.lng}, ${center.lat}],
                 zoom: ${zoom},
-                dragRotate: false,
-                touchZoomRotate: false
+
+
             });
 
             carto.setDefaultConfig({
@@ -467,7 +466,7 @@ function generateSnippet (config) {
             });
 
             carto.setDefaultAuth({
-                user: '${username}',
+                username: '${username}',
                 apiKey: '${apiKey}'
             });
 

@@ -9,6 +9,7 @@ import Palette from './color/palettes/Palette';
 import Base from './base';
 import Constant from './basic/constant';
 import NamedColor from './color/NamedColor';
+import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 
 export default class RampGeneric extends Base {
     _bindMetadata (metadata) {
@@ -22,11 +23,13 @@ export default class RampGeneric extends Base {
             this.others = this.palette.type === 'number-list'
                 ? DEFAULT_RAMP_OTHERS_NUMBER
                 : DEFAULT_RAMP_OTHERS_COLOR;
+            this.others._bindMetadata(metadata);
         } else {
+            this.others._bindMetadata(metadata);
             checkType('ramp', 'others', 2, this.palette.childType, this.others);
         }
 
-        if (this.input.isA(Property)) {
+        if (this.input.isA(Property) || this.input.isA(ClusterAggregation)) {
             this.input = this.input.type === 'number'
                 ? new Linear(this.input)
                 : new CategoryIndex(this.input);
@@ -36,7 +39,6 @@ export default class RampGeneric extends Base {
 
         checkType('ramp', 'input', 0, ['number', 'category'], this.input);
 
-        this.others._bindMetadata(metadata);
         this.childrenNames.push('others');
         this._metadata = metadata;
     }
@@ -64,10 +66,10 @@ export default class RampGeneric extends Base {
         return mix(paletteValues[min], paletteValues[max], m);
     }
 
-    getLegend (options) {
+    getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
-        const legendData = this.input.getLegendData(config);
+        const legendData = this.input._getLegendData(config);
         const data = legendData.data.map(({key, value}) => {
             value = this._calcEval(value, undefined);
             return { key, value };
