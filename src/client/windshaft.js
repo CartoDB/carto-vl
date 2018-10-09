@@ -356,7 +356,7 @@ export default class Windshaft {
         });
         Object.keys(agg.dimensions).forEach(dimName => {
             const dimension = agg.dimensions[dimName];
-            if (stats.dimensions) {
+            if (stats.dimensions && stats.dimensions[dimName].type) {
                 // otherwise, the dimension is a (legacy) ungrouped dimension
                 const dimensionStats = stats.dimensions[dimName];
                 const dimType = adaptColumnType(dimensionStats.type);
