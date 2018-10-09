@@ -186,13 +186,7 @@ For more information about styling, check out the guide [Introduction to Styling
     <!-- Include Mapbox GL CSS -->
     <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <!-- Make the map visible -->
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
