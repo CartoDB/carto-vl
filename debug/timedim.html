@@ -76,80 +76,56 @@
       )
       SELECT
         row_number() over () AS cartodb_id,
-        min_st + (max_st - min_st)*s AS sim_time,
+        min_st + (max_st - min_st)*s AS date,
         ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
         ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
         FROM params, positions
-    `, {
-      apiKey: '47507760c82bfd39eb9e52f00b6770f6b1a4d81f',
-      // apiKey: 'default_public',
-      user: 'cdb'
-    });
+    `);
     const viz = new carto.Viz(`
-      width: 20
+      @mstart: clusterTimeStart($date, 'month', 'Europe/Madrid')
+      @mend: clusterTimeEnd($date, 'month', 'Europe/Madrid')
+      @month: clusterTime($date, 'month', 'Europe/Madrid')
+      @animStart: animation(linear(@mstart), 5, fade(0.1, 10))
+      @animEnd: animation(linear(@mend), 5, fade(10, 0.1))
+      filter: @animStart and @animEnd
+      @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
+      color: ramp(linear(@mstart), SUNSET)
+      width: ramp(@selMonths, [60, 50, 40, 30], 20)
 
-      // Example 1: (legacy) ungrouped time as dates
-      // @dow: $sim_time
-      // color: ramp(linear(@dow), SUNSET)
-      // filter: animation(linear(@dow), 5, fade(2,2))
-
-      // Example 2: numeric time dimensions
-      // @dow: clusterDayOfWeek($sim_time, 'Europe/Madrid')
-      // @dow: clusterMonth($sim_time, 'Europe/Madrid', 1, '2017')
-      // color: ramp(linear(@dow), SUNSET)
-      // filter: animation(linear(@dow), 5, fade(2,2))
-
-      // Example 3: categorical time dimension
-      // @dow: clusterMonthIso($sim_time, 'Europe/Madrid')
-      // @months: buckets(@dow, ['2018-04', '2018-06', '2018-07', '2018-09'])
-      // color: ramp(@months, SUNSET) // // if 0-1 decoding in WindshaftMetadata
-      // filter: animation(linear(@months), 5, fade(2,2)) // causes undefined column request
-
-      // Example 4: Start/End dates
-      @dow: clusterMonthStart($sim_time, 'Europe/Madrid')
-      color: ramp(linear(@dow), SUNSET)
-      // filter: animation(linear(@dow), 5, fade(2,2))
-      @dowend: clusterMonthEnd($sim_time, 'Europe/Madrid')
-      strokeWidth: 4
-      strokeColor: ramp(linear(@dowend), SUNSET)
-      @anim: animation(linear(@dowend), 5, fade(10,0.1))
-      filter: animation(linear(@dow), 5, fade(0.1,10))*@anim
-
-      @list: viewportFeatures(@dow)
-
-      @maxDow: globalMax(@dow)
-      @minDow: globalMin(@dow)
+      @list: viewportFeatures(@month)
+      @maxMonth: globalMax(@month)
+      @minMonth: globalMin(@month)
+      @startMonths: globalMin(@mstart)
+      @endMonths: globalMax(@mend)
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
+    let info = true;
     layer.on('updated', () => {
-      if (viz.filter.expressionName === 'animation') {
-          const time = viz.filter.getProgressValue();
-          document.getElementById("timer").textContent = time;
-      } else if (viz.variables.anim) {
-          const time = viz.variables.anim.getProgressValue();
-          document.getElementById("timer").textContent = time;
-      } else {
-          console.log("Min", viz.variables.minDow.eval());
-          console.log("Max", viz.variables.maxDow.eval());
-          console.log('dow var:',viz.variables.list.value.map(f => viz.variables.dow.eval(f)));
-          console.log('dow prop:',viz.variables.list.value.map(f => f[viz.variables.dow.propertyName]));
+      if (info) {
+        info = false;
+        console.log(viz);
+        console.log("Min Month", viz.variables.minMonth.value);
+        console.log("Max Month", viz.variables.maxMonth.eval());
+        console.log("Start Months", viz.variables.startMonths.eval());
+        console.log("End Months", viz.variables.endMonths.eval());
+        // console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f)));
+        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
       }
-
-      // console.log('dow var:',viz.variables.list.value.map(f => f.variables.dow.value));  // <- f is not a viz feature!
+      const time = viz.variables.animStart.getProgressValue();
+      document.getElementById("timer").textContent = time;
     });
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureClick', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        if (feature.variables.dowend) {
-          console.log('Click:',feature.variables.dow.value, feature.variables.dowend.value);
-        }
-        else {
-          console.log('Click:',feature.variables.dow.value);
-        }
+        console.log('Start:', feature.variables.mstart.value);
+        console.log('End:', feature.variables.mend.value);
+        console.log('ISO:', feature.variables.month.value);
       }
     });
   </script>
 </body>
 </html>
+
+
