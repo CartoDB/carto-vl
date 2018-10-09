@@ -37,37 +37,34 @@
 
         //** CARTO VL functionality begins here **//
 
-
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
-
         // GLOBAL AGGREGATIONS
         const citiesSource = new carto.source.Dataset('populated_places');
         const citiesViz = new carto.Viz(`
             color: grey
-            width: 4
-            @min: globalMin($pop_max)
-            @max: globalMax($pop_max)
-            @avg: globalAvg($pop_max)
+            width: 15
+            @g_max: globalMax($pop_max)
+            @g_avg: globalAvg($pop_max)
+            @g_p95: globalPercentile($pop_max, 95)
+            filter: ($pop_max > @g_p95)
+            // filter: $pop_max == @g_max // biggest city is Tokyo!
         `);
-
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
         citiesLayer.addTo(map);
 
-        console.log(`
-            Min: ${citiesViz.variables.min.eval()}
-            Max:
-        `);;
-        citiesViz.variables.max.eval();
-        citiesViz.variables.avg.eval();
-
-
-        // citiesLayer.on('loaded', () => {
-        //     console.log(`N cities: ` + );
-        // })
+        // Display 3 variables with global aggregation functions
+        citiesLayer.on('loaded', () => {
+            const v = citiesViz.variables;
+            console.log(`
+                Maximum: ${v.g_max.value}
+                Average: ${v.g_avg.value.toFixed(0)}
+                95th percentile: ${v.g_p95.value}
+            `);
+        });
 
     </script>
 </body>
