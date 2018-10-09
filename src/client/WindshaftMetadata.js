@@ -122,9 +122,9 @@ export default class WindshaftMetadata extends MVTMetadata {
     }
 
     stats (propertyName) {
-        const { dimension } = this._dimensionInfo(propertyName);
+        const { dimension, type } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
-            if (dimension.modes) { // and propertyName is one of the modes
+            if (dimension.modes && type === 'date') {
                 const mode = propertyMode(dimension.modes, propertyName);
                 if (mode) {
                     const { min, max } = dimension;
