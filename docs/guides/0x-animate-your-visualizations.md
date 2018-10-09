@@ -175,10 +175,10 @@ viz.variables.animation.play();
 
 The next step to control the animation is to add buttons and elements that let you interact with it. These are the elements you have to add:
 
-* **Progress** banner to display the animation progress.
+* **Progress** slider to display the animation progress.
 * **Play** button to play or resume the animation.
 * **Pause** button to pause the animation.
-* **Duration** range slider to control the speed of the animation.
+* **Duration** slider to control the speed of the animation.
 
 ```html
 <aside>
@@ -254,7 +254,7 @@ setInterval(updateProgress, 100);
 
 #### All together
 
-Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. Thes styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section](//TODO).
+Well done! Here you have the full example with the controls. Feel free to play with it. Remember you can style your HTML controls using CSS. These styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section]((http://carto.com/developers/carto-vl/examples/#example-animation-controls).
 
 <div class="example-map">
     <iframe
