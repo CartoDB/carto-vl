@@ -11,7 +11,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -67,7 +67,7 @@ The last supported type of value for `ramp` is the `Image` type. Let's see some 
         src="/developers/carto-vl/examples/maps/styling/image-multiple.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

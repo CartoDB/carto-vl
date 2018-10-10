@@ -42,12 +42,13 @@ Let's see an example with *implicit casts* and explicit linear range.
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
+        src="/developers/carto-vl/examples/#population-density-basic"
         width="100%"
         height="1000"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples/guides/ramp/population-density-basic.html">View my source code!</a>
 </div>
 
 
@@ -69,7 +70,7 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples/guides/ramp/population-density-classified.html">View my source code!</a>
@@ -114,7 +115,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
         src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -133,7 +134,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
         src="/developers/carto-vl/examples/maps/guides/ramp/election-others-bucket.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -152,7 +153,7 @@ Let's see this with a dataset of US railroad accidents.
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-top.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -169,7 +170,7 @@ For this case, we can request to see every category by putting the property as t
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-all.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -207,7 +208,7 @@ Let's see all these options in actions!
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-colors.html"
         width="100%"
         height="1000"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

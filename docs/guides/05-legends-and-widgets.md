@@ -24,7 +24,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -38,7 +38,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -51,7 +51,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -104,7 +104,7 @@ You can see all together on this example:
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-widgets.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -177,7 +177,7 @@ Let's see the full example!
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-numeric-histogram.html"
         width="100%"
         height="500"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -228,7 +228,7 @@ function drawHistogram() {
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-category-histogram.html"
         width="100%"
         height="800"
-        style="20px auto !important"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
