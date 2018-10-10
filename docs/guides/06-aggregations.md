@@ -182,11 +182,11 @@ And add this new variable to the same viz:
 
 > Notice how `blend` works here as a convenient way to apply a conditional style, where its parameters can be interpreted as `blend(FALSE_VALUE, TRUE_VALUE, CONDITION)`. See also that we named our feature-dependent variable with a `@f_` prefix.
 
-You can also remove the current filter, to display more cities at the same time. Just add `//` before the `filter` line in the `viz` definition, like this:
+As a test, you can temporary disable (and then enable again) the current filter, to display more cities at the same time. Just add `//` before the `filter` line in the `viz` definition, like this:
 ```
 // filter: ($pop_max > @g_p95)
 ```
-> This is a practical way to de-activate a filter without removing it from the code, maybe for future reference.
+> This is a practical way to de-activate a filter without removing it from the code.
 
 
 At this point, you have created this great visualization, using global and viewport functions:
@@ -204,7 +204,16 @@ To explore the map at full screen size, have a look at [this link](/developers/c
 
 ### Resolution
 
-> TIP: If you are using a lot of points in your viz and the current symbols overlap, changing the resolution is a way to improve the rendering, specially when in a low zoom level, because you'll get less points by clustering them.
+When you are displaying a layer with points (and just in this case), this is an interesting property you need to know about for your viz. The resolution is a value that goes from **1 (default) to 255**, and it defines an spatial aggregation for your features.
+
+For that aggregation a grid is internally created, with the size in pixels you have indicated for the property. Any feature falling in the same cell will be aggregated into a 'clustered point', considering for its position the [centroid](https://carto.com/help/glossary/#centroid).
+
+The higher is the number of points and the resolution parameter, the bigger is the visual effect that can be perceived in the map.
+
+You can give it a try
+
+> TIP: If you are using a lot of points in your visualization and the current symbols overlap, changing the resolution is a way to improve the rendering, specially when in a low zoom level, because you'll get less points by clustering them.
 
 
-### Clustering
+### Clustering aggregations
+The last group of aggregation functions is the one related to clusters.
