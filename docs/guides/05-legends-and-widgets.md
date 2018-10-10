@@ -14,6 +14,8 @@ However, in any case, CARTO VL itself doesn't provide functionality to display l
 
 With that said, we provide some examples of this so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
 
+To access the `getLegendData()` method you'll need a way to reference your `ramp` expression. If the `ramp` expression is the root expression of a styling property it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you'll need to use a variable, as explained in the [next subsection](##_Widgets).
+
 ### Unclassified numerical data
 
 <div class="example-map">
@@ -22,6 +24,7 @@ With that said, we provide some examples of this so you can base your own legend
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
         width="100%"
         height="500"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -35,6 +38,7 @@ With that said, we provide some examples of this so you can base your own legend
         src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
         width="100%"
         height="500"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -47,6 +51,7 @@ With that said, we provide some examples of this so you can base your own legend
         src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
         width="100%"
         height="500"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -99,6 +104,7 @@ You can see all together on this example:
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-widgets.html"
         width="100%"
         height="500"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -171,6 +177,7 @@ Let's see the full example!
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-numeric-histogram.html"
         width="100%"
         height="500"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -221,6 +228,7 @@ function drawHistogram() {
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-category-histogram.html"
         width="100%"
         height="800"
+        style="20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
