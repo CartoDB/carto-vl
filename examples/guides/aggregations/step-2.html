@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+
+    <!-- Numeral.js for number formatting -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+</head>
+
+<body>
+    <!-- Add map container -->
+    <div id="map"></div>
+    <!-- Add panel -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Population</h1>
+            </header>
+            <section class="open-sans">
+                <div class="separator"></div>
+                <div class="js-population">
+                    <!-- updated content will be displayed here -->
+                </div>
+            </section>
+        </div>
+    </aside>
+
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2
+        });
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+
+        //** CARTO VL functionality begins here **//
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
+        const citiesSource = new carto.source.Dataset('populated_places');
+        const citiesViz = new carto.Viz(`
+            color: blend(gray, red, @f_isBiggest)
+            width: blend(10, 40, @f_isBiggest)
+            @g_max: globalMax($pop_max)
+            @g_avg: globalAvg($pop_max)
+            @g_p95: globalPercentile($pop_max, 95)
+            // filter: ($pop_max > @g_p95)
+            // filter: $pop_max == @g_max // biggest city is Tokyo!
+            @v_sum: viewportSum($pop_max)
+            @v_max: viewportMax($pop_max)
+            @v_min: viewportMin($pop_max)
+            @f_isBiggest: ($pop_max == @v_max)
+        `);
+        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        citiesLayer.addTo(map);
+
+        // Display 3 variables with global aggregation functions
+        citiesLayer.on('loaded', () => {
+            const v = citiesViz.variables;
+            console.log(`
+                Maximum: ${v.g_max.value}
+                Average: ${v.g_avg.value.toFixed(0)}
+                95th percentile: ${v.g_p95.value}
+            `);
+        });
+
+        citiesLayer.on('updated', () => {
+            const v = citiesViz.variables;
+            // Displaying values in the console
+            console.log(`
+                Viewport Sum: ${v.v_sum.value}
+                Viewport Max: ${v.v_max.value}
+                Viewport Min: ${v.v_min.value}
+            `);
+
+            // Displaying values in the panel
+            const sum = numeral(v.v_sum.value).format('0.0a');
+            const highest = numeral(v.v_max.value).format('0.0a');
+            const lowest = numeral(v.v_min.value).format('0.0a');
+            const html = `
+                <h2>${sum}</h2>
+                <p>The city with less population in the map has <strong>${lowest}</strong>
+                    and the biggest has <strong style='color:red;'>${highest}</strong> people</p>
+            `;
+            const panelContent = document.querySelector('.js-population');
+            panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
+        });
+
+    </script>
+</body>
+
+</html>

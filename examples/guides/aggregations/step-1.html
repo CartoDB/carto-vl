@@ -2,8 +2,10 @@
 <html>
 
 <head>
+    <meta charset="utf-8">
+
     <!-- Include CARTO VL JS -->
-    <script src="../../../../dist/carto-vl.js"></script>
+    <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
@@ -40,7 +42,7 @@
         const citiesSource = new carto.source.Dataset('populated_places');
         const citiesViz = new carto.Viz(`
             color: grey
-            width: 15
+            width: 10
             @g_max: globalMax($pop_max)
             @g_avg: globalAvg($pop_max)
             @g_p95: globalPercentile($pop_max, 95)
