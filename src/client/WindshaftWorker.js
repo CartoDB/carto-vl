@@ -1,6 +1,7 @@
 import { MVTWorker } from '../sources/MVTWorker';
 import schema from '../renderer/schema';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import { FP32_MIN_SAFE_INTEGER } from '../renderer/viz/expressions/constants';
 
 export class WindshaftWorker extends MVTWorker {
     decodeProperty (metadata, propertyName, propertyValue) {
@@ -15,6 +16,9 @@ export class WindshaftWorker extends MVTWorker {
             case 'category':
                 return metadata.categorizeString(basename, propertyValue);
             case 'number':
+                if (isNaN(propertyValue)) {
+                    return FP32_MIN_SAFE_INTEGER;
+                }
                 return propertyValue;
             default:
                 throw new CartoMapsAPIError(

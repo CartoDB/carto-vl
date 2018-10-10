@@ -223,7 +223,7 @@ export class MVTWorker {
                 throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);
             }
             return metadata.categorizeString(propertyName, propertyValue);
-        } else if (propertyValue === null || propertyValue === undefined || Number.isNaN(propertyValue)) {
+        } else if (isNaN(propertyValue)) {
             return FP32_MIN_SAFE_INTEGER;
         } else if (typeof propertyValue === 'number') {
             if (metadataPropertyType !== 'number') {
