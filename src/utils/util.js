@@ -168,7 +168,7 @@ class YMDHMSParser extends IsoParser {
         return fieldsFromMatch(match);
     }
     // TODO: implementing parseNext instead of next would be more efficient
-    next (iso) {
+    parseNext (iso) {
         const match = (this.check(iso) || []).slice();
         const i = [1, 2, 3, 4, 5, 6].find(i => match[i] === undefined) || 7;
         if (i === 1) {
@@ -176,25 +176,7 @@ class YMDHMSParser extends IsoParser {
         } else {
             match[i - 1] = Number(match[i - 1]) + 1;
         }
-        // we could leave this unadjusted; it will be accepted...
-        const t = parsedValue(timeValue(fieldsFromMatch(match)));
-        iso = `${pad(t.year, 4)}`;
-        if (i > 2) {
-            iso += `-${pad(t.month, 2)}`;
-            if (i > 3) {
-                iso += `-${pad(t.day, 2)}`;
-                if (i > 4) {
-                    iso += `T${pad(t.hour, 2)}`;
-                    if (i > 5) {
-                        iso += `:${pad(t.minute, 2)}`;
-                        if (i > 6) {
-                            iso += `:${pad(t.second, 2)}`;
-                        }
-                    }
-                }
-            }
-        }
-        return iso;
+        return fieldsFromMatch(match);
     }
 }
 
@@ -203,13 +185,18 @@ class MillenniumParser extends IsoParser {
         super(/^M(\d+)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({ year: (Number(match[1]) - 1) * 1000 + 1 });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
-        const m = Number(match[1]);
-        return `M${m + 1}`;
+        let m = Number(match[1]);
+        if (next) {
+            ++m;
+        }
+        return dateFields({ year: (m - 1) * 1000 + 1 });
     }
 }
 
@@ -218,13 +205,18 @@ class CenturyParser extends IsoParser {
         super(/^C(\d+)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({ year: (Number(match[1]) - 1) * 100 + 1 });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
-        const c = Number(match[1]);
-        return `C${c + 1}`;
+        let c = Number(match[1]);
+        if (next) {
+            ++c;
+        }
+        return dateFields({ year: (c - 1) * 100 + 1 });
     }
 }
 
@@ -233,13 +225,18 @@ class DecadeParser extends IsoParser {
         super(/^D(\d+)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({ year: Number(match[1]) * 10 });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
-        const d = Number(match[1]);
-        return `D${d + 1}`;
+        let d = Number(match[1]);
+        if (next) {
+            ++d;
+        }
+        return dateFields({ year: d * 10 });
     }
 }
 
@@ -248,21 +245,22 @@ class SemesterParser extends IsoParser {
         super(/^(\d\d\d\d)S(\d)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({
-            year: Number(match[1]),
-            month: (Number(match[2]) - 1) * 6 + 1
-        });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
-        let s = Number(match[2]) + 1;
-        if (s > 2) {
-            ++y;
-            s = 1;
+        let s = Number(match[2]);
+        if (next) {
+            ++s;
         }
-        return `${y}S${s}`;
+        return dateFields({
+            year: y,
+            month: (s - 1) * 6 + 1
+        });
     }
 }
 
@@ -271,21 +269,22 @@ class TrimesterParser extends IsoParser {
         super(/^(\d\d\d\d)t(\d)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({
-            year: Number(match[1]),
-            month: (Number(match[2]) - 1) * 4 + 1
-        });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
-        let t = Number(match[2]) + 1;
-        if (t > 3) {
-            ++y;
-            t = 1;
+        let t = Number(match[2]);
+        if (next) {
+            ++t;
         }
-        return `${y}t${t}`;
+        return dateFields({
+            year: y,
+            month: (t - 1) * 4 + 1
+        });
     }
 }
 
@@ -294,21 +293,22 @@ class QuarterParser extends IsoParser {
         super(/^(\d\d\d\d)\-?Q(\d)$/);
     }
     parse (iso) {
-        const match = this.check(iso);
-        return dateFields({
-            year: Number(match[1]),
-            month: (Number(match[2]) - 1) * 3 + 1
-        });
+        return this._parse(iso, false);
     }
-    next (iso) {
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
-        let q = Number(match[2]) + 1;
-        if (q > 4) {
-            ++y;
-            q = 1;
+        let q = Number(match[2]);
+        if (next) {
+            ++q;
         }
-        return `${y}Q${q}`;
+        return dateFields({
+            year: y,
+            month: (q - 1) * 3 + 1
+        });
     }
 }
 
@@ -336,23 +336,26 @@ class WeekParser extends IsoParser {
         super(/^(\d\d\d\d)\-?W(\d\d)$/);
     }
     parse (iso) {
+        return this._parse(iso, false);
+    }
+    parseNext (iso) {
+        return this._parse(iso, true);
+    }
+    _parse (iso, next) {
         const match = this.check(iso);
 
-        const year = Number(match[1]);
-        const week = Number(match[2]);
+        let year = Number(match[1]);
+        let week = Number(match[2]);
+        if (next) {
+            ++week;
+        }
+
         const start = startOfIsoWeek(year, week);
         return dateFields({
             year: start.getFullYear(),
             month: start.getMonth() + 1,
             day: start.getDate()
         });
-    }
-    next (iso) {
-        const match = this.check(iso);
-        let y = Number(match[1]);
-        let w = Number(match[2]) + 1;
-        // will not adjust; it's OK; it will work even if the w belongs to y+1
-        return `${y}W${pad(w, 2)}`;
     }
 }
 
@@ -375,7 +378,7 @@ function parseIso (iso, next = false) {
     iso = iso || '';
     const parser = findParser(iso);
     if (next) {
-        iso = parser.next(iso);
+        return parser.parseNext(iso);
     }
     return parser.parse(iso);
 }
