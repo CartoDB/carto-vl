@@ -76,7 +76,7 @@ Let's see an example with *implicit casts* and explicit linear range.
 
 There are multiple classifying methods (quantiles, equal intervals...) and the classification can be applied to two different samples:
 - The entire dataset. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
-- Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes on the view (map center / map zoom) will trigger an automatic re-computation of the classification.
+- Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
 On top on that, you can also classify the data by a fixed list of breakpoints with the [`buckets()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify the features by its price into 3 different categories (buckets): the features that have a price less than 10, the features that have a price between 10 and 200, and the features that have a price higher than 200. It's important to note that there is always one more category than breakpoint. The `buckets` function can also be used with categorical inputs, we'll see that on the [next section](#One_to_one_mapping._One_category_-_one_color.).
 
@@ -98,14 +98,14 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
 
 ### Categorical properties
 
-Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
+Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
 
 #### A note about encodings
 
 Within CARTO VL we follow and enforce one condition:
-**categorical properties comes from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them.
+**categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them.
 
-As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored / encoded as numbers. Otherwise, the data should be stored / encoded as strings.
+As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
 
 #### One to one mapping. One category - one color.
 
@@ -139,7 +139,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 
 When working with categories, the concept of the *others bucket* arises. For example, the buckets function picks some categories, but, what happens with the unselected categories?
 
-In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function, so it will fallback to the `others` bucket.
+In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function so it will fall back to the `others` bucket.
 
 The `others` bucket will be colored gray by default. However, it's possible to override this behavior by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives'], [red, blue], white)`.
 
@@ -173,7 +173,7 @@ Let's see this with a dataset of US railroad accidents.
 
 #### Showing every category without selecting each color
 
-Sometimes, we don't care about the correspondence between colors and categories nor about having too much categories. This is particularly useful for getting quick feedback and exploring a dataset, but it is of reduced utility in later stages.
+Sometimes, we don't care about the correspondence between colors and categories nor about having too many categories. This is particularly useful for getting quick feedback and exploring a dataset, but it is of reduced utility in later stages.
 
 For this case, we can request to see every category by putting the property as the `ramp` input without enclosing it in a function like `buckets`.
 
@@ -212,7 +212,7 @@ There is also another way to specify colors, and that is to use one of the built
 
 The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
 
-Let's see all this options in actions!
+Let's see all these options in actions!
 
 <div class="example-map">
     <iframe
@@ -227,7 +227,7 @@ Let's see all this options in actions!
 
 ### Numeric values / Bubble-maps
 
-When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map each point has a width that depends on a feature property.
+When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map, each point has a width that depends on a feature property.
 
 Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections we'll see both approaches, learning how to create bubble maps like this:
 <div class="example-map">
@@ -263,7 +263,7 @@ Using `ramp($number, [0, 50])` works, and it probably works as expected. If `$nu
 
 However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. Basic geometry tells us that the area of a circle is proportional to the square of its radius.
 
-If we don't want to accentuate differences we'll need to take the square root. This can be done with the a little bit uglier:
+If we don't want to accentuate differences we'll need to take the square root. This can be done with:
 ```
 // We'll need to take the square of the output values to specify the widths and not the areas
 width: sqrt(ramp($number, [0, 50^2]))
@@ -275,7 +275,7 @@ width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 
 #### Direct approach when styling by a numerical property
 
-`ramp` is useful because it allows to map most input to most values, interpolating the values if needed and providing implicit casts if they are convenient. However, it can be overkill when the matching is done from a numerical property to a numeric list.
+`ramp` is useful because it allows mapping most input to most values, interpolating the values if needed and providing implicit casts if they are convenient. However, it can be overkill when the matching is done from a numerical property to a numeric list.
 
 For this case, using regular math is probably simpler and easier, while having the same, correct, results.
 

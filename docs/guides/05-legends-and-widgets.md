@@ -2,17 +2,17 @@
 
 Most of the times, displaying data in a map without further information is meaningless. Here, we'll see two ways to enrich visualizations: legends and widgets.
 - Legends. Legends don't provide additional information, instead, they provide information about how information was displayed on the map: was the conservative party colored red or blue? or, in a bubble-map, which property is displayed by the size of each circle, and in which manner.
-- Widgets. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested on the global results of the election: how many votes did receive each party in total? how many people voted?
+- Widgets. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested in the global results of the election: how many votes did receive each party in total? how many people voted?
 
 ## Legends
 
-In the data driven visualization guide we had displayed multiple legends to better understand other concepts, but we didn't talk about the legends themselves.
+In the data-driven visualization guide we had displayed multiple legends to better understand other concepts, but we didn't talk about the legends themselves.
 
-CARTO VL provides some facilities to create legends: the advanced `eval()` method, which won't be covered by this guide, and the user friendly `getLegendData()` method, which is what we will use here.
+CARTO VL provides some facilities to create legends: the advanced `eval()` method, which won't be covered by this guide, and the user-friendly `getLegendData()` method, which is what we will use here.
 
-However, in any case, CARTO VL itself doesn't provide functionality to display legends, it provides functionality to built them upon them. CARTO VL provides the necessary data to create the legends, but using that data to draw the legends on the screen is left as a responsibility of the developer. The reason for this is that in this way, you'll be able to customize much more your application.
+However, in any case, CARTO VL itself doesn't provide functionality to display legends, it provides functionality to build them upon them. CARTO VL provides the necessary data to create the legends, but using that data to draw the legends on the screen is left as a responsibility of the developer. The reason for this is that in this way, you'll be able to customize much more your application.
 
-With that said, we provide some examples of this, so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
+With that said, we provide some examples of this so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
 
 ### Unclassified numerical data
 
@@ -55,7 +55,7 @@ With that said, we provide some examples of this, so you can base your own legen
 
 The first thing you need to know to create widgets is the concept of [variables](). A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myAwesomeWidgetExpression()`, how do we actually get that information?
 
-Firstly, we'll need to bind that expression to a new name, so our visualization could be created like this:
+Firstly, we'll need to bind that expression to a new name so our visualization could be created like this:
 
 ```Javascript
 const myViz = new carto.Viz(`
@@ -107,7 +107,7 @@ You can see all together on this example:
 
 CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
 
-To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](https://carto.com/developers/airship/) too, since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
+To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](https://carto.com/developers/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
 
 The first thing you'll need is to include Airship with:
 ```HTML
@@ -131,7 +131,7 @@ After including Airship, we'll need to add the HTML tags to place our histogram:
  </aside>
 ```
 
-After that, we'll need to make sure to tell CARTO VL to process an histogram as a part of the visualization:
+After that, we'll need to make sure to tell CARTO VL to process a histogram as a part of the visualization:
 ```Javascript
 const viz = new carto.Viz(`
     // The rest of the style should go here too
@@ -140,9 +140,9 @@ const viz = new carto.Viz(`
 ```
 The [`viewportHistogram`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
 
-The second parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
+The second parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case, we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
 
-The third parameter is the number of buckets of the histogram, by defaults it has a high value (1000), we'll simplify this a little bit here.
+The third parameter is the number of buckets of the histogram, by default it has a high value (1000), we'll simplify this a little bit here.
 
 The last step is to connect CARTO VL data with the Airship *as-histogram-widget* component. We do this with:
 ```Javascript
