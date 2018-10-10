@@ -19,18 +19,9 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Legend</h1>
+                <h1>Widgets</h1>
             </header>
-            <p class="description open-sans">Type of accident</p>
-            <section>
-                <div id="controls">
-                    <ul id="content"></ul>
-                </div>
-            </section>
-            <header>
-                <h1>Visualizations</h1>
-            </header>
-            <p class="description open-sans">Change the visualization of the layer</p>
+            <p class="description open-sans">Displaying additional information</p>
             <div id="widgets">
                 <div>
                     <label>Viewport accidents:</label><div id="widget-viewport-accidents"></div>
@@ -55,7 +46,7 @@
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
             center: [-96, 41],
-            zoom: 4,
+            zoom: 3.5,
         });
 
         carto.setDefaultAuth({

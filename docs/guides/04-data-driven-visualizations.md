@@ -4,7 +4,7 @@
 
 [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
 - One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue,
-- Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color black to the features with low population density and yellow to the ones with a high population density.
+- Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color green to the features with low population density and red to the ones with a high population density. Intermediate population densities will receive the interpolation between green, yellow and red based on how close its value is to the lowest and highest values in the dataset.
 
 <div class="example-map">
     <iframe
@@ -21,7 +21,7 @@
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
         width="100%"
-        height="500"
+        height="1000"
         frameBorder="0">
     </iframe>
 </div>
@@ -30,9 +30,9 @@ It's easy to create choropleth maps by using `ramp` with colors as the values. H
 
 ## Ramp inputs
 
-On the previous section, we talked about how `ramp` can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call "Style by value".
+On the previous introduction, we talked about how [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
 
-The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the price of each feature, or by categorical data like the method of payment (credit card, cash...).
+The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash...).
 
 ### Numerical properties
 
@@ -53,21 +53,24 @@ color: ramp($population_density, [black, yellow])
 
  Let's see another *implicit cast*, this time one a little bit more interesting.
 
- The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. This is what sets the context of the lowest and highest population densities for `ramp`.
+ The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. The second and third parameter of `linear` is what sets the context of the lowest and highest population densities for `ramp`.
 
- Sometimes, the data has [outliers](https://en.wikipedia.org/wiki/Outlier) (features with data that is very far away from the norm). In these cases, we may want to ignore them when computing the `ramp`. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
+ Sometimes, the data has [outliers](https://en.wikipedia.org/wiki/Outlier): features with data that is very far away from the norm. In these cases, we may want to ignore them when computing the ramp. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
+
+Let's see an example with *implicit casts* and explicit linear range.
 
 <div class="example-map">
     <iframe
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
         width="100%"
-        height="500"
+        height="1000"
         frameBorder="0">
     </iframe>
 </div>
 
- #### Classifying numerical properties
+
+#### Classifying numerical properties
 
  Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
 
@@ -88,7 +91,8 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
         frameBorder="0">
     </iframe>
 </div>
-##### A note about `filter:`
+
+#### A note about `filter:`
 
 `filter:` is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
 
@@ -183,7 +187,7 @@ For this case, we can request to see every category by putting the property as t
     </iframe>
 </div>
 
-As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input.
+As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input. It's difficult to distinguish colors when there are so many categories, you should try to avoid this form (to use `buckets` or `top`) when this happens.
 
 ##### CieLAB interpolation
 The interpolation made by `ramp` is always done in the CieLAB color space. This is very important since interpolation in the sRGB color space is not the same as in the CieLAB color space. The later assures a better perception of color since the CieLAB color space models the way the human eye perceives colors. We see the interpolation of two colors colorA and colorB at 50% in the middle when the interpolation is done in CieLAB, but not necessarily if it's done in sRGB.
@@ -196,34 +200,36 @@ In the previous section we talked about using different types of input for ramp,
 ### Color values
 
 One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($dn, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
-`ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`, `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($dn, [#00F, #F00])`, `ramp($dn, [blue, #F00])`, `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
+- `ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`
+- `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($dn, [#00F, #F00])`
+- `ramp($dn, [blue, #F00])`
+- `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
 
-There is another way to specify colors, and that is to use one of the built-in color palettes. We have built-in all the CARTOColors and ColorBrewer palettes. You can use them like this:
+There is also another way to specify colors, and that is to use one of the built-in color palettes. We have built-in all the CARTOColors and ColorBrewer palettes. You can use them like this:
+- `ramp($dn, temps)`
+- `ramp($dn, tealrose)`
+- `ramp($dn, cb_blues)`
 
-ramp($dn, temps)
-ramp($dn, tealrose)
-ramp($dn, cb_blues)
+The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
 
+Let's see all this options in actions!
 
 <div class="example-map">
     <iframe
         id="population-density-colors"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-colors.html"
         width="100%"
-        height="500"
+        height="1000"
         frameBorder="0">
     </iframe>
 </div>
 
-The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
 
 ### Numeric values / Bubble-maps
 
-When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map each point has a width that depends on an feature property.
+When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map each point has a width that depends on a feature property.
 
-Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections will see both approaches.
-
-In the following subsections we'll learn how to create bubble maps like this:
+Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections we'll see both approaches, learning how to create bubble maps like this:
 <div class="example-map">
     <iframe
         id="accidents-bubblemap"
@@ -236,7 +242,7 @@ In the following subsections we'll learn how to create bubble maps like this:
 
 #### The `ramp` way
 
-`ramp` can be used in the same way it can be used with colors changing the color values to numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
+`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
 ```
 width: ramp($number, [0, 50])
 ```
@@ -253,9 +259,9 @@ width: ramp(buckets($cat, 'categoryA', 'categoryB'), [1, 50])
 ```
 
 #### Size perception
-Using `ramp($number, [0, 50])` works, and it probably works as expected. If $number is a property with a minimum of 0 and a maximum of 300 in the dataset, a feature with `$number=150` is halfway in the `linear` range. Therefore, ramp will output `50%*0+50%*50` (25).
+Using `ramp($number, [0, 50])` works, and it probably works as expected. If `$number` is a property with a minimum of 0 and a maximum of 300 in the dataset, a feature with `$number=150` is halfway in the `linear` range. Therefore, ramp will output `50%*0+50%*50` (25).
 
-However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. The basic geometry just tells us that the area of a circle is proportional to the square of its radius.
+However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. Basic geometry tells us that the area of a circle is proportional to the square of its radius.
 
 If we don't want to accentuate differences we'll need to take the square root. This can be done with the a little bit uglier:
 ```
@@ -282,7 +288,7 @@ The last supported type of value for `ramp` is the `Image` type. Let's see some 
 <div class="example-map">
     <iframe
         id="image-multiple"
-        src="/developers/carto-vl/examples/styling/image-multiple.html"
+        src="/developers/carto-vl/examples/maps/styling/image-multiple.html"
         width="100%"
         height="500"
         frameBorder="0">
