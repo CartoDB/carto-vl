@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.9.1] - 2018-10-09
+### Fixed
+- Fix width and strokeWidth rendering in HighDPI screens
+
 ## [0.9.0] - 2018-10-09
 ### Added
 - Add `globalStandardDev` and `viewportStandardDev` classification expressions
