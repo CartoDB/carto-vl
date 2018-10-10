@@ -490,6 +490,7 @@ export default class Dataframe extends DummyDataframe {
 
         const metadata = this.metadata;
         const getters = {};
+
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
             getters[propertyName] = {
@@ -498,7 +499,9 @@ export default class Dataframe extends DummyDataframe {
                     if (metadata.properties[propertyName].type === 'category') {
                         return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
                     } else {
-                        return this._dataframe.properties[propertyName][index];
+                        return this._dataframe.properties[propertyName][index] <= Number.MIN_SAFE_INTEGER
+                            ? Number.NaN
+                            : this._dataframe.properties[propertyName][index];
                     }
                 }
             };
@@ -508,14 +511,6 @@ export default class Dataframe extends DummyDataframe {
 
         featureClassCache.set(this.metadata, cls);
         this._cls = cls;
-    }
-
-    _getFeatureProperty (index, propertyName) {
-        if (this.metadata.properties[propertyName].type === 'category') {
-            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
-        } else {
-            return this.properties[propertyName][index];
-        }
     }
 
     getFeature (index) {
