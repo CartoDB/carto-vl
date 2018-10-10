@@ -59,7 +59,7 @@
             // @totalAccidents: globalCount()
             @viewportAccidents: viewportCount()
             @totalDamage: globalSum($total_damage)
-            @viewportDamage: viewportSum($total_damage*clusterCount())
+            @viewportDamage: viewportSum($total_damage)
 `);
         const layer = new carto.Layer('layer', source, viz);
 
