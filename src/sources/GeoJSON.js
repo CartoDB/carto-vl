@@ -6,7 +6,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/ca
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
-import { MIN_SAFE_INTEGER } from '../renderer/viz/expressions/constants';
+import { FP32_MIN_SAFE_INTEGER } from '../renderer/viz/expressions/constants';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -285,7 +285,7 @@ export default class GeoJSON extends Base {
                 }
                 const numericValue = Number(f.properties[name]);
                 properties[name][i] = Number.isNaN(numericValue)
-                    ? MIN_SAFE_INTEGER
+                    ? FP32_MIN_SAFE_INTEGER
                     : numericValue;
             });
             dateFields.forEach(name => {

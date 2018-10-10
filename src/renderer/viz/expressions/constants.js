@@ -7,4 +7,5 @@ export const DEFAULT_OPTIONS = {
     othersLabel: OTHERS_LABEL,
     samples: DEFAULT_SAMPLES
 };
-export const MIN_SAFE_INTEGER = Math.pow(-2, 24);
+
+export const FP32_MIN_SAFE_INTEGER = -(1 << 24);

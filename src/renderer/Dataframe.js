@@ -2,7 +2,7 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-import { MIN_SAFE_INTEGER } from './viz/expressions/constants';
+import { FP32_MIN_SAFE_INTEGER } from './viz/expressions/constants';
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -499,7 +499,7 @@ export default class Dataframe extends DummyDataframe {
                     if (metadata.properties[propertyName].type === 'category') {
                         return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
                     } else {
-                        return this._dataframe.properties[propertyName][index] === MIN_SAFE_INTEGER
+                        return this._dataframe.properties[propertyName][index] === FP32_MIN_SAFE_INTEGER
                             ? Number.NaN
                             : this._dataframe.properties[propertyName][index];
                     }

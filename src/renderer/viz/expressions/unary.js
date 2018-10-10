@@ -1,7 +1,7 @@
 import { implicitCast, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
-import { MIN_SAFE_INTEGER } from './constants';
+import { FP32_MIN_SAFE_INTEGER } from './constants';
 
 /**
  * Compute the natural logarithm (base e) of a number x.
@@ -199,7 +199,7 @@ export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
  */
 export const IsNaN = genUnaryOp('isNaN',
     x => Number.isNaN(x) ? 1 : 0,
-    x => `((${x} == ${MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`
+    x => `((${x} == ${FP32_MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`
 );
 
 /**
