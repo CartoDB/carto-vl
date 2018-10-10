@@ -67,8 +67,122 @@ All the _viewport*_ like expressions will take only the features that are on the
 
 #### Histograms: distribution of data
 
+CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
+
+To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](https://carto.com/developers/airship/) too, since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
+
+The first thing you'll need it is to include Airship with:
+```HTML
+<!-- Airship -->
+<link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.0-beta.0/airship.css">
+<script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
+```
+
 #### Numeric histograms: what is the distribution of the price?
-http://127.0.0.1:8080/examples/misc/legends/legend-numeric-chart.html
+
+After including Airship, we'll need to add the HTML tags to place our histogram:
+```HTML
+ <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Damage distribution</h1>
+            </header>
+            <as-histogram-widget />
+            <footer class="js-footer"></footer>
+        </div>
+ </aside>
+```
+
+After that, we'll need to make sure to tell CARTO VL to process an histogram as a part of the visualization:
+```Javascript
+const viz = new carto.Viz(`
+    // The rest of the style should go here too
+    @histogram: viewportHistogram($total_damage, 1, 6)
+`);
+```
+The [`viewportHistogram`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
+
+The second parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
+
+The third parameter is the number of buckets of the histogram, by defaults it has a high value (1000), we'll simplify this a little bit here.
+
+The last step is to connect CARTO VL data with the Airship *as-histogram-widget* component. We do this with:
+```Javascript
+layer.on('updated', drawHistogram);
+
+function drawHistogram() {
+    var histogramWidget = document.querySelector('as-histogram-widget');
+    const histogram = layer.viz.variables.histogram.value;
+    histogramWidget.data = histogram.map(entry => {
+        return {
+            start: entry.x[0] / 1e6,
+            end: entry.x[1] / 1e6,
+            value: Math.log(entry.y + 1)
+        }
+    });
+}
+```
+
+If you are curious about the usage of `Math.log`, this is done because the dataset has an exponential-like distribution that makes the histogram unusable without using a logarithmic scale.
+
+Let's see the full example!
+
+<div class="example-map">
+    <iframe
+        id="accidents-numeric-histogram"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-numeric-histogram.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 #### Categorical histograms: how many votes did each party receive?
-http://127.0.0.1:8080/examples/misc/legends/legend-categorical-chart.html
+
+To make a category histogram or widget the steps are similar.
+
+The Airship component is now *<as-category-widget>*:
+```HTML
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Accident type</h1>
+            </header>
+            <as-category-widget />
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+```
+
+The CARTO VL visualization can be simplified:
+```Javascript
+const viz = new carto.Viz(`
+    @histogram: viewportHistogram($total_damage, 1, 6)
+`);
+```
+
+And the connection between Airship and CARTO VL needs a small adjustment:
+```Javascript
+layer.on('updated', drawHistogram);
+
+function drawHistogram() {
+    var histogramWidget = document.querySelector('as-category-widget');
+    const histogram = layer.viz.variables.histogram.value;
+    histogramWidget.categories = histogram.map(entry => {
+        return {
+            name: entry.x,
+            value: entry.y
+        }
+    });
+}
+```
+
+<div class="example-map">
+    <iframe
+        id="accidents-numeric-histogram"
+        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-category-histogram.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
