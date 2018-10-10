@@ -57,7 +57,7 @@ The first thing you need to know to create widgets is the concept of [variables]
 
 Firstly, we'll need to bind that expression to a new name so our visualization could be created like this:
 
-```Javascript
+```js
 const myViz = new carto.Viz(`
     color: red
     width: 7
@@ -68,7 +68,7 @@ const myViz = new carto.Viz(`
 
 Then, we'll need to ask for the value of the expression when needed. Since our awesome widget expression may change its value dynamically, for example, due to panning or filtering we should probably read it each time its layer is changed:
 
-```Javascript
+```js
 myLayer.on('updated', ()=>{
     const myWidgetData = myViz.variables.myAwesomeVariable.value;
     updateMyAwesomeWidget(myWidgetData);
@@ -110,7 +110,7 @@ CARTO VL provides access to the necessary data for creating histograms. However,
 To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](https://carto.com/developers/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
 
 The first thing you'll need is to include Airship with:
-```HTML
+```html
 <!-- Airship -->
 <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.0-beta.0/airship.css">
 <script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
@@ -132,7 +132,7 @@ After including Airship, we'll need to add the HTML tags to place our histogram:
 ```
 
 After that, we'll need to make sure to tell CARTO VL to process a histogram as a part of the visualization:
-```Javascript
+```js
 const viz = new carto.Viz(`
     // The rest of the style should go here too
     @histogram: viewportHistogram($total_damage, 1, 6)
@@ -145,7 +145,7 @@ The second parameter is optional, defaults to `1` and it is a way to weight each
 The third parameter is the number of buckets of the histogram, by default it has a high value (1000), we'll simplify this a little bit here.
 
 The last step is to connect CARTO VL data with the Airship *as-histogram-widget* component. We do this with:
-```Javascript
+```js
 layer.on('updated', drawHistogram);
 
 function drawHistogram() {
@@ -180,7 +180,7 @@ Let's see the full example!
 To make a category histogram or widget the steps are similar.
 
 The Airship component is now *<as-category-widget>*:
-```HTML
+```html
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -193,14 +193,14 @@ The Airship component is now *<as-category-widget>*:
 ```
 
 The CARTO VL visualization can be simplified:
-```Javascript
+```js
 const viz = new carto.Viz(`
     @histogram: viewportHistogram($total_damage, 1, 6)
 `);
 ```
 
 And the connection between Airship and CARTO VL needs a small adjustment:
-```Javascript
+```js
 layer.on('updated', drawHistogram);
 
 function drawHistogram() {
