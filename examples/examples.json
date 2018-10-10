@@ -84,11 +84,11 @@
                     "file": "styling/scaled.html"
                 },
                 {
-                    "title": "Population basic (basic)",
+                    "title": "Population Density - basic",
                     "file": "guides/ramp/population-density-basic.html"
                 },
                 {
-                    "title": "Railroad accidents (all)",
+                    "title": "Railroad accidents",
                     "file": "guides/ramp/accidents-all.html"
                 }
             ]
