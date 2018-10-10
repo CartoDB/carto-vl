@@ -42,8 +42,9 @@ export default class ViewportCount extends ViewportAggregation {
         return this.value;
     }
 
-    accumViewportAgg () {
-        this._value++;
+    accumViewportAgg (feature) {
+        const clusterCount = feature._cdb_feature_count;
+        this._value += clusterCount;
     }
 
     _resetViewportAgg () {

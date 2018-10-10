@@ -69,7 +69,10 @@ export default class ViewportPercentile extends ViewportAggregation {
 
     accumViewportAgg (feature) {
         const v = this.property.eval(feature);
-        this._array.push(v);
+        const clusterCount = feature._cdb_feature_count;
+        for (let i = 0; i < clusterCount; i++) {
+            this._array.push(v);
+        }
     }
 
     _preDraw (...args) {

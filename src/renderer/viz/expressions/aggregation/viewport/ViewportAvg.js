@@ -46,8 +46,9 @@ export default class ViewportAvg extends ViewportAggregation {
         const propertyValue = this.property.eval(feature);
 
         if (!Number.isNaN(propertyValue)) {
-            this._count++;
-            this._sum += propertyValue;
+            const clusterCount = feature._cdb_feature_count;
+            this._count += clusterCount;
+            this._sum += clusterCount * propertyValue;
         }
     }
 
