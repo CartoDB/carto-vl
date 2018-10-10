@@ -6,6 +6,7 @@ import Metadata from '../renderer/Metadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import { MIN_SAFE_INTEGER } from '../renderer/viz/expressions/constants';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -223,7 +224,7 @@ export class MVTWorker {
             }
             return metadata.categorizeString(propertyName, propertyValue);
         } else if (propertyValue === null || propertyValue === undefined || Number.isNaN(propertyValue)) {
-            return Number.MIN_SAFE_INTEGER;
+            return MIN_SAFE_INTEGER;
         } else if (typeof propertyValue === 'number') {
             if (metadataPropertyType !== 'number') {
                 throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);

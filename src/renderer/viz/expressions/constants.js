@@ -7,3 +7,4 @@ export const DEFAULT_OPTIONS = {
     othersLabel: OTHERS_LABEL,
     samples: DEFAULT_SAMPLES
 };
+export const MIN_SAFE_INTEGER = Math.pow(-2, 24);
