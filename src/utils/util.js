@@ -156,25 +156,20 @@ function fieldsFromMatch (match) {
     });
 }
 
-function pad (x, n) {
-    return x.toString().padStart(n, '0');
-}
 class YMDHMSParser extends IsoParser {
     constructor () {
         super(/^(\d\d\d\d)(?:\-?(\d\d)(?:\-?(\d\d)(?:[T\s]?(\d\d)(?:\:(\d\d)(?:\:(\d\d))?)?)?)?)?$/);
     }
-    parse (iso) {
-        const match = this.check(iso) || [];
-        return fieldsFromMatch(match);
-    }
-    // TODO: implementing parseNext instead of next would be more efficient
-    parseNext (iso) {
-        const match = (this.check(iso) || []).slice();
-        const i = [1, 2, 3, 4, 5, 6].find(i => match[i] === undefined) || 7;
-        if (i === 1) {
-            match[1] = 2;
-        } else {
-            match[i - 1] = Number(match[i - 1]) + 1;
+    parse (iso, next) {
+        let match = this.check(iso) || [];
+        if (next) {
+            match = match.slice();
+            const i = [1, 2, 3, 4, 5, 6].find(i => match[i] === undefined) || 7;
+            if (i === 1) {
+                match[1] = 2;
+            } else {
+                match[i - 1] = Number(match[i - 1]) + 1;
+            }
         }
         return fieldsFromMatch(match);
     }
@@ -184,13 +179,7 @@ class MillenniumParser extends IsoParser {
     constructor () {
         super(/^M(\d+)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let m = Number(match[1]);
         if (next) {
@@ -204,13 +193,7 @@ class CenturyParser extends IsoParser {
     constructor () {
         super(/^C(\d+)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let c = Number(match[1]);
         if (next) {
@@ -224,13 +207,7 @@ class DecadeParser extends IsoParser {
     constructor () {
         super(/^D(\d+)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let d = Number(match[1]);
         if (next) {
@@ -244,13 +221,7 @@ class SemesterParser extends IsoParser {
     constructor () {
         super(/^(\d\d\d\d)S(\d)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
         let s = Number(match[2]);
@@ -268,13 +239,7 @@ class TrimesterParser extends IsoParser {
     constructor () {
         super(/^(\d\d\d\d)t(\d)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
         let t = Number(match[2]);
@@ -292,13 +257,7 @@ class QuarterParser extends IsoParser {
     constructor () {
         super(/^(\d\d\d\d)\-?Q(\d)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
         let y = Number(match[1]);
         let q = Number(match[2]);
@@ -335,13 +294,7 @@ class WeekParser extends IsoParser {
     constructor () {
         super(/^(\d\d\d\d)\-?W(\d\d)$/);
     }
-    parse (iso) {
-        return this._parse(iso, false);
-    }
-    parseNext (iso) {
-        return this._parse(iso, true);
-    }
-    _parse (iso, next) {
+    parse (iso, next) {
         const match = this.check(iso);
 
         let year = Number(match[1]);
@@ -377,26 +330,11 @@ function findParser (iso) {
 function parseIso (iso, next = false) {
     iso = iso || '';
     const parser = findParser(iso);
-    if (next) {
-        return parser.parseNext(iso);
-    }
-    return parser.parse(iso);
+    return parser.parse(iso, next);
 }
 
 function timeValue (parsed) {
     return Date.UTC(parsed.year, parsed.month - 1, parsed.day, parsed.hour, parsed.minute, parsed.second);
-}
-
-function parsedValue (dateValue) {
-    const date = msToDate(dateValue);
-    return {
-        year: date.getUTCFullYear(),
-        month: date.getUTCMonth() + 1,
-        day: date.getUTCDate(),
-        hour: date.getUTCHours(),
-        minute: date.getUTCMinutes(),
-        second: date.getUTCSeconds()
-    };
 }
 
 export function startTimeValue (iso) {
