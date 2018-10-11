@@ -113,11 +113,11 @@
                 },
                 {
                     "title": "Population density - colors",
-                    "file": "population-density-colors.html"
+                    "file": "guides/ramp/population-density-colors.html"
                 },
                 {
                     "title": "Railroad accidents - bubble-map",
-                    "file": "accidents-bubblemap.html"
+                    "file": "guides/ramp/accidents-bubblemap.html"
                 }
             ]
         },
