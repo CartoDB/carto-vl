@@ -42,13 +42,13 @@ Let's see an example with *implicit casts* and explicit linear range.
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/#population-density-basic"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
         width="100%"
         height="1000"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples/guides/ramp/population-density-basic.html">View my source code!</a>
+    <a href="/developers/carto-vl/examples/guides/ramp#population-density-basic">View my source code!</a>
 </div>
 
 
@@ -69,7 +69,7 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
         id="population-density-classified"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
         width="100%"
-        height="500"
+        height="1000"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
