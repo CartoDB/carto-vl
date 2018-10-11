@@ -84,22 +84,16 @@
     const viz = new carto.Viz(`
       @month: clusterTimeRange($date, 'month', 'Europe/Madrid')
 
-
       // linear uses start date value
       // width: linear(@month)*60
       width: linear(@month, '2018-01', '2018-09')*60
       color: ramp(linear(@month), SUNSET)
+      // TODO: animation should use start, end propertie automatically
+      filter: animation(linear(@month))
 
-      // TODO: buckets should use category
+      // TODO: buckets should use category?
       // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
       // width: ramp(@selMonths, [60, 50, 40, 30], 20)
-
-
-      // TODO: animation should use start, end
-      // @animStart: animation(linear(@mstart), 5, fade(0.1, 10))
-      // @animEnd: animation(linear(@mend), 5, fade(10, 0.1))
-      // filter: @animStart and @animEnd
-
 
       @list: viewportFeatures(@month)
       @maxMonth: globalMax(@month)
@@ -108,17 +102,20 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
+    const animation = viz.filter.expressionName === 'animation' ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
-        // info = false;
+        info = !animation;
         console.log(viz);
         console.log("Min Month", viz.variables.minMonth.value);
         console.log("Max Month", viz.variables.maxMonth.value);
         console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f).text));
         // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
       }
-      // const time = viz.variables.animStart.getProgressValue();
-      // document.getElementById("timer").textContent = time;
+      if (animation) {
+        const time = animation.getProgressValue();
+        document.getElementById("timer").textContent = time;
+      }
     });
     const interactivity = new carto.Interactivity(layer);
     interactivity.on('featureClick', event => {
