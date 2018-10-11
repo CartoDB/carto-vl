@@ -1,10 +1,10 @@
-const map = new carto.Map({
+const map = new CartoMap({
     container: 'map',
     background: 'black'
 });
 
 carto.setDefaultAuth({
-    user: 'localhost',
+    username: 'localhost',
     apiKey: '1234'
 });
 carto.setDefaultConfig({

@@ -9,6 +9,8 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { layerVisibility } from './constants/layer';
+import { mat4 } from 'gl-matrix';
+import { unproject } from './utils/geometry';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -18,24 +20,24 @@ const renderers = new WeakMap();
 *
 * A Layer is the primary way to visualize geospatial data.
 *
-* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+* To create a layer a {@link carto.source|source} and {@link carto.Viz|viz} are required:
 *
-* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
-* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-* @param {carto.source.Base} source - The source of the data
+* @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {carto.source} source - The source of the data
 * @param {carto.Viz} viz - The description of the visualization of the data
+* @throws CartoError
 *
 * @example
 * const layer = new carto.Layer('layer0', source, viz);
 *
-* @fires CartoError
-*
 * @constructor Layer
-* @memberof carto
+* @name carto.Layer
 * @api
 */
+
 export default class Layer {
     constructor (id, source, viz) {
         this._checkId(id);
@@ -90,7 +92,7 @@ export default class Layer {
     /**
      * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
      *
-     * @param {string} eventName - Type of event to listen for
+     * @param {String} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -103,7 +105,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
@@ -157,7 +159,7 @@ export default class Layer {
      * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
      * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source.Base} source - The new Source object
+     * @param {carto.source} source - The new Source object
      * @param {carto.Viz?} viz - Optional. The new Viz object
      * @memberof carto.Layer
      * @instance
@@ -194,6 +196,7 @@ export default class Layer {
         }
 
         this._source = source;
+        this._noFirstRequestData = false;
         this.requestData();
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
@@ -251,6 +254,8 @@ export default class Layer {
             viz.filter._blendFrom(this._viz.filter, ms, interpolator);
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
+        } else {
+            return this.update(this._source, viz);
         }
 
         return this._vizChanged(viz).then(() => {
@@ -289,6 +294,8 @@ export default class Layer {
     show () {
         this.map.setLayoutProperty(this.id, 'visibility', 'visible');
         this._visible = true;
+        this._noFirstRequestData = false;
+        this._fireUpdateOnNextRender = true;
         this.requestData();
     }
 
@@ -304,6 +311,7 @@ export default class Layer {
     hide () {
         this.map.setLayoutProperty(this.id, 'visibility', 'none');
         this._visible = false;
+        this._fireUpdateOnNextRender = true;
         this._fire('updated');
     }
 
@@ -315,16 +323,11 @@ export default class Layer {
         return this._source.requestMetadata(viz);
     }
 
-    async requestData (matrix) {
-        // Set renderer zoom and center
-        this._setZoomCenter(matrix);
-
+    async requestData () {
         if (!this.metadata || !this._visible) {
             return;
         }
-
-        this._source.requestData(this._getZoom(), this._getViewport());
-        this._fireUpdateOnNextRender = true;
+        this._needRefresh();
     }
 
     hasDataframes () {
@@ -371,7 +374,15 @@ export default class Layer {
         // Call request data if the matrix has changed
         if (!util.equalArrays(this._matrix, matrix)) {
             this._matrix = matrix;
-            this.requestData(matrix);
+            this.renderer.matrix = matrix;
+            this._setRendererZoomCenter(matrix);
+            if (this._source && this._visible) {
+                this._source.requestData(this._getZoom(), this._getViewport());
+            }
+            this._fireUpdateOnNextRender = true;
+        } else if (!this._noFirstRequestData && this._source && this._visible) {
+            this._source.requestData(this._getZoom(), this._getViewport());
+            this._noFirstRequestData = true;
         }
     }
 
@@ -398,7 +409,6 @@ export default class Layer {
                 this._fireUpdateOnNextRender = false;
                 this._fire('updated');
             }
-
             if (!this._isLoaded && this._state === 'dataLoaded') {
                 this._isLoaded = true;
                 this._fire('loaded');
@@ -420,16 +430,17 @@ export default class Layer {
      */
     _onDataframeAdded (dataframe) {
         dataframe.setFreeObserver(() => {
-            this._needRefresh();
+            this.map.triggerRepaint();
         });
         this._renderLayer.addDataframe(dataframe);
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._needRefresh();
+        this.map.triggerRepaint();
     }
 
     _needRefresh () {
+        this._fireUpdateOnNextRender = true;
         this.map.triggerRepaint();
     }
 
@@ -496,7 +507,7 @@ export default class Layer {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source.Base".`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source".`);
         }
     }
 
@@ -512,29 +523,51 @@ export default class Layer {
         }
     }
 
-    _setZoomCenter (matrix) {
+    _setRendererZoomCenter (matrix) {
         let zoom;
         let center;
 
-        if (matrix) {
-            // Compute the zoom and center from the matrix.
-            // This is a solution to avoid subscribing to map events and
-            // make a better and efficient use of the Custom Layers interface.
-            // TODO: the best solution is to use the matrix at the shader
-            // level and remove the aspect and scale logic from the renderer
-            zoom = util.computeMatrixZoom(matrix);
-            center = util.computeMatrixCenter(matrix);
-        } else {
-            zoom = util.computeMapZoom(this.map);
-            center = util.computeMapCenter(this.map);
-        }
+        zoom = util.computeMapZoom(this.map);
+        center = util.computeMapCenter(this.map);
 
         this.renderer.setZoom(zoom);
         this.renderer.setCenter(center);
     }
 
     _getViewport () {
-        return this.renderer.getBounds();
+        const inv = mat4.invert([], this._matrix);
+
+        const corners = [
+            [-1, -1],
+            [-1, 1],
+            [1, -1],
+            [1, 1]
+        ].map(NDC =>
+            unproject(inv, ...NDC)
+        ).map(c =>
+            // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
+            c.map(x => x * 2 - 1)
+        );
+
+        // Rotation no longer gurantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
+        // we need to compute the AABB min/max by iterating
+        const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+        const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+        corners.forEach(corner => {
+            min[0] = Math.min(min[0], corner[0]);
+            min[1] = Math.min(min[1], corner[1]);
+            max[0] = Math.max(max[0], corner[0]);
+            max[1] = Math.max(max[1], corner[1]);
+        });
+
+        // Our API flips the `y` coordinate, we need to convert the values accordingly
+        min[1] = -min[1];
+        max[1] = -max[1];
+        const temp = min[1];
+        min[1] = max[1];
+        max[1] = temp;
+
+        return [...min, ...max];
     }
 
     _getZoom () {
@@ -557,28 +590,3 @@ function _getRenderer (map, gl) {
     }
     return renderers.get(map);
 }
-
-/**
- *
- * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
- *
- * @typedef {object} LayerEvent
- * @api
- */
-
-/**
- * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
- *
- * @event loaded
- * @type {LayerEvent}
- * @api
- */
-
-/**
- * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
- * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
- *
- * @event updated
- * @type {LayerEvent}
- * @api
-*/

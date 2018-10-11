@@ -5,7 +5,7 @@ import { regExpThatContains as thatContains } from '../../../src/utils/util';
 describe('sources/dataset', () => {
     const tableName = 'table0';
     const auth = {
-        user: 'test',
+        username: 'test',
         apiKey: '1234567890'
     };
     const options = {

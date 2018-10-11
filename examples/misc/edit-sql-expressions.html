@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Edit SQL & Expressions | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,40 +13,45 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
-  <div id="container">
-    <div id="map"></div>
-    <div id="controls">
-      <div class="control-inner">
-        <h3>SQL</h3>
-        <textarea id="sql" rows="3">SELECT * FROM ne_10m_populated_places_simple</textarea>
-        <div class="action-container">
-          <button class="button-update" onclick="updateSource()">
-            <span>UPDATE SQL</span>
-          </button>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <div id="controls">
+        <div class="control-inner">
+          <h3>SQL</h3>
+          <textarea id="sql" rows="3">SELECT * FROM ne_10m_populated_places_simple</textarea>
+          <div class="action-container">
+            <button class="button-update" onclick="updateSource()">
+              <span>UPDATE SQL</span>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="control-inner">
-        <h3>Expressions</h3>
-        <textarea id="expressions" rows="3">
+        <div class="control-inner">
+          <h3>Expressions</h3>
+          <textarea id="expressions" rows="3">
           width: 6
           color: rgb(237, 76, 89)
           strokeWidth: 0.5
           strokeColor: rgb(255, 255, 255)
           filter: $pop_max > 10000
         </textarea>
-        <div class="action-container">
-          <button class="button-update" onclick="updateViz()">
-            <span>UPDATE STYLE</span>
-          </button>
+          <div class="action-container">
+            <button class="button-update" onclick="updateViz()">
+              <span>UPDATE STYLE</span>
+            </button>
+          </div>
+        </div>
+        <div class="control-inner">
+          <p>This example only uses one viz and one layer whose content is changed.</p>
+          <p>Since the viz and source objects are the same the wont trigger events, you need to use the promise to
+            handle
+            errors.</p>
         </div>
       </div>
-      <div class="control-inner">
-        <p>This example only uses one viz and one layer whose content is changed.</p>
-        <p>Since the viz and source objects are the same the wont trigger events, you need to use the promise to handle errors.</p>
-      </div>
     </div>
-  </div>
+  </aside>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -53,8 +59,8 @@
       center: [0, 30],
       zoom: 2,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
+
+
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -63,7 +69,7 @@
     map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
@@ -76,17 +82,17 @@
     function updateSource() {
       reset('#sql');
       populatedPlacesLayer.update(new carto.source.SQL(getValue('#sql')))
-        // .catch(cartoError => {
-        //   error('#sql', cartoError);
-        // });
+      // .catch(cartoError => {
+      //   error('#sql', cartoError);
+      // });
     }
 
     function updateViz() {
       reset('#expressions')
       populatedPlacesLayer.blendToViz(new carto.Viz(getValue('#expressions')))
-        // .catch(cartoError => {
-        //   error('#expressions', cartoError);
-        // });
+      // .catch(cartoError => {
+      //   error('#expressions', cartoError);
+      // });
     }
 
     function getValue(id) {
@@ -103,4 +109,5 @@
     }
   </script>
 </body>
+
 </html>

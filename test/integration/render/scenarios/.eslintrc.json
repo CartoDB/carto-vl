@@ -2,6 +2,7 @@
     "globals": {
         "carto": true,
         "sources": true,
-        "mapboxgl": true
+        "mapboxgl": true,
+        "CartoMap": true
     }
 }

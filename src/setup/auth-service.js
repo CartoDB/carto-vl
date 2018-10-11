@@ -4,11 +4,11 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/err
 let defaultAuth;
 
 /**
- * Set default authentication parameters: user and apiKey.
+ * Set default authentication parameters: [user or username] and apiKey.
  *
- * @param {object} auth
- * @param {string} auth.user - Name of the user
- * @param {string} auth.apiKey - API key used to authenticate against CARTO
+ * @param {Object} auth
+ * @param {String} auth.username - Name of the user. For backwards compatibility also `auth.user` is allowed
+ * @param {String} auth.apiKey - API key used to authenticate against CARTO
  *
  * @memberof carto
  * @api
@@ -20,7 +20,7 @@ function setDefaultAuth (auth) {
 
 /**
  * Get default authentication
- * @return {object}
+ * @return {Object}
  */
 function getDefaultAuth () {
     return defaultAuth;
@@ -36,7 +36,7 @@ function cleanDefaultAuth () {
 /**
  * Check a valid auth parameter.
  *
- * @param  {object} auth
+ * @param  {Object} auth
  */
 function checkAuth (auth) {
     if (util.isUndefined(auth)) {
@@ -45,7 +45,7 @@ function checkAuth (auth) {
     if (!util.isObject(auth)) {
         throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'auth' property must be an object.`);
     }
-    auth.username = auth.user; // API adapter
+    auth.username = util.isUndefined(auth.username) ? auth.user : auth.username; // backwards compatibility
     checkApiKey(auth.apiKey);
     checkUsername(auth.username);
 }

@@ -10,8 +10,8 @@ const programCache = new Cache();
  * Use a cache to improve speed.
  *
  * @param {WebGLRenderingContext} gl - The context where the program will be executed
- * @param {string} glslvertexShader - vertex shader code
- * @param {string} glslfragmentShader - fragment shader code
+ * @param {String} glslvertexShader - vertex shader code
+ * @param {String} glslfragmentShader - fragment shader code
  */
 export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     const code = glslvertexShader + glslfragmentShader;
@@ -77,8 +77,6 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
     shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
 
-    shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
-    shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
     shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
@@ -88,6 +86,7 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
     shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
+    shader.matrix = gl.getUniformLocation(shader.program, 'matrix');
 
     return shader;
 }

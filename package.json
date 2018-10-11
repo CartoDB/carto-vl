@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "0.8.0",
+  "version": "0.9.1",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -28,21 +28,25 @@
     "dist"
   ],
   "dependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/runtime": "^7.0.0",
     "@mapbox/vector-tile": "^1.3.0",
-    "babel-loader": "^8.0.0",
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
+    "gl-matrix": "^2.8.1",
     "jsep": "CartoDB/jsep#additional-char-ids-packaged",
     "lru-cache": "^4.1.1",
     "mitt": "^1.1.3",
     "pbf": "^3.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.0.0",
     "@carto/mapbox-gl": "0.48.0-carto1",
+    "babel-loader": "^8.0.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
+    "current-git-branch": "^1.0.1",
     "eslint": "^4.15.0",
     "eslint-config-semistandard": "^12.0.1",
     "eslint-config-standard": "^11.0.0",
@@ -112,7 +116,13 @@
     "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",
     "prepublishOnly": "./scripts/release.sh",
+    "cdn:branch:publish": "./scripts/publish-branch.sh",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
     "loc": "sloc src/ examples/"
-  }
+  },
+  "browserslist": [
+    "defaults",
+    "not ie <12",
+    "not edge <17"
+  ]
 }

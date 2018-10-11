@@ -2,9 +2,8 @@ const map = new mapboxgl.Map({
     container: 'map',
     style: 'http://localhost:5000/test/common/basemaps/voyager-gl-style.json',
     center: [-73.97720677029952, 40.77784846220871],
-    zoom: 13,
-    dragRotate: false,
-    touchZoomRotate: false
+    zoom: 13
+
 });
 
 const metadata = {
