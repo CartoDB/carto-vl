@@ -237,4 +237,4 @@ function drawHistogram() {
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---category-histogram">View my source code!</a>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---category-widget">View my source code!</a>

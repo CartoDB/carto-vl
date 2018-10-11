@@ -71,7 +71,7 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
         height="1000"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-Population-Density---Classification.html">View my source code!</a>
+    <a href="/developers/carto-vl/examples#example-population-density---classification">View my source code!</a>
 </div>
 
 ##### A note about `filter:`
@@ -118,7 +118,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
     </iframe>
 </div>
 <div style="margin-bottom: 20px !important">
-   <a href="/developers/carto-vl/examples#example-Election---basic">View my source code!</a>
+   <a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 </div>
 ##### *Others*
 
@@ -137,7 +137,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-Election---Others-Bucket">View my source code!</a>
+    <a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 </div>
 
 ##### Showing the most common categories: `top`
