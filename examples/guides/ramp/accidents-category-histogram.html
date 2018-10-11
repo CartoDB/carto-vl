@@ -50,7 +50,7 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("dot_rail_safety_data ");
+        const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
             @histogram: viewportHistogram($accident_type)
 `);

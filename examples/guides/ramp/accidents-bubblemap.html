@@ -92,7 +92,7 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("dot_rail_safety_data ");
+        const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
             width: ramp($total_damage, [0, 50])
             strokeWidth: 0.2
