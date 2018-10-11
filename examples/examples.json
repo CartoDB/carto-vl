@@ -92,8 +92,32 @@
                     "file": "guides/ramp/population-density-basic.html"
                 },
                 {
-                    "title": "Railroad accidents",
+                    "title": "Population Density - Classification",
+                    "file": "guides/ramp/population-density-classified.html"
+                },
+                {
+                    "title": "Election - basic",
+                    "file": "guides/ramp/election-basic.html"
+                },
+                {
+                    "title": "Election - Others Bucket",
+                    "file": "guides/ramp/election-others-bucket.html"
+                },
+                {
+                    "title": "Railroad accidents - top expression",
+                    "file": "guides/ramp/accidents-top.html"
+                },
+                {
+                    "title": "Railroad accidents - all types",
                     "file": "guides/ramp/accidents-all.html"
+                },
+                {
+                    "title": "Population density - colors",
+                    "file": "population-density-colors.html"
+                },
+                {
+                    "title": "Railroad accidents - bubble-map",
+                    "file": "accidents-bubblemap.html"
                 }
             ]
         },

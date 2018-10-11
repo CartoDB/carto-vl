@@ -60,7 +60,7 @@
 
     const ctx = document.getElementById('histogram').getContext('2d');
     // Define the source
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const source = new carto.source.Dataset('populated_places');
     // Define the visualization
     const viz = new carto.Viz(
     ` @color: ramp($featurecla, bold)

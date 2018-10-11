@@ -73,7 +73,7 @@
     });
 
     // Define layer
-    const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+    const source = new carto.source.Dataset('populated_places');
     const viz = new carto.Viz(`
         color: blue       // 'color' is never ignored
         width: 10         // 'width' is ignored for polygons
@@ -86,10 +86,10 @@
     layer.on('loaded', hideLoader);
 
     function usePoints(){
-      layer.update(new carto.source.Dataset('ne_10m_populated_places_simple'), viz)
+      layer.update(new carto.source.Dataset('populated_places'), viz)
     }
     function useLines(){
-      layer.update(new carto.source.Dataset('ne_10m_populated_places_simple'), viz)
+      layer.update(new carto.source.Dataset('populated_places'), viz)
     }
     function usePolygons(){
       layer.update(new carto.source.Dataset('world_borders'), viz)

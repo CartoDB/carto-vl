@@ -74,16 +74,16 @@
     // Define sources
     const allCitiesSource = new carto.source.SQL(`
       SELECT *
-        FROM ne_10m_populated_places_simple
+        FROM populated_places
     `);
     const europeanCitiesSource = new carto.source.SQL(`
       SELECT *
-        FROM ne_10m_populated_places_simple
+        FROM populated_places
         WHERE adm0name IN (SELECT admin FROM ne_adm0_europe)
     `);
     const spanishCitiesSource = new carto.source.SQL(`
       SELECT *
-        FROM ne_10m_populated_places_simple
+        FROM populated_places
         WHERE adm0name = 'Spain'
     `);
 

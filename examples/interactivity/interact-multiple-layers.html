@@ -63,7 +63,7 @@
     // Define first layer style and variables for interactivity
     const citiesSource = new carto.source.SQL(`
       SELECT *
-        FROM ne_10m_populated_places_simple
+        FROM populated_places
         WHERE adm0name IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
     const citiesViz = new carto.Viz(`

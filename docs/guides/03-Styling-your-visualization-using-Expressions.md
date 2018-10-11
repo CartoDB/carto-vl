@@ -77,6 +77,19 @@ There are multiple ways to get color expressions (expressions with type color):
 
 TODO embed examples/styling/color-spaces.html
 
+<div class="example-map">
+    <iframe
+        id="population-density-basic"
+        src="/developers/carto-vl/examples/maps/styling/color-spaces.html"
+        width="100%"
+        height="1000"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+    <a href="/developers/carto-vl/examples/guides/styling#color-spaces">View my source code!</a>
+</div>
+
+
 You can take a look at the reference for a detailed description of all color expressions.
 
 #### Transparency, alpha channel, opacity, and filtering
@@ -115,6 +128,7 @@ Once you have a `Visualization` object, you can:
         src="/developers/carto-vl/examples/guides/viz-properties/accessing-viz-properties.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
