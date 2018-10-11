@@ -74,25 +74,27 @@
         citiesLayer.addTo(map);
 
         // Display 3 variables with global aggregation functions
-        citiesLayer.on('loaded', () => {
+        function displayGlobalValues() {
             const v = citiesViz.variables;
             console.log(`
                 Maximum: ${v.g_max.value}
                 Average: ${v.g_avg.value.toFixed(0)}
                 95th percentile: ${v.g_p95.value}
             `);
-        });
+        }
+        citiesLayer.on('loaded', displayGlobalValues);
 
-        citiesLayer.on('updated', () => {
+        // Display viewport-derived values
+        function displayViewportValues() {
             const v = citiesViz.variables;
-            // Displaying values in the console
+            // In the console
             console.log(`
                 Viewport Sum: ${v.v_sum.value}
                 Viewport Max: ${v.v_max.value}
                 Viewport Min: ${v.v_min.value}
             `);
 
-            // Displaying values in the panel
+            // In the panel
             const sum = numeral(v.v_sum.value).format('0.0a');
             const highest = numeral(v.v_max.value).format('0.0a');
             const lowest = numeral(v.v_min.value).format('0.0a');
@@ -103,7 +105,8 @@
             `;
             const panelContent = document.querySelector('.js-population');
             panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
-        });
+        }
+        citiesLayer.on('updated', displayViewportValues);
 
     </script>
 </body>

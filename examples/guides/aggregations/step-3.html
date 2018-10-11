@@ -58,34 +58,27 @@
         // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
         const citiesSource = new carto.source.Dataset('populated_places');
         const citiesViz = new carto.Viz(`
-            // color: blend(gray, red, @f_isBiggest)
-            width: blend(60, 40, @f_isBiggest)
-            @g_max: globalMax($pop_max)
-            @g_avg: globalAvg($pop_max)
-            @g_p95: globalPercentile($pop_max, 95)
-            // filter: ($pop_max > @g_p95)
-            // filter: $pop_max == @g_max // biggest city is Tokyo!
-            @v_sum: viewportSum($pop_max)
-            @v_max: viewportMax($pop_max)
-            @v_min: viewportMin($pop_max)
-            @f_isBiggest: ($pop_max == @v_max)
-            resolution: 28
-            color: ramp(linear($pop_max, 0, 10000000), tealrose)
+            color: red
+            width: sqrt(clusterSum($pop_max) / 50000) + 5
+            resolution: 16
         `);
+
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
         citiesLayer.addTo(map);
 
         // Display 3 variables with global aggregation functions
-        citiesLayer.on('loaded', () => {
+        function displayGlobalValues() {
             const v = citiesViz.variables;
             console.log(`
                 Maximum: ${v.g_max.value}
                 Average: ${v.g_avg.value.toFixed(0)}
                 95th percentile: ${v.g_p95.value}
             `);
-        });
+        }
+        citiesLayer.on('loaded', displayGlobalValues);
 
-        citiesLayer.on('updated', () => {
+        // Display viewport-derived values
+        function displayViewportValues() {
             const v = citiesViz.variables;
             // Displaying values in the console
             console.log(`
@@ -105,7 +98,12 @@
             `;
             const panelContent = document.querySelector('.js-population');
             panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
-        });
+        }
+        citiesLayer.on('updated', displayViewportValues);
+
+        // Deactivate after removing viewport variables from viz
+        citiesLayer.off('loaded', displayGlobalValues)
+        citiesLayer.off('updated', displayViewportValues);
 
     </script>
 </body>

@@ -33,15 +33,17 @@ citiesLayer.addTo(map);
 
 For a review of these variables, add a `console.log` sentence once the layer has loaded:
 ```js
-citiesLayer.on('loaded', () => {
+function displayGlobalValues() {
     const v = citiesViz.variables;
     console.log(`
         Maximum: ${v.g_max.value}
         Average: ${v.g_avg.value.toFixed(0)}
         95th percentile: ${v.g_p95.value}
     `);
-});
+}
+citiesLayer.on('loaded', displayGlobalValues);
 ```
+> Creating a separated function allows easily deactivating the layer later on with `citiesLayer.off`.
 
 Global functions can be easily combined with other capabilities, such as `filter`. For example, you can display just the biggest cities in the world with this little addition to your `viz`:
 ```js
@@ -101,16 +103,17 @@ const citiesViz = new carto.Viz(`
 
 As a check, show the new variable values in the console
 ```js
-citiesLayer.on('updated', () => {
+function displayViewportValues() {
     const v = citiesViz.variables;
     console.log(`
         Viewport Sum: ${v.v_sum.value}
         Viewport Max: ${v.v_max.value}
         Viewport Min: ${v.v_min.value}
     `);
-});
+}
+citiesLayer.on('updated', displayViewportValues);
 ```
-> Move the map to see how the values get updated.
+> Move the map to see how those values get updated.
 
 Now you are going to display those values in a panel, which is pretty common, instead of just logging them to the console.
 
@@ -132,7 +135,7 @@ Add this to your **HTML** code (NOT inside the `<script>` tags), just after the 
 </aside>
 ```
 
-To improve a bit how you are going to display those big population numbers, we're going to import first a formatting library called [numeraljs](http://numeraljs.com/). So you have to add inside the `<head>` section:
+To improve a bit how you are going to display those big population numbers, we're going to import first a formatting library called [numeraljs](http://numeraljs.com/). So you have to add this inside the `<head>` section:
 ```html
 <!-- Numeral.js for number formatting -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
@@ -140,12 +143,12 @@ To improve a bit how you are going to display those big population numbers, we'r
 
 And now to let's display some interesting figures in that panel!.
 
-You should add this (back again into your JavaScript code, inside the current handler for the layer updates):
+You should add this (back again into your JavaScript code, inside the current `displayViewportValues` function attached to the layer updates):
 
 ```js
-citiesLayer.on('updated', () => {
+function displayViewportValues(){
     const v = citiesViz.variables;
-    // Displaying values in the console
+    // In the console
     console.log(`
         Viewport Sum: ${v.v_sum.value}
         Viewport Max: ${v.v_max.value}
@@ -164,12 +167,13 @@ citiesLayer.on('updated', () => {
     `;
     const panelContent = document.querySelector('.js-population');
     panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
-});
+}
+citiesLayer.on('updated', displayViewportValues);
 ```
-> Notice how we used `numeral` from the external library, and its `.format` method to display millions of people. And
+> Notice how we used `numeral` from the external library, and its `.format` method to display millions of people.
 
 
-As a nice complement, you can now change the _color_ and _size_ of the city with more population right now on the screen, using this code (replace in the current viz the `color: grey` and `width: 10` with:
+As a nice complement, you can now change the _color_ and _size_ of the city with more population on the screen using this code (replace in the current viz the `color: grey` and `width: 10` with:
 ```
 color: blend(gray, red, @f_isBiggest)
 width: blend(10, 40, @f_isBiggest)
@@ -204,16 +208,201 @@ To explore the map at full screen size, have a look at [this link](/developers/c
 
 ### Resolution
 
-When you are displaying a layer with points (and just in this case), this is an interesting property you need to know about for your viz. The resolution is a value that goes from **1 (default) to 255**, and it defines an spatial aggregation for your features.
+This is an interesting property you need to know about when you are displaying a layer with points and using CARTO backend (`carto.source.Dataset` or `carto.source.SQL`). The resolution is a value that defines an spatial aggregation for your features, and it can go from **1 pixel** (default) to **255px**.
 
-For that aggregation a grid is internally created, with the size in pixels you have indicated for the property. Any feature falling in the same cell will be aggregated into a 'clustered point', considering for its position the [centroid](https://carto.com/help/glossary/#centroid).
+For that resolution value a regular grid is internally created, with the size in pixels you have indicated. Any feature falling in the same cell will be aggregated into a 'clustered point'. That point's position will be determined by the current [centroid](https://carto.com/help/glossary/#centroid) of the features found inside each cell (aggregation placement is always set to `centroid` mode).
 
-The higher is the number of points and the resolution parameter, the bigger is the visual effect that can be perceived in the map.
+You can give it a try now modifying the resolution in the current viz, adding this property:
+```
+resolution: 128
+```
+> Remember, if there is no explicit value, `resolution = 1`. Common resolution values are <=16
 
-You can give it a try
+That should be enough to set the resolution and reduce the number of points, but depending on the layer it might be difficult to be perceived without further modifications. Let's add more properties to grasp the concept, removing the `filter` and changing the `width`, using this:
+```js
+const citiesViz = new carto.Viz(`
+    color: blend(gray, red, @f_isBiggest)
+    // width: blend(10, 40, @f_isBiggest)
+    width: 5 * clusterCount()
+    @g_max: globalMax($pop_max)
+    @g_avg: globalAvg($pop_max)
+    @g_p95: globalPercentile($pop_max, 95)
+    // filter: ($pop_max > @g_p95)
+    // filter: $pop_max == @g_max // biggest city is Tokyo!
+    @v_sum: viewportSum($pop_max)
+    @v_max: viewportMax($pop_max)
+    @v_min: viewportMin($pop_max)
+    @f_isBiggest: ($pop_max == @v_max)
+    resolution: 128
+`);
+```
+> `clusterCount` is the number of points aggregated inside each cluster. You'll know more about these clustered functions in the next section.
 
-> TIP: If you are using a lot of points in your visualization and the current symbols overlap, changing the resolution is a way to improve the rendering, specially when in a low zoom level, because you'll get less points by clustering them.
+
+>**Tip**: if you are using a lot of points in your visualization and the current symbols overlap, changing the resolution can be a way to improve the rendering, specially in a low zoom level, because you'll get less points by clustering them. The resolution is always a balance between spatial accuracy and readability.
 
 
 ### Clustering aggregations
-The last group of aggregation functions is the one related to clusters.
+The last group of aggregation functions is the one about clusters, which are related to the previous concept of resolution and spatial aggregations.
+
+This is the set of available operations, pretty similar to the corresponding `global` and `viewport`, which are:
+- `clusterMin`
+- `clusterMax`
+- `clusterSum`
+- `clusterCount`
+- `clusterAvg`
+- `clusterMode`: aggregate into points using the mode. This makes sense using a _Category_ type of property.
+
+Now let's use a pretty useful one as an example, the `clusterSum`, using it to build the symbol's size (`width` property).
+
+You could replace current `width: 5 * clusterCount()` with:
+```
+width: sqrt(clusterSum($pop_max) / 5000) + 5
+```
+> In this expression the aggregated population in the cluster is used to determine the circle size (helped with some maths to manually adjust values to pixels).
+
+But if you just replace that property in the current viz configuration, you'll get a `CartoValidationError: [Incorrect value]: Incompatible combination of cluster aggregation usages`, because you are mixing aggregated and unaggregated usages of the same property *pop_max*. So it is better if you just simplify the viz.
+
+Change your viz code to this:
+```js
+const citiesViz = new carto.Viz(`
+    color: red
+    width: sqrt(clusterSum($pop_max) / 50000) + 5
+    resolution: 16
+`);
+```
+
+And to fix some errors caused by the lack of previous variables, deactive these handlers:
+```js
+citiesLayer.off('loaded', displayGlobalValues)
+citiesLayer.off('updated', displayViewportValues);
+```
+
+---
+
+Congrats, you made your way through this guide!. This is the result:
+<div class="example-map">
+    <iframe
+        id="guides-aggregations-step-3"
+        src="/developers/carto-vl/examples/maps/guides/aggregations/step-3.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
+
+This is the complete code:
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+
+    <!-- Numeral.js for number formatting -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
+</head>
+
+<body>
+    <!-- Add map container -->
+    <div id="map"></div>
+    <!-- Add panel -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Population</h1>
+            </header>
+            <section class="open-sans">
+                <div class="separator"></div>
+                <div class="js-population">
+                    <!-- updated content will be displayed here -->
+                </div>
+            </section>
+        </div>
+    </aside>
+
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2
+        });
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+
+        //** CARTO VL functionality begins here **//
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
+        const citiesSource = new carto.source.Dataset('populated_places');
+        const citiesViz = new carto.Viz(`
+            color: red
+            width: sqrt(clusterSum($pop_max) / 50000) + 5
+            resolution: 16
+        `);
+
+        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        citiesLayer.addTo(map);
+
+        // Display 3 variables with global aggregation functions
+        function displayGlobalValues() {
+            const v = citiesViz.variables;
+            console.log(`
+                Maximum: ${v.g_max.value}
+                Average: ${v.g_avg.value.toFixed(0)}
+                95th percentile: ${v.g_p95.value}
+            `);
+        }
+        citiesLayer.on('loaded', displayGlobalValues);
+
+        // Display viewport-derived values
+        function displayViewportValues() {
+            const v = citiesViz.variables;
+            // Displaying values in the console
+            console.log(`
+                Viewport Sum: ${v.v_sum.value}
+                Viewport Max: ${v.v_max.value}
+                Viewport Min: ${v.v_min.value}
+            `);
+
+            // Displaying values in the panel
+            const sum = numeral(v.v_sum.value).format('0.0a');
+            const highest = numeral(v.v_max.value).format('0.0a');
+            const lowest = numeral(v.v_min.value).format('0.0a');
+            const html = `
+                <h2>${sum}</h2>
+                <p>The city with less population in the map has <strong>${lowest}</strong>
+                    and the biggest has <strong style='color:red;'>${highest}</strong> people</p>
+            `;
+            const panelContent = document.querySelector('.js-population');
+            panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
+        }
+        citiesLayer.on('updated', displayViewportValues);
+
+        // Deactivate after removing viewport variables from viz
+        citiesLayer.off('loaded', displayGlobalValues)
+        citiesLayer.off('updated', displayViewportValues);
+
+    </script>
+</body>
+
+</html>
+```
