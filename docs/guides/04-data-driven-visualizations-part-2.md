@@ -15,6 +15,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples/#example-railroad-accidents---bubble-map">View my source code!</a>
 
 ##### The `ramp` way
 
@@ -71,6 +72,7 @@ The last supported type of value for `ramp` is the `Image` type. Let's see some 
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
 
 As you can see, the features that weren't specified in the `buckets` list received the color gray and were represented with circles. As discussed above, this *others bucket* receive default values, but they can be overridden, even when working with images. Let's see that:
 ```

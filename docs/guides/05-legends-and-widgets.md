@@ -28,6 +28,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples/#example-legends---unclassified-numerical-data">View my source code!</a>
 
 
 #### Categorical data
@@ -42,6 +43,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples/#example-legends---categorical-data">View my source code!</a>
 
 ##### Showing images
 
@@ -55,6 +57,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
 
 ### Widgets
 
@@ -108,6 +111,7 @@ You can see all together on this example:
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---widgets">View my source code!</a>
 
 ##### Histograms: distribution of data
 
@@ -181,6 +185,7 @@ Let's see the full example!
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---numeric-histogram">View my source code!</a>
 
 ##### Categorical histograms: how many votes did each party receive?
 
@@ -224,7 +229,7 @@ function drawHistogram() {
 
 <div class="example-map">
     <iframe
-        id="accidents-numeric-histogram"
+        id="accidents-category-histogram"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-category-histogram.html"
         width="100%"
         height="800"
@@ -232,3 +237,4 @@ function drawHistogram() {
         frameBorder="0">
     </iframe>
 </div>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---category-histogram">View my source code!</a>
