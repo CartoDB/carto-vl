@@ -113,7 +113,8 @@
                 },
                 {
                     "title": "Population density - colors",
-                    "file": "guides/ramp/population-density-colors.html"
+                    "file": "guides/ramp/population-density-colors.html",
+                    "height": "1050"
                 },
                 {
                     "title": "Railroad accidents - bubble-map",
