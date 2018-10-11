@@ -64,13 +64,12 @@ On top on that, you can also classify the data by a fixed list of breakpoints wi
 
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="population-density-classified"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
         width="100%"
         height="1000"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples/guides/ramp/population-density-classified.html">View my source code!</a>
