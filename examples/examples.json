@@ -88,6 +88,10 @@
                     "file": "guides/viz-properties/geom-types.html"
                 },
                 {
+                    "title": "Accessing visualization properties",
+                    "file": "guides/viz-properties/accessing-viz-properties.html"
+                },
+                {
                     "title": "Population Density - basic",
                     "file": "guides/ramp/population-density-basic.html"
                 },

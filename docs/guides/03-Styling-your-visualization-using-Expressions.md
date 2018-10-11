@@ -8,13 +8,13 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/viz-properties/geom-types.html"
+        src="/developers/carto-vl/examples/maps/guides/viz-properties/geom-types.html"
         width="100%"
         height="1000"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples/guides/ramp#geom-types">View my source code!</a>
+    <a href="/developers/carto-vl/examples/#example-geometry-types">View my source code!</a>
 </div>
 
 The complete list of CARTO VL styling properties and their semantics can be seen [here](https://carto.com/developers/carto-vl/reference/#vizspec).
@@ -75,8 +75,6 @@ There are multiple ways to get color expressions (expressions with type color):
 - Other advanced expressions like color arithmetic or blending
 
 
-TODO embed examples/styling/color-spaces.html
-
 <div class="example-map">
     <iframe
         id="population-density-basic"
@@ -86,7 +84,7 @@ TODO embed examples/styling/color-spaces.html
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples/guides/styling#color-spaces">View my source code!</a>
+    <a href="/developers/carto-vl/examples#example-color-spaces">View my source code!</a>
 </div>
 
 
@@ -125,12 +123,13 @@ Once you have a `Visualization` object, you can:
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/guides/viz-properties/accessing-viz-properties.html"
+        src="/developers/carto-vl/examples/maps/guides/viz-properties/accessing-viz-properties.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#example-color-spaces">View my source code!</a>
 </div>
 
 
