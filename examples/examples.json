@@ -84,6 +84,10 @@
                     "file": "styling/scaled.html"
                 },
                 {
+                    "title": "Geometry types",
+                    "file": "guides/viz-properties/geom-types.html"
+                },
+                {
                     "title": "Population Density - basic",
                     "file": "guides/ramp/population-density-basic.html"
                 },

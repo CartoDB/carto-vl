@@ -1,10 +1,10 @@
-# Legends and Widgets
+## Legends and Widgets
 
 Most of the times, displaying data in a map without further information is meaningless. Here, we'll see two ways to enrich visualizations: legends and widgets.
 - Legends. Legends don't provide additional information, instead, they provide information about how information was displayed on the map: was the conservative party colored red or blue? or, in a bubble-map, which property is displayed by the size of each circle, and in which manner.
 - Widgets. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested in the global results of the election: how many votes did receive each party in total? how many people voted?
 
-## Legends
+### Legends
 
 In the data-driven visualization guide we had displayed multiple legends to better understand other concepts, but we didn't talk about the legends themselves.
 
@@ -16,7 +16,7 @@ With that said, we provide some examples of this so you can base your own legend
 
 To access the `getLegendData()` method you'll need a way to reference your `ramp` expression. If the `ramp` expression is the root expression of a styling property it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you'll need to use a variable, as explained in the [next subsection](##_Widgets).
 
-### Unclassified numerical data
+#### Unclassified numerical data
 
 <div class="example-map">
     <iframe
@@ -30,7 +30,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
 </div>
 
 
-### Categorical data
+#### Categorical data
 
 <div class="example-map">
     <iframe
@@ -43,7 +43,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
     </iframe>
 </div>
 
-#### Showing images
+##### Showing images
 
 <div class="example-map">
     <iframe
@@ -56,7 +56,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
     </iframe>
 </div>
 
-## Widgets
+### Widgets
 
 The first thing you need to know to create widgets is the concept of [variables](). A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myAwesomeWidgetExpression()`, how do we actually get that information?
 
@@ -82,15 +82,15 @@ myLayer.on('updated', ()=>{
 
 If, however, myAwesomeWidgetExpression was static, we could just use `myLayer.on('loaded', ()=>{...});`.
 
-### Scalars: what is the total of ...? what is the average of ...? what is the maximum ...?
+#### Scalars: what is the total of ...? what is the average of ...? what is the maximum ...?
 
-#### What is the average price in the entire dataset?
+##### What is the average price in the entire dataset?
 
 To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsglobalavg) expression.
 
 There are similar expressions for getting the minimum, the maximum, the sum, and percentiles.
 
-#### What is the average price in the features shown?
+##### What is the average price in the features shown?
 
 There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewportavg).
 
@@ -109,7 +109,7 @@ You can see all together on this example:
     </iframe>
 </div>
 
-#### Histograms: distribution of data
+##### Histograms: distribution of data
 
 CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
 
@@ -122,7 +122,7 @@ The first thing you'll need is to include Airship with:
 <script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
 ```
 
-#### Numeric histograms: what is the distribution of the price?
+##### Numeric histograms: what is the distribution of the price?
 
 After including Airship, we'll need to add the HTML tags to place our histogram:
 ```HTML
@@ -182,7 +182,7 @@ Let's see the full example!
     </iframe>
 </div>
 
-#### Categorical histograms: how many votes did each party receive?
+##### Categorical histograms: how many votes did each party receive?
 
 To make a category histogram or widget the steps are similar.
 

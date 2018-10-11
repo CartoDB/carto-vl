@@ -1,8 +1,8 @@
-# Styling your visualization using Expressions
+## Styling your visualization using Expressions
 
 CARTO VL styling is based on the concept of visualizations. A visualization is a set of styling properties and variables that are assigned expressions. Visualizations allow you to control everything from the color of features to the available properties in interactivity events.
 
-## Styling properties
+### Styling properties
 Visualizations have a fixed set of styling properties like `color` or `width` that adapt automatically to the geometry type:
 
 <div class="example-map">
@@ -20,7 +20,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 The complete list of CARTO VL styling properties and their semantics can be seen [here](https://carto.com/developers/carto-vl/reference/#vizspec).
 
 
-## What is an expression?
+### What is an expression?
 
 
 As seen above, each styling property is assigned a value that is considered to be an expression. Expressions assigned to properties that can be constants (like `red`, `#FFF`,`7`) or functions (like `sqrt`, `+`, or `ramp`).
@@ -65,7 +65,7 @@ color: 7+3
 
 For a complete list of types and valid functions, see the [reference](https://carto.com/developers/carto-vl/reference/).
 
-## Color expression basics
+### Color expression basics
 
 There are multiple ways to get color expressions (expressions with type color):
 - **Color constants** are colors defined by its name (`red`, `blue`, `white`...) or by its hexadecimal RGB(A) composition (#F88, #F88A, #F08080, #F08080A0).
@@ -79,7 +79,7 @@ TODO embed examples/styling/color-spaces.html
 
 You can take a look at the reference for a detailed description of all color expressions.
 
-### Transparency, alpha channel, opacity, and filtering
+#### Transparency, alpha channel, opacity, and filtering
 
 There are multiple ways to set the alpha channel:
 - The alpha channel when using a color constant or color constructor. You should use this whenever you can (i.e., you want to change the alpha channel of a color constant or color constructor). For example: `rgba(255,255,255,0.5)` or `#F375`.
@@ -87,7 +87,7 @@ There are multiple ways to set the alpha channel:
 - Using the `filter` property. The filter property multiplies the color alpha channel (both fill and stroke) of the features with its value. This, however, has a special semantic regarding viewport aggregation expressions. We'll look at this later.
 
 
-## Numeric and boolean expressions basics
+### Numeric and boolean expressions basics
 
 In CARTO VL numeric expressions are a first class citizen. You have access to math like `+`, `-`, `*`,`/`,`^`,`log`,`sin`... out of the box.
 
@@ -96,12 +96,12 @@ You’ll also be able to get boolean-like values within CARTO VL. Some ways to g
 We talk about boolean-like types and not just boolean types because there is no “boolean” type in CARTO VL. Every “boolean-like” type is actually emulated by the numeric type.
 This makes our boolean logic a [fuzzy boolean logic](https://en.wikipedia.org/wiki/Fuzzy_logic), making most animations (blendings) work out of the box.
 
-## Using dataset feature properties
+### Using dataset feature properties
 To refer to a dataset feature property we can use the dollar sign. For example, `$price` refers to the features property named ‘price’ in the dataset.
 
 We’ll use this extensively in the Data-driven visualization guide.
 
-## Accessing and modifying visualization properties
+### Accessing and modifying visualization properties
 
 Once a visualization has been created, you can access and modify all the styling properties through the returned [Visualization]().
 
@@ -120,7 +120,7 @@ Once you have a `Visualization` object, you can:
 </div>
 
 
-## The String and the JS Visualization APIs
+### The String and the JS Visualization APIs
 
 CARTO VL provides two equivalent and similar APIs to define visualizations. Until now, we have seen the String API which is nothing more than a small layer of syntax sugar for the JS API. In fact, internally, the usage of the String API is implemented through the usage of the public JS API.
 
@@ -153,7 +153,7 @@ Eliminates the need to access the `carto.expressions` namespace
 Accessing data properties with `$propertyName`
 Variables
 
-## Variables
+### Variables
 
 As we’ve seen, CARTO VL visualization language follows the next pattern: `property: expression`, where expression can be a constant or a function call of the form `functionName(param1, param2, …)` or a built-in infix function call like `param1/param2`.
 
@@ -161,7 +161,7 @@ The usage of variables is indeed not required for applying any of the CARTO VL s
 
 We’ll cover this topic in depth on the [Interactivity] guide.
 
-## Comparison to CSS-derived languages
+### Comparison to CSS-derived languages
 
 In contrast with cascading languages like CSS and CSS-derived languages, CARTO VL styling properties cannot be redefined based on selectors. Instead, CARTO VL expressions like `ramp` are used to select the expected values based on some input (the selector).
 
