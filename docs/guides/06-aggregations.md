@@ -14,40 +14,39 @@ For these cases, CARTO VL provides you with a set of functions automatically cal
 - `globalAvg`: calculates the average value.
 - `globalPercentile`: calculates the Nth percentile.
 
-Let's use some of them with our cities dataset. You can start as usual from a [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Take its source code and copy it to a new file called `aggregations.html`. Now you're ready to start.
+Let's use some of them with our cities dataset. You can start as usual from a [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Take its source code and copy it to a new file called `aggregations.html`. Now you are ready to start.
 
 Then create a visualization adding the cities layer and 3 variables with global functions using this code:
 ```js
 const citiesSource = new carto.source.Dataset('populated_places');
-const citiesViz = new carto.Viz(`
+const viz = new carto.Viz(`
     color: grey
     width: 10
     @g_max: globalMax($pop_max)
     @g_avg: globalAvg($pop_max)
     @g_p95: globalPercentile($pop_max, 95)
 `);
-const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+const citiesLayer = new carto.Layer('cities', citiesSource, viz);
 citiesLayer.addTo(map);
 ```
-> The use of `g_` prefix is not required but it can be useful as an indicator of a _global_ variable. Don't forget to add your credentials as usual, using `carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public'});` to be able to connect to the CARTO dataset.
+> The use of `g_` prefix is not required but it can be useful as an indicator of a _global_ variable.
 
 For a review of these variables, add a `console.log` sentence once the layer has loaded:
 ```js
 function displayGlobalValues() {
-    const v = citiesViz.variables;
     console.log(`
-        Maximum: ${v.g_max.value}
-        Average: ${v.g_avg.value.toFixed(0)}
-        95th percentile: ${v.g_p95.value}
+        Maximum: ${viz.variables.g_max.value}
+        Average: ${viz.variables.g_avg.value.toFixed(0)}
+        95th percentile: ${viz.variables.g_p95.value}
     `);
 }
 citiesLayer.on('loaded', displayGlobalValues);
 ```
-> Creating a separated function allows easily deactivating the layer later on with `citiesLayer.off`.
+> Creating a separated function allows deactivating the layer later on with `citiesLayer.off`.
 
-Global functions can be easily combined with other capabilities, such as `filter`. For example, you can display just the biggest cities in the world with this little addition to your `viz`:
+Global functions can be combined with other capabilities, such as `filter`. For example, you can display just the biggest cities in the world with this little addition to your `viz`:
 ```js
-const citiesViz = new carto.Viz(`
+const viz = new carto.Viz(`
     color: grey
     width: 10
     @g_max: globalMax($pop_max)
@@ -86,7 +85,7 @@ In an analogous way with the global ones, you have available these functions:
 
 You'll practice now to use some of them, adding several to the current viz. First, add some viewport functions to sum the population in the current view and to get the biggest and lowest population values, with this code:
 ```js
-const citiesViz = new carto.Viz(`
+const viz = new carto.Viz(`
     color: grey
     width: 10
     @g_max: globalMax($pop_max)
@@ -104,11 +103,10 @@ const citiesViz = new carto.Viz(`
 As a check, show the new variable values in the console
 ```js
 function displayViewportValues() {
-    const v = citiesViz.variables;
     console.log(`
-        Viewport Sum: ${v.v_sum.value}
-        Viewport Max: ${v.v_max.value}
-        Viewport Min: ${v.v_min.value}
+        Viewport Sum: ${viz.variables.v_sum.value}
+        Viewport Max: ${viz.variables.v_max.value}
+        Viewport Min: ${viz.variables.v_min.value}
     `);
 }
 citiesLayer.on('updated', displayViewportValues);
@@ -147,26 +145,25 @@ You should add this (back again into your JavaScript code, inside the current `d
 
 ```js
 function displayViewportValues(){
-    const v = citiesViz.variables;
     // In the console
     console.log(`
-        Viewport Sum: ${v.v_sum.value}
-        Viewport Max: ${v.v_max.value}
-        Viewport Min: ${v.v_min.value}
+        Viewport Sum: ${viz.variables.v_sum.value}
+        Viewport Max: ${viz.variables.v_max.value}
+        Viewport Min: ${viz.variables.v_min.value}
     `);
 
     // NEW CODE HERE...>>>
     // Displaying values in the panel
-    const sum = numeral(v.v_sum.value).format('0.0a');
-    const highest = numeral(v.v_max.value).format('0.0a');
-    const lowest = numeral(v.v_min.value).format('0.0a');
+    const sum = numeral(viz.variables.v_sum.value).format('0.0a');
+    const highest = numeral(viz.variables.v_max.value).format('0.0a');
+    const lowest = numeral(viz.variables.v_min.value).format('0.0a');
     const html = `
         <h2>${sum}</h2>
         <p>The city with less population in the map has <strong>${lowest}</strong>
             and the biggest has <strong style='color:red;'>${highest}</strong> people</p>
     `;
     const panelContent = document.querySelector('.js-population');
-    panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
+    panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
 }
 citiesLayer.on('updated', displayViewportValues);
 ```
@@ -220,7 +217,7 @@ resolution: 128
 
 That should be enough to set the resolution and reduce the number of points, but depending on the layer it might be difficult to be perceived without further modifications. Let's add more properties to grasp the concept, removing the `filter` and changing the `width`, using this:
 ```js
-const citiesViz = new carto.Viz(`
+const viz = new carto.Viz(`
     color: blend(gray, red, @f_isBiggest)
     // width: blend(10, 40, @f_isBiggest)
     width: 5 * clusterCount()
@@ -265,7 +262,7 @@ But if you just replace that property in the current viz configuration, you'll g
 
 Change your viz code to this:
 ```js
-const citiesViz = new carto.Viz(`
+const viz = new carto.Viz(`
     color: red
     width: sqrt(clusterSum($pop_max) / 50000) + 5
     resolution: 16
@@ -353,47 +350,45 @@ This is the complete code:
 
         // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
         const citiesSource = new carto.source.Dataset('populated_places');
-        const citiesViz = new carto.Viz(`
+        const viz = new carto.Viz(`
             color: red
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
 
-        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
         citiesLayer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
-            const v = citiesViz.variables;
             console.log(`
-                Maximum: ${v.g_max.value}
-                Average: ${v.g_avg.value.toFixed(0)}
-                95th percentile: ${v.g_p95.value}
+                Maximum: ${viz.variables.g_max.value}
+                Average: ${viz.variables.g_avg.value.toFixed(0)}
+                95th percentile: ${viz.variables.g_p95.value}
             `);
         }
         citiesLayer.on('loaded', displayGlobalValues);
 
         // Display viewport-derived values
         function displayViewportValues() {
-            const v = citiesViz.variables;
-            // Displaying values in the console
+            // In the console
             console.log(`
-                Viewport Sum: ${v.v_sum.value}
-                Viewport Max: ${v.v_max.value}
-                Viewport Min: ${v.v_min.value}
+                Viewport Sum: ${viz.variables.v_sum.value}
+                Viewport Max: ${viz.variables.v_max.value}
+                Viewport Min: ${viz.variables.v_min.value}
             `);
 
-            // Displaying values in the panel
-            const sum = numeral(v.v_sum.value).format('0.0a');
-            const highest = numeral(v.v_max.value).format('0.0a');
-            const lowest = numeral(v.v_min.value).format('0.0a');
+            // In the panel
+            const sum = numeral(viz.variables.v_sum.value).format('0.0a');
+            const highest = numeral(viz.variables.v_max.value).format('0.0a');
+            const lowest = numeral(viz.variables.v_min.value).format('0.0a');
             const html = `
                 <h2>${sum}</h2>
                 <p>The city with less population in the map has <strong>${lowest}</strong>
                     and the biggest has <strong style='color:red;'>${highest}</strong> people</p>
             `;
             const panelContent = document.querySelector('.js-population');
-            panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
+            panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
         }
         citiesLayer.on('updated', displayViewportValues);
 

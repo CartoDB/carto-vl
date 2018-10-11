@@ -40,7 +40,7 @@
 
         // GLOBAL AGGREGATIONS
         const citiesSource = new carto.source.Dataset('populated_places');
-        const citiesViz = new carto.Viz(`
+        const viz = new carto.Viz(`
             color: grey
             width: 10
             @g_max: globalMax($pop_max)
@@ -49,16 +49,15 @@
             filter: ($pop_max > @g_p95)
             // filter: $pop_max == @g_max // biggest city is Tokyo!
         `);
-        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
         citiesLayer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
-            const v = citiesViz.variables;
             console.log(`
-                Maximum: ${v.g_max.value}
-                Average: ${v.g_avg.value.toFixed(0)}
-                95th percentile: ${v.g_p95.value}
+                Maximum: ${viz.variables.g_max.value}
+                Average: ${viz.variables.g_avg.value.toFixed(0)}
+                95th percentile: ${viz.variables.g_p95.value}
             `);
         }
         citiesLayer.on('loaded', displayGlobalValues);

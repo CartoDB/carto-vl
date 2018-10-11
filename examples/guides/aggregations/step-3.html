@@ -57,47 +57,45 @@
 
         // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
         const citiesSource = new carto.source.Dataset('populated_places');
-        const citiesViz = new carto.Viz(`
+        const viz = new carto.Viz(`
             color: red
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
 
-        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
         citiesLayer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
-            const v = citiesViz.variables;
             console.log(`
-                Maximum: ${v.g_max.value}
-                Average: ${v.g_avg.value.toFixed(0)}
-                95th percentile: ${v.g_p95.value}
+                Maximum: ${viz.variables.g_max.value}
+                Average: ${viz.variables.g_avg.value.toFixed(0)}
+                95th percentile: ${viz.variables.g_p95.value}
             `);
         }
         citiesLayer.on('loaded', displayGlobalValues);
 
         // Display viewport-derived values
         function displayViewportValues() {
-            const v = citiesViz.variables;
             // Displaying values in the console
             console.log(`
-                Viewport Sum: ${v.v_sum.value}
-                Viewport Max: ${v.v_max.value}
-                Viewport Min: ${v.v_min.value}
+                Viewport Sum: ${viz.variables.v_sum.value}
+                Viewport Max: ${viz.variables.v_max.value}
+                Viewport Min: ${viz.variables.v_min.value}
             `);
 
             // Displaying values in the panel
-            const sum = numeral(v.v_sum.value).format('0.0a');
-            const highest = numeral(v.v_max.value).format('0.0a');
-            const lowest = numeral(v.v_min.value).format('0.0a');
+            const sum = numeral(viz.variables.v_sum.value).format('0.0a');
+            const highest = numeral(viz.variables.v_max.value).format('0.0a');
+            const lowest = numeral(viz.variables.v_min.value).format('0.0a');
             const html = `
                 <h2>${sum}</h2>
                 <p>The city with less population in the map has <strong>${lowest}</strong>
                     and the biggest has <strong style='color:red;'>${highest}</strong> people</p>
             `;
             const panelContent = document.querySelector('.js-population');
-            panelContent.innerHTML = v.v_sum.value > 0 ? html : 'There are no cities here!';
+            panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
         }
         citiesLayer.on('updated', displayViewportValues);
 
