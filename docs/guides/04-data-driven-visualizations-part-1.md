@@ -39,13 +39,12 @@ color: ramp($population_density, [black, yellow])
 
 Let's see an example with *implicit casts* and explicit linear range.
 
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
         width="100%"
         height="1000"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples#example-population-density---basic">View my source code!</a>
@@ -72,7 +71,7 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
         height="1000"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples/guides/ramp/population-density-classified.html">View my source code!</a>
+    <a href="/developers/carto-vl/examples/guides/ramp/Population-Density---Classification.html">View my source code!</a>
 </div>
 
 ##### A note about `filter:`
@@ -108,7 +107,7 @@ Buckets allows to pick some or all categories from a categorical property in a p
 //      'progressives'  <=> red
 color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])
 ```
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="election-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
@@ -117,6 +116,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#example-population-density---basic">View my source code!</a>
 </div>
 
 ##### *Others*
@@ -136,6 +136,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#Election---Others-Bucket">View my source code!</a>
 </div>
 
 ##### Showing the most common categories: `top`
@@ -155,6 +156,7 @@ Let's see this with a dataset of US railroad accidents.
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#Railroad-accidents---top-expression">View my source code!</a>
 </div>
 
 ##### Showing every category without selecting each color
@@ -172,6 +174,7 @@ For this case, we can request to see every category by putting the property as t
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#Railroad accidents---all-types">View my source code!</a>
 </div>
 
 As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input. It's difficult to distinguish colors when there are so many categories, you should try to avoid this form (to use `buckets` or `top`) when this happens.
@@ -210,4 +213,5 @@ Let's see all these options in actions!
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
+    <a href="/developers/carto-vl/examples#Population-density---colors">View my source code!</a>
 </div>
