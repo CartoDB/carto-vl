@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
+import { timeRange } from '../../../utils/util';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -63,6 +64,11 @@ export default class Linear extends BaseExpression {
             const smin = (min - inputMin) / inputDiff;
             const smax = (max - inputMin) / inputDiff;
             return (input - smin) / (smax - smin);
+        } else if (this.input.type === 'timerange') {
+            const input = this.input.eval(feature).startValue;
+            const min = timeRange(this.min.eval()).startValue;
+            const max = timeRange(this.max.eval()).endValue;
+            return (input - min) / (max - min);
         }
 
         const v = this.input.eval(feature);
@@ -83,6 +89,14 @@ export default class Linear extends BaseExpression {
             this._metadata = metadata;
 
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+        } else if (this.input.type === 'timerange') {
+            const min = this.min.eval();
+            const max = this.max.eval();
+            const smin = metadata.decode(this.input.propertyNameFor('start'), min);
+            const smax = metadata.decode(this.input.propertyNameFor('start'), max);
+            this._metadata = metadata;
+
+            this.inlineMaker = (inline) => `((${inline.input.start}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);
@@ -93,6 +107,7 @@ export default class Linear extends BaseExpression {
     }
 
     _getLegendData (config) {
+        // TODO: timerange support
         const min = this.min.eval();
         const max = this.max.eval();
         const INC = 1 / (config.samples - 1);

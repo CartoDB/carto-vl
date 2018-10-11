@@ -344,3 +344,35 @@ export function startTimeValue (iso) {
 export function endTimeValue (iso) {
     return timeValue(parseIso(iso, true));
 }
+
+class TimeRange {
+    constructor (iso) {
+        this._text = iso;
+    }
+    get text () {
+        return this._text;
+    }
+    get startValue () {
+        return startTimeValue(this._text);
+    }
+    get endValue () {
+        return endTimeValue(this._text);
+    }
+    get startDate() {
+        return msToDate(this.startValue);
+    }
+    get endDate() {
+        return msToDate(this.endValue);
+    }
+};
+
+export function timeRange (t) {
+    if (!isTimeRange(t)) {
+        t = new TimeRange(t);
+    }
+    return t;
+}
+
+export function isTimeRange(t) {
+    return t instanceof TimeRange;
+}

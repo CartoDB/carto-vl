@@ -95,6 +95,7 @@ export default class WindshaftMetadata extends MVTMetadata {
             case 'date':
                 return decodeDate(propertyValue, this.stats(propertyName));
             case 'category':
+                // TODO: if baseType === 'date' wrap in util.timeRange()
                 return this.categorizeString(baseName, propertyValue);
             case 'number':
                 return propertyValue;
