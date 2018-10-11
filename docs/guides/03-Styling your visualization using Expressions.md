@@ -5,8 +5,17 @@ CARTO VL styling is based on the concept of visualizations. A visualization is a
 ## Styling properties
 Visualizations have a fixed set of styling properties like `color` or `width` that adapt automatically to the geometry type:
 
-TODO embed example (geom-types.html)
-`
+<div class="example-map">
+    <iframe
+        id="population-density-basic"
+        src="/developers/carto-vl/examples/maps/viz-properties/geom-types.html"
+        width="100%"
+        height="1000"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+    <a href="/developers/carto-vl/examples/guides/ramp#geom-types">View my source code!</a>
+</div>
 
 The complete list of CARTO VL styling properties and their semantics can be seen [here](https://carto.com/developers/carto-vl/reference/#vizspec).
 
