@@ -1,7 +1,7 @@
 ## Using data in your visualization with Sources
 In this guide you will learn how to use different data sources for your CARTO VL visualizations. After practicing with it, you will be able to connect to your datasets in several ways, and you will know which is the better option for you.
 
-This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
+This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a basic map.
 
 After practicing with this guide, you will be able to create this CARTO VL map:
 
@@ -35,14 +35,14 @@ Now you will see how to use the main three type of sources, but first let's crea
 You can start from this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
 > To copy the source code from an example, you just have to navigate to it with your browser, click right button > `View source` and copy the whole text, from `<html>` to `</html>` tags.
 
-You can then add a simple navigation control to warm up, just after the map creation:
+You can then add a navigation control to warm up, just after the map creation:
 ```js
 const nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-left');
 ```
 
 ### Dataset
-A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a local vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a simple table at the server, with a geometry field you can map.
+A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a local vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a table at the server, with a geometry field you can map.
 
 #### Add a Dataset
 You already know how to add a `Dataset` thanks to *Getting Started* guide:
@@ -88,11 +88,11 @@ The result should look like this:
 </div>
 
 #### When to use a Dataset?
-You have a CARTO account, with several custom datasets, and you want to easily visualize one of them in a map, with all its rows.
+You have a CARTO account, with several custom datasets, and you want to visualize one of them in a map, with all its rows.
 
 
 ### GeoJSON
-A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can easily create some *.geojson* contents online at [geojson.io](http://geojson.io/).
+A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can create some *.geojson* contents online at [geojson.io](http://geojson.io/).
 
 With the next steps, you'll create a new layer with this format, in this case visualizing the main *CARTO offices*.
 
@@ -191,7 +191,7 @@ Define query, to select just the biggest cities in the world
 ```js
 const query = 'SELECT * FROM populated_places WHERE megacity = 1';
 ```
-> This is a very simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
+> This is a simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
 
 Create a SQL source:
 ```js
@@ -217,7 +217,7 @@ megacitiesLayer.addTo(map);
 ```
 
 #### When to use SQL?
-You have a CARTO account, with several custom datasets, and you want to visualize them in a layer, applying some kind of transformation to the source, from a simple filter to more advanced analysis.
+You have a CARTO account, with several custom datasets, and you want to visualize them in a layer, applying some kind of transformation to the source, from a filter to more advanced analysis.
 
 ---
 

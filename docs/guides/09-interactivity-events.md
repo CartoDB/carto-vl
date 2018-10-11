@@ -175,7 +175,7 @@ event happened (we didn't use that so far) and the list of [Features](/developer
 ### Adding pop-ups
 A very common case when creating dynamic visualizations is to display pop-ups, little emerging windows with information on the features.
 
-You can build the pop-up yourself if you want to, but using `Mapbox GL` allows you to easily reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup) in this case.
+You can build the pop-up yourself if you want to, but using `Mapbox GL` allows you to reuse [mapboxgl.Popup](https://www.mapbox.com/mapbox-gl-js/api/#popup) in this case.
 
 So let's adapt a bit the previous `featureClick` handler. You're going to add some code inside the current handler:
 ```js
