@@ -5,6 +5,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Fixed
+- Fix an error when evaluating non-feature-dependent expressions
+
+## [0.9.1] - 2018-10-09
+### Fixed
+- Fix width and strokeWidth rendering in HighDPI screens
+
+## [0.9.0] - 2018-10-09
 ### Added
 - Add `globalStandardDev` and `viewportStandardDev` classification expressions
 - New method `ramp.getLegendData`
@@ -18,16 +26,21 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `getJoinedValues` method to `viewportHistogram` expression.
 - Add support for `opacity()` with images as first parameter
 - Add `carto.basemaps` for easier use of CARTO styles
+- Support pitch and bearing (aka rotation/tilt)
+- Allow `username` in auth, keeping compatibility with `user`.
 
 ### Changed
 - Use an optional third parameter in `ramp` expression to override the default value for "others"
 - Simplified `CartoError` and new specific error types
+- Remove `carto.Map` (used just for tests).
+- New build using Babel.
 
 ### Fixed
 - Fix symbol override
 - Fix `blendTo` with `circle` SVG
 - Fix small error with color output in `ramp`
 - Fix `top()` with non MapsAPI sources
+- Fix `isNaN` expression failing in Windows 10
 
 ## [0.8.0] - 2018-09-07
 ### Added

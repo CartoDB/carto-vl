@@ -35,11 +35,9 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 30],
-      zoom: 2,
+      center: [0, 0],
+      zoom: 0,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false
     });
 
     // Add zoom controls
@@ -52,7 +50,7 @@
 
     // Define user
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 

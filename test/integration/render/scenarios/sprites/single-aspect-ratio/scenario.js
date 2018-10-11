@@ -1,4 +1,4 @@
-const map = new carto.Map({
+const map = new CartoMap({
     container: 'map',
     background: 'white'
 });

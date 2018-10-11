@@ -79,7 +79,7 @@ const map = new mapboxgl.Map({
       style: carto.basemaps.voyager,
       center: [0, 30],
       zoom: 2,
-      dragRotate: false
+
     });
 ```
 
@@ -105,11 +105,11 @@ At this point you will have a basic map:
 
 In order to render data from CARTO you need to create a CARTO account and then get the necessary [credentials](/developers/fundamentals/authorization/).
 
-The first thing you need to do is [authenticate the client](/developers/carto-vl/reference/#cartosetdefaultauth) with your `user` and `apiKey`. For guides and examples, we provide a public CARTO account that you can use to try out the library:
+The first thing you need to do is [authenticate the client](/developers/carto-vl/reference/#cartosetdefaultauth) with your `username` and `apiKey`. For guides and examples, we provide a public CARTO account that you can use to try out the library:
 
 ```js
 carto.setDefaultAuth({
-    user: 'cartovl',
+    username: 'cartovl',
     apiKey: 'default_public'
 });
 ```
@@ -210,7 +210,7 @@ For more information about styling, check out the guide [Introduction to Styling
 
         // Define user
         carto.setDefaultAuth({
-            user: 'cartovl',
+            username: 'cartovl',
             apiKey: 'default_public'
         });
 

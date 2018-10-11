@@ -94,7 +94,8 @@ function writeTemplate (file, template) {
         sources: sources,
         cartovl: `http://localhost:${PORT}/dist/${bundle}.js`,
         mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
-        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
+        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css'),
+        glmatrix: `http://localhost:${PORT}/` + path.join('node_modules', 'gl-matrix', 'dist', 'gl-matrix-min.js')
     }));
 }
 

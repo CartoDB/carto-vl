@@ -10,7 +10,7 @@ module.exports = {
         library: 'carto',
         libraryTarget: 'umd'
     },
-    devtool: 'sourcemap',
+    devtool: 'source-map',
     mode: 'development',
     module: {
         rules: [

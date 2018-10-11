@@ -8,7 +8,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
  * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
- * @param {string} name - The property in the dataset that is going to be evaluated
+ * @param {String} name - The property in the dataset that is going to be evaluated
  * @return {Number|Category|Date}
  *
  * @example <caption>Display only cities with name different from "London".</caption>
@@ -58,7 +58,9 @@ export default class Property extends BaseExpression {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
 
-        return feature[this.name];
+        return feature[this.name] && feature[this.name] === Number.MIN_SAFE_INTEGER
+            ? Number.NaN
+            : feature[this.name];
     }
 
     toString () {

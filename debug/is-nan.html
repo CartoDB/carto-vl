@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>External GeoJSON layer | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../dist/carto-vl.js"></script>
+  <!-- <script src="https://libs.cartocdn.com/carto-vl/v0.8.0/carto-vl.min.js"></script> -->
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link href="https://carto.com/developers/carto-vl/examples/maps/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>External GeoJSON layer</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Add one external GeoJSON layer to your map</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-77.04, 38.89],
+      zoom: 9,
+      scrollZoom: true
+    });
+
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    const data = {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "type": "Feature",
+          "properties": {
+            "value": 10
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -77.12911152370515,
+              38.79930767201779
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -77.16797018042666,
+              38.766521892689916
+            ]
+          }
+        },
+        {
+          "type": "Feature",
+          "properties": {
+          },
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              -77.01586821694521,
+              38.885072355144786
+            ]
+          }
+        }
+      ]
+    };
+
+    const source = new carto.source.GeoJSON(data);
+    const viz = new carto.Viz(`
+  width:20
+  filter: isNaN($value)
+`);
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map);
+    layer.on('loaded', hideLoader);
+
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

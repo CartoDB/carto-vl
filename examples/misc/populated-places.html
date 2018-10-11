@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Populated places | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,24 +13,29 @@
   <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <ul>
-      <li>
-        <input type="radio" name="pop" onclick="setAll()" id="all" checked>
-        <label for="all">All places<label>
-      </li>
-      <li>
-        <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
-        <label for="most">Very populated places</label>
-      </li>
-      <li>
-        <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
-        <label for="less">Less populated places</label>
-      </li>
-    </ul>
-  </div>
+  <aside class="toolbox">
+    <div class="box">
+      <div id="controls">
+        <ul>
+          <li>
+            <input type="radio" name="pop" onclick="setAll()" id="all" checked>
+            <label for="all">All places<label>
+          </li>
+          <li>
+            <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
+            <label for="most">Very populated places</label>
+          </li>
+          <li>
+            <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
+            <label for="less">Less populated places</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -37,8 +43,6 @@
       center: [0, 30],
       zoom: 2,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -47,7 +51,7 @@
     map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
@@ -93,4 +97,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -95,8 +95,7 @@ let map = new mapboxgl.Map({
     container: 'map',
     style: { version: 8, sources: {}, layers: [] },
     center: [0, 0],
-    zoom: 0,
-    dragRotate: false
+    zoom: 0
 });
 
 map.touchZoomRotate.disableRotation();
@@ -245,7 +244,7 @@ function setConfig (input) {
 const superRefresh = (opts) => {
     const sourceType = document.querySelector('input[name="source"]:checked').value;
     const sourceAuth = {
-        user: document.getElementById('user').value,
+        username: document.getElementById('user').value,
         apiKey: 'default_public'
     };
 
@@ -458,8 +457,8 @@ function generateSnippet (config) {
                 style: '${basemap}',
                 center: [${center.lng}, ${center.lat}],
                 zoom: ${zoom},
-                dragRotate: false,
-                touchZoomRotate: false
+
+
             });
 
             carto.setDefaultConfig({
@@ -467,7 +466,7 @@ function generateSnippet (config) {
             });
 
             carto.setDefaultAuth({
-                user: '${username}',
+                username: '${username}',
                 apiKey: '${apiKey}'
             });
 

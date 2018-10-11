@@ -7,9 +7,17 @@ describe('api/layer', () => {
     let viz, viz2;
 
     beforeEach(() => {
-        source = new Dataset('ne_10m_populated_places_simple', {
-            user: 'test',
-            apiKey: '1234567890'
+        source = new GeoJSON({
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': [
+                    [-64.73, 32.31],
+                    [-80.19, 25.76],
+                    [-66.09, 18.43],
+                    [-64.73, 32.31]
+                ]
+            }
         });
         viz = new Viz();
         viz2 = new Viz();
@@ -45,7 +53,7 @@ describe('api/layer', () => {
 
             expect(() => {
                 new Layer('layer0', {});
-            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source.Base".');
+            }).toThrowError(cvt.INCORRECT_TYPE + ' The given object is not a valid \'source\'. See "carto.source".');
         });
 
         it('should throw an error if viz is not valid', () => {
@@ -69,7 +77,7 @@ describe('api/layer', () => {
     describe('cloning the source', () => {
         it('should be done with Dataset sources', () => {
             const source = new Dataset('ne_10m_populated_places_simple', {
-                user: 'test',
+                username: 'test',
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());
@@ -77,7 +85,7 @@ describe('api/layer', () => {
         });
         it('should be done with SQL sources', () => {
             const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
-                user: 'test',
+                username: 'test',
                 apiKey: '1234567890'
             });
             const layer = new Layer('layer0', source, new Viz());
@@ -100,11 +108,13 @@ describe('api/layer', () => {
     describe('.blendToViz', () => {
         it('should resolve the promise if a valid viz is passed', (done) => {
             const layer = new Layer('layer0', source, viz);
-            // Mock for _vizChanged
+            // Mocks
             layer._vizChanged = () => Promise.resolve();
-            // Mock metadata
             layer.metadata = { geomType: 'point' };
-            layer.blendToViz(viz2).then(done);
+            layer._context = Promise.resolve(null);
+            layer._compileShaders = () => {
+                layer.blendToViz(viz2).then(done);
+            };
         });
         it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
