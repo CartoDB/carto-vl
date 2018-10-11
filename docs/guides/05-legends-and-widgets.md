@@ -20,7 +20,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
 
 <div class="example-map">
     <iframe
-        id="accidents-numeric-histogram"
+        id="legend-number"
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
         width="100%"
         height="500"
@@ -34,7 +34,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
 
 <div class="example-map">
     <iframe
-        id="accidents-numeric-histogram"
+        id="legend-buckets"
         src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
         width="100%"
         height="500"
@@ -47,7 +47,7 @@ To access the `getLegendData()` method you'll need a way to reference your `ramp
 
 <div class="example-map">
     <iframe
-        id="accidents-numeric-histogram"
+        id="legend-image"
         src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
         width="100%"
         height="500"

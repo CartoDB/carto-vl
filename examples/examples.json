@@ -119,6 +119,30 @@
                 {
                     "title": "Railroad accidents - bubble-map",
                     "file": "guides/ramp/accidents-bubblemap.html"
+                },
+                {
+                    "title": "Legends - Unclassified numerical data",
+                    "file": "misc/legends/legend-number.html"
+                },
+                {
+                    "title": "Legends - Categorical data",
+                    "file": "misc/legends/legend-buckets.html"
+                },
+                {
+                    "title": "Legends - Categorical data with Image markers",
+                    "file": "misc/legends/legend-image.html"
+                },
+                {
+                    "title": "Railroad accidents - Widgets",
+                    "file": "guides/ramp/accidents-widgets.html"
+                },
+                {
+                    "title": "Railroad accidents - Numeric Histogram",
+                    "file": "guides/ramp/accidents-numeric-histogram.html"
+                },
+                {
+                    "title": "Railroad accidents - Category Widget",
+                    "file": "guides/ramp/accidents-category-histogram.html"
                 }
             ]
         },
