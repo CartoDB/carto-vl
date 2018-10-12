@@ -121,11 +121,11 @@ export default class WindshaftMetadata extends MVTMetadata {
         if (type === 'category' && baseType === 'date') {
             let start = propertyValue;
             let end = propertyValues[1];
-            const [min, max] = modalMinMax('start', dimension);
-            if (min !== max) {
-                [start, end] = [start, end].map(v => min + v * (max - min));
-            }
-            return util.timeRange(start*1000, end*1000);
+            const [estart, eend] = [[start, 'start'], [end, 'end']].map(([v, mode]) => {
+                const [min, max] = modalMinMax(mode, dimension);
+                return min !== max ? min + v * (max - min) : v;
+            });
+            return util.timeRange(estart*1000, eend*1000);
         }
 
         switch (type) {
