@@ -286,7 +286,9 @@ export default class Dataframe extends DummyDataframe {
         const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
         const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
-        for (let i = 0; i < points.length; i += 6) {
+        // FIXME: points.length includes rejected points (out of tile)
+        // so we use numFeatures here, but should fix the points size
+        for (let i = 0; i < this.numFeatures*6; i += 6) {
             const featureIndex = i / 6;
 
             const feature = this.getFeature(featureIndex);
