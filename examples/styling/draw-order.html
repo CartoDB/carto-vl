@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Draw order  | CARTO</title>
+  <title>Draw order | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <!-- Include CARTO VL JS -->
@@ -13,14 +13,19 @@
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
+
+  <!-- Add map container -->
   <div id="map"></div>
+
+  <!-- Add title/legend box -->
     <aside class="toolbox">
       <div class="box">
         <header>
           <h1>Draw Order</h1>
         </header>
         <section>
-          <p class="description open-sans">How to use CARTO ordering style property</p>
+          <p class="description toolbox-text">Set the draw order of points</p>
+          <!-- Add radio button selector -->
           <div id="controls">
             <ul>
               <li>
@@ -38,31 +43,27 @@
             </ul>
           </div>
         </section>
-        <footer class="js-footer"></footer>
       </div>
     </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
-    </div>
+    
   <script>
+
+    // Add basemap and set properties
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [2.1734, 41.3851],
       zoom: 14,
       scrollZoom: false,
-
-
     });
 
+    // Add zoom controls
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
 
     // Define user
     carto.setDefaultAuth({
@@ -70,7 +71,7 @@
       apiKey: 'default_public'
     });
 
-    // Define layer
+    // Define source
     const source = new carto.source.Dataset(`
       spend_data
     `);
