@@ -2,7 +2,6 @@
 import BaseExpression from '../../base';
 import PropertyExpression from '../../basic/property';
 import { checkType, checkInstance, checkExpression, checkMaxArguments, checkStringValue } from '../../utils';
-import { timeRange } from '../../../../../utils/util';
 import * as schema from '../../../../schema';
 
 // experimental clusterTimeRange which returns a TimeRange
@@ -16,9 +15,14 @@ const SERIAL_UNITS = [
     'decade', 'century', 'millennium'
 ];
 
+// experimental: this flag enables/disables of support for the category form of the time range
+// in the GPU. (so that for example buckets, ramps could be made aware of it).
+// but it requires three dataframe properties instead of two.
+const CATEGORY_SUPPORT = false;
+
 export default class clusterTimeRange extends BaseExpression {
     constructor (property, units, timezone) {
-        const expressionName = expressionName;
+        const expressionName = 'clusterTimeRange';
         checkMaxArguments(arguments, 3, expressionName);
         super({ property });
         checkExpression(expressionName, 'property', 0, property);
@@ -30,9 +34,9 @@ export default class clusterTimeRange extends BaseExpression {
                 timezone
             },
             format: 'iso'
-        },
+        };
         this._dimension.propertyName = schema.column.dimColumn(this.property.name, units);
-        this.type = 'timerange'
+        this.type = 'timerange';
         this._expressionName = expressionName;
     }
 
@@ -49,11 +53,12 @@ export default class clusterTimeRange extends BaseExpression {
     }
 
     get propertyName () {
+        // return this.propertyNameFor('start');
         return this.propertyNameFor(null);
     }
 
     eval (feature) {
-        return timeRange(feature[this.propertyName]);
+        return feature[this.propertyName];
     }
 
     _bindMetadata (metadata) {
@@ -68,9 +73,9 @@ export default class clusterTimeRange extends BaseExpression {
         return {
             preface: '',
             inline: {
+                text: CATEGORY_SUPPORT ? `${getGLSLforProperty(this.propertyNameFor(null))}` : undefined,
                 start: `${getGLSLforProperty(this.propertyNameFor('start'))}`,
-                end: `${getGLSLforProperty(this.propertyNameFor('end'))}`,
-                text: `${getGLSLforProperty(this.propertyName)}`
+                end: `${getGLSLforProperty(this.propertyNameFor('end'))}`
             }
         };
     }
@@ -78,8 +83,12 @@ export default class clusterTimeRange extends BaseExpression {
     _postShaderCompile () {}
 
     _getMinimumNeededSchema () {
+        const modes = ['start', 'end'];
+        if (CATEGORY_SUPPORT) {
+            modes.push(null);
+        }
         return {
-            [this.property.name]: ['start', 'end', null].map(mode => {
+            [this.property.name]: modes.map(mode => {
                 return {
                     type: 'dimension',
                     dimension: this._dimension,

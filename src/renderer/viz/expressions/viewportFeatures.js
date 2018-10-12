@@ -127,5 +127,5 @@ function _childrenFromProperties (properties) {
 }
 
 function validProperty (property) {
-    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension)  || property.isA(ClusterTimeRange);
+    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension) || property.isA(ClusterTimeRange);
 }

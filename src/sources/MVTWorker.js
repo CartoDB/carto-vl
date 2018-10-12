@@ -186,14 +186,14 @@ export class MVTWorker {
 
     _getPropertyNamesFrom (metadata) {
         const propertyNames = [];
-        for (let i = 0; i < metadata.propertyKeys.length; i++) {
-            const propertyName = metadata.propertyKeys[i];
-            const baseName = metadata.baseName(propertyName);
-            if (metadata.properties[baseName].type === 'geometry') {
-                continue;
-            }
-            propertyNames.push(propertyName);
-        }
+        metadata.propertyKeys.forEach(propKey => {
+            metadata.decodedProperties(propKey).forEach(propertyName => {
+                const baseName = metadata.baseName(propertyName);
+                if (metadata.properties[baseName].type !== 'geometry') {
+                    propertyNames.push(propertyName);
+                }
+            });
+        });
         return propertyNames;
     }
 
