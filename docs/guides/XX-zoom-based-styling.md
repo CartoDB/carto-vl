@@ -2,11 +2,11 @@
 
 An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different zoom level. At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed. 
 
-The decisions that you as the map designer make are critical to the interpretability of your map by the end user. The  zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed. 
+With any map, the decisions that you as the map designer make are critical to the interpretability of your map by the end user. The zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed. 
 
 ### What is zoom-based styling?
 
-We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, through multiple zoom levels, we can see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view. 
+We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view. 
 
 For example, major highways don’t display until zoom X and when they show, their appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
 
@@ -22,7 +22,7 @@ In this guide, we will demonstrate how this complexity has been greatly reduced 
 
 ### Getting started
 
-The zoom-based styling features that this guide covers are:
+The functionalities that we will explore in this guide are:
 - scaled()
   - How to keep symbol sizes consistent through zoom level
 - [zoomRange()](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoomrange)
@@ -30,7 +30,7 @@ The zoom-based styling features that this guide covers are:
 - [zoom()](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom)
   - How to filter the amount or type of data that is visible at each zoom
 
-We will explore each of these features independently, and then bring the concepts together to create a map that takes full advantage of zoom-based styling in CARTO VL using a [dataset of street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) in the city of Vancouver, British Columbia, Canada.
+We will explore each one independently, and then bring the concepts together to create a map that takes full advantage of zoom-based styling in CARTO VL using a [dataset of street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) in the city of Vancouver, British Columbia, Canada.
 
 At the end of the guide you will have built a visualization like this one:
 <div class="example-map">
@@ -43,14 +43,20 @@ At the end of the guide you will have built a visualization like this one:
     </iframe>
 </div>
 
-In order to start, grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Copy its source code into a new file called `interactivity.html` and test it is working fine before going on.
+### Map set-up
 
-Add a navigation control to the map, with:
-```js
-// Add zoom controls
-const nav = new mapboxgl.NavigationControl();
-map.addControl(nav, 'top-left');
-```
+Let's start by getting a working template like (TO DO)
+
+<div class="example-map">
+    <iframe
+        id="guides-interactivity-step-2"
+        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-1.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
 
 ### Map events
 It all begins with the map and sometimes you are interested in listening to some relevant events from to the **map** itself. For example you want to wait for it to load or maybe display the current map's center coordinates. In those cases, you can use a set of events already provided by the **Mapbox GL JS Map**, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach callback functions to react on them.
