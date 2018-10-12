@@ -123,7 +123,8 @@ export default class WindshaftMetadata extends MVTMetadata {
             let end = propertyValues[1];
             const [estart, eend] = [[start, 'start'], [end, 'end']].map(([v, mode]) => {
                 const [min, max] = modalMinMax(mode, dimension);
-                return min !== max ? min + v * (max - min) : v;
+                // return min !== max ? min + v * (max - min) : v;
+                return v + min;
             });
             return util.timeRange(estart*1000, eend*1000);
         }
@@ -208,9 +209,10 @@ function decodeTimeDim (propertyName, propertyValue, stats, dimension) {
         // the magnitude of the values is potentially large;
         // to prevent loss of precision in the GPU we'll remap
         // the range to 0:1
-        if (min !== max) {
-            return (propertyValue - min) / (max - min);
-        }
+        // if (min !== max) {
+        //     return (propertyValue - min) / (max - min);
+        // }
+        return propertyValue - min;
     }
     return propertyValue;
 }
