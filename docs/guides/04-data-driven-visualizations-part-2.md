@@ -1,4 +1,37 @@
+## Data-driven visualizations (part 2)
 
+### Ramp values
+
+In the previous section we talked about using different types of input for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
+
+#### Color values
+
+One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($dn, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
+- `ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`
+- `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($dn, [#00F, #F00])`
+- `ramp($dn, [blue, #F00])`
+- `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
+
+There is also another way to specify colors, and that is to use one of the built-in color palettes. We have built-in all the CARTOColors and ColorBrewer palettes. You can use them like this:
+- `ramp($dn, temps)`
+- `ramp($dn, tealrose)`
+- `ramp($dn, cb_blues)`
+
+The complete list of CARTOColors can be seen [here](https://carto.com/carto-colors/).
+
+Let's see all these options in actions!
+
+<div class="example-map">
+    <iframe
+        id="population-density-colors"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-colors.html"
+        width="100%"
+        height="1000"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+    <a href="/developers/carto-vl/examples#example-population-density---colors">View my source code!</a>
+</div>
 
 #### Numeric values / Bubble-maps
 
