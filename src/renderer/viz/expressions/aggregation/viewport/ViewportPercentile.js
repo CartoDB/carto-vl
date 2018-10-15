@@ -40,7 +40,7 @@ export default class ViewportPercentile extends ViewportAggregation {
         this._isViewport = true;
         this.percentile = implicitCast(percentile);
         this.type = 'number';
-        super.inlineMaker = inline => inline.impostor;
+        super.inlineMaker = inline => inline._impostor;
     }
 
     get value () {
@@ -49,11 +49,16 @@ export default class ViewportPercentile extends ViewportAggregation {
 
     eval (feature) {
         if (this._value === null) {
-            const percentile = _getPercentile(this.percentile.eval(feature), this._array.length);
-            const index = clamp(percentile, 0, this._array.length - 1);
-
-            this._array.sort((a, b) => a - b);
-            this._value = this._array[index];
+            const unclampedIndex = Math.floor(this.percentile.eval(feature) / 100 * this._total);
+            const index = clamp(unclampedIndex, 0, this._total - 1);
+            const array = [...this._map.entries()];
+            array.sort((a, b) => a[0] - b[0]);
+            let accum = 0;
+            for (let i = 0; i < array.length; i++) {
+                accum += array[i][1];
+                array[i][1] = accum;
+            }
+            this._value = binarySearch(array, index, 0, array.length - 1);
         }
 
         return this._value;
@@ -65,23 +70,32 @@ export default class ViewportPercentile extends ViewportAggregation {
 
     _resetViewportAgg () {
         this._value = null;
-        this._array = [];
+        this._map = new Map();
+        this._total = 0;
     }
 
     accumViewportAgg (feature) {
         const v = this.property.eval(feature);
         const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
-        for (let i = 0; i < clusterCount; i++) {
-            this._array.push(v);
-        }
+        this._map.set(v, (this._map.get(v) || 0) + clusterCount);
+        this._total += clusterCount;
     }
 
     _preDraw (...args) {
-        this.impostor.expr = this.eval();
+        this._impostor.expr = this.eval();
         super._preDraw(...args);
     }
 }
 
-function _getPercentile (value, length) {
-    return Math.floor(value / 100 * length);
+function binarySearch (array, index, begin, end) {
+    const m = Math.round((begin + end) / 2);
+    const upper = array[m][1];
+    const lower = array[m - 1][1] || 0;
+    if (index >= lower && index <= upper) {
+        return array[m][0];
+    } else if (index < lower) {
+        return binarySearch(array, index, begin, m - 1);
+    } else {
+        return binarySearch(array, index, m + 1, end);
+    }
 }
