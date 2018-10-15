@@ -14,10 +14,6 @@ export default class ViewportAggregation extends BaseExpression {
         this.inlineMaker = inline => inline._impostor;
     }
 
-    isFeatureDependent () {
-        return false;
-    }
-
     _bindMetadata (metadata) {
         // TODO improve type check
         super._bindMetadata(metadata);

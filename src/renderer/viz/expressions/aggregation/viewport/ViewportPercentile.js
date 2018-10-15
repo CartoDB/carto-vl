@@ -51,10 +51,6 @@ export default class ViewportPercentile extends ViewportAggregation {
         checkType('viewportPercentile', 'percentile', 1, 'number', this.percentile);
     }
 
-    get value () {
-        return this.eval();
-    }
-
     eval (feature) {
         if (this._value === null) {
             // See Nearest rank method: https://en.wikipedia.org/wiki/Percentile
@@ -73,10 +69,6 @@ export default class ViewportPercentile extends ViewportAggregation {
         return this._value;
     }
 
-    _getMinimumNeededSchema () {
-        return this.property._getMinimumNeededSchema();
-    }
-
     _resetViewportAgg () {
         this._value = null;
         this._map = new Map();
@@ -88,11 +80,6 @@ export default class ViewportPercentile extends ViewportAggregation {
         const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
         this._map.set(v, (this._map.get(v) || 0) + clusterCount);
         this._total += clusterCount;
-    }
-
-    _preDraw (...args) {
-        this._impostor.expr = this.eval();
-        super._preDraw(...args);
     }
 }
 
