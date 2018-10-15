@@ -1,6 +1,6 @@
 ## Aggregating data
 
-In this guide you will explore a set of functions called **aggregations** (aggr.), that will allow you to extract different values from your datasets considering the whole set of features (*global aggr.*), just the ones in the current map extent (*viewport aggr.*) or from spatial aggregations (*cluster aggr.*).
+In this guide you will explore a set of functions called **aggregations** (aggr.), that will allow you to extract different values from your datasets considering: the whole set of features (*global aggr.*), just the ones displayed in the current map extent (*viewport aggr.*) or derived from spatial aggregations (*cluster aggr.*).
 
 
 ### Global aggregations
@@ -18,7 +18,7 @@ Let's use some of them with our cities dataset. You can start as usual from a [b
 
 Then create a visualization adding the cities layer and 3 variables with global functions using this code:
 ```js
-const citiesSource = new carto.source.Dataset('populated_places');
+const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`
     color: grey
     width: 10
@@ -26,8 +26,8 @@ const viz = new carto.Viz(`
     @g_avg: globalAvg($pop_max)
     @g_p95: globalPercentile($pop_max, 95)
 `);
-const citiesLayer = new carto.Layer('cities', citiesSource, viz);
-citiesLayer.addTo(map);
+const layer = new carto.Layer('cities', source, viz);
+layer.addTo(map);
 ```
 > The use of `g_` prefix is not required but it can be useful as an indicator of a _global_ variable.
 
@@ -40,9 +40,9 @@ function displayGlobalValues() {
         95th percentile: ${viz.variables.g_p95.value}
     `);
 }
-citiesLayer.on('loaded', displayGlobalValues);
+layer.on('loaded', displayGlobalValues);
 ```
-> Creating a separated function allows deactivating the layer later on with `citiesLayer.off`.
+> Creating a separated function allows deactivating the layer later on with `layer.off`.
 
 Global functions can be combined with other capabilities, such as `filter`. For example, you can display just the biggest cities in the world with this little addition to your `viz`:
 ```js
@@ -109,7 +109,7 @@ function displayViewportValues() {
         Viewport Min: ${viz.variables.v_min.value}
     `);
 }
-citiesLayer.on('updated', displayViewportValues);
+layer.on('updated', displayViewportValues);
 ```
 > Move the map to see how those values get updated.
 
@@ -165,7 +165,7 @@ function displayViewportValues(){
     const panelContent = document.querySelector('.js-population');
     panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
 }
-citiesLayer.on('updated', displayViewportValues);
+layer.on('updated', displayViewportValues);
 ```
 > Notice how we used `numeral` from the external library, and its `.format` method to display millions of people.
 
@@ -271,8 +271,8 @@ const viz = new carto.Viz(`
 
 And to fix some errors caused by the lack of previous variables, deactive these handlers:
 ```js
-citiesLayer.off('loaded', displayGlobalValues)
-citiesLayer.off('updated', displayViewportValues);
+layer.off('loaded', displayGlobalValues)
+layer.off('updated', displayViewportValues);
 ```
 
 ---
@@ -349,15 +349,15 @@ This is the complete code:
         });
 
         // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
-        const citiesSource = new carto.source.Dataset('populated_places');
+        const source = new carto.source.Dataset('populated_places');
         const viz = new carto.Viz(`
             color: red
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
 
-        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
-        citiesLayer.addTo(map);
+        const layer = new carto.Layer('cities', source, viz);
+        layer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
@@ -367,7 +367,7 @@ This is the complete code:
                 95th percentile: ${viz.variables.g_p95.value}
             `);
         }
-        citiesLayer.on('loaded', displayGlobalValues);
+        layer.on('loaded', displayGlobalValues);
 
         // Display viewport-derived values
         function displayViewportValues() {
@@ -390,11 +390,11 @@ This is the complete code:
             const panelContent = document.querySelector('.js-population');
             panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
         }
-        citiesLayer.on('updated', displayViewportValues);
+        layer.on('updated', displayViewportValues);
 
         // Deactivate after removing viewport variables from viz
-        citiesLayer.off('loaded', displayGlobalValues)
-        citiesLayer.off('updated', displayViewportValues);
+        layer.off('loaded', displayGlobalValues)
+        layer.off('updated', displayViewportValues);
 
     </script>
 </body>

@@ -39,7 +39,7 @@
         });
 
         // GLOBAL AGGREGATIONS
-        const citiesSource = new carto.source.Dataset('populated_places');
+        const source = new carto.source.Dataset('populated_places');
         const viz = new carto.Viz(`
             color: grey
             width: 10
@@ -49,8 +49,8 @@
             filter: ($pop_max > @g_p95)
             // filter: $pop_max == @g_max // biggest city is Tokyo!
         `);
-        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
-        citiesLayer.addTo(map);
+        const layer = new carto.Layer('cities', source, viz);
+        layer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
@@ -60,7 +60,7 @@
                 95th percentile: ${viz.variables.g_p95.value}
             `);
         }
-        citiesLayer.on('loaded', displayGlobalValues);
+        layer.on('loaded', displayGlobalValues);
 
     </script>
 </body>

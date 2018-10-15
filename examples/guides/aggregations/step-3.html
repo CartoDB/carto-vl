@@ -56,15 +56,15 @@
         });
 
         // GLOBAL AGGREGATIONS + VIEWPORT AGGRS.
-        const citiesSource = new carto.source.Dataset('populated_places');
+        const source = new carto.source.Dataset('populated_places');
         const viz = new carto.Viz(`
             color: red
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
 
-        const citiesLayer = new carto.Layer('cities', citiesSource, viz);
-        citiesLayer.addTo(map);
+        const layer = new carto.Layer('cities', source, viz);
+        layer.addTo(map);
 
         // Display 3 variables with global aggregation functions
         function displayGlobalValues() {
@@ -74,7 +74,7 @@
                 95th percentile: ${viz.variables.g_p95.value}
             `);
         }
-        citiesLayer.on('loaded', displayGlobalValues);
+        layer.on('loaded', displayGlobalValues);
 
         // Display viewport-derived values
         function displayViewportValues() {
@@ -97,11 +97,11 @@
             const panelContent = document.querySelector('.js-population');
             panelContent.innerHTML = viz.variables.v_sum.value > 0 ? html : 'There are no cities here!';
         }
-        citiesLayer.on('updated', displayViewportValues);
+        layer.on('updated', displayViewportValues);
 
         // Deactivate after removing viewport variables from viz
-        citiesLayer.off('loaded', displayGlobalValues)
-        citiesLayer.off('updated', displayViewportValues);
+        layer.off('loaded', displayGlobalValues)
+        layer.off('updated', displayViewportValues);
 
     </script>
 </body>
