@@ -8,7 +8,8 @@ In the previous section we talked about using different types of input for ramp,
 
 One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($dn, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
 - `ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`
-- `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`,`ramp($dn, [#00F, #F00])`
+- `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])`
+- `ramp($dn, [#00F, #F00])`
 - `ramp($dn, [blue, #F00])`
 - `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
 
