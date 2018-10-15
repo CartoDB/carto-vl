@@ -48,10 +48,12 @@
 
         // Define Viz object and custom style
         const viz = new carto.Viz(`
-                color: white
-                width: 1
-                strokeColor: green
-                strokeWidth: 0.5    
+            @category: ramp($common_name,prism)
+
+            width: ramp(zoomRange([10,14]),[0.5,scaled(sqrt($diameter)*2,15)])
+            color: ramp(zoomRange([10,14]),[rgb(0,255,30),opacity(@category,0.8)])
+            strokeColor: ramp(zoomRange([11,14]),[black,@category])
+            strokeWidth: ramp(zoomRange([11,14,16]),[0,0.5,1])
         `);
 
         // Define map layer

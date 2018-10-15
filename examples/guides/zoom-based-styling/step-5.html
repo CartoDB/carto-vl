@@ -48,10 +48,10 @@
 
         // Define Viz object and custom style
         const viz = new carto.Viz(`
-                color: white
-                width: 1
-                strokeColor: green
-                strokeWidth: 0.5    
+                color: ramp(zoomrange([12,18]),[white,green])
+                width: ramp(zoomrange([12,18]),[1,20])
+                strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
+                strokeColor: ramp(zoomrange([12,18]),[green,white])
         `);
 
         // Define map layer

@@ -31,6 +31,10 @@
             dragRotate: false,
         });
 
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
         //** CARTO VL functionality begins here **//
 
         // Define user
@@ -43,7 +47,10 @@
         const source = new carto.source.Dataset('vancouver_trees');
 
         // Define Viz object and custom style
-        const viz = new carto.Viz();
+        const viz = new carto.Viz(`
+                color: white
+                strokeColor: green
+        `);
 
         // Define map layer
         const layer = new carto.Layer('layer', source, viz);
