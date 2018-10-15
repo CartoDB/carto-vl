@@ -39,8 +39,8 @@ color: white
 ```
 
 
-**Note: about function terminology**
-
+**Note:**
+**About function terminology**
 The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology:
  - A *function* is a transformation between inputs, the *function parameters*, to an output.
  - A *function call* is the application of the function to some values as the *function parameters*.
@@ -66,7 +66,7 @@ For a complete list of types and valid functions, see the [reference](/developer
 ### Color expression basics
 
 There are multiple ways to get color expressions (expressions whose type is `color`):
-- **Color constants** are colors defined by its name (`red`, `blue`, `white`...) or by its hexadecimal RGB(A) composition (#F88, #F88A, #F08080, #F08080A0).
+- **Color constants** are colors defined by its name (`red`, `blue`, `white`...) or by its hexadecimal RGB(A) composition (`#F88`, `#F88A`, `#F08080`, `#F08080A0`).
 - **Color constructors** are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
 - The **`opacity`** function, which overrides an input color alpha channel.
 - The **`ramp`** function, which will be introduced in the "Data Driven visualization" guide.
@@ -86,7 +86,7 @@ There are multiple ways to get color expressions (expressions whose type is `col
 </div>
 
 
-You can take a look at the reference for a detailed description of all color expressions.
+You can take a look at the [reference](/developers/carto-vl/reference/) for a detailed description of all color expressions.
 
 #### Transparency, alpha channel, opacity, and filtering
 
@@ -106,9 +106,9 @@ We talk about boolean-like types and not just boolean types because there is no 
 This makes our boolean logic a [fuzzy boolean logic](https://en.wikipedia.org/wiki/Fuzzy_logic), making most animations (blendings) work out of the box.
 
 ### Using dataset feature properties
-To refer to a dataset feature property we can use the dollar sign. For example, `$price` refers to the features property named ‘price’ in the dataset.
+To refer to a dataset feature property we can use the dollar sign. For example, `$price` refers to the feature property named ‘price’ in the dataset.
 
-We’ll use this extensively in the Data-driven visualization guide.
+We’ll use this extensively in the [Data-driven visualization guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/).
 
 ### Accessing and modifying visualization properties
 
@@ -170,7 +170,7 @@ As we’ve seen, CARTO VL visualization language follows the next pattern: `prop
 
 The usage of variables is indeed not required for applying any of the CARTO VL styling capabilities. However, it is required for [Interactivity]( /developers/carto-vl/reference/#cartointeractivity) and it can be used to simplify some visualizations.
 
-We’ll cover this topic in depth on the [Interactivity](/developers/carto-vl/guides/interactivity-events/) guide.
+We’ll cover this topic in depth on the [Interactivity guide](/developers/carto-vl/guides/interactivity-events/).
 
 ### Comparison to CSS-derived languages
 

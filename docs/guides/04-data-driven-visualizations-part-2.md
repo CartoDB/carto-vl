@@ -42,7 +42,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
         id="accidents-bubblemap"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
         width="100%"
-        height="500"
+        height="900"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
@@ -51,7 +51,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
 
 #### The `ramp` way
 
-`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
+`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same [*implicit casts*](http://ramp-guide.developers.carto-staging.com/developers/carto-vl/guides/Glossary/) we talked before will be performed.
 ```
 width: ramp($number, [0, 50])
 ```
