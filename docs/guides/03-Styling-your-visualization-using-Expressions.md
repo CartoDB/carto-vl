@@ -41,11 +41,9 @@ color: white
 
 **Note: about function terminology**
 
-The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology.
-
-A *function* is a transformation between inputs, the *function parameters*, to an output.
-
-A *function call* is the application of the function to some values as the *function parameters*.
+The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology:
+ - A *function* is a transformation between inputs, the *function parameters*, to an output.
+ - A *function call* is the application of the function to some values as the *function parameters*.
 
 
 Each expression imposes limitations on the types of expressions that can be used as its input parameters.
