@@ -39,7 +39,7 @@ color: white
 ```
 
 
-*Note: about function terminology*
+**Note: about function terminology**
 
 The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology.
 
