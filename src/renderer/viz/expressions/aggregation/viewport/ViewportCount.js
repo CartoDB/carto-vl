@@ -1,6 +1,7 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
 import { checkMaxArguments } from '../../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -42,8 +43,9 @@ export default class ViewportCount extends ViewportAggregation {
         return this.value;
     }
 
-    accumViewportAgg () {
-        this._value++;
+    accumViewportAgg (feature) {
+        const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
+        this._value += clusterCount;
     }
 
     _resetViewportAgg () {

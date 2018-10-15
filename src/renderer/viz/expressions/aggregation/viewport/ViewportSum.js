@@ -1,5 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { checkMaxArguments } from '../../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 
 /**
  * Return the sum of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -45,7 +46,8 @@ export default class ViewportSum extends ViewportAggregation {
         const propertyValue = this.property.eval(feature);
 
         if (!Number.isNaN(propertyValue)) {
-            this._value = this._value + propertyValue;
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
+            this._value = this._value + clusterCount * propertyValue;
         }
     }
 
