@@ -1,5 +1,4 @@
 import ViewportAggregation from './ViewportAggregation';
-import { number } from '../../../expressions';
 import { implicitCast, clamp, checkMaxArguments, checkType, checkExpression } from '../../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
