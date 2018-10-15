@@ -89,13 +89,13 @@ If, however, myAwesomeWidgetExpression was static, we could just use `myLayer.on
 
 ##### What is the average price in the entire dataset?
 
-To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsglobalavg) expression.
+To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](/carto-vl/reference/#cartoexpressionsglobalavg) expression.
 
 There are similar expressions for getting the minimum, the maximum, the sum, and percentiles.
 
 ##### What is the average price in the features shown?
 
-There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewportavg).
+There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](/carto-vl/reference/#cartoexpressionsviewportavg).
 
 All the _viewport*_ like expressions will take only the features that are on the viewport region and that pass the filter set in the `filter:` visualization property.
 
@@ -117,7 +117,7 @@ You can see all together on this example:
 
 CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
 
-To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](https://carto.com/developers/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
+To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
 
 The first thing you'll need is to include Airship with:
 ```html
@@ -148,7 +148,7 @@ const viz = new carto.Viz(`
     @histogram: viewportHistogram($total_damage, 1, 6)
 `);
 ```
-The [`viewportHistogram`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
+The [`viewportHistogram`](/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
 
 The second parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case, we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
 

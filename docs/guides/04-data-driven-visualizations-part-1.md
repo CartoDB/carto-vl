@@ -2,7 +2,7 @@
 
 ### What is a ramp?
 
-[`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
+[`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) is a special CARTO VL expression that outputs values based on an input. Depending on the type of the input the matching will be performed in different ways:
 - One-to-one mapping is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue,
 - Interpolation is performed otherwise, this allows to create intermediate values automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color green to the features with low population density and red to the ones with a high population density. Intermediate population densities will receive the interpolation between green, yellow and red based on how close its value is to the lowest and highest values in the dataset.
 
@@ -10,7 +10,7 @@ It's easy to create choropleth maps by using `ramp` with colors as the values. H
 
 ### Ramp inputs
 
-On the previous introduction, we talked about how [`ramp`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
+On the previous introduction, we talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
 
 The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash...).
 
@@ -27,13 +27,13 @@ color: ramp($population_density, [black, yellow])
 
  This will map the feature with the lowest population density in the Source data to *black* and the feature with the highest population density to *yellow*. You can even set intermediate colors in the color list like `[black, gray, yellow]`.
 
- Matching the input with the context of the lowest population density and highest population density is actually done by the [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($population_density, [green, yellow, red])` to `ramp(linear($population_density), [green, yellow, red])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
+ Matching the input with the context of the lowest population density and highest population density is actually done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($population_density, [green, yellow, red])` to `ramp(linear($population_density), [green, yellow, red])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
 
 ##### Overriding the default range and avoiding outliers
 
  Let's see another *implicit cast*, this time one a little bit more interesting.
 
- The [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. The second and third parameter of `linear` is what sets the context of the lowest and highest population densities for `ramp`.
+ The [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When linear is called with only one parameter it will transform things like `linear($population_density)` to things like `linear($population_density, globalMin($population_density), globalMax($population_density))`. The second and third parameter of `linear` is what sets the context of the lowest and highest population densities for `ramp`.
 
  Sometimes, the data has [outliers](https://en.wikipedia.org/wiki/Outlier): features with data that is very far away from the norm. In these cases, we may want to ignore them when computing the ramp. This can be easily done by manually setting the second and third parameters of linear to the minimum and maximum values of the data range we are interested.
 
@@ -53,13 +53,13 @@ Let's see an example with *implicit casts* and explicit linear range.
 
 ##### Classifying numerical properties
 
- Usage of [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](https://carto.com/developers/carto-vl/reference/#cartoexpressionslinear).
+ Usage of [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear).
 
 There are multiple classifying methods (quantiles, equal intervals...) and the classification can be applied to two different samples:
 - The entire dataset. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - Viewport data. `viewport*` classifiers will apply the classification only to the features that are on the viewport. This includes filtering by the `filter:` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
-On top on that, you can also classify the data by a fixed list of breakpoints with the [`buckets()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify the features by its price into 3 different categories (buckets): the features that have a price less than 10, the features that have a price between 10 and 200, and the features that have a price higher than 200. It's important to note that there is always one more category than breakpoint. The `buckets` function can also be used with categorical inputs, we'll see that on the [next section](#One_to_one_mapping._One_category_-_one_color.).
+On top on that, you can also classify the data by a fixed list of breakpoints with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify the features by its price into 3 different categories (buckets): the features that have a price less than 10, the features that have a price between 10 and 200, and the features that have a price higher than 200. It's important to note that there is always one more category than breakpoint. The `buckets` function can also be used with categorical inputs, we'll see that on the [next section](#One_to_one_mapping._One_category_-_one_color.).
 
 Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
 
@@ -91,7 +91,7 @@ As a rule of thumb, if it makes sense to apply numerical functions like addition
 
 ##### One to one mapping. One category - one color.
 
-To create a one to one mapping between categories and colors (or any other list of values) the simplest function is [`buckets`](https://carto.com/developers/carto-vl/reference/#cartoexpressionsbuckets).
+To create a one to one mapping between categories and colors (or any other list of values) the simplest function is [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets).
 
 Buckets allows to pick some or all categories from a categorical property in a particular order, allowing `ramp` to match those with the color list. Let's see it with an example:
 ```CARTOVL_Viz

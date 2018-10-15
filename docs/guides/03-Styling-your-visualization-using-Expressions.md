@@ -17,7 +17,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
     <a href="/developers/carto-vl/examples/#example-geometry-types">View my source code!</a>
 </div>
 
-The complete list of CARTO VL styling properties and their semantics can be seen [here](https://carto.com/developers/carto-vl/reference/#vizspec).
+The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
 
 ### What is an expression?
@@ -63,7 +63,7 @@ Similarly, even though the `7+3` is valid, this example would not work because a
 color: 7+3
 ```
 
-For a complete list of types and valid functions, see the [reference](https://carto.com/developers/carto-vl/reference/).
+For a complete list of types and valid functions, see the [reference](/developers/carto-vl/reference/).
 
 ### Color expression basics
 
