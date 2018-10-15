@@ -8,7 +8,7 @@ Most of the times, displaying data in a map without further information is meani
 
 In the data-driven visualization guide we had displayed multiple legends to better understand other concepts, but we didn't talk about the legends themselves.
 
-CARTO VL provides some facilities to create legends: the advanced `eval()` method, which won't be covered by this guide, and the user-friendly `getLegendData()` method, which is what we will use here.
+CARTO VL provides some facilities to create legends: the advanced `eval()` method, which won't be covered by this guide, and the user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, which is what we will use here.
 
 However, in any case, CARTO VL itself doesn't provide functionality to display legends, it provides functionality to build them upon them. CARTO VL provides the necessary data to create the legends, but using that data to draw the legends on the screen is left as a responsibility of the developer. The reason for this is that in this way, you'll be able to customize much more your application.
 

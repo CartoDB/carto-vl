@@ -23,7 +23,7 @@ The complete list of CARTO VL styling properties and their semantics can be seen
 ### What is an expression?
 
 
-As seen above, each styling property is assigned a value that is considered to be an expression. Expressions assigned to properties that can be constants (like `red`, `#FFF`,`7`) or functions (like `sqrt`, `+`, or `ramp`).
+As seen above, each styling property is assigned a value that is considered to be an expression. Expressions assigned to properties can be constants (like `red`, `#FFF`,`7`) or functions (like `sqrt`, `+`, or `ramp`).
 
 
 ```CARTO_VL_Viz
@@ -65,12 +65,12 @@ For a complete list of types and valid functions, see the [reference](/developer
 
 ### Color expression basics
 
-There are multiple ways to get color expressions (expressions with type color):
+There are multiple ways to get color expressions (expressions whose type is `color`):
 - **Color constants** are colors defined by its name (`red`, `blue`, `white`...) or by its hexadecimal RGB(A) composition (#F88, #F88A, #F08080, #F08080A0).
 - **Color constructors** are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
-- The **`opacity`** function, which overrides an input color alpha channel
+- The **`opacity`** function, which overrides an input color alpha channel.
 - The **`ramp`** function, which will be introduced in the "Data Driven visualization" guide.
-- Other advanced expressions like color arithmetic or blending
+- Other advanced expressions like color arithmetic or blending.
 
 
 <div class="example-map">
