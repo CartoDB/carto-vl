@@ -1,6 +1,6 @@
 ## Aggregating data
 
-In this guide you will explore a set of functions called **aggregations** (aggr.), that will allow you to extract different values from your datasets considering: the whole set of features (*global aggr.*), just the ones displayed in the current map extent (*viewport aggr.*) or derived from spatial aggregations (*cluster aggr.*).
+In this guide you will explore a set of functions called **aggregations** (aggr.), that will allow you to extract different values from your datasets considering the whole set of features (*global aggr.*), just the ones displayed in the current map extent (*viewport aggr.*) or those derived from spatial aggregations (*cluster aggr.*).
 
 
 ### Global aggregations
@@ -16,7 +16,7 @@ For these cases, CARTO VL provides you with a set of functions automatically cal
 
 Let's use some of them with our cities dataset. You can start as usual from a [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Take its source code and copy it to a new file called `aggregations.html`. Now you are ready to start.
 
-Then create a visualization adding the cities layer and 3 variables with global functions using this code:
+Then create a visualization adding the cities layer and 3 variables with global functions, using this code:
 ```js
 const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`
@@ -31,7 +31,7 @@ layer.addTo(map);
 ```
 > The use of `g_` prefix is not required but it can be useful as an indicator of a _global_ variable.
 
-For a review of these variables, add a `console.log` sentence once the layer has loaded:
+For a review of these variables, add a `console.log` sentence once the layer has `loaded` (to know more about _events_, have a look at the [Interactivity and events Guide](/developers/carto-vl/guides/interactivity-events/):
 ```js
 function displayGlobalValues() {
     console.log(`
@@ -81,7 +81,7 @@ In an analogous way with the global ones, you have available these functions:
 - `viewportAvg`
 - `viewportPercentile`
 
-> Obviously, the features that don't pass any possible filter you have placed (hence not visible), will be excluded from the calculations.
+> Obviously, the features that don't pass any possible filter you have set (hence not visible), will be excluded from the calculations.
 
 You'll practice now to use some of them, adding several to the current viz. First, add some viewport functions to sum the population in the current view and to get the biggest and lowest population values, with this code:
 ```js
@@ -113,7 +113,7 @@ layer.on('updated', displayViewportValues);
 ```
 > Move the map to see how those values get updated.
 
-Now you are going to display those values in a panel, which is pretty common, instead of just logging them to the console.
+Next you are going to display those values in a panel, which is pretty common, instead of just logging them to the console.
 
 Add this to your **HTML** code (NOT inside the `<script>` tags), just after the map:
 ```html
@@ -133,15 +133,15 @@ Add this to your **HTML** code (NOT inside the `<script>` tags), just after the 
 </aside>
 ```
 
-To improve a bit how you are going to display those big population numbers, we're going to import first a formatting library called [numeraljs](http://numeraljs.com/). So you have to add this inside the `<head>` section:
+To improve a bit how you are going to display those big population numbers, we're going to import first a formatting library called [numeraljs](http://numeraljs.com/). So you will have to add this inside the `<head>` section:
 ```html
 <!-- Numeral.js for number formatting -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
 ```
 
-And now to let's display some interesting figures in that panel!.
+And now let's display some interesting figures in that panel!.
 
-You should add this (back again into your JavaScript code, inside the current `displayViewportValues` function attached to the layer updates):
+You should add this code (back again into your JavaScript, inside the current `displayViewportValues` function, attached to the layer updates):
 
 ```js
 function displayViewportValues(){
@@ -167,10 +167,10 @@ function displayViewportValues(){
 }
 layer.on('updated', displayViewportValues);
 ```
-> Notice how we used `numeral` from the external library, and its `.format` method to display millions of people.
+> Notice how we have used `numeral` from the external library, and its `.format` method to display millions of people.
 
 
-As a nice complement, you can now change the _color_ and _size_ of the city with more population on the screen using this code (replace in the current viz the `color: grey` and `width: 10` with:
+As a nice complement, you can now change the _color_ and _size_ of the city with more population on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
 ```
 color: blend(gray, red, @f_isBiggest)
 width: blend(10, 40, @f_isBiggest)
@@ -181,13 +181,13 @@ And add this new variable to the same viz:
 @f_isBiggest: ($pop_max == @v_max)
 ```
 
-> Notice how `blend` works here as a convenient way to apply a conditional style, where its parameters can be interpreted as `blend(FALSE_VALUE, TRUE_VALUE, CONDITION)`. See also that we named our feature-dependent variable with a `@f_` prefix.
+> Notice how `blend` works here as a convenient way to apply a conditional style, where its parameters can be interpreted as `blend(FALSE_VALUE, TRUE_VALUE, CONDITION)`; in our case it could be read as "if the feature is the biggest (its pop_max is the maximum value in the viewport), display it in red and a bigger size". See also that we named our feature-dependent variable with a `@f_` prefix.
 
 As a test, you can temporary disable (and then enable again) the current filter, to display more cities at the same time. Just add `//` before the `filter` line in the `viz` definition, like this:
 ```
 // filter: ($pop_max > @g_p95)
 ```
-> This is a practical way to de-activate a filter without removing it from the code.
+> This is a practical way to de-activate a filter, without removing it from the code.
 
 
 At this point, you have created this great visualization, using global and viewport functions:
@@ -213,7 +213,7 @@ You can give it a try now modifying the resolution in the current viz, adding th
 ```
 resolution: 128
 ```
-> Remember, if there is no explicit value, `resolution = 1`. Common resolution values are <=16
+> Remember, if there is no explicit value, `resolution = 1`. Common resolution values are usually <=16
 
 That should be enough to set the resolution and reduce the number of points, but depending on the layer it might be difficult to be perceived without further modifications. Let's add more properties to grasp the concept, removing the `filter` and changing the `width`, using this:
 ```js
@@ -240,7 +240,7 @@ const viz = new carto.Viz(`
 
 
 ### Clustering aggregations
-The last group of aggregation functions is the one about clusters, which are related to the previous concept of resolution and spatial aggregations.
+The last group of aggregation functions is the one about clusters, which are related to the previous concept of resolution and its spatial aggregations.
 
 This is the set of available operations, pretty similar to the corresponding `global` and `viewport`, which are:
 - `clusterMin`
