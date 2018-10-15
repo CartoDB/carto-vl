@@ -1,6 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
-import { implicitCast, clamp, checkMaxArguments } from '../../utils';
+import { implicitCast, clamp, checkMaxArguments, checkType } from '../../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -34,13 +34,15 @@ export default class ViewportPercentile extends ViewportAggregation {
      */
     constructor (property, percentile) {
         checkMaxArguments(arguments, 2, 'viewportPercentile');
-
-        super({ property, _impostor: number(0) });
-
-        this._isViewport = true;
+        super({ property });
         this.percentile = implicitCast(percentile);
-        this.type = 'number';
-        super.inlineMaker = inline => inline._impostor;
+        this.childrenNames.push('percentile');
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        checkType('viewportPercentile', 'property', 0, 'number', this.property);
+        checkType('viewportPercentile', 'percentile', 1, 'number', this.percentile);
     }
 
     get value () {
