@@ -1,8 +1,8 @@
 ## Legends and Widgets
 
 Most of the times, displaying data in a map without further information is meaningless. Here, we'll see two ways to enrich visualizations: legends and widgets.
-- Legends. Legends don't provide additional information, instead, they provide information about how information was displayed on the map: was the conservative party colored red or blue? or, in a bubble-map, which property is displayed by the size of each circle, and in which manner.
-- Widgets. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested in the global results of the election: how many votes did receive each party in total? how many people voted?
+- **Legends**. Legends don't provide additional information, instead, they provide information about how information was displayed on the map: was the conservative party colored red or blue? or, in a bubble-map, which property is displayed by the size of each circle, and in which manner.
+- **Widgets**. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested in the global results of the election: how many votes did receive each party in total? how many people voted?
 
 ### Legends
 
@@ -129,7 +129,7 @@ The first thing you'll need is to include Airship with:
 ##### Numeric histograms: what is the distribution of the price?
 
 After including Airship, we'll need to add the HTML tags to place our histogram:
-```HTML
+```html
  <aside class="toolbox">
         <div class="box">
             <header>
@@ -191,7 +191,7 @@ Let's see the full example!
 
 To make a category histogram or widget the steps are similar.
 
-The Airship component is now *<as-category-widget>*:
+The Airship component is now *as-category-widget*:
 ```html
     <aside class="toolbox">
         <div class="box">

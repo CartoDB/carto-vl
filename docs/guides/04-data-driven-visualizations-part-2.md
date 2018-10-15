@@ -1,10 +1,8 @@
-## Data-driven visualizations (part 2)
-
-### Ramp values
+## Data-driven visualizations (part 2): Ramp values
 
 In the previous section we talked about using different types of input for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
 
-#### Color values
+### Color values
 
 One way to output colors is to specify a list of colors, just like we have done in all the previous examples. This can be done with expressions like `ramp($dn, [blue, red])`. But usage of named colors (`blue`, `red`, `green`...) is not enforced, any valid color expression is ok, for example:
 - `ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`
@@ -34,7 +32,7 @@ Let's see all these options in actions!
     <a href="/developers/carto-vl/examples#example-population-density---colors">View my source code!</a>
 </div>
 
-#### Numeric values / Bubble-maps
+### Numeric values / Bubble-maps
 
 When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map, each point has a width that depends on a feature property.
 
@@ -51,7 +49,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
 </div>
 <a href="/developers/carto-vl/examples/#example-railroad-accidents---bubble-map">View my source code!</a>
 
-##### The `ramp` way
+#### The `ramp` way
 
 `ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same *implicit casts* we talked [before](#Showing-raw-/-unclassified-numerical-data) will be performed.
 ```
@@ -69,7 +67,7 @@ Categorical properties can be used like before too, although normally, it doesn'
 width: ramp(buckets($cat, 'categoryA', 'categoryB'), [1, 50])
 ```
 
-##### Size perception
+#### Size perception
 Using `ramp($number, [0, 50])` works, and it probably works as expected. If `$number` is a property with a minimum of 0 and a maximum of 300 in the dataset, a feature with `$number=150` is halfway in the `linear` range. Therefore, ramp will output `50%*0+50%*50` (25).
 
 However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. Basic geometry tells us that the area of a circle is proportional to the square of its radius.
@@ -84,7 +82,7 @@ Similarly, classifiers can be re-mapped in the same way:
 width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 ```
 
-##### Direct approach when styling by a numerical property
+#### Direct approach when styling by a numerical property
 
 `ramp` is useful because it allows mapping most input to most values, interpolating the values if needed and providing implicit casts if they are convenient. However, it can be overkill when the matching is done from a numerical property to a numeric list.
 
@@ -92,7 +90,7 @@ For this case, using regular math is probably simpler and easier, while having t
 
 For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])` is equivalent to `width: sqrt($number/globalMax($number))*50`. And since sometimes we don't want to normalize by the maximum value in the dataset, this could be reduced further to get `width: sqrt($number)`.
 
-#### Images values
+### Images values
 
 The last supported type of value for `ramp` is the `Image` type. Let's see some examples:
 

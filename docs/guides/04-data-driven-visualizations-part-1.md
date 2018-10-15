@@ -82,6 +82,14 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
 
 Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
 
+We'll talk here about:
+- [Encodings](#A_note_about_encodings)
+- [One to one mapping](#One_to_one_mapping._One_category_-_one_color.)
+- [Others bucket](#*Others*)
+- [Showing the most common categories](#Showing_the_most_common_categories:_`top`)
+- [Showing every category](#Showing_every_category_without_selecting_each_color)
+- [CieLAB interpolation](#_CieLAB_interpolation)
+
 ##### A note about encodings
 
 Within CARTO VL we follow and enforce one condition:
@@ -120,6 +128,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 <div style="margin-bottom: 20px !important">
    <a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 </div>
+
 ##### *Others*
 
 When working with categories, the concept of the *others bucket* arises. For example, the buckets function picks some categories, but, what happens with the unselected categories?
