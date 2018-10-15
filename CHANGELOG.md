@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Fixed
 - Fix an error when evaluating non-feature-dependent expressions
+- Fix viewportPercentile (styling by it was broken)
+- Fix viewport* functions to take clustering into account
 
 ## [0.9.1] - 2018-10-09
 ### Fixed
