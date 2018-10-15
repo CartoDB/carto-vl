@@ -8,15 +8,14 @@
 
 It's easy to create choropleth maps by using `ramp` with colors as the values. However, `ramp` values don't need to be colors, allowing creating different and richer types of maps like bubble-maps. But, for simplicity's sake, we will stick to colors until the [Ramp Values section](#Ramp-values).
 
-### Ramp inputs
 
-On the previous introduction, we talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
+We've talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
 
 The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash...).
 
-#### Numerical properties
+### Numerical properties
 
-##### Showing unclassified numerical data
+#### Showing unclassified numerical data
 
 Going back to our previous example, it's common to want to map a continuous range of numeric data like population density data, to a continuous range of colors, for example, the range of colors between black and yellow.
 
@@ -29,7 +28,7 @@ color: ramp($population_density, [black, yellow])
 
  Matching the input with the context of the lowest population density and highest population density is actually done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is placed automatically by `ramp` when the input is a numeric property. CARTO VL `ramp` function just transforms `ramp($population_density, [green, yellow, red])` to `ramp(linear($population_density), [green, yellow, red])`. These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
 
-##### Overriding the default range and avoiding outliers
+#### Overriding the default range and avoiding outliers
 
  Let's see another *implicit cast*, this time one a little bit more interesting.
 
@@ -51,7 +50,7 @@ Let's see an example with *implicit casts* and explicit linear range.
 </div>
 
 
-##### Classifying numerical properties
+#### Classifying numerical properties
 
  Usage of [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes easier to detect patterns and improve the perception of the data, since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear).
 
@@ -74,11 +73,11 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
     <a href="/developers/carto-vl/examples#example-population-density---classification">View my source code!</a>
 </div>
 
-##### A note about `filter:`
+#### A note about `filter:`
 
 `filter:` is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
 
-#### Categorical properties
+### Categorical properties
 
 Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
 
@@ -90,14 +89,14 @@ We'll talk here about:
 - [Showing every category](#Showing_every_category_without_selecting_each_color)
 - [CieLAB interpolation](#_CieLAB_interpolation)
 
-##### A note about encodings
+#### A note about encodings
 
 Within CARTO VL we follow and enforce one condition:
 **categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them.
 
 As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
 
-##### One to one mapping. One category - one color.
+#### One to one mapping. One category - one color.
 
 To create a one to one mapping between categories and colors (or any other list of values) the simplest function is [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets).
 
@@ -129,7 +128,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
    <a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 </div>
 
-##### *Others*
+#### *Others*
 
 When working with categories, the concept of the *others bucket* arises. For example, the buckets function picks some categories, but, what happens with the unselected categories?
 
@@ -149,7 +148,7 @@ The `others` bucket will be colored gray by default. However, it's possible to o
     <a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 </div>
 
-##### Showing the most common categories: `top`
+#### Showing the most common categories: `top`
 
 If we don't care about which colors get each category, but we don't want to color every category in the dataset, we can use `top` to group all uncommon categories in the *others bucket*.
 
@@ -169,7 +168,7 @@ Let's see this with a dataset of US railroad accidents.
     <a href="/developers/carto-vl/examples#example-railroad-accidents---top-expression">View my source code!</a>
 </div>
 
-##### Showing every category without selecting each color
+#### Showing every category without selecting each color
 
 Sometimes, we don't care about the correspondence between colors and categories nor about having too many categories. This is particularly useful for getting quick feedback and exploring a dataset, but it is of reduced utility in later stages.
 
@@ -189,5 +188,5 @@ For this case, we can request to see every category by putting the property as t
 
 As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input. It's difficult to distinguish colors when there are so many categories, you should try to avoid this form (to use `buckets` or `top`) when this happens.
 
-###### CieLAB interpolation
+##### CieLAB interpolation
 The interpolation made by `ramp` is always done in the CieLAB color space. This is very important since interpolation in the sRGB color space is not the same as in the CieLAB color space. The later assures a better perception of color since the CieLAB color space models the way the human eye perceives colors. We see the interpolation of two colors colorA and colorB at 50% in the middle when the interpolation is done in CieLAB, but not necessarily if it's done in sRGB.
