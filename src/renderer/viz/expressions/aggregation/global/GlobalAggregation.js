@@ -20,10 +20,6 @@ export default class GlobalAggregation extends BaseExpression {
         return false;
     }
 
-    get value () {
-        return this._value.expr;
-    }
-
     eval () {
         return this._value.expr;
     }
