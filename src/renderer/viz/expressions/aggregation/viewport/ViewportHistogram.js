@@ -1,6 +1,7 @@
 import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
 import { checkMaxArguments, checkArray } from '../../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 
 /**
  * Generates a histogram.
@@ -66,7 +67,7 @@ export default class ViewportHistogram extends BaseExpression {
         const x = this.x.eval(feature);
 
         if (x !== undefined) {
-            const clusterCount = feature._cdb_feature_count || 1;
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
             const weight = clusterCount * this.weight.eval(feature);
             const count = this._histogram.get(x) || 0;
             this._histogram.set(x, count + weight);

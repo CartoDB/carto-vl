@@ -1,5 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { checkMaxArguments } from '../../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 
 /**
  * Return the average value of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -46,7 +47,7 @@ export default class ViewportAvg extends ViewportAggregation {
         const propertyValue = this.property.eval(feature);
 
         if (!Number.isNaN(propertyValue)) {
-            const clusterCount = feature._cdb_feature_count || 1;
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
             this._count += clusterCount;
             this._sum += clusterCount * propertyValue;
         }

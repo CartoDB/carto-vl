@@ -1,6 +1,7 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
 import { implicitCast, clamp, checkMaxArguments } from '../../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
@@ -69,7 +70,7 @@ export default class ViewportPercentile extends ViewportAggregation {
 
     accumViewportAgg (feature) {
         const v = this.property.eval(feature);
-        const clusterCount = feature._cdb_feature_count || 1;
+        const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
         for (let i = 0; i < clusterCount; i++) {
             this._array.push(v);
         }
