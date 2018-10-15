@@ -139,16 +139,16 @@ Usage of the JS API can facilitate some advanced topics, but both are equivalent
 
 In the reference documentation you’ll be able to see examples with both APIs for each expression, but let’s see some examples:
 
-```Javascript
-// Usage of the String API
+Usage of the String API:
+```js
 const viz = new carto.Viz(`
     width: 5
     color: red
 `);
 ```
 
-```Javascript
-// Usage of the JS API
+Usage of the JS API:
+```js
 const s = carto.expressions;
 const viz = new carto.Viz({
     width: 5
@@ -157,20 +157,20 @@ const viz = new carto.Viz({
 ```
 
 As you can see, the String API provides some syntax sugar for named colors. It also provides easier usage of:
-Arithmetic operators: `+, `/`, `^`...
-Boolean operators: `and`, `or`, `not`...
-Eliminates the need to access the `carto.expressions` namespace
-`#FFF` like color constants
-Accessing data properties with `$propertyName`
-Variables
+- Arithmetic operators: `+, `/`, `^`...
+- Boolean operators: `and`, `or`, `not`...
+- Eliminates the need to access the `carto.expressions` namespace
+- `#FFF` like color constants
+- Accessing data properties with `$propertyName`
+- Variables
 
 ### Variables
 
 As we’ve seen, CARTO VL visualization language follows the next pattern: `property: expression`, where expression can be a constant or a function call of the form `functionName(param1, param2, …)` or a built-in infix function call like `param1/param2`.
 
-The usage of variables is indeed not required for applying any of the CARTO VL styling capabilities. However, it is required for [Interactivity] and it can be used to simplify some visualizations.
+The usage of variables is indeed not required for applying any of the CARTO VL styling capabilities. However, it is required for [Interactivity](/developers/carto-vl/guides/interactivity-events/) and it can be used to simplify some visualizations.
 
-We’ll cover this topic in depth on the [Interactivity] guide.
+We’ll cover this topic in depth on the [Interactivity](/developers/carto-vl/guides/interactivity-events/) guide.
 
 ### Comparison to CSS-derived languages
 
