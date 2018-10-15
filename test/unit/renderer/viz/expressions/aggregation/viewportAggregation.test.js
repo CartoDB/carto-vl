@@ -119,13 +119,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
 
+            viewportPercentile = s.viewportPercentile($price, 1);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(0);
+
             viewportPercentile = s.viewportPercentile($price, 24);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
             viewportPercentile = s.viewportPercentile($price, 26);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
-
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
@@ -136,11 +139,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(1.5);
+
             viewportPercentile = s.viewportPercentile($price, 76);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
 
             viewportPercentile = s.viewportPercentile($price, 100);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(2);
+
+            viewportPercentile = s.viewportPercentile($price, 999);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
         });

@@ -1,6 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
-import { implicitCast, clamp, checkMaxArguments, checkType } from '../../utils';
+import { implicitCast, clamp, checkMaxArguments, checkType, checkExpression } from '../../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
@@ -33,9 +33,15 @@ export default class ViewportPercentile extends ViewportAggregation {
      * @param {*} percentile
      */
     constructor (property, percentile) {
+        property = implicitCast(property);
+        percentile = implicitCast(percentile);
+
+        checkExpression('viewportPercentile', 'property', 0, property);
+        checkExpression('viewportPercentile', 'percentile', 0, percentile);
         checkMaxArguments(arguments, 2, 'viewportPercentile');
+
         super({ property });
-        this.percentile = implicitCast(percentile);
+        this.percentile = percentile;
         this.childrenNames.push('percentile');
     }
 
@@ -51,7 +57,8 @@ export default class ViewportPercentile extends ViewportAggregation {
 
     eval (feature) {
         if (this._value === null) {
-            const unclampedIndex = Math.floor(this.percentile.eval(feature) / 100 * this._total);
+            // See Nearest rank method: https://en.wikipedia.org/wiki/Percentile
+            const unclampedIndex = Math.ceil(this.percentile.eval(feature) / 100 * this._total) - 1;
             const index = clamp(unclampedIndex, 0, this._total - 1);
             const array = [...this._map.entries()];
             array.sort((a, b) => a[0] - b[0]);
@@ -92,8 +99,8 @@ export default class ViewportPercentile extends ViewportAggregation {
 function binarySearch (array, index, begin, end) {
     const m = Math.round((begin + end) / 2);
     const upper = array[m][1];
-    const lower = array[m - 1][1] || 0;
-    if (index >= lower && index <= upper) {
+    const lower = (array[m - 1] || [array[m][0] - 1, 0])[1];
+    if (index >= lower && index < upper) {
         return array[m][0];
     } else if (index < lower) {
         return binarySearch(array, index, begin, m - 1);

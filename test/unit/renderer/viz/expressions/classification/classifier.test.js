@@ -51,12 +51,20 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportStandardDev', ['color', 2]);
             validateTypeErrors('viewportStandardDev', ['number', 'color']);
             validateMaxArgumentsError('viewportStandardDev', ['number', 'number-array', 'number', 'number']);
+
+            validateTypeErrors('viewportPercentile', []);
+            validateTypeErrors('viewportPercentile', ['number', 'category']);
+            validateTypeErrors('viewportPercentile', ['category', 2]);
+            validateTypeErrors('viewportPercentile', ['color', 2]);
+            validateTypeErrors('viewportPercentile', ['number', 'color']);
+            validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
         });
     });
 
     describe('type', () => {
         validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
         validateStaticType('viewportStandardDev', ['number-property', 2, 0.5], 'category');
+        validateStaticType('viewportPercentile', ['number', 'number'], 'number');
     });
 
     describe('eval', () => {
