@@ -93,7 +93,7 @@ export default class Linear extends BaseExpression {
             const min = this.min.eval();
             const max = this.max.eval();
             const smin = metadata.decode(this.input.propertyNameFor('start'), min);
-            const smax = metadata.decode(this.input.propertyNameFor('start'), max);
+            const smax = metadata.decode(this.input.propertyNameFor('end'), max);
             this._metadata = metadata;
 
             this.inlineMaker = (inline) => `((${inline.input.start}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
