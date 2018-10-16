@@ -7,14 +7,11 @@ export default class ViewportAggregation extends BaseExpression {
      * @param {*} property
      */
     constructor ({ property }) {
-        super({ property: implicitCast(property), _impostor: number(0) });
+        property = implicitCast(property);
+        super({ property, _impostor: number(0) });
         this._isViewport = true;
         this.type = 'number';
         this.inlineMaker = inline => inline._impostor;
-    }
-
-    isFeatureDependent () {
-        return false;
     }
 
     _bindMetadata (metadata) {

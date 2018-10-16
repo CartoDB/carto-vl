@@ -7,7 +7,7 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
         validateMaxArgumentsError('globalMin', ['number', 'number']);
         validateMaxArgumentsError('globalSum', ['number', 'number']);
         validateMaxArgumentsError('globalAvg', ['number', 'number']);
-        validateMaxArgumentsError('globalCount', ['number', 'number']);
+        validateMaxArgumentsError('globalCount', ['number']);
         validateMaxArgumentsError('globalPercentile', ['number', 'number', 'number']);
     });
 
@@ -20,10 +20,10 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
                     min: 0,
                     avg: 1,
                     max: 2,
-                    sum: 3,
-                    count: 4
+                    sum: 3
                 }
-            }
+            },
+            featureCount: 4
         };
 
         it('globalMin($price) should return the metadata min', () => {
@@ -50,8 +50,8 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
             expect(globalSum.value).toEqual(3);
         });
 
-        it('globalCount($price) should return the metadata count', () => {
-            const globalCount = s.globalCount($price);
+        it('globalCount() should return the metadata count', () => {
+            const globalCount = s.globalCount();
             globalCount._bindMetadata(fakeMetadata);
             expect(globalCount.value).toEqual(4);
         });
