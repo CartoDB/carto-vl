@@ -19,10 +19,9 @@ describe('src/renderer/viz/expressions/unary', () => {
             validateMaxArgumentsError('tan', ['number', 'number']);
             validateMaxArgumentsError('sign', ['number', 'number']);
             validateMaxArgumentsError('abs', ['number', 'number']);
-            validateMaxArgumentsError('isNaN', ['number', 'number']);
+            validateMaxArgumentsError('isNull', ['number', 'number']);
             validateMaxArgumentsError('not', ['number', 'number']);
             validateMaxArgumentsError('floor', ['number', 'number']);
-            validateMaxArgumentsError('isNaN', ['number', 'number']);
         });
     });
 
@@ -80,12 +79,12 @@ describe('src/renderer/viz/expressions/unary', () => {
         test('not', s.FALSE, 1);
     });
 
-    describe('isNaN', () => {
-        test('isNaN', 0, 0);
-        test('isNaN', 1.23, 0);
-        test('isNaN', s.TRUE, 0);
-        test('isNaN', s.FALSE, 0);
-        test('isNaN', Number.NaN, 1);
+    describe('isNull', () => {
+        test('isNull', 0, 0);
+        test('isNull', 1.23, 0);
+        test('isNull', s.TRUE, 0);
+        test('isNull', s.FALSE, 0);
+        test('isNull', null, 1);
     });
 
     // Helper function to test binary expressions
