@@ -190,7 +190,7 @@ We can use the results of this visual examination to set different widths by zoo
 width: ramp(zoomrange([12,18]),[1,20])
 ```
 
-This sets the width of our symbols to be `1` at zoom levels less than `12` and `20` at zoom levels greater than `18`. All other sizes (for zooms `12` through `18`) will be interpolated between the anchor sizes of `1` and `20`. You can add additional breakpoints to fine-tune your map even further.
+This sets the width of our symbols to `1` at zoom levels less than or equal to `12` and `20` at zoom levels greater than or equal to `18`. All other sizes (between zooms `12` and `18`) are interpolated between the anchor sizes of `1` and `20`. You can add additional breakpoints to fine-tune your map even further.
 
 <div class="example-map">
     <iframe
@@ -202,18 +202,23 @@ This sets the width of our symbols to be `1` at zoom levels less than `12` and `
     </iframe>
 </div>
 
-We can use the same logic to modify our `strokeWidth` by zoom:
+We can use the same logic to`strokeWidth`:
 
 ```js
 strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
 ```
 
-as well as the `color` and `strokeColor`:
+As described above for any width property, symbol sizes are interpolated between the defined zoom ranges inside of the `ramp`. This is the same behavior for color. 
+
+To demonstrate, add the style for point color and stroke color below to your map:
 
 ```js
 color: ramp(zoomrange([12,18]),[white,green])
 strokeColor: ramp(zoomrange([12,18]),[green,white])
 ```
+As you zoom in on the map, look closely at the point and stroke colors. 
+
+At zooms less than `12` the point color is `white` and the stroke color is `green`. At zooms greater than `18` we are flipping the fill and stroke colors.  You will know that you are at zoom `18` when the points are green with a white outline. As you zoom in, you will notice that there is a transition in color happening. This is where the interpoation is taking place.
 
 <div class="example-map">
     <iframe
@@ -225,11 +230,13 @@ strokeColor: ramp(zoomrange([12,18]),[green,white])
     </iframe>
 </div>
 
-While the examples above only set styles for two zooms, you can add more zoom levels and style conditions. If you want to try it out, you can add additional stops to any of the styles above.
+While the examples above only set styles for two zooms, you can add more zoom levels and style conditions. 
+
+Give it a try! Add in some additional stops to any of the styles above to see what the possibilities are.
 
 ### Set feature visibility by zoom
 
-Up until now, we have seen how to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
+Up until now, we have looked at ways to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
 
 We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
 
