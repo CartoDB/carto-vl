@@ -311,6 +311,11 @@ export default class Dataframe extends DummyDataframe {
 
             const radius = this._computePointRadius(feature, viz);
 
+            if (!viz.symbol.default) {
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                c2.x += symbolOffset[0] * radius;
+                c2.y -= symbolOffset[1] * radius;
+            }
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
                 c2.x += vizOffset.x;
