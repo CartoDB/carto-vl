@@ -1,6 +1,7 @@
 import { version } from '../../package';
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
+import WindshaftCodec from './WindshaftCodec';
 import schema from '../renderer/schema';
 import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
@@ -247,11 +248,9 @@ export default class Windshaft {
                             // TODO:
                             // we should consider eliminating this and requiring
                             // all dimensions to be used through clusterXXX functions
-                            // aggregation.dimensions[propertyName] = {
-                            //     column: propertyName
-                            // };
-                            // Old style definition, for compatibility with old tilers
-                            aggregation.dimensions[propertyName] = propertyName;
+                            aggregation.dimensions[propertyName] = {
+                                column: propertyName
+                            };
                         }
                     });
                 }
@@ -417,7 +416,8 @@ export default class Windshaft {
 
         const idProperty = 'cartodb_id';
 
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
+        const codec = new WindshaftCodec();
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty, codec });
         return metadata;
     }
 }

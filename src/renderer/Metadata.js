@@ -1,3 +1,4 @@
+import DataframeCodec from './DataframeCodec';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
@@ -5,7 +6,7 @@ export const IDENTITY = {
 };
 
 export default class Metadata {
-    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
+    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty, codec } = { properties: {} }) {
         this.properties = properties;
         this.featureCount = featureCount;
         this.sample = sample;
@@ -16,6 +17,8 @@ export default class Metadata {
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
+
+        this._codec = codec || new DataframeCodec();
 
         Object.values(properties).map(property => {
             property.categories = property.categories || [];
@@ -115,13 +118,17 @@ export default class Metadata {
     }
 
     // convert source values to internal representation
-    decode (propertyName, propertyValue) {
-        throw new Error(`Undefined decode called for ${propertyName} ${propertyValue}`);
+    encode (propertyName, propertyValue) {
+        return this._codec.encode(this, propertyName, propertyValue);
+    }
+
+    setCodec(codec) {
+        this._codec = codec;
     }
 
     // convert internal representation to user
-    encode (propertyName, propertyValue) {
-        throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`);
+    decode (propertyName, ...propertyValues) {
+        return this._codec.decode(this, propertyName, ...propertyValues);
     }
 
     stats (propertyName) {

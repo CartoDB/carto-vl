@@ -84,16 +84,17 @@ export default class Linear extends BaseExpression {
         if (this.input.type === 'date') {
             const min = this.min.eval();
             const max = this.max.eval();
-            const smin = metadata.decode(this.input.propertyName, min);
-            const smax = metadata.decode(this.input.propertyName, max);
+
+            const smin = metadata.encode(this.input.propertyName, min);
+            const smax = metadata.encode(this.input.propertyName, max);
             this._metadata = metadata;
 
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else if (this.input.type === 'timerange') {
             const min = this.min.eval();
             const max = this.max.eval();
-            const smin = metadata.decode(this.input.propertyNameFor('start'), min);
-            const smax = metadata.decode(this.input.propertyNameFor('end'), max);
+            const smin = metadata.encode(this.input.propertyNameFor('start'), min);
+            const smax = metadata.encode(this.input.propertyNameFor('end'), max);
             this._metadata = metadata;
 
             this.inlineMaker = (inline) => `((${inline.input.start}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
