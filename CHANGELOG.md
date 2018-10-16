@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Changed
 - Eliminate the need to specify a property in `globalCount()` and `viewportCount()`
-
+- Official support for unpatched Mapbox GL version 0.50
 
 ### Fixed
 - Fix an error when evaluating non-feature-dependent expressions
