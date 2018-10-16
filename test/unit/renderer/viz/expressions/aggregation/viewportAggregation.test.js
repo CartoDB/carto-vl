@@ -8,7 +8,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         validateMaxArgumentsError('viewportMin', ['number', 'number']);
         validateMaxArgumentsError('viewportSum', ['number', 'number']);
         validateMaxArgumentsError('viewportAvg', ['number', 'number']);
-        validateMaxArgumentsError('viewportCount', ['number', 'number']);
+        validateMaxArgumentsError('viewportCount', ['number']);
         validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
         validateMaxArgumentsError('viewportHistogram', ['number', 'number', 'number', 'number']);
     });
@@ -99,14 +99,8 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         });
 
         describe('viewportCount', () => {
-            it('($price) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($price);
-                fakeDrawMetadata(viewportCount);
-                expect(viewportCount.eval()).toEqual(4);
-            });
-
-            it('($nulls) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($nulls);
+            it('() should return the metadata count', () => {
+                const viewportCount = s.viewportCount();
                 fakeDrawMetadata(viewportCount);
                 expect(viewportCount.eval()).toEqual(4);
             });

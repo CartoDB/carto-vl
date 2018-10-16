@@ -6,20 +6,19 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *
- * @param {Number} input - numeric expression
- * @return {Number} Result of the aggregation
+ * @return {Number} feature count in the viewport
  *
  * @example <caption>Assign the feature count in the viewport to a variable.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   variables: {
- *      v_count: s.viewportCount(s.prop('amount'))
+ *      v_count: s.viewportCount()
  *   }
  * });
  *
  * @example <caption>Assign the feature count in the viewport to a variable. (String)</caption>
  * const viz = new carto.Viz(`
- *   \@v_count: viewportCount($amount)
+ *   \@v_count: viewportCount()
  * `);
  *
  * @memberof carto.expressions
@@ -29,10 +28,13 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  */
 export default class ViewportCount extends ViewportAggregation {
     constructor () {
-        checkMaxArguments(arguments, 1, 'viewportCount');
-
+        checkMaxArguments(arguments, 0, 'viewportCount');
         super({ property: number(0) });
         this._value = 0;
+    }
+
+    toString () {
+        return `${this.expressionName}()`;
     }
 
     get value () {
@@ -50,5 +52,9 @@ export default class ViewportCount extends ViewportAggregation {
 
     _resetViewportAgg () {
         this._value = 0;
+    }
+
+    _getMinimumNeededSchema () {
+        return {};
     }
 }
