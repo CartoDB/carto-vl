@@ -51,7 +51,7 @@ Matching between numbers (the feature's data) and other numbers (the point sizes
 
 #### The `ramp` way
 
-`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same [*implicit casts*](http://ramp-guide.developers.carto-staging.com/developers/carto-vl/guides/Glossary/) we talked before will be performed.
+`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same [*implicit casts*](/developers/carto-vl/guides/Glossary/) we talked before will be performed.
 ```
 width: ramp($number, [0, 50])
 ```
