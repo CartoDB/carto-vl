@@ -501,6 +501,7 @@ import { Cubic } from './expressions/interpolators';
 import { ILinear } from './expressions/interpolators';
 
 import Linear from './expressions/linear';
+import LinearEnd from './expressions/linearend';
 
 import NamedColor from './expressions/color/NamedColor';
 
@@ -651,6 +652,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const linearEnd = (...args) => new LinearEnd(...args);
 export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
