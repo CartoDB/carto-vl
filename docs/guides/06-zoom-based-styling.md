@@ -225,17 +225,21 @@ strokeColor: ramp(zoomrange([12,18]),[green,white])
     </iframe>
 </div>
 
+While the examples above only set styles for two zooms, you can add more zoom levels and style conditions. If you want to try it out, you can add additional stops to any of the styles above.
+
 ### Set feature visibility by zoom
 
-With the previous two functionalities, we saw how to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
+Up until now, we have seen how to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
 
 We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
 
-As we saw in the previous step, using `zoomrange`, inside of a `ramp` gives us the ability to define particular styles at a given zoom. We can use this functionality inside of a filter as well to set criteria for when features draw through zoom.
+As we saw in the previous step, using `zoomrange`, inside of a `ramp` allows us to define particular styles at a variety of zoom levels. We can use this functionality inside of a filter as well to set criteria for when features appear and disappear through zoom.
+
+In the Vancouver trees dataset, there is an attribute that records the diameter of each tree. We will use that attribute to decrease the number of points that are visible at our opening zoom by displaying only the trees that pass our `filter` criteria.
 
 Let's explore this further with [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom)using the [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) property.
 
-In the Vancouver trees dataset, there is an attribute that records the diameter of each tree. We will use that attribute to decrease the number of points that are visible at our opening zoom by displaying only the trees that pass our `filter` criteria.
+
 
 Using the map we made in the previous section, add the following line to the visualization:
 
