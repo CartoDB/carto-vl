@@ -227,7 +227,11 @@ strokeColor: ramp(zoomrange([12,18]),[green,white])
 
 ### Set feature visibility by zoom
 
-With the previous two functionalities, we saw how to modify the _appearance_ of features based on zoom. Next, we'll explore how we can control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
+With the previous two functionalities, we saw how to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
+
+We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
+
+As we saw in the previous step, using `zoomrange`, inside of a `ramp` gives us the ability to define particular styles at a given zoom. We can use this functionality inside of a filter as well to set criteria for when features draw through zoom.
 
 Let's explore this further with [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom)using the [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) property.
 
