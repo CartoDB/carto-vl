@@ -10,22 +10,10 @@ module.exports = {
         library: 'carto',
         libraryTarget: 'umd'
     },
-    devtool: 'sourcemap',
+    devtool: 'source-map',
     mode: 'development',
     module: {
         rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env'
-                        ]
-                    }
-                }
-            },
             { test: /\.glsl$/, use: 'webpack-glsl-loader' },
             { test: /\.svg$/, use: 'svg-inline-loader' },
             {
