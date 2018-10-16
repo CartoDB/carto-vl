@@ -8,11 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
 - Eliminate the need to specify a property in `globalCount()` and `viewportCount()`
 
-
 ### Fixed
 - Fix an error when evaluating non-feature-dependent expressions
 - Fix `viewportPercentile` (styling by it was broken)
 - Fix `viewport*` functions to take clustering into account
+- Fix wrong `expressionName` due to mangled `this.constructor.name` in the minified version
 
 ## [0.9.1] - 2018-10-09
 ### Fixed

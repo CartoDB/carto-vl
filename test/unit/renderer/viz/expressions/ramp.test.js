@@ -934,8 +934,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
             it('should return the first number in the array at low zoom levels', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata(METADATA);
-                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoomLevel: 0};
+                const fakeGL = { uniform1f: () => { }, uniform1i: () => { } };
+                const fakeDrawMetadata = { zoomLevel: 0 };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(100);
@@ -944,9 +944,9 @@ describe('src/renderer/viz/expressions/ramp', () => {
             it('should return an interpolated number in the array at a intermediate zoom level', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata(METADATA);
-                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
+                const fakeGL = { uniform1f: () => { }, uniform1i: () => { } };
                 // See zoomrange() implementation to know more about how we create `fakeDrawMetadata`
-                const fakeDrawMetadata = {zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9))};
+                const fakeDrawMetadata = { zoomLevel: Math.log2(Math.pow(2, 3) * 0.7 + 0.3 * Math.pow(2, 9)) };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(130);
@@ -955,8 +955,8 @@ describe('src/renderer/viz/expressions/ramp', () => {
             it('should return the last number in the array at high zoom levels', () => {
                 const r = ramp(zoomrange([3, 9]), [100, 200]);
                 r._bindMetadata(METADATA);
-                const fakeGL = {uniform1f: () => {}, uniform1i: () => {}};
-                const fakeDrawMetadata = {zoomLevel: 100};
+                const fakeGL = { uniform1f: () => { }, uniform1i: () => { } };
+                const fakeDrawMetadata = { zoomLevel: 100 };
                 r._preDraw(null, fakeDrawMetadata, fakeGL);
                 const actual = r.eval();
                 expect(actual).toEqual(200);
@@ -1060,6 +1060,14 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     ];
                     expect(actual).toEqual(expected);
                 });
+
+                it('should return a proper name', () => {
+                    const r = ramp(linear($price), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+                    const colorLegend = r.getLegendData();
+                    expect(colorLegend.name).toEqual('linear($price, globalMin(1), globalMax(4))');
+                });
             });
         });
 
@@ -1083,7 +1091,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
             describe('and it is a top input', () => {
                 it('should return legend data', () => {
-                    const r = ramp(top($grade, 2), [ red, blue ]);
+                    const r = ramp(top($grade, 2), [red, blue]);
 
                     r._bindMetadata(METADATA);
                     actual = r.getLegendData().data;

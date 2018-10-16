@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const banner = require('./banner');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
     entry: './src/index.js',
@@ -12,6 +13,13 @@ module.exports = {
     },
     devtool: false,
     mode: 'production',
+    optimization: {
+        minimizer: [new UglifyJsPlugin({
+            uglifyOptions: {
+                keep_fnames: true
+            }
+        })]
+    },
     module: {
         rules: [
             {
