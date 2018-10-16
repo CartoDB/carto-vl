@@ -59,7 +59,7 @@
 
         // Viz using a dynamic variable
         const viz = new carto.Viz(`
-            @currentFeatures: viewportFeatures()
+            @currentFeatures: viewportCount()
         `);
         const layer = new carto.Layer('Cities', source, viz);
         layer.addTo(map);
@@ -74,7 +74,7 @@
 
         // Add on 'updated' event handler to layer
         const displayNumberOfCities = () => {
-            const numberOfFeatures = viz.variables.currentFeatures.value.length;
+            const numberOfFeatures = viz.variables.currentFeatures.value;
             console.log(`Now you can see ${numberOfFeatures} cities`);
         };
         layer.on('updated', displayNumberOfCities);

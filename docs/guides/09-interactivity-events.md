@@ -89,10 +89,10 @@ If you check your work now, it should look like this:
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
-First, you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();` with this code that grabs the current displayed features using the *String API*:
+First, you are going to add a variable whose value depends solely on the current map extent. Replace your current `const viz = new carto.Viz();` with this code that grabs the current number of displayed features using the *String API*:
 ```js
 const viz = new carto.Viz(`
-    @currentFeatures: viewportFeatures()
+    @currentFeatures: viewportCount()
 `);
 ```
 
@@ -131,7 +131,7 @@ If the data you are interested in for your interaction is a feature `property`, 
 To test them you should edit again your `viz` as follows:
 ```js
 const viz = new carto.Viz(`
-    @currentFeatures: viewportFeatures()
+    @currentFeatures: viewportCount()
     @name: $name
     @popK: $pop_max / 1000.0
 `);
@@ -312,7 +312,7 @@ Here it is the full example:
 
         // Viz using a dynamic variable
         const viz = new carto.Viz(`
-            @currentFeatures: viewportFeatures()
+            @currentFeatures: viewportCount()
             @name: $name
             @popK: $pop_max / 1000.0
         `);
@@ -329,7 +329,7 @@ Here it is the full example:
 
         // Add on 'updated' event handler to layer
         const displayNumberOfCities = () => {
-            const numberOfFeatures = viz.variables.currentFeatures.value.length;
+            const numberOfFeatures = viz.variables.currentFeatures.value;
             console.log(`Now you can see ${numberOfFeatures} cities`);
         };
         layer.on('updated', displayNumberOfCities);
