@@ -5,9 +5,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+- Add `isNull` supporting numerical and categorical properties, deprecating `isNan()`
+
 ### Changed
 - Eliminate the need to specify a property in `globalCount()` and `viewportCount()`
 
+### Removed
+- Remove `isNan()`
 
 ### Fixed
 - Fix an error when evaluating non-feature-dependent expressions

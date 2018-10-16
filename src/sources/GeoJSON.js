@@ -6,7 +6,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/ca
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
-import { FP32_MIN_SAFE_INTEGER } from '../renderer/viz/expressions/constants';
+import { FP32_DESIGNATED_NULL_VALUE } from '../renderer/viz/expressions/constants';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -233,6 +233,9 @@ export default class GeoJSON extends Base {
         if (Number.isFinite(value)) {
             return this._addNumericPropertyToMetadata(propertyName, value);
         }
+        if (value === null) {
+            return;
+        }
         this._addCategoryPropertyToMetadata(propertyName, value);
     }
 
@@ -283,10 +286,10 @@ export default class GeoJSON extends Base {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                const numericValue = Number(f.properties[name]);
-                properties[name][i] = Number.isNaN(numericValue)
-                    ? FP32_MIN_SAFE_INTEGER
-                    : numericValue;
+                const numericValue = f.properties[name];
+                properties[name][i] = isNaN(numericValue) || numericValue == null
+                    ? FP32_DESIGNATED_NULL_VALUE
+                    : Number(numericValue);
             });
             dateFields.forEach(name => {
                 const property = this._properties[name];

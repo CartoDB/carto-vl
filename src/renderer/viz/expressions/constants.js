@@ -8,4 +8,4 @@ export const DEFAULT_OPTIONS = {
     samples: DEFAULT_SAMPLES
 };
 
-export const FP32_MIN_SAFE_INTEGER = -(1 << 24);
+export const FP32_DESIGNATED_NULL_VALUE = -(1 << 24);
