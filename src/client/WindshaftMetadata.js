@@ -187,7 +187,7 @@ function modalMinMax(mode, stats) {
         max = decodeModal('end', max);
     } else {
         min = decodeModal(mode, min);
-        max = decodeModal(mode, min);
+        max = decodeModal(mode, max);
     }
     return [min, max];
 }
