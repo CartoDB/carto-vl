@@ -84,7 +84,7 @@ describe('src/renderer/viz/expressions/unary', () => {
         test('isNull', 1.23, 0);
         test('isNull', s.TRUE, 0);
         test('isNull', s.FALSE, 0);
-        test('isNull', null, 1);
+        test('isNull', {eval: () => null}, 1);
     });
 
     // Helper function to test binary expressions
