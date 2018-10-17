@@ -295,7 +295,7 @@ Remember you can style your HTML controls using CSS. These styles are very simpl
 const map = new mapboxgl.Map({
     container: 'map',
     style: carto.basemaps.darkmatter,
-    center: [-8.291255, 33.684553],
+    center: [-0.12796893854942937, 35.1654623242204],
     zoom: 2.8,
     scrollZoom: false
 });
