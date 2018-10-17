@@ -34,11 +34,13 @@ const viz = new carto.Viz(`
         id="animation-step-0"
         src="/developers/carto-vl/examples/maps/guides/animation/step-0.html"
         width="100%"
-        height="500"a
+        height="500"
         frameBorder="0">
     </iframe>
 </div>
-> If you're wondering about the points, this is an animation of the journey of three birds, from January to April of 2014. It is using data from [movebank.org](https://www.movebank.org/) and the *date_time* column represents the date of the bird track and its associated timestamp. You can check the code of the previous map to see how to configure this *bird_journey* as the `carto.source.Dataset` for the visualization.
+
+**Note:**
+If you're wondering about the points, this is an animation of the journey of three birds, from January to April of 2014. It is using data from [movebank.org](https://www.movebank.org/) and the *date_time* column represents the date of the bird track and its associated timestamp. You can check the code of the previous map to see how to configure this *bird_journey* as the `carto.source.Dataset` for the visualization.
 
 
 #### The filter property
@@ -115,7 +117,7 @@ const viz = new carto.Viz(`
 #### Adjust fade
 Since we are visualizing bird migration, we want to show more clearly, through symbology, the journey the birds took. We can get this added effect by adjusting the `fade` parameters. By setting `fadeIn` to `0` and `fadeOut` to `0.5`, we keep the previous point in the animation visible for longer which helps us better visualize the flight path of the migration journey.
 
-```js
+```
 filter: animation($date_time, 30, fade(0, 0.5))
 ```
 
@@ -133,13 +135,13 @@ filter: animation($date_time, 30, fade(0, 0.5))
 #### Final touches
 Since this visualization represents the journey of three different birds, we can assign a unique color to each one, using their names to define `buckets` inside of a `ramp`. We will also decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`.
 
-*Note:*
+**Note:**
 For a more in-depth discussion of ramps and other styling properties, check out our **Data-driven visualization guide** [part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) and [part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/)
 
 ```js
 const viz = new carto.Viz(`
     filter: animation($date_time, 10, fade(0, 0.5))
-    color: ramp(buckets($bird_name, ["Sanne", "Eric", "Nico"]),[deeppink, yellow, turquoise])
+    color: ramp(buckets($bird_name, ["Sanne", "Eric", "Nico"]), [deeppink, yellow, turquoise])
     width: 4
     strokeWidth: 0
 `);
@@ -183,11 +185,11 @@ viz.variables.animation.play();
 The next step is to add buttons and elements that allow you to control and interact with the animation.
 
 The elements we will add are:
-* **Progress** a slider that shows the time progression of the animation (`js-progress-range`).
-* **Play** a button to play or resume the animation (`js-play-button`).
-* **Pause** a button to pause the animation (`js-pause-button`).
-* **Duration** a slider to control the length of the animation (`js-duration-range`).
-* **Current** a text to display the current timestep of the animation (`js-current-time`).
+* **Progress**: a slider that shows the time progression of the animation (`js-progress-range`).
+* **Play**: a button to play or resume the animation (`js-play-button`).
+* **Pause**: a button to pause the animation (`js-pause-button`).
+* **Duration**: a slider to control the length of the animation (`js-duration-range`).
+* **Current**: a text to display the current timestep of the animation (`js-current-time`).
 
 To display the controls, you're going to create a panel. You have to add this just under the map, like this:
 ```html
