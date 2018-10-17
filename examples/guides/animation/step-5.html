@@ -3,7 +3,7 @@
 
 <head>
     <!-- Include CARTO VL JS -->
-    <script src="../../../../dist/carto-vl.js"></script>
+    <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
@@ -189,29 +189,24 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-22.6995, 41.94674],
-            center: [-22.6995, 41.94674],
             zoom: 2.8,
             scrollZoom: false
         });
-        map.touchZoomRotate.disableRotation();
 
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
-
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
         //** CARTO VL functionality begins here **//
-        
+
         // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        
+
         // Define source
         const source = new carto.source.Dataset('bird_journey');
-        
+
         // Define and style Viz object
         const viz = new carto.Viz(`
             @duration: 10
@@ -221,7 +216,7 @@
 
         // Define map layer
         const layer = new carto.Layer('layer', source, viz);
-        
+
         // Get animation control elements
         const $progressRange = document.getElementById('js-progress-range');
         const $playButton = document.getElementById('js-play-button');
@@ -230,20 +225,20 @@
 
         // Listen to interaction events
         $playButton.addEventListener('click', () => {
-          viz.variables.animation.play();
+            viz.variables.animation.play();
         });
 
         $pauseButton.addEventListener('click', () => {
-          viz.variables.animation.pause();
+            viz.variables.animation.pause();
         });
 
         $durationRange.addEventListener('change', () => {
-          viz.variables.duration = parseInt($durationRange.value, 10);
+            viz.variables.duration = parseInt($durationRange.value, 10);
         });
 
         // Update progress each 100 milliseconds
-        function updateProgress () {
-          $progressRange.value = viz.variables.animation.getProgressPct();
+        function updateProgress() {
+            $progressRange.value = viz.variables.animation.getProgressPct();
         }
 
         setInterval(updateProgress, 100);

@@ -78,7 +78,7 @@ const SUPPORTED_PROPERTIES = [
 * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
 * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
 * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-* @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the expression's result. In combination with {@link carto.expressions.animation} temporal maps can be created.
+* @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
 * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
 * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
 * @property {Transformation} transform - transformation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.

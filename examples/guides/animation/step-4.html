@@ -24,15 +24,12 @@
             zoom: 2.8,
             scrollZoom: false
         });
-        map.touchZoomRotate.disableRotation();
 
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
         //** CARTO VL functionality begins here **//
-        
+
         // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
@@ -44,7 +41,7 @@
         // Define and style Viz object
         const viz = new carto.Viz(`
             filter: animation($date_time, 10, fade(0, 0.5))
-            color: ramp(buckets($bird_name,['Sanne', 'Eric", 'Nico']),[deeppink, yellow, turquoise, gray])
+            color: ramp(buckets($bird_name,['Sanne', 'Eric', 'Nico']),[deeppink, yellow, turquoise, gray])
             width: 4
             strokeWidth: 0
         `);

@@ -24,15 +24,12 @@
             zoom: 2.8,
             scrollZoom: false
         });
-        map.touchZoomRotate.disableRotation();
 
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
         //** CARTO VL functionality begins here **//
-        
+
         // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
@@ -46,7 +43,7 @@
         const viz = new carto.Viz(`
             filter: animation($date_time, 10, fade(1, 1))
         `);
- 
+
         // Define map layer
         const layer = new carto.Layer('layer', source, viz);
 
