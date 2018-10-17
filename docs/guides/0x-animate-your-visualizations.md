@@ -21,9 +21,9 @@ Before we begin, it is important to understand the general syntax for animating 
 
 We will walk through each part in more detail throughout this guide.
 
-Using the syntax above, let’s create a basic animation where points appear and disappear on a map. 
+Using the syntax above, let’s create a basic animation where points appear and disappear on a map.
 
-We will use the attribute `date_time` (a record of time when a data point was collected) as our input, set the duration of the animation to `10` seconds and set both fade parameters to `1`. 
+We will use the attribute `date_time` (a record of time when a data point was collected) as our input, set the duration of the animation to `10` seconds and set both fade parameters to `1`.
 
 ```js
 const viz = new carto.Viz(`
@@ -52,12 +52,13 @@ const viz = new carto.Viz(`
 
 #### The filter property
 
-
 Now that we have a basic map of animated points, let’s get a deeper understanding of the different pieces that make up the animation expression to fine-tune the visualization.
 
-In the example above, the animation expression is set to the `filter` property (for more information see the[vizSpec](https://carto.com/developers/carto-vl/reference/#vizspec)). The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). In the context of an  animation expression assigned to a `filter`, any feature that has a  value of `0` will be “filtered-out” and not shown while any feature that meets the filter, is assigned a value of `1` and is shown. 
+In the example above, the animation expression is set to the `filter` property (for more information see the[vizSpec](https://carto.com/developers/carto-vl/reference/#vizspec)). The convention in CARTO VL is that `0` represents the boolean value `false`, (the absence of or an *off* state), while `1` represents `true` (the presence of or an *on* state). In the context of an animation expression assigned to a `filter`, any feature that has a value of `0` will be “filtered-out” and not shown while any feature that meets the filter, is assigned a value of `1` and is shown.
 
-You can think of the  animation expression like a clock, cycling through each record of the input.  Any time there is a match, ,  the feature is drawn.  Now that we’ve gone through a more in-depth discussion of how features draw, let’s take a look at the next set of animation parameters are used to define the property, speed, and transition between animated features.
+You can think of the animation expression like a clock, cycling through each record of the input. Any time there is a match, the feature is drawn.
+
+Now that we’ve gone through a more in-depth discussion of how features draw, let’s take a look at the next set of animation parameters are used to define the property, speed, and transition between animated features.
 
 #### Input
 
@@ -76,7 +77,7 @@ To illustrate these concepts, let's animate the journey of three birds from Janu
 
 #### Animate points
 
-At the beginning of the guide we created a simple point animation using the attribute `$date_time` for the temporal input (the date of the bird track and associated timestamp), set the duration to `10` seconds and both fade parameters to `1`. 
+At the beginning of the guide we created a simple point animation using the attribute `$date_time` for the temporal input (the date of the bird track and associated timestamp), set the duration to `10` seconds and both fade parameters to `1`:
 
 ```js
 const viz = new carto.Viz(`
@@ -116,7 +117,7 @@ const viz = new carto.Viz(`
 
 #### Adjust fade
 
-Since we are visualizing  bird migration, we want to show more clearly, through symbology, the journey the birds took. We can get this added effect by adjusting  the`fade` parameters. By setting `fadeIn` to `0` and `fadeOut` to `0.5`, we  keep the previous point in the animation visible for longer which helps us better visualize the flight path of the migration journey.
+Since we are visualizing bird migration, we want to show more clearly, through symbology, the journey the birds took. We can get this added effect by adjusting the `fade` parameters. By setting `fadeIn` to `0` and `fadeOut` to `0.5`, we keep the previous point in the animation visible for longer which helps us better visualize the flight path of the migration journey.
 
 ```js
 filter: animation($date_time, 30, fade(0, 0.5))
@@ -132,12 +133,13 @@ filter: animation($date_time, 30, fade(0, 0.5))
     </iframe>
 </div>
 
+
 #### Final touches
 
-Since this visualization represents the journey of three different birds, we can assign  a unique color to  each one  using their names to define `buckets` inside of a `ramp`.decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`. 
+Since this visualization represents the journey of three different birds, we can assign a unique color to  each one  using their names to define `buckets` inside of a `ramp`. We will decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`.
 
 *Note:*
-For a more in-depth discussion of ramps and other styling properties, check out our [Data Driven Visualizations Guide](/developers/carto-vl/guides/0x-data-driven-visualizations.md). 
+For a more in-depth discussion of ramps and other styling properties, check out our [Data Driven Visualizations Guide](/developers/carto-vl/guides/0x-data-driven-visualizations.md).
 
 ```js
 const viz = new carto.Viz(`
@@ -160,9 +162,9 @@ const viz = new carto.Viz(`
 
 ### Adding controls to your animation
 
-Congratulations! You have created an animated visualization. 
+Congratulations! You have created an animated visualization.
 
-Next, let’s add some animation controls to play and pause the animation as well as a slider to adjust the speed of the animation on-the-fly. 
+Next, let’s add some animation controls to play and pause the animation as well as a slider to adjust the speed of the animation on-the-fly.
 #### Add variables
 
 Continuing with our map of bird migration, we will add  two variables in our Viz object: `@duration` and `@animation`. The `@duration` variable defines how to modify the duration value, which is really useful for playing with the animation expression.
@@ -174,7 +176,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-The different variables are available in the `viz` object you have just created. If you want to access the animation variable you can do it by typing `viz.variables.animation`. By assigning the animation expression to the `@animation` variable, you are going to be able to call the [public methods](http://animation-guide.developers.carto-staging.com/developers/carto-vl/reference/#expressionsanimation) as follows:
+The variables are now available in the `viz` object that we created in the previous step. If you want to access the animation variable you can do it by typing `viz.variables.animation`. By assigning the animation expression to the `@animation` variable, you are going to be able to call the [public methods](/developers/carto-vl/reference/#expressionsanimation) as follows:
 
 ```js
 viz.variables.animation.play();
@@ -182,9 +184,9 @@ viz.variables.animation.play();
 
 #### Add control elements
 
-The next step is to add buttons and elements that allow you to control and interact with the animation. 
+The next step is to add buttons and elements that allow you to control and interact with the animation.
 
-The   elements we will add are:
+The elements we will add are:
 
 * **Progress** slider to display the animation progress.
 * **Play** button to play or resume the animation.
@@ -218,7 +220,7 @@ const $durationRange = document.getElementById('js-duration-range');
 
 > Note: this guide makes use of some conventions. When setting an `id` to an element that is going to be accessed via JavaScript, the `id` starts with `js`. In addition, when assigning the element (`const $progressBanner = document.getElementById('js-progress-banner')`), the JavaScript value starts with `$`, which indicates that it contains an HTML element.
 
-#### Add listening events 
+#### Add listening events
 
 In this step, we will add listening events tied to the different  interaction buttons used  to control the animation. For example, we will tell the **Pause** button that it has to be ready and react when clicked  to pause the animation.
 
@@ -349,7 +351,7 @@ layer.addTo(map);
 
 ### Advanced animations
 
-In this section, you will learn other properties that can be used to animate the visualization. You can change the input range of values by using a `linear` expression, and thus visualize a subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
+In this section, you will learn other properties that can be used to animate the visualization. You can change the input range of values by using a `linear` expression, and thus visualize only  subset of the data. For example, if a dataset spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
 
 ```js
 const viz = new carto.Viz(`
@@ -366,6 +368,8 @@ const viz = new carto.Viz(`
 ```
 
 > Note: Values outside of the specified range will not appear in the animation.
+
+You can also apply the same time range (`@time`) to other properties like color using a `ramp` expression.
 
 ```js
 const viz = new carto.Viz(`
