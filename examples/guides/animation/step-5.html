@@ -178,7 +178,7 @@
             <p>Duration <input type="range" id="js-duration-range" class="white-thumb" min="0" max="10" step="1"></p>
         </section>
         <section>
-            <span id="js-current-time" class="open-sans"></span>
+            <p>Current: <span id="js-current-time" class="open-sans"></span></p>
         </section>
         <section>
             <button id="js-play-button" class="toolbox-button">Play</button>
@@ -213,7 +213,7 @@
         // Define and style Viz object
         const viz = new carto.Viz(`
             @duration: 10
-            @animation: animation($date_time, @duration, fade(1, 1))
+            @animation: animation($date_time, @duration, fade(0, 0.5))
             filter: @animation
         `);
 

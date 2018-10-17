@@ -156,14 +156,14 @@ const viz = new carto.Viz(`
 </div>
 
 
-### Adding controls to your animation
+### Animation controls
 Congratulations! You have created an animated visualization.
 
-Next, let’s add some animation controls to play and pause the animation as well as a slider to adjust the speed of the animation on-the-fly.
+Next, let’s add some animation controls to play and pause the animation as well as a slider to adjust the duration of the animation on-the-fly.
 
 
 #### Add variables
-Continuing with our map of bird migration, we will add two variables in our Viz object: `@duration` and `@animation`. The `@duration` variable defines how to modify the duration value, which is really useful for playing with the animation expression.
+To get started, we need to add two variables inside of our Viz object: `@duration` and `@animation`. Making the duration of the animation a variable (`@duration`) and putting that inside of the animation expression will allow us to dynamically modify the duration of the animation using the controls on the map.
 ```js
 const viz = new carto.Viz(`
     @duration: 30
@@ -172,24 +172,28 @@ const viz = new carto.Viz(`
 `);
 ```
 
-The variables are now available in the `viz` object that we created in the previous step. If you want to access the animation variable you can do it by typing `viz.variables.animation`. By assigning the animation expression to the `@animation` variable, you are going to be able to call the [public methods](/developers/carto-vl/reference/#expressionsanimation) as follows:
+The variables are now available in the `viz` object that we created in the previous step. If you want to access the animation variable you can do it by typing `viz.variables.animation`. By assigning the animation expression to the `@animation` variable, you are going to be able to call its [public methods](/developers/carto-vl/reference/#expressionsanimation) as follows:
 
 ```js
 viz.variables.animation.play();
 ```
 
 
-#### Add control elements
+#### Add animation controls
 The next step is to add buttons and elements that allow you to control and interact with the animation.
 
 The elements we will add are:
-* **Progress** slider to display the animation progress.
-* **Play** button to play or resume the animation.
-* **Pause** button to pause the animation.
-* **Duration** slider to control the speed of the animation.
+* **Progress** a slider that shows the time progression of the animation (`js-progress-range`).
+* **Play** a button to play or resume the animation (`js-play-button`).
+* **Pause** a button to pause the animation (`js-pause-button`).
+* **Duration** a slider to control the length of the animation (`js-duration-range`).
+* **Current** a text to display the current timestep of the animation (`js-current-time`).
 
-To display the controls, you're going to create a panel. You have to add this just under the map.
+To display the controls, you're going to create a panel. You have to add this just under the map, like this:
 ```html
+<!-- Map goes here -->
+<div id="map"></div>
+<!-- Animation control elements -->
 <aside>
     <header>
         <h1>Animation controls</h1>
@@ -198,7 +202,7 @@ To display the controls, you're going to create a panel. You have to add this ju
         <p>Progress: <input type="range" id="js-progress-range" min="0" max="1" step="0.01"></p>
     </section>
     <section>
-        <span id="js-current-time"></span>
+        <p>Current: <span id="js-current-time" class="open-sans"></span></p>
     </section>
     <section>
         <button id="js-play-button">Play</button>
@@ -208,7 +212,7 @@ To display the controls, you're going to create a panel. You have to add this ju
 </aside>
 ```
 
-As seen above, there is an `id` attribute assigned to each element giving us access to each one using JavaScript:
+As seen above, there is an `id` attribute assigned to each element which we can use to access them using JavaScript:
 
 ```js
 const $progressRange = document.getElementById('js-progress-range');
@@ -218,11 +222,12 @@ const $durationRange = document.getElementById('js-duration-range');
 const $currentTime = document.getElementById('js-current-time');
 ```
 
-> Note: this guide makes use of some conventions. When setting an `id` to an element that is going to be accessed via JavaScript, the `id` starts with `js`. In addition, when assigning the element (`const $progressBanner = document.getElementById('js-progress-banner')`), the JavaScript value starts with `$`, which indicates that it contains an HTML element.
+**Note:**
+This guide makes use of some conventions. When setting an `id` to an element that is going to be accessed via JavaScript, the `id` starts with `js`. In addition, when assigning the element (`const $progressBanner = document.getElementById('js-progress-banner')`), the JavaScript value starts with `$`, which indicates that it contains an HTML element.
 
 
 #### Add listening events
-In this step, we will add listening events tied to the different interaction buttons used to control the animation. For example, we will tell the **Pause** button that it has to be ready and react when clicked  to pause the animation.
+In this step, we will add listening events tied to the different interaction buttons used to control the animation as described above. For example, we will tell the **Pause** button that it has to be ready and react when clicked to pause the animation.
 
 ```js
 $pauseButton.addEventListener('click', () => {
@@ -247,9 +252,11 @@ $durationRange.addEventListener('change', () => {
 ```
 
 
-#### Update the progress
-You have learned how to change the animation by interacting with the different buttons, and now you are going learn how to update the current progress of the animation. This function will be the one responsible of:
-- updating the progress range, by updating the range value with the result of `getProgressPct()` method and
+#### Update the progress bar
+Now that we have added the listening events for the different buttons and defined the behavior upon interaction, next we will walk through updating the progress bar and the current time text.
+
+The `updateProgress` function will be responsible for:
+- updating the progress bar through the duration of the animation, using the range value provided by the `getProgressPct()` method and
 - displaying the current time, by updating a span with the current `getProgressValue()` method:
 
 ```js
@@ -265,7 +272,8 @@ Let’s call this function periodically by using `setInterval`:
 setInterval(updateProgress, 100);
 ```
 
-> Note: You can also do this by listening to layer events, you will learn how to use these events in the [Interactivity and Events Guide](/developers/carto-vl/guides/interactivity-events/)
+**Note:**
+The `setInterval()` is a commond method available at the browser, that calls a function or evaluates an expression at specified intervals, in milliseconds. You can also do this update by listening to `carto.layer` events. This topic is covered more in-depth in the [Interactivity and Events Guide](/developers/carto-vl/guides/interactivity-events/); once you know how, the second options is preferred.
 
 
 #### All together
@@ -307,7 +315,7 @@ const source = new carto.source.Dataset('bird_journey');
 // Add better styles
 const viz = new carto.Viz(`
     @duration: 30
-    @animation: animation($date_time, @duration, fade(1, 1))
+    @animation: animation($date_time, @duration, fade(0, 0.5))
     filter: @animation
     width: 4
     strokeWidth: 0
@@ -351,39 +359,43 @@ layer.addTo(map);
 
 <hr/>
 
-### Bonus-part: Advanced animations
-In this section, you will learn other properties that can be used to animate the visualization. You can change the input range of values by using a `linear` expression, and thus visualize only a subset of the data. For example, if a dataset having a *month* column spans an entire year, but you only want to animate between the months of February and June, you can adjust the input parameter to:
+### Taking it further
+In this section, we explore other properties that can be used for your animation, including how to animate only a subset of the data and how to symbolize that time range with color.
+
+In the examples above, we are animating the entire timespan of the bird journeys using `$date_time` as our input. If we want to only visualize a subset of the timespan, we can change the input range of values using a `linear` expression combined with a [`time`](/developers/carto-vl/reference/#cartoexpressionstime) expression:
 
 ```js
 const viz = new carto.Viz(`
-    animation(linear($month, 2, 6))
+    filter: animation(linear($date_time, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
 `);
 ```
 
-Similarly, if you have a timestamp property (`$date`), you can select a specific range using the [`time`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstime) expression:
+**Note:**
+Values outside of the specified range will not appear in the animation.
+
+This isn’t only limited to timestamp properties. If your input property is a number, for example the month of the year ranging from `1-12`, you can adjust the input parameter to that attribute (`$month`) and define the min and max range (`2,6`) that you want to visualize:
 
 ```js
 const viz = new carto.Viz(`
-    animation(linear($date_time, time('2018-01-01T00:00:00'), time('2018-01-05T00:00:00'))
+    filter: animation(linear($month, 2, 6))
 `);
 ```
 
-> Note: Values outside of the specified range will not appear in the animation.
-
-You can also apply the same time range (`@time`) to other properties like color using a `ramp` expression.
+You can also apply the same time range (`@time`) to other properties like color using a `ramp` expression. That double-encoding of the same time dimension, within the filter and the color, will reinforce the expressiveness of the visualization:
 
 ```js
 const viz = new carto.Viz(`
     @duration: 10
-    @linearAnimation: animation(linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z')), @duration)
-    color: ramp(@linearAnimation, Oryel)
-    filter: @linearAnimation
+    @animation: animation(@time, @duration, fade(0,0.5))
+    @time: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
+    color: ramp(@time, SunsetDark)
+    filter: @animation
     width: 10
     strokeWidth: 0
 `);
 ```
 
-You can apply the animation to the color property by using it in the `ramp` expression. Take a look at the result:
+As you can see in the result, we are able to visualize, via color, where each bird is at the same time range in the data and get some interesting insights about their journeys.
 
 <div class="example-map">
     <iframe

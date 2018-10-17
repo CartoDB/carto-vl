@@ -41,12 +41,13 @@
 
         // Define and style Viz object
         const viz = new carto.Viz(`
-          @duration: 10
-          @linearAnimation: animation(linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z')), @duration)
-          color: ramp(@linearAnimation, Oryel)
-          filter: @linearAnimation
-          width: 10
-          strokeWidth: 0
+            @duration: 10
+            @animation: animation(@time, @duration, fade(0,0.5))
+            @time: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
+            color: ramp(@time, SunsetDark)
+            filter: @animation
+            width: 10
+            strokeWidth: 0
         `);
 
         // Define map layer
