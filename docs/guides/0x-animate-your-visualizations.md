@@ -163,7 +163,7 @@ Next, let’s add some animation controls to play and pause the animation as wel
 
 
 #### Add variables
-Continuing with our map of bird migration, we will add  two variables in our Viz object: `@duration` and `@animation`. The `@duration` variable defines how to modify the duration value, which is really useful for playing with the animation expression.
+Continuing with our map of bird migration, we will add two variables in our Viz object: `@duration` and `@animation`. The `@duration` variable defines how to modify the duration value, which is really useful for playing with the animation expression.
 ```js
 const viz = new carto.Viz(`
     @duration: 30
@@ -198,6 +198,9 @@ To display the controls, you're going to create a panel. You have to add this ju
         <p>Progress: <input type="range" id="js-progress-range" min="0" max="1" step="0.01"></p>
     </section>
     <section>
+        <span id="js-current-time"></span>
+    </section>
+    <section>
         <button id="js-play-button">Play</button>
         <button id="js-pause-button">Pause</button>
         <input type="range" id="js-duration-range" min="0" max="30" step="1">
@@ -205,20 +208,21 @@ To display the controls, you're going to create a panel. You have to add this ju
 </aside>
 ```
 
-As seen above, there is an `id` attribute assigned to  each element giving us access to each one using JavaScript:
+As seen above, there is an `id` attribute assigned to each element giving us access to each one using JavaScript:
 
 ```js
 const $progressRange = document.getElementById('js-progress-range');
 const $playButton = document.getElementById('js-play-btn');
 const $pauseButton = document.getElementById('js-pause-btn');
 const $durationRange = document.getElementById('js-duration-range');
+const $currentTime = document.getElementById('js-current-time');
 ```
 
 > Note: this guide makes use of some conventions. When setting an `id` to an element that is going to be accessed via JavaScript, the `id` starts with `js`. In addition, when assigning the element (`const $progressBanner = document.getElementById('js-progress-banner')`), the JavaScript value starts with `$`, which indicates that it contains an HTML element.
 
 
 #### Add listening events
-In this step, we will add listening events tied to the different  interaction buttons used  to control the animation. For example, we will tell the **Pause** button that it has to be ready and react when clicked  to pause the animation.
+In this step, we will add listening events tied to the different interaction buttons used to control the animation. For example, we will tell the **Pause** button that it has to be ready and react when clicked  to pause the animation.
 
 ```js
 $pauseButton.addEventListener('click', () => {
@@ -234,7 +238,7 @@ $playButton.addEventListener('click', () => {
 });
 ```
 
-In the same way, we can  update the **duration** of the animation when the duration range is adjusted in the slider:
+In the same way, we can update the **duration** of the animation when the duration range is adjusted in the slider:
 
 ```js
 $durationRange.addEventListener('change', () => {
@@ -244,11 +248,14 @@ $durationRange.addEventListener('change', () => {
 
 
 #### Update the progress
-You have learned how to change the animation by interacting with the different buttons, and now you are going learn how to update the current progress of the animation. This function will be the one responsible of updating the progress range by updating the range value with the result of `getProgressPct()` method:
+You have learned how to change the animation by interacting with the different buttons, and now you are going learn how to update the current progress of the animation. This function will be the one responsible of:
+- updating the progress range, by updating the range value with the result of `getProgressPct()` method and
+- displaying the current time, by updating a span with the current `getProgressValue()` method:
 
 ```js
 function updateProgress () {
     $progressRange.value = viz.variables.animation.getProgressPct();
+    $currentTime.innerText = viz.variables.animation.getProgressValue();
 }
 ```
 
@@ -258,7 +265,7 @@ Let’s call this function periodically by using `setInterval`:
 setInterval(updateProgress, 100);
 ```
 
-> Note: You can also do this by listening to layer events, you will learn how to use these events in the [Interactivity and Events Guide](09-interactivity-events.md)
+> Note: You can also do this by listening to layer events, you will learn how to use these events in the [Interactivity and Events Guide](/developers/carto-vl/guides/interactivity-events/)
 
 
 #### All together
@@ -285,12 +292,7 @@ const map = new mapboxgl.Map({
     scrollZoom: false
 });
 
-map.touchZoomRotate.disableRotation();
-
-const nav = new mapboxgl.NavigationControl({
-    showCompass: false
-});
-
+const nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-left');
 
 // Autenticate the client
@@ -320,6 +322,7 @@ const $progressRange = document.getElementById('js-progress-range');
 const $playButton = document.getElementById('js-play-button');
 const $pauseButton = document.getElementById('js-pause-button');
 const $durationRange = document.getElementById('js-duration-range');
+const $currentTime = document.getElementById('js-current-time');
 
 // Listen to interaction events
 $playButton.addEventListener('click', () => {
@@ -337,6 +340,7 @@ $durationRange.addEventListener('change', () => {
 // Update progress each 100 milliseconds
 function updateProgress () {
     $progressRange.value = viz.variables.animation.getProgressPct();
+    $currentTime.innerText = viz.variables.animation.getProgressValue();
 }
 
 setInterval(updateProgress, 100);

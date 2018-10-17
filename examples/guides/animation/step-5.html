@@ -178,6 +178,9 @@
             <p>Duration <input type="range" id="js-duration-range" class="white-thumb" min="0" max="10" step="1"></p>
         </section>
         <section>
+            <span id="js-current-time" class="open-sans"></span>
+        </section>
+        <section>
             <button id="js-play-button" class="toolbox-button">Play</button>
             <button id="js-pause-button" class="toolbox-button">Pause</button>
         </section>
@@ -222,6 +225,8 @@
         const $playButton = document.getElementById('js-play-button');
         const $pauseButton = document.getElementById('js-pause-button');
         const $durationRange = document.getElementById('js-duration-range');
+        const $currentTime = document.getElementById('js-current-time');
+
 
         // Listen to interaction events
         $playButton.addEventListener('click', () => {
@@ -239,6 +244,7 @@
         // Update progress each 100 milliseconds
         function updateProgress() {
             $progressRange.value = viz.variables.animation.getProgressPct();
+            $currentTime.innerText = viz.variables.animation.getProgressValue();
         }
 
         setInterval(updateProgress, 100);

@@ -206,6 +206,10 @@
                 <input type="button" id="js-pause-button">
                 <input type="range" id="js-time-range" min="0" max="1" step="0.01">
             </section>
+            <br />
+            <section>
+                <span id="js-current-time" class="open-sans"></span>
+            </section>
             <hr>
             <section>
                 <span style="margin-right: 5px" class="open-sans">Duration (seconds)</span>
@@ -232,13 +236,13 @@
         map.addControl(nav, 'top-left');
 
         //** CARTO VL functionality begins here **//
-        
+
         // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        
+
         // Define source
         const source = new carto.source.Dataset('bird_journey');
 
@@ -257,13 +261,14 @@
 
         // Add map layer
         layer.addTo(map, 'watername_ocean');
-    
+
         // Get HTML elements
         const $playbutton = document.getElementById('js-play-button');
         const $pausebutton = document.getElementById('js-pause-button');
         const $durationRange = document.getElementById('js-duration-range');
         const $timeRange = document.getElementById('js-time-range');
-        const $spanDuration = document.getElementById('js-duration-span');        
+        const $spanDuration = document.getElementById('js-duration-span');
+        const $currentTime = document.getElementById('js-current-time');
 
         // Listen to layer events
         let last = $timeRange.value;
@@ -273,6 +278,7 @@
                 $timeRange.value = viz.variables.animation.getProgressPct();
                 last = $timeRange.value;
             }
+            $currentTime.innerText = viz.variables.animation.getProgressValue().toISOString();
         });
 
         $timeRange.addEventListener('change', () => {
