@@ -48,11 +48,16 @@
 
         // Define Viz object and custom style
         const viz = new carto.Viz(`
-                color: ramp(zoomrange([12,18]),[white,green])
-                width: ramp(zoomrange([12,18]),[1,20])
-                strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
-                strokeColor: ramp(zoomrange([12,18]),[green,white])
-                filter: zoom()>12 or $diameter>20
+            color: ramp(globalQuantiles($diameter,7),sunset)
+            width: ramp(zoomrange([12,18]),[1,20])
+            strokeWidth: 0
+            filter: ramp(zoomrange([12,13,14,15,16]),
+                        [$diameter>30,
+                        $diameter>20,
+                        $diameter>15,
+                        $diameter>10,
+                        true]
+                        )
         `);
 
         // Define map layer

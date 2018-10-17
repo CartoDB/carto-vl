@@ -55,7 +55,7 @@ strokeColor:       rgba(0,0,0,0.7)
 strokeWidth:      2*zoom()/50000`
 ];
 
-const examples = [
+/*const examples = [
     ['WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJjYXJ0b2dsIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogIHpvb20oKSAqIChhbmltYXRpb24oJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC41KVxuY29sb3I6ICByYW1wKGxpbmVhcihjbHVzdGVyQXZnKCR0ZW1wKSwgMCwzMCksIHRlYWxyb3NlKVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogYW5pbWF0aW9uKCRkYXksIDE0MCwgZmFkZSgwLjA1LCAwLjIpKSArIDAuMDUiLCJmIjp7ImxuZyI6MjQuNzM1NTY4NTIwNDAyOTIsImxhdCI6MTkuMTYzNDcwOTc4NzU0OTQ0fSwiZyI6MC44NDM4NjY0MzkyMzEyODQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
     ['Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChjbHVzdGVyTWF4KCRudW1iZXIpLzEwKVxuY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsMCwgNTApLCBTdW5zZXQpXG5zdHJva2VXaWR0aDogMVxuXG5cblxuXG4iLCJmIjp7ImxuZyI6LTg3LjcwOTk1MzA1MDcwODAxLCJsYXQiOjM3LjM3MDA0OTU5OTg5MzQzNH0sImciOjIuODM3NzkyNTAzNjMyNTY3NSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
     ['Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KCgkYXNpYW5fcG9wKyRibGFja19wb3ArJGhpc3BhbmljX28pLyR3aGl0ZV9wb3ApKjJcbmNvbG9yOiBoc3ZhKDAuNSwgMSwgMSwgMC43KVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogJHdoaXRlX3BvcCA+IDEgIiwiZiI6eyJsbmciOi04OS44MjAyMzQxODU0NDk4LCJsYXQiOjM4LjAyMDA5MTA5MTA1NzM0fSwiZyI6My4xMzM3MjI0MzM3MjQ2OTQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
@@ -72,7 +72,7 @@ const examples = [
     ['BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KGNsdXN0ZXJTdW0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjVcbmNvbG9yOiByYW1wKGNsdXN0ZXJNb2RlKCRjYXRlZ29yeSksIFByaXNtKVxuc3Ryb2tlQ29sb3I6IG9wYWNpdHkod2hpdGUsIDAuNSlcbmZpbHRlcjogaW4oY2x1c3Rlck1vZGUoJGNhdGVnb3J5KSwgW1wiVHJhbnNwb3J0ZXNcIiwgXCJTYWx1ZFwiXSkiLCJmIjp7ImxuZyI6Mi4xNzgxNzMwMjI4ODkwNDEsImxhdCI6NDEuMzk5MzA1OTE0MDc5MDR9LCJnIjoxMS44ODI5MTkwNDI3MTc0MzIsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
     ['Crazy images', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogJGNvdW50LzIgKzhcbmNvbG9yOiBvcGFjaXR5KCByYW1wKGxpbmVhcigkY291bnQsIDAsMTIwKSwgUmVkT3IpLCAkY291bnQvMjArMC40KVxuc3ltYm9sUGxhY2VtZW50OiBwbGFjZW1lbnQoc2luKDAuMSokY291bnQqbm93KCkpICwgY29zKDAuMSokY291bnQqbm93KCkpKVxuc3ltYm9sOiByYW1wKGJ1Y2tldHMoMTAwKigwLjEqbm93KCklMSA+MC41KSwgIFs1MF0pLCBbXG4gICAgaW1hZ2UoJy4uL3N0eWxpbmcvbWFya2VyLnN2ZycpLFxuICAgIGltYWdlKCcuLi9zdHlsaW5nL3N0YXIuc3ZnJylcbl0pXG4gIiwiZiI6eyJsbmciOi0xMDQuOTYyNjA1NDMxMjU4MjgsImxhdCI6MzkuNzI5MzYwMjIwMTUzNDk1fSwiZyI6MTIuNDg5NjU1NDg5ODk4OTkzLCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
     ['Flower image', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMzAwMCAgICAgICAgICAgICAgICAgICBcbnN5bWJvbDogcmFtcChsaW5lYXIoJGNhdXNlLCAxLDE0KSwgUHJpc20pICogaW1hZ2UoJy4uL3N0eWxpbmcvZmxvd2VyLnN2ZycpIiwiZiI6eyJsbmciOi0xMTkuNDU0OTIyODYwNjI3MTYsImxhdCI6MzguMDQ0NDg4NTUzMTIyOTZ9LCJnIjo1LjQ1MDQ4NzM0MDMyMjUxMDUsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ==']
-];
+];*/
 
 const BASEMAPS = {
     DarkMatter: carto.basemaps.darkmatter,
@@ -100,7 +100,7 @@ let map = new mapboxgl.Map({
 
 map.touchZoomRotate.disableRotation();
 
-examples.forEach(addExample);
+//examples.forEach(addExample);
 
 let layer = null;
 setInterval(() => {
@@ -394,7 +394,7 @@ const $exportMapButton = document.getElementById('export-map-button');
 const $copyHTMLButton = document.getElementById('copy-html-button');
 const $mapTextarea = document.getElementById('map-textarea');
 
-if ($exportMapButton) {
+/*if ($exportMapButton) {
     $exportMapButton.addEventListener('click', () => {
         const config = getJSONConfig();
         $mapTextarea.value = generateSnippet(config);
@@ -406,7 +406,7 @@ if ($copyHTMLButton) {
         $mapTextarea.select();
         document.execCommand('copy');
     });
-}
+}*/
 
 /**
  * Generates an HTML template for the given map configuration

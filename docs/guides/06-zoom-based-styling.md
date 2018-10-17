@@ -8,7 +8,7 @@ We most often hear about zoom-based styling in the context of basemaps. As an ex
 
 For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
 
-[MULTI-SCALE shot of Voyager]
+[MULTI-SCALE GIF of Voyager]
 
 ### Zoom-based styling with VL
 
@@ -20,7 +20,7 @@ In this guide, we will demonstrate how this complexity has been greatly reduced 
 
 ### Overview
 
-Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, first, we will explore the following zoom-based functionalities: 
+Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, we will first explore the following zoom-based functionalities: 
 
 - `scaled`
   - How to keep symbol sizes consistent through zoom level
@@ -32,8 +32,8 @@ Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) 
 After we explore each one independently, we will bring them together to create a map like this one (go ahead, zoom in and out!):
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-final"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/final-map.html"
+        id="guides-zoom-based-styling-step-8"
+        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-8.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -150,19 +150,19 @@ With these adjustments, we can more clearly see the distribution of trees around
 
 ### Scale symbol size
 
-Take a few minutes to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of 11 and smaller, but begin to break down as we zoom in on the map.
+Take a few minutes to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of `11` and smaller, but begin to break down as we zoom in.
 
 That's because styling that works well at _one_ zoom level doesn't always work well at _all_ zoom levels. 
 
 Let's say we are satisfied with how a `1` point symbol size looks at our opening zoom of `11`, we can use those two pieces of information as our anchor inside of `scaled`. This will keep symbol sizes constant (in real space) through zoom. 
 
-Let's give it a try by adjusting the `width` property:
+Let's give it a try by adding this information to the `width` property:
 
 ```js
 width: scaled(1,11)
 ```
 
-Now as we zoom in and out of the map, you'll notice that the `1` point symbol size that we defined, scales:
+In the resulting map, as we zoom in and out, you'll notice that the `1` point symbol size that we defined, scales based on the current zoom level:
 
 <div class="example-map">
     <iframe
@@ -174,13 +174,13 @@ Now as we zoom in and out of the map, you'll notice that the `1` point symbol si
     </iframe>
 </div>
 
-If you aren't satisfied with the result, try adjusting the anchor scale and/or point width. For example, adjust the `width` style to `scaled(1,15)`. You can also use this functionality with `strokeWidth`.
+If you aren't satisfied with the result, try adjusting the anchor scale and/or point width. For example, adjust the `width` style to `scaled(1,15)`. You can also use this functionality with `strokeWidth` to scale the outline of the points.
 
 ### Define a range of symbol sizes
 
-As demonstrated above, the `scaled` option is great to keep symbol sizes consistent through zoom. But there are other times where you will want finer control at every zoom level and/or at a range of zoom levels.
+As demonstrated above, the `scaled` option is great to keep symbol sizes consistent through zoom. There are other times where you will want finer control at every zoom level and/or at a range of zoom levels.
 
-Next, let's take a look at how we can use the `zoomRange` expression inside of a `ramp`.
+Next, let's take a look at how we can use the `zoomRange` expression inside of a `ramp` to accomplish that.
 
 In the previous step, we determined that a width of `1` worked well at our opening zoom of `11` but noticed in previous steps, as we zoom in, the size of `1` doesn't hold up well.
 
@@ -202,7 +202,7 @@ This sets the width of our symbols to `1` at zoom levels less than or equal to `
     </iframe>
 </div>
 
-We can use the same logic to`strokeWidth`:
+We can use the same logic for `strokeWidth`:
 
 ```js
 strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
@@ -240,24 +240,30 @@ Up until now, we have looked at ways to modify the _appearance_ of features base
 
 We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
 
-As we saw in the previous step, using `zoomrange`, inside of a `ramp` allows us to define particular styles at a variety of zoom levels. We can use this functionality inside of a filter as well to set criteria for when features appear and disappear through zoom.
+As we saw in the previous step, using `zoomrange`, inside of a `ramp` allows us to define particular styles at a variety of zoom levels. We can use this functionality inside of a `filter` as well to set criteria for when features appear and disappear through zoom.
 
-In the Vancouver trees dataset, there is an attribute that records the diameter of each tree. We will use that attribute to decrease the number of points that are visible at our opening zoom by displaying only the trees that pass our `filter` criteria.
+To demonstrate, we will use an attribute, `diameter` in the Vancouver trees dataset to control the visibility of trees, by zoom, based on this measurement. 
 
-Let's explore this further with [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom)using the [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) property.
-
-
-
-Using the map we made in the previous section, add the following line to the visualization:
+To better visualize the points appearing through zoom, first let's classify the data using `globalQuantiles`, `7` class breaks, and color each class with the CARTOColor scheme `sunset`:
 
 ```js
-filter: zoom()>12 or $diameter>20
+   color: ramp(globalQuantiles($diameter,7),sunset)
+   width: ramp(zoomrange([12,18]),[1,20])
+   strokeWidth: 0
+```
+Next, we'll add a `filter` and set our `diameter` criteria with `zoomrange` where we gradually introduce larger trees until zoom `16` and greater, where we display all trees (`true`):
+
+```js                
+filter:ramp(zoomrange([12,13,14,15,16]),
+            [$diameter>30,
+            $diameter>20,
+            $diameter>15,
+            $diameter>10,
+            true]
+        )
 ```
 
-With this filter, we are saying that at zoom levels less than `12`, only display trees that have a diameter greater than `20`. Then at zooms greater than `12`, display all points. 
-
-In the resulting map, we can see that the number of points at our opening zoom is reduced and if we zoom in another level, all of the trees draw.
-
+As you zoom in and out of the resulting map, you will notice that the colors (purple for high values to yellow for low values) begin to appear on the map based on the filter we defined above.
 
 <div class="example-map">
     <iframe
@@ -269,7 +275,134 @@ In the resulting map, we can see that the number of points at our opening zoom i
     </iframe>
 </div>
 
+Let's explore this further using [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom) with the [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) property.
+
+Using the same map from above, replace the `filter` styling with:
+
+```js
+filter: zoom()>15 or $diameter>30
+```
+
+With this filter, all points will draw when both criteria are met. This means that at zoom levels less than `15`, only trees that have a diameter of greater than `30` will draw. Once we hit zooms `15` and larger, all points draw.
+
+<div class="example-map">
+    <iframe
+        id="guides-zoom-based-styling-step-7"
+        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-7.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
+Which method you use depends on whether you want to introduce detail incrementally (`zoomrange`) or whether there is a more general (`zoom()`) filter that can be applied through zoom.
+
 ### Bringing it together
 
-As described at the beginning of the guide, with basemap design, features are introduced as they are relevant and designed according to the current zoom. The same thinking can be applied to thematic data by using zoom-based filters in conjunction with zoom-based styling.
+As described at the beginning of the guide, with basemap design, features are introduced as they are relevant and designed according to the zoom at which they are being viewed. In this guide we've explored a variety of ways to do the same with CARTO VL. 
+
+The final example in this guide demonstrates how to combine zoom-based filters and zoom-based styling and introduce multiple characteristics of a dataset through zoom.
+
+Take a look at the map, zoom in and out to see the changes in the styling and visibility of features:
+
+<div class="example-map">
+    <iframe
+        id="guides-zoom-based-styling-step-8"
+        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-8.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
+
+Pretty neat, right?!
+
+This is an example of how to take advantage of zoom-based styling for multiple visualization properties, to introduce thematic information through zoom. 
+
+Using zoom-based filters to introduce detail, the map opens with all visible trees colored green and sized to suit the density of information and view. As the zoom level increases, the color of trees transitions from green to a categorical coloring based on its `common_name`. At the next set of zoom levels, another attribute (`diameter`) is introduced by changing the sizing of features and setting an anchor for that sizing using `scaled`. Other properties like `strokeColor` and `strokeWidth` are also adjusted through zoom to compliment the multi-scale styling of the trees.
+
+If you would like to take a closer look, the full code for the example is here:
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Add map container -->
+    <div id="map"></div>
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-123.098599, 49.240685],
+            zoom: 11,
+            dragRotate: false,
+        });
+
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        //** CARTO VL functionality begins here **//
+
+        // Define user
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const source = new carto.source.Dataset('vancouver_trees');
+
+        // Define Viz object and custom style
+        const viz = new carto.Viz(`
+            @category: ramp($common_name,prism)
+
+            width: ramp(zoomRange([10,15]),[1,scaled($diameter/2,15)])
+            color: ramp(zoomRange([12,13]),[green,opacity(@category,0.7)])
+            strokeColor: ramp(zoomRange([12,13]),[black,@category])
+            strokeWidth: ramp(zoomRange([13,14,16]),[0,0.5,1])
+            filter: ramp(zoomrange([12,13,14,15,16]),
+                        [$diameter>30,
+                        $diameter>15,
+                        $diameter>10,
+                        $diameter>5,
+                        true]
+                    )
+        `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add map layer
+        layer.addTo(map,'watername_ocean');
+    </script>
+</body>
+
+</html>
+```
+
+
+
+
+
+
 
