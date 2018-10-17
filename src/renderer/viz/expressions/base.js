@@ -66,7 +66,10 @@ export default class Base {
      *
      */
     eval (feature) {
-        throw new CartoRuntimeError('Unimplemented');
+        if (this.isFeatureDependent()) {
+            throw new CartoRuntimeError('Unimplemented');
+        }
+        return this.value;
     }
 
     /**
