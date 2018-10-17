@@ -366,12 +366,10 @@ export default class Layer {
                 zoomLevel: this.map.getZoom()
             });
 
-            if (this._state === states.IDLE) {
+            if (this._state === states.INIT) {
                 this._fire('loaded');
-                this._fire('updated');
-            } else if (this._state === states.UPDATING) {
-                this._fire('updated');
             }
+            this._fire('updated');
 
             this._state = this.viz.isAnimated() ? states.UPDATING : states.IDLE;
         }
