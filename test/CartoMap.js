@@ -72,24 +72,6 @@ class CartoMap { // eslint-disable-line no-unused-vars
         return { lat: 0, lng: 0 };
     }
 
-    getBounds () {
-        return {
-            getNorthWest: () => ({ lat: 85, lng: -180 }),
-            getSouthWest: () => ({ lat: -85.1, lng: -180 })
-        };
-    }
-
-    changeVisibility (layer) {
-        switch (layer.visibility) {
-            case layerVisibility.VISIBLE:
-                this.show(layer);
-                break;
-            case layerVisibility.HIDDEN:
-                this.hide(layer);
-                break;
-        }
-    }
-
     hide (layer) {
         if (this._layers.has(layer)) {
             this._layers.delete(layer);

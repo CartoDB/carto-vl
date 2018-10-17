@@ -8,13 +8,18 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors
 import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
-import { layerVisibility } from './constants/layer';
 import { mat4 } from 'gl-matrix';
 import { unproject } from './utils/geometry';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
 const renderers = new WeakMap();
+
+const states = Object.freeze({
+    INIT: 'init', // Initial state until the map is rendered the first time
+    IDLE: 'idle', // The map has been rendered and there are no more scheduled frames (no map panning, no map zooming, no animation, no change in sources)
+    UPDATING: 'updating' // The map has been rendered but there is a new frame scheduled due to map panning, map zooming, animation or a change in the sources
+});
 
 /**
 *
@@ -43,56 +48,75 @@ export default class Layer {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
-        this._init(id, source, viz);
-    }
 
-    _init (id, source, viz) {
-        viz._boundLayer = this;
-        this._context = new Promise((resolve) => {
-            this._contextInitialize = resolve;
-        });
-
-        /* Custom Layer API attributes:
+        /* Mapbox GL Custom Layer API attributes:
           - id: string
           - type: "custom"
         */
         this.id = id;
         this.type = 'custom';
 
-        this.metadata = null;
-        this._state = 'init';
+        viz._boundLayer = this;
+        this._context = new Promise(resolve => {
+            this._contextInitialize = resolve;
+        });
+
+        this._state = states.INIT;
         this._visible = true;
-        this._isLoaded = false;
-        this._matrix = null;
-        this._fireUpdateOnNextRender = false;
         this._emitter = mitt();
-        this._oldDataframes = new Set();
         this._renderLayer = new RenderLayer();
+
+        // Use an UID to detect that a new call to `Layer.update()` is overriding an old (uncommitted) one
         this._atomicChangeUID = 0;
 
         this.update(source, viz);
     }
 
     /**
-     * Get layer visibility. Can be 'visible' or 'none'.
-     * @readonly
-     */
-    get visibility () {
-        return this._visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
-    }
-
-    /**
-     * Get layer visibility. Can be true or false.
-     * @readonly
+     * Layer visibility property.
+     *
+     * @type {boolean}
+     * @memberof carto.Layer
+     * @instance
+     * @api
      */
     get visible () {
         return this._visible;
     }
 
+    set visible (visible) {
+        this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
+        this._visible = visible;
+    }
+
     /**
-     * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
+     * Change layer visibility to visible
      *
-     * @param {String} eventName - Type of event to listen for
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     * @fires updated
+     */
+    show () {
+        this.visible = true;
+    }
+
+    /**
+     * Change layer visibility to hidden
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     * @fires updated
+     */
+    hide () {
+        this.visible = false;
+    }
+
+    /**
+     * Register an event handler for the given event name.
+     *
+     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`.
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -105,7 +129,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {String} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`.
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
@@ -166,11 +190,7 @@ export default class Layer {
      * @async
      * @api
      */
-    async update (source, viz) {
-        if (viz === undefined) {
-            // Use current viz
-            viz = this._viz;
-        }
+    async update (source, viz = this._viz) {
         this._checkSource(source);
         this._checkViz(viz);
 
@@ -178,12 +198,15 @@ export default class Layer {
         this._atomicChangeUID++;
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
-        const metadata = await source.requestMetadata(viz);
+
+        // Don't await directly to start requesting the images as soon as possible
+        const metadataPromise = source.requestMetadata(viz);
         await loadImagesPromise;
+        const metadata = await metadataPromise;
 
         await this._context;
         if (this._atomicChangeUID > uid) {
-            throw new CartoRuntimeError('Another atomic change was done before this one committed (1)');
+            throw new CartoRuntimeError('Another `Layer.update()` finished before this one');
         }
 
         // Everything was ok => commit changes
@@ -196,19 +219,11 @@ export default class Layer {
         }
 
         this._source = source;
-        this._noFirstRequestData = false;
-        this.requestData();
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
-        await this._context;
-        if (this._atomicChangeUID > uid) {
-            throw new CartoRuntimeError('Another atomic change was done before this one committed (2)');
-        }
-
         if (this._viz) {
             this._viz.onChange(null);
         }
-        viz.setDefaultsIfRequired(this._renderLayer.type);
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
@@ -218,7 +233,11 @@ export default class Layer {
     /**
      * Blend the current viz with another viz.
      *
-     * This allows smooth transforms between two different vizs.
+     * This allows smooth transitions between two different Vizs.
+     *
+     * Blending won't be performed when convenient for the attached Source. This
+     * happens with Maps API source when the new Viz uses a different set of properties or
+     * aggregations. In these cases a hard transition will be used instead.
      *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different vizs varying the width
@@ -241,7 +260,6 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
-        viz.setDefaultsIfRequired(this.metadata.geomType);
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
                 viz.variables[varName] = this._viz.variables[varName];
@@ -254,18 +272,18 @@ export default class Layer {
             viz.filter._blendFrom(this._viz.filter, ms, interpolator);
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
+
+            return this._vizChanged(viz).then(() => {
+                if (this._viz) {
+                    this._viz.onChange(null);
+                }
+                viz.setDefaultsIfRequired(this._renderLayer.type);
+                this._viz = viz;
+                this._viz.onChange(this._vizChanged.bind(this));
+            });
         } else {
             return this.update(this._source, viz);
         }
-
-        return this._vizChanged(viz).then(() => {
-            if (this._viz) {
-                this._viz.onChange(null);
-            }
-            viz.setDefaultsIfRequired(this._renderLayer.type);
-            this._viz = viz;
-            this._viz.onChange(this._vizChanged.bind(this));
-        });
     }
 
     /**
@@ -274,60 +292,13 @@ export default class Layer {
      * Calls to `blendToViz` and `update` wont' update the viz until those calls "commit",
      * having performed and completed all asynchronous necessary sanity checks.
      *
-     * @returns {carto.Viz} - Viz object currently bound to the layer
+     * @type {carto.Viz}
      * @memberof carto.Layer
+     * @readonly
      * @api
      */
     get viz () {
         return this._viz;
-    }
-
-    /**
-     * Change layer visibility to visible
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    show () {
-        this.map.setLayoutProperty(this.id, 'visibility', 'visible');
-        this._visible = true;
-        this._noFirstRequestData = false;
-        this._fireUpdateOnNextRender = true;
-        this.requestData();
-    }
-
-    /**
-     * Change layer visibility to hidden
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    hide () {
-        this.map.setLayoutProperty(this.id, 'visibility', 'none');
-        this._visible = false;
-        this._fireUpdateOnNextRender = true;
-        this._fire('updated');
-    }
-
-    async requestMetadata (viz) {
-        viz = viz || this._viz;
-        if (!viz) {
-            return;
-        }
-        return this._source.requestMetadata(viz);
-    }
-
-    async requestData () {
-        if (!this.metadata || !this._visible) {
-            return;
-        }
-        this._needRefresh();
     }
 
     hasDataframes () {
@@ -339,7 +310,7 @@ export default class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this._visible
+        return this.visible
             ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
             : [];
     }
@@ -371,18 +342,9 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        // Call request data if the matrix has changed
-        if (!util.equalArrays(this._matrix, matrix)) {
-            this._matrix = matrix;
-            this.renderer.matrix = matrix;
-            this._setRendererZoomCenter(matrix);
-            if (this._source && this._visible) {
-                this._source.requestData(this._getZoom(), this._getViewport());
-            }
-            this._fireUpdateOnNextRender = true;
-        } else if (!this._noFirstRequestData && this._source && this._visible) {
-            this._source.requestData(this._getZoom(), this._getViewport());
-            this._noFirstRequestData = true;
+        this.renderer.matrix = matrix;
+        if (this._source && this.visible) {
+            this._source.requestData(this._getZoom(), this._getViewport(matrix));
         }
     }
 
@@ -403,25 +365,26 @@ export default class Layer {
             this.renderer.renderLayer(this._renderLayer, {
                 zoomLevel: this.map.getZoom()
             });
-            const dataframesHaveChanged = !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()));
-            if (this.isAnimated() || this._fireUpdateOnNextRender || dataframesHaveChanged) {
-                this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
-                this._fireUpdateOnNextRender = false;
+
+            if (this._state === states.IDLE) {
+                this._fire('loaded');
+                this._fire('updated');
+            } else if (this._state === states.UPDATING) {
                 this._fire('updated');
             }
-            if (!this._isLoaded && this._state === 'dataLoaded') {
-                this._isLoaded = true;
-                this._fire('loaded');
-            }
+
+            this._state = this.viz.isAnimated() ? states.UPDATING : states.IDLE;
         }
     }
 
     _fire (eventType, eventData) {
-        try {
-            return this._emitter.emit(eventType, eventData);
-        } catch (err) {
-            console.error(err);
-        }
+        // We don't want to fire an event within MGL custom layer callback since an error there
+        // would crash MGL renderer
+        // We fire the event asynchronously to be safe
+        new Promise(resolve => {
+            this._emitter.emit(eventType, eventData);
+            resolve();
+        });
     }
 
     /**
@@ -429,26 +392,18 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded (dataframe) {
-        dataframe.setFreeObserver(() => {
-            this.map.triggerRepaint();
-        });
         this._renderLayer.addDataframe(dataframe);
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this.map.triggerRepaint();
+        this._needRefresh();
     }
 
     _needRefresh () {
-        this._fireUpdateOnNextRender = true;
         this.map.triggerRepaint();
     }
 
-    /**
-     * Callback executed when the client finishes loading data
-     */
     _onDataLoaded () {
-        this._state = 'dataLoaded';
         this._needRefresh();
     }
 
@@ -462,7 +417,7 @@ export default class Layer {
     }
 
     async _vizChanged (viz) {
-        if (this._cache) {
+        if (this._cache) { // TODO smells
             return this._cache;
         }
         this._cache = this._requestVizChanges(viz)
@@ -472,7 +427,7 @@ export default class Layer {
 
     async _requestVizChanges (viz) {
         await this._context;
-        if (!this._source) {
+        if (!this._source) { // TODO Await
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} a 'source' is required before changing the viz.`);
         }
 
@@ -485,13 +440,14 @@ export default class Layer {
             throw new CartoRuntimeError('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
         }
         this.metadata = metadata;
-        this._compileShaders(viz, this.metadata);
+        viz.setDefaultsIfRequired(this.metadata.geomType);
+        viz.setDefaultsIfRequired(this._renderLayer.type);
+        this._compileShaders(viz, this.metadata); // TODO shared with update??
         this._needRefresh();
-        return this.requestData();
     }
 
     _checkId (id) {
-        if (util.isUndefined(id)) {
+        if (id === undefined) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'id'`);
         }
         if (!util.isString(id)) {
@@ -503,7 +459,7 @@ export default class Layer {
     }
 
     _checkSource (source) {
-        if (util.isUndefined(source)) {
+        if (source === undefined) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof SourceBase)) {
@@ -523,19 +479,8 @@ export default class Layer {
         }
     }
 
-    _setRendererZoomCenter (matrix) {
-        let zoom;
-        let center;
-
-        zoom = util.computeMapZoom(this.map);
-        center = util.computeMapCenter(this.map);
-
-        this.renderer.setZoom(zoom);
-        this.renderer.setCenter(center);
-    }
-
-    _getViewport () {
-        const inv = mat4.invert([], this._matrix);
+    _getViewport (matrix) { // TODO move to util, check rsys
+        const inv = mat4.invert([], matrix);
 
         const corners = [
             [-1, -1],

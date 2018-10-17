@@ -17,10 +17,6 @@ const AABBTestResults = {
 };
 
 export default class Dataframe extends DummyDataframe {
-    setFreeObserver (freeObserver) {
-        this.freeObserver = freeObserver;
-    }
-
     bindRenderer (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -165,17 +161,12 @@ export default class Dataframe extends DummyDataframe {
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
         }
-        const freeObserver = this.freeObserver;
 
         Object.keys(this).map(key => {
             this[key] = null;
         });
 
         this.freed = true;
-
-        if (freeObserver) {
-            freeObserver(this);
-        }
     }
 
     _isPointInViewport (featureIndex) {

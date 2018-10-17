@@ -96,9 +96,9 @@ describe('Layer', () => {
         describe('.hide', () => {
             it('should hide a visible layer', (done) => {
                 layer.on('loaded', () => {
-                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    expect(layer.visible).toBeTruthy();
                     layer.hide();
-                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    expect(layer.visible).toBeFalsy();
                     done();
                 });
             });
@@ -135,9 +135,9 @@ describe('Layer', () => {
 
             it('should show a hidden layer', (done) => {
                 layer.on('loaded', () => {
-                    expect(layer.visibility).toEqual(layerVisibility.HIDDEN);
+                    expect(layer.visible).toBeFalsy();
                     layer.show();
-                    expect(layer.visibility).toEqual(layerVisibility.VISIBLE);
+                    expect(layer.visible).toBeTruthy();
                     done();
                 });
             });
