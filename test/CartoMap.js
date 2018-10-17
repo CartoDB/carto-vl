@@ -1,10 +1,6 @@
 // CartoMap depends on gl-matrix, which after imported is globally available as 'mat4'
 // Constants extracted from /carto-vl/src/constants/layer.js
 const RESOLUTION_ZOOMLEVEL_ZERO = 512;
-const layerVisibility = Object.freeze({
-    VISIBLE: 'visible',
-    HIDDEN: 'none'
-});
 
 /**
  * @description A simple non-interactive map used for tests

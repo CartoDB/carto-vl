@@ -1,5 +1,4 @@
 import carto from '../../../../src/';
-import { layerVisibility } from '../../../../src/constants/layer';
 import * as util from '../../util';
 import { mat4 } from 'gl-matrix';
 
