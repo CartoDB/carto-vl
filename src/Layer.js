@@ -16,9 +16,8 @@ import { unproject } from './utils/geometry';
 const renderers = new WeakMap();
 
 const states = Object.freeze({
-    INIT: 'init', // Initial state until the map is rendered the first time
-    IDLE: 'idle', // The map has been rendered and there are no more scheduled frames (no map panning, no map zooming, no animation, no change in sources)
-    UPDATING: 'updating' // The map has been rendered but there is a new frame scheduled due to map panning, map zooming, animation or a change in the sources
+    INIT: 'init', // Initial state until the Source is rendered for the first time
+    LOADED: 'loaded' // The Source has been rendered for the first time already
 });
 
 /**
@@ -352,27 +351,28 @@ export default class Layer {
      * Custom Layer API: `render` function
      */
     render (gl, matrix) {
-        this._paintLayer();
+        if (this._state === states.INIT) {
+            if (this._renderLayer.getActiveDataframes().length === 0) {
+                // Not loaded yet
+                return;
+            } else {
+                this._state = states.LOADED;
+                this._fire('loaded');
+            }
+        }
 
+        this._paintLayer();
         if (this.isAnimated()) {
             this._needRefresh();
         }
+        this._fire('updated');
     }
 
     _paintLayer () {
-        if (this._viz && this._viz.colorShader) {
-            this._renderLayer.setViz(this._viz);
-            this.renderer.renderLayer(this._renderLayer, {
-                zoomLevel: this.map.getZoom()
-            });
-
-            if (this._state === states.INIT) {
-                this._fire('loaded');
-            }
-            this._fire('updated');
-
-            this._state = this.viz.isAnimated() ? states.UPDATING : states.IDLE;
-        }
+        this._renderLayer.setViz(this._viz);
+        this.renderer.renderLayer(this._renderLayer, {
+            zoomLevel: this.map.getZoom()
+        });
     }
 
     _fire (eventType, eventData) {
