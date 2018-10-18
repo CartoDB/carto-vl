@@ -93,8 +93,8 @@ function writeTemplate (file, template) {
         file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
         cartovl: `http://localhost:${PORT}/dist/${bundle}.js`,
-        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
-        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css'),
+        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.css'),
         glmatrix: `http://localhost:${PORT}/` + path.join('node_modules', 'gl-matrix', 'dist', 'gl-matrix-min.js')
     }));
 }

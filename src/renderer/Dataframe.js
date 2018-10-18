@@ -2,7 +2,7 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-
+import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -311,6 +311,11 @@ export default class Dataframe extends DummyDataframe {
 
             const radius = this._computePointRadius(feature, viz);
 
+            if (!viz.symbol.default) {
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                c2.x += symbolOffset[0] * radius;
+                c2.y -= symbolOffset[1] * radius;
+            }
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
                 c2.x += vizOffset.x;
@@ -490,6 +495,7 @@ export default class Dataframe extends DummyDataframe {
 
         const metadata = this.metadata;
         const getters = {};
+
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
             getters[propertyName] = {
@@ -498,7 +504,9 @@ export default class Dataframe extends DummyDataframe {
                     if (metadata.properties[propertyName].type === 'category') {
                         return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
                     } else {
-                        return this._dataframe.properties[propertyName][index];
+                        return this._dataframe.properties[propertyName][index] === FP32_DESIGNATED_NULL_VALUE
+                            ? null
+                            : this._dataframe.properties[propertyName][index];
                     }
                 }
             };
@@ -508,14 +516,6 @@ export default class Dataframe extends DummyDataframe {
 
         featureClassCache.set(this.metadata, cls);
         this._cls = cls;
-    }
-
-    _getFeatureProperty (index, propertyName) {
-        if (this.metadata.properties[propertyName].type === 'category') {
-            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
-        } else {
-            return this.properties[propertyName][index];
-        }
     }
 
     getFeature (index) {

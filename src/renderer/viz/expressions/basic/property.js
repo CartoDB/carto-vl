@@ -1,7 +1,7 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
-
+import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
 /**
  * Evaluates the value of a column for every row in the dataset.
  *
@@ -58,8 +58,8 @@ export default class Property extends BaseExpression {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
 
-        return feature[this.name] && feature[this.name] === Number.MIN_SAFE_INTEGER
-            ? Number.NaN
+        return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE
+            ? null
             : feature[this.name];
     }
 
