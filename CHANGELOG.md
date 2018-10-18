@@ -5,8 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added
+- Official support for unpatched Mapbox GL version 0.50
+- Add `isNull` supporting numerical and categorical properties, deprecating `isNaN()`
+
 ### Changed
-- Eliminate the need to specify a property in `globalCount()` and `viewportCount()`
+- Eliminate the parameter to specify a property in `globalCount()` and `viewportCount()`
+
+### Removed
+- Remove `isNaN()` in favor of `isNull`
 
 ### Fixed
 - Fix an error when evaluating non-feature-dependent expressions
