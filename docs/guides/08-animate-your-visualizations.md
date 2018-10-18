@@ -75,7 +75,7 @@ The `fade` parameter is used to define two additional (`fadeIn, fadeOut`) durati
 To illustrate these concepts, we'll keep on working on the animated journey of our three birds.
 
 #### Animate points
-At the beginning of the guide, we created a simple point animation using the attribute `$date_time` for the temporal input, set the duration to `10` seconds and both fade parameters to `1`:
+At the beginning of the guide, we created a simple point animation using the attribute `$date_time` for the temporal input, set the duration to `10` seconds and both fade parameters to `1` second:
 
 ```js
 const viz = new carto.Viz(`
