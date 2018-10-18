@@ -40,7 +40,7 @@ const featureData = {
     ]
 };
 
-fdescribe('Null values', () => {
+describe('Null values', () => {
     let div, map, source, viz, layer;
 
     beforeEach(() => {
