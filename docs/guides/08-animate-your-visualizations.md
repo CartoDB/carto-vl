@@ -1,5 +1,5 @@
 ## Animated visualizations
-With CARTO VL you can make animated maps of points, lines and polygons using the [`animation`](/developers/carto-vl/reference/#cartoexpressionsanimation) expression. In this guide, you will learn how to make animated maps that tell a story by gaining a bette`r understanding of how to adjust animation parameters based on the type of data you are mapping.
+With CARTO VL you can make animated maps of points, lines and polygons using the [`animation`](/developers/carto-vl/reference/#cartoexpressionsanimation) expression. In this guide, you will learn how to make animated maps that tell a story by gaining a better understanding of how to adjust animation parameters based on the type of data you are mapping.
 
 <div class="example-map">
     <iframe
