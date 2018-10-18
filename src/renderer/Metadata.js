@@ -1,3 +1,4 @@
+import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
@@ -38,10 +39,17 @@ export default class Metadata {
                 frequency: Number.NaN
             });
         }
-        this.categoryToID.set(category, this.numCategories);
-        this.IDToCategory.set(this.numCategories, category);
-        this.numCategories++;
-        return this.numCategories - 1;
+        if (category !== null) {
+            this.categoryToID.set(category, this.numCategories);
+            this.IDToCategory.set(this.numCategories, category);
+            this.numCategories++;
+            return this.numCategories - 1;
+        } else {
+            this.categoryToID.set(category, FP32_DESIGNATED_NULL_VALUE);
+            this.IDToCategory.set(FP32_DESIGNATED_NULL_VALUE, category);
+            this.numCategories++;
+            return FP32_DESIGNATED_NULL_VALUE;
+        }
     }
 
     propertyNames (propertyName) {

@@ -7,3 +7,5 @@ export const DEFAULT_OPTIONS = {
     othersLabel: OTHERS_LABEL,
     samples: DEFAULT_SAMPLES
 };
+
+export const FP32_DESIGNATED_NULL_VALUE = -(1 << 24);

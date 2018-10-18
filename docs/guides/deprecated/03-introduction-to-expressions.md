@@ -59,7 +59,7 @@ const viz = new carto.Viz(`
 
 #### Unary
 
-This is the list of the available unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNaN`, `not`, `floor` and, `ceil`.
+This is the list of the available unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNull`, `not`, `floor` and, `ceil`.
 
 ```js
 const viz = new carto.Viz(`

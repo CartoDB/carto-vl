@@ -1,12 +1,6 @@
-import {
-    implicitCast,
-    checkType,
-    checkMaxArguments
-} from './utils';
+import { implicitCast, checkType, checkMaxArguments } from './utils';
 import BaseExpression from './base';
-import CartoValidationError, {
-    CartoValidationTypes as cvt
-} from '../../../errors/carto-validation-error';
+import { FP32_DESIGNATED_NULL_VALUE } from './constants';
 
 /**
  * Compute the natural logarithm (base e) of a number x.
@@ -179,32 +173,33 @@ export const Sign = genUnaryOp('sign', x => Math.sign(x), x => `sign(${x})`);
 export const Abs = genUnaryOp('abs', x => Math.abs(x), x => `abs(${x})`);
 
 /**
- * Check if a numeric expression is NaN.
+ * Check if a numerical or categorical property is missing (NULL value).
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @example <caption>Filter NaN values of the `numeric` property.</caption>
+ * @example <caption>Filter NULL values of the `numeric` property.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
- *   filter: s.not(s.isNaN(s.prop('numeric')))
+ *   filter: s.not(s.isNull(s.prop('numeric')))
  * });
  *
- * @example <caption>Filter NaN values of the `numeric` property. (String)</caption>
+ * @example <caption>Filter NULL values of the `numeric` property. (String)</caption>
  * const viz = new carto.Viz(`
- *   filter: not(isNaN($numeric))
+ *   filter: not(isNull($numeric))
  * `);
  *
  * @param {Number} x - Numeric expression to check
  * @return {Number}
  *
  * @memberof carto.expressions
- * @name isNaN
+ * @name isNull
  * @function
  * @api
  */
-export const IsNaN = genUnaryOp('isNaN',
-    x => Number.isNaN(x) ? 1 : 0,
-    x => `((${x} == ${Number.MIN_SAFE_INTEGER.toFixed(20)}) ? 1. : 0.)`
+export const IsNull = genUnaryOp('isNull',
+    x => x === null ? 1 : 0,
+    x => `((${x} == ${FP32_DESIGNATED_NULL_VALUE.toFixed(20)}) ? 1. : 0.)`,
+    ['number', 'category']// TODO force property
 );
 
 /**
@@ -291,7 +286,7 @@ export const Floor = genUnaryOp('floor', x => Math.floor(x), x => `floor(${x})`)
  */
 export const Ceil = genUnaryOp('ceil', x => Math.ceil(x), x => `ceil(${x})`);
 
-function genUnaryOp (name, jsFn, glsl) {
+function genUnaryOp (name, jsFn, glsl, validTypes = 'number') {
     return class UnaryOperation extends BaseExpression {
         constructor (a) {
             checkMaxArguments(arguments, 1, name);
@@ -312,10 +307,7 @@ function genUnaryOp (name, jsFn, glsl) {
         }
         _bindMetadata (meta) {
             super._bindMetadata(meta);
-            checkType(name, 'x', 0, 'number', this.a);
-            if (this.a.type !== 'number') {
-                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unary operation cannot be performed to '${this.a.type}'`);
-            }
+            checkType(name, 'x', 0, validTypes, this.a);
         }
     };
 }

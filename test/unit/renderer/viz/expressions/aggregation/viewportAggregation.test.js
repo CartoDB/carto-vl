@@ -36,7 +36,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         function fakeDrawMetadata (expr) {
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: null });
             expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
             expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });
             expr.accumViewportAgg({ price: 0, cat: 'a', numeric_with_nulls: 0 });
