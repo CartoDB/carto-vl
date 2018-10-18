@@ -12,4 +12,4 @@ const pointGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodePoint', () => {
     decodeGeom('point', pointGeometry);
-}, {runs: 10000});
+}, { runs: 10000 });

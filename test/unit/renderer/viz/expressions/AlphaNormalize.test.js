@@ -22,7 +22,7 @@ describe('src/renderer/viz/expressions/AlphaNormalize', () => {
                     }
                 }
             });
-            expect(expr.eval({price: 5})).toEqual({r: 255, g: 128, b: 0, a: 0.5});
+            expect(expr.eval({ price: 5 })).toEqual({ r: 255, g: 128, b: 0, a: 0.5 });
         });
     });
 });

@@ -12,9 +12,16 @@ describe('api/setup/config-service', () => {
             expect(getDefaultConfig()).toBeUndefined();
         });
 
+        let defaultConfig;
+        beforeEach(() => {
+            defaultConfig = getDefaultConfig();
+        });
         it('should return the last config set', () => {
             setDefaultConfig(config);
             expect(getDefaultConfig()).toEqual(config);
+        });
+        afterEach(() => {
+            setDefaultConfig(defaultConfig);
         });
     });
 

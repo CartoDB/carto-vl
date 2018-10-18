@@ -76,7 +76,7 @@ describe('api/layer', () => {
 
     describe('cloning the source', () => {
         it('should be done with Dataset sources', () => {
-            const source = new Dataset('ne_10m_populated_places_simple', {
+            const source = new Dataset('populated_places', {
                 username: 'test',
                 apiKey: '1234567890'
             });
@@ -84,7 +84,7 @@ describe('api/layer', () => {
             expect(layer._source).not.toBe(source);
         });
         it('should be done with SQL sources', () => {
-            const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
+            const source = new SQL('SELECT * FROM populated_places', {
                 username: 'test',
                 apiKey: '1234567890'
             });

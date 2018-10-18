@@ -42,7 +42,7 @@ export default class ViewportMax extends ViewportAggregation {
     accumViewportAgg (feature) {
         const propertyValue = this.property.eval(feature);
 
-        if (!Number.isNaN(propertyValue)) {
+        if (propertyValue !== null) {
             this._value = Math.max(this._value, propertyValue);
         }
     }

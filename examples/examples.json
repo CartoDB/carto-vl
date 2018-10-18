@@ -82,6 +82,71 @@
                 {
                     "title": "Scaled width",
                     "file": "styling/scaled.html"
+                },
+                {
+                    "title": "Geometry types",
+                    "file": "guides/viz-properties/geom-types.html"
+                },
+                {
+                    "title": "Accessing visualization properties",
+                    "file": "guides/viz-properties/accessing-viz-properties.html"
+                },
+                {
+                    "title": "Population Density - basic",
+                    "file": "guides/ramp/population-density-basic.html"
+                },
+                {
+                    "title": "Population Density - Classification",
+                    "file": "guides/ramp/population-density-classified.html"
+                },
+                {
+                    "title": "Election - basic",
+                    "file": "guides/ramp/election-basic.html"
+                },
+                {
+                    "title": "Election - Others Bucket",
+                    "file": "guides/ramp/election-others-bucket.html"
+                },
+                {
+                    "title": "Railroad accidents - top expression",
+                    "file": "guides/ramp/accidents-top.html"
+                },
+                {
+                    "title": "Railroad accidents - all types",
+                    "file": "guides/ramp/accidents-all.html"
+                },
+                {
+                    "title": "Population density - colors",
+                    "file": "guides/ramp/population-density-colors.html",
+                    "height": "1050"
+                },
+                {
+                    "title": "Railroad accidents - bubble-map",
+                    "file": "guides/ramp/accidents-bubblemap.html"
+                },
+                {
+                    "title": "Legends - Unclassified numerical data",
+                    "file": "misc/legends/legend-number.html"
+                },
+                {
+                    "title": "Legends - Categorical data",
+                    "file": "misc/legends/legend-buckets.html"
+                },
+                {
+                    "title": "Legends - Categorical data with Image markers",
+                    "file": "misc/legends/legend-image.html"
+                },
+                {
+                    "title": "Railroad accidents - Widgets",
+                    "file": "guides/ramp/accidents-widgets.html"
+                },
+                {
+                    "title": "Railroad accidents - Numeric Histogram",
+                    "file": "guides/ramp/accidents-numeric-histogram.html"
+                },
+                {
+                    "title": "Railroad accidents - Category Widget",
+                    "file": "guides/ramp/accidents-category-histogram.html"
                 }
             ]
         },

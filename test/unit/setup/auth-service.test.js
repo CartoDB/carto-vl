@@ -64,7 +64,7 @@ describe('api/setup/auth-service', () => {
     });
 
     // Reset global state to prevent errors in different tests
-    afterAll(() => {
+    afterEach(() => {
         cleanDefaultAuth(undefined);
     });
 });

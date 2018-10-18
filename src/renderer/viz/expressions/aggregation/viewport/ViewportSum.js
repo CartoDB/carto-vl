@@ -45,7 +45,7 @@ export default class ViewportSum extends ViewportAggregation {
     accumViewportAgg (feature) {
         const propertyValue = this.property.eval(feature);
 
-        if (!Number.isNaN(propertyValue)) {
+        if (propertyValue !== null) {
             const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
             this._value = this._value + clusterCount * propertyValue;
         }
