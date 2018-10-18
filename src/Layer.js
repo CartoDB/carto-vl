@@ -17,7 +17,8 @@ const renderers = new WeakMap();
 
 const states = Object.freeze({
     INIT: 'init', // Initial state until the Source is rendered for the first time
-    LOADED: 'loaded' // The Source has been rendered for the first time already
+    IDLE: 'idle', // The Source has been rendered for the first time already, but there are no scheduled updates
+    UPDATING: 'updating' // The Source has been rendered for the first time already and there is a scheduled update
 });
 
 /**
@@ -357,14 +358,17 @@ export default class Layer {
 
         this._paintLayer();
 
-        if (this._state === states.INIT) {
-            this._state = states.LOADED;
-            this._fire('loaded');
-        }
-        this._fire('updated');
-
+        const state = this._state;
+        this._state = states.IDLE;
         if (this.isAnimated()) {
             this._needRefresh();
+        }
+
+        if (state === states.INIT) {
+            this._fire('loaded');
+            this._fire('updated');
+        } else if (state === states.UPDATING) {
+            this._fire('updated');
         }
     }
 
@@ -398,6 +402,9 @@ export default class Layer {
     }
 
     _needRefresh () {
+        if (this._state !== states.INIT) {
+            this._state = states.UPDATING;
+        }
         this.map.triggerRepaint();
     }
 

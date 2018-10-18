@@ -25,6 +25,7 @@ describe('Layer', () => {
             color: @myColor
         `);
         layer = new carto.Layer('layer', source, viz);
+        layer._paintLayer = () => {};
         layer.addTo(map);
     });
 
@@ -49,33 +50,33 @@ describe('Layer', () => {
         });
 
         it('should fire a "updated" event when the source is updated', (done) => {
-            let update = jasmine.createSpy('update');
-            layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(new carto.source.GeoJSON(featureData));
-                layer._paintLayer();
-                expect(update).toHaveBeenCalledTimes(2);
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
+                layer.render();
+                expect(update).toHaveBeenCalledTimes(1);
                 done();
             });
         });
 
         it('should fire a "updated" event when the viz is updated', (done) => {
-            let update = jasmine.createSpy('update');
-            layer.on('updated', update);
             layer.on('loaded', async () => {
                 await layer.update(source, new carto.Viz('color: blue'));
-                layer._paintLayer();
-                expect(update).toHaveBeenCalledTimes(2);
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
+                layer.render();
+                expect(update).toHaveBeenCalledTimes(1);
                 done();
             });
         });
 
         it('should fire a "updated" event when a new dataframe is added', (done) => {
-            let update = jasmine.createSpy('update');
-            layer.on('updated', update);
             layer.on('loaded', () => {
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
                 layer._onDataframeAdded(layer._source._dataframe);
-                layer._paintLayer();
+                layer.render();
                 expect(update).toHaveBeenCalledTimes(1);
                 done();
             });
@@ -86,10 +87,10 @@ describe('Layer', () => {
             await layer.update(source, new carto.Viz('width: now()'));
             layer.on('updated', update);
             layer.on('loaded', () => {
-                layer._paintLayer();
+                layer.render();
+                expect(update).toHaveBeenCalledTimes(1);
+                layer.render();
                 expect(update).toHaveBeenCalledTimes(2);
-                layer._paintLayer();
-                expect(update).toHaveBeenCalledTimes(3);
                 done();
             });
         });
@@ -105,13 +106,9 @@ describe('Layer', () => {
             });
 
             it('should trigger an update event', (done) => {
-                let update = jasmine.createSpy('update');
-
                 layer.on('loaded', () => {
-                    layer.on('updated', update);
+                    layer.on('updated', done);
                     layer.hide();
-                    expect(update).toHaveBeenCalledTimes(1);
-                    done();
                 });
             });
 
@@ -119,7 +116,7 @@ describe('Layer', () => {
                 layer.on('loaded', () => {
                     const requestDataSourceSpy = spyOn(layer._source, 'requestData');
                     layer.hide();
-                    layer.requestData();
+                    layer.prerender();
 
                     expect(requestDataSourceSpy).not.toHaveBeenCalled();
                     done();
@@ -148,8 +145,9 @@ describe('Layer', () => {
                     const requestDataSourceSpy = spyOn(layer._source, 'requestData');
                     layer.hide();
                     layer.show();
-                    layer.requestData();
+                    layer.prerender(undefined, mat4.identity([]));
                     layer._matrix = mat4.identity([]);
+                    layer._matrix[0] = 2;
                     layer.prerender(undefined, mat4.identity([]));
 
                     expect(requestDataSourceSpy).toHaveBeenCalled();
