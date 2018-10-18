@@ -136,7 +136,7 @@ filter: animation($date_time, 30, fade(0, 0.5))
 Since this visualization represents the journey of three different birds, we can assign a unique color to each one, using their names to define `buckets` inside of a `ramp`. We will also decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`.
 
 **Note:**
-For a more in-depth discussion of ramps and other styling properties, check out our **Data-driven visualization guide** [part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) and [part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/)
+For a more in-depth discussion of ramps and other styling properties, check out our **[Data-driven visualization guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/)**.
 
 ```js
 const viz = new carto.Viz(`
