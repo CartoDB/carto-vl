@@ -493,8 +493,15 @@ export default class Dataframe extends DummyDataframe {
             }
         };
 
-        const metadata = this.metadata;
+        Object.defineProperties(cls.prototype, this._buildGetters());
+
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _buildGetters () {
         const getters = {};
+        const metadata = this.metadata;
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
             if (this.metadata.properties[propertyName].aggregations) {
@@ -522,11 +529,7 @@ export default class Dataframe extends DummyDataframe {
                 }
             };
         }
-
-        Object.defineProperties(cls.prototype, getters);
-
-        featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
+        return getters;
     }
 
     _getFeatureProperty (index, propertyName) {
