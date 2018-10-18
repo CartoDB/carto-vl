@@ -1,23 +1,31 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Filter based styling | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <!-- Include CARTO VL JS -->
+  <script src="../../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Filter based styling</h1>
+        <h1>Accessing visualization properties</h1>
       </header>
       <section>
-        <p class="description open-sans">Filter data in the browser</p>
+        <p class="description open-sans">Modifying and accessing visualization properties</p>
+        <label>The current color is:</label>
+        <label id="colorDisplay"></label>
+        <button onclick="randomizeColor()">Randomize color</button>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -32,12 +40,10 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.darkmatter,
-      center: [0, 30],
-      zoom: 2,
+      style: carto.basemaps.voyager,
+      center: [0, 0],
+      zoom: 0,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -47,26 +53,33 @@
 
     // Define user
     carto.setDefaultAuth({
-      username: 'cartovl',
+      user: 'cartovl',
       apiKey: 'default_public'
     });
 
     // Define layer
     const source = new carto.source.Dataset('populated_places');
     const viz = new carto.Viz(`
-        color: ramp(viewportQuantiles($pop_max, 5), redor)
-        width: 5
-        strokeWidth: 0
-        filter: between($pop_max, 10000, 100000)
+        color: blue
     `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
+    layer.on('updated', () => {
+      const currentColor = viz.color.value;
+      document.getElementById('colorDisplay').innerText = JSON.stringify(currentColor, null, 4);
+    });
+
+    function randomizeColor() {
+      viz.color.blendTo(`rgb(${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)})`);
+    }
+
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>

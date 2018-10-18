@@ -1066,7 +1066,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
 
                     r._bindMetadata(METADATA);
                     const colorLegend = r.getLegendData();
-                    expect(colorLegend.name).toEqual('linear($price, globalMin(1), globalMax(4))');
+                    expect(colorLegend.name).toEqual('linear($price, globalMin($price), globalMax($price))');
                 });
             });
         });

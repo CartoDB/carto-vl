@@ -56,7 +56,7 @@
     // Define layer
     const source = new carto.source.SQL(`
       SELECT *
-        FROM ne_10m_populated_places_simple
+        FROM populated_places
         WHERE adm0name = 'Spain'
     `);
     const viz = new carto.Viz(`
