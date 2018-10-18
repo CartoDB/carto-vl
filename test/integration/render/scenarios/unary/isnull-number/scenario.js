@@ -3,11 +3,11 @@ const map = new CartoMap({
     background: 'black'
 });
 
-const source = new carto.source.GeoJSON(sources['points']);
+const source = new carto.source.GeoJSON(sources['nullpoints']);
 const viz = new carto.Viz(`
-    width: 20,
-    color: hsv(0, linear($numeric, 0, 10), 1)
-    filter: not(isNaN($numeric))
+    width: 20
+    strokeWidth: 5*isNull($num)
+    color: ramp($num, [red, blue])
 `);
 const layer = new carto.Layer('layer', source, viz);
 
