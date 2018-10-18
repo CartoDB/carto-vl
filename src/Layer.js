@@ -351,21 +351,21 @@ export default class Layer {
      * Custom Layer API: `render` function
      */
     render (gl, matrix) {
-        if (this._state === states.INIT) {
-            if (this._renderLayer.getActiveDataframes().length === 0) {
-                // Not loaded yet
-                return;
-            } else {
-                this._state = states.LOADED;
-                this._fire('loaded');
-            }
+        if (this._state === states.INIT && this._renderLayer.getActiveDataframes().length === 0) {
+            return;
         }
 
         this._paintLayer();
+
+        if (this._state === states.INIT) {
+            this._state = states.LOADED;
+            this._fire('loaded');
+        }
+        this._fire('updated');
+
         if (this.isAnimated()) {
             this._needRefresh();
         }
-        this._fire('updated');
     }
 
     _paintLayer () {

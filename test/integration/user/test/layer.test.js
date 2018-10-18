@@ -41,8 +41,10 @@ describe('Layer', () => {
             let update = jasmine.createSpy('update');
             layer.on('updated', update);
             layer.on('loaded', () => {
-                expect(update).toHaveBeenCalledTimes(1);
-                done();
+                setTimeout(() => {
+                    expect(update).toHaveBeenCalledTimes(1);
+                    done();
+                }, 0);
             });
         });
 
