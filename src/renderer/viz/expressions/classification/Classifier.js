@@ -79,7 +79,7 @@ export default class Classifier extends BaseExpression {
             const max = breakpoints[i] || Number.POSITIVE_INFINITY;
             const key = [min, max];
             const value = i / breakpointsLength;
-            data.push({key, value});
+            data.push({ key, value });
         }
 
         return { name, data };

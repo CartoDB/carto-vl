@@ -136,7 +136,7 @@ function genHSV (name, alpha) {
                     clamp(${inline.s}${normalize(this.s)}, 0.,1.),
                     clamp(${inline.v}${normalize(this.v)}, 0.,1.)
                 )), ${alpha ? `clamp(${inline.a}, 0.,1.)` : '1.'})`
-                , `
+            , `
     #ifndef HSV2RGB
     #define HSV2RGB
     vec3 HSVtoRGB(vec3 HSV) {

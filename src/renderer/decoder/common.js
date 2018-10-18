@@ -71,7 +71,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                     // `turnLeft` indicates that the nextLine turns to the left
                     // `joinNormal` contains the direction and size for the `miter` vertex
                     //  If this is not defined means that the join must be `bevel`.
-                    let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+                    let { turnLeft, joinNormal } = getJoinNormal(prevNormal, nextNormal);
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);

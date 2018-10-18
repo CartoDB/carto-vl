@@ -72,7 +72,7 @@ describe('src/renderer/Dataframe', () => {
                     strokeWidth: { eval: () => 0.5 },
                     filter: { eval: () => 1.0 },
                     symbol: { default: false },
-                    symbolPlacement: {eval: () => [1, 1]},
+                    symbolPlacement: { eval: () => [1, 1] },
                     transform: { default: true }
                 };
                 it('should return an empty list when there are no points at the given position', () => {

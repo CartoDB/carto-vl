@@ -244,7 +244,7 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
-        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        const aabb = { minx: -1, miny: -1, maxx: 1, maxy: 1 };
         for (let i = start; i < end; i += 6) {
             const v1 = this._projectToNDC(vertices[i + 0], vertices[i + 1]);
             const v2 = this._projectToNDC(vertices[i + 2], vertices[i + 3]);
@@ -276,7 +276,7 @@ export default class Dataframe extends DummyDataframe {
         const ow = matrix[3] * x + matrix[7] * y + matrix[15];
 
         // Normalize by W
-        return {x: ox / ow, y: oy / ow};
+        return { x: ox / ow, y: oy / ow };
     }
 
     _getPointsAtPosition (pos, viz) {
