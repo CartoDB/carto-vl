@@ -1,4 +1,4 @@
-import mapboxgl from '@carto/mapbox-gl';
+import mapboxgl from 'mapbox-gl';
 import { projectToWebMercator, WM_2R } from '../../src/utils/util';
 
 const mapSize = 600;
