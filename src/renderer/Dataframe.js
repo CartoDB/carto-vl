@@ -493,11 +493,31 @@ export default class Dataframe extends DummyDataframe {
             }
         };
 
-        const metadata = this.metadata;
-        const getters = {};
+        Object.defineProperties(cls.prototype, this._buildGetters());
 
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _buildGetters () {
+        const getters = {};
+        const metadata = this.metadata;
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
+            if (this.metadata.properties[propertyName].aggregations) {
+                Object.values(this.metadata.properties[propertyName].aggregations).forEach(aggName => {
+                    getters[aggName] = {
+                        get: function () {
+                            const index = this._index;
+                            if (metadata.properties[propertyName].type === 'category') {
+                                return metadata.IDToCategory.get(this._dataframe.properties[aggName][index]);
+                            } else {
+                                return this._dataframe.properties[aggName][index];
+                            }
+                        }
+                    };
+                });
+            }
             getters[propertyName] = {
                 get: function () {
                     const index = this._index;
@@ -511,11 +531,7 @@ export default class Dataframe extends DummyDataframe {
                 }
             };
         }
-
-        Object.defineProperties(cls.prototype, getters);
-
-        featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
+        return getters;
     }
 
     getFeature (index) {
