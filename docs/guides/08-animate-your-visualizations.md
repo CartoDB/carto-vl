@@ -193,7 +193,6 @@ The elements we will add are:
 
 To display the controls, you're going to create a panel. You have to add this just under the map, like this:
 ```html
-<!-- Map goes here -->
 <div id="map"></div>
 <!-- Animation control elements -->
 <aside>
