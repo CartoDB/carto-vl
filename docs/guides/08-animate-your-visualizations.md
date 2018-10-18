@@ -382,14 +382,14 @@ const viz = new carto.Viz(`
 `);
 ```
 
-You can also apply the same time range (`@time`) to other properties like color using a `ramp` expression. That double-encoding of the same time dimension, within the filter and the color, will reinforce the expressiveness of the visualization:
+You can also apply the same time range (`@timeSteps`) to other properties like color using a `ramp` expression. That double-encoding of the same time dimension, within the filter and the color, will reinforce the expressiveness of the visualization:
 
 ```js
 const viz = new carto.Viz(`
     @duration: 10
-    @animation: animation(@time, @duration, fade(0,0.5))
-    @time: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
-    color: ramp(@time, SunsetDark)
+    @animation: animation(@timeSteps, @duration, fade(0,0.5))
+    @timeSteps: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
+    color: ramp(@timeSteps, SunsetDark)
     filter: @animation
     width: 10
     strokeWidth: 0
