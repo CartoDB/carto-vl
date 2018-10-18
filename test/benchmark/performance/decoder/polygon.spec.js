@@ -19,4 +19,4 @@ const polygonGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodePolygon', () => {
     decodeGeom('polygon', polygonGeometry);
-}, {runs: 10000});
+}, { runs: 10000 });
