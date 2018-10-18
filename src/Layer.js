@@ -194,7 +194,10 @@ export default class Layer {
         this._checkSource(source);
         this._checkViz(viz);
 
-        source = source._clone();
+        if (source !== this._source) {
+            source = source._clone();
+        }
+
         this._atomicChangeUID++;
         const uid = this._atomicChangeUID;
         const loadImagesPromise = viz.loadImages();
@@ -212,14 +215,6 @@ export default class Layer {
         // Everything was ok => commit changes
         this.metadata = metadata;
 
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
-
-        if (this._source !== source) {
-            this._freeSource();
-        }
-
-        this._source = source;
-
         viz.setDefaultsIfRequired(this.metadata.geomType);
         if (this._viz) {
             this._viz.onChange(null);
@@ -228,6 +223,13 @@ export default class Layer {
         viz.onChange(this._vizChanged.bind(this));
         this._compileShaders(viz, metadata);
         this._needRefresh();
+
+        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+        if (this._source !== source) {
+            this._freeSource();
+        }
+
+        this._source = source;
     }
 
     /**
@@ -422,33 +424,7 @@ export default class Layer {
     }
 
     async _vizChanged (viz) {
-        if (this._cache) { // TODO smells
-            return this._cache;
-        }
-        this._cache = this._requestVizChanges(viz)
-            .then(() => { this._cache = null; });
-        return this._cache;
-    }
-
-    async _requestVizChanges (viz) {
-        await this._context;
-        if (!this._source) { // TODO Await
-            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} a 'source' is required before changing the viz.`);
-        }
-
-        const source = this._source;
-        const loadImagesPromise = viz.loadImages();
-        const metadata = await source.requestMetadata(viz);
-        await loadImagesPromise;
-
-        if (this._source !== source) {
-            throw new CartoRuntimeError('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
-        }
-        this.metadata = metadata;
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-        viz.setDefaultsIfRequired(this._renderLayer.type);
-        this._compileShaders(viz, this.metadata); // TODO shared with update??
-        this._needRefresh();
+        return this.update(this._source, viz);
     }
 
     _checkId (id) {
