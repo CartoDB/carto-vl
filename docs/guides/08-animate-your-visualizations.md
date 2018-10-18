@@ -19,7 +19,7 @@ Before we begin with the details, it is important to understand the general synt
 
 We will walk through each part throughout this guide.
 
-Using the syntax above, let’s create a basic animation where points appear and disappear on a map. We will use a `date_time` attribute (a time associated with each feature) as our `input`, set the `duration` to `10` seconds and set both `fade` parameters to `1`.
+Using the syntax above, let’s create a basic animation where points appear and disappear on a map. We will use a `date_time` attribute (a time associated with each feature) as our `input`, set the `duration` to `10` seconds and set both `fade` parameters to `1` second.
 
 The result is an animation that cycles through all of the records in the dataset over 10 seconds. Each point will take 1 second to become visible (_fade in_) and another second to disappear (_fade out_). You can see it in action in the next map.
 
@@ -136,7 +136,7 @@ filter: animation($date_time, 30, fade(0, 0.5))
 Since this visualization represents the journey of three different birds, we can assign a unique color to each one, using their names to define `buckets` inside of a `ramp`. We will also decrease the `width` of the points to `4` and finally, remove the `strokeWidth` by setting it to `0`.
 
 **Note:**
-For a more in-depth discussion of ramps and other styling properties, check out our **[Data-driven visualization guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/)**.
+For a more in-depth discussion of ramps and other styling properties, check out our [Data-driven visualizations guide - part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/).
 
 ```js
 const viz = new carto.Viz(`
@@ -208,7 +208,7 @@ To display the controls, you're going to create a panel. You have to add this ju
     <section>
         <button id="js-play-button">Play</button>
         <button id="js-pause-button">Pause</button>
-        <input type="range" id="js-duration-range" min="0" max="30" step="1">
+        <input type="range" id="js-duration-range" min="1" max="30" step="1">
     </section>
 </aside>
 ```
