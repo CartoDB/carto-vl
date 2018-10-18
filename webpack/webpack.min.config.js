@@ -52,7 +52,7 @@ module.exports = {
         new webpack.BannerPlugin(banner)
     ],
     performance: {
-        maxEntrypointSize: 409600,
-        maxAssetSize: 409600
+        maxEntrypointSize: 435200,
+        maxAssetSize: 435200
     }
 };
