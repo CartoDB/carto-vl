@@ -8,7 +8,7 @@ We most often hear about zoom-based styling in the context of basemaps. As an ex
 For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
 
 <div class="box-textMediaa">
-    <img src="/developers/carto-vl/examples/guides/zoom-based-styling/multi-scale-voyager.gif" alt="Multi-scale GIF of Voyager">
+    <img src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/multi-scale-voyager.gif" alt="Multi-scale GIF of Voyager">
 </div>
 
 **Note:**
@@ -34,7 +34,7 @@ After we explore each one independently, we will bring them together to create a
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-8"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-8.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-8.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -109,7 +109,7 @@ Next, test that the map loads by opening the file in your web browser of choice.
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-1"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-1.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -136,7 +136,7 @@ With these adjustments, we can more clearly see the distribution of trees around
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-2"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -162,7 +162,7 @@ In the resulting map, as we zoom in and out, you'll notice that the `1` point sy
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-3"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -190,7 +190,7 @@ This sets the width of our symbols to `1` at zoom levels less than or equal to `
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-4"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -213,12 +213,12 @@ strokeColor: ramp(zoomrange([12,18]),[green,white])
 ```
 As you zoom in on the map, look closely at the point and stroke colors.
 
-At zooms less than `12` the point color is `white` and the stroke color is `green`. At zooms greater than `18` we are flipping the fill and stroke colors.  You will know that you are at zoom `18` when the points are green with a white outline. As you zoom in, you will notice that there is a transition in color happening. This is where the interpoation is taking place.
+At zooms less than `12` the point color is `white` and the stroke color is `green`. At zooms greater than `18` we are flipping the fill and stroke colors.  You will know that you are at zoom `18` when the points are green with a white outline. As you zoom in, you will notice that there is a transition in color happening. This is where the interpolation is taking place.
 
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-5"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-5.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-5.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -263,7 +263,7 @@ As you zoom in and out of the resulting map, you will notice that the colors (pu
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-6"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-6.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-6.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -283,7 +283,7 @@ With this filter, all points will draw when both criteria are met. This means th
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-7"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-7.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-7.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -303,7 +303,7 @@ Take a look at the map, zoom in and out to see the changes in the styling and vi
 <div class="example-map">
     <iframe
         id="guides-zoom-based-styling-step-8"
-        src="/developers/carto-vl/examples/guides/zoom-based-styling/step-8.html"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-8.html"
         width="100%"
         height="500"
         frameBorder="0">
