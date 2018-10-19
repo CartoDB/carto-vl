@@ -122,12 +122,12 @@ As we can see on the map, there are a lot of trees in Vancouver!
 To better visualize the high density of information, let's override the default point `width` and set it to `1` and set the `strokeWidth` to `0.5`:
 
 ```js
-        const viz = new carto.Viz(`
-                color: white
-                width: 1
-                strokeColor: green
-                strokeWidth: 0.5
-        `);
+const viz = new carto.Viz(`
+    color: white
+    width: 1
+    strokeColor: green
+    strokeWidth: 0.5
+`);
 ```
 
 With these adjustments, we can more clearly see the distribution of trees around the city:
@@ -152,7 +152,7 @@ Let's say we are satisfied with how a `1` point symbol size looks at our opening
 
 Let's give it a try by adding this information to the `width` property:
 
-```js
+```CARTO_VL_Viz
 width: scaled(1,11)
 ```
 
@@ -180,7 +180,7 @@ In the previous step, we determined that a width of `1` worked well at our openi
 
 We can use the results of this visual examination to set different widths by zoom:
 
-```js
+```CARTO_VL_Viz
 width: ramp(zoomrange([12,18]),[1,20])
 ```
 
@@ -198,7 +198,7 @@ This sets the width of our symbols to `1` at zoom levels less than or equal to `
 
 We can use the same logic for `strokeWidth`:
 
-```js
+```CARTO_VL_Viz
 strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
 ```
 
@@ -206,7 +206,7 @@ As described above for any width property, symbol sizes are interpolated between
 
 To demonstrate, add the style for point color and stroke color below to your map:
 
-```js
+```CARTO_VL_Viz
 color: ramp(zoomrange([12,18]),[white,green])
 strokeColor: ramp(zoomrange([12,18]),[green,white])
 ```
@@ -240,14 +240,14 @@ To demonstrate, we will use an attribute, `diameter` in the Vancouver trees data
 
 To better visualize the points appearing through zoom, first let's classify the data using `globalQuantiles`, `7` class breaks, and color each class with the CARTOColor scheme `sunset`:
 
-```js
-   color: ramp(globalQuantiles($diameter,7),sunset)
-   width: ramp(zoomrange([12,18]),[1,20])
-   strokeWidth: 0
+```CARTO_VL_Viz
+color: ramp(globalQuantiles($diameter,7),sunset)
+width: ramp(zoomrange([12,18]),[1,20])
+strokeWidth: 0
 ```
 Next, we'll add a `filter` and set our `diameter` criteria with `zoomrange` where we gradually introduce larger trees until zoom `16` and greater, where we display all trees (`true`):
 
-```js
+```CARTO_VL_Viz
 filter:ramp(zoomrange([12,13,14,15,16]),
             [$diameter>30,
             $diameter>20,
@@ -273,7 +273,7 @@ Let's explore this further using [`zoom`](https://carto.com/developers/carto-vl/
 
 Using the same map from above, replace the `filter` styling with:
 
-```js
+```CARTO_VL_Viz
 filter: zoom()>15 or $diameter>30
 ```
 
