@@ -1,5 +1,4 @@
 ## Zoom-based Styling
-
 An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different _zoom level_. At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed.
 
 With any map, the decisions that you as the map designer make are critical to the interpretability of your map by the end user. The zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed.
@@ -17,15 +16,14 @@ CARTO VL renderer provides a native/built-in way to do zoom-based styling withou
 
 
 ### Zoom-based styling with VL
-
 In the past, zoom-based styling has been overly complex creating a barrier of entry for many. It is no wonder that it was “easier” to put too much information on a map and/or only design a map for one zoom level.
 
 That’s not the case with CARTO VL.
 
 In this guide, we will demonstrate how this complexity has been greatly reduced and introduce _our_ concept of zoom-based styling. By the end of this guide, you will learn how to take advantage of these features and start making a whole new kind of multi-scale thematic map!
 
-### Overview
 
+### Overview
 Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, we will first explore the following zoom-based functionalities:
 
 - [`scaled`](/developers/carto-vl/reference/#cartoexpressionsscaled): how to keep symbol sizes consistent through zoom level.
@@ -43,8 +41,8 @@ After we explore each one independently, we will bring them together to create a
     </iframe>
 </div>
 
-### Getting started
 
+### Getting started
 To get started, copy and paste the code below into your favorite text editor and save it to a file `vancouver-trees.html`.
 
 ```html
@@ -118,8 +116,8 @@ Next, test that the map loads by opening the file in your web browser of choice.
     </iframe>
 </div>
 
-### Adjust symbol size
 
+### Adjust symbol size
 As we can see on the map, there are a lot of trees in Vancouver!
 
 To better visualize the high density of information, let's override the default point `width` and set it to `1` and set the `strokeWidth` to `0.5`:
@@ -145,8 +143,8 @@ With these adjustments, we can more clearly see the distribution of trees around
     </iframe>
 </div>
 
-### Scale symbol size
 
+### Scale symbol size
 Take a few minutes to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of `11` and smaller, but begin to break down as we zoom in.
 
 That's because styling that works well at _one_ zoom level doesn't always work well at _all_ zoom levels.
@@ -173,8 +171,8 @@ In the resulting map, as we zoom in and out, you'll notice that the `1` point sy
 
 If you aren't satisfied with the result, try adjusting the anchor scale and/or point width. For example, adjust the `width` style to `scaled(1,15)`. You can also use this functionality with `strokeWidth` to scale the outline of the points.
 
-### Define a range of symbol sizes
 
+### Define a range of symbol sizes
 As demonstrated above, the `scaled` option is great to keep symbol sizes consistent through zoom. There are other times where you will want finer control at every zoom level and/or at a range of zoom levels.
 
 Next, let's take a look at how we can use the `zoomRange` expression inside of a `ramp` to accomplish that.
@@ -231,8 +229,8 @@ While the examples above only set styles for two zooms, you can add more zoom le
 
 Give it a try! Add in some additional stops to any of the styles above to see what the possibilities are.
 
-### Set feature visibility by zoom
 
+### Set feature visibility by zoom
 Up until now, we have looked at ways to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out.
 
 We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
@@ -294,8 +292,8 @@ With this filter, all points will draw when both criteria are met. This means th
 
 Which method you use depends on whether you want to introduce detail incrementally (`zoomrange`) or whether there is a more general (`zoom()`) filter that can be applied through zoom.
 
-### Bringing it together
 
+### Bringing it together
 As described at the beginning of the guide, with basemap design, features are introduced as they are relevant and designed according to the zoom at which they are being viewed. In this guide we've explored a variety of ways to do the same with CARTO VL.
 
 The final example in this guide demonstrates how to combine zoom-based filters and zoom-based styling and introduce multiple characteristics of a dataset through zoom.
