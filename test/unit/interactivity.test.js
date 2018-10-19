@@ -8,7 +8,7 @@ describe('api/interactivity', () => {
         let source, viz, layer, mockMap;
 
         beforeEach(() => {
-            source = new Dataset('ne_10m_populated_places_simple', {
+            source = new Dataset('populated_places', {
                 username: 'test',
                 apiKey: '1234567890'
             });

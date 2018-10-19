@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Railroad accidents | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Legend</h1>
+            </header>
+            <p class="description open-sans">Type of accident</p>
+            <section>
+                <div id="controls">
+                    <ul id="content"></ul>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 3.5,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            width: 16
+            strokeWidth: 0.2
+            color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
+            symbol: ramp(top($accident_type, 3), [star, triangle, square])
+`);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            hideLoader();
+
+            let colorLegendList = '';
+
+            function rgbToHex(color) {
+                return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+            }
+            function hideLoader() {
+                document.getElementById('loader').style.opacity = '0';
+            }
+
+            const symbolLegend = viz.symbol.getLegendData();
+            const colorLegend = viz.color.getLegendData();
+
+            let symbolLegendList = '';
+            symbolLegend.data.forEach((legend, index) => {
+                const colorHex = rgbToHex(colorLegend.data[index].value);
+                symbolLegendList +=
+                    `
+          <li>
+              <span
+                class="image-mark"
+                style="
+                  background-color: ${colorHex};
+                  mask-image:url(${legend.value});
+                  -webkit-mask-image:url(${legend.value})
+              "></span>
+              <span>${legend.key.replace('CARTO_VL_OTHERS', 'Rest of types')}</span>
+          </li>
+        `
+            });
+
+            document.getElementById('content').innerHTML = symbolLegendList;
+        });
+    </script>
+</body>
+
+</html>
