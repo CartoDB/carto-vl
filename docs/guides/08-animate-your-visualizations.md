@@ -15,7 +15,9 @@ With CARTO VL you can make animated maps of points, lines and polygons using the
 ### Create a basic animation
 Before we begin with the details, it is important to understand the general syntax for animating data in CARTO VL:
 
-`filter: animation(input, duration, fade(fadeIn, fadeOut))`
+```CARTO_VL_Viz
+filter: animation(input, duration, fade(fadeIn, fadeOut))
+```
 
 We will walk through each part throughout this guide.
 
@@ -25,7 +27,7 @@ The result is an animation that cycles through all of the records in the dataset
 
 ```js
 const viz = new carto.Viz(`
-    filter: animation($date_time, 10, fade(1,1))
+    filter: animation($date_time, 10, fade(1, 1))
 `);
 ```
 
@@ -117,7 +119,7 @@ const viz = new carto.Viz(`
 #### Adjust fade
 Since we are visualizing bird migration, we want to show more clearly, through symbology, the journey the birds took. We can get this added effect by adjusting the `fade` parameters. By setting `fadeIn` to `0` and `fadeOut` to `0.5`, we keep the previous point in the animation visible for longer which helps us better visualize the flight path of the migration journey.
 
-```
+```CARTO_VL_Viz
 filter: animation($date_time, 30, fade(0, 0.5))
 ```
 
@@ -387,7 +389,7 @@ You can also apply the same time range (`@timeSteps`) to other properties like c
 ```js
 const viz = new carto.Viz(`
     @duration: 10
-    @animation: animation(@timeSteps, @duration, fade(0,0.5))
+    @animation: animation(@timeSteps, @duration, fade(0, 0.5))
     @timeSteps: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
     color: ramp(@timeSteps, SunsetDark)
     filter: @animation
