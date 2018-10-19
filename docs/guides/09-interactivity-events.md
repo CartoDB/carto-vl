@@ -41,7 +41,9 @@ const displayCenter = () => {
 };
 map.on('move', displayCenter);
 ```
-> Check the console after loading your file in the browser, to see the first message: 'Map has loaded'. Then, interact with the map control and see the updated values for center & zoom. You can check Mapbox [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map) for more information on map events.
+
+**Note:**
+Check the console after loading your file in the browser, to see the first message: 'Map has loaded'. Then, interact with the map control and see the updated values for center & zoom. You can check Mapbox [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map) for more information on map events.
 
 The result should look like this [map](/developers/carto-vl/examples/maps/guides/interactivity/step-1.html). Open it, change the extent and read the messages in the console (enable browser _Developer tools_):
 
@@ -66,7 +68,9 @@ layer.on('loaded', () => {
     console.log('Cities layer has been loaded!');
 });
 ```
-> This event could be useful for example to display some kind of loading animation over your map and then hiding it after the layer has loaded (see for example this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). Notice how the name of the event is `loaded`, not `load`.
+
+**Note:**
+This previous event could be useful for example to display some kind of loading animation over your map and then hiding it after the layer has loaded (see for example this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). Notice how the name of the event is `loaded`, not `load`.
 
 If you were using several layers, you could also have a single function to handle them all. For this case, **on** and **off** are available at `carto` namespace, expecting a list of layers like in this code: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })`.
 
@@ -82,7 +86,8 @@ If you check your work now, it should look like this:
         frameBorder="0">
     </iframe>
 </div>
-> You should open the [map](/developers/carto-vl/examples/maps/guides/interactivity/step-2.html) and explore the _console_ to check the current events.
+
+You should now open the [map](/developers/carto-vl/examples/maps/guides/interactivity/step-2.html) and explore the _console_ to check the current events.
 
 
 ### Using dynamic variables
@@ -104,7 +109,9 @@ const displayNumberOfCities = () => {
 };
 layer.on('updated', displayNumberOfCities);
 ```
-> Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible because the expression has no `properties` related to the features themselves.
+
+**Note:**
+Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible because the expression has no `properties` related to the features themselves.
 
 You can imagine `layer:updated` event as a "kind of" `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
 
@@ -123,7 +130,9 @@ You have already advanced a lot in this guide. Now take a small rest and check y
         frameBorder="0">
     </iframe>
 </div>
-> Open the map at [this step](/developers/carto-vl/examples/maps/guides/interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
+
+Open the map at [this step](/developers/carto-vl/examples/maps/guides/interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
+
 
 #### Data-driven variables
 If the data you are interested in for your interaction is a feature `property`, such as the _name_ of the city or its _population_, then you can also use some variables to store them. Those are called _data-driven variables_, because their values change as you interact with each of the features (in our example, with each city).
@@ -136,7 +145,9 @@ const viz = new carto.Viz(`
     @popK: $pop_max / 1000.0
 `);
 ```
-> Both properties, $name and $pop_max are columns in the original dataset.
+
+**Note:**
+Both properties, `$name` and `$pop_max` are columns in the original dataset.
 
 As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
 
@@ -159,7 +170,9 @@ interactivity.on('featureClick', featureEvent => {
     });
 });
 ```
-> Notice how `carto.Interactivity` provides you with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection (because you can click on several features at the same time if they are near enough).
+
+**Note:**
+Notice how `carto.Interactivity` provides you with a dynamic change on the mouse pointer when you hover on a feature, and how it handles a collection (because you can click on several features at the same time if they are near enough).
 
 The **carto.Interactivity** can handle different events:
 - `featureClick`: Fired when the user clicks on features.
@@ -205,7 +218,7 @@ new mapboxgl.Popup()
     .setHTML(html)
     .addTo(map);
 ```
-> For simplicity, we have created a pop-up linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
+For simplicity, we have just created a pop-up linked to the first feature, but you're free to choose the contents (maybe even a paginated pop-up with several cities and some photos?).
 
 
 ### Interactive-based styling
@@ -222,7 +235,9 @@ interactivity.on('featureEnter', featureEvent => {
     });
 });
 ```
-> [blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increases the size of the symbols.
+
+**Note:**
+[blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increases the size of the symbols.
 
 When the `featureLeave` event is fired you can tell your callback to `reset` the color and size for each feature:
 ```js
@@ -235,7 +250,6 @@ interactivity.on('featureLeave', featureEvent => {
 ```
 
 ### All together
-
 Congrats! You've finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
@@ -246,7 +260,8 @@ Congrats! You've finished this guide. The final map should look like this:
         frameBorder="0">
     </iframe>
 </div>
-> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/interactivity/step-4.html)
+
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/interactivity/step-4.html)
 
 
 Here it is the full example:
