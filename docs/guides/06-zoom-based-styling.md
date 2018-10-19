@@ -26,12 +26,9 @@ In this guide, we will demonstrate how this complexity has been greatly reduced 
 
 Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, we will first explore the following zoom-based functionalities:
 
-- `scaled`
-  - How to keep symbol sizes consistent through zoom level
-- [`zoomRange()`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoomrange)
-  - How to introduce detail through zoom across multiple visualization properties
-- [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom)
-  - How to filter the amount or type of data that is visible at each zoom
+- [`scaled`](/developers/carto-vl/reference/#cartoexpressionsscaled): how to keep symbol sizes consistent through zoom level.
+- [`zoomRange`](/developers/carto-vl/reference/#cartoexpressionszoomrange): how to introduce detail through zoom across multiple visualization properties.
+- [`zoom`](/developers/carto-vl/reference/#cartoexpressionszoom): how to filter the amount or type of data that is visible at each zoom.
 
 After we explore each one independently, we will bring them together to create a map like this one (go ahead, zoom in and out!):
 <div class="example-map">
