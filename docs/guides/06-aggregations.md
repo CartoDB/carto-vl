@@ -312,13 +312,10 @@ This is the complete code:
 <head>
     <meta charset="utf-8">
 
-    <!-- Include CARTO VL JS -->
-    <script src="../../../dist/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-    <!-- Make the map visible -->
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
     <link rel="stylesheet" type="text/css" href="../../style.css">
 
     <!-- Numeral.js for number formatting -->
