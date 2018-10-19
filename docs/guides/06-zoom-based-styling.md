@@ -58,11 +58,26 @@ To get started, copy and paste the code below into your favorite text editor and
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style>
+        #js-zoom {
+            position: absolute;
+            bottom: 0;
+            padding: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            color: rgba(0, 0, 0, 0.75);
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Add map container -->
     <div id="map"></div>
+
+    <!-- Zoom indicator -->
+    <div id="js-zoom"></div>
+
     <script>
         // Add basemap and set properties
         const map = new mapboxgl.Map({
@@ -75,6 +90,14 @@ To get started, copy and paste the code below into your favorite text editor and
         // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+
+        // Zoom level
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+        }
+        map.on('load', updateZoom);
+        map.on('move', updateZoom);
 
         //** CARTO VL functionality begins here **//
 
@@ -114,6 +137,9 @@ Next, test that the map loads by opening the file in your web browser of choice.
         frameBorder="0">
     </iframe>
 </div>
+
+**Note:**
+Notice how there is a little zoom level indicator, in the bottom-left hand corner. There is an `updateZoom` function in the JavaScript code that updates its content once the maps loads and every time it is moved.
 
 
 ### Adjust symbol size
@@ -334,11 +360,26 @@ If you would like to take a closer look, the full code for the example is here:
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style>
+        #js-zoom {
+            position: absolute;
+            bottom: 0;
+            padding: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            color: rgba(0, 0, 0, 0.75);
+            font-size: 16px;
+        }
+    </style>
 </head>
 
 <body>
     <!-- Add map container -->
     <div id="map"></div>
+
+    <!-- Zoom indicator -->
+    <div id="js-zoom"></div>
+
     <script>
         // Add basemap and set properties
         const map = new mapboxgl.Map({
@@ -351,6 +392,14 @@ If you would like to take a closer look, the full code for the example is here:
         // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
+
+        // Zoom level
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+        }
+        map.on('load', updateZoom);
+        map.on('move', updateZoom);
 
         //** CARTO VL functionality begins here **//
 
