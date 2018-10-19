@@ -2,14 +2,28 @@
 <html>
 
 <head>
+    <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <!-- Make the map visible -->
+    <style>
+        body {
+            margin: 0;
+        }
 
-    <link rel="stylesheet" type="text/css" href="../../style.css">
+        #map {
+            position: absolute;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
+    <!-- Map goes here -->
     <div id="map"></div>
     <script>
         // Add basemap and set properties
@@ -37,7 +51,7 @@
 
         // Define and style Viz object
         const viz = new carto.Viz(`
-            filter: animation($date_time, 10, fade(0, 0.5))
+            filter: animation($date_time, 10)
         `);
 
         // Define map layer
