@@ -70,7 +70,7 @@ To get started, copy and paste the code below into your favorite text editor and
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
             zoom: 11,
-            dragRotate: false,
+            dragRotate: false
         });
 
         // Add zoom controls
@@ -90,14 +90,14 @@ To get started, copy and paste the code below into your favorite text editor and
 
         // Define Viz object and custom style
         const viz = new carto.Viz(`
-                color: green
+            color: green
         `);
 
         // Define map layer
         const layer = new carto.Layer('layer', source, viz);
 
         // Add map layer
-        layer.addTo(map,'watername_ocean');
+        layer.addTo(map, 'watername_ocean');
     </script>
 </body>
 
