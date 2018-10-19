@@ -7,9 +7,9 @@ We most often hear about zoom-based styling in the context of basemaps. As an ex
 
 For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
 
-<div class="box-textMediaa">
-    <img src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/multi-scale-voyager.gif" alt="Multi-scale GIF of Voyager">
-</div>
+
+![Multi-scale GIF of Voyager](../../img/guides/zoom-based-styling/multi-scale-voyager.gif)
+
 
 **Note:**
 CARTO VL renderer provides a native/built-in way to do zoom-based styling without popping (by interpolating), which results in smooth transitions.
