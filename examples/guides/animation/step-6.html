@@ -10,6 +10,7 @@
 </head>
 
 <body>
+    <!-- Map goes here -->
     <div id="map"></div>
     <script>
         // Add basemap and set properties
@@ -37,7 +38,13 @@
 
         // Define and style Viz object
         const viz = new carto.Viz(`
-            filter: animation($date_time, 10, fade(0, 0.5))
+            @duration: 10
+            @animation: animation(@timeSteps, @duration, fade(0, 0.5))
+            @timeSteps: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
+            color: ramp(@timeSteps, SunsetDark)
+            filter: @animation
+            width: 10
+            strokeWidth: 0
         `);
 
         // Define map layer
