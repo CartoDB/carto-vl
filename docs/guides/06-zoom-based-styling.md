@@ -1,18 +1,22 @@
 ## Zoom-based Styling
 
-An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different _zoom level_. At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed. 
+An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different _zoom level_. At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed.
 
-With any map, the decisions that you as the map designer make are critical to the interpretability of your map by the end user. The zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed. 
+With any map, the decisions that you as the map designer make are critical to the interpretability of your map by the end user. The zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed.
 
-We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view. 
+We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view.
 
 For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
 
 [MULTI-SCALE GIF of Voyager]
 
+**Note:**
+CARTO VL renderer provides a native/built-in way to do zoom-based styling without popping (by interpolating), which results in smooth transitions.
+
+
 ### Zoom-based styling with VL
 
-In the past, zoom-based styling has been overly complex creating a barrier of entry for many. It is no wonder that it was “easier” to put too much information on a map and/or only design a map for one zoom level.  
+In the past, zoom-based styling has been overly complex creating a barrier of entry for many. It is no wonder that it was “easier” to put too much information on a map and/or only design a map for one zoom level.
 
 That’s not the case with CARTO VL.
 
@@ -20,7 +24,7 @@ In this guide, we will demonstrate how this complexity has been greatly reduced 
 
 ### Overview
 
-Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, we will first explore the following zoom-based functionalities: 
+Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, we will first explore the following zoom-based functionalities:
 
 - `scaled`
   - How to keep symbol sizes consistent through zoom level
@@ -132,7 +136,7 @@ To better visualize the high density of information, let's override the default 
                 color: white
                 width: 1
                 strokeColor: green
-                strokeWidth: 0.5    
+                strokeWidth: 0.5
         `);
 ```
 
@@ -152,9 +156,9 @@ With these adjustments, we can more clearly see the distribution of trees around
 
 Take a few minutes to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of `11` and smaller, but begin to break down as we zoom in.
 
-That's because styling that works well at _one_ zoom level doesn't always work well at _all_ zoom levels. 
+That's because styling that works well at _one_ zoom level doesn't always work well at _all_ zoom levels.
 
-Let's say we are satisfied with how a `1` point symbol size looks at our opening zoom of `11`, we can use those two pieces of information as our anchor inside of `scaled`. This will keep symbol sizes constant (in real space) through zoom. 
+Let's say we are satisfied with how a `1` point symbol size looks at our opening zoom of `11`, we can use those two pieces of information as our anchor inside of `scaled`. This will keep symbol sizes constant (in real space) through zoom.
 
 Let's give it a try by adding this information to the `width` property:
 
@@ -184,7 +188,7 @@ Next, let's take a look at how we can use the `zoomRange` expression inside of a
 
 In the previous step, we determined that a width of `1` worked well at our opening zoom of `11` but noticed in previous steps, as we zoom in, the size of `1` doesn't hold up well.
 
-We can use the results of this visual examination to set different widths by zoom:  
+We can use the results of this visual examination to set different widths by zoom:
 
 ```js
 width: ramp(zoomrange([12,18]),[1,20])
@@ -208,7 +212,7 @@ We can use the same logic for `strokeWidth`:
 strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
 ```
 
-As described above for any width property, symbol sizes are interpolated between the defined zoom ranges inside of the `ramp`. This is the same behavior for color. 
+As described above for any width property, symbol sizes are interpolated between the defined zoom ranges inside of the `ramp`. This is the same behavior for color.
 
 To demonstrate, add the style for point color and stroke color below to your map:
 
@@ -216,7 +220,7 @@ To demonstrate, add the style for point color and stroke color below to your map
 color: ramp(zoomrange([12,18]),[white,green])
 strokeColor: ramp(zoomrange([12,18]),[green,white])
 ```
-As you zoom in on the map, look closely at the point and stroke colors. 
+As you zoom in on the map, look closely at the point and stroke colors.
 
 At zooms less than `12` the point color is `white` and the stroke color is `green`. At zooms greater than `18` we are flipping the fill and stroke colors.  You will know that you are at zoom `18` when the points are green with a white outline. As you zoom in, you will notice that there is a transition in color happening. This is where the interpoation is taking place.
 
@@ -230,19 +234,19 @@ At zooms less than `12` the point color is `white` and the stroke color is `gree
     </iframe>
 </div>
 
-While the examples above only set styles for two zooms, you can add more zoom levels and style conditions. 
+While the examples above only set styles for two zooms, you can add more zoom levels and style conditions.
 
 Give it a try! Add in some additional stops to any of the styles above to see what the possibilities are.
 
 ### Set feature visibility by zoom
 
-Up until now, we have looked at ways to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out. 
+Up until now, we have looked at ways to modify the _appearance_ of features based on zoom. Next, we'll explore ways to control the _visibility_ of features to introduce more detail as we zoom in to the map, and remove detail as we zoom out.
 
 We will look at two different ways this can be done. First, with `zoomrange` and then with `zoom`.
 
 As we saw in the previous step, using `zoomrange`, inside of a `ramp` allows us to define particular styles at a variety of zoom levels. We can use this functionality inside of a `filter` as well to set criteria for when features appear and disappear through zoom.
 
-To demonstrate, we will use an attribute, `diameter` in the Vancouver trees dataset to control the visibility of trees, by zoom, based on this measurement. 
+To demonstrate, we will use an attribute, `diameter` in the Vancouver trees dataset to control the visibility of trees, by zoom, based on this measurement.
 
 To better visualize the points appearing through zoom, first let's classify the data using `globalQuantiles`, `7` class breaks, and color each class with the CARTOColor scheme `sunset`:
 
@@ -253,7 +257,7 @@ To better visualize the points appearing through zoom, first let's classify the 
 ```
 Next, we'll add a `filter` and set our `diameter` criteria with `zoomrange` where we gradually introduce larger trees until zoom `16` and greater, where we display all trees (`true`):
 
-```js                
+```js
 filter:ramp(zoomrange([12,13,14,15,16]),
             [$diameter>30,
             $diameter>20,
@@ -299,7 +303,7 @@ Which method you use depends on whether you want to introduce detail incremental
 
 ### Bringing it together
 
-As described at the beginning of the guide, with basemap design, features are introduced as they are relevant and designed according to the zoom at which they are being viewed. In this guide we've explored a variety of ways to do the same with CARTO VL. 
+As described at the beginning of the guide, with basemap design, features are introduced as they are relevant and designed according to the zoom at which they are being viewed. In this guide we've explored a variety of ways to do the same with CARTO VL.
 
 The final example in this guide demonstrates how to combine zoom-based filters and zoom-based styling and introduce multiple characteristics of a dataset through zoom.
 
@@ -317,7 +321,7 @@ Take a look at the map, zoom in and out to see the changes in the styling and vi
 
 Pretty neat, right?!
 
-This is an example of how to take advantage of zoom-based styling for multiple visualization properties, to introduce thematic information through zoom. 
+This is an example of how to take advantage of zoom-based styling for multiple visualization properties, to introduce thematic information through zoom.
 
 Using zoom-based filters to introduce detail, the map opens with all visible trees colored green and sized to suit the density of information and view. As the zoom level increases, the color of trees transitions from green to a categorical coloring based on its `common_name`. At the next set of zoom levels, another attribute (`diameter`) is introduced by changing the sizing of features and setting an anchor for that sizing using `scaled`. Other properties like `strokeColor` and `strokeWidth` are also adjusted through zoom to compliment the multi-scale styling of the trees.
 
@@ -399,10 +403,3 @@ If you would like to take a closer look, the full code for the example is here:
 
 </html>
 ```
-
-
-
-
-
-
-
