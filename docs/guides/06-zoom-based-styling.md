@@ -69,8 +69,7 @@ To get started, copy and paste the code below into your favorite text editor and
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
-            zoom: 11,
-            dragRotate: false
+            zoom: 11
         });
 
         // Add zoom controls
@@ -342,8 +341,7 @@ If you would like to take a closer look, the full code for the example is here:
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
-            zoom: 11,
-            dragRotate: false,
+            zoom: 11
         });
 
         // Add zoom controls
