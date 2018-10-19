@@ -144,7 +144,7 @@ With these adjustments, we can more clearly see the distribution of trees around
 
 
 ### Scale symbol size
-Take a few minutes to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of `11` and smaller, but begin to break down as we zoom in.
+Take a few seconds to zoom in and out of the map above. What you will notice is that the style modifications we made function at our opening zoom of `11` and smaller, but begin to break down as we zoom in.
 
 That's because styling that works well at _one_ zoom level doesn't always work well at _all_ zoom levels.
 
@@ -168,7 +168,8 @@ In the resulting map, as we zoom in and out, you'll notice that the `1` point sy
     </iframe>
 </div>
 
-If you aren't satisfied with the result, try adjusting the anchor scale and/or point width. For example, adjust the `width` style to `scaled(1,15)`. You can also use this functionality with `strokeWidth` to scale the outline of the points.
+**Note:**
+If you aren't satisfied with the previous result, try adjusting the anchor scale and/or point width. For example, adjust the `width` style to `scaled(1,15)`. You can also use this functionality with `strokeWidth` to scale the outline of the points.
 
 
 ### Define a range of symbol sizes
@@ -195,6 +196,7 @@ This sets the width of our symbols to `1` at zoom levels less than or equal to `
         frameBorder="0">
     </iframe>
 </div>
+
 
 We can use the same logic for `strokeWidth`:
 
@@ -269,7 +271,8 @@ As you zoom in and out of the resulting map, you will notice that the colors (pu
     </iframe>
 </div>
 
-Let's explore this further using [`zoom`](https://carto.com/developers/carto-vl/reference/#cartoexpressionszoom) with the [`filter`](https://carto.com/developers/carto-vl/reference/#cartoexpressions) property.
+
+Let's explore this further using [`zoom`](/developers/carto-vl/reference/#cartoexpressionszoom) with the [`filter`](/developers/carto-vl/reference/#cartoexpressions) property.
 
 Using the same map from above, replace the `filter` styling with:
 
@@ -289,7 +292,8 @@ With this filter, all points will draw when both criteria are met. This means th
     </iframe>
 </div>
 
-Which method you use depends on whether you want to introduce detail incrementally (`zoomrange`) or whether there is a more general (`zoom()`) filter that can be applied through zoom.
+**Note:**
+Which method you use depends on whether you want to introduce detail incrementally (`zoomrange`) or whether there is a more general (`zoom`) filter that can be applied through zoom.
 
 
 ### Bringing it together
