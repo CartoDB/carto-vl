@@ -70,7 +70,7 @@ export default class RampGeneric extends Base {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
         const legendData = this.input._getLegendData(config);
-        const data = legendData.data.map(({key, value}) => {
+        const data = legendData.data.map(({ key, value }) => {
             value = this._calcEval(value, undefined);
             return { key, value };
         });

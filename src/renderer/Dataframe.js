@@ -2,7 +2,7 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-
+import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -244,7 +244,7 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
-        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        const aabb = { minx: -1, miny: -1, maxx: 1, maxy: 1 };
         for (let i = start; i < end; i += 6) {
             const v1 = this._projectToNDC(vertices[i + 0], vertices[i + 1]);
             const v2 = this._projectToNDC(vertices[i + 2], vertices[i + 3]);
@@ -276,7 +276,7 @@ export default class Dataframe extends DummyDataframe {
         const ow = matrix[3] * x + matrix[7] * y + matrix[15];
 
         // Normalize by W
-        return {x: ox / ow, y: oy / ow};
+        return { x: ox / ow, y: oy / ow };
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -311,6 +311,11 @@ export default class Dataframe extends DummyDataframe {
 
             const radius = this._computePointRadius(feature, viz);
 
+            if (!viz.symbol.default) {
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                c2.x += symbolOffset[0] * radius;
+                c2.y -= symbolOffset[1] * radius;
+            }
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
                 c2.x += vizOffset.x;
@@ -488,34 +493,45 @@ export default class Dataframe extends DummyDataframe {
             }
         };
 
-        const metadata = this.metadata;
+        Object.defineProperties(cls.prototype, this._buildGetters());
+
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _buildGetters () {
         const getters = {};
+        const metadata = this.metadata;
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
+            if (this.metadata.properties[propertyName].aggregations) {
+                Object.values(this.metadata.properties[propertyName].aggregations).forEach(aggName => {
+                    getters[aggName] = {
+                        get: function () {
+                            const index = this._index;
+                            if (metadata.properties[propertyName].type === 'category') {
+                                return metadata.IDToCategory.get(this._dataframe.properties[aggName][index]);
+                            } else {
+                                return this._dataframe.properties[aggName][index];
+                            }
+                        }
+                    };
+                });
+            }
             getters[propertyName] = {
                 get: function () {
                     const index = this._index;
                     if (metadata.properties[propertyName].type === 'category') {
                         return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
                     } else {
-                        return this._dataframe.properties[propertyName][index];
+                        return this._dataframe.properties[propertyName][index] === FP32_DESIGNATED_NULL_VALUE
+                            ? null
+                            : this._dataframe.properties[propertyName][index];
                     }
                 }
             };
         }
-
-        Object.defineProperties(cls.prototype, getters);
-
-        featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
-    }
-
-    _getFeatureProperty (index, propertyName) {
-        if (this.metadata.properties[propertyName].type === 'category') {
-            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
-        } else {
-            return this.properties[propertyName][index];
-        }
+        return getters;
     }
 
     getFeature (index) {

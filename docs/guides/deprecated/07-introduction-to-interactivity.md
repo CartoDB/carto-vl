@@ -35,7 +35,7 @@ event happened and the list of [Features](https://carto.com/developers/carto-vl/
 As usual, we create a layer to display the `populated places` dataset:
 
 ```js
-const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`width: 15`);
 const layer = new carto.Layer('layer', source, viz);
 ```
@@ -79,7 +79,7 @@ We want to display the city name when the user clicks on a feature, as usual we 
 in the `Viz` object.
 
 ```js
-const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`
     @name: $name
     width: 15
@@ -104,7 +104,7 @@ interactivity.on('featureClick', featureEvent => {
 Following the previous example, we create a layer to show the `populated_places` dataset with a variable for the `name`.
 
 ```js
-const source = new carto.source.Dataset('ne_10m_populated_places_simple');
+const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`
     @name: $name
     width: 20

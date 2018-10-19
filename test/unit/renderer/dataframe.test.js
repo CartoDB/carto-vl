@@ -66,6 +66,28 @@ describe('src/renderer/Dataframe', () => {
                 expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1024, y: 1023.6 }, viz), [feature2]);
             });
 
+            describe('and symbols are active', () => {
+                const viz = {
+                    width: { eval: () => 10.5 },
+                    strokeWidth: { eval: () => 0.5 },
+                    filter: { eval: () => 1.0 },
+                    symbol: { default: false },
+                    symbolPlacement: { eval: () => [1, 1] },
+                    transform: { default: true }
+                };
+                it('should return an empty list when there are no points at the given position', () => {
+                    expect(dataframe.getFeaturesAtPosition({ x: 512, y: 512 }, viz)).toEqual([]);
+                    expect(dataframe.getFeaturesAtPosition({ x: 5000, y: 5000 }, viz)).toEqual([]);
+                    expect(dataframe.getFeaturesAtPosition({ x: 1024 + 5.25, y: 1023.4 - 10.5 }, viz)).toEqual([]);
+                });
+
+                it('should return a list containing the features at the given position', () => {
+                    expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 5, y: -10.4 }, viz), [feature1]);
+                    expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1024 + 5.25, y: 1024 - 10.5 }, viz), [feature2]);
+                    expectEqualFeatures(dataframe.getFeaturesAtPosition({ x: 1024 + 5.25, y: 1023.6 - 10.5 }, viz), [feature2]);
+                });
+            });
+
             it('should return zero features when the filter is not passed', () => {
                 const viz = {
                     width: { eval: () => 0.5 },
@@ -229,6 +251,7 @@ describe('src/renderer/Dataframe', () => {
 });
 
 function expectEqualFeatures (result, expected) {
+    expect(result.length).toEqual(expected.length);
     expected.forEach((_, index) => {
         Object.keys(expected).forEach(propertyName => {
             expect(result[index][propertyName]).toEqual(expected[index][propertyName]);

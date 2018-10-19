@@ -59,7 +59,7 @@ const viz = new carto.Viz(`
 
 #### Unary
 
-This is the list of the available unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNaN`, `not`, `floor` and, `ceil`.
+This is the list of the available unary operations: `log`, `sqrt`, `sin`, `cos`, `tan`, `sign`, `abs`, `isNull`, `not`, `floor` and, `ceil`.
 
 ```js
 const viz = new carto.Viz(`
@@ -108,7 +108,7 @@ These aggregations evaluate the provided expression with the features showed wit
 
 ```js
 const viz = new carto.Viz(`
-  @view_total: viewportCount($cities)
+  @view_total: viewportCount()
 `);
 [...]
 viz.variables.view_total.eval();
@@ -120,7 +120,7 @@ Global aggregations evaluate a property for all the features in the source data.
 
 ```js
 const viz = new carto.Viz(`
-  @total: globalCount($cities)
+  @total: globalCount()
 `);
 [...]
 viz.variables.total.eval();
