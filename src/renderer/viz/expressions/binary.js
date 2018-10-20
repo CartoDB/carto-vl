@@ -10,6 +10,7 @@ const NUMBER_AND_COLOR_TO_COLOR = 2;
 const COLORS_TO_COLOR = 4;
 const CATEGORIES_TO_NUMBER = 8;
 const IMAGES_TO_IMAGE = 16;
+const DATES_TO_NUMBER = 32;
 
 /**
  * Multiply two numeric expressions.
@@ -212,7 +213,7 @@ export const Pow = genBinaryOp('pow',
  * @api
  */
 export const GreaterThan = genBinaryOp('greaterThan',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x > y ? 1 : 0,
     (x, y) => `(${x}>${y}? 1.:0.)`
 );
@@ -243,7 +244,7 @@ export const GreaterThan = genBinaryOp('greaterThan',
  * @api
  */
 export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x >= y ? 1 : 0,
     (x, y) => `(${x}>=${y}? 1.:0.)`
 );
@@ -274,7 +275,7 @@ export const GreaterThanOrEqualTo = genBinaryOp('greaterThanOrEqualTo',
  * @api
  */
 export const LessThan = genBinaryOp('lessThan',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x < y ? 1 : 0,
     (x, y) => `(${x}<${y}? 1.:0.)`
 );
@@ -305,7 +306,7 @@ export const LessThan = genBinaryOp('lessThan',
  * @api
  */
 export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
-    NUMBERS_TO_NUMBER,
+    NUMBERS_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x <= y ? 1 : 0,
     (x, y) => `(${x}<=${y}? 1.:0.)`
 );
@@ -336,7 +337,7 @@ export const LessThanOrEqualTo = genBinaryOp('lessThanOrEqualTo',
  * @api
  */
 export const Equals = genBinaryOp('equals',
-    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x === y ? 1 : 0,
     (x, y) => `(${x}==${y}? 1.:0.)`
 );
@@ -367,7 +368,7 @@ export const Equals = genBinaryOp('equals',
  * @api
  */
 export const NotEquals = genBinaryOp('notEquals',
-    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER,
+    NUMBERS_TO_NUMBER | CATEGORIES_TO_NUMBER | DATES_TO_NUMBER,
     (x, y) => x !== y ? 1 : 0,
     (x, y) => `(${x}!=${y}? 1.:0.)`
 );
@@ -505,6 +506,8 @@ function getSignatureLoose (a, b) {
         (a.type === 'image' && b.type === 'image') ||
         (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
+    } else if (a.type === 'date' && b.type === 'date') {
+        return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -528,6 +531,8 @@ function getSignature (a, b) {
         (a.type === 'image' && b.type === 'image') ||
         (a.type === 'color' && b.type === 'image')) {
         return IMAGES_TO_IMAGE;
+    } else if (a.type === 'date' && b.type === 'date') {
+        return DATES_TO_NUMBER;
     } else {
         return UNSUPPORTED_SIGNATURE;
     }
@@ -545,6 +550,8 @@ function getReturnTypeFromSignature (signature) {
             return 'number';
         case IMAGES_TO_IMAGE:
             return 'image';
+        case DATES_TO_NUMBER:
+            return 'number';
         default:
             return undefined;
     }

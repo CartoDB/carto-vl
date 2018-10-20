@@ -2,6 +2,9 @@ import BaseExpression from './base';
 import * as util from '../../../utils/util';
 import { checkMaxArguments } from './utils';
 
+// FIXME: documentation is not correct:
+// filter examples not supported at the moment
+
 /**
  * Time contant expression
  *
@@ -30,8 +33,11 @@ export default class Time extends BaseExpression {
 
         super({});
         // TODO improve type check
-        this.type = 'time';
+        this.type = 'date';
         this.date = util.castDate(date);
+
+        // TODO: would need to encode the value as the property to compare with
+        // or we'd need date expressions to be compared to be decoded in GPU
         this.inlineMaker = () => undefined;
     }
 
