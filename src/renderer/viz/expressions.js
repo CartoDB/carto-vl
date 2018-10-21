@@ -532,6 +532,7 @@ import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
+import TimeRangeExpr from './expressions/time';
 
 import Top from './expressions/top';
 
@@ -645,6 +646,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const linearEnd = (...args) => new LinearEnd(...args);
 export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
@@ -683,6 +685,8 @@ export const category = (...args) => new BaseCategory(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };
+
+export const timeRange = (...args) => new TimeRangeExpr(...args);
 
 export const top = (...args) => new Top(...args);
 
