@@ -288,7 +288,7 @@ export default class Dataframe extends DummyDataframe {
 
         // FIXME: points.length includes rejected points (out of tile)
         // so we use numFeatures here, but should fix the points size
-        for (let i = 0; i < this.numFeatures*6; i += 6) {
+        for (let i = 0; i < this.numFeatures * 6; i += 6) {
             const featureIndex = i / 6;
 
             const feature = this.getFeature(featureIndex);
@@ -498,7 +498,8 @@ export default class Dataframe extends DummyDataframe {
                 get: function () {
                     const index = this._index;
                     const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                    return metadata.decode(propertyName, ...args);
+                    // return metadata.decode(propertyName, ...args);
+                    return metadata.codec(propertyName).internalToExternal(...args);
                 }
             };
         });

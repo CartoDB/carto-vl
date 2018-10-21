@@ -15,11 +15,6 @@ const SERIAL_UNITS = [
     'decade', 'century', 'millennium'
 ];
 
-// experimental: this flag enables/disables of support for the category form of the time range
-// in the GPU. (so that for example buckets, ramps could be made aware of it).
-// but it requires three dataframe properties instead of two.
-const CATEGORY_SUPPORT = false;
-
 export default class clusterTimeRange extends BaseExpression {
     constructor (property, units, timezone) {
         const expressionName = 'clusterTimeRange';
@@ -38,23 +33,15 @@ export default class clusterTimeRange extends BaseExpression {
         this._dimension.propertyName = schema.column.dimColumn(this.property.name, units);
         this.type = 'timerange';
         this._expressionName = expressionName;
+        this._range = [];
     }
 
     get name () {
         return this.property.name;
     }
 
-    propertyNameFor (mode = null) {
-        let name = this._dimension.propertyName;
-        if (mode) {
-            name = name + '_' + mode;
-        }
-        return name;
-    }
-
     get propertyName () {
-        // return this.propertyNameFor('start');
-        return this.propertyNameFor(null);
+        return this._dimension.propertyName;
     }
 
     eval (feature) {
@@ -65,6 +52,7 @@ export default class clusterTimeRange extends BaseExpression {
         super._bindMetadata(metadata);
         checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
         checkType(this._expressionName, 'property', 0, 'date', this.property);
+        this._range = metadata.properties[metadata.baseName(this.propertyName)].dimension.range;
     }
 
     _resolveAliases () {}
@@ -72,29 +60,21 @@ export default class clusterTimeRange extends BaseExpression {
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
-            inline: {
-                text: CATEGORY_SUPPORT ? `${getGLSLforProperty(this.propertyNameFor(null))}` : undefined,
-                start: `${getGLSLforProperty(this.propertyNameFor('start'))}`,
-                end: `${getGLSLforProperty(this.propertyNameFor('end'))}`
-            }
+            inline: this._range.map(propertyName => [
+                `${getGLSLforProperty(propertyName)}`
+            ])
         };
     }
 
     _postShaderCompile () {}
 
     _getMinimumNeededSchema () {
-        const modes = ['start', 'end'];
-        if (CATEGORY_SUPPORT) {
-            modes.push(null);
-        }
         return {
-            [this.property.name]: modes.map(mode => {
-                return {
-                    type: 'dimension',
-                    dimension: this._dimension,
-                    mode
-                };
-            })
+            [this.property.name]: {
+                type: 'dimension',
+                dimension: this._dimension,
+                range: true
+            }
         };
     }
 }

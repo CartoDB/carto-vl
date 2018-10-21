@@ -1,9 +1,8 @@
 import { version } from '../../package';
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
-import WindshaftCodec from './WindshaftCodec';
+import windshaftCodecFactory from './WindshaftCodec';
 import schema from '../renderer/schema';
-import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
@@ -372,20 +371,9 @@ export default class Windshaft {
                     min: dimensionStats.min,
                     max: dimensionStats.max
                 };
-                const modes = MNS[column].map(c => c.mode).filter(m => m);
-                if (MNS[column].filter(c => !c.mode && c.dimension.format === 'iso').length > 0) {
-                    modes.push('iso');
-                }
-                if (modes.length > 0) {
-                    // This is an ISO dimension which will be decoded as
-                    // one or two internal properties (start & end timedates)
-                    // Leave propertyName as the column name for decoding, but
-                    // internally we'll keep the properties for each mode.
-                    properties[column].dimension.modes = {};
-                    modes.forEach(mode => {
-                        const name = mode === 'iso' ? dimName : `${dimName}_${mode}`;
-                        properties[column].dimension.modes[mode] = name;
-                    });
+                const range = MNS[column].some(c => c.range);
+                if (range > 0) {
+                    properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
                 }
             }
         });
@@ -402,11 +390,6 @@ export default class Windshaft {
                 });
             } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
-                ['min', 'max', 'avg'].map(fn => {
-                    if (property[fn]) {
-                        property[fn] = new Time(property[fn] * 1000).value;
-                    }
-                });
             }
         });
 
@@ -416,10 +399,43 @@ export default class Windshaft {
 
         const idProperty = 'cartodb_id';
 
-        const codec = new WindshaftCodec();
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty, codec });
+        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
+        setMetadataCodecs(metadata);
         return metadata;
     }
+}
+
+function setMetadataCodecs (metadata) {
+    // assign codecs & encode stats
+    // a single codec kept per base property
+    // so, all its aggregations share the same encoding.
+    // is a dimension, the kept codec is that of the dimension
+    // (but we use a temporal base codec here to encode base stats)
+    metadata.propertyKeys.forEach(baseName => {
+        const property = metadata.properties[baseName];
+        const baseType = property.type;
+        const baseCodec = windshaftCodecFactory(metadata, baseType, baseName);
+        const dimType = property.dimension ? property.dimension.type : null;
+        const dimName = dimType ? property.dimension.propertyName : baseName;
+        const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
+        const dimCodec = dimType ? windshaftCodecFactory(metadata, actualDimType, dimName) : null;
+
+        // assign the code to the (base) property
+        property.codec = dimCodec || baseCodec;
+
+        // encode stats
+        encodeStats(metadata, baseName, baseCodec);
+        if (dimCodec) {
+            encodeStats(metadata, dimName, dimCodec);
+        }
+    });
+}
+
+function encodeStats (metadata, name, codec) {
+    const stats = metadata.stats(name);
+    metadata.availableStats(name).forEach(stat => {
+        stats[stat] = codec.sourceToExternal(stats[stat]);
+    });
 }
 
 function adaptGeometryType (type) {

@@ -44,18 +44,16 @@ import MVTMetadata from '../sources/MVTMetadata';
 //         min: '2017-01-01T00:00:00',  // stats of the base column
 //         max: '2018-12-01T00:00:00',
 //         dimension: {
-//             type: 'category', // type of the actual property received internally
+//             type: 'category', // type of the actual (source) property received internally
 //             grouping: {},// (to be changed to group) grouping parameters
-//             propertyName: "_cdb_dim_month_time1",
+//             propertyName: "_cdb_dim_month_time1", // source property
 //             min: '2017-01', // stats of property _cdb_dim_month_time1
 //             max: '2017-12',
-//             modes: {
-//                 // here come the actual decoded properties!!:
+//             range: [
+//                 // here come the actual decoded (internal) properties!!:
 //                 // the types of these properties is 'date'
-//                 'start': '_cdb_dim_month_time1_start',
-//                 'start': '_cdb_dim_month_time1_end'
-//                 // the stats for these properties are computed by the `stats` method of Metadata
-//                 // using the internal property stats
+//                 '_cdb_dim_month_time1_start',
+//                 '_cdb_dim_month_time1_end'
 //             }
 //         }
 //     }
@@ -82,14 +80,17 @@ export default class WindshaftMetadata extends MVTMetadata {
 
     decodedProperties (propertyName) {
         const { dimension } = this._dimensionInfo(propertyName);
-        if (dimension && dimension.grouping && dimension.modes) {
-            return Object.values(dimension.modes);
+        if (dimension && dimension.grouping && dimension.range) {
+            return dimension.range;
         }
         return super.decodedProperties(propertyName);
     }
 
+    // Stats usage: (is internal, external or source representation preferable?)
+    // * global aggregations
+    // * coding/decoding
     stats (propertyName) {
-        const { dimension, type } = this._dimensionInfo(propertyName);
+        const { dimension } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
             return dimension;
         }
@@ -97,16 +98,9 @@ export default class WindshaftMetadata extends MVTMetadata {
     }
 }
 
-const MODE_TYPES = {
-    'start': 'date',
-    'end': 'date',
-    'iso': 'category'
-};
-
 function dimensionType (dimension, propertyName) {
-    if (dimension.modes) {
-        const mode = Object.keys(dimension.modes).find(mode => dimension.modes[mode] === propertyName);
-        return MODE_TYPES[mode] || dimension.type;
+    if (dimension.range) {
+        return 'date';
     }
     return dimension.type;
 }

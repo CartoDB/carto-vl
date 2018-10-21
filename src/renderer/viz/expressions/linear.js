@@ -53,11 +53,14 @@ export default class Linear extends BaseExpression {
         if (this.input.type === 'date') {
             const input = this.input.eval(feature);
 
-            const min = this.min.eval().getTime();
+            const min = this.min.eval().getTime(); // time(this.min.eval()).getTime()
             const max = this.max.eval().getTime();
 
+            // TODO: we should use metadata.encode, right? but date is an exception
+            // because stats are kept in Date form
+            // FIXME: const smin = metadata.encode(this.input.propertyName, min/1000); ...
             const metadata = this._metadata;
-            const inputMin = metadata.properties[this.input.name].min.getTime();
+            const inputMin = metadata.properties[this.input.name].min.getTime(); // FIXME use metadata.stats ...
             const inputMax = metadata.properties[this.input.name].max.getTime();
             const inputDiff = inputMax - inputMin;
 
@@ -85,19 +88,26 @@ export default class Linear extends BaseExpression {
             const min = this.min.eval();
             const max = this.max.eval();
 
-            const smin = metadata.encode(this.input.propertyName, min);
-            const smax = metadata.encode(this.input.propertyName, max);
-            this._metadata = metadata;
+            // const smin = metadata.encode(this.input.propertyName, min);
+            // const smax = metadata.encode(this.input.propertyName, max);
+            // const smin = metadata.codec(this.input.propertyName).externalTointernal(min);
+            // const smax = metadata.codec(this.input.propertyName).externalTointernal(max);
+            const [smin, smax] = metadata.codec(this.input.propertyName).limitsTointernal(min, max);
+            this._metadata = metadata; // TODO: check this
 
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else if (this.input.type === 'timerange') {
             const min = this.min.eval();
             const max = this.max.eval();
-            const smin = metadata.encode(this.input.propertyNameFor('start'), min);
-            const smax = metadata.encode(this.input.propertyNameFor('end'), max);
+
+            // const [lo, hi] = metadata.decodedProperties(this.input.propertyName);
+            // const smin = metadata.encode(lo, min);
+            // const smax = metadata.encode(hi, max);
+            const [smin, smax] = metadata.codec(this.input.propertyName).limitsTointernal(min, max);
+
             this._metadata = metadata;
 
-            this.inlineMaker = (inline) => `((${inline.input.start}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+            this.inlineMaker = (inline) => `((${inline.input[0]}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);

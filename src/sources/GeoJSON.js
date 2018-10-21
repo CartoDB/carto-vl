@@ -1,7 +1,6 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from './GeoJSONMetadata';
-import Codec from './GeoJSONCodec';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
@@ -157,9 +156,8 @@ export default class GeoJSON extends Base {
         }
         const idProperty = 'cartodb_id';
 
-        const codec = new Codec();
-        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty, codec });
-
+        this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
+        // TODO: assign codecs per type (date,number==identity)
         return this._metadata;
     }
 
