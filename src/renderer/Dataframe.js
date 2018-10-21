@@ -494,36 +494,19 @@ export default class Dataframe extends DummyDataframe {
         const getters = {};
         this.metadata.propertyKeys.forEach(propertyName => {
             const decodedProperties = metadata.decodedProperties(propertyName);
-            if (decodedProperties.length > 1) {
-                getters[propertyName] = {
-                    get: function () {
-                        const index = this._index;
-                        const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                        return metadata.decode(propertyName, ...args);
-                    }
-                };
-            } else {
-                getters[propertyName] = {
-                    get: function () {
-                        const index = this._index;
-                        return metadata.decode(propertyName, this._dataframe.properties[propertyName][index]);
-                    }
-                };
-            }
+            getters[propertyName] = {
+                get: function () {
+                    const index = this._index;
+                    const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
+                    return metadata.decode(propertyName, ...args);
+                }
+            };
         });
 
         Object.defineProperties(cls.prototype, getters);
 
         featureClassCache.set(this.metadata, cls);
         this._cls = cls;
-    }
-
-    _getFeatureProperty (index, propertyName) {
-        if (this.metadata.properties[propertyName].type === 'category') {
-            return this.metadata.IDToCategory.get(this.properties[propertyName][index]);
-        } else {
-            return this.properties[propertyName][index];
-        }
     }
 
     getFeature (index) {
