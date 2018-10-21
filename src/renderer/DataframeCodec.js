@@ -1,6 +1,7 @@
 
 // A DataframeCodec provides two abstract operations:
 // encoding: converts source property values (as provided by a source)
+// or an external representation
 // into an internal form use in Dataframes.
 // decoding: converts an internal (dataframe) value to an external
 // format apt for presentation to the user as feature properties.
@@ -15,5 +16,8 @@ export default class DataframeCodec {
     // FIXME: rename as present?
     decode (_metadata, _propertyName, ...propertyValues) {
         return propertyValue[0];
+    }
+    recode (_metadata, _refPropertyName, _propertyName, propertyValue) {
+        return propertyValue;
     }
 }
