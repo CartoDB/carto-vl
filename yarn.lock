@@ -1925,7 +1925,7 @@ csscolorparser@~1.0.2:
   resolved "https://registry.yarnpkg.com/csscolorparser/-/csscolorparser-1.0.3.tgz#b34f391eea4da8f3e98231e2ccd8df9c041f171b"
   integrity sha1-s085HupNqPPpgjHizNjfnAQfFxs=
 
-current-git-branch@^1.0.1:
+current-git-branch@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/current-git-branch/-/current-git-branch-1.1.0.tgz#3730e71ee024ed27dab16d740e5b1ea4774fa49f"
   integrity sha512-n5mwGZllLsFzxDPtTmadqGe4IIBPfqPbiIRX4xgFR9VK/Bx47U+94KiVkxSKAKN6/s43TlkztS2GZpgMKzwQ8A==
@@ -2677,10 +2677,10 @@ expect.js@~0.2.0:
   resolved "https://registry.yarnpkg.com/expect.js/-/expect.js-0.2.0.tgz#1028533d2c1c363f74a6796ff57ec0520ded2be1"
   integrity sha1-EChTPSwcNj90pnlv9X7AUg3tK+E=
 
-exquisite-sst@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/exquisite-sst/-/exquisite-sst-1.5.0.tgz#568d8b100895fa10f34db535e388d71f861d8c3c"
-  integrity sha1-Vo2LEAiV+hDzTbU144jXH4YdjDw=
+exquisite-sst@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/exquisite-sst/-/exquisite-sst-1.6.0.tgz#f48bcd954281a98ec1b441d250ab099365648c3b"
+  integrity sha512-6Zl8rB/1s0puOqPr4nImd9tA7zmDevqeL4VZhdmqzXeS4DKlY6wyBFImWxQTSW+w5sPkZZONqBPpWLWie0sBvA==
   dependencies:
     cloudinary "^1.9.0"
     minimist "^1.2.0"
@@ -3668,9 +3668,9 @@ isbinaryfile@^3.0.0:
     buffer-alloc "^1.2.0"
 
 isemail@3.x.x:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/isemail/-/isemail-3.1.4.tgz#76e2187ff7bee59d57522c6fd1c3f09a331933cf"
-  integrity sha512-yE/W5osEWuAGSLVixV9pAexhkbZzglmuhO2CxdHu7IBh7uzuZogQ4bk0lE26HoZ6HD4ZYfKRKilkNuCnuJIBJw==
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/isemail/-/isemail-3.2.0.tgz#59310a021931a9fb06bbb51e155ce0b3f236832c"
+  integrity sha512-zKqkK+O+dGqevc93KNsbZ/TqTUFd46MwWjYOoMrjIMZ51eU7DtQG3Wmd9SQQT7i7RVnuTPEiYEWHU3MSbxC1Tg==
   dependencies:
     punycode "2.x.x"
 
