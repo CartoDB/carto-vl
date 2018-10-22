@@ -235,7 +235,7 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
-        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        const aabb = { minx: -1, miny: -1, maxx: 1, maxy: 1 };
         for (let i = start; i < end; i += 6) {
             const v1 = this._projectToNDC(vertices[i + 0], vertices[i + 1]);
             const v2 = this._projectToNDC(vertices[i + 2], vertices[i + 3]);
@@ -267,7 +267,7 @@ export default class Dataframe extends DummyDataframe {
         const ow = matrix[3] * x + matrix[7] * y + matrix[15];
 
         // Normalize by W
-        return {x: ox / ow, y: oy / ow};
+        return { x: ox / ow, y: oy / ow };
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -484,11 +484,31 @@ export default class Dataframe extends DummyDataframe {
             }
         };
 
-        const metadata = this.metadata;
-        const getters = {};
+        Object.defineProperties(cls.prototype, this._buildGetters());
 
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _buildGetters () {
+        const getters = {};
+        const metadata = this.metadata;
         for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
             const propertyName = this.metadata.propertyKeys[i];
+            if (this.metadata.properties[propertyName].aggregations) {
+                Object.values(this.metadata.properties[propertyName].aggregations).forEach(aggName => {
+                    getters[aggName] = {
+                        get: function () {
+                            const index = this._index;
+                            if (metadata.properties[propertyName].type === 'category') {
+                                return metadata.IDToCategory.get(this._dataframe.properties[aggName][index]);
+                            } else {
+                                return this._dataframe.properties[aggName][index];
+                            }
+                        }
+                    };
+                });
+            }
             getters[propertyName] = {
                 get: function () {
                     const index = this._index;
@@ -502,11 +522,7 @@ export default class Dataframe extends DummyDataframe {
                 }
             };
         }
-
-        Object.defineProperties(cls.prototype, getters);
-
-        featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
+        return getters;
     }
 
     getFeature (index) {

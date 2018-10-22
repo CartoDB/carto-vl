@@ -22,7 +22,7 @@ import { implicitCast, checkType } from './utils';
  * `);
  *
  * @memberof carto.expressions
- * @name scale
+ * @name scaled
  * @function
  * @api
  */

@@ -32,13 +32,8 @@
         }
 
         input[type=range] {
-            /*removes default webkit styles*/
             -webkit-appearance: none;
-
-            /*fix for FF unable to apply focus style bug */
             border: 1px solid white;
-
-            /*required for proper track sizing in FF*/
             background: transparent;
             border: none;
 
@@ -117,12 +112,9 @@
 
         input[type=range]::-ms-track {
             height: 3px;
-            /*remove bg colour from the track, we'll use ms-fill-lower and ms-fill-upper instead */
             background: transparent;
-            /*leave room for the larger thumb to overflow with a transparent border */
             border-color: transparent;
             border-width: 6px 0;
-            /*remove default tick marks*/
             color: transparent;
         }
 
@@ -179,13 +171,13 @@
             justify-content: center;
         }
 
-        #js-play-btn {
+        #js-play-button {
             background: url('./play.svg') no-repeat;
             background-color: #1785FB;
             background-position: center;
         }
 
-        #js-pause-btn {
+        #js-pause-button {
             background: url('./pause.svg') no-repeat;
             background-color: #1785FB;
             background-position: center;
@@ -194,7 +186,10 @@
 </head>
 
 <body>
+    <!-- Map goes here -->
     <div id="map"></div>
+
+    <!-- Animation control elements -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -204,8 +199,8 @@
                 <p class="description open-sans">Control animations by issuing "play", "pause" and "set" commands</p>
             </section>
             <section style="margin-top: 15px;">
-                <input type="button" id="js-play-btn">
-                <input type="button" id="js-pause-btn">
+                <input type="button" id="js-play-button">
+                <input type="button" id="js-pause-button">
                 <input type="range" id="js-time-range" min="0" max="1" step="0.01">
             </section>
             <hr>
@@ -224,14 +219,13 @@
         </div>
     </div>
     <script>
+        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-73.96, 40.75],
             zoom: 11,
-            scrollZoom: false,
-
-
+            scrollZoom: false
         });
 
         const nav = new mapboxgl.NavigationControl({
@@ -239,63 +233,63 @@
         });
         map.addControl(nav, 'top-left');
 
-        // Define user
+        //** CARTO VL functionality begins here **//
+
+        // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Define layer
+        // Define source
         const source = new carto.source.Dataset('taxi_50k');
 
+        // Define and style Viz object
         const viz = new carto.Viz(`
             @duration: 30
             @animation: animation(linear($tpep_pickup_datetime, time('2016-05-01T00:00:07Z'), time('2016-05-06T10:40:59Z')), @duration, fade(0.1, 0.5))
             filter: @animation
         `);
 
+        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
-        layer.addTo(map, 'watername_ocean');
 
-        // Elements
-        const $playBtn = document.getElementById('js-play-btn');
-        // const $stopBtn = document.getElementById('js-stop-btn');
-        const $pauseBtn = document.getElementById('js-pause-btn');
+        // Add map layer
+        layer.addTo(map, 'watername_ocean');
+    
+        // Get HTML elements
+        const $playbutton = document.getElementById('js-play-button');
+        const $pausebutton = document.getElementById('js-pause-button');
         const $durationRange = document.getElementById('js-duration-range');
         const $timeRange = document.getElementById('js-time-range');
         const $spanDuration = document.getElementById('js-duration-span');
-
-        // Callbacks
-        $durationRange.onchange = () => {
-            const duration = parseInt($durationRange.value, 10);
-            viz.variables.duration = $spanDuration.innerHTML = duration;
-        }
-
-        $timeRange.onchange = () => {
-            viz.variables.animation.setProgressPct($timeRange.value);
-        }
-
-        $playBtn.onclick = () => {
-            viz.variables.animation.play()
-            $playBtn.style.display = 'none';
-            $pauseBtn.style.display = 'initial';
-        };
-
-        $pauseBtn.onclick = () => {
-            viz.variables.animation.pause();
-            $pauseBtn.style.display = 'none';
-            $playBtn.style.display = 'initial';
-        };
-
-        $playBtn.style.display = 'none';
-
+        // Save initial time range value
         let last = $timeRange.value;
 
-        $timeRange.onchange = () => {
+        // Listen to interaction events
+        $durationRange.addEventListener('change', () => {
+            const duration = parseInt($durationRange.value, 10);
+            // Update animation duration
+            viz.variables.duration = $spanDuration.innerHTML = duration;
+        });
+
+        $playbutton.addEventListener('click', () => {
+            // Play the animation
+            viz.variables.animation.play()
+        });
+
+        $pausebutton.addEventListener('click', () => {
+            // Pause the animation
+            viz.variables.animation.pause();
+        });
+
+        $timeRange.addEventListener('change', () => {
+            // Update animation progress
             viz.variables.animation.setProgressPct($timeRange.value);
             last = $timeRange.value;
-        }
+        });
 
+        // Listen to layer events
         layer.on('updated', () => {
             if ($timeRange.value == last) {
                 $timeRange.value = viz.variables.animation.getProgressPct();

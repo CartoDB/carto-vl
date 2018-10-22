@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Railroad accidents | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Legend</h1>
+            </header>
+            <p class="description open-sans">Type of accident</p>
+            <section>
+                <div id="controls">
+                    <ul id="content"></ul>
+                </div>
+            </section>
+            <header>
+                <h1>Visualizations</h1>
+            </header>
+            <p class="description open-sans">Change the visualization of the layer</p>
+            <div id="controls">
+                <ul class="actions">
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp($total_damage, [0, 50])')"
+                            id="viz0" checked>
+                        <label for="viz0">
+                            <h2>ramp($total_damage, [0, 50])</h2>
+                            <p class="description open-sans">This will set a 0 pixel width to accidents with the minimum amount of damage in the dataset and 50 pixels to the one with the most damage.</span></p>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('sqrt(ramp($total_damage, [0, 50^2]))')"
+                            id="viz1">
+                        <label for="viz1">
+                            <h2>sqrt(ramp($total_damage, [0, 50^2]))</h2>
+                            <p class="description open-sans">The same as before for the extreme points, but the interpolation will be linear in area, not in width. An intermediate accident with half the damage of the worst accident will get half the area of the worst (50²/2), but not half its width. Unless you want to accentuate differences, this is usually the proper way to make a bubble map</span></p>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('sqrt($total_damage/globalMax($total_damage))*50')"
+                            id="viz4">
+                        <label for="viz4">
+                            <h2>sqrt($total_damage/globalMax($total_damage))*50')</h2>
+                            <p class="description open-sans">The same as before since the dataset has accidents with zero damage.</span></p>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="radio" name="source" onclick="viz.width.blendTo('ramp(globalEqIntervals($total_damage, 3), [0.5, 50])')"
+                            id="viz2">
+                        <label for="viz2">
+                            <h2>ramp(globalEqIntervals($total_damage, 3), [1, 25])</h2>
+                            <p class="description open-sans">Classifiers can be used too. In this example, the "Equal Intervals" method allows to detect the outliers quickly.</span></p>
+                        </label>
+                    </li>
+                </ul>
+                <div id="info"></div>
+            </div>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 3.5,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            width: ramp($total_damage, [0, 50])
+            strokeWidth: 0.2
+            color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
+`);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            hideLoader();
+
+            const colorLegend = layer.viz.color.getLegendData();
+            let colorLegendList = '';
+
+            function rgbToHex(color) {
+                return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+            }
+            function hideLoader() {
+                document.getElementById('loader').style.opacity = '0';
+            }
+            colorLegend.data.forEach((legend, index) => {
+                const color = legend.value
+                    ? rgbToHex(legend.value)
+                    : 'white'
+
+                if (color) {
+                    colorLegendList +=
+                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Rest of types')}</span></li>\n`;
+                }
+            });
+
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+    </script>
+</body>
+
+</html>

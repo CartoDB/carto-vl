@@ -3,7 +3,7 @@ import { checkType, checkExpression } from '../utils';
 
 export default class ReverseList extends Base {
     constructor (array) {
-        super({array});
+        super({ array });
 
         checkExpression('reverseList', 'array', 0, array);
 
