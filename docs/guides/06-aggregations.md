@@ -1,6 +1,6 @@
 ## Aggregating data
 
-In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*),just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
+In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*), just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
 
 
 ### Global aggregations
@@ -215,7 +215,7 @@ To explore the map at full screen size, have a look at [this link](/developers/c
 
 
 ### Resolution
-Resoultion is an interesting property to know about when you are displaying a point layer and using the **CARTO backend** (`carto.source.Dataset` or `carto.source.SQL`). Resolution is a value that defines the spatial aggregation for your features ranging from **1 pixel** (default) to **255 pixels**.
+Resolution is an interesting property to know about when you are displaying a point layer and using the **CARTO backend** (`carto.source.Dataset` or `carto.source.SQL`). Resolution is a value that defines the spatial aggregation for your features ranging from **1 pixel** (default) to **255 pixels**.
 
 A regular grid is internally created with cells sized by the number of pixels defined as the `resolution` value. Any feature falling in the same cell will be aggregated into a _clustered point_. That point's position will be determined by the current [centroid](https://carto.com/help/glossary/#centroid) of the features found inside each cell (aggregation placement is always set to `centroid` mode).
 
