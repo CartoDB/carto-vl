@@ -70,11 +70,11 @@ export default class clusterTimeRange extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return {
-            [this.property.name]: {
+            [this.property.name]: [{
                 type: 'dimension',
                 dimension: this._dimension,
                 range: true
-            }
+            }]
         };
     }
 }

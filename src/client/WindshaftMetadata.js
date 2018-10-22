@@ -61,7 +61,7 @@ import MVTMetadata from '../sources/MVTMetadata';
 
 export default class WindshaftMetadata extends MVTMetadata {
     _dimensionInfo (propertyName) {
-        const baseName = this.baseName(propertyName);
+        const baseName = this.baseName(propertyName) || propertyName;
         const column = this.properties[baseName];
         let dimension = null;
         if (baseName !== propertyName) {

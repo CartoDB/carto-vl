@@ -48,16 +48,17 @@ class DateCodec extends BaseCodec {
     constructor (metadata, propertyName) {
         super();
         const { min } = metadata.stats(propertyName);
-        this._min = min.getTime();
+        this._min_ms = min * 1000;
+        this._min_date = util.msToDate(this._min_ms);
     }
 
     sourceToInternal (propertyValue) {
-        return [util.msToDate(propertyValue * 1000) - this._min];
+        return [util.msToDate(propertyValue * 1000) - this._min_date];
     }
 
     internalToExternal (propertyValue) {
         let value = propertyValue;
-        value += this._min.getTime();
+        value += this._min_ms;
         return util.msToDate(value);
     }
 
@@ -70,7 +71,7 @@ class DateCodec extends BaseCodec {
     }
 
     inlineInternalMatch (thisValue, otherCodec) {
-        const offset = otherCodec._min.getTime() - this._min.getTime();
+        const offset = otherCodec._min_ms - this._min_ms;
         return `(${thisValue}-${offset.toFixed(20)})`;
     }
 }
@@ -80,7 +81,6 @@ class TimeRangeCodec extends BaseCodec {
         super();
         const { min } = metadata.stats(propertyName);
         this._min = decodeModal('start', min);
-        // this._min = this.limitsToInternal(min, max)[0];
     }
 
     sourceToInternal (propertyValue) {

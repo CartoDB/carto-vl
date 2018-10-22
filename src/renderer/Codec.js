@@ -62,19 +62,6 @@ export class BaseCodec {
     inlineInternalMatch (thisValue, _otherCodec) {
         return `${thisValue}`;
     }
-
-    // Encode external property limits (min,max) to produce a
-    // combined pair of internal limits.
-    // For internal range property pairs, combined limits as computed
-    // with this method must be employed when mapping (e.g. for lineaer)
-    // the values between them.
-    limitsToInternal (min, max) {
-        const [lo, hi] = [min, max].map(v => this.externalToInternal(v));
-        if (this.isRange()) {
-            return [lo[0], hi[1]];
-        }
-        return [lo[0], hi[0]];
-    }
 }
 
 // The Identity codec class serves

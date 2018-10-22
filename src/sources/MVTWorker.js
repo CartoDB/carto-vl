@@ -6,7 +6,6 @@ import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
-import MVTCodec from './MVTCodec';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -57,7 +56,7 @@ export class MVTWorker {
 
     castMetadata (metadata) {
         Object.setPrototypeOf(metadata, MVTMetadata.prototype);
-        metadata.setCodec(new MVTCodec());
+        // TODO: set codecs
     }
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {

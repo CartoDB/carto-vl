@@ -406,35 +406,19 @@ export default class Windshaft {
 }
 
 function setMetadataCodecs (metadata) {
-    // assign codecs & encode stats
+    // assign codecs
     // a single codec kept per base property
     // so, all its aggregations share the same encoding.
-    // is a dimension, the kept codec is that of the dimension
-    // (but we use a temporal base codec here to encode base stats)
-    metadata.propertyKeys.forEach(baseName => {
+    // form a dimension, the kept codec is that of the dimension
+    Object.keys(metadata.properties).forEach(baseName => {
         const property = metadata.properties[baseName];
         const baseType = property.type;
-        const baseCodec = windshaftCodecFactory(metadata, baseType, baseName);
-        const dimType = property.dimension ? property.dimension.type : null;
-        const dimName = dimType ? property.dimension.propertyName : baseName;
-        const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
-        const dimCodec = dimType ? windshaftCodecFactory(metadata, actualDimType, dimName) : null;
-
-        // assign the code to the (base) property
-        property.codec = dimCodec || baseCodec;
-
-        // encode stats
-        encodeStats(metadata, baseName, baseCodec);
-        if (dimCodec) {
-            encodeStats(metadata, dimName, dimCodec);
+        if (baseType !== 'geometry') {
+            const dimType = property.dimension ? property.dimension.type : null;
+            const dimName = dimType ? property.dimension.propertyName : baseName;
+            const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
+            property.codec = windshaftCodecFactory(metadata, actualDimType || baseType, dimName || baseName);
         }
-    });
-}
-
-function encodeStats (metadata, name, codec) {
-    const stats = metadata.stats(name);
-    metadata.availableStats(name).forEach(stat => {
-        stats[stat] = codec.sourceToExternal(stats[stat]);
     });
 }
 

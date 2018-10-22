@@ -130,6 +130,6 @@ export default class Metadata {
 
     codec (propertyName) {
         // FIXME: default identity code for debugging purposes
-        return this.properties[propertyName].codec || new IdentityCodec();
+        return this.properties[this.baseName(propertyName)].codec || new IdentityCodec();
     }
 }
