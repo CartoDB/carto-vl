@@ -4,7 +4,7 @@ In this guide you will explore a set of functions called **aggregations**, that 
 
 
 ### Global aggregations
-When you are working with a dataset, odds are that you are interested in comparing a feature with the rest of them. For example, _"is the population density in this neighborhood bigger than the average?"_ Or maybe you just want to display in a table some basic statistics describing the whole dataset.
+When you are working with a dataset, odds are that you are interested in comparing a feature with the rest of them. For example, _"is the population density in this neighborhood bigger than the average?"_. Or maybe you just want to display in a table some basic statistics describing the whole dataset.
 
 For these cases, CARTO VL provides you with a set of *global* functions that are automatically calculated for the entire dataset:
 - `globalMin`: calculates the minimum value.
@@ -46,7 +46,7 @@ layer.on('loaded', displayGlobalValues);
 ```
 
 **Note:**
-Creating a separated function allows deactivating the layer later on with `layer.off`.
+Creating a named function allows deactivating the listener for the layer later on, with `layer.off`.
 
 Global functions can be combined with other capabilities, such as `filter`. For example, you can display just the biggest cities in the world with this little addition to your `viz`:
 ```js
@@ -76,6 +76,9 @@ The result using the global functions in the previous step should look like this
 
 To open the map at this step, use this [link to the map](/developers/carto-vl/examples/maps/guides/aggregations/step-1.html), where you can check the console messages.
 
+**Note:**
+To display only the biggest city in the world change your filter to `filter: $pop_max == @g_max // biggest city is Tokyo!`.
+
 
 ### Viewport aggregations
 Sometimes you want to extract relevant information from the current view of the map (the **viewport**), to better understand *What am I seeing in the current map view?*. A set of *viewport* functions are available in CARTO VL for these cases.
@@ -100,7 +103,6 @@ const viz = new carto.Viz(`
     @g_avg: globalAvg($pop_max)
     @g_p95: globalPercentile($pop_max, 95)
     filter: ($pop_max > @g_p95)
-    // filter: $pop_max == @g_max // biggest city is Tokyo!
     @v_sum: viewportSum($pop_max)
     @v_max: viewportMax($pop_max)
     @v_min: viewportMin($pop_max)
@@ -181,7 +183,7 @@ layer.on('updated', displayViewportValues);
 **Note:**
 Notice how we have used `numeral` from the external library, and its `.format` method to display millions of people.
 
-As a nice complement, you can now change the _color_ and _size_ of cities with higher populations on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
+As a nice complement, you can now change the _color_ and _size_ of the city with highest population on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
 ```CARTO_VL_Viz
 color: blend(gray, red, @f_isBiggest)
 width: blend(10, 40, @f_isBiggest)
@@ -229,16 +231,16 @@ That should be enough to set the resolution and reduce the number of points, but
 ```js
 const viz = new carto.Viz(`
     color: blend(gray, red, @f_isBiggest)
-    // width: blend(10, 40, @f_isBiggest)
     width: 5 * clusterCount()
+
     @g_max: globalMax($pop_max)
     @g_avg: globalAvg($pop_max)
     @g_p95: globalPercentile($pop_max, 95)
-    // filter: ($pop_max > @g_p95)
-    // filter: $pop_max == @g_max // biggest city is Tokyo!
+
     @v_sum: viewportSum($pop_max)
     @v_max: viewportMax($pop_max)
     @v_min: viewportMin($pop_max)
+
     @f_isBiggest: ($pop_max == @v_max)
     resolution: 128
 `);
