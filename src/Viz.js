@@ -366,9 +366,6 @@ export default class Viz {
         return this['_' + shaderName];
     }
 
-    compileShaders (gl, metadata) {
-    }
-
     replaceChild (toReplace, replacer) {
         if (Object.values(this.variables).includes(toReplace)) {
             const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);

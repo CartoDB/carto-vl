@@ -67,8 +67,10 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         // Use an UID to detect that a new call to `Layer.update()` is overriding an old (uncommitted) one
-        this._nextUID = 0;
-        this._currentUID = null;
+        this._majorNextUID = 0;
+        this._majorCurrentUID = null;
+        this._minorNextUID = 0;
+        this._minorCurrentUID = null;
 
         this._sourcePromise = this.update(source, viz);
     }
@@ -204,10 +206,11 @@ export default class Layer {
 
         let uid;
         if (majorChange) {
-            uid = this._nextUID;
-            this._nextUID++;
+            uid = {major: this._majorNextUID, minor: 0};
+            this._majorNextUID++;
         } else {
-            uid = this._currentUID;
+            uid = {major: this._majorCurrentUID, minor: this._minorNextUID};
+            this._minorNextUID++;
         }
 
         const loadImagesPromise = viz.loadImages();
@@ -218,14 +221,27 @@ export default class Layer {
         const metadata = await metadataPromise;
 
         await this._context;
-        if (this._currentUID > uid) {
-            throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._currentUID}.`);
+
+        if (majorChange) {
+            if (this._majorCurrentUID > uid) {
+                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._majorCurrentUID}.`);
+            }
+        } else {
+            if (this._majorCurrentUID > uid) {
+                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this viz change. Commit ${uid} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
+            }
+            if (this._minorCurrentUID > uid) {
+                throw new CartoRuntimeError(`Another \`viz change\` finished before this one. Commit ${uid.major}.${uid.minor} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
+            }
         }
+        this._majorCurrentUID = uid.major;
+        this._minorCurrentUID = uid.minor;
 
         // Everything was ok => commit changes
         this.metadata = metadata;
 
         viz.setDefaultsIfRequired(this.metadata.geomType);
+        viz.setDefaultsIfRequired(this._renderLayer.type);
         if (this._viz) {
             this._viz.onChange(null);
         }
@@ -287,18 +303,8 @@ export default class Layer {
             viz.filter._blendFrom(this._viz.filter, ms, interpolator);
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
-
-            return this._vizChanged(viz).then(() => {
-                if (this._viz) {
-                    this._viz.onChange(null);
-                }
-                viz.setDefaultsIfRequired(this._renderLayer.type);
-                this._viz = viz;
-                this._viz.onChange(this._vizChanged.bind(this));
-            });
-        } else {
-            return this.update(this._source, viz);
         }
+        return this._update(this._source, viz, false);
     }
 
     /**
@@ -432,12 +438,8 @@ export default class Layer {
         return feature;
     }
 
-    _compileShaders (viz, metadata) {
-        viz.compileShaders(this.gl, metadata);
-    }
-
     async _vizChanged (viz) {
-        return this.update(this._source, viz);
+        return this._update(this._source, viz, false);
     }
 
     _checkId (id) {

@@ -113,9 +113,9 @@ describe('api/layer', () => {
             layer.metadata = { geomType: 'point' };
             layer._context = Promise.resolve(null);
             layer.map = {triggerRepaint: () => {}};
-            layer._compileShaders = () => {
+            layer._sourcePromise.then(() => {
                 layer.blendToViz(viz2).then(done);
-            };
+            });
         });
         it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
