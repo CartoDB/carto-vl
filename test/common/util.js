@@ -144,7 +144,7 @@ function loadOptions () {
 }
 
 function headless () {
-    return process.platform === 'linux';
+    return process.platform === 'darwin' || process.platform === 'linux';
 }
 
 /**
