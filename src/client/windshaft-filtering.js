@@ -169,6 +169,8 @@ class AggregationFiltering {
         if (f.isA(ClusterAvg) || f.isA(ClusterMax) || f.isA(ClusterMin) || f.isA(ClusterMode) || f.isA(ClusterSum)) {
             let p = this._property(f.property);
             if (p) {
+                console.log("PROP",p,schema.column.aggColumn(p.property, f.aggName),f.name);
+                // FIXME: should we just use the cluster aggr expression?
                 p.property = schema.column.aggColumn(p.property, f.aggName);
                 return p;
             }

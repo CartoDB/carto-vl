@@ -53,13 +53,12 @@ export default class Linear extends BaseExpression {
 
         super({ input, min, max });
         this.type = 'number';
-        if (this.input.type === 'timerange') {
-            // range modes:
-            // * 'start' of property between full range (from start of min to end of max)
-            // * 'end' of property between full range (from start of min to end of max)
-            // * 'unit' (default) range mapped to 0:1
-            this._rangeMode = range || 'unit';
-        }
+
+        // range mode is used only for timerange inputs:
+        // * 'start' of property between full range (from start of min to end of max)
+        // * 'end' of property between full range (from start of min to end of max)
+        // * 'unit' (default) range mapped to 0:1
+        this._rangeMode = range || 'unit';
     }
 
 
@@ -84,6 +83,7 @@ export default class Linear extends BaseExpression {
             return (input - smin) / (smax - smin);
         } else if (this.input.type === 'timerange') {
             let input, min, max;
+            const v = this.input.eval(feature);
             switch (this._rangeMode) {
                 case 'unit':
                     // choose same side for all three:
@@ -117,12 +117,13 @@ export default class Linear extends BaseExpression {
         super._bindMetadata(metadata);
 
         if (this.input.type === 'date') {
+            // This should actually be the default case (non-range)
             const min = this.min.eval();
             const max = this.max.eval();
 
-            const smin = metadata.codec(this.input.propertyName).externalTointernal(min);
-            const smax = metadata.codec(this.input.propertyName).externalTointernal(max);
-            this._metadata = metadata; // TODO: check this
+            const smin = metadata.codec(this.input.propertyName).externalToInternal(min)[0];
+            const smax = metadata.codec(this.input.propertyName).externalToInternal(max)[0];
+            this._metadata = metadata; // TODO: check reason for this
 
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         } else if (this.input.type === 'timerange') {
@@ -131,30 +132,31 @@ export default class Linear extends BaseExpression {
                 case 'unit':
                     // choose same side for all three:
                     inputIndex = 0; // start
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).startValue;
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[inputIndex];
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[inputIndex];
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).startValue;
                     break;
                 case 'start':
                     inputIndex = 0; // start
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).endValue;
                     break;
                 case 'end':
                     inputIndex = 1; // end
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).endValue;
                     break;
 
             }
-            // const prop = metadata.decodedProperties(this.input.propertyName)[inputIndex];
-            // const smin = metadata.codec(prop).externalToInternal(min);
-            // const smax = metadata.codec(prop).externalToInternal(max);
-            const [smin, smax] = [min, max].map(v => metadata.codec(this.input.propertyName).externalToInternal(v));
-            metadata.codec(this.input.propertyName).limitsTointernal(min, max);
 
             this._metadata = metadata;
 
-            this.inlineMaker = (inline) => `((${inline.input[inputIndex]}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+            this.inlineMaker = (inline) => `((${inline.input[inputIndex]}-(${min.toFixed(20)}))/(${(max - min).toFixed(20)}))`;
         } else {
             checkType('linear', 'input', 0, 'number', this.input);
             checkType('linear', 'min', 1, 'number', this.min);

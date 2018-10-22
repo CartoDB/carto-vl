@@ -14,7 +14,7 @@ export default function windshaftCodecFactory (metadata, type, propertyName) {
             return new TimeRangeCodec(metadata, propertyName);
         default:
             throw new CartoMapsAPIError(
-                `${cmt.NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`
+                `${cmt.NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${type}' cannot be decoded.`
             );
     }
 }
@@ -36,7 +36,7 @@ class CategoryCodec extends BaseCodec {
     }
 
     sourceToExternal (propertyValue) {
-        return propertyValue;
+        return [propertyValue];
     }
 
     externalToSource (v) {
@@ -90,7 +90,7 @@ class TimeRangeCodec extends BaseCodec {
     }
 
     internalToExternal (lo, hi) {
-        util.timeRange((lo + this._min) * 1000, (hi + this._min) * 1000);
+        return util.timeRange((lo + this._min) * 1000, (hi + this._min) * 1000);
     }
 
     externalToSource (v) {

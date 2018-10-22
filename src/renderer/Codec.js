@@ -24,7 +24,7 @@ export class BaseCodec {
     // and [lo, hi] for range codecs.
     // Used to encode sources into dataframe properties.
     sourceToInternal (v) {
-        return v;
+        return [v];
     }
 
     // Convert internal encoding to external;
@@ -69,7 +69,7 @@ export class BaseCodec {
 // encodings are exactly the same.
 export class IdentityCodec extends BaseCodec {
     sourceToInternal (v) {
-        return v;
+        return [v];
     }
     internalToExternal (v) {
         return v;
@@ -84,6 +84,6 @@ export class IdentityCodec extends BaseCodec {
     }
 
     externalToInternal (v) {
-        return v;
+        return [v];
     }
 }

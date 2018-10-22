@@ -1,4 +1,5 @@
 import MVTMetadata from '../sources/MVTMetadata';
+import windshaftCodecFactory from './WindshaftCodec';
 
 // // Windshaft metadata internal structure of properties
 // properties: {
@@ -96,6 +97,10 @@ export default class WindshaftMetadata extends MVTMetadata {
         }
         return super.stats(propertyName);
     }
+
+    setCodecs() {
+        setMetadataCodecs(this);
+    }
 }
 
 function dimensionType (dimension, propertyName) {
@@ -107,4 +112,21 @@ function dimensionType (dimension, propertyName) {
 
 function dimensionBaseType (dimension) {
     return dimension.type;
+}
+
+function setMetadataCodecs (metadata) {
+    // assign codecs
+    // a single codec kept per base property
+    // so, all its aggregations share the same encoding.
+    // form a dimension, the kept codec is that of the dimension
+    Object.keys(metadata.properties).forEach(baseName => {
+        const property = metadata.properties[baseName];
+        const baseType = property.type;
+        if (baseType !== 'geometry') {
+            const dimType = property.dimension ? property.dimension.type : null;
+            const dimName = dimType ? property.dimension.propertyName : baseName;
+            const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
+            property.codec = windshaftCodecFactory(metadata, actualDimType || baseType, dimName || baseName);
+        }
+    });
 }

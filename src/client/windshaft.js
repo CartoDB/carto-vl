@@ -1,7 +1,6 @@
 import { version } from '../../package';
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
-import windshaftCodecFactory from './WindshaftCodec';
 import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
@@ -400,27 +399,11 @@ export default class Windshaft {
         const idProperty = 'cartodb_id';
 
         const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
-        setMetadataCodecs(metadata);
+        metadata.setCodecs();
         return metadata;
     }
 }
 
-function setMetadataCodecs (metadata) {
-    // assign codecs
-    // a single codec kept per base property
-    // so, all its aggregations share the same encoding.
-    // form a dimension, the kept codec is that of the dimension
-    Object.keys(metadata.properties).forEach(baseName => {
-        const property = metadata.properties[baseName];
-        const baseType = property.type;
-        if (baseType !== 'geometry') {
-            const dimType = property.dimension ? property.dimension.type : null;
-            const dimName = dimType ? property.dimension.propertyName : baseName;
-            const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
-            property.codec = windshaftCodecFactory(metadata, actualDimType || baseType, dimName || baseName);
-        }
-    });
-}
 
 function adaptGeometryType (type) {
     switch (type) {
