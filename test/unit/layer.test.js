@@ -112,6 +112,7 @@ describe('api/layer', () => {
             layer._vizChanged = () => Promise.resolve();
             layer.metadata = { geomType: 'point' };
             layer._context = Promise.resolve(null);
+            layer.map = {triggerRepaint: () => {}};
             layer._compileShaders = () => {
                 layer.blendToViz(viz2).then(done);
             };

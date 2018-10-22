@@ -69,7 +69,7 @@ export default class Layer {
         // Use an UID to detect that a new call to `Layer.update()` is overriding an old (uncommitted) one
         this._atomicChangeUID = 0;
 
-        this.update(source, viz);
+        this._sourcePromise = this.update(source, viz);
     }
 
     /**
@@ -262,6 +262,7 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
+        await this._sourcePromise;
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
                 viz.variables[varName] = this._viz.variables[varName];
