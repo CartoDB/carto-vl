@@ -310,39 +310,63 @@ export default class Viz {
         }
     }
 
+    clearShaders () {
+        this._colorShader = null;
+        this._widthShader = null;
+        this._strokeColorShader = null;
+        this._strokeWidthShader = null;
+        this._filterShader = null;
+        this._symbolShader = null;
+        this._pointShader = null;
+        this._lineShader = null;
+        this._polygonShader = null;
+    }
+
+    get colorShader () {
+        return this._compileShader('colorShader', shaders.styler.colorShaderGLSL, { color: this.color });
+    }
+    get widthShader () {
+        return this._compileShader('widthShader', shaders.styler.widthShaderGLSL, { width: this.width });
+    }
+    get strokeColorShader () {
+        return this._compileShader('strokeColorShader', shaders.styler.colorShaderGLSL, { color: this.strokeColor });
+    }
+    get strokeWidthShader () {
+        return this._compileShader('strokeWidthShader', shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
+    }
+    get filterShader () {
+        return this._compileShader('filterShader', shaders.styler.filterShaderGLSL, { filter: this.filter });
+    }
+    get symbolShader () {
+        return this._compileShader('symbolShader', shaders.symbolizer.symbolShaderGLSL, {
+            symbol: this.symbol,
+            symbolPlacement: this.symbolPlacement,
+            transform: this.transform
+        });
+    }
+    get pointShader () {
+        return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get lineShader () {
+        return this._compileShader('lineShader', { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get polygonShader () {
+        return this._compileShader('polygonShader', { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+
+    _compileShader (shaderName, GLSL, expr) {
+        if (!this['_' + shaderName]) {
+            this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
+            checkVizPropertyTypes(this);
+            this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
+        }
+        return this['_' + shaderName];
+    }
+
     compileShaders (gl, metadata) {
-        this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
-        checkVizPropertyTypes(this);
-
-        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
-        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
-        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
-        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
-        this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
-
-        if (!this.symbol.default) {
-            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
-                symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement,
-                transform: this.transform
-            }, this);
-        }
-
-        if (!this._geomType || this._geomType === 'point') {
-            this.pointShader = compileShader(gl,
-                { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
-        if (!this._geomType || this._geomType === 'line') {
-            this.lineShader = compileShader(gl,
-                { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
-        if (!this._geomType || this._geomType === 'polygon') {
-            this.polygonShader = compileShader(gl,
-                { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
     }
 
     replaceChild (toReplace, replacer) {

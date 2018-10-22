@@ -67,7 +67,8 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         // Use an UID to detect that a new call to `Layer.update()` is overriding an old (uncommitted) one
-        this._atomicChangeUID = 0;
+        this._nextUID = 0;
+        this._currentUID = null;
 
         this._sourcePromise = this.update(source, viz);
     }
@@ -191,6 +192,9 @@ export default class Layer {
      * @api
      */
     async update (source, viz = this._viz) {
+        return this._update(source, viz, true);
+    }
+    async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
 
@@ -198,8 +202,14 @@ export default class Layer {
             source = source._clone();
         }
 
-        this._atomicChangeUID++;
-        const uid = this._atomicChangeUID;
+        let uid;
+        if (majorChange) {
+            uid = this._nextUID;
+            this._nextUID++;
+        } else {
+            uid = this._currentUID;
+        }
+
         const loadImagesPromise = viz.loadImages();
 
         // Don't await directly to start requesting the images as soon as possible
@@ -208,8 +218,8 @@ export default class Layer {
         const metadata = await metadataPromise;
 
         await this._context;
-        if (this._atomicChangeUID > uid) {
-            throw new CartoRuntimeError('Another `Layer.update()` finished before this one');
+        if (this._currentUID > uid) {
+            throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._currentUID}.`);
         }
 
         // Everything was ok => commit changes
@@ -221,7 +231,9 @@ export default class Layer {
         }
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
-        this._compileShaders(viz, metadata);
+        this.viz.clearShaders();
+        this.viz.metadata = metadata;
+        this.viz.gl = this.gl;
         this._needRefresh();
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
