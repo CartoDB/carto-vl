@@ -1,12 +1,12 @@
 ## Aggregating data
 
-In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*),just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
+In this guide you will explore a set of functions called **aggregations**, that will allow you to extract different values from your datasets considering the whole set of features (*global aggregations*), just the ones displayed in the current map extent (*viewport aggregations) or those derived from spatial aggregations (*cluster aggregations*).
 
 
 ### Global aggregations
-When you are working with a dataset, odds are that you are interested in comparing a feature with the rest of them. For example, _"is the population density in this neighborhood bigger than the average?"_ Or maybe you just want to display in a table some basic statistics describing the whole dataset.
+When you are working with a dataset, odds are that you are interested in comparing a feature with the rest of them. For example, _"is the population density in this neighborhood bigger than the average?"_. Or maybe you just want to display in a table some basic statistics describing the whole dataset.
 
-For these cases, CARTO VL provides you with a set of *global* functions that are automatically calculated for the entire dataset:
+For these cases, CARTO VL provides you with a set of functions automatically calculated for the whole dataset (hence *global* functions):
 - `globalMin`: calculates the minimum value.
 - `globalMax`: calculates the maximum value.
 - `globalSum`: calculates the sum of all values.
@@ -14,9 +14,9 @@ For these cases, CARTO VL provides you with a set of *global* functions that are
 - `globalAvg`: calculates the average value.
 - `globalPercentile`: calculates the Nth percentile.
 
-Let's use some of them with our cities dataset. You can start with the [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html) template. Take its source code and copy it to a new file called `aggregations.html`.
+Let's use some of them with our cities dataset. You can start as usual from a [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Take its source code and copy it to a new file called `aggregations.html`. Now you are ready to start.
 
-Next, create a visualization adding the cities layer and 3 variables with global functions, using this code:
+Then create a visualization adding the cities layer and 3 variables with global functions, using this code:
 ```js
 const source = new carto.source.Dataset('populated_places');
 const viz = new carto.Viz(`
@@ -61,9 +61,9 @@ const viz = new carto.Viz(`
 ```
 
 **Note:**
-How about using a filter to display only the biggest city in the world? How would you create a filter for that? Give it a quick try and then keep on working through the guide...
+How about using filtering to display just the biggest city in the world? How would you create a filter for that? Give it a quick try and then keep on working in the guide...
 
-The result using the global functions in the previous step should look like this:
+The result using previous global functions should look like this:
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-1"
@@ -78,9 +78,9 @@ To open the map at this step, use this [link to the map](/developers/carto-vl/ex
 
 
 ### Viewport aggregations
-Sometimes you want to extract relevant information from the current view of the map (the **viewport**), to better understand *What am I seeing in the current map view?*. A set of *viewport* functions are available in CARTO VL for these cases.
+Sometimes you want to extract relevant information from the current view of the map (the **viewport**), understanding *What am I exactly seeing now?*. And a set of functions is included in CARTO VL to help you in this case.
 
-In an analogous way to *global* functions, these are the available *viewport* functions:
+In an analogous way with the global ones, you have available these functions:
 - `viewportMin`
 - `viewportMax`
 - `viewportSum`
@@ -89,9 +89,9 @@ In an analogous way to *global* functions, these are the available *viewport* fu
 - `viewportPercentile`
 
 **Note:**
-It is important to note that features that have been removed using a `filter` are not visible and will be excluded from the aggregation calculations.
+Obviously, the features that don't pass any possible filter you have set (hence not visible), will be excluded from the calculations.
 
-Let's try some out by adding them to the current `viz`. First, add some functions to sum the population in the current viewport and also to get the highest and lowest population values:
+You'll practice now to use some of them, adding several to the current viz. First, add some viewport functions to sum the population in the current view and to get the biggest and lowest population values, with this code:
 ```js
 const viz = new carto.Viz(`
     color: grey
@@ -108,7 +108,7 @@ const viz = new carto.Viz(`
 ```
 
 **Note:**
-Notice how you can also use a convention to name your "viewport-related" variables, for example, with a `v_` prefix.
+Notice how you can also use a convention to name your "viewport-related" variables, for example with a `v_` prefix.
 
 As a check, show the new variable values in the console, which will be updated as you move the map:
 ```js
@@ -143,15 +143,15 @@ Add this to your **HTML** code (NOT inside the `<script>` tags), just after the 
 </aside>
 ```
 
-To improve a bit how the high population numbers display, we're going to first import a formatting library called [`numeraljs`](http://numeraljs.com/). To add it, paste the following inside the `<head>` section of your file:
+To improve a bit how you are going to display those big population numbers, we're going to import first a formatting library called [numeraljs](http://numeraljs.com/). So you will have to add this inside the `<head>` section of your file:
 ```html
 <!-- Numeral.js for number formatting -->
 <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
 ```
 
-And now let's display some interesting figures in that panel!
+And now let's display some interesting figures in that panel!.
 
-To continue, add this code (back again into your JavaScript, inside the current `displayViewportValues` function, attached to the layer updates):
+You should add this code (back again into your JavaScript, inside the current `displayViewportValues` function, attached to the layer updates):
 
 ```js
 function displayViewportValues(){
@@ -181,7 +181,7 @@ layer.on('updated', displayViewportValues);
 **Note:**
 Notice how we have used `numeral` from the external library, and its `.format` method to display millions of people.
 
-As a nice complement, you can now change the _color_ and _size_ of cities with higher populations on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
+As a nice complement, you can now change the _color_ and _size_ of the city with more population on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
 ```CARTO_VL_Viz
 color: blend(gray, red, @f_isBiggest)
 width: blend(10, 40, @f_isBiggest)
@@ -195,7 +195,7 @@ And add this new variable to the same viz:
 **Note:**
 Notice how `blend` works here as a convenient way to apply a *conditional style*, where its parameters can be interpreted as `blend(FALSE_VALUE, TRUE_VALUE, CONDITION)`; in our case it could be read as "if the feature is the biggest (its pop_max is the maximum value in the viewport), display it in red and a bigger size". See also that we named our feature-dependent variable with a `@f_` prefix.
 
-As a test, you can temporary disable (and then enable again) the current filter, to display more cities at the same time. This is a practical way to de-activate a filter, without removing it from the code. Just add `//` before the `filter` line in the `viz` definition to comment it out, like this:
+As a test, you can temporary disable (and then enable again) the current filter, to display more cities at the same time. This is a practical way to de-activate a filter, without removing it from the code. Just add `//` before the `filter` line in the `viz` definition, like this:
 ```CARTO_VL_Viz
 // filter: ($pop_max > @g_p95)
 ```
@@ -215,15 +215,15 @@ To explore the map at full screen size, have a look at [this link](/developers/c
 
 
 ### Resolution
-Resoultion is an interesting property to know about when you are displaying a point layer and using the **CARTO backend** (`carto.source.Dataset` or `carto.source.SQL`). Resolution is a value that defines the spatial aggregation for your features ranging from **1 pixel** (default) to **255 pixels**.
+This is an interesting property you need to know about when you are displaying a layer with points and using **CARTO backend** (`carto.source.Dataset` or `carto.source.SQL`). The resolution is a value that defines an spatial aggregation for your features, and it can go from **1 pixel** (default) to **255 pixels**.
 
-A regular grid is internally created with cells sized by the number of pixels defined as the `resolution` value. Any feature falling in the same cell will be aggregated into a _clustered point_. That point's position will be determined by the current [centroid](https://carto.com/help/glossary/#centroid) of the features found inside each cell (aggregation placement is always set to `centroid` mode).
+For that resolution value a regular grid is internally created, with the size in pixels you have indicated. Any feature falling in the same cell will be aggregated into a _clustered point_. That point's position will be determined by the current [centroid](https://carto.com/help/glossary/#centroid) of the features found inside each cell (aggregation placement is always set to `centroid` mode).
 
-Give it a try by modifying the default resolution of `1` in the current `viz` by adding this property and value:
+You can give it a try now modifying the resolution in the current `viz`, adding this property:
 ```CARTO_VL_Viz
 resolution: 128
 ```
-Remember, if there is no explicit value, `resolution = 1`. Common resolution values are usually `<=16`.
+Remember, if there is no explicit value, `resolution = 1`. Common resolution values are usually <=16
 
 That should be enough to set the resolution and reduce the number of points, but depending on the layer it might be difficult to be perceived without further modifications. Let's add more properties to grasp the concept, removing the `filter` and changing the `width`, using this:
 ```js
@@ -245,14 +245,14 @@ const viz = new carto.Viz(`
 ```
 
 **Note:**
-`clusterCount` is the number of points aggregated inside each cluster. We will take a more thorough look at clustered functions in the next section.
+`clusterCount` is the number of points aggregated inside each cluster. You'll know more about these clustered functions in the next section.
 
 
->**Tip**: When you are visualizing a high density of points, it is likely that the symbols in your visualization overlap. Changing the resolution is an effective way to improve the visualization, particularly at low zoom levels, since all points in a cell are summarized into clustered symbology. The resolution is always a balance between spatial accuracy and readability.
+>**Tip**: if you are using a lot of points in your visualization and the current symbols overlap, changing the resolution can be a way to improve the rendering, specially in a low zoom level, because you'll get less points by clustering them. The resolution is always a balance between spatial accuracy and readability.
 
 
 ### Clustering aggregations
-The last group of aggregation functions are clusters, which are related to the previous concept of resolution and its spatial aggregations.
+The last group of aggregation functions is the one about clusters, which are related to the previous concept of resolution and its spatial aggregations.
 
 This is the set of available operations, pretty similar to the corresponding `global` and `viewport`, which are:
 - `clusterMin`
@@ -262,9 +262,9 @@ This is the set of available operations, pretty similar to the corresponding `gl
 - `clusterAvg`
 - `clusterMode`: aggregate into points using the mode. This makes sense using a _Category_ type of property.
 
-Now let's use a pretty useful one as an example, the `clusterSum`, to modify the symbol's size (`width` property).
+Now let's use a pretty useful one as an example, the `clusterSum`, using it to build the symbol's size (`width` property).
 
-Modify the current `width: 5 * clusterCount()` to:
+You could replace current `width: 5 * clusterCount()` with:
 ```CARTO_VL_Viz
 width: sqrt(clusterSum($pop_max) / 5000) + 5
 ```
