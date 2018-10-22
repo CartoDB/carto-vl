@@ -48,15 +48,6 @@
     </div>
   </aside>
 
-  <!-- Add layer load indicator -->
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
-
   <script>
 
     // Add basemap and set properties
@@ -66,8 +57,6 @@
       center: [0, 30],
       zoom: 2,
       scrollZoom: false,
-
-
     });
 
     // Add zoom controls
@@ -114,7 +103,7 @@
     const citiesLayer = new carto.Layer('citiesLayer', allCitiesSource, citiesViz);
 
     // Add map layer
-    citiesLayer.addTo(map, 'watername_ocean');
+    citiesLayer.addTo(map);
 
     // Define layer selection behavior
     function setAllCities() {
@@ -125,12 +114,6 @@
     }
     function setSpanishCities() {
       citiesLayer.update(spanishCitiesSource, citiesViz);
-    }
-
-    // Define loader behavior and style when layer draws
-    citiesLayer.on('loaded', hideLoader);
-    function hideLoader() {
-      document.getElementById('loader').style.opacity = '0';
     }
 
   </script>

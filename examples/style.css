@@ -283,7 +283,7 @@ body {
 }
 
 #controls li label {
-  font: 12px/16px 'Open Sans';
+  font: 12px/16px 'Roboto';
   cursor: pointer;
 }
 
@@ -592,7 +592,7 @@ body {
 }
 
 #controls .actions li h2 {
-  font: 12px/16px 'Open Sans';
+  font: 12px/16px 'Roboto';
   margin: 0;
 }
 
@@ -612,7 +612,7 @@ body {
   margin-top: 4px;
 }
 #content, #controls {
-  font-family: 'Open Sans';
+  font-family: 'Roboto';
 }
 #controls .actions .description span {
   background: #f5f5f5;
