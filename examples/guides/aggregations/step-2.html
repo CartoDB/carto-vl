@@ -4,13 +4,10 @@
 <head>
     <meta charset="utf-8">
 
-    <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
     <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-    <!-- Make the map visible -->
+
     <link rel="stylesheet" type="text/css" href="../../style.css">
 
     <!-- Numeral.js for number formatting -->
@@ -18,8 +15,8 @@
 </head>
 
 <body>
-    <!-- Add map container -->
     <div id="map"></div>
+
     <!-- Add panel -->
     <aside class="toolbox">
         <div class="box">
@@ -64,7 +61,6 @@
             @g_avg: globalAvg($pop_max)
             @g_p95: globalPercentile($pop_max, 95)
             filter: ($pop_max > @g_p95)
-            // filter: $pop_max == @g_max // biggest city is Tokyo!
             @v_sum: viewportSum($pop_max)
             @v_max: viewportMax($pop_max)
             @v_min: viewportMin($pop_max)
