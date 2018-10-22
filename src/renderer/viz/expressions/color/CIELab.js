@@ -42,7 +42,7 @@ export default class CIELab extends BaseExpression {
 
         this._setGenericGLSL(inline =>
             `cielabToSRGBA(vec4(${inline.l}, ${inline.a}, ${inline.b}, 1.))`
-        , CIELabGLSL);
+            , CIELabGLSL);
     }
     // TODO EVAL
 

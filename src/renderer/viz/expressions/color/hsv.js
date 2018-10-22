@@ -136,18 +136,19 @@ function genHSV (name, alpha) {
                     clamp(${inline.s}${normalize(this.s)}, 0.,1.),
                     clamp(${inline.v}${normalize(this.v)}, 0.,1.)
                 )), ${alpha ? `clamp(${inline.a}, 0.,1.)` : '1.'})`
-            , `
-    #ifndef HSV2RGB
-    #define HSV2RGB
-    vec3 HSVtoRGB(vec3 HSV) {
-      float R = abs(HSV.x * 6. - 3.) - 1.;
-      float G = 2. - abs(HSV.x * 6. - 2.);
-      float B = 2. - abs(HSV.x * 6. - 4.);
-      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
-      return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
-    }
-    #endif
-    `);
+                , `
+                    #ifndef HSV2RGB
+                    #define HSV2RGB
+                    vec3 HSVtoRGB(vec3 HSV) {
+                        float R = abs(HSV.x * 6. - 3.) - 1.;
+                        float G = 2. - abs(HSV.x * 6. - 2.);
+                        float B = 2. - abs(HSV.x * 6. - 4.);
+                        vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+                        return ((RGB - 1.) * HSV.y + 1.) * HSV.z;
+                    }
+                    #endif
+                `
+            );
         }
     };
 
