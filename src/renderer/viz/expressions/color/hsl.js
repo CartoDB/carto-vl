@@ -134,19 +134,20 @@ function genHSL (name, alpha) {
                     clamp(${inline.s}${normalize(this.s)}, 0., 1.),
                     clamp(${inline.l}${normalize(this.l)}, 0., 1.)
                 )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
-            , `
-    #ifndef HSL2RGB
-    #define HSL2RGB
-    vec3 HSLtoRGB(vec3 HSL) {
-      float R = abs(HSL.x * 6. - 3.) - 1.;
-      float G = 2. - abs(HSL.x * 6. - 2.);
-      float B = 2. - abs(HSL.x * 6. - 4.);
-      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
-      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
-      return (RGB - 0.5) * C + HSL.z;
-    }
-    #endif
-    `);
+                , `
+                    #ifndef HSL2RGB
+                    #define HSL2RGB
+                    vec3 HSLtoRGB(vec3 HSL) {
+                        float R = abs(HSL.x * 6. - 3.) - 1.;
+                        float G = 2. - abs(HSL.x * 6. - 2.);
+                        float B = 2. - abs(HSL.x * 6. - 4.);
+                        float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
+                        vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+                        return (RGB - 0.5) * C + HSL.z;
+                    }
+                    #endif
+                `
+            );
         }
     };
 

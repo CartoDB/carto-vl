@@ -177,18 +177,13 @@ For more information about styling, check out the guide [Introduction to Styling
 <html>
 
 <head>
-    <!-- Include CARTO VL JS -->
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-    <!-- Make the map visible -->
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
+    <meta charset="utf-8">
+
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
