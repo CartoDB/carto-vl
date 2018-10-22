@@ -51,6 +51,14 @@ function takeReference (file, template) {
     }
 }
 
+function getDeviceScaleFactor (file) {
+    const matches = file.match(/@([0-9]*)x/);
+    if (matches && matches[1]) {
+        return parseInt(matches[1], 10);
+    }
+    return 1;
+}
+
 async function testSST (file, template, browser) {
     writeTemplate(file, template);
     let options = loadOptions();
@@ -58,6 +66,7 @@ async function testSST (file, template, browser) {
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
+    options.deviceScaleFactor = getDeviceScaleFactor(file);
     options.browser = browser;
     const capturedErrors = [];
     options.pageEvents = {
