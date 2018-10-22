@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Query layer | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../../dist/carto-vl.js"></script>
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+ <!-- Add map container -->
+  <div id="map"></div>
+
+  <!-- Add title/legend box -->
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>SQL Source Layer</h1>
+      </header>
+      <section>
+        <p class="description toolbox-text">Add a source layer with SQL</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+
+    <script>
+
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2
+        });
+
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+
+        //** CARTO VL functionality begins here **//
+
+        // Define user
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+            });
+
+        // Define source with SQL
+        const source = new carto.source.SQL(`
+        SELECT *
+            FROM ne_10m_populated_places_simple
+            WHERE adm0name = 'Spain'
+        `);
+
+        // Define Viz object
+        const viz = new carto.Viz();
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add layer to map
+        layer.addTo(map);
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Add external GeoJSON Layer | CARTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <!-- Include CARTO VL JS -->
+        <script src="../../dist/carto-vl.js"></script>
+        <!-- Include Mapbox GL JS -->
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+        <!-- Include Mapbox GL CSS -->
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+  <!-- Add map container -->  
+  <div id="map"></div>
+
+  <!-- Add title/legend box -->
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>External GeoJSON</h1>
+      </header>
+      <section>
+          <p class="description toolbox-text">Add an external GeoJSON layer to your map</p>
+      </section>
+    </div>
+  </aside>
+  
+  <script>
+
+    // Add basemap and set properties
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-77.04, 38.89],
+      zoom: 9,
+      scrollZoom: true,
+    });
+
+     // Add zoom controls
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    //Fetch GeoJSON layer
+    fetch('https://libs.cartocdn.com/carto-vl/assets/stations.geojson')
+      .then(response => response.json())
+      .then(function(data){
+          // Define source
+          const source = new carto.source.GeoJSON(data);
+          // Define Viz object
+          const viz = new carto.Viz();
+          // Define map layer
+          const layer = new carto.Layer('layer', source, viz);
+          
+          // Add layer to map
+          layer.addTo(map);
+      });
+
+  </script>
+</body>
+</html>

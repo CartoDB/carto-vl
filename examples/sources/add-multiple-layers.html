@@ -1,49 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Add multiple layers | CARTO</title>
+  <title>Add layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <!-- Include Mapbox GL JS -->
+  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+  <!-- Include Mapbox GL CSS -->
+  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 <body>
+
+  <!-- Add map container -->
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Multiple layers</h1>
-        </header>
-        <section>
-          <p class="description open-sans">Add multiple layers to your map</p>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
+
+  <!-- Add title/legend box -->
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Multiple layers</h1>
+      </header>
+      <section>
+        <p class="description toolbox-text">Add multiple CARTO source layers</p>
+      </section>
+      <footer class="js-footer"></footer>
     </div>
+  </aside>
+  
   <script>
+
+    // Add basemap and set properties
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [0, 43],
       zoom: 4,
       scrollZoom: false,
-
-
     });
 
+    // Add zoom controls
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+    
+    //** CARTO VL functionality begins here **//
 
     // Define user
     carto.setDefaultAuth({
@@ -51,30 +55,34 @@
       apiKey: 'default_public'
     });
 
-    // Define layers
+    // Define first (cities) source with SQL
     const citiesSource = new carto.source.SQL(`
       SELECT *
         FROM populated_places
         WHERE adm0name IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
+    // Define cities Viz object
     const citiesViz = new carto.Viz();
+    // Define cities map layer
     const citiesLayer = new carto.Layer('citiesLayer', citiesSource, citiesViz);
 
+
+    // Define second (countries) source with SQL
     const countriesSource = new carto.source.SQL(`
       SELECT *
         FROM ne_adm0_europe
         WHERE admin IN ('Spain','France','Italy','Switzerland','Portugal')
     `);
+    // Define countries Viz object
     const countriesViz = new carto.Viz();
+    // Define countries map layer
     const countriesLayer = new carto.Layer('countriesLayer', countriesSource, countriesViz);
 
-    citiesLayer.addTo(map, 'watername_ocean');
+    // Add map layers
+    citiesLayer.addTo(map);
     countriesLayer.addTo(map, 'citiesLayer');
-    countriesLayer.on('loaded', hideLoader);
+  
 
-    function hideLoader() {
-      document.getElementById('loader').style.opacity = '0';
-    }
   </script>
 </body>
 </html>
