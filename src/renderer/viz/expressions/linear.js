@@ -61,8 +61,6 @@ export default class Linear extends BaseExpression {
         this._rangeMode = range || 'unit';
     }
 
-
-
     eval (feature) {
         if (this.input.type === 'date') {
             const input = this.input.eval(feature);
@@ -83,7 +81,6 @@ export default class Linear extends BaseExpression {
             return (input - smin) / (smax - smin);
         } else if (this.input.type === 'timerange') {
             let input, min, max;
-            const v = this.input.eval(feature);
             switch (this._rangeMode) {
                 case 'unit':
                     // choose same side for all three:
@@ -101,7 +98,6 @@ export default class Linear extends BaseExpression {
                     min = timeRange(this.min.eval()).startValue;
                     max = timeRange(this.max.eval()).endValue;
                     break;
-
             }
             return (input - min) / (max - min);
         }
@@ -151,7 +147,6 @@ export default class Linear extends BaseExpression {
                     // min in ms is timeRange(this.min.eval()).startValue;
                     // max in ms is timeRange(this.max.eval()).endValue;
                     break;
-
             }
 
             this._metadata = metadata;

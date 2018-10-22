@@ -1,5 +1,5 @@
 import MVTMetadata from '../sources/MVTMetadata';
-import windshaftCodecFactory from './WindshaftCodec';
+import windshaftCodecFactory from '../codecs/windshaft';
 
 // // Windshaft metadata internal structure of properties
 // properties: {
@@ -98,7 +98,7 @@ export default class WindshaftMetadata extends MVTMetadata {
         return super.stats(propertyName);
     }
 
-    setCodecs() {
+    setCodecs () {
         setMetadataCodecs(this);
     }
 }

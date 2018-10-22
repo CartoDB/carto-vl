@@ -404,7 +404,6 @@ export default class Windshaft {
     }
 }
 
-
 function adaptGeometryType (type) {
     switch (type) {
         case 'ST_MultiPolygon':
