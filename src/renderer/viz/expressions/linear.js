@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
-import { timeRange } from '../../../utils/util';
+import { timeRange, msToDate } from '../../../utils/util';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -61,25 +61,35 @@ export default class Linear extends BaseExpression {
         this._rangeMode = range || 'unit';
     }
 
-    eval (feature) {
+    // Given a linear value 0:1, convert it back to the input value
+    // for TimeRange and Date inputs the result is an interpolated Date
+    converse (value) {
         if (this.input.type === 'date') {
-            const input = this.input.eval(feature);
-
-            const min = this.min.eval().getTime(); // time(this.min.eval()).getTime()
+            const min = this.min.eval().getTime();
             const max = this.max.eval().getTime();
-
-            // TODO: we should use metadata.encode, right? but date is an exception
-            // because stats are kept in Date form
-            // FIXME: const smin = metadata.encode(this.input.propertyName, min/1000); ...
-            const metadata = this._metadata;
-            const inputMin = metadata.properties[this.input.name].min.getTime(); // FIXME use metadata.stats ...
-            const inputMax = metadata.properties[this.input.name].max.getTime();
-            const inputDiff = inputMax - inputMin;
-
-            const smin = (min - inputMin) / inputDiff;
-            const smax = (max - inputMin) / inputDiff;
-            return (input - smin) / (smax - smin);
+            return msToDate(value * (max - min) + min);
         } else if (this.input.type === 'timerange') {
+            let min, max;
+            switch (this._rangeMode) {
+                case 'unit':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                case 'end':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+            }
+            return msToDate(value * (max - min) + min);
+        }
+        const min = this.min.eval();
+        const max = this.max.eval();
+        return value * (max - min) + min;
+    }
+
+    eval (feature) {
+        if (this.input.type === 'timerange') {
             let input, min, max;
             switch (this._rangeMode) {
                 case 'unit':
@@ -102,27 +112,18 @@ export default class Linear extends BaseExpression {
             return (input - min) / (max - min);
         }
 
-        const v = this.input.eval(feature);
-        const min = this.min.eval(feature);
-        const max = this.max.eval(feature);
-
-        return (v - min) / (max - min);
+        const input = this.input.eval(feature);
+        const metadata = this._metadata;
+        const min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval(feature))[0];
+        const max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval(feature))[0];
+        return (input - min) / (max - min);
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+        this._metadata = metadata;
 
-        if (this.input.type === 'date') {
-            // This should actually be the default case (non-range)
-            const min = this.min.eval();
-            const max = this.max.eval();
-
-            const smin = metadata.codec(this.input.propertyName).externalToInternal(min)[0];
-            const smax = metadata.codec(this.input.propertyName).externalToInternal(max)[0];
-            this._metadata = metadata; // TODO: check reason for this
-
-            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-        } else if (this.input.type === 'timerange') {
+        if (this.input.type === 'timerange') {
             let inputIndex, min, max;
             switch (this._rangeMode) {
                 case 'unit':
@@ -149,15 +150,20 @@ export default class Linear extends BaseExpression {
                     break;
             }
 
-            this._metadata = metadata;
-
             this.inlineMaker = (inline) => `((${inline.input[inputIndex]}-(${min.toFixed(20)}))/(${(max - min).toFixed(20)}))`;
         } else {
-            checkType('linear', 'input', 0, 'number', this.input);
-            checkType('linear', 'min', 1, 'number', this.min);
-            checkType('linear', 'max', 2, 'number', this.max);
+            checkType('linear', 'input', 0, ['number', 'date'], this.input);
+            checkType('linear', 'min', 1, ['number', 'date'], this.min);
+            checkType('linear', 'max', 2, ['number', 'date'], this.max);
+            // Should actually check:
+            // checkType('linear', 'min', 1, this.input.type, this.min);
+            // checkType('linear', 'max', 2, this.input.type, this.max);
+            // but global aggregations are currently of type number even for dates
 
-            this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
+            const smin = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0];
+            const smax = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[0];
+
+            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
         }
     }
 

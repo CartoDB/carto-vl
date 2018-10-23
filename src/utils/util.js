@@ -349,7 +349,7 @@ export function endTimeValue (iso) {
 }
 
 // TODO: move to separate file, possibly other time functions too
-class TimeRange {
+export class TimeRange {
     constructor (text, startValue, endValue) {
         this._text = text;
         this._startValue = startValue;

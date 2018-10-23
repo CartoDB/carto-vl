@@ -1,9 +1,10 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax } from '../expressions';
+import { number, linear, globalMin, globalMax, and, HOLD } from '../expressions';
 import Property from './basic/property';
-import { castDate, timeRange } from '../../../utils/util';
+import { castDate } from '../../../utils/util';
+import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -70,6 +71,20 @@ let waitingForOthers = new Set();
  * @class
  * @api
  */
+
+export function newAnimation (input, duration = 10, fade = new Fade()) {
+    if (input.isA(ClusterTimeRange)) { // TODO generalize to expression of type 'timerange' (e.g. a variable, here's too early to know)
+        const start = linear(input, globalMin(input), globalMax(input), 'start');
+        const end = linear(input, globalMin(input), globalMax(input), 'end');
+        const startAnim = new Animation(start, duration, new Fade(fade.fadeIn, HOLD));
+        const endAnim = new Animation(end, duration, new Fade(HOLD, fade.fadeOut));
+        // TODO: return wrapper with progress methods
+        // or change animation to support this mode where it delegates the eval/bind to the and expressions but uses start or end for progress eval.
+        return and(startAnim, endAnim);
+    }
+    return new Animation(input, duration, fade);
+}
+
 export class Animation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
@@ -216,31 +231,7 @@ export class Animation extends BaseExpression {
      */
     getProgressValue () {
         const progress = this.progress.eval(); // from 0 to 1
-        const min = this._input.min.eval();
-        const max = this._input.max.eval();
-
-        if (!(min instanceof Date)) {
-            if (typeof(min) === 'string') {
-                // If the input is a linear on a TimeRange, then
-                // type is 'number' (because linear takes the start value of TimeRange),
-                // but max and min are categories
-                // TODO: we should handle this in a cleaner way
-                // also, linear currently maps 0 to start of min and
-                // and 1 to start of max; to be used here it'll be better
-                // to map 1 to end of max
-                const tmin = timeRange(min).startValue;
-                const tmax = timeRange(max).startValue;
-                const tmix = progress * (tmax - tmin) + tmin;
-                return castDate(tmix);
-            }
-            return progress * (max - min) + min;
-        }
-
-        const tmin = min.getTime();
-        const tmax = max.getTime();
-        const tmix = (1 - progress) * tmin + tmax * progress;
-
-        return new Date(tmix);
+        return this._input.converse(progress);
     }
 
     /**
@@ -338,7 +329,7 @@ export class Animation extends BaseExpression {
         this._originalInput._bindMetadata(meta);
         this.duration._bindMetadata(meta);
 
-        checkType('animation', 'input', 0, ['number', 'date'], this._originalInput);
+        checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
         super._bindMetadata(meta);
 

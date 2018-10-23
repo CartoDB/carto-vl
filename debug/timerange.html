@@ -91,9 +91,14 @@
       // TODO: animation should use start, end propertie automatically
       // filter: animation(linear(@month))
 
-      @start: linear(@month,,,'start')
-      @end: linear(@month,,,'end')
-      filter: animation(@start, 10, fade(0.01, HOLD)) and animation(@end, 10, fade(HOLD, 0.01))
+      // @start: linear(@month,'start')
+      // @end: linear(@month,'end')
+      // filter: animation(@start, 10, fade(0.01, HOLD)) and animation(@end, 10, fade(HOLD, 0.01))
+
+      // filter: animation(@month, 10, fade(0.01, 0.01))
+      filter: animation(clusterTimeRange($date, 'month', 'Europe/Madrid'), 10, fade(0.01, 0.01))
+
+      // filter: animation(linear(@month), 10, fade(0.2, 0.2))
 
       // TODO: buckets should use category?
       // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])

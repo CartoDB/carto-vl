@@ -537,7 +537,7 @@ import TimeRangeExpr from './expressions/time';
 import Top from './expressions/top';
 
 import { Fade } from './expressions/Fade';
-import { Animation } from './expressions/Animation';
+import { newAnimation } from './expressions/Animation';
 
 import { Log } from './expressions/unary';
 import { Sqrt } from './expressions/unary';
@@ -690,7 +690,7 @@ export const timeRange = (...args) => new TimeRangeExpr(...args);
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
-export const animation = (...args) => new Animation(...args);
+export const animation = (...args) => newAnimation(...args);
 
 export const log = (...args) => new Log(...args);
 export const sqrt = (...args) => new Sqrt(...args);
