@@ -133,16 +133,16 @@ export default class Base {
      * @param {Expression} blendFunc
      * @memberof Expression
      * @instance
+     * @async
      * @name blendTo
      */
-    blendTo (final, duration = 500) {
+    async blendTo (final, duration = 500) {
         // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
-        return final;
     }
 
     isA (expressionClass) {

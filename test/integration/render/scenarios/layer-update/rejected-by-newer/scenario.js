@@ -12,23 +12,39 @@ layer.on('loaded', async () => {
 
     try {
         const source1 = new carto.source.GeoJSON(sources['points']);
-        const tmp = source1.requestMetadata;
-        source1.requestMetadata = async () => {
-            await sleep(100);
-            return tmp;
-        };
+        slowDown(source1, 60);
+
         const update1 = layer.update(source1, new carto.Viz('color: green'));
-        // Slow down source (setTimeout monkey patch) by 100 ms ?
 
         const source2 = new carto.source.GeoJSON(sources['points']);
-        const update2 = layer.update(source2, new carto.Viz('color: red'));
+        layer.update(source2, new carto.Viz('color: red'));
 
         await update1;
+        console.warn('Update1 should have been rejected');
     } catch (e) {
         // Update 2 should override update1 since it is newer => red points
         window.loaded = true;
     }
 });
+
+function slowDown (source, ms) {
+    const oriRequestMetadata = source.requestMetadata.bind(source);
+    source._clone = () => source;
+    let ok = false;
+    source.requestMetadata = async (...args) => {
+        await sleep(ms);
+        ok = true;
+        return oriRequestMetadata(...args);
+    };
+    const oriRequestData = source.requestData.bind(source);
+    source.requestData = (...args) => {
+        if (!ok) {
+            return;
+        }
+        return oriRequestData(...args);
+    };
+    return source;
+}
 
 function sleep (ms) {
     return new Promise(resolve => setTimeout(resolve, ms));

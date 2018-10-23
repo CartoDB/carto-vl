@@ -223,14 +223,14 @@ export default class Layer {
         await this._context;
 
         if (majorChange) {
-            if (this._majorCurrentUID > uid) {
+            if (this._majorCurrentUID > uid.major) {
                 throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._majorCurrentUID}.`);
             }
         } else {
-            if (this._majorCurrentUID > uid) {
+            if (this._majorCurrentUID > uid.major) {
                 throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this viz change. Commit ${uid} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
             }
-            if (this._minorCurrentUID > uid) {
+            if (this._minorCurrentUID > uid.minor) {
                 throw new CartoRuntimeError(`Another \`viz change\` finished before this one. Commit ${uid.major}.${uid.minor} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
             }
         }
