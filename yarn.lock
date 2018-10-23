@@ -2677,10 +2677,10 @@ expect.js@~0.2.0:
   resolved "https://registry.yarnpkg.com/expect.js/-/expect.js-0.2.0.tgz#1028533d2c1c363f74a6796ff57ec0520ded2be1"
   integrity sha1-EChTPSwcNj90pnlv9X7AUg3tK+E=
 
-exquisite-sst@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/exquisite-sst/-/exquisite-sst-1.5.0.tgz#568d8b100895fa10f34db535e388d71f861d8c3c"
-  integrity sha1-Vo2LEAiV+hDzTbU144jXH4YdjDw=
+exquisite-sst@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/exquisite-sst/-/exquisite-sst-1.6.0.tgz#f48bcd954281a98ec1b441d250ab099365648c3b"
+  integrity sha512-6Zl8rB/1s0puOqPr4nImd9tA7zmDevqeL4VZhdmqzXeS4DKlY6wyBFImWxQTSW+w5sPkZZONqBPpWLWie0sBvA==
   dependencies:
     cloudinary "^1.9.0"
     minimist "^1.2.0"
