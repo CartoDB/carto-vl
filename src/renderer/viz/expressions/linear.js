@@ -88,6 +88,28 @@ export default class Linear extends BaseExpression {
         return value * (max - min) + min;
     }
 
+    // return min, max, but for time ranges they are returned as Dates
+    limits () {
+        let min, max;
+        if (this.input.type === 'timerange') {
+            switch (this._rangeMode) {
+                case 'unit':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                case 'end':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+            }
+        } else {
+            min = this.min.eval();
+            max = this.max.eval();
+        }
+        return [min, max];
+    }
+
     eval (feature) {
         if (this.input.type === 'timerange') {
             let input, min, max;

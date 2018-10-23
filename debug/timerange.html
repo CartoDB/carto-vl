@@ -95,8 +95,11 @@
       // @end: linear(@month,'end')
       // filter: animation(@start, 10, fade(0.01, HOLD)) and animation(@end, 10, fade(HOLD, 0.01))
 
-      // filter: animation(@month, 10, fade(0.01, 0.01))
-      filter: animation(clusterTimeRange($date, 'month', 'Europe/Madrid'), 10, fade(0.01, 0.01))
+      // filter: animation(@month, 10, fade(0.01, 0.01)) // not supported
+      // filter: animation(clusterTimeRange($date, 'month', 'Europe/Madrid'), 10, fade(0.01, 0.01)) // poor support
+
+
+      filter: timeAnimation(@month, 10, fade(0.01, 0.01))
 
       // filter: animation(linear(@month), 10, fade(0.2, 0.2))
 
@@ -111,23 +114,36 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
-    const animation = viz.filter.expressionName === 'animation' ? viz.filter : null;
+    const animation = ['animation', 'timeAnimation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    console.log('FILTER:', viz.filter.expressionName);
     layer.on('updated', () => {
-      // if (info) {
-      //   info = !animation;
-      //   console.log(viz);
-      //   console.log("Min Month", viz.variables.minMonth.value);
-      //   console.log("Max Month", viz.variables.maxMonth.value);
-      //   console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f).text));
-      //   // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
-      // }
+      if (info) {
+        info = !animation;
+        console.log(viz);
+        console.log("Min Month", viz.variables.minMonth.value);
+        console.log("Max Month", viz.variables.maxMonth.value);
+        console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f).text));
+        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
+      }
       if (animation) {
         const time = animation.getProgressValue();
         document.getElementById("timer").textContent = time;
       }
     });
     const interactivity = new carto.Interactivity(layer);
+    let playing = true;
     interactivity.on('featureClick', event => {
+      if (animation) {
+        if (playing) {
+          console.log('PAUSE');
+          animation.pause();
+        } else {
+          console.log('PLAY');
+          animation.play();
+        }
+        playing = !playing;
+      };
+
       if (event.features.length > 0) {
         const feature = event.features[0];
         console.log('Start:', feature.variables.month.value.startValue);

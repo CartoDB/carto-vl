@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax, and, HOLD } from '../expressions';
+import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
@@ -72,19 +72,6 @@ let waitingForOthers = new Set();
  * @api
  */
 
-export function newAnimation (input, duration = 10, fade = new Fade()) {
-    if (input.isA(ClusterTimeRange)) { // TODO generalize to expression of type 'timerange' (e.g. a variable, here's too early to know)
-        const start = linear(input, globalMin(input), globalMax(input), 'start');
-        const end = linear(input, globalMin(input), globalMax(input), 'end');
-        const startAnim = new Animation(start, duration, new Fade(fade.fadeIn, HOLD));
-        const endAnim = new Animation(end, duration, new Fade(HOLD, fade.fadeOut));
-        // TODO: return wrapper with progress methods
-        // or change animation to support this mode where it delegates the eval/bind to the and expressions but uses start or end for progress eval.
-        return and(startAnim, endAnim);
-    }
-    return new Animation(input, duration, fade);
-}
-
 export class Animation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
@@ -93,8 +80,9 @@ export class Animation extends BaseExpression {
         input = implicitCast(input);
         const originalInput = input;
 
-        if (input.isA(Property)) {
-            input = linear(input, globalMin(input), globalMax(input));
+        // TODO: support for variables
+        if (input.isA(Property) || input.isA(ClusterTimeRange)) {
+            input = linear(input, globalMin(input), globalMax(input), 'start');
         }
 
         const progress = number(0);
@@ -244,8 +232,7 @@ export class Animation extends BaseExpression {
      */
     setTimestamp (timestamp) {
         const date = castDate(timestamp);
-        const tmin = this._input.min.eval();
-        const tmax = this._input.max.eval();
+        const [tmin, tmax] = this._input.limits();
 
         if (date.getTime() < tmin) {
             throw new RangeError('animation.setTimestamp requires the date parameter to be higher than the lower limit');
@@ -331,6 +318,7 @@ export class Animation extends BaseExpression {
 
         checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
+
         super._bindMetadata(meta);
 
         checkType('animation', 'input', 0, 'number', this._input);
