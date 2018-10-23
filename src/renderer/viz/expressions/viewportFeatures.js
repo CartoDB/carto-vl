@@ -95,7 +95,8 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg (feature) {
-        this.expr.push(new this._FeatureProxy(feature));
+        // this.expr.push(new this._FeatureProxy(feature));
+        this.expr.push(feature);
     }
 
     genViewportFeatureClass (properties) {

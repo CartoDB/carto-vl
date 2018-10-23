@@ -4,6 +4,9 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-run
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 
+import ViewportFeatures from '../renderer/viz/expressions/viewportFeatures';
+import Feature from '../interactivity/feature';
+
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
@@ -188,7 +191,17 @@ export default class Renderer {
                 }
 
                 for (let j = 0; j < viewportExpressionsLength; j++) {
-                    viewportExpressions[j].accumViewportAgg(feature);
+                    const currentViewportExp = viewportExpressions[j];
+                    if (currentViewportExp instanceof ViewportFeatures) {
+                        const interactivityFeature = new Feature(feature,
+                            renderLayer.viz,
+                            renderLayer.customizedFeatures,
+                            renderLayer.trackFeatureViz,
+                            renderLayer.idProperty);
+                        currentViewportExp.accumViewportAgg(interactivityFeature);
+                    } else {
+                        currentViewportExp.accumViewportAgg(feature);
+                    }
                 }
             }
         });
