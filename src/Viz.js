@@ -304,7 +304,7 @@ export default class Viz {
             expr => expr._getDependencies()
         ).reduce((a, b) =>
             [...a, ...b]
-            , []);
+        , []);
         while (unmarked.length) {
             visit(unmarked.pop());
         }
