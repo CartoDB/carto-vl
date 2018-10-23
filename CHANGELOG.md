@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Changed
 - Eliminate the parameter to specify a property in `globalCount()` and `viewportCount()`
+- Change type from `viewportFeatures` expression, adding vizProperties to features as in `Interactivity`
 
 ### Removed
 - Remove `isNaN()` in favor of `isNull`
