@@ -5,6 +5,8 @@ import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
+import FEATURE_VIZ_PROPERTIES from '../utils/featureVizProperties';
+
 /**
  * Generates a list of features in the viewport
  *
@@ -54,6 +56,7 @@ import CartoRuntimeError from '../../../errors/carto-runtime-error';
 export default class ViewportFeatures extends BaseExpression {
     constructor (...properties) {
         properties = properties.map(p => implicitCast(p));
+        // TODO validate here properties don't collide with interactivity.Feature predefined props
 
         // We need to set all the properties as children of the expression
         // in order for variables to be resolved.
@@ -64,7 +67,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
-        this._FeatureProxy = null;
+        this._columns = null;
     }
 
     _applyToShaderSource () {
@@ -84,35 +87,32 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg () {
-        if (!this._FeatureProxy) {
+        if (!this._columns) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
+
             const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            this._FeatureProxy = this.genViewportFeatureClass(columns);
+            FEATURE_VIZ_PROPERTIES.forEach((propertyName) => {
+                if (columns.includes(propertyName)) {
+                    throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${propertyName}' property can't be used, as it is a reserved property name`);
+                }
+            });
+            this._columns = columns;
         }
         this.expr = [];
     }
 
-    accumViewportAgg (feature) {
-        // this.expr.push(new this._FeatureProxy(feature));
-        this.expr.push(feature);
+    accumViewportAgg (interactivityFeature) {
+        this._addRequiredPropertiesTo(interactivityFeature);
+        this.expr.push(interactivityFeature);
     }
 
-    genViewportFeatureClass (properties) {
-        const cls = class ViewportFeature {
-            constructor (feature) {
-                this._feature = feature;
-            }
-        };
-        properties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function () {
-                    return this._feature[prop];
-                }
-            });
+    _addRequiredPropertiesTo (interactivityFeature) {
+        this._columns.forEach((column) => {
+            // TODO check reserved names for properties
+            interactivityFeature[column] = interactivityFeature.rawFeature[column];
         });
-        return cls;
     }
 }
 

@@ -1,4 +1,5 @@
 import FeatureVizProperty from './featureVizProperty';
+import FEATURE_VIZ_PROPERTIES from '../renderer/viz/utils/featureVizProperties';
 
 /**
  * @namespace Features
@@ -79,13 +80,13 @@ import FeatureVizProperty from './featureVizProperty';
  * @api
  */
 
-export const FEATURE_VIZ_PROPERTIES = ['color', 'width', 'strokeColor', 'strokeWidth', 'symbol', 'symbolPlacement'];
-
 export default class Feature {
     constructor (rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty) {
         this.id = rawFeature[idProperty];
 
+        this._rawFeature = rawFeature;
         this._featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
+
         this._defineFeatureVizProperties();
         this._defineVariables(viz.variables);
     }
@@ -108,6 +109,10 @@ export default class Feature {
             variables[varName] = this._buildFeatureVizProperty(name);
         });
         this.variables = variables;
+    }
+
+    get rawFeature () {
+        return this._rawFeature;
     }
 
     reset (duration = 500) {
