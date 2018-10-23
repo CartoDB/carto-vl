@@ -206,10 +206,10 @@ export default class Layer {
 
         let uid;
         if (majorChange) {
-            uid = {major: this._majorNextUID, minor: 0};
+            uid = { major: this._majorNextUID, minor: 0 };
             this._majorNextUID++;
         } else {
-            uid = {major: this._majorCurrentUID, minor: this._minorNextUID};
+            uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
             this._minorNextUID++;
         }
 
