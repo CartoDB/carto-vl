@@ -134,7 +134,7 @@ function genHSL (name, alpha) {
                     clamp(${inline.s}${normalize(this.s)}, 0., 1.),
                     clamp(${inline.l}${normalize(this.l)}, 0., 1.)
                 )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
-                , `
+            , `
                     #ifndef HSL2RGB
                     #define HSL2RGB
                     vec3 HSLtoRGB(vec3 HSL) {
