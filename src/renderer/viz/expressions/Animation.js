@@ -1,10 +1,12 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax } from '../expressions';
+import { number, linear, globalMin, globalMax, HOLD } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
+import { And } from './binary';
+import VariantExpression from './Variant'
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -72,7 +74,7 @@ let waitingForOthers = new Set();
  * @api
  */
 
-export class Animation extends BaseExpression {
+class ScalarAnimation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
 
@@ -326,3 +328,71 @@ export class Animation extends BaseExpression {
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
     }
 }
+
+class TimeRangeAnimation extends And {
+    constructor (input, duration = 10, fade = new Fade()) {
+        const start = linear(input, globalMin(input), globalMax(input), 'start');
+        const end = linear(input, globalMin(input), globalMax(input), 'end');
+        const startAnim = new ScalarAnimation(start, duration, new Fade(fade.fadeIn, HOLD));
+        const endAnim = new ScalarAnimation(end, duration, new Fade(HOLD, fade.fadeOut));
+        super(startAnim, endAnim);
+        this._startAnim = startAnim;
+        this._endAnim = endAnim;
+        this.expressionName = 'timeAnimation';
+        this.input = input;
+    }
+
+    isAnimated () {
+        return this._startAnim.isAnimated();
+    }
+
+    getProgressValue () {
+        return this._startAnim.getProgressValue();
+    }
+
+    setTimestamp (timestamp) {
+        this._startAnim.setTimestamp(timestamp);
+        this._endAnim.setTimestamp(timestamp);
+    }
+
+    getProgressPct () {
+        return this._startAnim.getProgressPct();
+    }
+
+    setProgressPct (progress) {
+        this._startAnim.setProgressPct(progress);
+        this._endAnim.setProgressPct(progress);
+    }
+
+    pause () {
+        this._startAnim.pause();
+        this._endAnim.pause();
+    }
+
+    play () {
+        this._startAnim.play();
+        this._endAnim.play();
+        this._endAnim.setProgressPct(this._startAnim.getProgressPct());
+    }
+
+    stop () {
+        this._startAnim.stop();
+        this._endAnim.stop();
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+        this.input._resolveAliases(aliases);
+    }
+
+}
+
+export class Animation extends VariantExpression {
+    _choose(input, duration, fade) {
+        if (input.type === 'timerange') {
+            return new TimeRangeAnimation(input, duration, fade);
+        } else {
+            return new ScalarAnimation(input, duration, fade);
+        }
+    }
+};
