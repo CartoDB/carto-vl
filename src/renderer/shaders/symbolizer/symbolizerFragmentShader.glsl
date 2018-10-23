@@ -10,7 +10,8 @@ $propertyPreface
 
 void main(void) {
     vec2 featureID = abs(featureIDVar);
-    vec2 imageUV = pointCoord*0.5+vec2(0.5);
+    vec2 imageUV = pointCoord;
+    imageUV.x = imageUV.x * 0.5 + 0.5;
     vec4 symbolColor = $symbol_inline;
     vec4 noOverrideColor = vec4(0.);
 
@@ -22,7 +23,7 @@ void main(void) {
     }
     c.a *= filtering;
     if (imageUV!=clamp(imageUV, 0.,1.)){
-        c.a = 0.;
+        c = vec4(0.);
     }
 
     gl_FragColor = vec4(c.rgb*c.a, c.a);
