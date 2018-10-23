@@ -1,5 +1,6 @@
 import carto from '../../../../src';
 import * as util from '../../util';
+import FEATURE_VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/featureVizProperties';
 
 const feature1 = {
     type: 'Feature',
@@ -29,7 +30,7 @@ const feature2 = {
 
 const features = {
     type: 'FeatureCollection',
-    features: [ feature1, feature2 ]
+    features: [feature1, feature2]
 };
 
 function checkFeatures (list, expectedList) {
@@ -45,7 +46,7 @@ function checkFeatures (list, expectedList) {
     }
 }
 
-describe('viewportFeatures', () => {
+fdescribe('viewportFeatures', () => {
     let map, source1, viz1, layer1, source2, viz2, layer2, setup;
 
     beforeEach(() => {
@@ -93,6 +94,27 @@ describe('viewportFeatures', () => {
             ];
             checkFeatures(viz2.variables.list2all.eval(), expectedAll);
             checkFeatures(viz2.variables.list2value.eval(), expectedValue);
+            done();
+        });
+    });
+
+    it('should get interactivity-like features, with vizProperties', done => {
+        layer1.on('loaded', () => {
+            // 1. keep required properties
+            const expected = [
+                { value: 10, category: 'a' },
+                { value: 1000, category: 'b' }
+            ];
+            const featureList = viz1.variables.list.eval();
+            checkFeatures(featureList, expected);
+
+            // 2. and featureVizProperties / variables are available
+            featureList.forEach(feature => {
+                FEATURE_VIZ_PROPERTIES.forEach(propertyName => {
+                    expect(feature.hasOwnProperty(propertyName)).toBeTruthy();
+                });
+                expect(feature.hasOwnProperty('variables'));
+            });
             done();
         });
     });
@@ -250,7 +272,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [0, 50], [0, 0], [50, 0], [0, 50] ]
+                [[0, 50], [0, 0], [50, 0], [0, 50]]
             ]
         },
         properties: {
@@ -265,7 +287,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [165, 50], [165, 0], [215, 0], [165, 50] ]
+                [[165, 50], [165, 0], [215, 0], [165, 50]]
             ]
         },
         properties: {
@@ -280,7 +302,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [200, 50], [200, 0], [250, 0], [200, 50] ]
+                [[200, 50], [200, 0], [250, 0], [200, 50]]
             ]
         },
         properties: {
@@ -295,7 +317,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [-226, -70], [-226, -85], [-176, -85], [-226, -70] ]
+                [[-226, -70], [-226, -85], [-176, -85], [-226, -70]]
             ]
         },
         properties: {

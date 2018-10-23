@@ -110,7 +110,6 @@ export default class ViewportFeatures extends BaseExpression {
 
     _addRequiredPropertiesTo (interactivityFeature) {
         this._columns.forEach((column) => {
-            // TODO check reserved names for properties
             interactivityFeature[column] = interactivityFeature.rawFeature[column];
         });
     }
