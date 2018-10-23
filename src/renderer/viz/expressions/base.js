@@ -126,7 +126,8 @@ export default class Base {
     }
 
     /**
-     * Linear interpolation between this and finalValue with the specified duration
+     * Linear interpolate between `this` and `final` with the specified duration
+     *
      * @api
      * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds

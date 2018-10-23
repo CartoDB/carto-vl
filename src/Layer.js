@@ -181,13 +181,21 @@ export default class Layer {
     }
 
     /**
-     * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.: the viz will be changed with the source, not before it.
+     * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.:
+     * the viz will be changed with the source, not before it.
+     *
      * This method will return a promise that will be resolved once the source and the visualization are validated.
-     * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
+     *
+     * The promise will be rejected if the validation fails, for example
+     * because the visualization expects a property name that is not present in the source.
+     *
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
-     * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source} source - The new Source object
-     * @param {carto.Viz?} viz - Optional. The new Viz object
+     * If the promise is rejected the layer's source and viz won't be changed by this call.
+     *
+     * Concurrent calls to `blendToViz` or `blendTo` won't override calls to update (like calls to `update` do).
+     *
+     * @param {carto.source} source - The new Source object.
+     * @param {carto.Viz?} viz - Optional. The new Viz object. Defaults to the current viz.
      * @memberof carto.Layer
      * @instance
      * @async
@@ -266,8 +274,20 @@ export default class Layer {
      * This allows smooth transitions between two different Vizs.
      *
      * Blending won't be performed when convenient for the attached Source. This
-     * happens with Maps API source when the new Viz uses a different set of properties or
+     * happens with Maps API sources when the new Viz uses a different set of properties or
      * aggregations. In these cases a hard transition will be used instead.
+     *
+     * This method returns a promise that will be resolved if validations passed.
+     *
+     * The promise will be rejected if the validation fails, for example
+     * because the visualization expects a property name that is not present in the source.
+     *
+     * The promise will be rejected also if this method is invoked again before the first promise is resolved.
+     * If the promise is rejected the layer's viz won't be changed by this call.
+     *
+     * Concurrent calls to `update` will override the effects of `blendToViz`:
+     * if a call to `blendToViz` is performed after a call to `update`, but the `update` hasn't been resolved yet,
+     * the call to `update` will override the call to `blendToViz` is it resolves.
      *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different vizs varying the width
