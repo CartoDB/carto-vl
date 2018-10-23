@@ -17,23 +17,17 @@
         <h1>Interactive based styling</h1>
       </header>
       <section>
-        <p class="description open-sans">Style a feature based on type of interactivity</p>
+        <p class="description open-sans">Style a feature based on the type of interaction</p>
         <div class="separator"></div>
         <section class="usage">
           <header>USAGE</header>
-          <p class="open-sans">Hover and click on the points</p>
+          <p class="open-sans">Hover or click on a points</p>
         </section>
       </section>
       <footer class="js-footer"></footer>
     </div>
     </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
+  
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
@@ -41,8 +35,6 @@
       center: [0, 30],
       zoom: 1.5,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -60,8 +52,8 @@
     const source = new carto.source.Dataset('world_population_2015');
     const viz = new carto.Viz(`
       width: sqrt($pop_2015)/200
-      color: opacity(BlueViolet, 0.5)
-      strokeColor: opacity(BlueViolet, 0.8)
+      color: opacity(blueviolet, 0.5)
+      strokeColor: opacity(blueviolet, 0.8)
     `);
     const layer = new carto.Layer('layer', source, viz);
 
@@ -72,9 +64,9 @@
     interactivity.on('featureEnter', event => {
       event.features.forEach(feature => {
         if (feature.id !== clickedFeatureId) {
-          feature.color.blendTo('opacity(DeepPink, 0.5)', delay)
+          feature.color.blendTo('opacity(deeppink, 0.5)', delay)
           feature.strokeWidth.blendTo('4', delay);
-          feature.strokeColor.blendTo('opacity(DeepPink, 0.8)', delay);
+          feature.strokeColor.blendTo('opacity(deeppink, 0.8)', delay);
         }
       });
     });
