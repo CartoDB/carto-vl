@@ -163,8 +163,6 @@ export default class Renderer {
 
         viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
 
-        const viewportExpressionsLength = viewportExpressions.length;
-
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
 
@@ -190,21 +188,28 @@ export default class Renderer {
                     continue;
                 }
 
-                for (let j = 0; j < viewportExpressionsLength; j++) {
-                    const currentViewportExp = viewportExpressions[j];
-                    if (currentViewportExp instanceof ViewportFeatures) {
-                        const interactivityFeature = new Feature(feature,
-                            renderLayer.viz,
-                            renderLayer.customizedFeatures,
-                            renderLayer.trackFeatureViz,
-                            renderLayer.idProperty);
-                        currentViewportExp.accumViewportAgg(interactivityFeature);
-                    } else {
-                        currentViewportExp.accumViewportAgg(feature);
-                    }
-                }
+                // Pass the rawFeature to all viewport aggregations
+                this._accumViewportAggregations(viewportExpressions, feature, renderLayer);
             }
         });
+    }
+
+    _accumViewportAggregations (viewportExpressions, rawFeature, renderLayer) {
+        const viewportExpressionsLength = viewportExpressions.length;
+
+        for (let j = 0; j < viewportExpressionsLength; j++) {
+            const currentViewportExp = viewportExpressions[j];
+            if (currentViewportExp instanceof ViewportFeatures) {
+                const interactivityFeature = new Feature(rawFeature,
+                    renderLayer.viz,
+                    renderLayer.customizedFeatures,
+                    renderLayer.trackFeatureViz,
+                    renderLayer.idProperty);
+                currentViewportExp.accumViewportAgg(interactivityFeature);
+            } else {
+                currentViewportExp.accumViewportAgg(rawFeature);
+            }
+        }
     }
 
     /**
