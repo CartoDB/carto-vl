@@ -3,7 +3,7 @@ import { linear, globalMin, globalMax, HOLD } from '../expressions';
 import { Animation } from './Animation';
 import { And } from './binary';
 
-export class TimeAnimation extends And {
+export class TimeRangeAnimation extends And {
     constructor (input, duration = 10, fade = new Fade()) {
         const start = linear(input, globalMin(input), globalMax(input), 'start');
         const end = linear(input, globalMin(input), globalMax(input), 'end');
