@@ -10,7 +10,7 @@ Depending on the type of input the matching output will be performed in differen
 - **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. 
   - For example, `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
 
-`ramp` values don't always have to be colors giving you the ablitiy to create a variety of map types like bubble maps and flow maps. For simplicity's sake, this guide will stick to colors until [part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/).
+To introduce the use of `ramp`, this guide covers using them with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
 
 We've talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call **style by value**.
