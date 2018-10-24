@@ -72,8 +72,8 @@ let config = {
     //  2. {{=it.user}}: will use the username as extraced from `user_from_host` or `routes`.
     //  3. {{=it.port}}: will use the `port` from this very same configuration file.
     resources_url_templates: {
-        http: 'http://{{=it.user}}.localhost.lan:{{=it.port}}/api/v1/map',
-        https: 'http://{{=it.user}}.localhost.lan:{{=it.port}}/api/v1/map'
+        http: 'http://127.0.0.1:{{=it.port}}/user/{{=it.user}}/api/v1/map/',
+        https: 'http://127.0.0.1:{{=it.port}}/user/{{=it.user}}/api/v1/map/'
     },
 
     // Maximum number of connections for one process
