@@ -106,15 +106,11 @@ export default class Feature {
 
     _defineVariables (vizVariables) {
         const variables = {};
-        Object.keys(vizVariables).map(varName => {
+        Object.keys(vizVariables).forEach(varName => {
             const name = `__cartovl_variable_${varName}`;
             variables[varName] = this._buildFeatureVizProperty(name);
         });
         this.variables = variables;
-    }
-
-    get rawFeature () {
-        return this._rawFeature;
     }
 
     reset (duration = 500) {
