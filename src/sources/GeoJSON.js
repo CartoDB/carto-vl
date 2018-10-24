@@ -279,7 +279,8 @@ export default class GeoJSON extends Base {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                properties[name][i] = this._metadata.codec(name).sourceToInternal(f.properties[name]);
+                // note that GeoJSON does not support multi-value properties
+                properties[name][i] = this._metadata.codec(name).sourceToInternal(f.properties[name])[0];
             });
         }
         return properties;

@@ -5,7 +5,7 @@ import ListGeneric from './ListGeneric';
 import ListTransform from '../ListTransform';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
-const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'time', 'image', 'transformation'];
+const SUPPORTED_CHILD_TYPES = ['number', 'category', 'color', 'date', 'image', 'transformation'];
 
 /**
  * Wrapper around arrays. Explicit usage is unnecessary since CARTO VL will wrap implicitly all arrays using this function.

@@ -5,6 +5,10 @@ import BaseCodec from './Base';
 // encodings are exactly the same.
 // TODO: null/NaN support?
 export default class IdentityCodec extends BaseCodec {
+    isIdentity () {
+        return true;
+    }
+
     sourceToInternal (v) {
         return [v];
     }

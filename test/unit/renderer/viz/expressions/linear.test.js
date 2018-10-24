@@ -12,7 +12,7 @@ describe('src/renderer/viz/expressions/linear', () => {
         validateTypeErrors('linear', ['number', 'color', 'number']);
         validateTypeErrors('linear', ['category', 'number', 'number']);
         validateTypeErrors('linear', ['number', 'number', 'category']);
-        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number']);
+        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -56,7 +56,7 @@ describe('src/renderer/viz/expressions/linear', () => {
             );
             expect(l.eval({
                 wadus: 0.5
-            })).toEqual(0.5);
+            })).toEqual(1420070396.50025);
         });
     });
 });

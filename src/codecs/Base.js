@@ -18,6 +18,10 @@ export default class BaseCodec {
         return false;
     }
 
+    isIdentity () {
+        return false;
+    }
+
     // Convert source encoding to internal;
     // Result is always an array, [value] for scalar codecs
     // and [lo, hi] for range codecs.

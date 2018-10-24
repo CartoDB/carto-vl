@@ -1,4 +1,4 @@
-import { IdentityCodec } from './Codec';
+import IdentityCodec from '../codecs/Identity';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {

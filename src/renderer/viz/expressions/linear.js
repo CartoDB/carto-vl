@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
 import { timeRange, msToDate } from '../../../utils/util';
+import IdentityCodec from '../../../codecs/Identity';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -136,8 +137,11 @@ export default class Linear extends BaseExpression {
 
         const input = this.input.eval(feature);
         const metadata = this._metadata;
-        const min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval(feature))[0];
-        const max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval(feature))[0];
+        const codec = (metadata && this.input.propertyName)
+            ? metadata.codec(this.input.propertyName)
+            : new IdentityCodec();
+        const min = codec.externalToInternal(this.min.eval(feature))[0];
+        const max = codec.externalToInternal(this.max.eval(feature))[0];
         return (input - min) / (max - min);
     }
 
@@ -182,10 +186,15 @@ export default class Linear extends BaseExpression {
             // checkType('linear', 'max', 2, this.input.type, this.max);
             // but global aggregations are currently of type number even for dates
 
-            const smin = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0];
-            const smax = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[0];
-
-            this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+            const codec = this.input.propertyName && metadata.codec(this.input.propertyName);
+            if (!codec || codec.isIdentity()) {
+                // this permits using properties for the min/man expressions
+                this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
+            } else {
+                const smin = codec.externalToInternal(this.min.eval())[0];
+                const smax = codec.externalToInternal(this.max.eval())[0];
+                this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
+            }
         }
     }
 

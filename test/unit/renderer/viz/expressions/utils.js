@@ -1,5 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
+import IdentityCodec from '../../../../../src/codecs/identity';
 
 const metadata = new Metadata({
     properties: {
@@ -170,15 +171,13 @@ class MockMetadata {
     constructor (properties, idProperty) {
         this.properties = properties;
         this.idProperty = idProperty;
+        this._codec = new IdentityCodec();
     }
     stats (propertyName) {
         return this.properties[propertyName];
     }
-    decode (propertyName, propertyValue) {
-        return propertyValue;
-    }
-    encode (propertyName, propertyValue) {
-        return propertyValue;
+    codec () {
+        return this._codec;
     }
 }
 
