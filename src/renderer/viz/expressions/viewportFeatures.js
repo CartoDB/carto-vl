@@ -56,7 +56,6 @@ import FEATURE_VIZ_PROPERTIES from '../utils/featureVizProperties';
 export default class ViewportFeatures extends BaseExpression {
     constructor (...properties) {
         properties = properties.map(p => implicitCast(p));
-        // TODO validate here properties don't collide with interactivity.Feature predefined props
 
         // We need to set all the properties as children of the expression
         // in order for variables to be resolved.
@@ -104,14 +103,7 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     accumViewportAgg (interactivityFeature) {
-        this._addRequiredPropertiesTo(interactivityFeature);
         this.expr.push(interactivityFeature);
-    }
-
-    _addRequiredPropertiesTo (interactivityFeature) {
-        this._propertyNames.forEach((name) => {
-            interactivityFeature[name] = interactivityFeature._rawFeature[name];
-        });
     }
 }
 

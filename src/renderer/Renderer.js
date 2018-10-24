@@ -200,11 +200,14 @@ export default class Renderer {
         for (let j = 0; j < viewportExpressionsLength; j++) {
             const currentViewportExp = viewportExpressions[j];
             if (currentViewportExp instanceof ViewportFeatures) {
-                const interactivityFeature = new Feature(rawFeature,
-                    renderLayer.viz,
-                    renderLayer.customizedFeatures,
-                    renderLayer.trackFeatureViz,
-                    renderLayer.idProperty);
+                const featureVizParams = {
+                    viz: renderLayer.viz,
+                    customizedFeatures: renderLayer.customizedFeatures,
+                    trackFeatureViz: renderLayer.trackFeatureViz,
+                    idProperty: renderLayer.idProperty
+                };
+                const publicFeatureProperties = currentViewportExp._propertyNames;
+                const interactivityFeature = new Feature(rawFeature, featureVizParams, publicFeatureProperties);
                 currentViewportExp.accumViewportAgg(interactivityFeature);
             } else {
                 currentViewportExp.accumViewportAgg(rawFeature);

@@ -83,34 +83,46 @@ import FEATURE_VIZ_PROPERTIES from '../renderer/viz/utils/featureVizProperties';
  */
 
 export default class Feature {
-    constructor (rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty) {
+    constructor (rawFeature, { viz, customizedFeatures, trackFeatureViz, idProperty }, publicFeatureProperties = []) {
         this.id = rawFeature[idProperty];
 
         this._rawFeature = rawFeature;
-        const featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
+        this._featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
 
-        this._defineFeatureVizProperties(featureVizParams);
-        this._defineVariables(viz.variables, featureVizParams);
+        this._defineFeatureVizProperties();
+        this._defineVariables();
+        this._definePublicFeatureProperties(publicFeatureProperties);
     }
 
-    _defineFeatureVizProperties (featureVizParams) {
+    _defineFeatureVizProperties () {
         FEATURE_VIZ_PROPERTIES.forEach((property) => {
-            this[property] = this._buildFeatureVizProperty(property, featureVizParams);
+            this[property] = this._buildFeatureVizProperty(property);
         });
     }
 
-    _buildFeatureVizProperty (name, featureVizParams) {
-        const { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty } = featureVizParams;
+    _buildFeatureVizProperty (name) {
+        const { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty } = this._featureVizParams;
         return new FeatureVizProperty(name, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
     }
 
-    _defineVariables (vizVariables, featureVizParams) {
+    _defineVariables () {
         const variables = {};
+        const vizVariables = this._featureVizParams.viz.variables;
         Object.keys(vizVariables).forEach(varName => {
             const name = `__cartovl_variable_${varName}`;
-            variables[varName] = this._buildFeatureVizProperty(name, featureVizParams);
+            variables[varName] = this._buildFeatureVizProperty(name);
         });
         this.variables = variables;
+    }
+
+    _definePublicFeatureProperties (featurePropertyNames) {
+        featurePropertyNames.forEach(prop => {
+            Object.defineProperty(this, prop, {
+                get: function () {
+                    return this._rawFeature[prop];
+                }
+            });
+        });
     }
 
     reset (duration = 500) {
