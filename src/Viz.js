@@ -18,6 +18,7 @@ import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
+import VIZ_PROPERTIES from './renderer/viz/utils/properties';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -373,7 +374,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            const properties = ['color', 'width', 'strokeColor', 'strokeWidth', 'filter', 'symbol', 'symbolPlacement', 'transform'];
+            const properties = VIZ_PROPERTIES;
             const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
             if (propertyName) {
                 this[propertyName] = replacer;
