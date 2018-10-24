@@ -90,7 +90,7 @@ export default class Feature {
         const featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
 
         this._defineFeatureVizProperties(featureVizParams);
-        this._defineVariables(viz.variables);
+        this._defineVariables(viz.variables, featureVizParams);
     }
 
     _defineFeatureVizProperties (featureVizParams) {
@@ -104,11 +104,11 @@ export default class Feature {
         return new FeatureVizProperty(name, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
     }
 
-    _defineVariables (vizVariables) {
+    _defineVariables (vizVariables, featureVizParams) {
         const variables = {};
         Object.keys(vizVariables).forEach(varName => {
             const name = `__cartovl_variable_${varName}`;
-            variables[varName] = this._buildFeatureVizProperty(name);
+            variables[varName] = this._buildFeatureVizProperty(name, featureVizParams);
         });
         this.variables = variables;
     }
