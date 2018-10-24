@@ -330,6 +330,9 @@ function findParser (iso) {
 function parseIso (iso, next = false) {
     iso = iso || '';
     const parser = findParser(iso);
+    if (!parser) {
+        throw new Error(`No date parser found for ${iso}`);
+    }
     return parser.parse(iso, next);
 }
 
@@ -343,4 +346,209 @@ export function startTimeValue (iso) {
 
 export function endTimeValue (iso) {
     return timeValue(parseIso(iso, true));
+}
+
+// TODO: move to separate file, possibly other time functions too
+class TimeRange {
+    constructor (text, startValue, endValue) {
+        this._text = text;
+        this._startValue = startValue;
+        this._endValue = endValue;
+    }
+    static fromText (iso) {
+        return new TimeRange(iso, startTimeValue(iso), endTimeValue(iso));
+    }
+    static fromStartEnd (startDate, endDate) {
+        const start = startDate && startDate.getTime();
+        const end = endDate && endDate.getTime();
+        return this.fromStartEndValues(start, end);
+    }
+    static fromStartEndValues (startValue, endValue) {
+        const iso = periodISO(startValue, endValue);
+        return new TimeRange(iso, startValue, endValue);
+    }
+    get text () {
+        return this._text;
+    }
+    get startValue () {
+        return this._startValue;
+    }
+    get endValue () {
+        return this._endValue;
+    }
+    get startDate () {
+        return msToDate(this._startValue);
+    }
+    get endDate () {
+        return msToDate(this._endValue);
+    }
+}
+
+export function timeRange (t1, t2) {
+    if (t2 === undefined) {
+        if (t1 === undefined) {
+            return new TimeRange();
+            // return undefined;
+        }
+        if (isTimeRange(t1)) {
+            return t1;
+        } else {
+            return TimeRange.fromText(t1);
+        }
+    } else {
+        if (t1 instanceof Date) {
+            return TimeRange.fromStartEnd(t1, t2);
+        } else {
+            return TimeRange.fromStartEndValues(t1, t2);
+        }
+    }
+}
+
+export function isTimeRange (t) {
+    return t instanceof TimeRange;
+}
+
+function parsedValue (dateValue) {
+    const date = msToDate(dateValue);
+    return {
+        year: date.getUTCFullYear(),
+        month: date.getUTCMonth() + 1,
+        day: date.getUTCDate(),
+        hour: date.getUTCHours(),
+        minute: date.getUTCMinutes(),
+        second: date.getUTCSeconds()
+    };
+}
+
+const TIME_LEVELS = ['year', 'month', 'day', 'hour', 'minute', 'second'];
+const TIME_STARTS = [1, 1, 1, 0, 0, 0];
+const YEAR_LEVEL = 0;
+const MONTH_LEVEL = 1;
+const DAY_LEVEL = 2;
+const HOUR_LEVEL = 3;
+const MINUTE_LEVEL = 4;
+const SECOND_LEVEL = 5;
+
+const MS_PER_DAY = 86400000;
+const MS_PER_HOUR = 3600000;
+const MS_PER_MINUTE = 60000;
+const MS_PER_S = 1000;
+
+function startLevel (parsed) {
+    let i = TIME_LEVELS.length - 1;
+    while (i > 0 && parsed[TIME_LEVELS[i]] === TIME_STARTS[i]) {
+        --i;
+    }
+    return i;
+}
+
+function pad (x, n) {
+    return x.toString().padStart(n, '0');
+}
+
+// Return year and week number given year and day number
+function yearWeek (y, yd) {
+    const dow = isoDow(y, 1, 1);
+    const start = dow > 4 ? 9 - dow : 2 - dow;
+    if ((Math.abs(yd - start) % 7) !== 0) {
+        // y yd is not the start of any week
+        return [];
+    }
+    if (yd < start) {
+        // The week starts before the first week of the year => go back one year
+        yd += Math.round((Date.UTC(y, 0, 1) - Date.UTC(y - 1, 0, 1)) / MS_PER_DAY);
+        return yearWeek(y - 1, yd);
+    } else if (Date.UTC(y, 0, 1) + (yd - 1 + 3) * MS_PER_DAY >= Date.UTC(y + 1, 0, 1)) {
+        // The Wednesday (start of week + 3) lies in the next year => advance one year
+        yd -= Math.round((Date.UTC(y + 1, 0, 1) - Date.UTC(y, 0, 1)) / MS_PER_DAY);
+        return yearWeek(y + 1, yd);
+    }
+    return [y, 1 + Math.round((yd - start) / 7)];
+}
+
+export function periodISO (v1, v2) {
+    const t1 = parsedValue(v1);
+    const t2 = parsedValue(v2);
+    const l1 = startLevel(t1);
+    const l2 = startLevel(t2);
+    let invalid;
+
+    if (Math.max(l1, l2) === YEAR_LEVEL) {
+        const d = t2['year'] - t1['year'];
+        if (d === 1000 && ((t1['year'] - 1) % 1000) === 0) { // TODO: does this work for year < 0?
+            // millennium
+            return `M${1 + (t1['year'] - 1) / 1000}`;
+        } else if (d === 100 && ((t1['year'] - 1) % 100) === 0) {
+            // century
+            return `C${1 + (t1['year'] - 1) / 100}`;
+        } else if (d === 10 && (t1['year'] % 10) === 0) {
+            // decade
+            return `D${t1['year'] / 10}`;
+        } else if (d === 1) {
+            // year
+            return pad(t1['year'], 4);
+        } else {
+            invalid = `${d} years`;
+        }
+    } else if (Math.max(l1, l2) === MONTH_LEVEL) {
+        const d = 12 * t2['year'] + t2['month'] - 12 * t1['year'] - t1['month'];
+        if (d === 6 && ((t1['month'] - 1) % 6) === 0) {
+            // semester
+            return `${pad(t1['year'], 4)}S${1 + (t1['month'] - 1) / 6}`;
+        } else if (d === 4) {
+            // trimester
+            return `${pad(t1['year'], 4)}t${1 + (t1['month'] - 1) / 4}`;
+        } else if (d === 3) {
+            // quarter
+            return `${pad(t1['year'], 4)}-Q${1 + (t1['month'] - 1) / 3}`;
+        } else if (d === 1) {
+            // month
+            return `${pad(t1['year'], 4)}-${pad(t1['month'], 2)}`;
+        } else {
+            invalid = `${d} months`;
+        }
+    } else if (Math.max(l1, l2) === DAY_LEVEL) {
+        const d = Math.round((v2 - v1) / MS_PER_DAY);
+        if (d === 1) {
+            // day
+            return `${pad(t1['year'], 4)}-${pad(t1['month'], 2)}-${pad(t1['day'], 2)}`;
+        } else if (d === 7) {
+            // week
+            let y = t1['year'];
+            const v0 = Date.UTC(y, 0, 1);
+            let yd = 1 + Math.round((v1 - v0) / MS_PER_DAY);
+            const [iy, w] = yearWeek(y, yd);
+            if (iy && w) {
+                return `${pad(iy, 4)}-W${pad(w, 2)}`;
+            }
+            invalid = '7 days';
+        } else {
+            invalid = `${d} days`;
+        }
+    } else if (Math.max(l1, l2) === HOUR_LEVEL) {
+        const d = Math.round((v2 - v1) / MS_PER_HOUR);
+        if (d === 1) {
+            // hour
+            return `${pad(t1['year'], 4)}-${pad(t1['month'], 2)}-${pad(t1['day'], 2)}T${pad(t1['hour'], 2)}`;
+        } else {
+            invalid = `${d} hours`;
+        }
+    } else if (Math.max(l1, l2) === MINUTE_LEVEL) {
+        const d = Math.round((v2 - v1) / MS_PER_MINUTE);
+        if (d === 1) {
+            // minute
+            return `${pad(t1['year'], 4)}-${pad(t1['month'], 2)}-${pad(t1['day'], 2)}T${pad(t1['hour'], 2)}:${pad(t1['minute'], 2)}`;
+        } else {
+            invalid = `${d} minutes`;
+        }
+    } else if (Math.max(l1, l2) === SECOND_LEVEL) {
+        const d = Math.round((v2 - v1) / MS_PER_S);
+        if (d === 1) {
+            // second
+            return `${pad(t1['year'], 4)}-${pad(t1['month'], 2)}-${pad(t1['day'], 2)}T${pad(t1['hour'], 2)}:${pad(t1['minute'], 2)}:${pad(t1['second'], 2)}`;
+        } else {
+            invalid = `${d} seconds`;
+        }
+    }
+    throw new Error(`Invalid period of ${invalid} between ${v1} and ${v2}`);
 }

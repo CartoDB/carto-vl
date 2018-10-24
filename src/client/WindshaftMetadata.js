@@ -82,6 +82,14 @@ export default class WindshaftMetadata extends MVTMetadata {
         return { baseName, column, dimension, type, baseType, sourceType };
     }
 
+    decodedProperties (propertyName) {
+        const { dimension } = this._dimensionInfo(propertyName);
+        if (dimension && dimension.grouping && dimension.modes) {
+            return Object.values(dimension.modes);
+        }
+        return super.decodedProperties(propertyName);
+    }
+
     decode (propertyName, propertyValue) {
         const { baseName, column, type, baseType, dimension } = this._dimensionInfo(propertyName);
         if (!column) {
@@ -95,6 +103,7 @@ export default class WindshaftMetadata extends MVTMetadata {
             case 'date':
                 return decodeDate(propertyValue, this.stats(propertyName));
             case 'category':
+                // TODO: if baseType === 'date' wrap in util.timeRange()
                 return this.categorizeString(baseName, propertyValue);
             case 'number':
                 return propertyValue;
@@ -105,8 +114,19 @@ export default class WindshaftMetadata extends MVTMetadata {
         }
     }
 
-    encode (propertyName, propertyValue) {
+    encode (propertyName, ...propertyValues) {
+        const propertyValue = propertyValues[0];
         const { dimension, type, baseType } = this._dimensionInfo(propertyName);
+
+        if (type === 'category' && baseType === 'date') {
+            let start = propertyValue;
+            let end = propertyValues[1];
+            const [min, max] = modalMinMax('start', dimension);
+            if (min !== max) {
+                [start, end] = [start, end].map(v => min + v * (max - min));
+            }
+            return util.timeRange(start*1000, end*1000);
+        }
 
         switch (type) {
             case 'date':
@@ -124,20 +144,6 @@ export default class WindshaftMetadata extends MVTMetadata {
     stats (propertyName) {
         const { dimension, type } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
-            if (dimension.modes && type === 'date') {
-                // For Start/End properties we don't return
-                // individual limits corresponding to specified property,
-                // which could be computing using propertyMode(dimension.modes, propertyName)
-                // for the value of the first argument to decodeModal.
-                // We instead compute always the limits of both Start and End,
-                // so that these pairs of properties use the same numerical scale
-                // (internally or when `linear` is applied without arguments)
-                const { min, max } = dimension;
-                return {
-                    min: asDate(decodeModal('start', min)),
-                    max: asDate(decodeModal('end', max))
-                };
-            }
             return dimension;
         }
         return super.stats(propertyName);
@@ -171,6 +177,20 @@ function propertyMode (modes, propertyName) {
     return Object.keys(modes).find(mode => modes[mode] === propertyName);
 }
 
+const COMBINED_LIMITS = true;
+
+function modalMinMax(mode, stats) {
+    let { min, max } = stats;
+    if (COMBINED_LIMITS) {
+        min = decodeModal('start', min);
+        max = decodeModal('end', max);
+    } else {
+        min = decodeModal(mode, min);
+        max = decodeModal(mode, min);
+    }
+    return [min, max];
+}
+
 function decodeTimeDim (propertyName, propertyValue, stats, dimension) {
     let shouldRemap = false;
     let { min, max } = stats;
@@ -180,8 +200,7 @@ function decodeTimeDim (propertyName, propertyValue, stats, dimension) {
             shouldRemap = true;
             propertyValue = decodeModal(mode, propertyValue);
             shouldRemap = true;
-            min = min.getTime() / 1000;
-            max = max.getTime() / 1000;
+            [min, max] = modalMinMax(mode, stats);
         }
     }
     shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.units);
@@ -246,7 +265,7 @@ const MODE_TYPES = {
 function dimensionType (dimension, propertyName) {
     if (dimension.modes) {
         const mode = Object.keys(dimension.modes).find(mode => dimension.modes[mode] === propertyName);
-        return MODE_TYPES[mode];
+        return MODE_TYPES[mode] || dimension.type;
     }
     return dimension.type;
 }

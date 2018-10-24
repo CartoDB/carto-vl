@@ -33,8 +33,12 @@ export default class Metadata {
             } else if (property.dimension) {
                 if (property.dimension.modes) {
                     Object.values(property.dimension.modes).forEach(modePropertyName => {
-                        this._addProperty(baseName, modePropertyName);
+                        this._addProperty(baseName, modePropertyName, false);
                     });
+                    // with the introduction of TimeRange and the removal of the iso prop. we may need the stats
+                    // of the null mode (the category) even if we're not actually
+                    // using that property
+                    this._addProperty(baseName, property.dimension.propertyName);
                 } else {
                     this._addProperty(baseName, property.dimension.propertyName);
                 }
@@ -44,9 +48,11 @@ export default class Metadata {
         });
     }
 
-    _addProperty (baseName, propertyName) {
+    _addProperty (baseName, propertyName, addToKeys = true) {
         this.baseNames[propertyName] = baseName;
-        this.propertyKeys.push(propertyName);
+        if (addToKeys) {
+            this.propertyKeys.push(propertyName);
+        }
     }
 
     categorizeString (propertyName, category, init = false) {
@@ -84,10 +90,21 @@ export default class Metadata {
         return [baseName];
     }
 
+    // dataframe properties into which a single source property is decoded
+    decodedProperties (propertyName) {
+        return [propertyName];
+    }
+
+    // property of the data origin (dataset, query) from which
+    // a (dataframe) property is derived
+    // TODO: move to windshaft metadata
     baseName (propertyName) {
         return this.baseNames[propertyName];
     }
 
+    // property transferred from the source from which
+    // a (dataframe) property it so be computed
+    // TODO: move to windshaft metadata
     sourcePropertyName (propertyName) {
         const baseName = this.baseName(propertyName);
         const dimension = this.properties[baseName].dimension;

@@ -491,12 +491,24 @@ export default class Dataframe extends DummyDataframe {
         const metadata = this.metadata;
         const getters = {};
         this.metadata.propertyKeys.forEach(propertyName => {
-            getters[propertyName] = {
-                get: function () {
-                    const index = this._index;
-                    return metadata.encode(propertyName, this._dataframe.properties[propertyName][index]);
-                }
-            };
+            const decodedProperties = metadata.decodedProperties(propertyName);
+            if (decodedProperties.length > 1) {
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
+                        // use encode method taking prop name, properties, index, so that it an use several propps
+                        return metadata.encode(propertyName, ...args);
+                    }
+                };
+            } else {
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        return metadata.encode(propertyName, this._dataframe.properties[propertyName][index]);
+                    }
+                };
+            }
         });
 
         Object.defineProperties(cls.prototype, getters);

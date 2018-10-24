@@ -3,7 +3,7 @@ import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
 import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
-import { castDate } from '../../../utils/util';
+import { castDate, timeRange } from '../../../utils/util';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -220,6 +220,19 @@ export class Animation extends BaseExpression {
         const max = this._input.max.eval();
 
         if (!(min instanceof Date)) {
+            if (typeof(min) === 'string') {
+                // If the input is a linear on a TimeRange, then
+                // type is 'number' (because linear takes the start value of TimeRange),
+                // but max and min are categories
+                // TODO: we should handle this in a cleaner way
+                // also, linear currently maps 0 to start of min and
+                // and 1 to start of max; to be used here it'll be better
+                // to map 1 to end of max
+                const tmin = timeRange(min).startValue;
+                const tmax = timeRange(max).startValue;
+                const tmix = progress * (tmax - tmin) + tmin;
+                return castDate(tmix);
+            }
             return progress * (max - min) + min;
         }
 

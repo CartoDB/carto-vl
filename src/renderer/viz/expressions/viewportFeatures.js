@@ -1,6 +1,7 @@
 import BaseExpression from './base';
 import Property from './basic/property';
 import ClusterTimeDimension from './aggregation/cluster/ClusterTimeDimension';
+import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
 import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 import { implicitCast } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
@@ -126,5 +127,5 @@ function _childrenFromProperties (properties) {
 }
 
 function validProperty (property) {
-    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension);
+    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension) || property.isA(ClusterTimeRange);
 }
