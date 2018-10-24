@@ -67,7 +67,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
-        this._columns = null;
+        this._propertyNames = null;
     }
 
     _applyToShaderSource () {
@@ -87,18 +87,18 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _resetViewportAgg () {
-        if (!this._columns) {
+        if (!this._propertyNames) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
 
-            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            FEATURE_VIZ_PROPERTIES.forEach((propertyName) => {
-                if (columns.includes(propertyName)) {
-                    throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${propertyName}' property can't be used, as it is a reserved property name`);
+            const propertyNames = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
+            FEATURE_VIZ_PROPERTIES.forEach((vizPropertyName) => {
+                if (propertyNames.includes(vizPropertyName)) {
+                    throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${vizPropertyName}' property can't be used, as it is a reserved viz property name`);
                 }
             });
-            this._columns = columns;
+            this._propertyNames = propertyNames;
         }
         this.expr = [];
     }
@@ -109,8 +109,8 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _addRequiredPropertiesTo (interactivityFeature) {
-        this._columns.forEach((column) => {
-            interactivityFeature[column] = interactivityFeature._rawFeature[column];
+        this._propertyNames.forEach((name) => {
+            interactivityFeature[name] = interactivityFeature._rawFeature[name];
         });
     }
 }
