@@ -18,14 +18,14 @@ const CYCLIC_UNITS = [
 
 // TODO: generalize with base clusterDimension
 export default class clusterTimeDimension extends BaseExpression {
-    constructor ({ property, expressionName, dimension, type, mode }) {
+    constructor ({ property, expressionName, dimension, type, range }) {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
         this._dimension = dimension;
         this._dimension.propertyName = schema.column.dimColumn(this.property.name, this._dimension.group.units);
         this._expressionName = expressionName;
         this.type = type;
-        this._mode = mode;
+        this._range = range;
     }
 
     static get serialUnits () {
@@ -41,11 +41,7 @@ export default class clusterTimeDimension extends BaseExpression {
     }
 
     get propertyName () {
-        let name = this._dimension.propertyName;
-        if (this._mode) {
-            name = name + '_' + this._mode;
-        }
-        return name;
+        return this._dimension.propertyName;
     }
 
     eval (feature) {
@@ -56,14 +52,21 @@ export default class clusterTimeDimension extends BaseExpression {
         super._bindMetadata(metadata);
         checkInstance(this._expressionName, 'property', 0, PropertyExpression, this.property);
         checkType(this._expressionName, 'property', 0, 'date', this.property);
+        this._range = metadata.properties[metadata.baseName(this.propertyName)].dimension.range;
     }
 
     _resolveAliases () {}
 
     _applyToShaderSource (getGLSLforProperty) {
+        const inline = this._range
+            ? this._range.map(propertyName => [
+                `${getGLSLforProperty(propertyName)}`
+            ])
+            : `${getGLSLforProperty(this.propertyName)}`;
+
         return {
             preface: '',
-            inline: `${getGLSLforProperty(this.propertyName)}`
+            inline
         };
     }
 
@@ -74,7 +77,7 @@ export default class clusterTimeDimension extends BaseExpression {
             [this.property.name]: [{
                 type: 'dimension',
                 dimension: this._dimension,
-                range: !!this._mode
+                range: !!this._range
             }]
         };
     }
