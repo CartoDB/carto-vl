@@ -102,8 +102,6 @@ This end to end tests cover the entire library by performing tests against real 
 
 To install Docker, follow the instructions on https://docs.docker.com/install/
 
-You'll also need to add `127.0.0.1 localhost.localhost.lan` your `/etc/hosts/` file.
-
 ```bash
 # Running the tests
 $ yarn test:e2e

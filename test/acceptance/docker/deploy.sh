@@ -4,6 +4,10 @@ git clone https://github.com/CartoDB/Windshaft-cartodb.git ;
 
 cp /srv/config/environments/test.js Windshaft-cartodb/config/environments/development.js
 cd ./Windshaft-cartodb/
+
+git checkout master
+git pull origin master
+
 yarn
 
 cd /srv
