@@ -9,7 +9,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/viz-properties/geom-types.html"
         width="100%"
-        height="500"
+        height="100"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples/#example-geometry-types">View my source code!</a>
@@ -27,15 +27,14 @@ color: white
 
 Expressions can be combined together with _expression functions_:
 
-```CARTO_VL_Viz
+```js
 width: 7+3
 color: white
 ```
 
 **Note:**
-The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology:
-* A *function* is a transformation between inputs, the *function parameters*, to an output.
-* A *function call* is the application of the function to some values as the *function parameters*.
+The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology. 
+A **function** is a transformation between inputs, the **function parameters**, to an output. A **function call** is the application of the function to some values as the **function parameters**.
 
 
 Each expression imposes limitations on the types of expressions that can be used as its input parameters.
@@ -57,11 +56,11 @@ For a complete list of types and valid functions, see the [reference](/developer
 ### Color expression basics
 
 There are multiple ways to get color expressions (expressions whose type is `color`):
-- **Color constants** are colors defined by name (`red`, `blue`, `white`...) or by hexadecimal RGB(A) composition (`#F88`, `#F88A`, `#F08080`, `#F08080A0`).
-- **Color constructors** are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
-- The **`opacity`** function, which overrides an input color's alpha channel.
-- The **`ramp`** function, which is introduced in the "Data Driven visualization" guide.
-- Other advanced expressions like color arithmetic or blending.
+* **color constants**: are colors defined by name (`red`, `blue`, `white`...) or by hexadecimal RGB(A) composition (`#F88`, `#F88A`, `#F08080`, `#F08080A0`).
+* **color constructors**: are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
+* **`opacity` function**: overrides an input color's alpha channel.
+* **`ramp` function**: which is introduced in the "Data Driven visualization" guide.
+* Other advanced expressions like color arithmetic or blending.
 
 <div class="example-map">
     <iframe
@@ -78,12 +77,11 @@ You can take a look at the [reference](/developers/carto-vl/reference/) for a de
 
 #### Transparency, alpha channel, opacity, and filtering
 There are multiple ways to set the alpha channel:
-- Using a color constant or color constructor. You should use this whenever you can (i.e., you want to change the alpha channel of a color constant or color constructor). For example: `rgba(255,255,255,0.5)` or `#F375`.
-- Using `opacity` to override the alpha channel. You should use this when the input color expression is not a color constant or color constructor. For example, it is very common to combine `opacity` with `ramp`. For example: `opacity(ramp($price, prism), 0.5)`
-- Using the `filter` property. The filter property multiplies the color alpha channel (both fill and stroke) of the features with its value. This, however, has a special semantic regarding viewport aggregation expressions. We'll look at this later.
+* Using a color constant or color constructor. You should use this whenever you can (i.e., you want to change the alpha channel of a color constant or color constructor). For example: `rgba(255,255,255,0.5)` or `#F375`.
+* Using `opacity` to override the alpha channel. You should use this when the input color expression is not a color constant or color constructor. For example, it is very common to combine `opacity` with `ramp`. For example: `opacity(ramp($price, prism), 0.5)`
+* Using the `filter` property. The filter property multiplies the color alpha channel (both fill and stroke) of the features with its value. This, however, has a special semantic regarding viewport aggregation expressions. We'll look at this later.
 
 ### Numeric and boolean expressions basics
-
 In CARTO VL numeric expressions are a first class citizen. You have access to math like `+`, `-`, `*`,`/`,`^`,`log`,`sin`... out of the box.
 
 You can also get boolean-like values within CARTO VL. Some ways to get these “boolean-like” types are comparison functions (`==`, `!=`, `>`, `<`, `>=`), utils (`between`, `in`) and logic functions (`not`, `or`, `and`).
