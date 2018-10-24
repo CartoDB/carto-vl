@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { checkInstance, checkMaxArguments } from './utils';
+import { checkInstance, checkMaxArguments, implicitCast, checkExpression } from './utils';
 
 /**
  * Order ascending by a provided expression. NOTE: only works with `width()`.
@@ -32,10 +32,14 @@ import { checkInstance, checkMaxArguments } from './utils';
 export class Asc extends BaseExpression {
     constructor (by) {
         checkMaxArguments(arguments, 1, 'asc');
-
-        super({});
-        checkInstance('asc', 'by', 0, Width, by);
+        by = implicitCast(by);
+        checkExpression('asc', 'by', 0, by);
+        super({ by });
         this.type = 'orderer';
+    }
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        checkInstance('asc', 'by', 0, Width, this.by);
     }
 }
 
@@ -70,10 +74,14 @@ export class Asc extends BaseExpression {
 export class Desc extends BaseExpression {
     constructor (by) {
         checkMaxArguments(arguments, 1, 'desc');
-
-        super({});
-        checkInstance('desc', 'by', 0, Width, by);
+        by = implicitCast(by);
+        checkExpression('desc', 'by', 0, by);
+        super({ by });
         this.type = 'orderer';
+    }
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        checkInstance('desc', 'by', 0, Width, this.by);
     }
 }
 
