@@ -1,6 +1,5 @@
 import BaseExpression from './base';
 import * as util from '../../../utils/util';
-import { checkMaxArguments } from './utils';
 
 export default class TimeRangeExpr extends BaseExpression {
     constructor (start, end) {

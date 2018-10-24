@@ -394,7 +394,7 @@ export class Animation extends VariantExpression {
         }
     }
 
-    _default_choice(input, duration, fade, ...rest) {
+    _defaultChoice (input, duration, fade, ...rest) {
         return new ScalarAnimation(input, duration, fade, ...rest);
     }
 }
