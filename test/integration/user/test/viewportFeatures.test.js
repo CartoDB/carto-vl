@@ -46,7 +46,7 @@ function checkFeatures (list, expectedList) {
     }
 }
 
-fdescribe('viewportFeatures', () => {
+describe('viewportFeatures', () => {
     let map, source1, viz1, layer1, source2, viz2, layer2, setup;
 
     beforeEach(() => {
