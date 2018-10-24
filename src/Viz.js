@@ -366,66 +366,22 @@ export default class Viz {
         return this['_' + shaderName];
     }
 
-	replaceChild (toReplace, replacer) {
+    replaceChild (toReplace, replacer) {
         if (Object.values(this.variables).includes(toReplace)) {
             const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-        	const properties = ['color', 'width', 'strokeColor', 'strokeWidth', 'filter', 'symbol', 'symbolPlacement', 'transform'];
-            properties.forEach((property) => {
-            	if (toReplace === this[property]){
-                	this[property] = replacer;
-                    replacer.parent = this;
-                    replacer.notify = toReplace.notify;
-                }
-            });
-            
-            if (!properties.includes(toReplace)){
-            	throw new CartoRuntimeError('No child found');
+            const properties = ['color', 'width', 'strokeColor', 'strokeWidth', 'filter', 'symbol', 'symbolPlacement', 'transform'];
+            const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
+            if (propertyName) {
+                this[propertyName] = replacer;
+                replacer.parent = this;
+                replacer.notify = toReplace.notify;
+            } else {
+                throw new CartoRuntimeError('No child found');
             }
-        }
-  	}
-        if (Object.values(this.variables).includes(toReplace)) {
-            const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
-            this.variables[varName] = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.color) {
-            this.color = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.width) {
-            this.width = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeColor) {
-            this.strokeColor = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeWidth) {
-            this.strokeWidth = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.filter) {
-            this.filter = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbol) {
-            this.symbol = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbolPlacement) {
-            this.symbolPlacement = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.transform) {
-            this.transform = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else {
-            throw new CartoRuntimeError('No child found');
         }
     }
 
