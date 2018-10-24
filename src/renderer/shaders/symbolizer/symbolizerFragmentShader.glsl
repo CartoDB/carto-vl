@@ -23,7 +23,7 @@ void main(void) {
     }
     c.a *= filtering;
     if (imageUV!=clamp(imageUV, 0.,1.)){
-        c = vec4(0.);
+        c.a = 0.;
     }
 
     gl_FragColor = vec4(c.rgb*c.a, c.a);
