@@ -1,11 +1,12 @@
-import { implicitCast, checkMaxArguments } from '../utils';
+import { checkMaxArguments, implicitCast, checkExpression } from '../utils';
 import ReversePalette from './ReversePalette';
 import ReverseList from './ReverseList';
+import Base from '../base';
 
 /**
  * Reverse the provided item.
  *
- * @param {Palette|List} x - item to be reversed
+ * @param {Palette|List} input - item to be reversed
  * @return {Palette|List}
  *
  * @example <caption>Invert a Palette.</caption>
@@ -35,13 +36,23 @@ import ReverseList from './ReverseList';
  * @function
  * @api
  */
-export default function reverse (list) {
-    checkMaxArguments(arguments, 1, 'reverse');
-    list = implicitCast(list);
+export default class Reverse extends Base {
+    constructor (input) {
+        checkMaxArguments(arguments, 1, 'reverse');
+        input = implicitCast(input);
+        checkExpression('reverse', 'input', 0, input);
+        super({input});
+    }
 
-    if (list.type === 'palette') {
-        return new ReversePalette(list);
-    } else {
-        return new ReverseList(list);
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+
+        if (this.input.type === 'palette') {
+            Object.setPrototypeOf(this, ReversePalette.prototype);
+        } else {
+            Object.setPrototypeOf(this, ReverseList.prototype);
+        }
+
+        return this._bindMetadata(metadata);
     }
 }

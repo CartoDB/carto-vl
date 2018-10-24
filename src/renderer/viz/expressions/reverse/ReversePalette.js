@@ -1,12 +1,10 @@
 import Palette from '../color/palettes/Palette';
 
 export default class ReversePalette extends Palette {
-    constructor (palette) {
-        super(palette.name, palette.subPalettes);
+    _bindMetadata (metadata) {
         this.type = 'palette';
-        this._originalPalette = palette;
-        this.tags = palette.tags;
-        this.subPalettes = new Proxy(palette.subPalettes, {
+        this.childType = 'color';
+        this.subPalettes = new Proxy(this.input.subPalettes, {
             get: (target, name) => {
                 if (Number.isFinite(Number(name)) && Array.isArray(target[name])) {
                     return this._reversePalette(target[name]);
@@ -14,10 +12,11 @@ export default class ReversePalette extends Palette {
                 return target[name];
             }
         });
+        this.tags = this.input.tags;
     }
 
     getLongestSubPalette () {
-        return this._reversePalette(this._originalPalette.getLongestSubPalette());
+        return this._reversePalette(this.input.getLongestSubPalette());
     }
 
     _reversePalette (palette) {
