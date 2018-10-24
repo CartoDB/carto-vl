@@ -81,7 +81,7 @@ You can take a look at the [reference](/developers/carto-vl/reference/) for a de
 
 #### Transparency, alpha channel, opacity, and filtering
 There are multiple ways to set the alpha channel:
-- **Color constant or color constructor**: use this whenever you want to change the alpha channel of a color constant or color constructor (`rgba(255,255,255,0.5)` or `#F375`).
+- **Color constant** or **color constructor**: use this whenever you want to change the alpha channel of a color constant or color constructor (`rgba(255,255,255,0.5)` or `#F375`).
 - **`opacity`**: use to override the alpha channel. Use this when the input color expression is not a color constant or color constructor. For example, combining `opacity` with `ramp` (`opacity(ramp($price, prism), 0.5)`)
 - **`filter`**: this property multiplies the color alpha channel (both fill and stroke) of the features with its value. This, however, has a special semantic regarding viewport aggregation expressions. We'll look at this later.
 

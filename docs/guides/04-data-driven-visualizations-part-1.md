@@ -2,13 +2,13 @@
 
 ### What is a ramp?
 
-The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp). `ramp` is a special CARTO VL expression that outputs values based on an input. 
+The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs values based on an input. 
 
 Depending on the type of input the matching output will be performed in different ways:
-- **One-to-one mapping**: is performed when the number of possible categories in the input matches the number of values. 
-  - For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red.
-- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. 
-  - For example, `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
+- **One-to-one**: is performed when the number of possible categories in the input matches the number of values:
+`ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red
+- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically: 
+`color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
 
 To introduce the use of `ramp`, this guide covers using them with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
@@ -35,22 +35,29 @@ This will map the feature with the lowest population density in the source data 
         id="population-density-unclassed"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-unclassed.html"
         width="100%"
-        height="1000"
+        height="500"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-population-density---unclassed">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-population-density---unclassed">View my source code!</a>
 
 To see more variation in the data, you can even set intermediate colors in the color list, for example:
 
 ```CARTOVL_Viz
 color: ramp($population_density, [midnightblue, deeppink, gold])
 ```
+
 Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. 
 
 Meaning the CARTO VL `ramp` function transforms:
 
-`ramp($population_density, [midnightblue, deeppink, gold])` to `ramp(linear($population_density), [midnightblue, deeppink, gold])`
+```CARTOVL_Viz
+ramp($population_density, [midnightblue, deeppink, gold]) 
+
+to 
+
+ramp(linear($population_density), [midnightblue, deeppink, gold])
+```
 
 These transformations are what we call *implicit casts* and are a common topic in CARTO VL.
 
