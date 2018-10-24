@@ -75,6 +75,8 @@ import FEATURE_VIZ_PROPERTIES from '../renderer/viz/utils/featureVizProperties';
  * @property {FeatureVizProperty} widthStroke
  * @property {FeatureVizProperty} symbol
  * @property {FeatureVizProperty} symbolPlacement
+ * @property {FeatureVizProperty} filter
+ * @property {FeatureVizProperty} transform
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
