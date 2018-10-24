@@ -1,6 +1,6 @@
 import NumberCodec from '../Number';
 import CategoryCodec from '../Category';
-import DateCodec from './Date';
+import WindshaftDateCodec from './WindshaftDate';
 import TimeRangeCodec from './TimeRange';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../../errors/carto-maps-api-error';
 
@@ -11,7 +11,7 @@ export default function windshaftCodecFactory (metadata, type, propertyName) {
         case 'category':
             return new CategoryCodec(metadata, propertyName);
         case 'date':
-            return new DateCodec(metadata, propertyName);
+            return new WindshaftDateCodec(metadata, propertyName);
         case 'timerange':
             return new TimeRangeCodec(metadata, propertyName);
         default:

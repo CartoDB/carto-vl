@@ -1,6 +1,7 @@
 
 import Dataframe from '../renderer/Dataframe';
 import Metadata from '../renderer/Metadata';
+import MVTMetadata from './MVTMetadata';
 import Base from './Base';
 import TileClient from './TileClient';
 import Worker from './MVTWorkers.worker';
@@ -34,13 +35,14 @@ export default class MVT extends Base {
      * @name MVT
      * @api
      */
-    constructor (templateURL, metadata = new Metadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
+    constructor (templateURL, metadata = new MVTMetadata(), options = { layerID: undefined, viewportZoomToSourceZoom: Math.ceil, maxZoom: undefined }) {
         super();
         this._templateURL = templateURL;
         if (!(metadata instanceof Metadata)) {
-            metadata = new Metadata(metadata);
+            metadata = new MVTMetadata(metadata);
         }
         this._metadata = metadata;
+        this._metadata.setCodecs();
         this._tileClient = new TileClient(templateURL);
         this._options = options;
         this._options.viewportZoomToSourceZoom = this._options.viewportZoomToSourceZoom || Math.ceil;

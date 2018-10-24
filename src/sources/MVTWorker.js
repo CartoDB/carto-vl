@@ -56,7 +56,7 @@ export class MVTWorker {
 
     castMetadata (metadata) {
         Object.setPrototypeOf(metadata, MVTMetadata.prototype);
-        // TODO: set codecs
+        metadata.setCodecs();
     }
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {
@@ -228,7 +228,6 @@ export class MVTWorker {
     }
 
     decodeProperty (metadata, propertyName, propertyValue) {
-        // return metadata.encode(propertyName, propertyValue);
         return metadata.codec(propertyName).sourceToInternal(propertyValue);
     }
 

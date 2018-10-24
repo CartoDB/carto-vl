@@ -1,7 +1,7 @@
 import BaseCodec from '../Base';
 import * as util from '../../utils/util';
 
-export default class DateCodec extends BaseCodec {
+export default class WindshaftDateCodec extends BaseCodec {
     constructor (metadata, propertyName) {
         super();
         const { min } = metadata.stats(propertyName);
