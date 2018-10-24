@@ -1,5 +1,4 @@
 ## Style with Expressions
-
 CARTO VL styling is based on the concept of visualizations. A visualization is a set of styling properties and variables that are assigned expressions. Visualizations allow you to control everything from the color of features to the available properties in interactivity events.
 
 ### Styling properties
@@ -10,8 +9,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/viz-properties/geom-types.html"
         width="100%"
-        height="1000"
-        style="margin: 20px auto !important"
+        height="500"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples/#example-geometry-types">View my source code!</a>
@@ -20,7 +18,6 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
 ### What is an expression?
-
 As seen above, each styling property is assigned a value that is considered to be an expression. Expressions assigned to properties can be constants (like `red`, `#FFF`,`7`) or functions (like `sqrt`, `+`, or `ramp`).
 
 ```CARTO_VL_Viz
@@ -37,8 +34,8 @@ color: white
 
 **Note:**
 The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology:
- - A *function* is a transformation between inputs, the *function parameters*, to an output.
- - A *function call* is the application of the function to some values as the *function parameters*.
+* A *function* is a transformation between inputs, the *function parameters*, to an output.
+* A *function call* is the application of the function to some values as the *function parameters*.
 
 
 Each expression imposes limitations on the types of expressions that can be used as its input parameters.
@@ -71,8 +68,7 @@ There are multiple ways to get color expressions (expressions whose type is `col
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/styling/color-spaces.html"
         width="100%"
-        height="1000"
-        style="margin: 20px auto !important"
+        height="100"
         frameBorder="0">
     </iframe>
     <a href="/developers/carto-vl/examples#example-color-spaces">View my source code!</a>
@@ -81,7 +77,6 @@ There are multiple ways to get color expressions (expressions whose type is `col
 You can take a look at the [reference](/developers/carto-vl/reference/) for a detailed description of all color expressions.
 
 #### Transparency, alpha channel, opacity, and filtering
-
 There are multiple ways to set the alpha channel:
 - Using a color constant or color constructor. You should use this whenever you can (i.e., you want to change the alpha channel of a color constant or color constructor). For example: `rgba(255,255,255,0.5)` or `#F375`.
 - Using `opacity` to override the alpha channel. You should use this when the input color expression is not a color constant or color constructor. For example, it is very common to combine `opacity` with `ramp`. For example: `opacity(ramp($price, prism), 0.5)`
