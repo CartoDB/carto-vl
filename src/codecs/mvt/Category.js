@@ -3,7 +3,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-
 
 export default class MVTCategoryCodec extends CategoryCodec {
     sourceToInternal (propertyValue) {
-        if (typeof propertyValue !== 'number') {
+        if (typeof propertyValue !== 'category') {
             // TODO: It would be nice to include the name of the source property in the error message.
             // In general Codecs are unique per original base property, not per source property,
             // but for the generic MVT sources we don't support multiple source properties per base property (e.g. aggregations)
