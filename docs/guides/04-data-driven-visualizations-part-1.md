@@ -5,15 +5,17 @@
 The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp). `ramp` is a special CARTO VL expression that outputs values based on an input. 
 
 Depending on the type of input the matching output will be performed in different ways:
-- **One-to-one mapping**: is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red.
-- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
+- **One-to-one mapping**: is performed when the number of possible categories in the input matches the number of values. 
+  - For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red.
+- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. 
+  - For example, `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
 
 `ramp` values don't always have to be colors giving you the ablitiy to create a variety of map types like bubble maps and flow maps. For simplicity's sake, this guide will stick to colors until [part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/).
 
 
-We've talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call *Style by value*.
+We've talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. But, the common case is to match a property as the input to fixed constant outputs like colors. This is what we call **style by value**.
 
-The following sections will cover *Style by value* with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
+The following sections will cover **style by value** with different property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
 ### Numeric properties
 
