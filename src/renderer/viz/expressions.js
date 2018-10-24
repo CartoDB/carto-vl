@@ -482,7 +482,6 @@ import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
 import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
-import ClusterTimeRange from './expressions/aggregation/cluster/ClusterTimeRange';
 
 import Constant from './expressions/basic/constant';
 
@@ -626,7 +625,6 @@ export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
 export const clusterTime = (...args) => new ClusterTime(...args);
-export const clusterTimeRange = (...args) => new ClusterTimeRange(...args);
 
 export const constant = (...args) => new Constant(...args);
 

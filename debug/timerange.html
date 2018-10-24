@@ -82,7 +82,7 @@
         FROM params, positions
     `);
     const viz = new carto.Viz(`
-      @month: clusterTimeRange($date, 'month', 'Europe/Madrid')
+      @month: clusterTime($date, 'month', 'Europe/Madrid')
 
       // linear uses start date value
       // width: linear(@month)*60

@@ -4,7 +4,7 @@ import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArgume
 import { number, linear, globalMin, globalMax, HOLD } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
-import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
+import ClusterTime from './aggregation/cluster/ClusterTime';
 import { And } from './binary';
 import VariantExpression from './Variant';
 
@@ -82,8 +82,7 @@ class ScalarAnimation extends BaseExpression {
         input = implicitCast(input);
         const originalInput = input;
 
-        // TODO: support for variables
-        if (input.isA(Property) || input.isA(ClusterTimeRange)) {
+        if (input.isA(Property) || (input.isA(ClusterTime) && input.type === 'timerange')) {
             input = linear(input, globalMin(input), globalMax(input), 'start');
         }
 
