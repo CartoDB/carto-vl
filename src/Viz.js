@@ -366,7 +366,27 @@ export default class Viz {
         return this['_' + shaderName];
     }
 
-    replaceChild (toReplace, replacer) {
+	replaceChild (toReplace, replacer) {
+        if (Object.values(this.variables).includes(toReplace)) {
+            const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
+            this.variables[varName] = replacer;
+            replacer.parent = this;
+            replacer.notify = toReplace.notify;
+        } else {
+        	const properties = ['color', 'width', 'strokeColor', 'strokeWidth', 'filter', 'symbol', 'symbolPlacement', 'transform'];
+            properties.forEach((property) => {
+            	if (toReplace === this[property]){
+                	this[property] = replacer;
+                    replacer.parent = this;
+                    replacer.notify = toReplace.notify;
+                }
+            });
+            
+            if (!properties.includes(toReplace)){
+            	throw new CartoRuntimeError('No child found');
+            }
+        }
+  	}
         if (Object.values(this.variables).includes(toReplace)) {
             const varName = Object.keys(this.variables).find(varName => this.variables[varName] === toReplace);
             this.variables[varName] = replacer;
