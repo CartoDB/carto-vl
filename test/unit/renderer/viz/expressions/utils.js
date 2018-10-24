@@ -1,6 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
-import IdentityCodec from '../../../../../src/codecs/identity';
+import IdentityCodec from '../../../../../src/codecs/Identity';
 
 const metadata = new Metadata({
     properties: {
