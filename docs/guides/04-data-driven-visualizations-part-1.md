@@ -2,9 +2,11 @@
 
 ### What is a ramp?
 
-The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp). `ramp` is a special CARTO VL expression that outputs values based on an input. Depending on the type of input the matching output will be performed in different ways:
-- _One-to-one mapping_ is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red.
-- _Interpolation_ is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
+The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp). `ramp` is a special CARTO VL expression that outputs values based on an input. 
+
+Depending on the type of input the matching output will be performed in different ways:
+- **One-to-one mapping**: is performed when the number of possible categories in the input matches the number of values. For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red.
+- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. For example: `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
 
 `ramp` values don't always have to be colors giving you the ablitiy to create a variety of map types like bubble maps and flow maps. For simplicity's sake, this guide will stick to colors until [part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/).
 
