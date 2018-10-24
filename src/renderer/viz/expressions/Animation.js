@@ -386,11 +386,15 @@ class TimeRangeAnimation extends And {
 }
 
 export class Animation extends VariantExpression {
-    _choose (input, duration, fade) {
+    _choose (input, duration, fade, ...rest) {
         if (input.type === 'timerange') {
-            return new TimeRangeAnimation(input, duration, fade);
+            return new TimeRangeAnimation(input, duration, fade, ...rest);
         } else {
-            return new ScalarAnimation(input, duration, fade);
+            return new ScalarAnimation(input, duration, fade, ...rest);
         }
+    }
+
+    _default_choice(input, duration, fade, ...rest) {
+        return new ScalarAnimation(input, duration, fade, ...rest);
     }
 }

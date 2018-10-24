@@ -10,7 +10,7 @@ export default class VariantExpression extends BaseExpression {
     constructor (...args) {
         super({});
         this._args = args;
-        this._proxy = null;
+        this._proxy = this._default_choice(...args);
         const ownProperties = [
             '_resolveAliases', '_args', '_proxy', '_choose'
         ];
@@ -36,6 +36,10 @@ export default class VariantExpression extends BaseExpression {
             }
         };
         return new Proxy(this, aliaser);
+    }
+
+    _default_choice () {
+        return null;
     }
 
     _resolveAliases (aliases) {
