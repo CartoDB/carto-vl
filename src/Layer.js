@@ -66,7 +66,10 @@ export default class Layer {
         this._emitter = mitt();
         this._renderLayer = new RenderLayer();
 
-        // Use an UID to detect that a new call to `Layer.update()` is overriding an old (uncommitted) one
+        // There are 2 type of changes in a layer source or viz:
+        //  - Major changes. Major changes are performed by the `update` method and they will override (have priority over) minor changes
+        //  - Minor changes. Minor changes are performed by the `blendToViz` and `blendTo` method and they won't override concurrent calls to `update`
+        // The public docs of `update` and `blendToViz` explains this API particularity in more detail, which is implemented with these counters
         this._majorNextUID = 0;
         this._majorCurrentUID = null;
         this._minorNextUID = 0;
@@ -330,7 +333,7 @@ export default class Layer {
     /**
      * Viz attached to this layer.
      *
-     * Calls to `blendToViz` and `update` wont' update the viz until those calls "commit",
+     * Calls to `blendToViz` and `update` won't update the viz until those calls "commit",
      * having performed and completed all asynchronous necessary sanity checks.
      *
      * @type {carto.Viz}

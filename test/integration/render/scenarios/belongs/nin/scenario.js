@@ -12,6 +12,5 @@ const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
 layer.on('loaded', () => {
-    console.log('wad');
     window.loaded = true;
 });

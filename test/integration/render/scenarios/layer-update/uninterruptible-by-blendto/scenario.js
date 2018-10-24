@@ -8,7 +8,6 @@ const layer = new carto.Layer('layer', source1, new carto.Viz());
 
 layer.addTo(map);
 layer.on('loaded', async () => {
-    // TODO
     slowDown(source1, 60);
     const updatePromise = layer.update(source1, new carto.Viz('color: green'));
     layer.viz.color.blendTo('red', 300);
