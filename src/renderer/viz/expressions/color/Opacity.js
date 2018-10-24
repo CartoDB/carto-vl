@@ -1,5 +1,4 @@
 import BaseExpression from '../base';
-import { number } from '../../expressions';
 import { checkType, checkMaxArguments, checkExpression, implicitCast } from '../utils';
 
 /**
