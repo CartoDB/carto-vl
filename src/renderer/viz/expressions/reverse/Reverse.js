@@ -41,7 +41,7 @@ export default class Reverse extends Base {
         checkMaxArguments(arguments, 1, 'reverse');
         input = implicitCast(input);
         checkExpression('reverse', 'input', 0, input);
-        super({input});
+        super({ input });
     }
 
     _bindMetadata (metadata) {
