@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation demo | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
+  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-74.0032059, 40.7482066],
+            zoom: 12,
+        });
+
+
+    carto.setDefaultAuth({
+      apiKey: 'default_public',
+      user: 'cartovl'
+    });
+
+    const animStart = '2018-04-11T12:00:00Z';
+    // const animEnd = '2018-04-18T12:00:00Z';
+    const animEnd = '2019-12-18T12:00:00Z';
+    const animDuration = 10;
+    const lineLength = 600000;
+
+    const s = carto.expressions;
+    const source = new carto.source.SQL(`
+      select*from taxi_50k
+    `);
+    const viz = new carto.Viz(`
+      @month: clusterTime($tpep_pickup_datetime, 'hour')
+
+      // linear uses start date value
+      // width: linear(@month)*60
+      width: linear(@month)*60
+      color: ramp(linear(@month), SUNSET)
+
+      // filter: animation(@month, 10, fade(0.01, 0.01))
+      filter: animation(@month,60,fade(0.01,0.01))
+
+      // TODO: buckets should use category?
+      // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
+      // width: ramp(@selMonths, [60, 50, 40, 30], 20)
+
+      @list: viewportFeatures(@month)
+      @maxMonth: globalMax(@month)
+      @minMonth: globalMin(@month)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    let info = true;
+    const animation = ['animation', 'timeAnimation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    console.log('FILTER:', viz.filter.expressionName);
+    layer.on('updated', () => {
+      if (info) {
+        info = !animation;
+        console.log(viz);
+        console.log("Min Month", viz.variables.minMonth.value);
+        console.log("Max Month", viz.variables.maxMonth.value);
+        console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f).text));
+        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
+      }
+      if (animation) {
+        const time = animation.getProgressValue();
+        document.getElementById("timer").textContent = time;
+      }
+    });
+    const interactivity = new carto.Interactivity(layer);
+    let playing = true;
+    interactivity.on('featureClick', event => {
+      if (animation) {
+        if (playing) {
+          console.log('PAUSE');
+          animation.pause();
+        } else {
+          console.log('PLAY');
+          animation.play();
+        }
+        playing = !playing;
+      };
+
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        console.log('Start:', feature.variables.month.value.startValue);
+        console.log('End:', feature.variables.month.value.endValue);
+        console.log('ISO:', feature.variables.month.value.text);
+        console.log('Start D:', feature.variables.month.value.startDate);
+        console.log('End D:', feature.variables.month.value.endDate);
+      }
+    });
+  </script>
+</body>
+</html>
+
+
