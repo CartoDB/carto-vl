@@ -2,7 +2,6 @@ import { version } from '../../package';
 import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
 import schema from '../renderer/schema';
-import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
@@ -247,11 +246,9 @@ export default class Windshaft {
                             // TODO:
                             // we should consider eliminating this and requiring
                             // all dimensions to be used through clusterXXX functions
-                            // aggregation.dimensions[propertyName] = {
-                            //     column: propertyName
-                            // };
-                            // Old style definition, for compatibility with old tilers
-                            aggregation.dimensions[propertyName] = propertyName;
+                            aggregation.dimensions[propertyName] = {
+                                column: propertyName
+                            };
                         }
                     });
                 }
@@ -373,20 +370,9 @@ export default class Windshaft {
                     min: dimensionStats.min,
                     max: dimensionStats.max
                 };
-                const modes = MNS[column].map(c => c.mode).filter(m => m);
-                if (MNS[column].filter(c => !c.mode && c.dimension.format === 'iso').length > 0) {
-                    modes.push('iso');
-                }
-                if (modes.length > 0) {
-                    // This is an ISO dimension which will be decoded as
-                    // one or two internal properties (start & end timedates)
-                    // Leave propertyName as the column name for decoding, but
-                    // internally we'll keep the properties for each mode.
-                    properties[column].dimension.modes = {};
-                    modes.forEach(mode => {
-                        const name = mode === 'iso' ? dimName : `${dimName}_${mode}`;
-                        properties[column].dimension.modes[mode] = name;
-                    });
+                const range = MNS[column].some(c => c.range);
+                if (range > 0) {
+                    properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
                 }
             }
         });
@@ -403,11 +389,6 @@ export default class Windshaft {
                 });
             } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
-                ['min', 'max', 'avg'].map(fn => {
-                    if (property[fn]) {
-                        property[fn] = new Time(property[fn] * 1000).value;
-                    }
-                });
             }
         });
 
@@ -418,6 +399,7 @@ export default class Windshaft {
         const idProperty = 'cartodb_id';
 
         const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
+        metadata.setCodecs();
         return metadata;
     }
 }

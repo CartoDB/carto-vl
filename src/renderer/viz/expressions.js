@@ -482,9 +482,6 @@ import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
 import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
-import ClusterTimeStart from './expressions/aggregation/cluster/ClusterTimeStart';
-import ClusterTimeEnd from './expressions/aggregation/cluster/ClusterTimeEnd';
-
 import ClusterTimeRange from './expressions/aggregation/cluster/ClusterTimeRange';
 
 import Constant from './expressions/basic/constant';
@@ -535,6 +532,7 @@ import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
+import TimeRangeExpr from './expressions/time';
 
 import Top from './expressions/top';
 
@@ -628,9 +626,6 @@ export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
 export const clusterTime = (...args) => new ClusterTime(...args);
-export const clusterTimeStart = (...args) => new ClusterTimeStart(...args);
-export const clusterTimeEnd = (...args) => new ClusterTimeEnd(...args);
-
 export const clusterTimeRange = (...args) => new ClusterTimeRange(...args);
 
 export const constant = (...args) => new Constant(...args);
@@ -689,6 +684,8 @@ export const category = (...args) => new BaseCategory(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };
+
+export const timeRange = (...args) => new TimeRangeExpr(...args);
 
 export const top = (...args) => new Top(...args);
 

@@ -157,7 +157,7 @@ export default class GeoJSON extends Base {
         const idProperty = 'cartodb_id';
 
         this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
-
+        // TODO: assign codecs per type (date,number==identity)
         return this._metadata;
     }
 
@@ -279,7 +279,7 @@ export default class GeoJSON extends Base {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                properties[name][i] = this._metadata.decode(name, f.properties[name]);
+                properties[name][i] = this._metadata.encode(name, f.properties[name]);
             });
         }
         return properties;

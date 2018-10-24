@@ -1,9 +1,12 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax } from '../expressions';
+import { number, linear, globalMin, globalMax, HOLD } from '../expressions';
 import Property from './basic/property';
-import { castDate, timeRange } from '../../../utils/util';
+import { castDate } from '../../../utils/util';
+import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
+import { And } from './binary';
+import VariantExpression from './Variant';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -70,7 +73,8 @@ let waitingForOthers = new Set();
  * @class
  * @api
  */
-export class Animation extends BaseExpression {
+
+class ScalarAnimation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
 
@@ -78,8 +82,9 @@ export class Animation extends BaseExpression {
         input = implicitCast(input);
         const originalInput = input;
 
-        if (input.isA(Property)) {
-            input = linear(input, globalMin(input), globalMax(input));
+        // TODO: support for variables
+        if (input.isA(Property) || input.isA(ClusterTimeRange)) {
+            input = linear(input, globalMin(input), globalMax(input), 'start');
         }
 
         const progress = number(0);
@@ -216,31 +221,7 @@ export class Animation extends BaseExpression {
      */
     getProgressValue () {
         const progress = this.progress.eval(); // from 0 to 1
-        const min = this._input.min.eval();
-        const max = this._input.max.eval();
-
-        if (!(min instanceof Date)) {
-            if (typeof(min) === 'string') {
-                // If the input is a linear on a TimeRange, then
-                // type is 'number' (because linear takes the start value of TimeRange),
-                // but max and min are categories
-                // TODO: we should handle this in a cleaner way
-                // also, linear currently maps 0 to start of min and
-                // and 1 to start of max; to be used here it'll be better
-                // to map 1 to end of max
-                const tmin = timeRange(min).startValue;
-                const tmax = timeRange(max).startValue;
-                const tmix = progress * (tmax - tmin) + tmin;
-                return castDate(tmix);
-            }
-            return progress * (max - min) + min;
-        }
-
-        const tmin = min.getTime();
-        const tmax = max.getTime();
-        const tmix = (1 - progress) * tmin + tmax * progress;
-
-        return new Date(tmix);
+        return this._input.converse(progress);
     }
 
     /**
@@ -253,8 +234,7 @@ export class Animation extends BaseExpression {
      */
     setTimestamp (timestamp) {
         const date = castDate(timestamp);
-        const tmin = this._input.min.eval();
-        const tmax = this._input.max.eval();
+        const [tmin, tmax] = this._input.limits();
 
         if (date.getTime() < tmin) {
             throw new RangeError('animation.setTimestamp requires the date parameter to be higher than the lower limit');
@@ -338,12 +318,80 @@ export class Animation extends BaseExpression {
         this._originalInput._bindMetadata(meta);
         this.duration._bindMetadata(meta);
 
-        checkType('animation', 'input', 0, ['number', 'date'], this._originalInput);
+        checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
+
         super._bindMetadata(meta);
 
         checkType('animation', 'input', 0, 'number', this._input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
+    }
+}
+
+class TimeRangeAnimation extends And {
+    constructor (input, duration = 10, fade = new Fade()) {
+        const start = linear(input, globalMin(input), globalMax(input), 'start');
+        const end = linear(input, globalMin(input), globalMax(input), 'end');
+        const startAnim = new ScalarAnimation(start, duration, new Fade(fade.fadeIn, HOLD));
+        const endAnim = new ScalarAnimation(end, duration, new Fade(HOLD, fade.fadeOut));
+        super(startAnim, endAnim);
+        this._startAnim = startAnim;
+        this._endAnim = endAnim;
+        this.expressionName = 'timeAnimation';
+        this.input = input;
+    }
+
+    isAnimated () {
+        return this._startAnim.isAnimated();
+    }
+
+    getProgressValue () {
+        return this._startAnim.getProgressValue();
+    }
+
+    setTimestamp (timestamp) {
+        this._startAnim.setTimestamp(timestamp);
+        this._endAnim.setTimestamp(timestamp);
+    }
+
+    getProgressPct () {
+        return this._startAnim.getProgressPct();
+    }
+
+    setProgressPct (progress) {
+        this._startAnim.setProgressPct(progress);
+        this._endAnim.setProgressPct(progress);
+    }
+
+    pause () {
+        this._startAnim.pause();
+        this._endAnim.pause();
+    }
+
+    play () {
+        this._startAnim.play();
+        this._endAnim.play();
+        this._endAnim.setProgressPct(this._startAnim.getProgressPct());
+    }
+
+    stop () {
+        this._startAnim.stop();
+        this._endAnim.stop();
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+        this.input._resolveAliases(aliases);
+    }
+}
+
+export class Animation extends VariantExpression {
+    _choose (input, duration, fade) {
+        if (input.type === 'timerange') {
+            return new TimeRangeAnimation(input, duration, fade);
+        } else {
+            return new ScalarAnimation(input, duration, fade);
+        }
     }
 }

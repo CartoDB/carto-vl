@@ -1,8 +1,11 @@
+import { IdentityCodec } from './Codec';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
     properties: {}
 };
+
+const STATS = ['min', 'max', 'avg', 'sum', 'mode'];
 
 export default class Metadata {
     constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
@@ -31,13 +34,11 @@ export default class Metadata {
                     this._addProperty(baseName, propName);
                 });
             } else if (property.dimension) {
-                if (property.dimension.modes) {
-                    Object.values(property.dimension.modes).forEach(modePropertyName => {
-                        this._addProperty(baseName, modePropertyName, false);
+                if (property.dimension.range) {
+                    property.dimension.range.forEach(rangePropertyName => {
+                        this._addProperty(baseName, rangePropertyName, false);
                     });
-                    // with the introduction of TimeRange and the removal of the iso prop. we may need the stats
-                    // of the null mode (the category) even if we're not actually
-                    // using that property
+                    // add source property too, for stats
                     this._addProperty(baseName, property.dimension.propertyName);
                 } else {
                     this._addProperty(baseName, property.dimension.propertyName);
@@ -82,8 +83,8 @@ export default class Metadata {
         if (prop.aggregations) {
             return Object.values(prop.aggregations);
         } else if (prop.dimension) {
-            if (prop.dimension.modes) {
-                return Object.values(prop.dimension.modes);
+            if (prop.dimension.range) {
+                return prop.dimension.range;
             }
             return [prop.dimension.propertyName];
         }
@@ -91,6 +92,7 @@ export default class Metadata {
     }
 
     // dataframe properties into which a single source property is decoded
+    // TODO: rename as encodedProperties
     decodedProperties (propertyName) {
         return [propertyName];
     }
@@ -108,23 +110,26 @@ export default class Metadata {
     sourcePropertyName (propertyName) {
         const baseName = this.baseName(propertyName);
         const dimension = this.properties[baseName].dimension;
-        if (dimension && dimension.modes) {
+        if (dimension && dimension.range) {
             return dimension.propertyName;
         }
         return propertyName;
     }
 
-    // convert source values to internal representation
-    decode (propertyName, propertyValue) {
-        throw new Error(`Undefined decode called for ${propertyName} ${propertyValue}`);
+    _filterStats (keys) {
+        return keys.filter(key => STATS.includes(key));
     }
 
-    // convert internal representation to user
-    encode (propertyName, propertyValue) {
-        throw new Error(`Undefined encode called for ${propertyName} ${propertyValue}`);
+    availableStats (propertyName) {
+        return this._filterStats(Object.keys(this.stats(propertyName)));
     }
 
     stats (propertyName) {
         return this.properties[propertyName];
+    }
+
+    codec (propertyName) {
+        // FIXME: default identity code for debugging purposes
+        return this.properties[this.baseName(propertyName)].codec || new IdentityCodec();
     }
 }

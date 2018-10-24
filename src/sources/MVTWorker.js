@@ -56,6 +56,7 @@ export class MVTWorker {
 
     castMetadata (metadata) {
         Object.setPrototypeOf(metadata, MVTMetadata.prototype);
+        // TODO: set codecs
     }
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {
@@ -131,7 +132,7 @@ export class MVTWorker {
         if (geometries) {
             pointGeometries = new Float32Array(geometries);
         }
-        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        const { properties } = this._initializePropertyArrays(metadata, mvtLayer.length);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -160,7 +161,7 @@ export class MVTWorker {
                     `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
-            this._decodeProperties(metadata, propertyNames, properties, f, numFeatures);
+            this._decodeProperties(metadata, properties, f, numFeatures);
             numFeatures++;
         }
 
@@ -184,14 +185,15 @@ export class MVTWorker {
         return { propertyNames, properties };
     }
 
+    _getSourcePropertyNamesFrom (metadata) {
+        return metadata.propertyKeys.filter(name => metadata.properties[metadata.baseName(name)].type !== 'geometry');
+    }
+
     _getPropertyNamesFrom (metadata) {
         const propertyNames = [];
-        metadata.propertyKeys.forEach(propKey => {
-            metadata.decodedProperties(propKey).forEach(propertyName => {
-                const baseName = metadata.baseName(propertyName);
-                if (metadata.properties[baseName].type !== 'geometry') {
-                    propertyNames.push(propertyName);
-                }
+        this._getSourcePropertyNamesFrom(metadata).forEach(sourceName => {
+            metadata.decodedProperties(sourceName).forEach(propertyName => {
+                propertyNames.push(propertyName);
             });
         });
         return propertyNames;
@@ -211,18 +213,23 @@ export class MVTWorker {
         return properties;
     }
 
-    _decodeProperties (metadata, propertyNames, properties, feature, i) {
-        const length = propertyNames.length;
+    _decodeProperties (metadata, properties, feature, i) {
+        const sourcePropertyNames = this._getSourcePropertyNamesFrom(metadata);
+        const length = sourcePropertyNames.length;
         for (let j = 0; j < length; j++) {
-            const propertyName = propertyNames[j];
-            const sourcePropertyName = metadata.sourcePropertyName(propertyName);
+            const sourcePropertyName = sourcePropertyNames[j];
+            const propertyNames = metadata.decodedProperties(sourcePropertyName);
             const propertyValue = feature.properties[sourcePropertyName];
-            properties[propertyName][i] = this.decodeProperty(metadata, propertyName, propertyValue);
+            const values = this.decodeProperty(metadata, sourcePropertyName, propertyValue);
+            values.forEach((value, j) => {
+                properties[propertyNames[j]][i] = value;
+            });
         }
     }
 
     decodeProperty (metadata, propertyName, propertyValue) {
-        return metadata.decode(propertyName, propertyValue);
+        // return metadata.encode(propertyName, propertyValue);
+        return metadata.codec(propertyName).sourceToInternal(propertyValue);
     }
 
     _generateDataFrame (rs, geometry, properties, size, type, metadata) {

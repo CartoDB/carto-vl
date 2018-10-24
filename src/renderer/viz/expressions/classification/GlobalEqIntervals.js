@@ -40,7 +40,7 @@ export default class GlobalEqIntervals extends Classifier {
         super._bindMetadata(metadata);
         checkExpression('globalEqIntervals', 'input', 0, this.input);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
-        const { min, max } = metadata.properties[this.input.name];
+        const { min, max } = metadata.stats(this.input.name);
         this.min = min;
         this.max = max;
         this.breakpoints.map((breakpoint, index) => {

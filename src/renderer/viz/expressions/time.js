@@ -3,7 +3,7 @@ import * as util from '../../../utils/util';
 import { checkMaxArguments } from './utils';
 
 /**
- * Time contant expression
+ * Time constant expression
  *
  * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
  * @return {Date}
@@ -30,7 +30,7 @@ export default class Time extends BaseExpression {
 
         super({});
         // TODO improve type check
-        this.type = 'time';
+        this.type = 'date';
         this.date = util.castDate(date);
         this.inlineMaker = () => undefined;
     }

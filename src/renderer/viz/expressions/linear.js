@@ -1,7 +1,7 @@
 import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
-import { timeRange } from '../../../utils/util';
+import { timeRange, msToDate } from '../../../utils/util';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -28,10 +28,16 @@ import { timeRange } from '../../../utils/util';
 * @api
 */
 export default class Linear extends BaseExpression {
-    constructor (input, min, max) {
-        checkMaxArguments(arguments, 3, 'linear');
+    constructor (input, min, max, range) {
+        checkMaxArguments(arguments, 4, 'linear');
 
         input = implicitCast(input);
+
+        if (min && !(min instanceof BaseExpression) && max === undefined && range === undefined) {
+            range = min;
+            min = undefined;
+            max = undefined;
+        }
 
         if (min === undefined && max === undefined) {
             min = globalMin(input);
@@ -47,62 +53,139 @@ export default class Linear extends BaseExpression {
 
         super({ input, min, max });
         this.type = 'number';
+
+        // range mode is used only for timerange inputs:
+        // * 'start' of property between full range (from start of min to end of max)
+        // * 'end' of property between full range (from start of min to end of max)
+        // * 'unit' (default) range mapped to 0:1
+        this._rangeMode = range || 'unit';
+    }
+
+    // Given a linear value 0:1, convert it back to the input value
+    // for TimeRange and Date inputs the result is an interpolated Date
+    converse (value) {
+        if (this.input.type === 'date') {
+            const min = this.min.eval().getTime();
+            const max = this.max.eval().getTime();
+            return msToDate(value * (max - min) + min);
+        } else if (this.input.type === 'timerange') {
+            let min, max;
+            switch (this._rangeMode) {
+                case 'unit':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                case 'end':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+            }
+            return msToDate(value * (max - min) + min);
+        }
+        const min = this.min.eval();
+        const max = this.max.eval();
+        return value * (max - min) + min;
+    }
+
+    // return min, max, but for time ranges they are returned as Dates
+    limits () {
+        let min, max;
+        if (this.input.type === 'timerange') {
+            switch (this._rangeMode) {
+                case 'unit':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                case 'end':
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+            }
+        } else {
+            min = this.min.eval();
+            max = this.max.eval();
+        }
+        return [min, max];
     }
 
     eval (feature) {
-        if (this.input.type === 'date') {
-            const input = this.input.eval(feature);
-
-            const min = this.min.eval().getTime();
-            const max = this.max.eval().getTime();
-
-            const metadata = this._metadata;
-            const inputMin = metadata.properties[this.input.name].min.getTime();
-            const inputMax = metadata.properties[this.input.name].max.getTime();
-            const inputDiff = inputMax - inputMin;
-
-            const smin = (min - inputMin) / inputDiff;
-            const smax = (max - inputMin) / inputDiff;
-            return (input - smin) / (smax - smin);
-        } else if (this.input.type === 'timerange') {
-            const input = this.input.eval(feature).startValue;
-            const min = timeRange(this.min.eval()).startValue;
-            const max = timeRange(this.max.eval()).endValue;
+        if (this.input.type === 'timerange') {
+            let input, min, max;
+            switch (this._rangeMode) {
+                case 'unit':
+                    // choose same side for all three:
+                    input = this.input.eval(feature).startValue;
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                    input = this.input.eval(feature).startValue;
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+                case 'end':
+                    input = this.input.eval(feature).endValue;
+                    min = timeRange(this.min.eval()).startValue;
+                    max = timeRange(this.max.eval()).endValue;
+                    break;
+            }
             return (input - min) / (max - min);
         }
 
-        const v = this.input.eval(feature);
-        const min = this.min.eval(feature);
-        const max = this.max.eval(feature);
-
-        return (v - min) / (max - min);
+        const input = this.input.eval(feature);
+        const metadata = this._metadata;
+        const min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval(feature))[0];
+        const max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval(feature))[0];
+        return (input - min) / (max - min);
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+        this._metadata = metadata;
 
-        if (this.input.type === 'date') {
-            const min = this.min.eval();
-            const max = this.max.eval();
-            const smin = metadata.decode(this.input.propertyName, min);
-            const smax = metadata.decode(this.input.propertyName, max);
-            this._metadata = metadata;
+        if (this.input.type === 'timerange') {
+            let inputIndex, min, max;
+            switch (this._rangeMode) {
+                case 'unit':
+                    // choose same side for all three:
+                    inputIndex = 0; // start
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[inputIndex];
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[inputIndex];
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).startValue;
+                    break;
+                case 'start':
+                    inputIndex = 0; // start
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).endValue;
+                    break;
+                case 'end':
+                    inputIndex = 1; // end
+                    min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
+                    // min in ms is timeRange(this.min.eval()).startValue;
+                    // max in ms is timeRange(this.max.eval()).endValue;
+                    break;
+            }
+
+            this.inlineMaker = (inline) => `((${inline.input[inputIndex]}-(${min.toFixed(20)}))/(${(max - min).toFixed(20)}))`;
+        } else {
+            checkType('linear', 'input', 0, ['number', 'date'], this.input);
+            checkType('linear', 'min', 1, ['number', 'date'], this.min);
+            checkType('linear', 'max', 2, ['number', 'date'], this.max);
+            // Should actually check:
+            // checkType('linear', 'min', 1, this.input.type, this.min);
+            // checkType('linear', 'max', 2, this.input.type, this.max);
+            // but global aggregations are currently of type number even for dates
+
+            const smin = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0];
+            const smax = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[0];
 
             this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-        } else if (this.input.type === 'timerange') {
-            const min = this.min.eval();
-            const max = this.max.eval();
-            const smin = metadata.decode(this.input.propertyNameFor('start'), min);
-            const smax = metadata.decode(this.input.propertyNameFor('start'), max);
-            this._metadata = metadata;
-
-            this.inlineMaker = (inline) => `((${inline.input.start}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
-        } else {
-            checkType('linear', 'input', 0, 'number', this.input);
-            checkType('linear', 'min', 1, 'number', this.min);
-            checkType('linear', 'max', 2, 'number', this.max);
-
-            this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
         }
     }
 

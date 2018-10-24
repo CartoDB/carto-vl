@@ -88,8 +88,9 @@
       // width: linear(@month)*60
       width: linear(@month, '2018-01', '2018-09')*60
       color: ramp(linear(@month), SUNSET)
-      // TODO: animation should use start, end propertie automatically
-      filter: animation(linear(@month))
+
+      // filter: animation(@month, 10, fade(0.01, 0.01))
+      filter: animation(@month)
 
       // TODO: buckets should use category?
       // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
@@ -102,7 +103,8 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
-    const animation = viz.filter.expressionName === 'animation' ? viz.filter : null;
+    const animation = ['animation', 'timeAnimation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    console.log('FILTER:', viz.filter.expressionName);
     layer.on('updated', () => {
       if (info) {
         info = !animation;
@@ -118,7 +120,19 @@
       }
     });
     const interactivity = new carto.Interactivity(layer);
+    let playing = true;
     interactivity.on('featureClick', event => {
+      if (animation) {
+        if (playing) {
+          console.log('PAUSE');
+          animation.pause();
+        } else {
+          console.log('PLAY');
+          animation.play();
+        }
+        playing = !playing;
+      };
+
       if (event.features.length > 0) {
         const feature = event.features[0];
         console.log('Start:', feature.variables.month.value.startValue);

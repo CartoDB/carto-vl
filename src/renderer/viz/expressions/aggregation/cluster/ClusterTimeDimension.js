@@ -74,7 +74,7 @@ export default class clusterTimeDimension extends BaseExpression {
             [this.property.name]: [{
                 type: 'dimension',
                 dimension: this._dimension,
-                mode: this._mode
+                range: !!this._mode
             }]
         };
     }

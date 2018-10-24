@@ -1,6 +1,5 @@
 import MVTMetadata from '../sources/MVTMetadata';
-import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
-import * as util from '../utils/util';
+import windshaftCodecFactory from '../codecs/windshaft';
 
 // // Windshaft metadata internal structure of properties
 // properties: {
@@ -46,18 +45,16 @@ import * as util from '../utils/util';
 //         min: '2017-01-01T00:00:00',  // stats of the base column
 //         max: '2018-12-01T00:00:00',
 //         dimension: {
-//             type: 'category', // type of the actual property received internally
+//             type: 'category', // type of the actual (source) property received internally
 //             grouping: {},// (to be changed to group) grouping parameters
-//             propertyName: "_cdb_dim_month_time1",
+//             propertyName: "_cdb_dim_month_time1", // source property
 //             min: '2017-01', // stats of property _cdb_dim_month_time1
 //             max: '2017-12',
-//             modes: {
-//                 // here come the actual decoded properties!!:
+//             range: [
+//                 // here come the actual decoded (internal) properties!!:
 //                 // the types of these properties is 'date'
-//                 'start': '_cdb_dim_month_time1_start',
-//                 'start': '_cdb_dim_month_time1_end'
-//                 // the stats for these properties are computed by the `stats` method of Metadata
-//                 // using the internal property stats
+//                 '_cdb_dim_month_time1_start',
+//                 '_cdb_dim_month_time1_end'
 //             }
 //         }
 //     }
@@ -65,7 +62,7 @@ import * as util from '../utils/util';
 
 export default class WindshaftMetadata extends MVTMetadata {
     _dimensionInfo (propertyName) {
-        const baseName = this.baseName(propertyName);
+        const baseName = this.baseName(propertyName) || propertyName;
         const column = this.properties[baseName];
         let dimension = null;
         if (baseName !== propertyName) {
@@ -84,192 +81,52 @@ export default class WindshaftMetadata extends MVTMetadata {
 
     decodedProperties (propertyName) {
         const { dimension } = this._dimensionInfo(propertyName);
-        if (dimension && dimension.grouping && dimension.modes) {
-            return Object.values(dimension.modes);
+        if (dimension && dimension.grouping && dimension.range) {
+            return dimension.range;
         }
         return super.decodedProperties(propertyName);
     }
 
-    decode (propertyName, propertyValue) {
-        const { baseName, column, type, baseType, dimension } = this._dimensionInfo(propertyName);
-        if (!column) {
-            return;
-        }
-
-        if (dimension && (baseType === 'date' && type !== 'category')) {
-            return decodeTimeDim(propertyName, propertyValue, this.stats(propertyName), dimension);
-        }
-        switch (type) {
-            case 'date':
-                return decodeDate(propertyValue, this.stats(propertyName));
-            case 'category':
-                // TODO: if baseType === 'date' wrap in util.timeRange()
-                return this.categorizeString(baseName, propertyValue);
-            case 'number':
-                return propertyValue;
-            default:
-                throw new CartoMapsAPIError(
-                    `${cmt.NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`
-                );
-        }
-    }
-
-    encode (propertyName, ...propertyValues) {
-        const propertyValue = propertyValues[0];
-        const { dimension, type, baseType } = this._dimensionInfo(propertyName);
-
-        if (type === 'category' && baseType === 'date') {
-            let start = propertyValue;
-            let end = propertyValues[1];
-            const [min, max] = modalMinMax('start', dimension);
-            if (min !== max) {
-                [start, end] = [start, end].map(v => min + v * (max - min));
-            }
-            return util.timeRange(start*1000, end*1000);
-        }
-
-        switch (type) {
-            case 'date':
-                return encodeDate(propertyValue, this.stats(propertyName));
-            case 'category':
-                return this.IDToCategory.get(propertyValue);
-            default:
-                if (type === 'number' && baseType === 'date') {
-                    return encodeTimeDim(propertyName, propertyValue, this.stats(propertyName), dimension);
-                }
-                return propertyValue;
-        }
-    }
-
+    // Stats usage: (is internal, external or source representation preferable?)
+    // * global aggregations
+    // * coding/decoding
     stats (propertyName) {
-        const { dimension, type } = this._dimensionInfo(propertyName);
+        const { dimension } = this._dimensionInfo(propertyName);
         if (dimension && dimension.grouping) {
             return dimension;
         }
         return super.stats(propertyName);
     }
-}
 
-function decodeDate (propertyValue, stats) {
-    // unclassified date (epoch)
-    // for convenience propertyValue can be either a source-encoded value or a Date()
-    // (so this can be applied to the source values or to the stats which are stored as Dates)
-    const d = asDate(propertyValue);
-    const { min, max } = stats;
-    const n = (d - min) / (max.getTime() - min.getTime());
-    return n;
-}
-
-function decodeModal (mode, propertyValue) {
-    if (propertyValue instanceof Date) {
-        // Support Date because stats are stored so, rather that in source encoding
-        return propertyValue.getTime() / 1000;
-    }
-    switch (mode) {
-        case 'start':
-            return util.startTimeValue(propertyValue) / 1000;
-        case 'end':
-            return util.endTimeValue(propertyValue) / 1000;
+    setCodecs () {
+        setMetadataCodecs(this);
     }
 }
-
-function propertyMode (modes, propertyName) {
-    return Object.keys(modes).find(mode => modes[mode] === propertyName);
-}
-
-const COMBINED_LIMITS = true;
-
-function modalMinMax(mode, stats) {
-    let { min, max } = stats;
-    if (COMBINED_LIMITS) {
-        min = decodeModal('start', min);
-        max = decodeModal('end', max);
-    } else {
-        min = decodeModal(mode, min);
-        max = decodeModal(mode, min);
-    }
-    return [min, max];
-}
-
-function decodeTimeDim (propertyName, propertyValue, stats, dimension) {
-    let shouldRemap = false;
-    let { min, max } = stats;
-    if (dimension.modes) {
-        const mode = propertyMode(dimension.modes, propertyName);
-        if (mode) {
-            shouldRemap = true;
-            propertyValue = decodeModal(mode, propertyValue);
-            shouldRemap = true;
-            [min, max] = modalMinMax(mode, stats);
-        }
-    }
-    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.units);
-    if (shouldRemap) {
-        // the magnitude of the values is potentially large;
-        // to prevent loss of precision in the GPU we'll remap
-        // the range to 0:1
-        if (min !== max) {
-            return (propertyValue - min) / (max - min);
-        }
-    }
-    return propertyValue;
-}
-
-function encodeDate (propertyValue, stats) {
-    let value = propertyValue;
-    const { min, max } = stats;
-    value *= (max.getTime() - min.getTime());
-    value += min.getTime();
-    const d = new Date();
-    d.setTime(value);
-    return d;
-}
-
-// convert seconds epoch (source encoding) or Date to Date
-function asDate (value) {
-    if (value instanceof Date) {
-        return value;
-    }
-    return util.msToDate(value * 1000);
-}
-
-function encodeTimeDim (propertyName, propertyValue, stats, dimension) {
-    let shouldRemap = false;
-    let castDate = false;
-    if (dimension.modes) {
-        const mode = propertyMode(dimension.modes, propertyName);
-        if (mode) {
-            shouldRemap = true;
-            castDate = true;
-        }
-    }
-    shouldRemap = shouldRemap || ['seconds', 'minutes'].includes(dimension.grouping.units);
-    if (shouldRemap) {
-        const { min, max } = stats;
-        if (min !== max) {
-            return Math.round((max - min) * propertyValue + min);
-        }
-    }
-    if (castDate) {
-        propertyValue = asDate(propertyValue);
-    }
-    return propertyValue;
-}
-
-const MODE_TYPES = {
-    'start': 'date',
-    'end': 'date',
-    'iso': 'category'
-};
 
 function dimensionType (dimension, propertyName) {
-    if (dimension.modes) {
-        const mode = Object.keys(dimension.modes).find(mode => dimension.modes[mode] === propertyName);
-        return MODE_TYPES[mode] || dimension.type;
+    if (dimension.range) {
+        return 'date';
     }
     return dimension.type;
 }
 
 function dimensionBaseType (dimension) {
     return dimension.type;
+}
+
+function setMetadataCodecs (metadata) {
+    // assign codecs
+    // a single codec kept per base property
+    // so, all its aggregations share the same encoding.
+    // form a dimension, the kept codec is that of the dimension
+    Object.keys(metadata.properties).forEach(baseName => {
+        const property = metadata.properties[baseName];
+        const baseType = property.type;
+        if (baseType !== 'geometry') {
+            const dimType = property.dimension ? property.dimension.type : null;
+            const dimName = dimType ? property.dimension.propertyName : baseName;
+            const actualDimType = (dimType === 'category' && property.dimension.range) ? 'timerange' : dimType;
+            property.codec = windshaftCodecFactory(metadata, actualDimType || baseType, dimName || baseName);
+        }
+    });
 }
