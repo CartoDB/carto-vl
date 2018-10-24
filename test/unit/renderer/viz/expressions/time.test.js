@@ -1,9 +1,13 @@
 import Time from '../../../../../src/renderer/viz/expressions/time';
-import { validateMaxArgumentsError } from './utils';
+import { validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 describe('src/renderer/viz/expressions/time', () => {
     describe('error control', () => {
         validateMaxArgumentsError('time', ['date', 'date']);
+        validateTypeErrors('time', [null]);
+        validateTypeErrors('time', ['number']);
+        validateTypeErrors('time', ['category']);
+        validateTypeErrors('time', []);
     });
 
     const expectedDate = new Date('2016-05-30T13:45:00+05:00');

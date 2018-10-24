@@ -31,7 +31,7 @@ export function regExpThatContains (text) {
 
 /**
  * Transform the given parameter into a Date object.
- * When a number is given as a parameter is asummed to be a milliseconds epoch.
+ * When a number is given as a parameter is assumed to be a milliseconds epoch.
  * @param {Date|number|string} date
  */
 export function castDate (date) {
@@ -44,7 +44,11 @@ export function castDate (date) {
         date.setUTCMilliseconds(msEpoch);
         return date;
     }
-    return new Date(date);
+    if (isString(date)) {
+        return new Date(date);
+    } else {
+        throw new Error('invalid date type');
+    }
 }
 
 export function isSetsEqual (a, b) {
