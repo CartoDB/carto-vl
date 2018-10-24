@@ -1,6 +1,8 @@
 #!/bin/bash
 
 git clone https://github.com/CartoDB/Windshaft-cartodb.git ;
+git checkout master
+git pull origin master
 
 cp /srv/config/environments/test.js Windshaft-cartodb/config/environments/development.js
 cd ./Windshaft-cartodb/
