@@ -39,8 +39,8 @@ function decodeModal (mode, propertyValue) {
     }
     switch (mode) {
         case 'start':
-            return util.startTimeValue(propertyValue) / 1000;
+            return util.timeRange(propertyValue).startValue / 1000;
         case 'end':
-            return util.endTimeValue(propertyValue) / 1000;
+            return util.timeRange(propertyValue).endValue / 1000;
     }
 }

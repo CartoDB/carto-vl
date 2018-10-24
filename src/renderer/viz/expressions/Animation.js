@@ -6,7 +6,7 @@ import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTimeRange from './aggregation/cluster/ClusterTimeRange';
 import { And } from './binary';
-import VariantExpression from './Variant'
+import VariantExpression from './Variant';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -384,15 +384,14 @@ class TimeRangeAnimation extends And {
         super._resolveAliases(aliases);
         this.input._resolveAliases(aliases);
     }
-
 }
 
 export class Animation extends VariantExpression {
-    _choose(input, duration, fade) {
+    _choose (input, duration, fade) {
         if (input.type === 'timerange') {
             return new TimeRangeAnimation(input, duration, fade);
         } else {
             return new ScalarAnimation(input, duration, fade);
         }
     }
-};
+}
