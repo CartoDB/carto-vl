@@ -5,7 +5,7 @@
 The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs values based on an input. 
 
 Depending on the type of input the matching output will be performed in different ways:
-- **One-to-one**: is performed when the number of possible categories in the input matches the number of values:
+- **One-to-one**: is performed when the number of possible categories in the input matches the number of values    
 `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])` will set conservatives blue, and progressives red
 - **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically: 
 `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
@@ -19,16 +19,15 @@ The following sections will cover **style by value** with different property typ
 
 ### Numeric properties
 
-#### Showing unclassed numeric data
+#### Symbolizing unclassed numeric data
 
-Going back to our previous example, it's common to want to map a continuous range of numeric data, like population density, to a continuous range of colors, for example, the range of colors between black and yellow.
+Going back to our previous example, it's common to want to map a continuous range of numeric data, like population density, to a continuous range of colors, for example, the range of colors between black and yellow. This is straight-forward with CARTO VL.
 
-This is straight-forward with CARTO VL:
- ```CARTOVL_Viz
+This styling below will map the feature with the lowest population density in the source data to *midnight blue* and the feature with the highest population density to *gold*:
+
+```CARTOVL_Viz
 color: ramp($population_density, [midnightblue, gold])
- ```
-
-This will map the feature with the lowest population density in the source data to *midnight blue* and the feature with the highest population density to *gold*:
+```
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -52,10 +51,12 @@ Matching the input with the context of the lowest population density and highest
 Meaning the CARTO VL `ramp` function transforms:
 
 ```CARTOVL_Viz
-ramp($population_density, [midnightblue, deeppink, gold]) 
+ramp($population_density, [midnightblue, deeppink, gold])
+``` 
 
 to 
 
+```CARTOVL_Viz
 ramp(linear($population_density), [midnightblue, deeppink, gold])
 ```
 
