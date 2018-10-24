@@ -5,14 +5,14 @@ With any map, the decisions that you as the map designer make are critical to th
 
 We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view.
 
-For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels to cased lines at larger zoom levels.
+For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels, to cased lines at larger zoom levels.
 
 
 ![Multi-scale GIF of Voyager](../../img/guides/zoom-based-styling/multi-scale-voyager.gif)
 
 
 **Note:**
-CARTO VL renderer provides a native/built-in way to do zoom-based styling without popping (by interpolating), which results in smooth transitions.
+The CARTO VL renderer provides a native/built-in way to do zoom-based styling without "popping" (by interpolating), which results in smooth transitions.
 
 
 ### Zoom-based styling with VL
