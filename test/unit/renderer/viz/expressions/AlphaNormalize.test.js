@@ -17,9 +17,11 @@ describe('src/renderer/viz/expressions/AlphaNormalize', () => {
             const expr = alphaNormalize(rgb(255, 128, 0), property('price'));
             expr._bindMetadata(
                 mockMetadata({
-                    price: {
-                        type: 'number',
-                        max: 10
+                    properties: {
+                        price: {
+                            type: 'number',
+                            max: 10
+                        }
                     }
                 })
             );

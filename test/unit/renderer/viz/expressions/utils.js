@@ -168,9 +168,10 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
 }
 
 class MockMetadata {
-    constructor (properties, idProperty) {
-        this.properties = properties;
-        this.idProperty = idProperty;
+    constructor (data) {
+        Object.keys(data).forEach(key => {
+            this[key] = data[key];
+        });
         this._codec = new IdentityCodec();
     }
     stats (propertyName) {

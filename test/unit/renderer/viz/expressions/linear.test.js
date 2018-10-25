@@ -47,10 +47,12 @@ describe('src/renderer/viz/expressions/linear', () => {
             const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
             l._bindMetadata(
                 mockMetadata({
-                    wadus: {
-                        type: 'date',
-                        min: new Date('1880-01-01T00:00:07Z'),
-                        max: new Date('1880-01-01T00:00:09Z')
+                    properties: {
+                        wadus: {
+                            type: 'date',
+                            min: new Date('1880-01-01T00:00:07Z'),
+                            max: new Date('1880-01-01T00:00:09Z')
+                        }
                     }
                 })
             );
