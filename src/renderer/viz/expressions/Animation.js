@@ -337,7 +337,7 @@ class TimeRangeAnimation extends And {
         super(startAnim, endAnim);
         this._startAnim = startAnim;
         this._endAnim = endAnim;
-        this.expressionName = 'timeAnimation';
+        this.expressionName = 'animation';
         this.input = input;
     }
 
