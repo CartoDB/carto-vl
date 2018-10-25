@@ -68,11 +68,31 @@ Use the map below to toggle between three styles. You will notice that the map d
 
 #### Explicit ranges
 
-When `linear` is called with only one parameter (as seen in **Style 2** above) it will transform it to what we see in **Style 3** above (`linear($population_density, globalMin($population_density), globalMax($population_density))`). The second and third parameters of `linear` (`globalMin()` and `globalMax()`) are what set the values of the lowest and highest population densities for `ramp`.
+When `linear` is called with only one parameter (as seen in **Style 2** above) it will transform it to what we see in **Style 3** above: 
+
+```js
+linear($population_density, globalMin($population_density), globalMax($population_density))
+``` 
+
+The second and third parameters of `linear` (`globalMin()` and `globalMax()`) are what set the values of the lowest and highest population densities for `ramp`.
 
 It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outlier) with values that are very far away from the norm. There are times where you will want to "ignore" these outliers when computing a `ramp`. With CARTO VL, this can be done by manually setting *explicit ranges* for the second and third parameters of `linear` to the minimum and maximum values of the data range you are interested in.
 
-In the map below, **Style 3** is equivalent to the map above. As you toggle between the styles, you will notice how **Style 4** (where the data range has been fixed to the `[0, 160]` range) and **Style 5** (where the data range has been set to take into account the first 1% of the data and the last 1% of the data) change based on the modifications made to second and third parameters.
+In the map below, **Style 3** is equivalent to the map above. As you toggle between the styles, you will notice how **Style 4** and **Style 5** (where the data range has been set to take into account the first 1% of the data and the last 1% of the data) change based on the modifications made to second and third parameters.
+
+```js
+// Style 3
+// Equivalent to Style 3 above
+color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
+
+// Style 4
+// The data range has been fixed to the [0, 160] range
+color: ramp(linear($dn, 0, 160), [green, yellow, red])
+
+// Style 5
+// The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
+color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
+```
 
 * **Style 3**: `ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])`
 * **Style 4**: `ramp(linear($dn, 0, 160), [green, yellow, red])`
