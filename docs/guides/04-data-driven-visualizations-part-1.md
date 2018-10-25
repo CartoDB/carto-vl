@@ -8,7 +8,7 @@ Depending on the type of input, the matching output is performed in two differen
 - **One-to-one**: is performed when the number of possible categories in the input matches the number of values.
 - **Interpolation**: is performed when there isn't a one-to-one match and intermediate values are created automatically.
 
-Throughout this guide, you will explore the use of [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) to match *inputs* to *values* in these ways. The most common use case is to match a property in your data as the input to fixed constant outputs like color or size. This is what we call **style by value**.
+Throughout this guide, you will explore different ways to use [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) to match *inputs* to *values*. The most common use case is to match a property in your data as the input to fixed constant outputs like color or size. This is what we call **style by value**.
 
 The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand the options available when dealing with something like a transaction dataset and how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
@@ -17,7 +17,7 @@ To introduce the use of `ramp`, this guide covers use-cases with the styling pro
 
 ### Numeric properties
 
-#### Unclassed numeric data
+#### Unclassed maps
 
 It is common to want to map a continuous range of numeric data, like population density, to a continuous range of colors, for example, the range of colors between black and yellow. This is straight-forward with CARTO VL.
 
@@ -85,12 +85,12 @@ It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outli
 
 In the map below, as you toggle between styles, you will notice how **Style 4** and **Style 5** change based on the modifications made to second (minimum) and third (maximum) parameters.
 
-```js
+```CARTOVL_Viz
 // Style 3: equivalent to Style 3 above
 color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
 
 // Style 4: the data range has been fixed to the [0, 160] range
-color: ramp(linear($dn, 0, 160), [green, yellow, red])
+color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 
 // Style 5: the data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
@@ -115,20 +115,26 @@ There are multiple classification methods aviailable in CARTO VL (quantiles, equ
 - **The entire dataset**. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
-Use the map below to see how classification of data varies between these two sample types. Do you see how `viewport*` classifiers are dynamic and change the results according to the map bounds?
-
-ADD MAP
-
-You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10, features that have a price between 10 and 200, and features that have a price higher than 200. 
-
-It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
-
 **Note**
-Learn more about using `global*` and `viewport*` methods in the [Aggregations]() guide.
-ADD GUIDE LINK
+Learn more about using `global*` and `viewport*` methods in the Aggregations guide.
 
-Let's see some maps with those. 
-ADD MAP WITH BUCKETS
+Use the map below to see how classification of data varies between these two sample types:
+
+```CARTOVL_Viz
+// Style 1: Quantiles classification with 3 class breaks on the entire dataset. The first bucket will contain the lower 33% of the data samples, the second the middle 33%, and the last one the last 33%.
+color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
+
+// Style 2: Equal intervals classification with 3 class breaks on the entire dataset. The range of data for each class is then divided by the number of classes, which gives the common difference
+color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
+
+// Style 3: Quantiles classification equivalent to Style 1 but only using the samples that are shown in the viewport. 
+color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
+
+// Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport. 
+color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
+```
+
+Do you see how `viewport*` classifiers are dynamic and change the results according to the map bounds? Be sure to keep an eye on the dynamic legend!
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -138,7 +144,27 @@ ADD MAP WITH BUCKETS
         height="1000"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-population-density---classification">View my source code!</a>
+</div>
+<a href="/developers/carto-vl/examples#example-population-density---classified">View my source code!</a>
+
+You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10,features that have a price between 10 and 200, and features that have a price higher than 200. 
+
+It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
+
+```CARTOVL_Viz
+// Style 1: Manual classification features with population density less than 80 will be set midnightblue, between 80 and 160 will be set deeppink, and greater than 160 will be set gold.
+color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
+```
+
+<div class="example-map" style="margin: 20px auto !important">
+    <iframe
+        id="population-density-buckets-numeric"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-buckets.html"
+        width="100%"
+        height="1000"
+        frameBorder="0">
+    </iframe>
+    <a href="/developers/carto-vl/examples#example-population-density---buckets">View my source code!</a>
 </div>
 
 **Note:**
