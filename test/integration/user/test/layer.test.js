@@ -71,17 +71,6 @@ describe('Layer', () => {
             });
         });
 
-        it('should fire a "updated" event when a new dataframe is added', (done) => {
-            layer.on('loaded', () => {
-                let update = jasmine.createSpy('update');
-                layer.on('updated', update);
-                layer._onDataframeAdded(layer._source._dataframe);
-                layer.render();
-                expect(update).toHaveBeenCalledTimes(1);
-                done();
-            });
-        });
-
         it('should fire a "updated" event when the viz is animated', async (done) => {
             let update = jasmine.createSpy('update');
             await layer.update(source, new carto.Viz('width: now()'));
@@ -142,7 +131,13 @@ describe('Layer', () => {
 
             it('should request source data', (done) => {
                 layer.on('loaded', () => {
-                    const requestDataSourceSpy = spyOn(layer._source, 'requestData');
+                    const requestDataFn = layer._source.requestData.bind(layer._source);
+                    let requestDataCalled = false;
+                    layer._source.requestData = (...args) => {
+                        requestDataCalled = true;
+                        return requestDataFn(...args);
+                    };
+                    // spyOn(layer._source, 'requestData');
                     layer.hide();
                     layer.show();
                     layer.prerender(undefined, mat4.identity([]));
@@ -150,7 +145,7 @@ describe('Layer', () => {
                     layer._matrix[0] = 2;
                     layer.prerender(undefined, mat4.identity([]));
 
-                    expect(requestDataSourceSpy).toHaveBeenCalled();
+                    expect(requestDataCalled).toBeTruthy();
                     done();
                 });
             });

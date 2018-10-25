@@ -76,6 +76,8 @@ export default class Layer {
         this._minorCurrentUID = null;
 
         this._sourcePromise = this.update(source, viz);
+
+        this._renderWaiters = [];
     }
 
     /**
@@ -389,12 +391,13 @@ export default class Layer {
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
             this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(() => {
-                if (this._state === states.INIT) {
-                    this._state = states.IDLE;
-                    this._fire('loaded');
-                    this._fire('updated');
-                }
-                this._needRefresh();
+                this._needRefresh().then(() => {
+                    if (this._state === states.INIT) {
+                        this._state = states.IDLE;
+                        this._fire('loaded');
+                        this._fire('updated');
+                    }
+                });
             });
         }
     }
@@ -405,16 +408,12 @@ export default class Layer {
     render (gl, matrix) {
         this._paintLayer();
 
-        const state = this._state;
-        this._state = states.IDLE;
+        this._renderWaiters.forEach(resolve => resolve());
+
         if (this.isAnimated()) {
             this._needRefresh();
         }
-
-        if (state === states.INIT) {
-            this._fire('loaded');
-            this._fire('updated');
-        } else if (state === states.UPDATING) {
+        if (this._state === states.UPDATING) {
             this._fire('updated');
         }
     }
@@ -445,14 +444,16 @@ export default class Layer {
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        // dataframe.onActive(this._needRefresh.bind(this));
     }
 
     _needRefresh () {
         if (this._state !== states.INIT) {
             this._state = states.UPDATING;
         }
-        this.map.triggerRepaint();
+        return new Promise(resolve => {
+            this._renderWaiters.push(resolve);
+            this.map.triggerRepaint();
+        });
     }
 
     _addLayerIdToFeature (feature) {

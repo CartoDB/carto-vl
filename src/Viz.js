@@ -360,7 +360,6 @@ export default class Viz {
 
     _compileShader (shaderName, GLSL, expr) {
         if (!this['_' + shaderName]) {
-            console.log('_compileShader', shaderName);
             this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
             checkVizPropertyTypes(this);
             this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
