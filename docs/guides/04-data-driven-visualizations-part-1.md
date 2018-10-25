@@ -45,18 +45,15 @@ To see more variation in the data, you can even set intermediate colors in the c
 ```CARTOVL_Viz
 color: ramp($population_density, [midnightblue, deeppink, gold])
 ```  
+#### Implicit casts
 
 Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call *implicit casts*.
 
-Use the map below to toggle between the following examples of *implicit casts*:
+Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal.
 
 * **Style 1**: `ramp($population_density, [midnightblue, deeppink, gold])` 
-will be implicitly cast to 
 * **Style 2**: `ramp(linear($population_density), [midnightblue, deeppink, gold])` 
-will be implicitly cast to 
 * **Style 3**: `ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])` 
-
-Since these transformations are happening, as you switch between styles, you will notice that the map does not change.
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -69,25 +66,28 @@ Since these transformations are happening, as you switch between styles, you wil
 </div>
 <a href="/developers/carto-vl/examples#example-population-density---basic">View my source code!</a>
 
+#### Explicit ranges
 
-#### Overriding the default range to avoid outliers
+When `linear` is called with only one parameter (as seen in **Style 2** above) it will transform it to what we see in **Style 3** above (`linear($population_density, globalMin($population_density), globalMax($population_density))`). The second and third parameters of `linear` (`globalMin()` and `globalMax()`) are what set the values of the lowest and highest population densities for `ramp`.
 
-The [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function has another *implicit cast*. When `linear` is called with only one parameter (as seen in **Style 2** above) it will transform it to what we see in **Style 3** above (`linear($population_density, globalMin($population_density), globalMax($population_density))`). The second and third parameters of `linear` (`globalMin()` and `globalMax()`) are what set the values of the lowest and highest population densities for `ramp`.
+It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outlier) with values that are very far away from the norm. There are times where you will want to "ignore" these outliers when computing a `ramp`. With CARTO VL, this can be done by manually setting *explicit ranges* for the second and third parameters of `linear` to the minimum and maximum values of the data range you are interested in.
 
-It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outlier) with values that are very far away from the norm. There are times where you will want to "ignore" these outliers when computing a `ramp`. With CARTO VL, this can be done by manually setting the second and third parameters of `linear` to the minimum and maximum values of the data range you are interested in.
+In the map below, **Style 3** is equivalent to the map above. As you toggle between the styles, you will notice how **Style 4** (where the data range has been fixed to the `[0, 160]` range) and **Style 5** (where the data range has been set to take into account the first 1% of the data and the last 1% of the data) change based on the modifications made to second and third parameters.
 
-Use the map below to toggle between examples of *implicit casts* and explicit linear ranges:
+* **Style 3**: `ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])`
+* **Style 4**: `ramp(linear($dn, 0, 160), [green, yellow, red])`
+* **Style 5**: `ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])`
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-outliers.html"
         width="100%"
-        height="1000"
+        height="500"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-population-density---basic">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-population-density---outliers">View my source code!</a>
 
 #### Classifying numeric properties
 

@@ -19,45 +19,23 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Select Visualization</h1>
+                <h1>Explicit ranges</h1>
             </header>
             <section>
-                <p class="description open-sans">Change the visualization of the layer</p>
+                <p class="description open-sans">Select a style</p>
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [midnightblue, deeppink, gold])')" id="viz1" checked>
-                            <label for="viz1">
-                                <h2>Style 1</h2>
-                            </label>
-                        </li>
-                        <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [green, yellow, red])')" id="viz2">
-                            <label for="viz2">
-                                <h2>ramp(linear($dn), [midnightblue, deeppink, gold])</h2>
-                                <p class="description open-sans">Equivalent to the above example due to implicit casts</p>
-                            </label>
-                        </li>
-                        <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])')" id="viz3">
-                            <label for="viz3">
-                                <h2>ramp(linear($dn, globalMin($dn), globalMax($dn)), [green, yellow, red])</h2>
-                                <p  class="description open-sans">Equivalent to the above examples due to implicit casts</p>
-                            </label>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])')" id="viz3" checked>
+                            <label for="viz3">Style 3</label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])')" id="viz4">
-                            <label for="viz4">
-                                <h2>ramp(linear($dn, 0, 160), [green, yellow, red])</h2>
-                                <p class="description open-sans">The data range has been fixed to the [0, 160] range</p>
-                            </label>
+                            <label for="viz4">Style 4</label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])')" id="viz5">
-                            <label for="viz5">
-                                <h2>ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])</h2>
-                                <p  class="description open-sans">The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data. For dynamic datasets this is better than the previous fixed approach.</p>
-                            </h2>
+                            <label for="viz5">Style 5</label>
                         </li>
                     </ul>
                     <div id="info"></div>
@@ -83,7 +61,7 @@
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
             width: 2
-            color: ramp($dn, [midnightblue, deeppink, gold])
+            color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
