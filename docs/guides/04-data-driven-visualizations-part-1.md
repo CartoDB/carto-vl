@@ -141,7 +141,7 @@ Do you see how `viewport*` classifiers are dynamic and change the results accord
         id="population-density-classified"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
         width="100%"
-        height="1000"
+        height="500"
         frameBorder="0">
     </iframe>
 </div>
@@ -161,11 +161,11 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
         id="population-density-buckets-numeric"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-buckets.html"
         width="100%"
-        height="1000"
+        height="500"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-population-density---buckets">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-population-density---buckets">View my source code!</a>
 
 **Note:**
 **`filter:`** is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
