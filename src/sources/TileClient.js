@@ -1,5 +1,6 @@
 import DataframeCache from './DataframeCache';
 import { rTiles } from '../client/rsys';
+import { isSetsEqual } from '../utils/util';
 
 export default class TileClient {
     constructor (templateURLs) {
@@ -8,7 +9,8 @@ export default class TileClient {
         }
 
         this._templateURLs = templateURLs;
-        this._requestGroupID = 0;
+        this._nextGroupID = 0;
+        this._currentRequestGroupID = 0;
         this._oldDataframes = [];
         this._cache = new DataframeCache();
     }
@@ -39,31 +41,30 @@ export default class TileClient {
     }
 
     async _getTiles (tiles, urlToDataframeTransformer) {
-        this._requestGroupID++;
-        let completedTiles = [];
-        let needToComplete = tiles.length;
-        const requestGroupID = this._requestGroupID;
+        this._nextGroupID++;
+        const requestGroupID = this._nextGroupID;
 
-        return Promise.all(tiles.map(({ x, y, z }) =>
-            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
+        const completedDataframes = await Promise.all(tiles.map(({ x, y, z }) => {
+            return this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
                 dataframe.orderID = x + y / 1000;
-                if (dataframe.empty) {
-                    needToComplete--;
-                } else {
-                    completedTiles.push(dataframe);
-                }
-                if (completedTiles.length === needToComplete && requestGroupID === this._requestGroupID) {
-                    const completedDataframesSet = new Set(completedTiles);
-                    this._oldDataframes.filter(d => !completedDataframesSet.has(d)).forEach(d => {
-                        d.active = false;
-                    });
-                    completedTiles.forEach(d => {
-                        d.active = true;
-                    });
-                    this._oldDataframes = completedTiles;
-                }
-            })
-        ));
+                return dataframe;
+            });
+        }));
+
+        if (requestGroupID < this._currentRequestGroupID) {
+            return true;
+        }
+        this._currentRequestGroupID = requestGroupID;
+
+        this._oldDataframes.forEach(d => {
+            d.active = false;
+        });
+        completedDataframes.forEach(d => {
+            d.active = true;
+        });
+        const dataframesChanged = !isSetsEqual(new Set(completedDataframes), new Set(this._oldDataframes));
+        this._oldDataframes = completedDataframes;
+        return dataframesChanged;
     }
 
     async _requestDataframe (x, y, z, urlToDataframeTransformer) {

@@ -43,7 +43,7 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', () => {
                 setTimeout(() => {
-                    expect(update).toHaveBeenCalledTimes(1);
+                    expect(update).toHaveBeenCalled();
                     done();
                 }, 0);
             });
@@ -66,7 +66,7 @@ describe('Layer', () => {
                 let update = jasmine.createSpy('update');
                 layer.on('updated', update);
                 layer.render();
-                expect(update).toHaveBeenCalledTimes(1);
+                expect(update).toHaveBeenCalled();
                 done();
             });
         });
@@ -77,9 +77,9 @@ describe('Layer', () => {
             layer.on('updated', update);
             layer.on('loaded', () => {
                 layer.render();
-                expect(update).toHaveBeenCalledTimes(1);
+                expect(update).toHaveBeenCalled();
                 layer.render();
-                expect(update).toHaveBeenCalledTimes(2);
+                expect(update).toHaveBeenCalled();
                 done();
             });
         });

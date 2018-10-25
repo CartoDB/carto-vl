@@ -81,7 +81,7 @@ export default class GeoJSON extends Base {
             Object.keys(newProperties).forEach(propertyName => {
                 this._boundColumns.add(propertyName);
             });
-            return Promise.resolve({ dataLoaded: Promise.resolve(true) });
+            return Promise.resolve(Object.keys(newProperties).length > 0);
         }
         const dataframe = new Dataframe({
             active: true,
@@ -96,7 +96,7 @@ export default class GeoJSON extends Base {
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
-        return Promise.resolve({ dataLoaded: Promise.resolve(true) });
+        return Promise.resolve(true);
     }
 
     requiresNewMetadata () {

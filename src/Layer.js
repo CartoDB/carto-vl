@@ -390,14 +390,16 @@ export default class Layer {
     prerender (gl, matrix) {
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(() => {
-                this._needRefresh().then(() => {
-                    if (this._state === states.INIT) {
-                        this._state = states.IDLE;
-                        this._fire('loaded');
-                        this._fire('updated');
-                    }
-                });
+            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesChanged => {
+                if (dataframesChanged) {
+                    this._needRefresh().then(() => {
+                        if (this._state === states.INIT) {
+                            this._state = states.IDLE;
+                            this._fire('loaded');
+                            this._fire('updated');
+                        }
+                    });
+                }
             });
         }
     }
@@ -413,9 +415,8 @@ export default class Layer {
         if (this.isAnimated()) {
             this._needRefresh();
         }
-        if (this._state === states.UPDATING) {
-            this._fire('updated');
-        }
+
+        this._fire('updated');
     }
 
     _paintLayer () {
