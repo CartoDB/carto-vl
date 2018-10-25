@@ -103,8 +103,7 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
-    const animation = ['animation', 'timeAnimation'].includes(viz.filter.expressionName ) ? viz.filter : null;
-    console.log('FILTER:', viz.filter.expressionName);
+    const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
         info = !animation;
