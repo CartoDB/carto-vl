@@ -70,7 +70,7 @@ export default class Metadata {
                 frequency: Number.NaN
             });
         }
-        const categoryId = categoryId === null ? FP32_DESIGNATED_NULL_VALUE : this.numCategories;
+        const categoryId = category === null ? FP32_DESIGNATED_NULL_VALUE : this.numCategories;
         this.categoryToID.set(category, categoryId);
         this.IDToCategory.set(categoryId, category);
         this.numCategories++;
