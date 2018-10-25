@@ -216,6 +216,9 @@ export default class Renderer {
         this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
+        if (!viz) {
+            return;
+        }
         const gl = this.gl;
 
         this._updateDataframeMatrices(dataframes);
