@@ -261,7 +261,10 @@ export default class Layer {
         this.viz.clearShaders();
         this.viz.metadata = metadata;
         this.viz.gl = this.gl;
-        this.viz.filterShader; // trigger filter shaders compilation, which is required for viewport aggregations
+
+        // trigger filter shaders compilation, which is required for viewport aggregations
+        precompileFilterShaders(this.viz);
+
         this._needRefresh();
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
@@ -554,4 +557,8 @@ function _getRenderer (map, gl) {
         renderers.set(map, renderer);
     }
     return renderers.get(map);
+}
+
+function precompileFilterShaders (viz) {
+    return viz.filterShader;
 }
