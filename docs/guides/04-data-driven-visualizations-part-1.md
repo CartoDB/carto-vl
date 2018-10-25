@@ -51,9 +51,16 @@ Matching the input with the context of the lowest population density and highest
 
 Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal.
 
-* **Style 1**: `ramp($population_density, [midnightblue, deeppink, gold])` 
-* **Style 2**: `ramp(linear($population_density), [midnightblue, deeppink, gold])` 
-* **Style 3**: `ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])` 
+```js
+// Style 1: This will be implicitly cast to Style 2
+color: ramp($population_density,[midnightblue, deeppink, gold])
+
+// Style 2: will be implicitly cast to Style 3
+color: ramp($population_density, [midnightblue, deeppink, gold])
+
+// Style 3
+color: ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])
+```
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -78,25 +85,18 @@ The second and third parameters of `linear` (`globalMin()` and `globalMax()`) ar
 
 It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outlier) with values that are very far away from the norm. There are times where you will want to "ignore" these outliers when computing a `ramp`. With CARTO VL, this can be done by manually setting *explicit ranges* for the second and third parameters of `linear` to the minimum and maximum values of the data range you are interested in.
 
-In the map below, **Style 3** is equivalent to the map above. As you toggle between the styles, you will notice how **Style 4** and **Style 5** (where the data range has been set to take into account the first 1% of the data and the last 1% of the data) change based on the modifications made to second and third parameters.
+In the map below, as you toggle between styles, you will notice how **Style 4** and **Style 5** change based on the modifications made to second and third parameters.
 
 ```js
-// Style 3
-// Equivalent to Style 3 above
+// Style 3: equivalent to Style 3 above
 color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
 
-// Style 4
-// The data range has been fixed to the [0, 160] range
+// Style 4: the data range has been fixed to the [0, 160] range
 color: ramp(linear($dn, 0, 160), [green, yellow, red])
 
-// Style 5
-// The data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
+// Style 5: the data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
-
-* **Style 3**: `ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])`
-* **Style 4**: `ramp(linear($dn, 0, 160), [green, yellow, red])`
-* **Style 5**: `ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])`
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
