@@ -2,15 +2,15 @@
 
 ### What is a ramp?
 
-The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs values based on an input. 
+The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs *values* based on an *input*. 
 
 Depending on the type of input, the matching output is performed in two different ways:
 - **One-to-one**: is performed when the number of possible categories in the input matches the number of values.
 - **Interpolation**: is performed when there isn't a one-to-one match and intermediate values are created automatically.
 
-In this guide, you will explore the use of [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) to match *inputs* to *values*. The most common use case is to match a property in your data as the input to fixed constant outputs like color or size. This is what we call **style by value**.
+Throughout this guide, you will explore the use of [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) to match *inputs* to *values* in these ways. The most common use case is to match a property in your data as the input to fixed constant outputs like color or size. This is what we call **style by value**.
 
-The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand when dealing with something like a transaction dataset how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
+The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand the options available when dealing with something like a transaction dataset and how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
 **Note**:
 To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
@@ -38,7 +38,7 @@ color: ramp($population_density, [midnightblue, gold])
 </div>
 <a href="/developers/carto-vl/examples#example-population-density---unclassed">View my source code!</a>
 
-To see more variation in the data, you can even set intermediate colors in the color list,for example:
+To see more variation in the data, you can even set intermediate colors in the color list for example, here we are adding an intermediate color, `deeppink`:
 
 ```CARTOVL_Viz
 color: ramp($population_density, [midnightblue, deeppink, gold])
@@ -47,7 +47,7 @@ color: ramp($population_density, [midnightblue, deeppink, gold])
 
 Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call *implicit casts*.
 
-Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal.
+Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
 
 ```js
 // Style 1: this will be implicitly cast to Style 2
@@ -73,7 +73,7 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 
 #### Explicit ranges
 
-When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3** above: 
+When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3**: 
 
 ```js
 color: linear($population_density, globalMin($population_density), globalMax($population_density))
@@ -111,11 +111,13 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
 
 Usage of [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes it easier to detect patterns in data since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear).
 
-There are multiple classification methods aviailable in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied to data using two different samples:
+There are multiple classification methods aviailable in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied using two different samples of data:
 - **The entire dataset**. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
-Use the map below to see how classification of data varies  Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
+Use the map below to see how classification of data varies between these two sample types. Do you see how `viewport*` classifiers are dynamic and change the results according to the map bounds?
+
+ADD MAP
 
 You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10, features that have a price between 10 and 200, and features that have a price higher than 200. 
 
@@ -123,8 +125,10 @@ It's important to note that there is always one more class break than set breakp
 
 **Note**
 Learn more about using `global*` and `viewport*` methods in the [Aggregations]() guide.
+ADD GUIDE LINK
 
 Let's see some maps with those. 
+ADD MAP WITH BUCKETS
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -153,8 +157,7 @@ We'll talk here about:
 - [CieLAB interpolation](#_CieLAB_interpolation)
 
 **Note:**
-Within CARTO VL we follow and enforce one condition:
-**categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
+Within CARTO VL we follow and enforce one condition: **categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
 
 #### One to one mapping
 
