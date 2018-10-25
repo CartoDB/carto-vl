@@ -8,7 +8,6 @@
 //   properties are presented to the user
 //   (e.g. `property.eval(feature)` or `globalMin(property)`)
 // The Codec base class serves both as a base for derived codecs.
-// TODO: null/NaN handling here or in the default identity?
 // Codecs are associated to source properties.
 // There are two kind of codecs:
 // * Scalar (simple) encoder: source value is encoded as a single internal value
