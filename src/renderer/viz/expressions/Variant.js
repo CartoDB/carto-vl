@@ -13,24 +13,25 @@ export default class VariantExpression extends BaseExpression {
         // Resolve the expression at construction time if possible
         this._proxy = this._choose(...args);
         const ownProperties = [
-            '_resolveAliases', '_args', '_proxy', '_choose'
+            // '_bindMetadata', '_resolveAliases', // omit these to use proxy once set
+            '_args', '_proxy', '_choose'
         ];
         const aliaser = {
             set: (obj, prop, value) => {
+                // obj is this
                 if (prop === '_proxy') {
-                    this._proxy = value;
-                } else if (this._proxy) {
-                    this._proxy[prop] = value;
+                    obj._proxy = value;
+                } else if (obj._proxy) {
+                    obj._proxy[prop] = value;
                 } else {
                     obj[prop] = value;
                 }
                 return true;
             },
             get: (obj, prop) => {
-                if (ownProperties.includes(prop)) {
-                    return obj[prop];
-                } else if (this._proxy) {
-                    return this._proxy[prop];
+                // obj is this
+                if (obj._proxy && !ownProperties.includes(prop)) {
+                    return obj._proxy[prop];
                 } else {
                     return obj[prop];
                 }
@@ -52,13 +53,15 @@ export default class VariantExpression extends BaseExpression {
             if (this._proxy) {
                 this._proxy._bindMetadata(metadata);
             }
+        } else {
+            this._proxy._bindMetadata(metadata);
         }
     }
 
     _resolveAliases (aliases) {
         super._resolveAliases(aliases);
         if (!this._proxy) {
-            // Try to resolve after binding varialbes if it hasn't been resolved yet
+            // Try to resolve after binding variables if it hasn't been resolved yet
             this._args.forEach(arg => {
                 if (arg instanceof BaseExpression) {
                     arg._resolveAliases(aliases);
@@ -68,6 +71,8 @@ export default class VariantExpression extends BaseExpression {
             if (this._proxy) {
                 this._proxy._resolveAliases(aliases);
             }
+        } else {
+            this._proxy._resolveAliases(aliases);
         }
     }
 }
