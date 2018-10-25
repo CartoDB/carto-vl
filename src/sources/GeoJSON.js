@@ -232,6 +232,9 @@ export default class GeoJSON extends Base {
         if (Number.isFinite(value)) {
             return this._addNumericPropertyToMetadata(propertyName, value);
         }
+        if (value === null) {
+            return;
+        }
         this._addCategoryPropertyToMetadata(propertyName, value);
     }
 

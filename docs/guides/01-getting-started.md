@@ -30,12 +30,12 @@ It relies on [Mapbox GL](https://www.mapbox.com/mapbox-gl-js/api) to render the 
 
 ```html
 <head>
-  <!-- Include CARTO VL JS -->
+  <!-- Include CARTO VL JS from the CARTO CDN-->
   <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+
+  <!-- Include Mapbox GL from the Mapbox CDN-->
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 </head>
 ```
 
@@ -43,7 +43,7 @@ The easiest way to use CARTO VL is to include the required files from our CDN as
 
 Then, you will need to add Mapbox GL JavaScript and CSS files. This will let you use both `carto` and `mapboxgl` in your code.
 
-> Currently, not every Mapbox GL version is compatible with CARTO VL. We highly recommend the following combination. If you are importing CARTO VL from npm, you have to use our Mapbox GL fork. Read more about how to do this in [the advanced guide](/developers/carto-vl/guides/advanced)
+> CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](https://carto.com/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided with patched MGL bundles, but this is no longer required.
 
 #### Add map container
 
@@ -177,20 +177,13 @@ For more information about styling, check out the guide [Introduction to Styling
 <html>
 
 <head>
-    <!-- Include CARTO VL JS -->
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-    <!-- Make the map visible -->
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
+    <meta charset="utf-8">
+
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>

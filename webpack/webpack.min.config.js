@@ -1,17 +1,27 @@
 const path = require('path');
 const webpack = require('webpack');
 const banner = require('./banner');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        'carto-vl.min': './src/index.js'
+    },
     output: {
         path: path.resolve(__dirname, '..', 'dist'),
-        filename: 'carto-vl.min.js',
+        filename: '[name].js',
         library: 'carto',
         libraryTarget: 'umd'
     },
     devtool: false,
     mode: 'production',
+    optimization: {
+        minimizer: [new UglifyJsPlugin({
+            uglifyOptions: {
+                keep_fnames: true
+            }
+        })]
+    },
     module: {
         rules: [
             {
@@ -44,7 +54,7 @@ module.exports = {
         new webpack.BannerPlugin(banner)
     ],
     performance: {
-        maxEntrypointSize: 409600,
-        maxAssetSize: 409600
+        maxEntrypointSize: 435200,
+        maxAssetSize: 435200
     }
 };

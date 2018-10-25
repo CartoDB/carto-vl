@@ -62,34 +62,6 @@ export default class Renderer {
         this._initGL(gl);
     }
 
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (center) {
-        this._center.x = center.x;
-        this._center.y = center.y;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const sx = this._zoom * this._getAspect();
-        const sy = this._zoom;
-        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
-    }
-
     _initGL (gl) {
         this.gl = gl;
         const OESTextureFloat = gl.getExtension('OES_texture_float');
@@ -364,7 +336,7 @@ export default class Renderer {
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
-            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
 
             if (!viz.symbol.default) {
                 const textureId = viz.symbolShader.textureIds.get(viz);

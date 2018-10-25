@@ -2,7 +2,6 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -17,10 +16,6 @@ const AABBTestResults = {
 };
 
 export default class Dataframe extends DummyDataframe {
-    setFreeObserver (freeObserver) {
-        this.freeObserver = freeObserver;
-    }
-
     bindRenderer (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -165,17 +160,12 @@ export default class Dataframe extends DummyDataframe {
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
         }
-        const freeObserver = this.freeObserver;
 
         Object.keys(this).map(key => {
             this[key] = null;
         });
 
         this.freed = true;
-
-        if (freeObserver) {
-            freeObserver(this);
-        }
     }
 
     _isPointInViewport (featureIndex) {
@@ -244,7 +234,7 @@ export default class Dataframe extends DummyDataframe {
         if (!this.matrix) {
             return false;
         }
-        const aabb = {minx: -1, miny: -1, maxx: 1, maxy: 1};
+        const aabb = { minx: -1, miny: -1, maxx: 1, maxy: 1 };
         for (let i = start; i < end; i += 6) {
             const v1 = this._projectToNDC(vertices[i + 0], vertices[i + 1]);
             const v2 = this._projectToNDC(vertices[i + 2], vertices[i + 3]);
@@ -276,7 +266,7 @@ export default class Dataframe extends DummyDataframe {
         const ow = matrix[3] * x + matrix[7] * y + matrix[15];
 
         // Normalize by W
-        return {x: ox / ow, y: oy / ow};
+        return { x: ox / ow, y: oy / ow };
     }
 
     _getPointsAtPosition (pos, viz) {
@@ -313,6 +303,11 @@ export default class Dataframe extends DummyDataframe {
 
             const radius = this._computePointRadius(feature, viz);
 
+            if (!viz.symbol.default) {
+                const symbolOffset = viz.symbolPlacement.eval(feature);
+                c2.x += symbolOffset[0] * radius;
+                c2.y -= symbolOffset[1] * radius;
+            }
             if (!viz.transform.default) {
                 const vizOffset = viz.transform.eval(feature);
                 c2.x += vizOffset.x;
@@ -490,24 +485,26 @@ export default class Dataframe extends DummyDataframe {
             }
         };
 
-        const metadata = this.metadata;
+        Object.defineProperties(cls.prototype, this._buildGetters());
+
+        featureClassCache.set(this.metadata, cls);
+        this._cls = cls;
+    }
+
+    _buildGetters () {
         const getters = {};
-        this.metadata.propertyKeys.forEach(propertyName => {
+        const metadata = this.metadata;
+        metadata.propertyKeys.forEach(propertyName => {
             const decodedProperties = metadata.decodedProperties(propertyName);
             getters[propertyName] = {
                 get: function () {
                     const index = this._index;
                     const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                    // return metadata.decode(propertyName, ...args);
                     return metadata.codec(propertyName).internalToExternal(...args);
                 }
             };
         });
-
-        Object.defineProperties(cls.prototype, getters);
-
-        featureClassCache.set(this.metadata, cls);
-        this._cls = cls;
+        return getters;
     }
 
     getFeature (index) {

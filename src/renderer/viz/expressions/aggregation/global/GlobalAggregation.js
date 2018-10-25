@@ -16,12 +16,11 @@ export default class GlobalAggregation extends BaseExpression {
         super.inlineMaker = inline => inline._value;
     }
 
+    toString () {
+        return `${this.expressionName}(${this.property.toString()})`;
+    }
     isFeatureDependent () {
         return false;
-    }
-
-    get value () {
-        return this._value.expr;
     }
 
     eval () {

@@ -6,7 +6,7 @@
  *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
- *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
+ *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test.
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
@@ -544,7 +544,7 @@ import { Sin } from './expressions/unary';
 import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
-import { Abs, IsNaN } from './expressions/unary';
+import { Abs, IsNull } from './expressions/unary';
 import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
@@ -697,7 +697,7 @@ export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const abs = (...args) => new Abs(...args);
-export const isNaN = (...args) => new IsNaN(...args);
+export const isNull = (...args) => new IsNull(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);

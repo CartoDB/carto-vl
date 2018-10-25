@@ -1,4 +1,5 @@
 import IdentityCodec from '../codecs/Identity';
+import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
@@ -69,10 +70,11 @@ export default class Metadata {
                 frequency: Number.NaN
             });
         }
-        this.categoryToID.set(category, this.numCategories);
-        this.IDToCategory.set(this.numCategories, category);
+        const categoryId = categoryId === null ? FP32_DESIGNATED_NULL_VALUE : this.numCategories;
+        this.categoryToID.set(category, categoryId);
+        this.IDToCategory.set(categoryId, category);
         this.numCategories++;
-        return this.numCategories - 1;
+        return categoryId;
     }
 
     propertyNames (baseName) {

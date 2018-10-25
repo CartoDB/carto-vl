@@ -1,7 +1,19 @@
 ## Using data in your visualization with Sources
 In this guide you will learn how to use different data sources for your CARTO VL visualizations. After practicing with it, you will be able to connect to your datasets in several ways, and you will know which is the better option for you.
 
-This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a simple map.
+This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started), so you already know how to make a basic map.
+
+After practicing with this guide, you will be able to create this CARTO VL map:
+
+<div class="example-map">
+    <iframe
+        id="guides-sources-step-final"
+        src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
+        width="100%"
+        height="500"
+        frameBorder="0">
+    </iframe>
+</div>
 
 
 ### How to get data
@@ -14,17 +26,23 @@ Our library currently supports these three options:
 
 Every option is a different kind of **Source**, and CARTO VL provides you with a suitable object in its API to connect to them under the namespace `carto.source` (for example `carto.source.Dataset`).
 
-Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vector-tile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and powerful dynamic styling.
-> In fact, there is a fourth type of source in CARTO VL called [MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advance cases.
+Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vectortile), following *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This is an advanced technology which allows transferring geographic data from the server to your browser in small chunks, allowing a good performance and a powerful dynamic styling.
+> In fact, there is a fourth type of source in CARTO VL called [carto.source.MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advanced cases.
 
 
 Now you will see how to use the main three type of sources, but first let's create a basic map.
 
-You can start from this [basemap](/developers/carto-vl/examples/getting-started/basemap). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
+You can start from this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Go ahead and clone its source code into a new file called `sources.html`, we will wait for you...
+> To copy the source code from an example, you just have to navigate to it with your browser, click right button > `View source` and copy the whole text, from `<html>` to `</html>` tags.
 
+You can then add a navigation control to warm up, just after the map creation:
+```js
+const nav = new mapboxgl.NavigationControl();
+map.addControl(nav, 'top-left');
+```
 
 ### Dataset
-A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a simple table at the server, with a geometry field you can map.
+A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with information regarding to an specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a local vector file with points, lines or polygons, but hosted at CARTO. If you don't, you can imagine it as a table at the server, with a geometry field you can map.
 
 #### Add a Dataset
 You already know how to add a `Dataset` thanks to *Getting Started* guide:
@@ -39,7 +57,7 @@ const citiesSource = new carto.source.Dataset('populated_places', {
 });
 ```
 
-As with any `Source`, you should then pass it to a `Layer` to visualize it, but first let's create its Viz with a style:
+As with any `Source`, you should then pass it to a `Layer` to visualize it, but first let's create its Viz with a simple style:
 ```js
 const citiesViz = new carto.Viz(`
     color: grey
@@ -51,6 +69,7 @@ Now you're ready for the layer creation
 ```js
 const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
 ```
+> It is a good practice to give them a short but clear name, like 'cities'
 
 And now you can add that layer to the map, so include this code:
 ```js
@@ -69,11 +88,11 @@ The result should look like this:
 </div>
 
 #### When to use a Dataset?
-You have a CARTO account, with several custom datasets, and you want to easily visualize one of them in a map, with all its rows.
+You have a CARTO account, with several custom datasets, and you want to visualize one of them in a map, with all its rows.
 
 
 ### GeoJSON
-A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can easily create some *.geojson* contents online at [geojson.io](http://geojson.io/).
+A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is an standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can create some *.geojson* contents online at [geojson.io](http://geojson.io/).
 
 With the next steps, you'll create a new layer with this format, in this case visualizing the main *CARTO offices*.
 
@@ -153,7 +172,7 @@ officesLayer.addTo(map);
 Now the map should look like this:
 <div class="example-map">
     <iframe
-        id="guides-sources-source-geojson"
+        id="guides-sources-step-2"
         src="/developers/carto-vl/examples/maps/guides/sources/step-2.html"
         width="100%"
         height="500"
@@ -172,7 +191,7 @@ Define query, to select just the biggest cities in the world
 ```js
 const query = 'SELECT * FROM populated_places WHERE megacity = 1';
 ```
-> This is a very simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
+> This is a simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
 
 Create a SQL source:
 ```js
@@ -198,7 +217,7 @@ megacitiesLayer.addTo(map);
 ```
 
 #### When to use SQL?
-You have a CARTO account, with several custom datasets, and you want to visualize them in a layer, applying some kind of transformation to the source, from a simple filter to more advanced analysis.
+You have a CARTO account, with several custom datasets, and you want to visualize them in a layer, applying some kind of transformation to the source, from a filter to more advanced analysis.
 
 ---
 
@@ -207,13 +226,14 @@ You have a CARTO account, with several custom datasets, and you want to visualiz
 Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
-        id="guides-sources-source-sql"
+        id="guides-sources-step-3"
         src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
 
 
 This is the complete code:
@@ -222,20 +242,13 @@ This is the complete code:
 <html>
 
 <head>
-    <!-- Include CARTO VL JS -->
-    <script src="../../../../dist/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
-    <!-- Make the map visible -->
-    <style>
-        #map {
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-    </style>
+    <meta charset="utf-8">
+
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
@@ -248,19 +261,16 @@ This is the complete code:
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
-            zoom: 2,
-            scrollZoom: false,
-            dragRotate: false,
-            touchZoomRotate: false,
+            zoom: 2
         });
+
         // Add zoom controls
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
 
         //** CARTO VL functionality begins here **//
+
 
         // DATASET
         // Define Dataset source with custom credentials
@@ -268,15 +278,19 @@ This is the complete code:
             username: 'cartovl',
             apiKey: 'default_public'
         });
+
         // Define Viz object with custom style
         const citiesViz = new carto.Viz(`
             color: grey
             width: 4
         `);
+
         // Define map Layer
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+
         // Add map Layer
         citiesLayer.addTo(map);
+
 
         // GEOJSON
         // Create GeoJSON content
@@ -325,30 +339,39 @@ This is the complete code:
                 }
             ]
         };
+
         // Define GeoJSON source
         const officesSource = new carto.source.GeoJSON(offices);
+
         // Define Viz object with custom style
         const officesViz = new carto.Viz(`
             color: red
             width: 20
         `);
+
         // Define map Layer
         const officesLayer = new carto.Layer('offices', officesSource, officesViz);
+
         // Add map Layer
         officesLayer.addTo(map);
+
 
         // SQL
         // Define query
         const query = 'SELECT * FROM populated_places WHERE megacity = 1';
+
         // Define SQL source with query and custom credentials
         const megacitiesSource = new carto.source.SQL(query, {
             username: 'cartovl',
             apiKey: 'default_public'
         });
+
         // Define Viz object with custom style
         const megacitiesViz = new carto.Viz('color: blue');
+
         // Define map Layer
         const megacitiesLayer = new carto.Layer('megacities', megacitiesSource, megacitiesViz);
+
         // Add map Layer
         megacitiesLayer.addTo(map);
     </script>

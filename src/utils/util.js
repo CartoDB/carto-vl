@@ -77,22 +77,6 @@ export function projectToWebMercator (latLng) {
     };
 }
 
-export function computeMapZoom (map) {
-    const bounds = map.getBounds();
-    const nw = bounds.getNorthWest();
-    const sw = bounds.getSouthWest();
-    return (projectToWebMercator(nw).y - projectToWebMercator(sw).y) / WM_2R;
-}
-
-export function computeMapCenter (map) {
-    const center = map.getCenter();
-    const coords = projectToWebMercator(center);
-    return {
-        x: coords.x / WM_R,
-        y: coords.y / WM_R
-    };
-}
-
 export function computeMatrixZoom (matrix) {
     // The matrix projects spherical mercator coordinates to gl coordinates
     return -(2 * matrix[15] / matrix[5]);
@@ -117,8 +101,6 @@ export default {
     isSetsEqual,
     equalArrays,
     projectToWebMercator,
-    computeMapZoom,
-    computeMapCenter,
     computeMatrixZoom,
     computeMatrixCenter
 };

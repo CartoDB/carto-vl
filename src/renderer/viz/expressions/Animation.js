@@ -181,7 +181,7 @@ class ScalarAnimation extends BaseExpression {
     eval (feature) {
         const input = this._input.eval(feature);
 
-        if (Number.isNaN(input)) {
+        if (input === null) {
             return 0;
         }
 

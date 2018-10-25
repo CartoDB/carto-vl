@@ -66,7 +66,10 @@ export default class Base {
      *
      */
     eval (feature) {
-        throw new CartoRuntimeError('Unimplemented');
+        if (this.isFeatureDependent()) {
+            throw new CartoRuntimeError('Unimplemented');
+        }
+        return this.value;
     }
 
     /**
@@ -123,23 +126,24 @@ export default class Base {
     }
 
     /**
-     * Linear interpolation between this and finalValue with the specified duration
+     * Linear interpolate between `this` and `final` with the specified duration
+     *
      * @api
      * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
      * @memberof Expression
      * @instance
+     * @async
      * @name blendTo
      */
-    blendTo (final, duration = 500) {
+    async blendTo (final, duration = 500) {
         // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
-        return final;
     }
 
     isA (expressionClass) {

@@ -7,9 +7,17 @@ describe('api/layer', () => {
     let viz, viz2;
 
     beforeEach(() => {
-        source = new Dataset('ne_10m_populated_places_simple', {
-            username: 'test',
-            apiKey: '1234567890'
+        source = new GeoJSON({
+            'type': 'Feature',
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': [
+                    [-64.73, 32.31],
+                    [-80.19, 25.76],
+                    [-66.09, 18.43],
+                    [-64.73, 32.31]
+                ]
+            }
         });
         viz = new Viz();
         viz2 = new Viz();
@@ -68,7 +76,7 @@ describe('api/layer', () => {
 
     describe('cloning the source', () => {
         it('should be done with Dataset sources', () => {
-            const source = new Dataset('ne_10m_populated_places_simple', {
+            const source = new Dataset('populated_places', {
                 username: 'test',
                 apiKey: '1234567890'
             });
@@ -76,7 +84,7 @@ describe('api/layer', () => {
             expect(layer._source).not.toBe(source);
         });
         it('should be done with SQL sources', () => {
-            const source = new SQL('SELECT * FROM ne_10m_populated_places_simple', {
+            const source = new SQL('SELECT * FROM populated_places', {
                 username: 'test',
                 apiKey: '1234567890'
             });
@@ -100,11 +108,14 @@ describe('api/layer', () => {
     describe('.blendToViz', () => {
         it('should resolve the promise if a valid viz is passed', (done) => {
             const layer = new Layer('layer0', source, viz);
-            // Mock for _vizChanged
+            // Mocks
             layer._vizChanged = () => Promise.resolve();
-            // Mock metadata
             layer.metadata = { geomType: 'point' };
-            layer.blendToViz(viz2).then(done);
+            layer._context = Promise.resolve(null);
+            layer.map = { triggerRepaint: () => {} };
+            layer._sourcePromise.then(() => {
+                layer.blendToViz(viz2).then(done);
+            });
         });
         it('should reject the promise if viz is undefined', (done) => {
             const layer = new Layer('layer0', source, viz);
