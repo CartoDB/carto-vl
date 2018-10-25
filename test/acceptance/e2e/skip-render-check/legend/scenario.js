@@ -23,6 +23,8 @@ const layer = new carto.Layer('layer', source, viz);
 layer.addTo(map);
 layer.on('loaded', async function () {
     const legend = viz.color.getLegendData();
-    assert(legend.data.length === 0, 'Unexpected number of buckets');
+    const expectedBuckets = buckets + 1; // this covers the "CARTO_VL_OTHERS" extra category bucket
+    assert(legend.data.length === expectedBuckets, 'Unexpected number of buckets');
+    assert(legend.data[buckets].key === 'CARTO_VL_OTHERS', 'Last bucket should be the special OTHERS bucket');
     window.loaded = true;
 });
