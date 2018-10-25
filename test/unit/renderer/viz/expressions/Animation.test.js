@@ -12,8 +12,8 @@ describe('src/renderer/viz/expressions/Animation', () => {
     });
 
     describe('type', () => {
-        validateStaticType('animation', ['number'], 'number');
-        validateStaticType('animation', ['number', 10], 'number');
+        validateStaticType('animation', ['number'], 'number', true);
+        validateStaticType('animation', ['number', 10], 'number', true);
     });
 
     describe('.eval', () => {

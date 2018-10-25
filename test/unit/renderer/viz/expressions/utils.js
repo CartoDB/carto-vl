@@ -53,12 +53,12 @@ export function validateMaxArgumentsError (expressionName, args) {
     });
 }
 
-export function validateStaticType (expressionName, argTypes, expectedType) {
+export function validateStaticType (expressionName, argTypes, expectedType, skipPropertiesAtConstructorTime = false) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
         validateConstructorTimeType(expressionName, simpleArgs, expectedType);
-        if (!equalArgs(simpleArgs, propertyArgs)) {
+        if (!equalArgs(simpleArgs, propertyArgs) && !skipPropertiesAtConstructorTime) {
             validateConstructorTimeType(expressionName, propertyArgs, expectedType);
         }
         validateCompileTimeType(expressionName, propertyArgs, expectedType);

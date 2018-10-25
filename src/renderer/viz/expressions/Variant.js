@@ -10,7 +10,8 @@ export default class VariantExpression extends BaseExpression {
     constructor (...args) {
         super({});
         this._args = args;
-        this._proxy = this._defaultChoice(...args);
+        // Resolve the expression at construction time if possible
+        this._proxy = this._choose(...args);
         const ownProperties = [
             '_resolveAliases', '_args', '_proxy', '_choose'
         ];
@@ -38,18 +39,35 @@ export default class VariantExpression extends BaseExpression {
         return new Proxy(this, aliaser);
     }
 
-    _defaultChoice () {
-        return null;
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+        if (!this._proxy) {
+            // Try to resolve at compilation if it hasn't been resolved yet
+            this._args.forEach(arg => {
+                if (arg instanceof BaseExpression) {
+                    arg._bindMetadata(metadata);
+                }
+            });
+            this._proxy = this._choose(...this._args);
+            if (this._proxy) {
+                this._proxy._bindMetadata(metadata);
+            }
+        }
     }
 
     _resolveAliases (aliases) {
         super._resolveAliases(aliases);
-        this._args.forEach(arg => {
-            if (arg instanceof BaseExpression) {
-                arg._resolveAliases(aliases);
+        if (!this._proxy) {
+            // Try to resolve after binding varialbes if it hasn't been resolved yet
+            this._args.forEach(arg => {
+                if (arg instanceof BaseExpression) {
+                    arg._resolveAliases(aliases);
+                }
+            });
+            this._proxy = this._choose(...this._args);
+            if (this._proxy) {
+                this._proxy._resolveAliases(aliases);
             }
-        });
-        this._proxy = this._choose(...this._args);
-        this._proxy._resolveAliases(aliases);
+        }
     }
 }
