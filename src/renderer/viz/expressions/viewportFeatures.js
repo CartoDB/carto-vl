@@ -4,6 +4,7 @@ import { implicitCast } from './utils';
 import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
+import { blend, property, notEquals, transition } from '../expressions';
 
 /**
  * Generates a list of features in the viewport
@@ -83,13 +84,13 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg () {
+    _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
             const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            this._FeatureProxy = this.genViewportFeatureClass(columns);
+            this._FeatureProxy = this.genViewportFeatureClass(columns, renderLayer);
         }
         this.expr = [];
     }
@@ -98,7 +99,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.expr.push(new this._FeatureProxy(feature));
     }
 
-    genViewportFeatureClass (properties) {
+    genViewportFeatureClass (properties, renderLayer) {
         const cls = class ViewportFeature {
             constructor (feature) {
                 this._feature = feature;
@@ -108,6 +109,20 @@ export default class ViewportFeatures extends BaseExpression {
             Object.defineProperty(cls.prototype, prop, {
                 get: function () {
                     return this._feature[prop];
+                }
+            });
+        });
+
+        const idProperty = 'cartodb_id'; // TODO use metadata id property
+        // TODO 'customizedFeatures, viz, trackFeatureViz' from renderlayer
+        ['color', 'width', 'strokeColor', 'strokeWidth'].forEach(prop => {
+            const blender = _generateBlenderFunction(prop,
+                renderLayer.customizedFeatures, renderLayer.viz, renderLayer.trackFeatureViz, idProperty);
+            Object.defineProperty(cls.prototype, prop, {
+                get: function () {
+                    return {
+                        blendTo: (...args) => blender.bind(this)(...args)
+                    };
                 }
             });
         });
@@ -122,4 +137,42 @@ function _childrenFromProperties (properties) {
         childContainer['p' + ++i] = property;
     });
     return childContainer;
+}
+
+function _generateResetFunction (propertyName, id, customizedFeatures, viz, idProperty) {
+    return function reset (duration = 500) {
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].replaceChild(
+                customizedFeatures[id][propertyName].mix,
+                // transition(0) is used to ensure that blend._predraw() "GC" collects it
+                blend(notEquals(property(idProperty), id), transition(0), transition(duration))
+            );
+            viz[propertyName].notify();
+            customizedFeatures[id][propertyName] = undefined;
+        }
+    };
+}
+
+function _generateBlenderFunction (propertyName, customizedFeatures, viz, trackFeatureViz, idProperty) {
+    return function generatedBlendTo (newExpression, duration = 500) {
+        if (typeof newExpression === 'string') {
+            // newExpression = parseVizExpression(newExpression);
+        }
+        const id = this._feature[idProperty];
+        if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
+            customizedFeatures[id][propertyName].a.blendTo(newExpression, duration);
+            return;
+        }
+        const blendExpr = blend(
+            newExpression,
+            viz[propertyName],
+            blend(1, notEquals(property(idProperty), id), transition(duration))
+        );
+        trackFeatureViz(id, propertyName, blendExpr, customizedFeatures);
+        viz.replaceChild(
+            viz[propertyName],
+            blendExpr
+        );
+        viz[propertyName].notify();
+    };
 }

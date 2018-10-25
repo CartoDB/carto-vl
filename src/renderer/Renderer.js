@@ -130,7 +130,7 @@ export default class Renderer {
         // Assume that all dataframes of a renderLayer share the same metadata
         const metadata = dataframes.length ? dataframes[0].metadata : null;
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
+        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));
 
         const viewportExpressionsLength = viewportExpressions.length;
 
