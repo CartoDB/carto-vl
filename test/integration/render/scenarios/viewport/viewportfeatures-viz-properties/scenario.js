@@ -21,7 +21,14 @@ layer.on('loaded', async () => {
     const augmentedSize = feature.variables.augmentedSize.value;
 
     await feature.color.blendTo('blue', duration);
+    await sleep(duration);
+
     await feature.width.blendTo(augmentedSize, 10);
+    await sleep(10);
 
     window.loaded = true;
 });
+
+function sleep (ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
