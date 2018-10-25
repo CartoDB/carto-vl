@@ -27,7 +27,8 @@ describe('E2E tests:', () => {
     files.forEach(file => {
         it(util.getName(file), () => {
             const actual = util.testSST(file, template, browser);
-            return chai.expect(actual).to.eventually.eq(0);
+            // Threshold to cover small renderer between different environments
+            return chai.expect(actual).to.eventually.be.at.most(1);
         });
     });
 
