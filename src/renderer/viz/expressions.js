@@ -531,7 +531,7 @@ import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
-import TimeRangeExpr from './expressions/time';
+import TimeRangeExpr from './expressions/timeRange';
 
 import Top from './expressions/top';
 
