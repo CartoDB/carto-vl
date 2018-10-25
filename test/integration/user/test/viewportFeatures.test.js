@@ -111,9 +111,9 @@ describe('viewportFeatures', () => {
             // 2. and featureVizProperties / variables are available
             featureList.forEach(feature => {
                 VIZ_PROPERTIES.forEach(propertyName => {
-                    expect(feature.hasOwnProperty(propertyName)).toBeTruthy();
+                    expect(feature[propertyName]).toBeTruthy();
                 });
-                expect(feature.hasOwnProperty('variables'));
+                expect(feature['variables']).toBeTruthy();
             });
             done();
         });

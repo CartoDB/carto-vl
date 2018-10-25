@@ -6,6 +6,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../erro
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 import VIZ_PROPERTIES from '../utils/properties';
+import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -66,7 +67,7 @@ export default class ViewportFeatures extends BaseExpression {
         this.type = 'featureList';
         this._isViewport = true;
         this._requiredProperties = properties;
-        this._propertyNames = null;
+        this._FeatureProxy = null;
     }
 
     _applyToShaderSource () {
@@ -85,8 +86,8 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg () {
-        if (!this._propertyNames) {
+    _resetViewportAgg (metadata, renderLayer) {
+        if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
@@ -97,13 +98,14 @@ export default class ViewportFeatures extends BaseExpression {
                     throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${vizPropertyName}' property can't be used, as it is a reserved viz property name`);
                 }
             });
-            this._propertyNames = propertyNames;
+
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
     }
 
-    accumViewportAgg (interactivityFeature) {
-        this.expr.push(interactivityFeature);
+    accumViewportAgg (feature) {
+        this.expr.push(new this._FeatureProxy(feature));
     }
 }
 
