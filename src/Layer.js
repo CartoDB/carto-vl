@@ -261,6 +261,7 @@ export default class Layer {
         this.viz.clearShaders();
         this.viz.metadata = metadata;
         this.viz.gl = this.gl;
+        this.viz.filterShader; // trigger filter shaders compilation, which is required for viewport aggregations
         this._needRefresh();
 
         source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
