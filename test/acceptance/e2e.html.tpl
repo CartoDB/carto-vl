@@ -24,6 +24,18 @@
       display: none;
     }
   </style>
+
+  <script>
+  const debounceSetLoaded = (delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          window.loaded = true;
+        }, delay);
+    };
+  };
+  </script>
 </head>
 
 <body>
