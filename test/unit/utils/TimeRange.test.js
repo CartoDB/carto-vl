@@ -1,19 +1,22 @@
-import * as util from '../../../src/utils/util';
-import periodISO from '../../../src/utils/time/periodISO';
+import TimeRange from '../../../src/utils/time/TimeRange';
 
 function time (y, m = 1, d = 1, h = 0, min = 0, sec = 0) {
     return Date.UTC(y, m - 1, d, h, min, sec);
 }
 
 function startTimeValue (iso) {
-    return util.timeRange(iso).startValue;
+    return TimeRange.fromText(iso).startValue;
 }
 
 function endTimeValue (iso) {
-    return util.timeRange(iso).endValue;
+    return TimeRange.fromText(iso).endValue;
 }
 
-describe('utils/utils start/endTimeValue', () => {
+function ISOperiod (start, end) {
+    return TimeRange.fromStartEndValues(start, end).text;
+}
+
+describe('TimeRange defined by a ISO string', () => {
     it('should compute correct year start time', () => {
         expect(startTimeValue('2017')).toEqual(time(2017));
     });
@@ -141,55 +144,55 @@ describe('utils/utils start/endTimeValue', () => {
     });
 });
 
-describe('utils/utils periodISO', () => {
+describe('TimeRange defined by start, end times', () => {
     it('should compute correct year', () => {
-        expect(periodISO(time(2017), time(2018))).toEqual('2017');
+        expect(ISOperiod(time(2017), time(2018))).toEqual('2017');
     });
     it('should compute correct month', () => {
-        expect(periodISO(time(2017, 12), time(2018, 1))).toEqual('2017-12');
-        expect(periodISO(time(2017, 1), time(2017, 2))).toEqual('2017-01');
+        expect(ISOperiod(time(2017, 12), time(2018, 1))).toEqual('2017-12');
+        expect(ISOperiod(time(2017, 1), time(2017, 2))).toEqual('2017-01');
     });
     it('should compute correct day', () => {
-        expect(periodISO(time(2017, 12, 1), time(2017, 12, 2))).toEqual('2017-12-01');
-        expect(periodISO(time(2017, 12, 31), time(2018))).toEqual('2017-12-31');
-        expect(periodISO(time(2017, 11, 30), time(2017, 12))).toEqual('2017-11-30');
+        expect(ISOperiod(time(2017, 12, 1), time(2017, 12, 2))).toEqual('2017-12-01');
+        expect(ISOperiod(time(2017, 12, 31), time(2018))).toEqual('2017-12-31');
+        expect(ISOperiod(time(2017, 11, 30), time(2017, 12))).toEqual('2017-11-30');
     });
     it('should compute correct week', () => {
-        expect(periodISO(time(2017, 1, 30), time(2017, 2, 6))).toEqual('2017-W05');
-        expect(periodISO(time(2013, 4, 8), time(2013, 4, 15))).toEqual('2013-W15');
-        expect(periodISO(time(2009, 12, 28), time(2010, 1, 4))).toEqual('2009-W53');
-        expect(periodISO(time(2010, 1, 4), time(2010, 1, 11))).toEqual('2010-W01');
-        expect(periodISO(time(2011, 12, 26), time(2012, 1, 2))).toEqual('2011-W52');
-        expect(periodISO(time(2012, 1, 2), time(2012, 1, 9))).toEqual('2012-W01');
-        expect(periodISO(time(2013, 12, 30), time(2014, 1, 6))).toEqual('2014-W01');
-        expect(periodISO(time(2014, 1, 6), time(2014, 1, 13))).toEqual('2014-W02');
+        expect(ISOperiod(time(2017, 1, 30), time(2017, 2, 6))).toEqual('2017-W05');
+        expect(ISOperiod(time(2013, 4, 8), time(2013, 4, 15))).toEqual('2013-W15');
+        expect(ISOperiod(time(2009, 12, 28), time(2010, 1, 4))).toEqual('2009-W53');
+        expect(ISOperiod(time(2010, 1, 4), time(2010, 1, 11))).toEqual('2010-W01');
+        expect(ISOperiod(time(2011, 12, 26), time(2012, 1, 2))).toEqual('2011-W52');
+        expect(ISOperiod(time(2012, 1, 2), time(2012, 1, 9))).toEqual('2012-W01');
+        expect(ISOperiod(time(2013, 12, 30), time(2014, 1, 6))).toEqual('2014-W01');
+        expect(ISOperiod(time(2014, 1, 6), time(2014, 1, 13))).toEqual('2014-W02');
     });
     it('should compute correct quarter', () => {
-        expect(periodISO(time(2017, 1), time(2017, 4))).toEqual('2017-Q1');
-        expect(periodISO(time(2017, 4), time(2017, 7))).toEqual('2017-Q2');
-        expect(periodISO(time(2017, 7), time(2017, 10))).toEqual('2017-Q3');
-        expect(periodISO(time(2017, 10), time(2018))).toEqual('2017-Q4');
+        expect(ISOperiod(time(2017, 1), time(2017, 4))).toEqual('2017-Q1');
+        expect(ISOperiod(time(2017, 4), time(2017, 7))).toEqual('2017-Q2');
+        expect(ISOperiod(time(2017, 7), time(2017, 10))).toEqual('2017-Q3');
+        expect(ISOperiod(time(2017, 10), time(2018))).toEqual('2017-Q4');
     });
     it('should compute correct hour', () => {
-        expect(periodISO(time(2017, 12, 1, 3), time(2017, 12, 1, 4))).toEqual('2017-12-01T03');
-        expect(periodISO(time(2017, 12, 1, 23), time(2017, 12, 2, 0))).toEqual('2017-12-01T23');
-        expect(periodISO(time(2017, 12, 1, 0), time(2017, 12, 1, 1))).toEqual('2017-12-01T00');
-        expect(periodISO(time(2017, 12, 31, 23), time(2018))).toEqual('2017-12-31T23');
+        expect(ISOperiod(time(2017, 12, 1, 3), time(2017, 12, 1, 4))).toEqual('2017-12-01T03');
+        expect(ISOperiod(time(2017, 12, 1, 23), time(2017, 12, 2, 0))).toEqual('2017-12-01T23');
+        expect(ISOperiod(time(2017, 12, 1, 0), time(2017, 12, 1, 1))).toEqual('2017-12-01T00');
+        expect(ISOperiod(time(2017, 12, 31, 23), time(2018))).toEqual('2017-12-31T23');
     });
     it('should compute correct minute', () => {
-        expect(periodISO(time(2017, 12, 1, 3, 2), time(2017, 12, 1, 3, 3))).toEqual('2017-12-01T03:02');
+        expect(ISOperiod(time(2017, 12, 1, 3, 2), time(2017, 12, 1, 3, 3))).toEqual('2017-12-01T03:02');
     });
     it('should compute correct century', () => {
-        expect(periodISO(time(2001), time(2101))).toEqual('C21');
-        expect(periodISO(time(1901), time(2001))).toEqual('C20');
-        expect(periodISO(time(1801), time(1901))).toEqual('C19');
+        expect(ISOperiod(time(2001), time(2101))).toEqual('C21');
+        expect(ISOperiod(time(1901), time(2001))).toEqual('C20');
+        expect(ISOperiod(time(1801), time(1901))).toEqual('C19');
     });
     it('should compute correct millennium', () => {
-        expect(periodISO(time(2001), time(3001))).toEqual('M3');
-        expect(periodISO(time(1001), time(2001))).toEqual('M2');
+        expect(ISOperiod(time(2001), time(3001))).toEqual('M3');
+        expect(ISOperiod(time(1001), time(2001))).toEqual('M2');
     });
     it('should compute correct decade', () => {
-        expect(periodISO(time(2000), time(2010))).toEqual('D200');
-        expect(periodISO(time(2010), time(2020))).toEqual('D201');
+        expect(ISOperiod(time(2000), time(2010))).toEqual('D200');
+        expect(ISOperiod(time(2010), time(2020))).toEqual('D201');
     });
 });
