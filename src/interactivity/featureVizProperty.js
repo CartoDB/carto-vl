@@ -17,8 +17,8 @@ export default class FeatureVizProperty {
         this._properties = feature;
         this._viz = viz;
 
-        this.blendTo = _generateBlenderFunction(propertyName, feature[idProperty], customizedFeatures, viz, trackFeatureViz, idProperty);
-        this.reset = _generateResetFunction(propertyName, feature[idProperty], customizedFeatures, viz, idProperty);
+        this.blendTo = generateBlenderFunction(propertyName, feature[idProperty], customizedFeatures, viz, trackFeatureViz, idProperty);
+        this.reset = generateResetFunction(propertyName, feature[idProperty], customizedFeatures, viz, idProperty);
     }
 
     get value () {
@@ -26,7 +26,7 @@ export default class FeatureVizProperty {
     }
 }
 
-function _generateResetFunction (propertyName, id, customizedFeatures, viz, idProperty) {
+export function generateResetFunction (propertyName, id, customizedFeatures, viz, idProperty) {
     return function reset (duration = 500) {
         if (customizedFeatures[id] && customizedFeatures[id][propertyName]) {
             customizedFeatures[id][propertyName].replaceChild(
@@ -40,7 +40,7 @@ function _generateResetFunction (propertyName, id, customizedFeatures, viz, idPr
     };
 }
 
-function _generateBlenderFunction (propertyName, id, customizedFeatures, viz, trackFeatureViz, idProperty) {
+export function generateBlenderFunction (propertyName, id, customizedFeatures, viz, trackFeatureViz, idProperty) {
     return function generatedBlendTo (newExpression, duration = 500) {
         if (typeof newExpression === 'string') {
             newExpression = parseVizExpression(newExpression);

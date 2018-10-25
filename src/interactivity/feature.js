@@ -89,12 +89,12 @@ export default class Feature {
         this._rawFeature = rawFeature;
         this._featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
 
-        this._defineFeatureVizProperties();
-        this._defineVariables();
-        this._definePublicFeatureProperties(publicFeatureProperties);
+        this._defineVizProperties();
+        this._defineVizVariables();
+        this._defineFeatureProperties(publicFeatureProperties);
     }
 
-    _defineFeatureVizProperties () {
+    _defineVizProperties () {
         VIZ_PROPERTIES.forEach((property) => {
             this[property] = this._buildFeatureVizProperty(property);
         });
@@ -105,7 +105,7 @@ export default class Feature {
         return new FeatureVizProperty(name, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
     }
 
-    _defineVariables () {
+    _defineVizVariables () {
         const variables = {};
         const vizVariables = this._featureVizParams.viz.variables;
         Object.keys(vizVariables).forEach(varName => {
@@ -115,7 +115,7 @@ export default class Feature {
         this.variables = variables;
     }
 
-    _definePublicFeatureProperties (featurePropertyNames) {
+    _defineFeatureProperties (featurePropertyNames) {
         featurePropertyNames.forEach(prop => {
             Object.defineProperty(this, prop, {
                 get: function () {
