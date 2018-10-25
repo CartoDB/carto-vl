@@ -66,9 +66,8 @@ export default class GeoJSON extends Base {
         this._setCoordinatesCenter();
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestMetadata (viz) {
@@ -97,7 +96,6 @@ export default class GeoJSON extends Base {
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
-        this._dataLoadedCallback();
     }
 
     requiresNewMetadata () {

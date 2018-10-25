@@ -109,6 +109,21 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
+    onActive (callback) {
+        this._onActive = callback;
+    }
+
+    get active () {
+        return this._active;
+    }
+
+    set active (value) {
+        if (this._active !== value) {
+            this._active = value;
+            this._onActive();
+        }
+    }
+
     inViewport (featureIndex) {
         if (!this.matrix) {
             return false;

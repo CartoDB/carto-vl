@@ -3,7 +3,7 @@ import { computeAABB } from '../utils/geometry';
 
 export default class DummyDataframe {
     constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
-        this.active = active;
+        this._active = active;
         this.center = center;
         this.properties = properties;
         this.scale = scale;

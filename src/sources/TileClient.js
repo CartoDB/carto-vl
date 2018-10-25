@@ -13,9 +13,8 @@ export default class TileClient {
         this._cache = new DataframeCache();
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestData (zoom, viewport, urlToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
@@ -55,14 +54,14 @@ export default class TileClient {
                         completedTiles.push(dataframe);
                     }
                     if (completedTiles.length === needToComplete && requestGroupID === this._requestGroupID) {
-                        this._oldDataframes.forEach(d => {
+                        const completedDataframesSet = new Set(completedTiles);
+                        this._oldDataframes.filter(d => !completedDataframesSet.has(d)).forEach(d => {
                             d.active = false;
                         });
-                        completedTiles.map(d => {
+                        completedTiles.forEach(d => {
                             d.active = true;
                         });
                         this._oldDataframes = completedTiles;
-                        this._dataLoadedCallback();
                     }
                 });
         });

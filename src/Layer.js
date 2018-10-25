@@ -263,7 +263,7 @@ export default class Layer {
         this.viz.gl = this.gl;
         this._needRefresh();
 
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+        source.bindLayer(this._onDataframeAdded.bind(this));
         if (this._source !== source) {
             this._freeSource();
         }
@@ -442,7 +442,7 @@ export default class Layer {
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._needRefresh();
+        dataframe.onActive(this._needRefresh.bind(this));
     }
 
     _needRefresh () {
@@ -450,10 +450,6 @@ export default class Layer {
             this._state = states.UPDATING;
         }
         this.map.triggerRepaint();
-    }
-
-    _onDataLoaded () {
-        this._needRefresh();
     }
 
     _addLayerIdToFeature (feature) {
