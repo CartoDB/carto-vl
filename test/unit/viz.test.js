@@ -195,17 +195,6 @@ describe('api/viz', () => {
         afterEach(function () {
             Date.now = dateNow;
         });
-        it('should return the new/final expression', () => {
-            const numberA = s.number(1);
-            const numberB = s.number(2);
-            const expected = s.gt(s.property('fake_property'), numberA);
-            new Viz({
-                filter: expected
-            });
-
-            const final = numberA.blendTo(numberB, 10);
-            expect(final).toBe(numberB);
-        });
         it('should notify the viz on change', done => {
             const numberA = s.number(1);
             const numberB = s.number(2);

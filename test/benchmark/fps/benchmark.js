@@ -1,7 +1,8 @@
 const puppeteer = require('puppeteer');
+const headless = require('../../common/util').headless;
 
 puppeteer.launch({
-    headless: process.platform === 'linux',
+    headless: headless(),
     args: ['--disable-gpu-vsync']
 }).then(browser => {
     browser.newPage().then(page => {
