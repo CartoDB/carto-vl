@@ -5,7 +5,7 @@ import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
-import FEATURE_VIZ_PROPERTIES from '../utils/featureVizProperties';
+import VIZ_PROPERTIES from '../utils/properties';
 
 /**
  * Generates a list of features in the viewport
@@ -92,7 +92,7 @@ export default class ViewportFeatures extends BaseExpression {
             }
 
             const propertyNames = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            FEATURE_VIZ_PROPERTIES.forEach((vizPropertyName) => {
+            VIZ_PROPERTIES.forEach((vizPropertyName) => {
                 if (propertyNames.includes(vizPropertyName)) {
                     throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${vizPropertyName}' property can't be used, as it is a reserved viz property name`);
                 }

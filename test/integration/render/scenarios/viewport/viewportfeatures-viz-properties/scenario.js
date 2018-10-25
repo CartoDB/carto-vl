@@ -17,8 +17,11 @@ layer.on('loaded', async () => {
     const feature = viz.variables.v_features.value[0];
 
     // Using viz properties, viz variables (and also feature props)
-    await feature.color.blendTo('blue', feature.numeric);
-    await feature.width.blendTo(feature.variables.augmentedSize.value, 10);
+    const duration = feature.numeric;
+    const augmentedSize = feature.variables.augmentedSize.value;
+
+    await feature.color.blendTo('blue', duration);
+    await feature.width.blendTo(augmentedSize, 10);
 
     window.loaded = true;
 });

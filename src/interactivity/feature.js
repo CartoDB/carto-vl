@@ -1,5 +1,5 @@
 import FeatureVizProperty from './featureVizProperty';
-import FEATURE_VIZ_PROPERTIES from '../renderer/viz/utils/featureVizProperties';
+import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 
 /**
  * @namespace Features
@@ -95,7 +95,7 @@ export default class Feature {
     }
 
     _defineFeatureVizProperties () {
-        FEATURE_VIZ_PROPERTIES.forEach((property) => {
+        VIZ_PROPERTIES.forEach((property) => {
             this[property] = this._buildFeatureVizProperty(property);
         });
     }
@@ -126,7 +126,7 @@ export default class Feature {
     }
 
     reset (duration = 500) {
-        FEATURE_VIZ_PROPERTIES.forEach((property) => {
+        VIZ_PROPERTIES.forEach((property) => {
             this[property].reset(duration);
         });
 

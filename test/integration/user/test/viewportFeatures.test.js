@@ -1,6 +1,6 @@
 import carto from '../../../../src';
 import * as util from '../../util';
-import FEATURE_VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/featureVizProperties';
+import VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/properties';
 
 const feature1 = {
     type: 'Feature',
@@ -110,7 +110,7 @@ describe('viewportFeatures', () => {
 
             // 2. and featureVizProperties / variables are available
             featureList.forEach(feature => {
-                FEATURE_VIZ_PROPERTIES.forEach(propertyName => {
+                VIZ_PROPERTIES.forEach(propertyName => {
                     expect(feature.hasOwnProperty(propertyName)).toBeTruthy();
                 });
                 expect(feature.hasOwnProperty('variables'));
