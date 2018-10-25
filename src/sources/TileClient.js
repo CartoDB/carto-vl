@@ -19,7 +19,7 @@ export default class TileClient {
 
     requestData (zoom, viewport, urlToDataframeTransformer, viewportZoomToSourceZoom = Math.ceil) {
         const tiles = rTiles(zoom, viewport, viewportZoomToSourceZoom);
-        this._getTiles(tiles, urlToDataframeTransformer);
+        return this._getTiles(tiles, urlToDataframeTransformer);
     }
 
     free () {
@@ -38,33 +38,32 @@ export default class TileClient {
         return Math.abs(x + y) % this._templateURLs.length;
     }
 
-    _getTiles (tiles, urlToDataframeTransformer) {
+    async _getTiles (tiles, urlToDataframeTransformer) {
         this._requestGroupID++;
         let completedTiles = [];
         let needToComplete = tiles.length;
         const requestGroupID = this._requestGroupID;
 
-        tiles.forEach(({ x, y, z }) => {
-            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(
-                dataframe => {
-                    dataframe.orderID = x + y / 1000;
-                    if (dataframe.empty) {
-                        needToComplete--;
-                    } else {
-                        completedTiles.push(dataframe);
-                    }
-                    if (completedTiles.length === needToComplete && requestGroupID === this._requestGroupID) {
-                        const completedDataframesSet = new Set(completedTiles);
-                        this._oldDataframes.filter(d => !completedDataframesSet.has(d)).forEach(d => {
-                            d.active = false;
-                        });
-                        completedTiles.forEach(d => {
-                            d.active = true;
-                        });
-                        this._oldDataframes = completedTiles;
-                    }
-                });
-        });
+        return Promise.all(tiles.map(({ x, y, z }) =>
+            this._cache.get(`${x},${y},${z}`, () => this._requestDataframe(x, y, z, urlToDataframeTransformer)).then(dataframe => {
+                dataframe.orderID = x + y / 1000;
+                if (dataframe.empty) {
+                    needToComplete--;
+                } else {
+                    completedTiles.push(dataframe);
+                }
+                if (completedTiles.length === needToComplete && requestGroupID === this._requestGroupID) {
+                    const completedDataframesSet = new Set(completedTiles);
+                    this._oldDataframes.filter(d => !completedDataframesSet.has(d)).forEach(d => {
+                        d.active = false;
+                    });
+                    completedTiles.forEach(d => {
+                        d.active = true;
+                    });
+                    this._oldDataframes = completedTiles;
+                }
+            })
+        ));
     }
 
     async _requestDataframe (x, y, z, urlToDataframeTransformer) {

@@ -388,7 +388,14 @@ export default class Layer {
     prerender (gl, matrix) {
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix));
+            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(() => {
+                if (this._state === states.INIT) {
+                    this._state = states.IDLE;
+                    this._fire('loaded');
+                    this._fire('updated');
+                }
+                this._needRefresh();
+            });
         }
     }
 
@@ -396,10 +403,6 @@ export default class Layer {
      * Custom Layer API: `render` function
      */
     render (gl, matrix) {
-        if (this._state === states.INIT && this._renderLayer.getActiveDataframes().length === 0) {
-            return;
-        }
-
         this._paintLayer();
 
         const state = this._state;
@@ -442,7 +445,7 @@ export default class Layer {
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        dataframe.onActive(this._needRefresh.bind(this));
+        // dataframe.onActive(this._needRefresh.bind(this));
     }
 
     _needRefresh () {

@@ -23,6 +23,6 @@ layer.addTo(map);
 layer.on('loaded', async function () {
     // This will create a new set of tiles as the numfloors
     // attribute was not present in the initial viz object.
-    await viz.color.blendTo('ramp($numfloors, temps)', 0);
+    // await viz.color.blendTo('ramp($numfloors, temps)', 0);
     layer.on('updated', debounceSetLoaded());
 });

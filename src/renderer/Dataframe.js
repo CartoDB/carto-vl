@@ -111,9 +111,9 @@ export default class Dataframe extends DummyDataframe {
 
     onActive (callback) {
         this._onActive = callback;
-        if (this.active) {
-            this._onActive();
-        }
+        // if (this.active) {
+        //     this._onActive();
+        // }
     }
 
     get active () {
@@ -123,7 +123,7 @@ export default class Dataframe extends DummyDataframe {
     set active (value) {
         if (this._active !== value) {
             this._active = value;
-            this._onActive();
+            // this._onActive();
         }
     }
 
