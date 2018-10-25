@@ -27,8 +27,11 @@ describe('E2E tests:', () => {
     files.forEach(file => {
         it(util.getName(file), () => {
             const actual = util.testSST(file, template, browser);
-            // Threshold to cover small renderer between different environments
-            return chai.expect(actual).to.eventually.be.at.most(1);
+            if (!file.match(/skip-render-check/)) {
+                // Threshold to cover small renderer between different environments
+                return chai.expect(actual).to.eventually.be.at.most(1);
+            }
+            return actual;
         });
     });
 
