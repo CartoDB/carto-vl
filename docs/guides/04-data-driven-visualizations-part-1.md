@@ -50,9 +50,11 @@ Matching the input with the context of the lowest population density and highest
 
 Use the map below to toggle between the following examples of *implicit casts*:
 
-* **Style 1** (`ramp($population_density, [midnightblue, deeppink, gold])`) will be implicitly cast to 
-* **Style 2** (`ramp(linear($population_density), [midnightblue, deeppink, gold])`) which will be implicitly cast to 
-* **Style 3** (`ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])`) 
+* **Style 1**: `ramp($population_density, [midnightblue, deeppink, gold])` 
+will be implicitly cast to 
+* **Style 2**: `ramp(linear($population_density), [midnightblue, deeppink, gold])` 
+will be implicitly cast to 
+* **Style 3**: `ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])` 
 
 Since these transformations are happening, as you switch between styles, you will notice that the map does not change.
 
