@@ -12,7 +12,7 @@ Throughout this guide, you will explore the use of [`ramp`](/developers/carto-vl
 
 The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand the options available when dealing with something like a transaction dataset and how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
-**Note**:
+**Note**
 To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
 ### Numeric properties
@@ -49,7 +49,7 @@ Matching the input with the context of the lowest population density and highest
 
 Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
 
-```js
+```CARTOVL_Viz
 // Style 1: this will be implicitly cast to Style 2
 color: ramp($population_density,[midnightblue, deeppink, gold])
 
@@ -75,7 +75,7 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 
 When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3**: 
 
-```js
+```CARTOVL_Viz
 color: linear($population_density, globalMin($population_density), globalMax($population_density))
 ``` 
 
