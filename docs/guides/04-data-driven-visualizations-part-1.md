@@ -4,26 +4,24 @@
 
 The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs values based on an input. 
 
-Depending on the type of input the matching output will be performed in different ways:
+Depending on the type of input, the matching output is performed in two different ways:
 - **One-to-one**: is performed when the number of possible categories in the input matches the number of values.
-For example, `ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])`
-will set conservatives blue, and progressives red
-- **Interpolation**: is performed when there isn't a one-to-one match allowing intermediate values to be created automatically. 
-For example, `color: ramp($population_density, [green, yellow, red])` will assign the color green to features with a low population density and red to the ones with high population density. Intermediate population densities will get colored based on the interpolation between green, yellow and red based on how close a value is to the lowest and highest values in the dataset.
+- **Interpolation**: is performed when there isn't a one-to-one match and intermediate values are created automatically.
 
-To introduce the use of `ramp`, this guide covers using them with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
+In this guide, you will explore the use of [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) to match *inputs* to *values*. The most common use case is to match a property in your data as the input to fixed constant outputs like color or size. This is what we call **style by value**.
 
-We've talked about how [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) can be used to match *inputs* with *values*. In general, `ramp` allows matching most types of inputs with most types of values. The most common use case is to match a property as the input to fixed constant outputs like color. This is what we call **style by value**.
+The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand when dealing with something like a transaction dataset how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
-The following sections will cover **style by value** for different data property types. For example, when dealing with a transaction dataset we could style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
+**Note**:
+To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
 ### Numeric properties
 
-#### Symbolize unclassed numeric data
+#### Unclassed numeric data
 
 It is common to want to map a continuous range of numeric data, like population density, to a continuous range of colors, for example, the range of colors between black and yellow. This is straight-forward with CARTO VL.
 
-The style below will map the feature with the lowest population density in the source data to `midnight blue` and the feature with the highest population density to `gold`:
+The style below assigns the feature with the lowest population density in the source data to `midnightblue` and the feature with the highest population density to `gold`. Intermediate population densities are colored based on the interpolation between `midnightblue` and `gold` based on how close a value is to the lowest and highest values in the dataset.
 
 ```CARTOVL_Viz
 color: ramp($population_density, [midnightblue, gold])
@@ -109,19 +107,24 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
 </div>
 <a href="/developers/carto-vl/examples#example-population-density---outliers">View my source code!</a>
 
-#### Classifying numeric properties
+#### Classed numeric data
 
 Usage of [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes it easier to detect patterns in data since it is difficult to perceive small differences in color or size, which can arise when using [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear).
 
-There are multiple classification methods aviailable in CARTO VL (quantiles, equal intervals, standard deviation) and the classification of the data can be applied to two different samples:
+There are multiple classification methods aviailable in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied to data using two different samples:
 - **The entire dataset**. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
-On top on that, you can also classify the data by a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify the features by their price into 3 different buckets: features that have a price less than 10, features that have a price between 10 and 200, and features that have a price higher than 200. 
+Use the map below to see how classification of data varies  Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
+
+You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10, features that have a price between 10 and 200, and features that have a price higher than 200. 
 
 It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
 
-Let's see some maps with those. Do you see how `viewport*` classifiers are dynamic and changes in the map bounds change the result?
+**Note**
+Learn more about using `global*` and `viewport*` methods in the [Aggregations]() guide.
+
+Let's see some maps with those. 
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -137,7 +140,7 @@ Let's see some maps with those. Do you see how `viewport*` classifiers are dynam
 **Note:**
 **`filter:`** is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
 
-### Categorical properties
+### Categorical data
 
 Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
 
@@ -150,11 +153,8 @@ We'll talk here about:
 - [CieLAB interpolation](#_CieLAB_interpolation)
 
 **Note:**
-**About Encodings**
 Within CARTO VL we follow and enforce one condition:
-**categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them.
-
-As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
+**categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
 
 #### One to one mapping
 
@@ -192,9 +192,9 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 
 When working with categories, the concept of the *others bucket* arises. For example, the buckets function picks some categories, but, what happens with the unselected categories?
 
-In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function so it will fall back to the `others` bucket.
+In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function so it automatically got assigned to the `others` bucket.
 
-The `others` bucket will be colored gray by default. However, it's possible to override this behavior by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives'], [red, blue], white)`.
+The `others` bucket is colored gray by default. However, it's possible to override this default by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives'], [red, blue], white)`.
 
 <div class="example-map">
     <iframe
