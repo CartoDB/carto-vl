@@ -12,6 +12,7 @@ export default class IdentityCodec extends BaseCodec {
     sourceToInternal (v) {
         return [v];
     }
+
     internalToExternal (v) {
         return v;
     }
