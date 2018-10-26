@@ -41,51 +41,39 @@
 
     carto.setDefaultAuth({
       apiKey: 'default_public',
-      user: 'cartovl'
+      username: 'cartovl'
     });
-
-    const animStart = '2018-04-11T12:00:00Z';
-    // const animEnd = '2018-04-18T12:00:00Z';
-    const animEnd = '2019-12-18T12:00:00Z';
-    const animDuration = 10;
-    const lineLength = 600000;
 
     const s = carto.expressions;
     const source = new carto.source.SQL(`
       select*from taxi_50k
     `);
     const viz = new carto.Viz(`
-      @month: clusterTime($tpep_pickup_datetime, 'hour')
+      @hour: clusterTime($tpep_pickup_datetime, 'hour')
 
       // linear uses start date value
-      // width: linear(@month)*60
-      width: linear(@month)*60
-      color: ramp(linear(@month), SUNSET)
+      // width: linear(@hour)*60
+      width: linear(@hour)*60
+      color: ramp(linear(@hour), SUNSET)
 
-      // filter: animation(@month, 10, fade(0.01, 0.01))
-      filter: animation(@month,60,fade(0.01,0.01))
+      filter: animation(@hour, 130, fade(0.01,0.01))
 
-      // TODO: buckets should use category?
-      // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
-      // width: ramp(@selMonths, [60, 50, 40, 30], 20)
-
-      @list: viewportFeatures(@month)
-      @maxMonth: globalMax(@month)
-      @minMonth: globalMin(@month)
+      @list: viewportFeatures(@hour)
+      @maxhour: globalMax(@hour)
+      @minhour: globalMin(@hour)
     `);
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
-    const animation = ['animation', 'timeAnimation'].includes(viz.filter.expressionName ) ? viz.filter : null;
-    console.log('FILTER:', viz.filter.expressionName);
+    const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
         info = !animation;
         console.log(viz);
-        console.log("Min Month", viz.variables.minMonth.value);
-        console.log("Max Month", viz.variables.maxMonth.value);
-        console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f).text));
-        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
+        console.log("Min hour", viz.variables.minhour.value);
+        console.log("Max hour", viz.variables.maxhour.value);
+        console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f).text));
+        // console.log('Hours:',viz.variables.list.value.map(f => f[viz.variables.hour.propertyName]));
       }
       if (animation) {
         const time = animation.getProgressValue();
