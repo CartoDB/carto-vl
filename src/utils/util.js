@@ -1,6 +1,7 @@
 /**
  * Export util functions
  */
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -47,7 +48,7 @@ export function castDate (date) {
     if (isString(date)) {
         return new Date(date);
     } else {
-        throw new Error('invalid date type');
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid Date type`);
     }
 }
 
