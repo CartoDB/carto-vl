@@ -311,7 +311,7 @@ export default class Viz {
         }
     }
 
-    clearShaders () {
+    _bindMetadata (metadata) {
         this._colorShader = null;
         this._widthShader = null;
         this._strokeColorShader = null;
@@ -321,6 +321,9 @@ export default class Viz {
         this._pointShader = null;
         this._lineShader = null;
         this._polygonShader = null;
+        this.metadata = metadata;
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
+        checkVizPropertyTypes(this);
     }
 
     get colorShader () {
@@ -360,8 +363,6 @@ export default class Viz {
 
     _compileShader (shaderName, GLSL, expr) {
         if (!this['_' + shaderName]) {
-            this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
-            checkVizPropertyTypes(this);
             this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
         }
         return this['_' + shaderName];
