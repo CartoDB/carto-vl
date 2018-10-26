@@ -128,7 +128,7 @@ export default class Renderer {
         }
 
         // Assume that all dataframes of a renderLayer share the same metadata
-        const metadata = dataframes.length ? dataframes[0].metadata : null;
+        const metadata = viz.metadata;
 
         renderLayer.parseVizExpression = parseVizExpression; // to avoid a circular dependency problem
         viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));

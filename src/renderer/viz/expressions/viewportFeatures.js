@@ -99,7 +99,7 @@ export default class ViewportFeatures extends BaseExpression {
                 }
             });
 
-            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer, metadata);
         }
         this.expr = [];
     }
