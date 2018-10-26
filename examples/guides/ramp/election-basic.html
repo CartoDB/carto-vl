@@ -22,7 +22,7 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-3, 55.8],
-            zoom: 4.5,
+            zoom: 4,
         });
 
         carto.setDefaultAuth({
@@ -32,8 +32,8 @@
 
         const source = new carto.source.Dataset("uk_elections ");
         const viz = new carto.Viz(`
-            color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])
-            strokeColor: opacity(white, 0.6)`
+            color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue, crimson])
+            strokeColor: rgba(255,255,255,0.6)`
         );
         const layer = new carto.Layer('layer', source, viz);
 

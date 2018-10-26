@@ -90,15 +90,12 @@ In the map below, as you toggle between styles, you will notice how **Style 4** 
 
 ```CARTO_VL_Viz
 // Style 3: equivalent to Style 3 above
-
 color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
 
 // Style 4: the data range has been fixed to the [0, 160] range
-
 color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 
 // Style 5: the data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
-
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
 
@@ -127,21 +124,17 @@ Learn more about using `global*` and `viewport*` methods in the Aggregations gui
 Use the map below to see how classification of data varies between these two sample types:
 
 ```CARTO_VL_Viz
-// Style 1: Quantiles classification with 3 class breaks on the entire dataset. The first bucket will contain the lower 33% of the data samples, the second the middle 33%, and the last one the last 33%.
-
+// Style 1: Quantiles with 3 class breaks (global). The first bucket contains the lower 33% of the data, the second the middle 33%, and the third, the last 33%.
 color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
-// Style 2: Equal intervals classification with 3 class breaks on the entire dataset. The range of data for each class is then divided by the number of classes, which gives the common difference
+// Style 2: Equal intervals with 3 class breaks (global). The range of data is divided by the number of class breaks, giving the common difference.
+color: ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 
-color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
-
-// Style 3: Quantiles classification equivalent to Style 1 but only using the samples that are shown in the viewport. 
-
-color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
+// Style 3: Quantiles with 3 class breaks (viewport). 
+color: ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
 // Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport. 
-
-color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
+color: ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 ```
 
 Do you see how `viewport*` classifiers are dynamic and change the results according to the map bounds? Be sure to keep an eye on the dynamic legend!
@@ -162,7 +155,7 @@ You can also classify data with a fixed list of breakpoints (manual classificati
 It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
 
 ```CARTO_VL_Viz
-// Style 1: Manual classification features with population density less than 80 will be set midnightblue, between 80 and 160 will be set deeppink, and greater than 160 will be set gold.
+// Style 1: Features with population density less than 80 will be set midnightblue, between 80 and 160 will be set deeppink, and greater than 160 will be set gold.
 color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 ```
 
@@ -199,33 +192,25 @@ Within CARTO VL we follow and enforce one condition: **categorical properties co
 
 To create a one to one mapping between categories and colors (or any other list of values) the simplest function is [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets).
 
-Buckets allows to pick some or all categories from a categorical property in a particular order, allowing `ramp` to match those with the color list. Let's see it with an example:
-```CARTOVL_Viz
-// Suppose we have an election map with a `winner` property that contains the political party that won the region, like:
-// $geom                    $winner
-// GeometryOfRegionA        'conservatives'
-// GeometryOfRegionB        'progressives'
-// ...
-//
-// We can create a choropleth map by matching the winners of each region to one color by using buckets
-// This will create the following correspondence:
-//      'conservatives' <=> blue
-//      'progressives'  <=> red
+With `buckets` you can pick some or all categories from a categorical property in a particular order, and use `ramp` to match those with a color list. 
+
+To see this in action, the map below displays election results in the UK. In the data, there is a field for the winner ($winner)that contains the result of which political party (`conservatives` or `progressives`) won a given region. With this information,you can create a category map by matching the winners of each region to a unique color using `buckets`:
+
+```CARTO_VL_Viz
+// Color regions where the conservatives won blue and progressives red
+
 color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])
 ```
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="election-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<div style="margin-bottom: 20px !important">
-   <a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
-</div>
+<a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 
 #### *Others*
 
