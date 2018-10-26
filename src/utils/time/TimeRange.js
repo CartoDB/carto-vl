@@ -6,12 +6,8 @@ function timeValue (parsed) {
     return Date.UTC(parsed.year, parsed.month - 1, parsed.day, parsed.hour, parsed.minute, parsed.second);
 }
 
-function startTimeValue (iso) {
-    return timeValue(parseISO(iso, false));
-}
-
-function endTimeValue (iso) {
-    return timeValue(parseISO(iso, true));
+function startEndTimeValues (iso) {
+    return parseISO(iso).map(timeValue);
 }
 
 export default class TimeRange {
@@ -21,7 +17,7 @@ export default class TimeRange {
         this._endValue = endValue;
     }
     static fromText (iso) {
-        return new TimeRange(iso, startTimeValue(iso), endTimeValue(iso));
+        return new TimeRange(iso, ...startEndTimeValues(iso));
     }
     static fromStartEnd (startDate, endDate) {
         const start = startDate && startDate.getTime();
