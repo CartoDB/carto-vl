@@ -1,3 +1,5 @@
+import CartoParsingError from '../../errors/carto-parsing-error';
+
 class IsoParser {
     constructor (format) {
         this._format = format;
@@ -203,7 +205,7 @@ export default function parseISO (iso) {
     iso = iso || '';
     const parser = findParser(iso);
     if (!parser) {
-        throw new Error(`No date parser found for ${iso}`);
+        throw new CartoParsingError(`No date parser found for ${iso}`);
     }
     return parser.parse(iso);
 }
