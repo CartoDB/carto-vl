@@ -214,12 +214,12 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 
 #### *Others*
 
-In the map above, any region that had a winner other than the conservative or progressive party, by default, is colored `gray`. That default went into effect since we didn't define a color for features outside of these two categories. This is the concept of the *others bucket*. As we he buckets function picks some categories, but, what happens with the unselected categories?
+In the map above, any region that had a winner other than `conservative` or `progressive` is colored `gray` by default. For example, other winning parties like the green party or labor party weren't placed in the `bucket` function so they are automatically assigned to the `others` bucket. It is possible to ovveride the default `others` color by adding a third parameter to `ramp`: 
 
-In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function so it automatically got assigned to the `others` bucket.
-
-The `others` bucket is colored gray by default. However, it's possible to override this default by providing a third parameter to `ramp`: `ramp(buckets($winner, ['conservatives', 'progressives'], [red, blue], white)`.
-
+```CARTO_VL_Viz
+// color regions where conservatives won royalblue and crimson where progressives won color all others orange 
+ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], orange)
+```
 <div class="example-map">
     <iframe
         id="election-others-bucket"
