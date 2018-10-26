@@ -13,29 +13,24 @@ const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
 
-layer.on('loaded', () => {
+layer.on('loaded', async () => {
     const feature = viz.variables.v_features.value[0];
 
     // Using viz properties, viz variables (and also feature props)
     const duration = feature.numeric;
     const augmentedSize = feature.variables.augmentedSize.value;
 
-    feature.color.blendTo('blue', duration);
-
-    let updates = 0;
-    const func = () => {
-        if (updates === 0) {
-            feature.width.blendTo(augmentedSize * 2, 10);
-            updates++;
-        } else {
-            window.loaded = true;
-        }
+    // Two blendTo operations
+    const update = async () => {
+        await feature.width.blendTo(augmentedSize * 2, 10); // second blend
+        window.loaded = true;
     };
+    layer.on('updated', debounce(update));
 
-    layer.on('updated', debounceSetLoaded(func));
+    await feature.color.blendTo('blue', duration); // first blend
 });
 
-const debounceSetLoaded = (func, delay = 250) => {
+const debounce = (func, delay = 250) => {
     let timeoutId;
     return function () {
         clearTimeout(timeoutId);
