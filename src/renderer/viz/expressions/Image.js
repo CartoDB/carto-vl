@@ -109,7 +109,7 @@ function _getCanvasFromImage (img) {
     const width = img.width / max * CANVAS_SIZE;
     const height = img.height / max * CANVAS_SIZE;
 
-    ctx.drawImage(img, 1 + (CANVAS_SIZE - width) / 2, 1 + (CANVAS_SIZE - height) / 2, width - 2, height - 2);
+    ctx.drawImage(img, (CANVAS_SIZE - width) / 2, (CANVAS_SIZE - height) / 2, width, height);
 
     return canvas;
 }
