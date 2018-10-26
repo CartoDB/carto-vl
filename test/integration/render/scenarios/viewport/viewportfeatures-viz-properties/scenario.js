@@ -20,15 +20,25 @@ layer.on('loaded', async () => {
     const duration = feature.numeric;
     const augmentedSize = feature.variables.augmentedSize.value;
 
-    await feature.color.blendTo('blue', duration);
-    await sleep(duration);
+    feature.color.blendTo('blue', duration);
 
-    await feature.width.blendTo(augmentedSize, 10);
-    await sleep(10);
+    let updates = 0;
+    const func = () => {
+        if (updates === 0) {
+            feature.width.blendTo(augmentedSize * 2, 10);
+            updates++;
+        } else {
+            window.loaded = true;
+        }
+    };
 
-    window.loaded = true;
+    layer.on('updated', debounceSetLoaded(func));
 });
 
-function sleep (ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+const debounceSetLoaded = (func, delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+    };
+};
