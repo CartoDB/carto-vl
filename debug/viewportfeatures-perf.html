@@ -74,6 +74,8 @@
     layer.on('updated', () => {
       if (!window.feature) {
         window.feature = viz.variables.wadus2.value[0];
+        window.feature && window.feature.width.blendTo(200);
+        window.feature && window.feature.color.blendTo('red');
       }
       console.log(viz.variables.wadus2.value.length);
     });

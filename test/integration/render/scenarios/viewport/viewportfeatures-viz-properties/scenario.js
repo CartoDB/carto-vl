@@ -13,7 +13,7 @@ const layer = new carto.Layer('layer', source, viz);
 
 layer.addTo(map);
 
-layer.on('loaded', async () => {
+layer.on('loaded', () => {
     const feature = viz.variables.v_features.value[0];
 
     // Using viz properties, viz variables (and also feature props)
