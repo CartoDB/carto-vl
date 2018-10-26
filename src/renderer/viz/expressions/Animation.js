@@ -1,11 +1,10 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax, HOLD } from '../expressions';
+import { number, linear, globalMin, globalMax, HOLD, and } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTime from './aggregation/cluster/ClusterTime';
-import { And } from './binary';
 import VariantExpression from './Variant';
 
 let waitingForLayer = new Set();
@@ -328,17 +327,24 @@ class ScalarAnimation extends BaseExpression {
     }
 }
 
-class TimeRangeAnimation extends And {
+class TimeRangeAnimation extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         const start = linear(input, globalMin(input), globalMax(input), 'start');
         const end = linear(input, globalMin(input), globalMax(input), 'end');
         const startAnim = new ScalarAnimation(start, duration, new Fade(fade.fadeIn, HOLD));
         const endAnim = new ScalarAnimation(end, duration, new Fade(HOLD, fade.fadeOut));
-        super(startAnim, endAnim);
+        const combinedAnimation = and(startAnim, endAnim);
+        super({ combinedAnimation });
+        this.type = 'number';
         this._startAnim = startAnim;
         this._endAnim = endAnim;
-        this.expressionName = 'animation';
         this.input = input;
+        this.expressionName = 'animation';
+        this.inlineMaker = inline => inline.combinedAnimation;
+    }
+
+    eval (feature) {
+        return this.combinedAnimation.eval(feature);
     }
 
     isAnimated () {
@@ -377,11 +383,6 @@ class TimeRangeAnimation extends And {
     stop () {
         this._startAnim.stop();
         this._endAnim.stop();
-    }
-
-    _resolveAliases (aliases) {
-        super._resolveAliases(aliases);
-        this.input._resolveAliases(aliases);
     }
 }
 
