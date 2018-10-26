@@ -214,7 +214,7 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 
 #### *Others*
 
-When working with categories, the concept of the *others bucket* arises. For example, the buckets function picks some categories, but, what happens with the unselected categories?
+In the map above, any region that had a winner other than the conservative or progressive party, by default, is colored `gray`. That default went into effect since we didn't define a color for features outside of these two categories. This is the concept of the *others bucket*. As we he buckets function picks some categories, but, what happens with the unselected categories?
 
 In the previous example, we could have regions in which the 'socialist' party won. This category wasn't placed in the `buckets` function so it automatically got assigned to the `others` bucket.
 
