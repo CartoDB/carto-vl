@@ -23,7 +23,7 @@ It is common to want to map a continuous range of numeric data, like population 
 
 The style below assigns the feature with the lowest population density in the source data to `midnightblue` and the feature with the highest population density to `gold`. Intermediate population densities are colored based on the interpolation between `midnightblue` and `gold` based on how close a value is to the lowest and highest values in the dataset.
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 color: ramp($population_density, [midnightblue, gold])
 ```
 
@@ -40,7 +40,7 @@ color: ramp($population_density, [midnightblue, gold])
 
 To see more variation in the data, you can even set intermediate colors in the color list for example, here we are adding an intermediate color, `deeppink`:
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 color: ramp($population_density, [midnightblue, deeppink, gold])
 ```  
 #### Implicit casts
@@ -49,14 +49,17 @@ Matching the input with the context of the lowest population density and highest
 
 Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 // Style 1: this will be implicitly cast to Style 2
+
 color: ramp($population_density,[midnightblue, deeppink, gold])
 
 // Style 2: will be implicitly cast to Style 3
+
 color: ramp($population_density, [midnightblue, deeppink, gold])
 
 // Style 3
+
 color: ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])
 ```
 
@@ -75,7 +78,7 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 
 When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3**: 
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 color: linear($population_density, globalMin($population_density), globalMax($population_density))
 ``` 
 
@@ -85,14 +88,17 @@ It is common for datasets to have [outliers](https://en.wikipedia.org/wiki/Outli
 
 In the map below, as you toggle between styles, you will notice how **Style 4** and **Style 5** change based on the modifications made to second (minimum) and third (maximum) parameters.
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 // Style 3: equivalent to Style 3 above
+
 color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
 
 // Style 4: the data range has been fixed to the [0, 160] range
+
 color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 
 // Style 5: the data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
+
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
 
@@ -120,17 +126,21 @@ Learn more about using `global*` and `viewport*` methods in the Aggregations gui
 
 Use the map below to see how classification of data varies between these two sample types:
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 // Style 1: Quantiles classification with 3 class breaks on the entire dataset. The first bucket will contain the lower 33% of the data samples, the second the middle 33%, and the last one the last 33%.
+
 color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
 // Style 2: Equal intervals classification with 3 class breaks on the entire dataset. The range of data for each class is then divided by the number of classes, which gives the common difference
+
 color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 
 // Style 3: Quantiles classification equivalent to Style 1 but only using the samples that are shown in the viewport. 
+
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 
 // Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport. 
+
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
 
@@ -151,7 +161,7 @@ You can also classify data with a fixed list of breakpoints (manual classificati
 
 It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
 
-```CARTOVL_Viz
+```CARTO_VL_Viz
 // Style 1: Manual classification features with population density less than 80 will be set midnightblue, between 80 and 160 will be set deeppink, and greater than 160 will be set gold.
 color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 ```

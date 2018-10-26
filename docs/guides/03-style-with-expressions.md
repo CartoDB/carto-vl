@@ -25,14 +25,14 @@ As seen above, each styling property is assigned a value that is considered to b
 
 Expressions assigned to properties can be constants (`red`, `#FFF`,`7`) or functions (`sqrt`, `+`, or `ramp`):
 
-```js
+```CARTO_VL_Viz
 width: 7
 color: white
 ```
 
 Expressions can be combined together with _expression functions_:
 
-```js
+```CARTO_VL_Viz
 width: 7+3
 color: white
 ```
@@ -45,13 +45,13 @@ Each styling property imposes limitations on the types of expressions that can b
 
 For example, the styling below would _not work_ because a numeric parameter (`7`) can't be added to a color parameter (`white`):
 
-```js
+```CARTO_VL_Viz
 width: 7+white
 ```
 
 Similarly, even though the `7+3` is valid, this example would _not work_ because a numeric expression (the addition) is being assigned to the styling property `color` (which only accepts color expressions):
 
-```js
+```CARTO_VL_Viz
 color: 7+3
 ```
 
@@ -129,7 +129,7 @@ In the [reference](/developers/carto-vl/reference/) documentation examples are s
 This basic example of coloring a feature `red` and setting its width to `5` shows how the String API provides syntax sugar for things like named colors:
 
 Usage of the JS API:
-```js
+```CARTO_VL_Viz
 const s = carto.expressions;
 const viz = new carto.Viz({
     width: 5
@@ -137,7 +137,7 @@ const viz = new carto.Viz({
 });
 ```
 Usage of the String API:
-```js
+```CARTO_VL_Viz
 const viz = new carto.Viz(`
     width: 5
     color: red
