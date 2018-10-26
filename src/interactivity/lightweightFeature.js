@@ -10,14 +10,14 @@ import { generateBlenderFunction, generateResetFunction } from './blendUtils';
  * @param {*} renderLayer
  * @returns FeatureLike class
  */
-export function genLightweightFeatureClass (propertyNames, renderLayer) {
+export function genLightweightFeatureClass (propertyNames, renderLayer, metadata) {
     const cls = class LightweightFeature {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
         }
     };
 
-    _defineVizProperties(cls.prototype, renderLayer);
+    _defineVizProperties(cls.prototype, renderLayer, metadata);
     _defineVizVariables(cls.prototype, renderLayer);
     _defineFeatureProperties(cls.prototype, propertyNames);
     _defineResetMethod(cls.prototype);
@@ -25,14 +25,15 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     return cls;
 }
 
-function _defineVizProperties (targetObject, renderLayer) {
+function _defineVizProperties (targetObject, renderLayer, metadata) {
     VIZ_PROPERTIES.forEach(prop => {
-        _createLightweightFeatureVizProperty(targetObject, renderLayer, prop);
+        _createLightweightFeatureVizProperty(targetObject, renderLayer, metadata, prop);
     });
 }
 
-function _createLightweightFeatureVizProperty (targetObject, renderLayer, prop, propName = prop) {
-    const { customizedFeatures, viz, trackFeatureViz, idProperty, parseVizExpression } = renderLayer;
+function _createLightweightFeatureVizProperty (targetObject, renderLayer, metadata, prop, propName = prop) {
+    const { customizedFeatures, viz, trackFeatureViz, parseVizExpression } = renderLayer;
+    const idProperty = metadata.idProperty;
     const blender = (featureId) => {
         return generateBlenderFunction(prop, featureId, customizedFeatures, viz, trackFeatureViz, idProperty, parseVizExpression);
     };
