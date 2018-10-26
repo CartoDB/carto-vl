@@ -92,6 +92,8 @@ class ScalarAnimation extends BaseExpression {
         this._originalInput = originalInput;
         this._paused = false;
 
+        this.expressionName = 'animation';
+
         this.preface = `
         #ifndef ANIMATION
         #define ANIMATION

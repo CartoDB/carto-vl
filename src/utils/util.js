@@ -48,9 +48,7 @@ export function castDate (date) {
 }
 
 export function msToDate (msEpoch) {
-    const date = new Date(0);
-    date.setUTCMilliseconds(msEpoch);
-    return date;
+    return new Date(msEpoch);
 }
 
 export function isSetsEqual (a, b) {
@@ -105,23 +103,22 @@ export default {
     computeMatrixCenter
 };
 
-export function timeRange (t1, t2) {
-    if (t2 === undefined) {
-        if (t1 === undefined) {
-            return new TimeRange();
-            // return undefined;
+export function castTimeRange (v, tz = null) {
+    if (v === undefined || isTimeRange(v)) {
+        if (v && tz) {
+            return timeRange({ iso: v.text, timeZone: tz });
         }
-        if (isTimeRange(t1)) {
-            return t1;
-        } else {
-            return TimeRange.fromText(t1);
-        }
+        return v;
+    }
+    return timeRange({ iso: v, timeZone: tz });
+}
+
+export function timeRange (parameters) {
+    const { start, end, iso, timeZone } = parameters;
+    if (iso) {
+        return TimeRange.fromText(iso, timeZone);
     } else {
-        if (t1 instanceof Date) {
-            return TimeRange.fromStartEnd(t1, t2);
-        } else {
-            return TimeRange.fromStartEndValues(t1, t2);
-        }
+        return TimeRange.fromStartEndValues(start, end, timeZone);
     }
 }
 

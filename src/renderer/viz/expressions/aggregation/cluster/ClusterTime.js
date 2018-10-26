@@ -23,4 +23,7 @@ export default class ClusterTime extends ClusterTimeDimension {
             range: isCyclic ? undefined : []
         });
     }
+    converse (v) {
+        return v;
+    }
 }

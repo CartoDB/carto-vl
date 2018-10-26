@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js'></script>
-  <link href='https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 <style>
     body {
       margin: 0;
@@ -48,36 +48,43 @@
     const source = new carto.source.SQL(`
       select*from taxi_50k
     `);
+
     const viz = new carto.Viz(`
-      @hour: clusterTime($tpep_pickup_datetime, 'hour')
+      // @hour: clusterTime($tpep_pickup_datetime, 'hour')
+      @hour: clusterTime($tpep_pickup_datetime, 'hour', 'America/New_York')
 
       // linear uses start date value
       // width: linear(@hour)*60
-      width: linear(@hour)*60
-      color: ramp(linear(@hour), SUNSET)
+      width: 10
+      strokeWidth: 0
+      // color: ramp(linear(@hour), SUNSET)
+      color: opacity(rgb(255,255,0),0.5)
 
-      filter: animation(@hour, 130, fade(0.01,0.01))
+
+      filter: animation(@hour, 130, fade(0.0,0.0))
 
       @list: viewportFeatures(@hour)
       @maxhour: globalMax(@hour)
       @minhour: globalMin(@hour)
     `);
     const layer = new carto.Layer('layer', source, viz);
-    layer.addTo(map, 'background');
+    layer.addTo(map);
     let info = true;
+    console.log('FIL',viz.filter.expressionName)
     const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
         info = !animation;
         console.log(viz);
-        console.log("Min hour", viz.variables.minhour.value);
-        console.log("Max hour", viz.variables.maxhour.value);
+        console.log("Min hour", viz.variables.minhour.value.text);
+        console.log("Max hour", viz.variables.maxhour.value.text);
         console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f).text));
         // console.log('Hours:',viz.variables.list.value.map(f => f[viz.variables.hour.propertyName]));
       }
       if (animation) {
         const time = animation.getProgressValue();
-        document.getElementById("timer").textContent = time;
+        const msg = `${time.text} (${time.timeZone})`;
+        document.getElementById("timer").textContent = msg;
       }
     });
     const interactivity = new carto.Interactivity(layer);
@@ -96,11 +103,7 @@
 
       if (event.features.length > 0) {
         const feature = event.features[0];
-        console.log('Start:', feature.variables.month.value.startValue);
-        console.log('End:', feature.variables.month.value.endValue);
-        console.log('ISO:', feature.variables.month.value.text);
-        console.log('Start D:', feature.variables.month.value.startDate);
-        console.log('End D:', feature.variables.month.value.endDate);
+        console.log('hour:', feature.variables.hour.value.text);
       }
     });
   </script>

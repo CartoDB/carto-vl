@@ -4,8 +4,10 @@ import * as util from '../../utils/util';
 export default class TimeRangeCodec extends BaseCodec {
     constructor (metadata, propertyName) {
         super();
-        const { min } = metadata.stats(propertyName);
+        const stats = metadata.stats(propertyName);
+        const { min } = stats;
         this._min = decodeModal('start', min);
+        this._timeZone = stats.grouping && stats.grouping.timezone;
     }
 
     sourceToInternal (propertyValue) {
@@ -15,15 +17,19 @@ export default class TimeRangeCodec extends BaseCodec {
     }
 
     internalToExternal (lo, hi) {
-        return util.timeRange((lo + this._min) * 1000, (hi + this._min) * 1000);
+        return util.timeRange({
+            start: (lo + this._min) * 1000,
+            end: (hi + this._min) * 1000,
+            timeZone: this._timeZone
+        });
     }
 
     externalToSource (v) {
-        return util.timeRange(v).text;
+        return util.castTimeRange(v, this._timeZone).text;
     }
 
     sourceToExternal (v) {
-        return util.timeRange(v);
+        return util.timeRange({ iso: v, timeZone: this._timeZone });
     }
 
     inlineInternalMatch (thisValue, otherCodec) {
@@ -33,14 +39,13 @@ export default class TimeRangeCodec extends BaseCodec {
 }
 
 function decodeModal (mode, propertyValue) {
-    if (propertyValue instanceof Date) {
-        // Support Date because stats are stored so, rather that in source encoding
-        return propertyValue.getTime() / 1000;
-    }
+    // if (propertyValue instanceof Date) {
+    //     return propertyValue.getTime() / 1000;
+    // }
     switch (mode) {
         case 'start':
-            return util.timeRange(propertyValue).startValue / 1000;
+            return util.timeRange({ iso: propertyValue }).startValue / 1000;
         case 'end':
-            return util.timeRange(propertyValue).endValue / 1000;
+            return util.timeRange({ iso: propertyValue }).endValue / 1000;
     }
 }

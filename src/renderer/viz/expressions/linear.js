@@ -1,8 +1,9 @@
 import BaseExpression from './base';
 import { checkExpression, implicitCast, checkType, checkMaxArguments, clamp } from './utils';
 import { globalMin, globalMax } from '../expressions';
-import { timeRange, msToDate } from '../../../utils/util';
+import { castTimeRange, msToDate } from '../../../utils/util';
 import IdentityCodec from '../../../codecs/Identity';
+import TZDate from '../../../utils/time/TZDate';
 /**
 * Linearly interpolates the value of a given input between a minimum and a maximum. If `min` and `max` are not defined they will
 * default to `globalMin(input)` and `globalMax(input)`.
@@ -70,19 +71,22 @@ export default class Linear extends BaseExpression {
             const max = this.max.eval().getTime();
             return msToDate(value * (max - min) + min);
         } else if (this.input.type === 'timerange') {
+            const minRange = this.min.eval();
+            const maxRange = this.max.eval();
             let min, max;
             switch (this._rangeMode) {
                 case 'unit':
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).startValue;
+                    // timeRange here allows min, max to be simply iso strings
+                    min = castTimeRange(minRange).startValue;
+                    max = castTimeRange(maxRange).startValue;
                     break;
                 case 'start':
                 case 'end':
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = castTimeRange(minRange).startValue;
+                    max = castTimeRange(maxRange).endValue;
                     break;
             }
-            return msToDate(value * (max - min) + min);
+            return TZDate.fromValue(value * (max - min) + min, minRange.timeZone);
         }
         const min = this.min.eval();
         const max = this.max.eval();
@@ -95,13 +99,13 @@ export default class Linear extends BaseExpression {
         if (this.input.type === 'timerange') {
             switch (this._rangeMode) {
                 case 'unit':
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).startValue;
+                    min = castTimeRange(this.min.eval()).startValue;
+                    max = castTimeRange(this.max.eval()).startValue;
                     break;
                 case 'start':
                 case 'end':
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = castTimeRange(this.min.eval()).startValue;
+                    max = castTimeRange(this.max.eval()).endValue;
                     break;
             }
         } else {
@@ -118,18 +122,18 @@ export default class Linear extends BaseExpression {
                 case 'unit':
                     // choose same side for all three:
                     input = this.input.eval(feature).startValue;
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).startValue;
+                    min = castTimeRange(this.min.eval()).startValue;
+                    max = castTimeRange(this.max.eval()).startValue;
                     break;
                 case 'start':
                     input = this.input.eval(feature).startValue;
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = castTimeRange(this.min.eval()).startValue;
+                    max = castTimeRange(this.max.eval()).endValue;
                     break;
                 case 'end':
                     input = this.input.eval(feature).endValue;
-                    min = timeRange(this.min.eval()).startValue;
-                    max = timeRange(this.max.eval()).endValue;
+                    min = castTimeRange(this.min.eval()).startValue;
+                    max = castTimeRange(this.max.eval()).endValue;
                     break;
             }
             return (input - min) / (max - min);
@@ -157,22 +161,22 @@ export default class Linear extends BaseExpression {
                     inputIndex = 0; // start
                     min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[inputIndex];
                     max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[inputIndex];
-                    // min in ms is timeRange(this.min.eval()).startValue;
-                    // max in ms is timeRange(this.max.eval()).startValue;
+                    // min in ms is castTimeRange(this.min.eval()).startValue;
+                    // max in ms is castTimeRange(this.max.eval()).startValue;
                     break;
                 case 'start':
                     inputIndex = 0; // start
                     min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
                     max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
-                    // min in ms is timeRange(this.min.eval()).startValue;
-                    // max in ms is timeRange(this.max.eval()).endValue;
+                    // min in ms is castTimeRange(this.min.eval()).startValue;
+                    // max in ms is castTimeRange(this.max.eval()).endValue;
                     break;
                 case 'end':
                     inputIndex = 1; // end
                     min = metadata.codec(this.input.propertyName).externalToInternal(this.min.eval())[0]; // start
                     max = metadata.codec(this.input.propertyName).externalToInternal(this.max.eval())[1]; // end
-                    // min in ms is timeRange(this.min.eval()).startValue;
-                    // max in ms is timeRange(this.max.eval()).endValue;
+                    // min in ms is castTimeRange(this.min.eval()).startValue;
+                    // max in ms is castTimeRange(this.max.eval()).endValue;
                     break;
             }
 
