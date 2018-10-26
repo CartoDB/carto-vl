@@ -24,6 +24,25 @@
       display: none;
     }
   </style>
+
+  <script>
+  function assert(condition, message) {
+    if (!condition) {
+      // Delaying marking the window as loaded after throwing the error.
+      setTimeout(() => window.loaded = true, 1);
+      throw message || 'Assertion failed';
+    }
+  }
+  const debounceSetLoaded = (delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          window.loaded = true;
+        }, delay);
+    };
+  };
+  </script>
 </head>
 
 <body>

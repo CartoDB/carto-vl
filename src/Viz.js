@@ -18,6 +18,7 @@ import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
+import VIZ_PROPERTIES from './renderer/viz/utils/properties';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -310,39 +311,60 @@ export default class Viz {
         }
     }
 
-    compileShaders (gl, metadata) {
-        this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
-        checkVizPropertyTypes(this);
+    clearShaders () {
+        this._colorShader = null;
+        this._widthShader = null;
+        this._strokeColorShader = null;
+        this._strokeWidthShader = null;
+        this._filterShader = null;
+        this._symbolShader = null;
+        this._pointShader = null;
+        this._lineShader = null;
+        this._polygonShader = null;
+    }
 
-        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
-        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
-        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
-        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
-        this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
+    get colorShader () {
+        return this._compileShader('colorShader', shaders.styler.colorShaderGLSL, { color: this.color });
+    }
+    get widthShader () {
+        return this._compileShader('widthShader', shaders.styler.widthShaderGLSL, { width: this.width });
+    }
+    get strokeColorShader () {
+        return this._compileShader('strokeColorShader', shaders.styler.colorShaderGLSL, { color: this.strokeColor });
+    }
+    get strokeWidthShader () {
+        return this._compileShader('strokeWidthShader', shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
+    }
+    get filterShader () {
+        return this._compileShader('filterShader', shaders.styler.filterShaderGLSL, { filter: this.filter });
+    }
+    get symbolShader () {
+        return this._compileShader('symbolShader', shaders.symbolizer.symbolShaderGLSL, {
+            symbol: this.symbol,
+            symbolPlacement: this.symbolPlacement,
+            transform: this.transform
+        });
+    }
+    get pointShader () {
+        return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get lineShader () {
+        return this._compileShader('lineShader', { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get polygonShader () {
+        return this._compileShader('polygonShader', { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
+            { transform: this.transform });
+    }
 
-        if (!this.symbol.default) {
-            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
-                symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement,
-                transform: this.transform
-            }, this);
+    _compileShader (shaderName, GLSL, expr) {
+        if (!this['_' + shaderName]) {
+            this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
+            checkVizPropertyTypes(this);
+            this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
         }
-
-        if (!this._geomType || this._geomType === 'point') {
-            this.pointShader = compileShader(gl,
-                { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
-        if (!this._geomType || this._geomType === 'line') {
-            this.lineShader = compileShader(gl,
-                { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
-        if (!this._geomType || this._geomType === 'polygon') {
-            this.polygonShader = compileShader(gl,
-                { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
-                { transform: this.transform }, this);
-        }
+        return this['_' + shaderName];
     }
 
     replaceChild (toReplace, replacer) {
@@ -351,40 +373,16 @@ export default class Viz {
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace === this.color) {
-            this.color = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.width) {
-            this.width = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeColor) {
-            this.strokeColor = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeWidth) {
-            this.strokeWidth = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.filter) {
-            this.filter = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbol) {
-            this.symbol = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbolPlacement) {
-            this.symbolPlacement = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.transform) {
-            this.transform = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
         } else {
-            throw new CartoRuntimeError('No child found');
+            const properties = VIZ_PROPERTIES;
+            const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
+            if (propertyName) {
+                this[propertyName] = replacer;
+                replacer.parent = this;
+                replacer.notify = toReplace.notify;
+            } else {
+                throw new CartoRuntimeError('No child found');
+            }
         }
     }
 
