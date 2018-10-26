@@ -170,20 +170,6 @@ export default class Renderer {
         for (let j = 0; j < viewportExpressionsLength; j++) {
             const currentViewportExp = viewportExpressions[j];
             currentViewportExp.accumViewportAgg(rawFeature);
-
-            // if (currentViewportExp instanceof ViewportFeatures) {
-            //     const featureVizParams = {
-            //         viz: renderLayer.viz,
-            //         customizedFeatures: renderLayer.customizedFeatures,
-            //         trackFeatureViz: renderLayer.trackFeatureViz,
-            //         idProperty: renderLayer.idProperty
-            //     };
-            //     const publicFeatureProperties = currentViewportExp._propertyNames;
-            //     const interactivityFeature = new Feature(rawFeature, featureVizParams, publicFeatureProperties);
-            //     currentViewportExp.accumViewportAgg(interactivityFeature);
-            // } else {
-            //     currentViewportExp.accumViewportAgg(rawFeature);
-            // }
         }
     }
 
