@@ -61,12 +61,12 @@ import windshaftCodecFactory from '../codecs/windshaft';
 // }
 
 export default class WindshaftMetadata extends MVTMetadata {
-    constructor(...args) {
+    constructor (...args) {
         super(...args);
         this.propertyKeys = [];
         this.baseNames = {};
         Object.keys(this.properties).forEach(baseName => {
-            const property = properties[baseName];
+            const property = this.properties[baseName];
             if (property.aggregations) {
                 Object.values(property.aggregations).forEach(propName => {
                     this._addProperty(baseName, propName);
