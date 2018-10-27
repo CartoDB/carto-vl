@@ -358,8 +358,7 @@ export default class Windshaft {
                 const dimType = adaptColumnType(dimensionStats.type);
                 const { column, ...params } = dimension;
                 if (properties[column].dimension) {
-                    // TODO: proper error
-                    throw new Error(`Multiple dimensions based on same column ${column}`);
+                    throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Multiple dimensions based on same column '${column}'.`);
                 }
                 properties[column].dimension = {
                     propertyName: dimName,
