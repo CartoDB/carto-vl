@@ -389,12 +389,18 @@ class TimeRangeAnimation extends BaseExpression {
 }
 
 export class Animation extends VariantExpression {
-    _choose (input, duration, fade, ...rest) {
+    constructor (input, duration = 10, fade = new Fade()) {
+        checkMaxArguments(arguments, 3, 'animation');
+        duration = implicitCast(duration);
+        input = implicitCast(input);
+        super([input, duration, fade], { input, duration, fade });
+    }
+    _choose (input, duration, fade) {
         if (input.type || !(input instanceof BaseExpression)) {
             if (input.type === 'timerange') {
-                return new TimeRangeAnimation(input, duration, fade, ...rest);
+                return new TimeRangeAnimation(input, duration, fade);
             } else {
-                return new ScalarAnimation(input, duration, fade, ...rest);
+                return new ScalarAnimation(input, duration, fade);
             }
         }
         return null;

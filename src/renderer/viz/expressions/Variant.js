@@ -7,13 +7,12 @@ import BaseExpression from './base';
 // constructor arguments and returning an expression to which all
 // properties will be forwarded.
 export default class VariantExpression extends BaseExpression {
-    constructor (...args) {
-        super({});
+    constructor (args, superArgs) { // TODO: remove args
+        super(superArgs || {});
         this._args = args;
         // Resolve the expression at construction time if possible
         this._proxy = this._choose(...args);
         const ownProperties = [
-            // '_bindMetadata', '_resolveAliases', // omit these to use proxy once set
             '_args', '_proxy', '_choose'
         ];
         const aliaser = {
@@ -43,12 +42,6 @@ export default class VariantExpression extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         if (!this._proxy) {
-            // Try to resolve at compilation if it hasn't been resolved yet
-            this._args.forEach(arg => {
-                if (arg instanceof BaseExpression) {
-                    arg._bindMetadata(metadata);
-                }
-            });
             this._proxy = this._choose(...this._args);
             if (this._proxy) {
                 this._proxy._bindMetadata(metadata);
@@ -61,12 +54,6 @@ export default class VariantExpression extends BaseExpression {
     _resolveAliases (aliases) {
         super._resolveAliases(aliases);
         if (!this._proxy) {
-            // Try to resolve after binding variables if it hasn't been resolved yet
-            this._args.forEach(arg => {
-                if (arg instanceof BaseExpression) {
-                    arg._resolveAliases(aliases);
-                }
-            });
             this._proxy = this._choose(...this._args);
             if (this._proxy) {
                 this._proxy._resolveAliases(aliases);
