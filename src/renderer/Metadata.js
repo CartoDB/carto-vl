@@ -64,7 +64,7 @@ export default class Metadata {
         if (this.categoryToID.has(category)) {
             return this.categoryToID.get(category);
         }
-        if (!init) {
+        if (!init && category !== null) {
             this.properties[propertyName].categories.push({
                 name: category,
                 frequency: Number.NaN
