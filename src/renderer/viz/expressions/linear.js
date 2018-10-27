@@ -71,19 +71,24 @@ export default class Linear extends BaseExpression {
             const max = this.max.eval().getTime();
             return msToDate(value * (max - min) + min);
         } else if (this.input.type === 'timerange') {
-            const minRange = this.min.eval();
-            const maxRange = this.max.eval();
+            const minRange = castTimeRange(this.min.eval());
+            const maxRange = castTimeRange(this.max.eval());
+            if (minRange === undefined || maxRange === undefined) {
+                // FIXME: it seems update event of layer can triggered
+                // before metadata has been bounded.
+                return null;
+            }
             let min, max;
             switch (this._rangeMode) {
                 case 'unit':
                     // timeRange here allows min, max to be simply iso strings
-                    min = castTimeRange(minRange).startValue;
-                    max = castTimeRange(maxRange).startValue;
+                    min = minRange.startValue;
+                    max = maxRange.startValue;
                     break;
                 case 'start':
                 case 'end':
-                    min = castTimeRange(minRange).startValue;
-                    max = castTimeRange(maxRange).endValue;
+                    min = minRange.startValue;
+                    max = maxRange.endValue;
                     break;
             }
             return TZDate.fromValue(value * (max - min) + min, minRange.timeZone);

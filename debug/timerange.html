@@ -115,14 +115,17 @@
       }
       if (animation) {
         const time = animation.getProgressValue();
-        const msg = `${time.text} (${time.timeZone})`;
-        document.getElementById("timer").textContent = msg;
+        if (time) {
+            const msg = `${time.text} (${time.timeZone})`;
+            document.getElementById("timer").textContent = msg;
+        }
       }
     });
     const interactivity = new carto.Interactivity(layer);
     let playing = true;
     interactivity.on('featureClick', event => {
       if (animation) {
+        // const playing = animation.isAnimated();
         if (playing) {
           console.log('PAUSE');
           animation.pause();

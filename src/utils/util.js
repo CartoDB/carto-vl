@@ -110,7 +110,9 @@ export function castTimeRange (v, tz = null) {
         }
         return v;
     }
-    return timeRange({ iso: v, timeZone: tz });
+    if (typeof v === 'string') {
+        return timeRange({ iso: v, timeZone: tz });
+    }
 }
 
 export function timeRange (parameters) {
