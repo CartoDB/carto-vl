@@ -122,10 +122,6 @@ export default class Metadata {
         return keys.filter(key => STATS.includes(key));
     }
 
-    availableStats (propertyName) {
-        return this._filterStats(Object.keys(this.stats(propertyName)));
-    }
-
     stats (propertyName) {
         return this.properties[propertyName];
     }
