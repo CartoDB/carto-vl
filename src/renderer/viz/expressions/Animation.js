@@ -393,14 +393,14 @@ export class Animation extends VariantExpression {
         checkMaxArguments(arguments, 3, 'animation');
         duration = implicitCast(duration);
         input = implicitCast(input);
-        super([input, duration, fade], { input, duration, fade });
+        super({ input, duration, fade });
     }
-    _choose (input, duration, fade) {
-        if (input.type || !(input instanceof BaseExpression)) {
-            if (input.type === 'timerange') {
-                return new TimeRangeAnimation(input, duration, fade);
+    _choose () {
+        if (this.input.type || !(this.input instanceof BaseExpression)) {
+            if (this.input.type === 'timerange') {
+                return new TimeRangeAnimation(this.input, this.duration, this.fade);
             } else {
-                return new ScalarAnimation(input, duration, fade);
+                return new ScalarAnimation(this.input, this.duration, this.fade);
             }
         }
         return null;
