@@ -17,12 +17,23 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
         }
     };
 
+    _defineIdProperty(cls.prototype, renderLayer);
     _defineVizProperties(cls.prototype, renderLayer);
     _defineVizVariables(cls.prototype, renderLayer);
     _defineFeatureProperties(cls.prototype, propertyNames);
     _defineResetMethod(cls.prototype);
 
     return cls;
+}
+
+function _defineIdProperty (targetObject, renderLayer) {
+    Object.defineProperty(targetObject, 'id', {
+        get: function () {
+            const idProperty = renderLayer.viz.metadata.idProperty;
+            return this._rawFeature[idProperty];
+        },
+        configurable: true
+    });
 }
 
 function _defineVizProperties (targetObject, renderLayer) {
@@ -45,12 +56,10 @@ function _createLightweightFeatureVizProperty (targetObject, renderLayer, prop, 
         get: function () {
             return {
                 blendTo: (...args) => {
-                    const featureId = this._rawFeature[idProperty];
-                    return blender(featureId)(...args);
+                    return blender(this.id)(...args);
                 },
                 reset: (...args) => {
-                    const featureId = this._rawFeature[idProperty];
-                    return reset(featureId)(...args);
+                    return reset(this.id)(...args);
                 },
                 value: viz[prop].eval(this._rawFeature)
             };
@@ -63,10 +72,9 @@ function _defineVizVariables (targetObject, renderLayer) {
         get: function () {
             const variables = {};
 
-            // To allow the use of _rawFeature[idProperty] in `_createLightweightFeatureVizProperty`
-            const rawFeature = this._rawFeature;
-            Object.defineProperty(variables, '_rawFeature', {
-                get: function () { return rawFeature; }
+            // To allow the use of this.id in `_createLightweightFeatureVizProperty`
+            Object.defineProperty(variables, 'id', {
+                get: function () { return this.id; }
             });
 
             // viz variables
