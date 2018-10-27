@@ -38,13 +38,5 @@ function asDate (value) {
     if (value instanceof Date) {
         return value;
     }
-    // TODO: value is in some arbitrary TZ;
-    // next will interpret it as UTC, but then return
-    // the value adjusted to the local TZ
-    // it would be better to avoid the conversion,
-    // so that the date can be interpreted in the value implicit TZ
-
-    // as it is now, it is the corresponding UTC date that defines the start/end
-    // so getUTCDate() etc toUTCString() etc
     return util.msToDate(value * 1000);
 }
