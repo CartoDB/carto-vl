@@ -77,8 +77,8 @@ export default class MVT extends Base {
         return new MVT(this._templateURL, JSON.parse(JSON.stringify(this._metadata)), this._options);
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
-        this._tileClient.bindLayer(addDataframe, dataLoadedCallback);
+    bindLayer (addDataframe) {
+        this._tileClient.bindLayer(addDataframe);
     }
 
     async requestMetadata () {

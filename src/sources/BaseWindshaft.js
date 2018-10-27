@@ -21,8 +21,8 @@ export default class BaseWindshaft extends Base {
         this._serverURL = this._generateURL(this._auth, this._config);
     }
 
-    bindLayer (...args) {
-        this._client.bindLayer(...args);
+    bindLayer (addDataframe) {
+        this._client.bindLayer(addDataframe);
     }
 
     requiresNewMetadata (viz) {

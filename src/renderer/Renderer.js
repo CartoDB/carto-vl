@@ -195,6 +195,9 @@ export default class Renderer {
         this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
+        if (!viz) {
+            return;
+        }
         const gl = this.gl;
 
         this._updateDataframeMatrices(dataframes);
@@ -213,8 +216,9 @@ export default class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const styleDataframe = (dataframe, dataframeTexture, shader, vizExpr) => {
-            const textureId = shader.textureIds.get(viz);
+        const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr) => {
+            const shader = metashader.shader;
+            const textureId = metashader.textureIds;
 
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
@@ -240,11 +244,15 @@ export default class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorShader, viz.color));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthShader, viz.width));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterShader, viz.filter));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
+        if (dataframes[0].type !== 'polygon') {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
+        }
+        if (dataframes[0].type !== 'line') {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth));
+        }
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -290,16 +298,17 @@ export default class Renderer {
 
         const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
-            let renderer = null;
+            let metaRenderer = null;
             if (!viz.symbol.default) {
-                renderer = viz.symbolShader;
+                metaRenderer = viz.symbolMetaShader;
             } else if (dataframe.type === 'point') {
-                renderer = viz.pointShader;
+                metaRenderer = viz.pointMetaShader;
             } else if (dataframe.type === 'line') {
-                renderer = viz.lineShader;
+                metaRenderer = viz.lineMetaShader;
             } else {
-                renderer = viz.polygonShader;
+                metaRenderer = viz.polygonMetaShader;
             }
+            const renderer = metaRenderer.shader;
             gl.useProgram(renderer.program);
 
             // Set filtering condition on "... AND feature is in current order bucket"
@@ -339,14 +348,14 @@ export default class Renderer {
             gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
 
             if (!viz.symbol.default) {
-                const textureId = viz.symbolShader.textureIds.get(viz);
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbol._preDraw(renderer.program, drawMetadata, gl);
 
                 viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbolPlacement._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -374,7 +383,7 @@ export default class Renderer {
             }
 
             if (!viz.transform.default) {
-                const textureId = renderer.textureIds.get(viz);
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);

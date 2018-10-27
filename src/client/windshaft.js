@@ -21,10 +21,9 @@ export default class Windshaft {
         this.inProgressInstantiations = {};
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
-        this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
+        this._mvtClient.bindLayer(addDataframe);
     }
 
     _getInstantiationID (MNS, resolution, filtering, choices) {
@@ -168,7 +167,7 @@ export default class Windshaft {
         }
         this._mvtClient = new MVT(urlTemplates);
         this._mvtClient._workerName = 'windshaft';
-        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
+        this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
         this._mvtClient._metadata = metadata;
