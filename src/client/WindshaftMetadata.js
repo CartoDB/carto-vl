@@ -61,6 +61,39 @@ import windshaftCodecFactory from '../codecs/windshaft';
 // }
 
 export default class WindshaftMetadata extends MVTMetadata {
+    constructor(...args) {
+        super(...args);
+        this.propertyKeys = [];
+        this.baseNames = {};
+        Object.keys(this.properties).forEach(baseName => {
+            const property = properties[baseName];
+            if (property.aggregations) {
+                Object.values(property.aggregations).forEach(propName => {
+                    this._addProperty(baseName, propName);
+                });
+            } else if (property.dimension) {
+                if (property.dimension.range) {
+                    property.dimension.range.forEach(rangePropertyName => {
+                        this._addProperty(baseName, rangePropertyName, false);
+                    });
+                    // add source property too, for stats
+                    this._addProperty(baseName, property.dimension.propertyName);
+                } else {
+                    this._addProperty(baseName, property.dimension.propertyName);
+                }
+            } else {
+                this._addProperty(baseName, baseName);
+            }
+        });
+    }
+
+    _addProperty (baseName, propertyName, addToKeys = true) {
+        this.baseNames[propertyName] = baseName;
+        if (addToKeys) {
+            this.propertyKeys.push(propertyName);
+        }
+    }
+
     _dimensionInfo (propertyName) {
         const baseName = this.baseName(propertyName) || propertyName;
         const column = this.properties[baseName];
@@ -77,6 +110,10 @@ export default class WindshaftMetadata extends MVTMetadata {
         // type of the dataframe properties
         const type = dimension ? dimensionType(dimension, propertyName) : sourceType;
         return { baseName, column, dimension, type, baseType, sourceType };
+    }
+
+    baseName (propertyName) {
+        return this.baseNames[propertyName];
     }
 
     decodedProperties (propertyName) {
@@ -100,6 +137,15 @@ export default class WindshaftMetadata extends MVTMetadata {
 
     setCodecs () {
         setMetadataCodecs(this);
+    }
+
+    sourcePropertyName (propertyName) {
+        const baseName = this.baseName(propertyName);
+        const dimension = this.properties[baseName].dimension;
+        if (dimension && dimension.range) {
+            return dimension.propertyName;
+        }
+        return propertyName;
     }
 }
 
