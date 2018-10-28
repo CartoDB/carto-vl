@@ -177,18 +177,18 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 
 Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, there are a fixed number of political parties. And in a geographic region, only one party can win. This is what we refer to as *categorical data*.
 
-In the section, we will explore a variety of ways to symbolize categorical data:
-* **One to one mapping**: match specific categories to specific colors.
+In this section, we will explore a variety of ways to symbolize categorical data:
+* **One-to-one match**: match specific categories to specific colors.
 * **Other categories**: color unspecified categories.
 * **Color most common categories**: using the `top` function.
 * **Color all categories**: with interpolation.
 
 **Note:**
-Before starting with your category map, it is important to note that in CARTO VL **only string properties in the Source are considered categorical**. This means that if you have a category encoded as a number, it is treated as a number. Therefore, functions that expect categorical properties won't work. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work. As a rule of thumb, in CARTO VL, if you want to apply numeric functions (addition or multiplication), the property should be stored/encoded as numbers.
+Before starting with your category map, it is important to note that in CARTO VL **only string properties in the Source are considered categorical**. This means that if you have a category encoded as a number, it is treated as a number. Therefore, functions that expect categorical properties won't work. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work. As a rule of thumb, in CARTO VL, if you want to apply numeric functions (addition, multiplication, etc.), the property should be stored/encoded as numbers.
 
-#### One-to-one mapping
+#### One-to-one match
 
-To assign a specific color to a specific category (or any other list of values) in your data, use the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function.
+To assign a specific color to a specific category in your data, use the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function.
 
 Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors. 
 
@@ -234,9 +234,9 @@ ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], or
 
 #### Color most common categories
 
-Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the scenario above, any other category is assigned to the `others` bucket. 
+Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket. 
 
-The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (darkorange,darkviolet,darkturquoise) and all other weather conditions are colored `white` in the *others* bucket:
+The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (`darkorange`,`darkviolet`,`darkturquoise`) and all other weather conditions are colored `white` in the *others* bucket:
 
 ```CARTO_VL_Viz
 color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
@@ -253,11 +253,11 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 </div>
 <a href="/developers/carto-vl/examples#example-railroad-accidents---top-expression">View my source code!</a>
 
-#### Color all categories with interpolation
+#### Color all categories
 
-Sometimes, we don't care about the correspondence between colors and categories nor about having too many categories. This is particularly useful for getting quick feedback and exploring a dataset, but it is of reduced utility in later stages.
+There are times, in the initial phases of exploring a dataset, where it is helpful to hae all categories in a property assigned a color. This is the default behavior in CARTO VL if you use a property as the `ramp` input (with no `buckets`) and a color list.  
 
-For this case, we can request to see every category by putting the property as the `ramp` input without enclosing it in a function like `buckets`.
+In the rail accident dataset, there are six types of weather conditions defined. In the map below, each type of condition is assigned a color. Since we don't have a one-to-one match between all of the categories in `weather` to the colors in the list the color for each category is interpolated between the ones provided.  
 
 <div class="example-map">
     <iframe
