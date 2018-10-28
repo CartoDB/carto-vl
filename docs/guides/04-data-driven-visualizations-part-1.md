@@ -192,7 +192,7 @@ To assign a specific color to a specific category in your data, use the [`bucket
 
 Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors. 
 
-The map below is a categorical map of election results in the UK. Using a field ($winner),regions where the Conseravative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
+The map below is a categorical map of election results in the UK. Using a field (`$winner`), regions where the Conseravative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
 
 ```CARTO_VL_Viz
 // Color regions where the conservatives won blue and progressives red
@@ -255,24 +255,26 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 
 #### Color all categories
 
-There are times, in the initial phases of exploring a dataset, where it is helpful to hae all categories in a property assigned a color. This is the default behavior in CARTO VL if you use a property as the `ramp` input (with no `buckets`) and a color list.  
+There are times, in the initial phases of exploring a dataset, where it is helpful to have all categories in a property assigned a color. This is the default behavior in CARTO VL if you use a property as the `ramp` input (with no `buckets`) and a color list.  
 
-In the rail accident dataset, there are six types of weather conditions defined. In the map below, each type of condition is assigned a color. Since we don't have a one-to-one match between all of the categories in `weather` to the colors in the list the color for each category is interpolated between the ones provided.  
+In the rail accident dataset, there are six types of weather conditions defined. In the map below, each type of condition is assigned a color even though there are only three colors in the list. To generate these intermediate colors, CARTO VL interpolates between the ones provided because the number of colors doesn't match the number of categories in the input. 
 
-<div class="example-map">
+```CARTO_VL_Viz
+color: ramp($weather,[darkorange,darkviolet,darkturquoise]
+```
+
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="accidents-all"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-all.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-railroad-accidents---all-types">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---all-types">View my source code!</a>
 
-As you can see, CARTO VL is generating intermediate colors by interpolating the provided colors. This is always done when the provided list of colors doesn't match the number of categories in the input. It's difficult to distinguish colors when there are so many categories, you should try to avoid this form (to use `buckets` or `top`) when this happens.
+As mentioned above, this is a useful method for exploring data and/or if there are fewer categories in your dataset. If you have a dataset with over 11 categories, we recommend using `buckets` or `top` since it is difficult for the human eye to distinguish between so many different colors.
 
 **Note:**
-**CieLAB interpolation**
-The interpolation made by `ramp` is always done in the CieLAB color space. This is very important since interpolation in the sRGB color space is not the same as in the CieLAB color space. The later assures a better perception of color since the CieLAB color space models the way the human eye perceives colors. We see the interpolation of two colors colorA and colorB at 50% in the middle when the interpolation is done in CieLAB, but not necessarily if it's done in sRGB.
+The color interpolation done by `ramp` is always in the CIELab color space. This is especially important the sRGB color space is not a perceptual one. CIELab assures a better perception of color since it models, more closely, the way the human eye perceives color. If for example, you are interpolating between two colors, (colorA and colorB) CIELab interploation will be at 50% (in the middle) between them which is not the case  in sRGB.
