@@ -186,20 +186,19 @@ We'll talk here about:
 - [CieLAB interpolation](#_CieLAB_interpolation)
 
 **Note:**
-Within CARTO VL we follow and enforce one condition: **categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), we will treat the property as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, if it makes sense to apply numerical functions like addition or multiplication to the data, the data should be stored/encoded as numbers. Otherwise, the data should be stored/encoded as strings.
+It is important to note that in CARTO VL there is a condition: **categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), it is treated as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, in CARTO VL, if you want to apply numeric functions like addition or multiplication to data, it should be stored/encoded as numbers. Otherwise, the data can be stored/encoded as strings.
 
 #### One to one mapping
 
-To create a one to one mapping between categories and colors (or any other list of values) the simplest function is [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets).
+To assign a specific color to a specific category (or any other list of values) in your data, use the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function.
 
-With `buckets` you can pick some or all categories from a categorical property in a particular order, and use `ramp` to match those with a color list. 
+Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors. 
 
-To see this in action, the map below displays election results in the UK. In the data, there is a field for the winner ($winner)that contains the result of which political party (`conservatives` or `progressives`) won a given region. With this information,you can create a category map by matching the winners of each region to a unique color using `buckets`:
+The map below is a categorical map of election results in the UK. Using a field ($winner),regions where the Conseravative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
 
 ```CARTO_VL_Viz
 // Color regions where the conservatives won blue and progressives red
-
-color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red])
+color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue, crimson])
 ```
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
@@ -214,45 +213,47 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [blue, red
 
 #### *Others*
 
-In the map above, any region that had a winner other than `conservative` or `progressive` is colored `gray` by default. For example, other winning parties like the green party or labor party weren't placed in the `bucket` function so they are automatically assigned to the `others` bucket. It is possible to ovveride the default `others` color by adding a third parameter to `ramp`: 
+In the map above, any region where a party other than Conservative or Labour won is colored `gray` by default. This is because in the data, there are parties other than Conservative or Labour. Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to the `others` bucket. If you want to display more categories, you can add them to the list and assign them an associated color. Once you use `buckets` any category that isn't explicitly defined, will be sent to the `others` bucket.
+
+If you want to overwrite the defualt `others` color (`gray`), you can add a third parameter to `ramp`. In this case, all other parties will be colored `orange`:
 
 ```CARTO_VL_Viz
-// color regions where conservatives won royalblue and crimson where progressives won color all others orange 
+// Overwrite the default others color to orange
 ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], orange)
 ```
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="election-others-bucket"
         src="/developers/carto-vl/examples/maps/guides/ramp/election-others-bucket.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 
-#### Showing the most common categories: `top`
+#### Color the most common categories
 
-If we don't care about which colors get each category, but we don't want to color every category in the dataset, we can use `top` to group all uncommon categories in the *others bucket*.
+Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the scenario above, any other category is assigned to the `others` bucket. 
 
-`top($cause, 5)` function will keep the five most common categories (regarding the entire dataset) and will group the rest into the *others bucket*.
+The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (darkorange,darkviolet,darkturquoise) and all other weather conditions are colored `white` in the *others* bucket:
 
-Let's see this with a dataset of US railroad accidents.
+```CARTO_VL_Viz
+color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
+```
 
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="accidents-top"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-top.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-railroad-accidents---top-expression">View my source code!</a>
 </div>
+<a href="/developers/carto-vl/examples#example-railroad-accidents---top-expression">View my source code!</a>
 
-#### Showing every category without selecting each color
+#### Color all categories with interpolation
 
 Sometimes, we don't care about the correspondence between colors and categories nor about having too many categories. This is particularly useful for getting quick feedback and exploring a dataset, but it is of reduced utility in later stages.
 
