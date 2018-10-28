@@ -175,20 +175,18 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 
 ### Categorical data
 
-Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, we only have a fixed number of political parties. And in each region, only one party can win. This kind of data is what we call *categorical data*.
+Of course, not all data is numeric. Sometimes, it's just one value of a fixed number of possible values. For example, in an election map, there are a fixed number of political parties. And in a geographic region, only one party can win. This is what we refer to as *categorical data*.
 
-We'll talk here about:
-- [Encodings](#A_note_about_encodings)
-- [One to one mapping](#One_to_one_mapping._One_category_-_one_color.)
-- [Others bucket](#*Others*)
-- [Showing the most common categories](#Showing_the_most_common_categories:_`top`)
-- [Showing every category](#Showing_every_category_without_selecting_each_color)
-- [CieLAB interpolation](#_CieLAB_interpolation)
+In the section, we will explore a variety of ways to symbolize categorical data:
+* **One to one mapping**: match specific categories to specific colors.
+* **Other categories**: color unspecified categories.
+* **Color most common categories**: using the `top` function.
+* **Color all categories**: with interpolation.
 
 **Note:**
-It is important to note that in CARTO VL there is a condition: **categorical properties come from strings in the Source**. This means that if you have a category encoded as a number (for example, giving an ID to each political party), it is treated as a number, and functions that expect categorical properties won't work with it. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work with them. As a rule of thumb, in CARTO VL, if you want to apply numeric functions like addition or multiplication to data, it should be stored/encoded as numbers. Otherwise, the data can be stored/encoded as strings.
+Before starting with your category map, it is important to note that in CARTO VL **only string properties in the Source are considered categorical**. This means that if you have a category encoded as a number, it is treated as a number. Therefore, functions that expect categorical properties won't work. Likewise, numerical properties encoded as strings will be treated as categories and functions that expect numerical properties won't work. As a rule of thumb, in CARTO VL, if you want to apply numeric functions (addition or multiplication), the property should be stored/encoded as numbers.
 
-#### One to one mapping
+#### One-to-one mapping
 
 To assign a specific color to a specific category (or any other list of values) in your data, use the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function.
 
@@ -211,9 +209,11 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue
 </div>
 <a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 
-#### *Others*
+#### Other categories
 
-In the map above, any region where a party other than Conservative or Labour won is colored `gray` by default. This is because in the data, there are parties other than Conservative or Labour. Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to the `others` bucket. If you want to display more categories, you can add them to the list and assign them an associated color. Once you use `buckets` any category that isn't explicitly defined, will be sent to the `others` bucket.
+In the map above, any region where a party other than Conservative or Labour won is colored `gray` by default. This is because in the data, there are additional political parties. 
+
+Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to a `others` bucket. Once you use `buckets` any category that isn't explicitly defined, will be sent to this bucket. If you want to display more categories, you can add them to the list and assign them a color. 
 
 If you want to overwrite the defualt `others` color (`gray`), you can add a third parameter to `ramp`. In this case, all other parties will be colored `orange`:
 
@@ -232,7 +232,7 @@ ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], or
 </div>
 <a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 
-#### Color the most common categories
+#### Color most common categories
 
 Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the scenario above, any other category is assigned to the `others` bucket. 
 

@@ -42,7 +42,7 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-96, 41],
-            zoom: 3.5,
+            zoom: 3,
         });
 
         carto.setDefaultAuth({
@@ -52,7 +52,6 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            width: 10
             strokeWidth: 0.2
             strokeColor: black
             color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)

@@ -30,7 +30,7 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("uk_elections ");
+        const source = new carto.source.Dataset("uk_elections");
         const viz = new carto.Viz(`
             color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue, crimson], orange)
             strokeColor: rgba(255,255,255,0.4)`
