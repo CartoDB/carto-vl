@@ -260,8 +260,7 @@ export default class Layer {
         }
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
-        this.viz.clearShaders();
-        this.viz.metadata = metadata;
+        this.viz._bindMetadata(metadata);
         this.viz.gl = this.gl;
         this._needRefresh();
 

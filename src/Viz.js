@@ -311,7 +311,7 @@ export default class Viz {
         }
     }
 
-    clearShaders () {
+    _bindMetadata (metadata) {
         this._colorShader = null;
         this._widthShader = null;
         this._strokeColorShader = null;
@@ -321,47 +321,48 @@ export default class Viz {
         this._pointShader = null;
         this._lineShader = null;
         this._polygonShader = null;
+        this.metadata = metadata;
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
+        checkVizPropertyTypes(this);
     }
 
-    get colorShader () {
+    get colorMetaShader () {
         return this._compileShader('colorShader', shaders.styler.colorShaderGLSL, { color: this.color });
     }
-    get widthShader () {
+    get widthMetaShader () {
         return this._compileShader('widthShader', shaders.styler.widthShaderGLSL, { width: this.width });
     }
-    get strokeColorShader () {
+    get strokeColorMetaShader () {
         return this._compileShader('strokeColorShader', shaders.styler.colorShaderGLSL, { color: this.strokeColor });
     }
-    get strokeWidthShader () {
+    get strokeWidthMetaShader () {
         return this._compileShader('strokeWidthShader', shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
     }
-    get filterShader () {
+    get filterMetaShader () {
         return this._compileShader('filterShader', shaders.styler.filterShaderGLSL, { filter: this.filter });
     }
-    get symbolShader () {
+    get symbolMetaShader () {
         return this._compileShader('symbolShader', shaders.symbolizer.symbolShaderGLSL, {
             symbol: this.symbol,
             symbolPlacement: this.symbolPlacement,
             transform: this.transform
         });
     }
-    get pointShader () {
+    get pointMetaShader () {
         return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
             { transform: this.transform });
     }
-    get lineShader () {
+    get lineMetaShader () {
         return this._compileShader('lineShader', { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
             { transform: this.transform });
     }
-    get polygonShader () {
+    get polygonMetaShader () {
         return this._compileShader('polygonShader', { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
             { transform: this.transform });
     }
 
     _compileShader (shaderName, GLSL, expr) {
         if (!this['_' + shaderName]) {
-            this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
-            checkVizPropertyTypes(this);
             this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
         }
         return this['_' + shaderName];
