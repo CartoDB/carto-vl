@@ -1,5 +1,5 @@
 import * as s from '../../../../../src/renderer/viz/expressions';
-import { validateStaticType, validateDynamicType, validateMaxArgumentsError, validateTypeErrors } from './utils';
+import { validateDynamicType, validateMaxArgumentsError, validateTypeErrors } from './utils';
 
 // Add custom toString function to improve test output.
 s.TRUE.toString = () => 's.TRUE';
@@ -57,7 +57,7 @@ describe('src/renderer/viz/expressions/binary', () => {
         describe('Signature NUMBERS_TO_NUMBER | NUMBER_AND_COLOR_TO_COLOR | COLORS_TO_COLOR', () => {
             validateDynamicType('mul', ['number', 'number'], 'number');
             validateDynamicType('mul', ['number', 'color'], 'color');
-            validateStaticType('mul', ['color', 'color'], 'color');
+            validateDynamicType('mul', ['color', 'color'], 'color');
         });
 
         describe('Signature NUMBERS_TO_NUMBER | COLORS_TO_COLOR', () => {

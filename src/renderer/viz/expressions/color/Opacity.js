@@ -1,6 +1,5 @@
 import BaseExpression from '../base';
-import { number } from '../../expressions';
-import { checkType, checkMaxArguments, checkExpression } from '../utils';
+import { checkType, checkMaxArguments, checkExpression, implicitCast } from '../utils';
 
 /**
  * Override the input opacity.
@@ -29,9 +28,9 @@ export default class Opacity extends BaseExpression {
     constructor (input, alpha) {
         checkMaxArguments(arguments, 2, 'opacity');
 
-        if (Number.isFinite(alpha)) {
-            alpha = number(alpha);
-        }
+        input = implicitCast(input);
+        alpha = implicitCast(alpha);
+
         checkExpression('opacity', 'input', 0, input);
         checkExpression('opacity', 'alpha', 1, alpha);
         super({ input, alpha });
