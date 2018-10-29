@@ -3,7 +3,6 @@ import BaseCodec from './Base';
 // The Identity codec class serves
 // as the default, identity encoding, in which all three
 // encodings are exactly the same.
-// TODO: null/NaN support?
 export default class IdentityCodec extends BaseCodec {
     isIdentity () {
         return true;
