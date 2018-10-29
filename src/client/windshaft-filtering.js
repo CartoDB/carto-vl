@@ -167,7 +167,7 @@ class AggregationFiltering {
         if (f.isA(ClusterAvg) || f.isA(ClusterMax) || f.isA(ClusterMin) || f.isA(ClusterMode) || f.isA(ClusterSum)) {
             let p = this._property(f.property);
             if (p) {
-                p.property = p.propertyName;
+                p.property = f.propertyName;
                 return p;
             }
         }
