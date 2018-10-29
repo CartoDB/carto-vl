@@ -13,8 +13,6 @@ import ClusterMin from '../renderer/viz/expressions/aggregation/cluster/ClusterM
 import ClusterMode from '../renderer/viz/expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from '../renderer/viz/expressions/aggregation/cluster/ClusterSum';
 
-import * as schema from '../renderer/schema';
-
 class AggregationFiltering {
     /**
      * Generate aggregation filters:
