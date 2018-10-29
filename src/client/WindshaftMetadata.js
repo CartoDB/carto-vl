@@ -100,8 +100,6 @@ export default class WindshaftMetadata extends MVTMetadata {
         let dimension = null;
         if (baseName !== propertyName) {
             if (baseName !== propertyName && column.dimension) {
-                // whatever
-            }
                 dimension = column.dimension;
             }
         }
