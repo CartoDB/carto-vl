@@ -12,7 +12,7 @@ So clusterTime is a kind of classification or grouping into buckets methods. It 
 
 To use aggregations effectively, each property to be used should be wrapped in either a cluster aggregation expression (`clusterSum`, `clusterAvg`, `clusterMin`, ...) or in a `clusterTime` expression. In the first case we obtained an aggregate of the property value over each cluster. In the second, the classified property becomes an aggregation dimension.
 
-### `clusterTime`
+## `clusterTime` parameters
 
 The expression for discretizing a date property of the date and use it as a dimensions of the clustered data has the form:
 
@@ -38,20 +38,20 @@ A `TimeRange` has these properties:
 * `text` an ISO8601-based representation of the period, e.g. '2018-04' for a month, '2018-04-01T03' for an hour.
 * `startDate`, `endDate` are the start and end of the period; note that the period is defined as `startDate <= t < endDate`, so the end date is just after the end of the period, for example the start of April 2018 is 2018-04-01T00:00:00 and the end is 2018-04-02T00:00:00. See below for information about the type of these dates, `TZDate`.
 
-## Cyclic (recurring) units as numeric values
+### Cyclic (recurring) units as numeric values
 
-* `semesterOfYear` (1:2)
-* `trimesterOfYear` (1:3)
-* `quarterOfYear` (1:4)
+* `semesterOfYear` (1:2) (6-month term)
+* `trimesterOfYear` (1:3) (4-month term)
+* `quarterOfYear` (1:4) (3-month term)
 * `monthOfYear` (1:12)
-* `weekOfYear` (1:53)
-* `dayOfWeek` (1:7)
+* `weekOfYear` (1:53) follows [ISO 8601 numbering](https://en.wikipedia.org/wiki/ISO_week_date)
+* `dayOfWeek` (1:7) as per ISO 8601, 1 = Monday, etc.
 * `dayOfMonth` (1:31)
 * `dayOfYear` (1:366)
 * `hourOfDay` (0:23)
 * `minuteOfHour` (0:59)
 
-## Time range units and its text representation
+### Time range units and its text representation
 
 The format is based on [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601):
 
@@ -76,6 +76,14 @@ For the numeric case, the `clusterTime` expression can be used as any other nume
 For the time ranges, linear and animation have special support for this type. Animation behaves in a special way with a time range: it will hold for the duration of each time range, and fade in/out will be applied before and after the periods. (the behaviour can be disabled by wrapping the time range in a linear expression, which will be based on the start date of the time ranges)
 
 viewportFeatures and interactivity is also compatible with clusterTime
+
+### Animation
+
+When applied to a `TimeRange` (e.g. through `clusterTime`), `animation` has a slightly different behavior than with other inputs.
+
+The progress of the animation will be a date (of class `TZDate`), and it will yield continuous values, interpolated from the start of the first time range to the end of the last time range. So even though the values of the input expression at each feature will be discrete values (e.g. months), the progress time will take continuous values, progressing through days, hours, etc.
+
+When the progress enters a given discrete value (a time range), the features with that value will match it for as long as the progress date remains within that range. The fade in and fade out durations will apply to progress values before and after entering the time range.
 
 ### Notes
 
