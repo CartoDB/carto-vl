@@ -221,8 +221,8 @@ export class MVTWorker {
             const propertyNames = metadata.decodedProperties(sourcePropertyName);
             const propertyValue = feature.properties[sourcePropertyName];
             const values = this.decodeProperty(metadata, sourcePropertyName, propertyValue);
-            values.forEach((value, j) => {
-                properties[propertyNames[j]][i] = value;
+            values.forEach((value, k) => {
+                properties[propertyNames[k]][i] = value;
             });
         }
     }
