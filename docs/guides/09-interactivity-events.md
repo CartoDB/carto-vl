@@ -1,7 +1,7 @@
 ## Interactivity and events
-In this guide you will learn how to deal with user interactions within your visualization. After going through it, you will be able to manage some interesting events (e.g. waiting for a layer to load or clicking on a feature) to give your users more dynamic and useful visualizations. You will also learn how to build very common add-ons such as *pop-ups*.
+In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being visualized.
 
-At the end of the guide you will have built a visualization like this one. Move your mouse over the cities and click on them to display a pop-up:
+By the end of the guide you will have built a visualization like this one where the color of features change as you mover your mouse over them and display pop-up information when you click on them:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
@@ -12,9 +12,10 @@ At the end of the guide you will have built a visualization like this one. Move 
     </iframe>
 </div>
 
-In order to start, grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Copy its source code into a new file called `interactivity.html` and test it is working fine before going on.
+### Getting started
+To start, grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html) one and copy the source code into a new file named `interactivity.html` and test it by opening the file in a browser before moving forward.
 
-Add a navigation control to the map, with:
+Next, add navigation controls to the map by pasting this code underneath the basemap definition:
 ```js
 // Add zoom controls
 const nav = new mapboxgl.NavigationControl();
@@ -22,15 +23,15 @@ map.addControl(nav, 'top-left');
 ```
 
 ### Map events
-It all begins with the map and sometimes you are interested in listening to some relevant events from to the **map** itself. For example you want to wait for it to load or maybe display the current map's center coordinates. In those cases, you can use a set of events already provided by the **Mapbox GL JS Map**, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach callback functions to react on them.
+Let's start with _map events_. These are events you can listen to from the **map** itself. For example, if you want to listen to an event for when a map loads or even display the current map's center coordinates, you can use a set of events provided by **Mapbox GL JS Map**, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach callback functions to react to them.
 
-Add this pair of listeners to your code to test map events, just after the map initialization:
+Try these map events out by adding a pair of listeners to your code, just after the code for the zoom controls:
 ```js
-// Wait for the map to render for the first time
+// Wait for the map to load for the first time
 map.on('load', () => {
     console.log('Map has loaded!');
 });
-// Listen to every move event caused by the user
+// Listen for every move event by the user
 const displayCenter = () => {
     const center = map.getCenter();
     const longitude = center.lng.toFixed(6);
@@ -42,18 +43,20 @@ const displayCenter = () => {
 map.on('move', displayCenter);
 ```
 
-**Note:**
-Check the console after loading your file in the browser, to see the first message: 'Map has loaded'. Then, interact with the map control and see the updated values for center & zoom. You can check Mapbox [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map) for more information on map events.
+To see the "reactions" (callback functions) to each map event above, open your file in a browser and then open the console through the browser's developer tools. Once the map loads you will see the first message: 'Map has loaded!'. Next, with the console still open, use the zoom controls to interact with the map and watch as the values for `Center:` and `Zoom:` update. 
 
-The result should look like this [map](/developers/carto-vl/examples/maps/guides/interactivity/step-1.html). Open it, change the extent and read the messages in the console (enable browser _Developer tools_):
-
+For more information on Mapbox GL JS map events see their [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map).
 
 ### Layer events
-Once you have your basemap, you can start to work with your layers. And all [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events to listen to: `loaded` and `updated`.
+In the previous section you saw how to add _map events_ once you have a basemap added. In this section, we will look at how to listen to _layer events_ with CARTO VL. 
 
-The use of the `loaded` event is pretty common, due to the fact that in most cases you need to load the data from an external server and that can take some time.
+All [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events you can listen to: _`loaded`_ and _`updated`_.
 
-Add this to your code to create a layer as usual, and add it to your map:
+#### Loaded event
+
+The use of the `loaded` event is pretty common due to the fact that in most cases, you will load data from an external server and depending on where it is coming from, that could take time.
+
+Add this to your code to create a CARTO VL layer of populated places and add it to your map:
 ```js
 carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
 const source = new carto.source.Dataset('populated_places');
@@ -62,19 +65,24 @@ const layer = new carto.Layer('Cities', source, viz);
 layer.addTo(map);
 ```
 
-Now add a `loaded` listener to the previous layer:
+Next add a `loaded` listener for that layer:
 ```js
 layer.on('loaded', () => {
-    console.log('Cities layer has been loaded!');
+    console.log('Cities layer has loaded!');
 });
 ```
 
+Load the file in your browser and open the console. This time, you will see two messages. First, `Map has loaded!` from the _map event_ and then, `Cities layer has loaded!` from the _layer event_. 
+
+If you were adding more than one layer to your map, you could use a single function to handle all of them. For these cases, **on** and **off** methods are available at the `carto` namespace. For example: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })` would show the message `All layers have loaded` once layer1 and layer2 draw on the map.
+
+There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). 
+
 **Note:**
-This previous event could be useful for example to display some kind of loading animation over your map and then hiding it after the layer has loaded (see for example this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). Notice how the name of the event is `loaded`, not `load`.
+It is important to note that the name of this event is **`loaded`**, not `load`.
 
-If you were using several layers, you could also have a single function to handle them all. For this case, **on** and **off** are available at `carto` namespace, expecting a list of layers like in this code: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })`.
-
-Regarding to the `updated` event, it can be useful for the cases where the layer's viz changes, for example when you are building an animation. See the [Playing with animations guide](/developers/carto-vl/guides/playing-with-animations).
+#### Updated event
+The `updated` event, is useful for cases when a layer's viz changes, for example when you have an [animated visualization](/developers/carto-vl/guides/playing-with-animations).
 
 If you check your work now, it should look like this:
 <div class="example-map">

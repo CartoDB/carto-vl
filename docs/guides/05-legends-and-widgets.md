@@ -1,20 +1,19 @@
 ## Legends and Widgets
 
-Most of the times, displaying data in a map without further information is meaningless. Here, we'll see two ways to enrich visualizations: legends and widgets.
-- **Legends**. Legends don't provide additional information, instead, they provide information about how information was displayed on the map: was the conservative party colored red or blue? or, in a bubble-map, which property is displayed by the size of each circle, and in which manner.
-- **Widgets**. A widget is an additional piece of information that accompanies the map and that provides information not necessarily present on the map. For example, in an election map, we are probably interested in the global results of the election: how many votes did receive each party in total? how many people voted?
+Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore two ways to enrich your visualizations with this information using _legends_ and _widgets_.
+
+- **Legends**: aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a brief description of what they represent. For example, legends help answer questions like: is the conservative party colored red or blue? or which property and value are represented by the size of each circle?
+- **Widgets**: provide additional pieces of information that accompany a map to facilitate understanding and exploration. Widgets often provide additional information about a dataset that is not symbolized on a map itself. For example, on a election map, you can style the map by winner, but also provide addtional information from the data. For example, how many total votes did each party receive? or how many people voted?
 
 ### Legends
 
-In the data-driven visualization guide we had displayed multiple legends to better understand other concepts, but we didn't talk about the legends themselves.
+CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. With that in mind, this guide provides a series of examples that are meant to serve as legend building blocks that you can take and begin to customize on top of. 
 
-CARTO VL provides some facilities to create legends: the advanced `eval()` method, which won't be covered by this guide, and the user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, which is what we will use here.
+There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method which is the one we cover in this guide.
 
-However, in any case, CARTO VL itself doesn't provide functionality to display legends, it provides functionality to build them upon them. CARTO VL provides the necessary data to create the legends, but using that data to draw the legends on the screen is left as a responsibility of the developer. The reason for this is that in this way, you'll be able to customize much more your application.
 
-With that said, we provide some examples of this so you can base your own legends on CARTO VL examples. Here, we'll explain both: the CARTO VL legend API and the reference examples that use such API.
 
-To access the `getLegendData()` method you'll need a way to reference your `ramp` expression. If the `ramp` expression is the root expression of a styling property it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you'll need to use a variable, as explained in the [next subsection](##_Widgets).
+To access the `getLegendData()` method you need to reference the `ramp` expression. If the `ramp` expression is the root expression of a styling property, like `color` or `width`, it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you'll need to use a variable, as explained in the [next subsection](##_Widgets).
 
 #### Unclassified numerical data
 
