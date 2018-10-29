@@ -103,13 +103,11 @@ export default class WindshaftMetadata extends MVTMetadata {
                 dimension = column.dimension;
             }
         }
-        // type of the dataset/query column
         const baseType = column.type;
-        // type of the source property
         const sourceType = dimension ? dimensionBaseType(dimension) : baseType;
         // type of the dataframe properties
-        const type = dimension ? dimensionType(dimension, propertyName) : sourceType;
-        return { baseName, column, dimension, type, baseType, sourceType };
+        const dataframeType = dimension ? dimensionType(dimension, propertyName) : sourceType;
+        return { baseName, column, dimension, dataframeType, baseType, sourceType };
     }
 
     baseName (propertyName) {
