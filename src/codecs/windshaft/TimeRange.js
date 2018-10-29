@@ -39,9 +39,6 @@ export default class TimeRangeCodec extends BaseCodec {
 }
 
 function decodeModal (mode, propertyValue) {
-    // if (propertyValue instanceof Date) {
-    //     return propertyValue.getTime() / 1000;
-    // }
     switch (mode) {
         case 'start':
             return util.timeRange({ iso: propertyValue }).startValue / 1000;
