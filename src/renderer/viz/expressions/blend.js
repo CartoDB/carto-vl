@@ -81,7 +81,6 @@ export default class Blend extends BaseExpression {
         super._preDraw(...args);
         if (this.originalMix.isA(Transition) && !this.originalMix.isAnimated()) {
             this.parent.replaceChild(this, this.b);
-            this.notify();
         }
     }
 }

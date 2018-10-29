@@ -139,7 +139,7 @@ export default class Viz {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
-                this._changed();
+                this._changed().catch(() => {});
             }
         });
 
@@ -155,7 +155,7 @@ export default class Viz {
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
-                        this._changed();
+                        this._changed().catch(() => {});
                     }
                     return true;
                 }
@@ -196,8 +196,9 @@ export default class Viz {
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
-            this._changeCallback(this);
+            return this._changeCallback(this);
         }
+        return Promise.resolve(null);
     }
 
     _updateRootExpressionList () {
