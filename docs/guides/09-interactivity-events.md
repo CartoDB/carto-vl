@@ -237,7 +237,7 @@ interactivity.on('featureEnter', featureEvent => {
 ```
 
 **Note:**
-[blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to red and also increases the size of the symbols.
+[blendTo](/developers/carto-vl/reference/#expressionblendto) is an expression that allows a smooth transition between two values. In this case, the transition makes the original color turn to green and also increases the size of the symbols.
 
 When the `featureLeave` event is fired you can tell your callback to `reset` the color and size for each feature:
 ```js
