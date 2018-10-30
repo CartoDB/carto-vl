@@ -126,16 +126,6 @@ export default class Feature {
         });
     }
 
-    reset (duration = 500) {
-        VIZ_PROPERTIES.forEach((property) => {
-            this[property].reset(duration);
-        });
-
-        for (let key in this.variables) {
-            this.variables[key].reset(duration);
-        }
-    }
-
     blendTo (newVizProperties, duration = 500) {
         Object.keys(newVizProperties).forEach((property) => {
             if (!(VIZ_PROPERTIES.includes(property))) {
@@ -144,5 +134,15 @@ export default class Feature {
             const newValue = newVizProperties[property];
             this[property].blendTo(newValue, duration);
         });
+    }
+
+    reset (duration = 500) {
+        VIZ_PROPERTIES.forEach((property) => {
+            this[property].reset(duration);
+        });
+
+        for (let key in this.variables) {
+            this.variables[key].reset(duration);
+        }
     }
 }

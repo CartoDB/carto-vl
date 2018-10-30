@@ -22,8 +22,8 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineVizProperties(cls.prototype, renderLayer);
     _defineVizVariables(cls.prototype, renderLayer);
     _defineFeatureProperties(cls.prototype, propertyNames);
-    _defineRootResetMethod(cls.prototype);
     _defineRootBlendToMethod(cls.prototype);
+    _defineRootResetMethod(cls.prototype);
 
     return cls;
 }
@@ -103,23 +103,6 @@ function _defineFeatureProperties (targetObject, propertyNames) {
     });
 }
 
-function _defineRootResetMethod (targetObject) {
-    Object.defineProperty(targetObject, 'reset', {
-        get: function () {
-            const reset = (duration = 500) => {
-                VIZ_PROPERTIES.forEach((property) => {
-                    this[property].reset(duration);
-                });
-
-                for (let key in this.variables) {
-                    this.variables[key].reset(duration);
-                }
-            };
-            return reset;
-        }
-    });
-}
-
 function _defineRootBlendToMethod (targetObject) {
     Object.defineProperty(targetObject, 'blendTo', {
         get: function () {
@@ -133,6 +116,23 @@ function _defineRootBlendToMethod (targetObject) {
                 });
             };
             return blendTo;
+        }
+    });
+}
+
+function _defineRootResetMethod (targetObject) {
+    Object.defineProperty(targetObject, 'reset', {
+        get: function () {
+            const reset = (duration = 500) => {
+                VIZ_PROPERTIES.forEach((property) => {
+                    this[property].reset(duration);
+                });
+
+                for (let key in this.variables) {
+                    this.variables[key].reset(duration);
+                }
+            };
+            return reset;
         }
     });
 }
