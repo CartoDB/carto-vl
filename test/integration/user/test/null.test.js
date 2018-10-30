@@ -61,7 +61,7 @@ describe('Null values', () => {
             layer.addTo(map);
 
             layer.on('loaded', () => {
-                expect(viz.variables.features.value.map(f => f.num)).toEqual([1, 2]);
+                expect(viz.variables.features.value.map(f => f.properties.num)).toEqual([1, 2]);
                 done();
             });
         });
@@ -75,7 +75,7 @@ describe('Null values', () => {
                 layer.addTo(map);
 
                 layer.on('loaded', () => {
-                    expect(viz.variables.features.value.map(f => f.cat)).toEqual(['A', 'C']);
+                    expect(viz.variables.features.value.map(f => f.properties.cat)).toEqual(['A', 'C']);
                     done();
                 });
             });

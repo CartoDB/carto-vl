@@ -91,12 +91,15 @@ function _defineVizVariables (targetObject, renderLayer) {
 }
 
 function _defineFeatureProperties (targetObject, propertyNames) {
-    propertyNames.forEach(prop => {
-        Object.defineProperty(targetObject, prop, {
-            get: function () {
-                return this._rawFeature[prop];
-            }
-        });
+    Object.defineProperty(targetObject, 'properties', {
+        get: function () {
+            const properties = {};
+            // feature properties
+            propertyNames.forEach(propertyName => {
+                properties[propertyName] = this._rawFeature[propertyName];
+            });
+            return properties;
+        }
     });
 }
 

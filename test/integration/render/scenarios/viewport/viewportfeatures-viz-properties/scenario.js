@@ -17,7 +17,7 @@ layer.on('loaded', async () => {
     const feature = viz.variables.v_features.value[0];
 
     // Using viz properties, viz variables (and also feature props)
-    const duration = feature.numeric;
+    const duration = feature.properties.numeric;
     const augmentedSize = feature.variables.augmentedSize.value;
 
     layer.on('updated', debounce(() => { window.loaded = true; }));
