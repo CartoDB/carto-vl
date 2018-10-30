@@ -1,5 +1,4 @@
 import MVT from '../../../src/sources/MVT';
-import { MVTWorker } from '../../../src/sources/MVTWorker';
 import MVTMetadata from '../../../src/sources/MVTMetadata';
 
 describe('sources/MVT', () => {
