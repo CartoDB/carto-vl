@@ -7,7 +7,7 @@ Maps that symbolize data without the necessary information to decode the symbols
 
 ### Legends
 
-CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. With that in mind, this guide provides a series of examples that are meant to serve as legend building blocks that you can take and begin to customize on top of. 
+CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. With that in mind, this guide provides a series of examples that are meant to serve as legend "building blocks" that you can take and begin to customize on top of. 
 
 There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method which is the one we cover in this guide.
 
