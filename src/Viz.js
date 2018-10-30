@@ -241,7 +241,7 @@ export default class Viz {
     }
 
     setDefaultsIfRequired (geomType) {
-        this._geomType = geomType;
+        this._geomType = this._geomType || geomType;
         if (this._appliedDefaults) {
             return;
         }
