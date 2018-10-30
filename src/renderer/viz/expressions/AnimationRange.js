@@ -24,7 +24,7 @@ export default class AnimationRange extends BaseExpression {
     }
 
     isAnimated () {
-        return this._startAnim.isAnimated();
+        return true;
     }
 
     getProgressValue () {

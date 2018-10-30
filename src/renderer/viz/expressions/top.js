@@ -36,7 +36,6 @@ export default class Top extends BaseExpression {
         checkMaxArguments(arguments, 2, 'top');
 
         buckets = implicitCast(buckets);
-        checkInstance('top', 'property', 0, Property, property);
         const children = { property, buckets };
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
@@ -60,6 +59,7 @@ export default class Top extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
+        checkInstance('top', 'property', 0, Property, this.property);
         checkType('top', 'property', 0, 'category', this.property);
         checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         checkType('top', 'buckets', 1, 'number', this.buckets);

@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateMaxArgumentsError, mockMetadata } from '../utils';
+import { validateMaxArgumentsError, validateTypeErrors, mockMetadata } from '../utils';
 
 describe('src/renderer/viz/expressions/globalAggregation', () => {
     describe('error control', () => {
@@ -9,6 +9,9 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
         validateMaxArgumentsError('globalAvg', ['number', 'number']);
         validateMaxArgumentsError('globalCount', ['number']);
         validateMaxArgumentsError('globalPercentile', ['number', 'number', 'number']);
+        validateTypeErrors('globalPercentile', ['number-property', 'number-property'], () =>
+            new RegExp('[\\s\\S]*\invalid second parameter \'percentile\'[\\s\\S]*parameter cannot be feature dependent', 'g'));
+        validateTypeErrors('globalPercentile', ['category', 'number-property']);
     });
 
     const $price = s.property('price');

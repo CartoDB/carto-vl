@@ -54,8 +54,6 @@ export default class AnimationGeneral extends BaseExpression {
 
     isAnimated () {
         return true;
-        // FIXME: this should return !this._paused;
-        // but there are other bugs that make that a worse option now (#1102)
     }
 
     _dataReady () {

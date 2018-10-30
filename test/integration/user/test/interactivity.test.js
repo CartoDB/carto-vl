@@ -510,3 +510,78 @@ describe('regression with a category filter', () => {
         document.body.removeChild(setup.div);
     });
 });
+
+describe('regression with blendTo', () => {
+    let div, map, source, viz, layer, interactivity;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        div = setup.div;
+        map = setup.map;
+
+        source = new carto.source.GeoJSON(feature1);
+        viz = new carto.Viz(`
+            color: red
+            @wadus: 123
+        `);
+        layer = new carto.Layer('layer1', source, viz);
+        interactivity = new carto.Interactivity(layer);
+        layer.addTo(map);
+    });
+
+    it('should ignore rejected updates when coming from `reset`', done => {
+        let error = null;
+        // chrome-only event
+        window.addEventListener('unhandledrejection', function (promiseRejectionEvent) {
+            error = promiseRejectionEvent;
+        });
+
+        const moveAway = debounce(() => {
+            util.simulateMove({ lng: -5, lat: -5 });
+        });
+        interactivity.on('featureEnter', async event => {
+            const feature = event.features[0];
+            await feature.color.blendTo('green', 50);
+            await feature.strokeWidth.blendTo(40, 50);
+
+            layer.on('updated', moveAway);
+        });
+
+        const resetEnd = debounce(() => {
+            const thereWasAnUpdateError = error && error.reason.message.startsWith('Another `viz change` finished before this one');
+            expect(thereWasAnUpdateError).toBeFalsy();
+            done();
+        });
+        interactivity.on('featureLeave', async event => {
+            layer.off('updated', moveAway);
+
+            const feature = event.features[0];
+            await feature.color.reset();
+            await feature.strokeWidth.reset();
+
+            layer.on('updated', resetEnd);
+        });
+
+        onLoaded(() => {
+            // Hover on the feature 1
+            util.simulateMove({ lng: 5, lat: 5 });
+        });
+    });
+
+    function onLoaded (callback) {
+        layer.on('loaded', callback);
+    }
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(div);
+    });
+});
+
+const debounce = (func, delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+    };
+};

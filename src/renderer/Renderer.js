@@ -3,7 +3,7 @@ import { Asc, Desc } from './viz/expressions';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-
+import { parseVizExpression } from './viz/parser';
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
@@ -128,11 +128,10 @@ export default class Renderer {
         }
 
         // Assume that all dataframes of a renderLayer share the same metadata
-        const metadata = dataframes.length ? dataframes[0].metadata : null;
+        const metadata = viz.metadata;
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
-
-        const viewportExpressionsLength = viewportExpressions.length;
+        renderLayer.parseVizExpression = parseVizExpression; // to avoid a circular dependency problem
+        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
@@ -159,11 +158,19 @@ export default class Renderer {
                     continue;
                 }
 
-                for (let j = 0; j < viewportExpressionsLength; j++) {
-                    viewportExpressions[j].accumViewportAgg(feature);
-                }
+                // Pass the rawFeature to all viewport aggregations
+                this._accumViewportAggregations(viewportExpressions, feature, renderLayer);
             }
         });
+    }
+
+    _accumViewportAggregations (viewportExpressions, rawFeature, renderLayer) {
+        const viewportExpressionsLength = viewportExpressions.length;
+
+        for (let j = 0; j < viewportExpressionsLength; j++) {
+            const currentViewportExp = viewportExpressions[j];
+            currentViewportExp.accumViewportAgg(rawFeature);
+        }
     }
 
     /**

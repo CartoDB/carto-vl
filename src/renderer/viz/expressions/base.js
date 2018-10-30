@@ -151,7 +151,7 @@ export default class Base {
     }
 
     notify () {
-        this.parent.notify();
+        return this.parent.notify();
     }
 
     accumViewportAgg (feature) {
@@ -297,6 +297,7 @@ export default class Base {
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
+        replacer.notify().catch(() => { }); // ignore change rejections when using blend
     }
 
     _blendFrom (final, duration = 500, interpolator = null) {

@@ -3,6 +3,7 @@ import TimeRange from './time/TimeRange';
 /**
  * Export util functions
  */
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -33,7 +34,7 @@ export function regExpThatContains (text) {
 
 /**
  * Transform the given parameter into a Date object.
- * When a number is given as a parameter is assummed to be a milliseconds epoch (UTC).
+ * When a number is given as a parameter is assumed to be a milliseconds epoch (UTC).
  * The result is a local Date.
  * @param {Date|number|string} date
  */
@@ -44,7 +45,11 @@ export function castDate (date) {
     if (typeof (date) === 'number') {
         return msToDate(date);
     }
-    return new Date(date);
+    if (isString(date)) {
+        return new Date(date);
+    } else {
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid Date type`);
+    }
 }
 
 export function msToDate (msEpoch) {
