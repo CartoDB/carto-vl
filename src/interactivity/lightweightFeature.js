@@ -1,6 +1,7 @@
 import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
 import { WM_R } from '../utils/util';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**
  * Generate a lightweight Feature-like class
@@ -45,7 +46,8 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineVizProperties(cls.prototype, renderLayer);
     _defineVizVariables(cls.prototype, renderLayer);
     _defineFeatureProperties(cls.prototype, propertyNames);
-    _defineResetMethod(cls.prototype);
+    _defineRootBlendToMethod(cls.prototype);
+    _defineRootResetMethod(cls.prototype);
 
     return cls;
 }
@@ -122,16 +124,36 @@ function _defineVizVariables (targetObject, renderLayer) {
 }
 
 function _defineFeatureProperties (targetObject, propertyNames) {
-    propertyNames.forEach(prop => {
-        Object.defineProperty(targetObject, prop, {
-            get: function () {
-                return this._rawFeature[prop];
-            }
-        });
+    Object.defineProperty(targetObject, 'properties', {
+        get: function () {
+            const properties = {};
+            // feature properties
+            propertyNames.forEach(propertyName => {
+                properties[propertyName] = this._rawFeature[propertyName];
+            });
+            return properties;
+        }
     });
 }
 
-function _defineResetMethod (targetObject) {
+function _defineRootBlendToMethod (targetObject) {
+    Object.defineProperty(targetObject, 'blendTo', {
+        get: function () {
+            const blendTo = (newVizProperties, duration = 500) => {
+                Object.keys(newVizProperties).forEach((property) => {
+                    if (!(VIZ_PROPERTIES.includes(property))) {
+                        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+                    }
+                    const newValue = newVizProperties[property];
+                    this[property].blendTo(newValue, duration);
+                });
+            };
+            return blendTo;
+        }
+    });
+}
+
+function _defineRootResetMethod (targetObject) {
     Object.defineProperty(targetObject, 'reset', {
         get: function () {
             const reset = (duration = 500) => {

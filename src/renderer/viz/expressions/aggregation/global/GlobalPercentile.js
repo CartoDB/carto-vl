@@ -1,12 +1,12 @@
 import BaseExpression from '../../base';
 import { number } from '../../../expressions';
-import { checkMaxArguments } from '../../utils';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+import { checkMaxArguments, checkExpression, implicitCast, checkType, checkInstance, checkFeatureIndependent } from '../../utils';
+import Property from '../../basic/property';
 /**
  * Return the Nth percentile of an numeric property for the entire source data.
  *
  * @param {Number} property - numeric property
- * @param {Number} percentile - Numeric expression in the [0, 100] range
+ * @param {Number} percentile - Numeric expression in the [0, 100] range, must be feature independent
  * @return {Number} Result of the aggregation
  *
  * @example <caption>Assign the 90th percentile of the `amount` property for the entire dataset to a variable.</caption>
@@ -30,33 +30,39 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../.
 export default class GlobalPercentile extends BaseExpression {
     constructor (property, percentile) {
         checkMaxArguments(arguments, 2, 'globalPercentile');
+        property = implicitCast(property);
+        percentile = implicitCast(percentile);
+        checkExpression('globalPercentile', 'property', 0, property);
+        checkExpression('globalPercentile', 'percentile', 1, percentile);
 
-        if (!Number.isFinite(percentile)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'percentile' must be a fixed literal number`);
-        }
-        super({ _value: number(0) });
-        // TODO improve type check
-        this.property = property;
-        this.percentile = percentile;
+        super({ _value: number(0), property, percentile });
+        this.type = 'number';
+        super.inlineMaker = inline => inline._value;
     }
 
     isFeatureDependent () {
         return false;
     }
 
-    get value () {
-        return this._value.expr;
+    eval () {
+        const p = this.percentile.eval() / 100;
+        return this._copySample[Math.floor(p * this._copySample.length)];
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        this.property._bindMetadata(metadata);
-        this.type = 'number';
-        super.inlineMaker = inline => inline._value;
-        const copy = metadata.sample.map(s => s[this.property.name]);
-        copy.sort((x, y) => x - y);
-        const p = this.percentile / 100;
-        this._value.expr = copy[Math.floor(p * copy.length)];
+        checkType('globalPercentile', 'property', 0, 'number', this.property);
+        checkType('globalPercentile', 'percentile', 0, 'number', this.percentile);
+        checkInstance('globalPercentile', 'property', 0, Property, this.property);
+        checkFeatureIndependent('globalPercentile', 'percentile', 1, this.percentile);
+
+        this._copySample = metadata.sample.map(s => s[this.property.name]);
+        this._copySample.sort((x, y) => x - y);
+    }
+
+    _preDraw (...args) {
+        this._value.expr = this.value;
+        super._preDraw(...args);
     }
 
     _getMinimumNeededSchema () {

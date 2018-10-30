@@ -1,13 +1,13 @@
 const map = new CartoMap({
     container: 'map',
-    background: 'black'
+    background: 'white'
 });
 
-const source = new carto.source.GeoJSON(sources['points']);
+const source = new carto.source.GeoJSON(sources['point']);
 const viz = new carto.Viz(`
-    color: ramp(linear($numeric, 0, 10), reverse(@palette))
-    width: 50
-    @palette: prism
+width: 50
+symbol: image('/test/common/test.png')
+symbolPlacement: align_bottom
 `);
 const layer = new carto.Layer('layer', source, viz);
 

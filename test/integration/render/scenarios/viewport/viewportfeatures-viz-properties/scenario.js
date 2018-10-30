@@ -17,17 +17,14 @@ layer.on('loaded', async () => {
     const feature = viz.variables.v_features.value[0];
 
     // Using viz properties, viz variables (and also feature props)
-    const duration = feature.numeric;
+    const duration = feature.properties.numeric;
     const augmentedSize = feature.variables.augmentedSize.value;
 
-    // Two blendTo operations
-    const update = async () => {
-        await feature.width.blendTo(augmentedSize * 2, 10); // second blend
-        window.loaded = true;
-    };
-    layer.on('updated', debounce(update));
-
-    await feature.color.blendTo('blue', duration); // first blend
+    layer.on('updated', debounce(() => { window.loaded = true; }));
+    await feature.blendTo({
+        color: 'blue',
+        width: augmentedSize * 2.0
+    }, duration);
 });
 
 const debounce = (func, delay = 250) => {

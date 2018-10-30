@@ -221,6 +221,7 @@ export default class Layer {
         if (majorChange) {
             uid = { major: this._majorNextUID, minor: 0 };
             this._majorNextUID++;
+            this._minorNextUID = 1;
         } else {
             uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
             this._minorNextUID++;
@@ -260,8 +261,7 @@ export default class Layer {
         }
         this._viz = viz;
         viz.onChange(this._vizChanged.bind(this));
-        this.viz.clearShaders();
-        this.viz.metadata = metadata;
+        this.viz._bindMetadata(metadata);
         this.viz.gl = this.gl;
         this._needRefresh();
 

@@ -1,5 +1,6 @@
 import FeatureVizProperty from './featureVizProperty';
 import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**
  * @namespace Features
@@ -122,6 +123,16 @@ export default class Feature {
                     return this._rawFeature[prop];
                 }
             });
+        });
+    }
+
+    blendTo (newVizProperties, duration = 500) {
+        Object.keys(newVizProperties).forEach((property) => {
+            if (!(VIZ_PROPERTIES.includes(property))) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+            }
+            const newValue = newVizProperties[property];
+            this[property].blendTo(newValue, duration);
         });
     }
 

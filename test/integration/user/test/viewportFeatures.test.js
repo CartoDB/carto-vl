@@ -33,14 +33,14 @@ const features = {
     features: [feature1, feature2]
 };
 
-function checkFeatures (list, expectedList) {
+function checkFeatures (featureList, expectedList) {
     // FIXME: this shouldn't require list to have the same order as expected
-    expect(list.length).toEqual(expectedList.length);
-    for (let i = 0; i < list.length; ++i) {
+    expect(featureList.length).toEqual(expectedList.length);
+    for (let i = 0; i < featureList.length; ++i) {
         const actual = {};
         const expected = expectedList[i];
         Object.keys(expected).forEach(prop => {
-            actual[prop] = list[i][prop];
+            actual[prop] = featureList[i].properties[prop];
         });
         expect(actual).toEqual(expected);
     }

@@ -14,7 +14,7 @@ class IDGenerator {
     }
 }
 
-export function compileShader (gl, template, expressions, viz) {
+export function compileShader (gl, template, expressions) {
     let tid = {};
     const getPropertyAccessCode = name => {
         if (tid[name] === undefined) {
@@ -47,15 +47,10 @@ export function compileShader (gl, template, expressions, viz) {
         expr._postShaderCompile(shader.program, gl);
     });
 
-    if (!shader.textureIds) {
-        shader.textureIds = new Map();
-    }
-
-    shader.textureIds.set(viz, tid);
-
-    // For debugging purposes
-    shader._codes = codes;
-    shader._template = template;
-
-    return shader;
+    return {
+        shader,
+        textureIds: tid,
+        _codes: codes,
+        _template: template
+    };
 }

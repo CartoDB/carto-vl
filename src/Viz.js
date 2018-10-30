@@ -126,6 +126,14 @@ export default class Viz {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
     }
 
+    /*
+     * There are cases when promise rejections are fine, such as when using
+     * `blendTo` to change the viz synchronously.
+    */
+    _ignoreChangeRejections () {
+        return {};
+    }
+
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
     _defineProperty (propertyName, propertyValue) {
@@ -139,7 +147,7 @@ export default class Viz {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
-                this._changed();
+                this._changed().catch(this._ignoreChangeRejections);
             }
         });
 
@@ -155,7 +163,7 @@ export default class Viz {
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
-                        this._changed();
+                        this._changed().catch(this._ignoreChangeRejections);
                     }
                     return true;
                 }
@@ -196,8 +204,9 @@ export default class Viz {
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
-            this._changeCallback(this);
+            return this._changeCallback(this);
         }
+        return Promise.resolve(null);
     }
 
     _updateRootExpressionList () {
@@ -311,7 +320,7 @@ export default class Viz {
         }
     }
 
-    clearShaders () {
+    _bindMetadata (metadata) {
         this._colorShader = null;
         this._widthShader = null;
         this._strokeColorShader = null;
@@ -321,47 +330,48 @@ export default class Viz {
         this._pointShader = null;
         this._lineShader = null;
         this._polygonShader = null;
+        this.metadata = metadata;
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
+        checkVizPropertyTypes(this);
     }
 
-    get colorShader () {
+    get colorMetaShader () {
         return this._compileShader('colorShader', shaders.styler.colorShaderGLSL, { color: this.color });
     }
-    get widthShader () {
+    get widthMetaShader () {
         return this._compileShader('widthShader', shaders.styler.widthShaderGLSL, { width: this.width });
     }
-    get strokeColorShader () {
+    get strokeColorMetaShader () {
         return this._compileShader('strokeColorShader', shaders.styler.colorShaderGLSL, { color: this.strokeColor });
     }
-    get strokeWidthShader () {
+    get strokeWidthMetaShader () {
         return this._compileShader('strokeWidthShader', shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
     }
-    get filterShader () {
+    get filterMetaShader () {
         return this._compileShader('filterShader', shaders.styler.filterShaderGLSL, { filter: this.filter });
     }
-    get symbolShader () {
+    get symbolMetaShader () {
         return this._compileShader('symbolShader', shaders.symbolizer.symbolShaderGLSL, {
             symbol: this.symbol,
             symbolPlacement: this.symbolPlacement,
             transform: this.transform
         });
     }
-    get pointShader () {
+    get pointMetaShader () {
         return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
             { transform: this.transform });
     }
-    get lineShader () {
+    get lineMetaShader () {
         return this._compileShader('lineShader', { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
             { transform: this.transform });
     }
-    get polygonShader () {
+    get polygonMetaShader () {
         return this._compileShader('polygonShader', { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
             { transform: this.transform });
     }
 
     _compileShader (shaderName, GLSL, expr) {
         if (!this['_' + shaderName]) {
-            this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
-            checkVizPropertyTypes(this);
             this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
         }
         return this['_' + shaderName];
