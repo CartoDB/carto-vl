@@ -26,8 +26,8 @@ layer.addTo(map);
 layer.on('loaded', async () => {
     const actual = {};
     viz.variables.features.value.forEach(f => {
-        actual[f.cartodb_id] = {
-            numfloors: f.numfloors
+        actual[f.properties.cartodb_id] = {
+            numfloors: f.properties.numfloors
         };
     });
     window.a = JSON.stringify(actual);
