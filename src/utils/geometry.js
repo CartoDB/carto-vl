@@ -166,6 +166,31 @@ export function computeAABB (geometry, type) {
     }
 }
 
+export function computeCentroid (geometry, type) {
+    switch (type) {
+        case 'point':
+            return [];
+        case 'line':
+        case 'polygon':
+            const centroids = [];
+
+            for (let i = 0; i < geometry.length; i++) {
+                const feature = geometry[i];
+                const polygon = feature[0];
+                // const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
+                let centroid = {
+                    x: polygon.flat[0],
+                    y: polygon.flat[1]
+                };
+                debugger;
+                centroids.push(centroid);
+                // console.log(centroid);
+            }
+
+            return centroids;
+    }
+}
+
 // Compute the WebMercator position at projected (x,y) NDC (Normalized Device Coordinates) reversing the projection of the point
 export function unproject (inv, x, y) {
     // To unproject a point we need the 3 coordinates (x,y,z)

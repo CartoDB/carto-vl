@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Labels | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [-87.69990112331521, 41.84453868528371],
+      zoom: 0,
+    });
+
+    const auth = {
+      user: 'cartovl',
+      apiKey: 'default_public'
+    };
+
+    carto.setDefaultAuth(auth);
+
+    const source = new carto.source.Dataset('world_borders');
+    const viz = new carto.Viz(`
+          color: ramp(linear($pop2005, 0, globalPercentile($pop2005, 95)), temps)
+          // width: ramp(sqrt(linear($pop_max, 0, globalPercentile($pop_max, 95))), [1, 40])
+          @f:    viewportFeatures($pop2005, $name)
+          @p80:    viewportPercentile($pop2005, 80)
+        `);
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.on('loaded', () => {
+
+      map.addSource('labels', {
+        type: 'geojson', data: null
+      });
+      const source = map.getSource('labels');
+
+      layer.on('updated', () => {
+        const features = viz.variables.f.value;
+        const geojsonFeatures = features.filter(f =>
+          f.pop2005 > viz.variables.p80.value || true
+        ).map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getCenter()
+            },
+            "properties": {
+              "name": `${f.name}`,
+            }
+          }
+        });
+
+        source.setData({
+          type: 'FeatureCollection',
+          features: geojsonFeatures
+        });
+      });
+
+      map.addLayer({
+        "id": "points",
+        "type": "symbol",
+        "source": "labels",
+        "layout": {
+          "text-field": "{name}",
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0],
+          "text-anchor": "top"
+        }
+      });
+    });
+
+    layer.addTo(map, 'watername_ocean');
+  </script>
+</body>
+
+</html>
