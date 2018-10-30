@@ -10,13 +10,17 @@ export default class TimeRangeCodec extends BaseCodec {
         this._timeZone = stats.grouping && stats.grouping.timezone;
     }
 
+    isRange () {
+        return true;
+    }
+
     sourceToInternal (propertyValue) {
         const lo = decodeModal('start', propertyValue);
         const hi = decodeModal('end', propertyValue);
         return [lo, hi].map(v => (v - this._min));
     }
 
-    internalToExternal (lo, hi) {
+    internalToExternal ([lo, hi]) {
         return util.timeRange({
             start: (lo + this._min) * 1000,
             end: (hi + this._min) * 1000,

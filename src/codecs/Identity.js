@@ -9,7 +9,7 @@ export default class IdentityCodec extends BaseCodec {
     }
 
     sourceToInternal (v) {
-        return [v];
+        return v;
     }
 
     internalToExternal (v) {
@@ -25,6 +25,6 @@ export default class IdentityCodec extends BaseCodec {
     }
 
     externalToInternal (v) {
-        return [v];
+        return v;
     }
 }

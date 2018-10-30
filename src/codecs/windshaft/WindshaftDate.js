@@ -10,7 +10,7 @@ export default class WindshaftDateCodec extends BaseCodec {
     }
 
     sourceToInternal (propertyValue) {
-        return [util.msToDate(propertyValue * 1000) - this._min_date];
+        return util.msToDate(propertyValue * 1000) - this._min_date;
     }
 
     internalToExternal (propertyValue) {

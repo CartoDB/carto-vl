@@ -500,7 +500,7 @@ export default class Dataframe extends DummyDataframe {
                 get: function () {
                     const index = this._index;
                     const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                    return metadata.codec(propertyName).internalToExternal(...args);
+                    return metadata.codec(propertyName).internalToExternal(args);
                 }
             };
         });

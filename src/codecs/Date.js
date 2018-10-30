@@ -11,7 +11,7 @@ export default class DateCodec extends BaseCodec {
 
     sourceToInternal (propertyValue) {
         // numbers (epoch in milliseconds) or Dates are accepted
-        return [util.castDate(propertyValue).getTime() - this._min_ms];
+        return util.castDate(propertyValue).getTime() - this._min_ms;
     }
 
     internalToExternal (propertyValue) {

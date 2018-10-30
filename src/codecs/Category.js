@@ -8,7 +8,7 @@ export default class CategoryCodec extends BaseCodec {
     }
 
     sourceToInternal (propertyValue) {
-        return [this._metadata.categorizeString(this._baseName, propertyValue)];
+        return this._metadata.categorizeString(this._baseName, propertyValue);
     }
 
     internalToExternal (propertyValue) {
@@ -16,7 +16,7 @@ export default class CategoryCodec extends BaseCodec {
     }
 
     sourceToExternal (propertyValue) {
-        return [propertyValue];
+        return propertyValue;
     }
 
     externalToSource (v) {

@@ -218,17 +218,20 @@ export class MVTWorker {
         const length = sourcePropertyNames.length;
         for (let j = 0; j < length; j++) {
             const sourcePropertyName = sourcePropertyNames[j];
-            const propertyNames = metadata.decodedProperties(sourcePropertyName);
-            const propertyValue = feature.properties[sourcePropertyName];
-            const values = this.decodeProperty(metadata, sourcePropertyName, propertyValue);
-            values.forEach((value, k) => {
-                properties[propertyNames[k]][i] = value;
-            });
+            const codec = metadata.codec(sourcePropertyName);
+            if (codec.isRange()) {
+                const propertyNames = metadata.decodedProperties(sourcePropertyName);
+                const propertyValue = feature.properties[sourcePropertyName];
+                const values = codec.sourceToInternal(propertyValue);
+                values.forEach((value, k) => {
+                    properties[propertyNames[k]][i] = value;
+                });
+            } else {
+                const propertyValue = feature.properties[sourcePropertyName];
+                const value = codec.sourceToInternal(propertyValue);
+                properties[sourcePropertyName][i] = value;
+            }
         }
-    }
-
-    decodeProperty (metadata, propertyName, propertyValue) {
-        return metadata.codec(propertyName).sourceToInternal(propertyValue);
     }
 
     _generateDataFrame (rs, geometry, properties, size, type, metadata) {

@@ -6,7 +6,7 @@ export default class NumberCodec extends IdentityCodec {
         if (isNaN(propertyValue) || propertyValue == null) {
             propertyValue = FP32_DESIGNATED_NULL_VALUE;
         }
-        return [propertyValue];
+        return propertyValue;
     }
 
     internalToExternal (value) {
@@ -20,6 +20,6 @@ export default class NumberCodec extends IdentityCodec {
         if (value === null) {
             value = FP32_DESIGNATED_NULL_VALUE;
         }
-        return [value];
+        return value;
     }
 }

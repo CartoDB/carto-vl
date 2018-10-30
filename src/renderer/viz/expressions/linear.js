@@ -149,8 +149,8 @@ export default class Linear extends BaseExpression {
         const codec = (metadata && this.input.propertyName)
             ? metadata.codec(this.input.propertyName)
             : new IdentityCodec();
-        const min = codec.externalToInternal(this.min.eval(feature))[0];
-        const max = codec.externalToInternal(this.max.eval(feature))[0];
+        const min = codec.externalToInternal(this.min.eval(feature));
+        const max = codec.externalToInternal(this.max.eval(feature));
         return (input - min) / (max - min);
     }
 
@@ -200,8 +200,8 @@ export default class Linear extends BaseExpression {
                 // this permits using properties for the min/man expressions
                 this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
             } else {
-                const smin = codec.externalToInternal(this.min.eval())[0];
-                const smax = codec.externalToInternal(this.max.eval())[0];
+                const smin = codec.externalToInternal(this.min.eval());
+                const smax = codec.externalToInternal(this.max.eval());
                 this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
             }
         }
