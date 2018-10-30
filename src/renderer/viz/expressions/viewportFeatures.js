@@ -5,7 +5,6 @@ import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
-import VIZ_PROPERTIES from '../utils/properties';
 import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
 
 /**
@@ -93,12 +92,6 @@ export default class ViewportFeatures extends BaseExpression {
             }
 
             const propertyNames = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            VIZ_PROPERTIES.forEach((vizPropertyName) => {
-                if (propertyNames.includes(vizPropertyName)) {
-                    throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${vizPropertyName}' property can't be used, as it is a reserved viz property name`);
-                }
-            });
-
             this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
