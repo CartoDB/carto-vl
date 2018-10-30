@@ -213,7 +213,10 @@ describe('api/viz', () => {
                 filter: expected
             });
             numberA.blendTo(numberB, 999);
-            viz.onChange(done);
+            viz.onChange(() => {
+                done();
+                return Promise.resolve(null);
+            });
             const t = Date.now() + 1000;
             Date.now = () => t;
             viz.filter._preDraw(null, {}, { uniform1f: () => { } });
@@ -223,7 +226,10 @@ describe('api/viz', () => {
     describe('resolution changes', () => {
         it('should be effective and notify observers', done => {
             const viz = new Viz();
-            viz.onChange(done);
+            viz.onChange(() => {
+                done();
+                return Promise.resolve(null);
+            });
             viz.resolution = 8;
             expect(viz.resolution).toEqual(8);
         });
