@@ -221,6 +221,7 @@ export default class Layer {
         if (majorChange) {
             uid = { major: this._majorNextUID, minor: 0 };
             this._majorNextUID++;
+            this._minorNextUID = 1;
         } else {
             uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
             this._minorNextUID++;

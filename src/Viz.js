@@ -126,6 +126,14 @@ export default class Viz {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
     }
 
+    /*
+     * There are cases when promise rejections are fine, such as when using
+     * `blendTo` to change the viz synchronously.
+    */
+    _ignoreChangeRejections () {
+        return {};
+    }
+
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
     _defineProperty (propertyName, propertyValue) {
@@ -139,7 +147,7 @@ export default class Viz {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
-                this._changed();
+                this._changed().catch(this._ignoreChangeRejections);
             }
         });
 
@@ -155,7 +163,7 @@ export default class Viz {
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
-                        this._changed();
+                        this._changed().catch(this._ignoreChangeRejections);
                     }
                     return true;
                 }
@@ -196,8 +204,9 @@ export default class Viz {
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
-            this._changeCallback(this);
+            return this._changeCallback(this);
         }
+        return Promise.resolve(null);
     }
 
     _updateRootExpressionList () {
