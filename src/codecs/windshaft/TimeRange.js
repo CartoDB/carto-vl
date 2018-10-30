@@ -6,7 +6,8 @@ export default class TimeRangeCodec extends BaseCodec {
         super();
         const stats = metadata.stats(propertyName);
         const { min } = stats;
-        this._min = decodeModal('start', min);
+        const tr = util.timeRange({ iso: min });
+        this._min = tr.startValue / 1000;
         this._timeZone = stats.grouping && stats.grouping.timezone;
     }
 
@@ -15,9 +16,8 @@ export default class TimeRangeCodec extends BaseCodec {
     }
 
     sourceToInternal (propertyValue) {
-        const lo = decodeModal('start', propertyValue);
-        const hi = decodeModal('end', propertyValue);
-        return [lo, hi].map(v => (v - this._min));
+        const tr = util.timeRange({ iso: propertyValue });
+        return [tr.startValue / 1000, tr.endValue / 1000].map(v => (v - this._min));
     }
 
     internalToExternal ([lo, hi]) {
@@ -39,14 +39,5 @@ export default class TimeRangeCodec extends BaseCodec {
     inlineInternalMatch (thisValue, otherCodec) {
         const offset = otherCodec._min.getTime() - this._min.getTime();
         return `(${thisValue}-${offset.toFixed(20)})`;
-    }
-}
-
-function decodeModal (mode, propertyValue) {
-    switch (mode) {
-        case 'start':
-            return util.timeRange({ iso: propertyValue }).startValue / 1000;
-        case 'end':
-            return util.timeRange({ iso: propertyValue }).endValue / 1000;
     }
 }

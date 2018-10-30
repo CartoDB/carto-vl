@@ -218,13 +218,13 @@ export class MVTWorker {
     _scalarPropertyCodecs (metadata) {
         return this._getSourcePropertyNamesFrom(metadata)
             .map(prop => [prop, metadata.codec(prop)])
-            .filter(([_prop, codec]) => !codec.isRange());
+            .filter(([_, codec]) => !codec.isRange());
     }
 
     _rangePropertyCodecs (metadata) {
         return this._getSourcePropertyNamesFrom(metadata)
-            .map(prop => metadata.decodedProperties(prop).concat([metadata.codec(prop)]))
-            .filter(([_prop, codec]) => codec.isRange());
+            .map(prop => [prop, metadata.decodedProperties(prop), metadata.codec(prop)])
+            .filter(([_prop, _dprop, codec]) => codec.isRange());
     }
 
     _decodeProperties (scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
@@ -237,10 +237,9 @@ export class MVTWorker {
 
         length = rangePropertyCodecs.length;
         for (let j = 0; j < length; j++) {
-            const [loPropertyName, hiPropertyName, codec] = rangePropertyCodecs[j];
-            const loPropertyValue = feature.properties[loPropertyName];
-            const hiPropertyValue = feature.properties[hiPropertyName];
-            const [loValue, hiValue] = codec.sourceToInternal([loPropertyValue, hiPropertyValue]);
+            const [propertyName, [loPropertyName, hiPropertyName], codec] = rangePropertyCodecs[j];
+            const propertyValue = feature.properties[propertyName];
+            const [loValue, hiValue] = codec.sourceToInternal(propertyValue);
             properties[loPropertyName][i] = loValue;
             properties[hiPropertyName][i] = hiValue;
         }
