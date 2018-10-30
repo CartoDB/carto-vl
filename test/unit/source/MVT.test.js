@@ -44,7 +44,7 @@ describe('sources/MVT', () => {
             });
             metadata.setCodecs();
             expect(() => {
-                metadata.codec('wadus').sourceToInternal('this is not a number')
+                metadata.codec('wadus').sourceToInternal('this is not a number');
             }).toThrowError(/MVT decoding error. Metadata property is of type \'number\' but the MVT tile contained a feature property of type 'string': \'this is not a number\'/);
         });
         it('should throw an error when the property type is number and the metadata declared type is category', () => {
@@ -58,7 +58,7 @@ describe('sources/MVT', () => {
             });
             metadata.setCodecs();
             expect(() => {
-                metadata.codec('wadus').sourceToInternal(123)
+                metadata.codec('wadus').sourceToInternal(123);
             }).toThrowError(/MVT decoding error. Metadata property is of type \'category\' but the MVT tile contained a feature property of type 'number': \'123\'/);
         });
     });
