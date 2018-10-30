@@ -9,9 +9,13 @@ Maps that symbolize data without the necessary information to decode the symbols
 
 CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. With that in mind, this guide provides a series of examples that are meant to serve as legend "building blocks" that you can take and begin to customize on top of. 
 
-There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method which is the one we cover in this guide.
+There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. This guide,covers the `getLegendData()` method. 
+
+By the end of this section, you will better understand how to add a legend for point data symbolized by category. You will also learn how to modify the legend based on which styling property is used.
 
 To access the `getLegendData()` method you need to reference the `ramp` expression. If the `ramp` expression is the root expression of a styling property, like `color`,`width`,`strokeColor`, or `strokeWidth`, it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you will need to use a variable, which we will explore in the [Widgets section](##_Widgets).
+
+
 
 #### Unclassified numerical data
 

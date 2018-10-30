@@ -82,7 +82,12 @@
                 {
                     "title": "Scaled width",
                     "file": "styling/scaled.html"
-                },
+                }
+            ]
+        },
+            {
+                    "title": "Guide Maps",
+                    "samples": [
                 {
                     "title": "Geometry types",
                     "file": "guides/viz-properties/geom-types.html"
