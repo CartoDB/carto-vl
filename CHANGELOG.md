@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `isNull` supporting numerical and categorical properties, deprecating `isNaN()`
 - Add `filter` and `transform` properties to features returned from `Interactivity` events.
 - Change type from `viewportFeatures` expression, adding vizProperties and variables to features as in `Interactivity`
+- Add root-level method `blendTo` to features, allowing several viz properties changes with one call.
 
 ### Changed
 - Eliminate the parameter to specify a property in `globalCount()` and `viewportCount()`

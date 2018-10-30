@@ -1,5 +1,6 @@
 import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**
  * Generate a lightweight Feature-like class
@@ -21,7 +22,8 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineVizProperties(cls.prototype, renderLayer);
     _defineVizVariables(cls.prototype, renderLayer);
     _defineFeatureProperties(cls.prototype, propertyNames);
-    _defineResetMethod(cls.prototype);
+    _defineRootResetMethod(cls.prototype);
+    _defineRootBlendToMethod(cls.prototype);
 
     return cls;
 }
@@ -98,7 +100,7 @@ function _defineFeatureProperties (targetObject, propertyNames) {
     });
 }
 
-function _defineResetMethod (targetObject) {
+function _defineRootResetMethod (targetObject) {
     Object.defineProperty(targetObject, 'reset', {
         get: function () {
             const reset = (duration = 500) => {
@@ -111,6 +113,23 @@ function _defineResetMethod (targetObject) {
                 }
             };
             return reset;
+        }
+    });
+}
+
+function _defineRootBlendToMethod (targetObject) {
+    Object.defineProperty(targetObject, 'blendTo', {
+        get: function () {
+            const blendTo = (newVizProperties, duration = 500) => {
+                Object.keys(newVizProperties).forEach((property) => {
+                    if (!(VIZ_PROPERTIES.includes(property))) {
+                        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+                    }
+                    const newValue = newVizProperties[property];
+                    this[property].blendTo(newValue, duration);
+                });
+            };
+            return blendTo;
         }
     });
 }
