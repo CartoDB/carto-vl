@@ -133,6 +133,8 @@ export class MVTWorker {
             pointGeometries = new Float32Array(geometries);
         }
         const { properties } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        const scalarPropertyCodecs = this._scalarPropertyCodecs(metadata);
+        const rangePropertyCodecs = this._rangePropertyCodecs(metadata);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -161,7 +163,7 @@ export class MVTWorker {
                     `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
-            this._decodeProperties(metadata, properties, f, numFeatures);
+            this._decodeProperties(scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
             numFeatures++;
         }
 
@@ -213,24 +215,34 @@ export class MVTWorker {
         return properties;
     }
 
-    _decodeProperties (metadata, properties, feature, i) {
-        const sourcePropertyNames = this._getSourcePropertyNamesFrom(metadata);
-        const length = sourcePropertyNames.length;
+    _scalarPropertyCodecs (metadata) {
+        return this._getSourcePropertyNamesFrom(metadata)
+            .map(prop => [prop, metadata.codec(prop)])
+            .filter(([_prop, codec]) => !codec.isRange());
+    }
+
+    _rangePropertyCodecs (metadata) {
+        return this._getSourcePropertyNamesFrom(metadata)
+            .map(prop => metadata.decodedProperties(prop).concat([metadata.codec(prop)]))
+            .filter(([_prop, codec]) => codec.isRange());
+    }
+
+    _decodeProperties (scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
+        let length = scalarPropertyCodecs.length;
         for (let j = 0; j < length; j++) {
-            const sourcePropertyName = sourcePropertyNames[j];
-            const codec = metadata.codec(sourcePropertyName);
-            if (codec.isRange()) {
-                const propertyNames = metadata.decodedProperties(sourcePropertyName);
-                const propertyValue = feature.properties[sourcePropertyName];
-                const values = codec.sourceToInternal(propertyValue);
-                values.forEach((value, k) => {
-                    properties[propertyNames[k]][i] = value;
-                });
-            } else {
-                const propertyValue = feature.properties[sourcePropertyName];
-                const value = codec.sourceToInternal(propertyValue);
-                properties[sourcePropertyName][i] = value;
-            }
+            const [propertyName, codec] = scalarPropertyCodecs[j];
+            const propertyValue = feature.properties[propertyName];
+            properties[propertyName][i] = codec.sourceToInternal(propertyValue);
+        }
+
+        length = rangePropertyCodecs.length;
+        for (let j = 0; j < length; j++) {
+            const [loPropertyName, hiPropertyName, codec] = rangePropertyCodecs[j];
+            const loPropertyValue = feature.properties[loPropertyName];
+            const hiPropertyValue = feature.properties[hiPropertyName];
+            const [loValue, hiValue] = codec.sourceToInternal([loPropertyValue, hiPropertyValue]);
+            properties[loPropertyName][i] = loValue;
+            properties[hiPropertyName][i] = hiValue;
         }
     }
 
