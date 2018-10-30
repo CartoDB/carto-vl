@@ -1,4 +1,6 @@
 import FeatureVizProperty from './featureVizProperty';
+import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**
  * @namespace Features
@@ -72,34 +74,72 @@ import FeatureVizProperty from './featureVizProperty';
  * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty} colorStroke
  * @property {FeatureVizProperty} widthStroke
+ * @property {FeatureVizProperty} symbol
+ * @property {FeatureVizProperty} symbolPlacement
+ * @property {FeatureVizProperty} filter
+ * @property {FeatureVizProperty} transform
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
  * @api
  */
-export default class Feature {
-    constructor (rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty) {
-        const variables = {};
-        Object.keys(viz.variables).map(varName => {
-            variables[varName] = new FeatureVizProperty(`__cartovl_variable_${varName}`, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        });
 
+export default class Feature {
+    constructor (rawFeature, { viz, customizedFeatures, trackFeatureViz, idProperty }, publicFeatureProperties = []) {
         this.id = rawFeature[idProperty];
-        this.color = new FeatureVizProperty('color', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        this.width = new FeatureVizProperty('width', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        this.strokeColor = new FeatureVizProperty('strokeColor', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        this.strokeWidth = new FeatureVizProperty('strokeWidth', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        this.symbol = new FeatureVizProperty('symbol', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
-        this.symbolPlacement = new FeatureVizProperty('symbolPlacement', rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+
+        this._rawFeature = rawFeature;
+        this._featureVizParams = { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty };
+
+        this._defineVizProperties();
+        this._defineVizVariables();
+        this._defineFeatureProperties(publicFeatureProperties);
+    }
+
+    _defineVizProperties () {
+        VIZ_PROPERTIES.forEach((property) => {
+            this[property] = this._buildFeatureVizProperty(property);
+        });
+    }
+
+    _buildFeatureVizProperty (name) {
+        const { rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty } = this._featureVizParams;
+        return new FeatureVizProperty(name, rawFeature, viz, customizedFeatures, trackFeatureViz, idProperty);
+    }
+
+    _defineVizVariables () {
+        const variables = {};
+        const vizVariables = this._featureVizParams.viz.variables;
+        Object.keys(vizVariables).forEach(varName => {
+            const name = `__cartovl_variable_${varName}`;
+            variables[varName] = this._buildFeatureVizProperty(name);
+        });
         this.variables = variables;
     }
 
+    _defineFeatureProperties (featurePropertyNames) {
+        featurePropertyNames.forEach(prop => {
+            Object.defineProperty(this, prop, {
+                get: function () {
+                    return this._rawFeature[prop];
+                }
+            });
+        });
+    }
+
+    blendTo (newVizProperties, duration = 500) {
+        Object.keys(newVizProperties).forEach((property) => {
+            if (!(VIZ_PROPERTIES.includes(property))) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
+            }
+            const newValue = newVizProperties[property];
+            this[property].blendTo(newValue, duration);
+        });
+    }
+
     reset (duration = 500) {
-        this.color.reset(duration);
-        this.width.reset(duration);
-        this.strokeColor.reset(duration);
-        this.strokeWidth.reset(duration);
-        this.symbol.reset(duration);
-        this.symbolPlacement.reset(duration);
+        VIZ_PROPERTIES.forEach((property) => {
+            this[property].reset(duration);
+        });
 
         for (let key in this.variables) {
             this.variables[key].reset(duration);

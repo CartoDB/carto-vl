@@ -9,9 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Official support for unpatched Mapbox GL version 0.50
 - Add `isNull` supporting numerical and categorical properties, deprecating `isNaN()`
+- Add `filter` and `transform` properties to features returned from `Interactivity` events.
+- Change type from `viewportFeatures` expression, adding vizProperties and variables to features as in `Interactivity`
+- Add root-level method `blendTo` to features, allowing several viz properties changes with one call.
 
 ### Changed
 - Eliminate the parameter to specify a property in `globalCount()` and `viewportCount()`
+- Move properties in `viewportFeatures` expression to `feature.properties` namespace.
 
 ### Removed
 - Remove `isNaN()` in favor of `isNull`

@@ -62,9 +62,15 @@ export default class RenderLayer {
         }
         return [].concat(...this.getActiveDataframes().map(df =>
             df.getFeaturesAtPosition(pos, this.viz)
-        )).map(rawFeature =>
-            new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
-        );
+        )).map(rawFeature => {
+            const featureVizParams = {
+                viz: this.viz,
+                customizedFeatures: this.customizedFeatures,
+                trackFeatureViz: this.trackFeatureViz,
+                idProperty: this.idProperty
+            };
+            return new Feature(rawFeature, featureVizParams);
+        });
     }
 
     trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {

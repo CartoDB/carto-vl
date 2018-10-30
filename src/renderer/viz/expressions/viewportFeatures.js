@@ -5,6 +5,9 @@ import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
+import VIZ_PROPERTIES from '../utils/properties';
+import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
+
 /**
  * Generates a list of features in the viewport
  *
@@ -83,35 +86,26 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg () {
+    _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
             if (!this._requiredProperties.every(p => (p.isA(Property)))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
-            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            this._FeatureProxy = this.genViewportFeatureClass(columns);
+
+            const propertyNames = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
+            VIZ_PROPERTIES.forEach((vizPropertyName) => {
+                if (propertyNames.includes(vizPropertyName)) {
+                    throw new CartoValidationError(`${cvt.INCORRECT_VALUE} '${vizPropertyName}' property can't be used, as it is a reserved viz property name`);
+                }
+            });
+
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
     }
 
     accumViewportAgg (feature) {
         this.expr.push(new this._FeatureProxy(feature));
-    }
-
-    genViewportFeatureClass (properties) {
-        const cls = class ViewportFeature {
-            constructor (feature) {
-                this._feature = feature;
-            }
-        };
-        properties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function () {
-                    return this._feature[prop];
-                }
-            });
-        });
-        return cls;
     }
 }
 
