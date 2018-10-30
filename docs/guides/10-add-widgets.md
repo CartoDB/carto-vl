@@ -1,66 +1,6 @@
-## Legends and Widgets
+## Widgets
 
-Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore two ways to enrich your visualizations with this information using _legends_ and _widgets_.
-
-- **Legends**: aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a brief description of what they represent. For example, legends help answer questions like: is the conservative party colored red or blue? or which property and value are represented by the size of each circle?
 - **Widgets**: provide additional pieces of information that accompany a map to facilitate understanding and exploration. Widgets often provide additional information about a dataset that is not symbolized on a map itself. For example, on a election map, you can style the map by winner, but also provide addtional information from the data. For example, how many total votes did each party receive? or how many people voted?
-
-### Legends
-
-CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application. With that in mind, this guide provides a series of examples that are meant to serve as legend "building blocks" that you can take and begin to customize on top of. 
-
-There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. This guide,covers the `getLegendData()` method. 
-
-By the end of this section, you will better understand how to add a legend for point data symbolized by category. You will also learn how to modify the legend based on which styling property is used.
-
-To access the `getLegendData()` method you need to reference the `ramp` expression. If the `ramp` expression is the root expression of a styling property, like `color`,`width`,`strokeColor`, or `strokeWidth`, it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you will need to use a variable, which we will explore in the [Widgets section](##_Widgets).
-
-
-
-#### Unclassified numerical data
-
-<div class="example-map">
-    <iframe
-        id="legend-number"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-<a href="/developers/carto-vl/examples/#example-legends---unclassified-numerical-data">View my source code!</a>
-
-
-#### Categorical data
-
-<div class="example-map">
-    <iframe
-        id="legend-buckets"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-<a href="/developers/carto-vl/examples/#example-legends---categorical-data">View my source code!</a>
-
-##### Showing images
-
-<div class="example-map">
-    <iframe
-        id="legend-image"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
-
-### Widgets
 
 The first thing you need to know to create widgets is the concept of [variables](). A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myAwesomeWidgetExpression()`, how do we actually get that information?
 
@@ -86,15 +26,15 @@ myLayer.on('updated', ()=>{
 
 If, however, myAwesomeWidgetExpression was static, we could just use `myLayer.on('loaded', ()=>{...});`.
 
-#### Scalars: what is the total of ...? what is the average of ...? what is the maximum ...?
+### Scalars: what is the total of ...? what is the average of ...? what is the maximum ...?
 
-##### What is the average price in the entire dataset?
+#### What is the average price in the entire dataset?
 
 To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](/carto-vl/reference/#cartoexpressionsglobalavg) expression.
 
 There are similar expressions for getting the minimum, the maximum, the sum, and percentiles.
 
-##### What is the average price in the features shown?
+#### What is the average price in the features shown?
 
 There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](/carto-vl/reference/#cartoexpressionsviewportavg).
 
@@ -114,7 +54,7 @@ You can see all together on this example:
 </div>
 <a href="/developers/carto-vl/examples#example-railroad-accidents---widgets">View my source code!</a>
 
-##### Histograms: distribution of data
+### Histograms: distribution of data
 
 CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
 
@@ -127,7 +67,7 @@ The first thing you'll need is to include Airship with:
 <script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
 ```
 
-##### Numeric histograms: what is the distribution of the price?
+### Numeric histograms: what is the distribution of the price?
 
 After including Airship, we'll need to add the HTML tags to place our histogram:
 ```html
