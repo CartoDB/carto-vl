@@ -495,14 +495,25 @@ export default class Dataframe extends DummyDataframe {
         const getters = {};
         const metadata = this.metadata;
         metadata.propertyKeys.forEach(propertyName => {
-            const decodedProperties = metadata.decodedProperties(propertyName);
-            getters[propertyName] = {
-                get: function () {
-                    const index = this._index;
-                    const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                    return metadata.codec(propertyName).internalToExternal(args);
-                }
-            };
+            const codec = metadata.codec(propertyName);
+            if (codec.isRange()) {
+                const decodedProperties = metadata.decodedProperties(propertyName);
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
+                        return codec.internalToExternal(args);
+                    }
+                };
+            } else {
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        const value = this._dataframe.properties[propertyName][index];
+                        return codec.internalToExternal(value);
+                    }
+                };
+            }
         });
         return getters;
     }
