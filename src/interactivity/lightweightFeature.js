@@ -1,5 +1,6 @@
 import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
+import { WM_R } from '../utils/util';
 
 /**
  * Generate a lightweight Feature-like class
@@ -15,6 +16,13 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
         }
+        getCenter () {
+            const dataframe = this._rawFeature._dataframe;
+            const x = dataframe.decodedGeom.vertices[6 * this._rawFeature._index] * dataframe.scale + dataframe.center.x;
+            const y = dataframe.decodedGeom.vertices[6 * this._rawFeature._index + 1] * dataframe.scale + dataframe.center.y;
+            const g = unprojectFromWebMercator({ x, y });
+            return [g.lng, g.lat];
+        }
     };
 
     _defineIdProperty(cls.prototype, renderLayer);
@@ -24,6 +32,15 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineResetMethod(cls.prototype);
 
     return cls;
+}
+
+function unprojectFromWebMercator ({ x, y }) {
+    const DEG2RAD = Math.PI / 180;
+    const EARTH_RADIUS = 6378137;
+    return {
+        lng: x * WM_R / EARTH_RADIUS / DEG2RAD,
+        lat: (Math.atan(Math.pow(Math.E, y * WM_R / EARTH_RADIUS)) - Math.PI / 4) * 2 / DEG2RAD
+    };
 }
 
 function _defineIdProperty (targetObject, renderLayer) {
