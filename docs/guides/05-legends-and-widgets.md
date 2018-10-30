@@ -11,9 +11,7 @@ CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it
 
 There are two different ways to create legends with CARTO VL: the advanced `eval()` method and the more user-friendly [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method which is the one we cover in this guide.
 
-
-
-To access the `getLegendData()` method you need to reference the `ramp` expression. If the `ramp` expression is the root expression of a styling property, like `color` or `width`, it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you'll need to use a variable, as explained in the [next subsection](##_Widgets).
+To access the `getLegendData()` method you need to reference the `ramp` expression. If the `ramp` expression is the root expression of a styling property, like `color`,`width`,`strokeColor`, or `strokeWidth`, it can be accessed directly with `layer.viz.color.getLegendData()`. Otherwise, you will need to use a variable, which we will explore in the [Widgets section](##_Widgets).
 
 #### Unclassified numerical data
 
