@@ -37,7 +37,7 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.424335, 37.771521],
-      zoom: 13,
+      zoom: 12,
     });
 
     map.touchZoomRotate.disableRotation();
@@ -54,7 +54,7 @@
     // Define the visualization
     const viz = new carto.Viz(`
       color: ramp(globalquantiles($masters_percent,5),purp)
-      strokeWidth: 0
+      strokeWidth: 1
     `);
 
     // Create the layer

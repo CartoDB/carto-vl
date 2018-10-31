@@ -141,7 +141,6 @@ Next, test that the map loads by opening the file in your web browser of choice.
 **Note:**
 Notice how there is a little zoom level indicator, in the bottom-left hand corner. There is an `updateZoom` function in the JavaScript code that updates its content once the maps loads and every time it is moved.
 
-
 ### Adjust symbol size
 As you can see on the map, there are a lot of trees in Vancouver!
 
