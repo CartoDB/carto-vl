@@ -1,4 +1,5 @@
 import { vec4 } from 'gl-matrix';
+import { average } from '../renderer/viz/expressions/stats';
 
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
@@ -166,28 +167,85 @@ export function computeAABB (geometry, type) {
     }
 }
 
-export function computeCentroid (geometry, type) {
+export function computeCentroids (decodedGeometry, type) {
+    const centroids = [];
     switch (type) {
         case 'point':
-            return [];
+            /*
+                        //     x: dataframe._aabb[this._rawFeature._index].minx,
+            //     y: dataframe._aabb[this._rawFeature._index].miny
+            */
+            // const points = [];
+
+            // Points
+            // const x = dataframe.decodedGeom.vertices[6 * this._rawFeature._index];
+            // const y = dataframe.decodedGeom.vertices[6 * this._rawFeature._index + 1];
+            // const centroid = { x, y };
+
+            /*
+            for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
+                const vertices = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
+                const centroid = _centroidForTriangles(vertices);
+                centroids.push(centroid);
+            } */
+
+            break;
         case 'line':
         case 'polygon':
-            const centroids = [];
-            let breakpoint;
-            for (let i = 0; i < geometry.vertices.length / 2; i++) {
-                geometry.breakpoints;
-
-                // https://en.wikipedia.org/wiki/Centroid#Of_a_triangle_2
-
-                // let centroid = {
-                //     x: polygon.flat[0],
-                //     y: polygon.flat[1]
-                // };
+            let startVertex = 0;
+            decodedGeometry.breakpoints.forEach((breakpoint) => {
+                const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
+                const centroid = _centroidForTriangles(vertices);
                 centroids.push(centroid);
-            }
-
-            return centroids;
+                startVertex = breakpoint;
+            });
+            break;
+        default:
+            throw new CartoValidationError();
     }
+    return centroids;
+}
+
+function _centroidForTriangles (vertices) {
+    // Triangles average coordinates, ponderated by area
+    const weightedXs = [];
+    const weightedYs = [];
+    const areas = [];
+    for (let i = 0; i < vertices.length / 6; i++) {
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(i * 6, 6 + i * 6);
+        const triangle = [[xA, yA], [xB, yB], [xC, yC]];
+        const area = triangleArea(triangle);
+        const averageX = average([xA, xB, xC]);
+        const averageY = average([yA, yB, yC]);
+
+        weightedXs.push(averageX * area);
+        weightedYs.push(averageY * area);
+        areas.push(area);
+    }
+    const totalWeight = _sumArray(areas);
+
+    let centroid = {
+        x: _sumArray(weightedXs) / totalWeight,
+        y: _sumArray(weightedYs) / totalWeight
+    };
+    return centroid;
+}
+
+function _sumArray (array) {
+    return array.reduce((p, c) => p + c, 0);
+}
+
+/*
+* Calculate the area of a triangle using its coordinates.
+* From https://en.wikipedia.org/wiki/Triangle#Computing_the_area_of_a_triangle
+*/
+export function triangleArea (threeVertexArray) {
+    let [xA, yA] = threeVertexArray[0];
+    let [xB, yB] = threeVertexArray[1];
+    let [xC, yC] = threeVertexArray[2];
+
+    const area = Math.abs((xA - xC) * (yB - yA) - (xA - xB) * (yC - yA)) / 2.0;
+    return area;
 }
 
 // Compute the WebMercator position at projected (x,y) NDC (Normalized Device Coordinates) reversing the projection of the point

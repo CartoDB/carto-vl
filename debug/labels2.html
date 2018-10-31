@@ -40,11 +40,13 @@
     carto.setDefaultAuth(auth);
 
     const source = new carto.source.Dataset('world_borders');
+    // const source = new carto.source.SQL('SELECT * from world_borders WHERE name=\'Andorra\' or name=\'Spain\'');
     const viz = new carto.Viz(`
           color: ramp(linear($pop2005, 0, globalPercentile($pop2005, 95)), temps)
           // width: ramp(sqrt(linear($pop_max, 0, globalPercentile($pop_max, 95))), [1, 40])
           @f:    viewportFeatures($pop2005, $name)
           @p80:    viewportPercentile($pop2005, 80)
+          // filter: $name == 'Andorra'
         `);
 
     const layer = new carto.Layer('layer', source, viz);
