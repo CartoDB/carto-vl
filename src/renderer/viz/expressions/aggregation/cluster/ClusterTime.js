@@ -49,18 +49,18 @@ import { checkExpression, checkMaxArguments, checkStringValue } from '../../util
  * such as `America/New_York` or `Europe/Madrid`, which not only define a time offset,
  * but also rules for DST (daylight savings time).
  *
- * @param {Date} property - Column of the table to be discretized as dimension
+ * @param {Date} property - Column of the table to be discretised as dimension
  * @param {String} units - Units of resolution for the discretization
- * @param {String} timezone - Time zone in which the dates are discretized. UTC by default.
+ * @param {String} timezone - Time zone in which the dates are discretised. UTC by default.
  * @return {TimeRange|Number} Dimension column; takes time range values (intervals) for serial units of resolutions and numbers for recurrent units.
  *
- * @example <caption>Use months as a dimension of the cluster aggregtions as `month`.</caption>
+ * @example <caption>Use months as a dimension of the cluster aggregations as `month`.</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz({
  *   month: s.clusterTime(s.prop('date', 'month', 'America/New_York'))
  * });
  *
- * @example <caption>Use months as a dimension of the cluster aggregtions as `month`. (String)</caption>
+ * @example <caption>Use months as a dimension of the cluster aggregations as `month`. (String)</caption>
  * const viz = new carto.Viz(`
  *   month: clusterTime($date, 'month', 'America/New_York')
  * `);
