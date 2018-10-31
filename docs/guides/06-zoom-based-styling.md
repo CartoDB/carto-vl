@@ -62,7 +62,7 @@ As you can see on the map, there are a lot of trees in Vancouver!
 
 To better visualize the high density of information, override the default point `width` and set it to `1` and set the `strokeWidth` to `0.5`:
 
-```js
+```CARTO_VL_Viz
 const viz = new carto.Viz(`
     color: white
     width: 1
