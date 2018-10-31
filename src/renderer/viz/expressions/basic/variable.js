@@ -76,24 +76,27 @@ export default function variable (name) {
         },
 
         get: (obj, prop) => {
-            if (prop === 'parent') {
-                return obj[prop];
-            } else if (prop === '_resolveAliases') {
-                return resolve;
-            } else if (prop === '_getDependencies') {
-                return _getDependencies;
-            } else if (prop === 'notify') {
-                return obj[prop];
-            } else if (prop === 'blendTo') {
-                return obj[prop];
+            switch (prop) {
+                case 'parent':
+                case 'notify':
+                case 'blendTo':
+                    return obj[prop];
+                case '_resolveAliases':
+                    return resolve;
+                case '_getDependencies':
+                    return _getDependencies;
+                default:
+                    if (alias !== undefined) {
+                        const p = alias[prop];
+                        if (p !== undefined) {
+                            if (p.bind) {
+                                return p.bind(alias);
+                            }
+                            return p;
+                        }
+                    }
+                    return obj[prop];
             }
-            if (alias && alias[prop]) {
-                if (isFunction(alias[prop])) {
-                    return alias[prop].bind(alias);
-                }
-                return alias[prop];
-            }
-            return obj[prop];
         }
     };
 
