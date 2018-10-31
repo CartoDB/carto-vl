@@ -122,26 +122,21 @@ export default class Linear extends BaseExpression {
 
     eval (feature) {
         if (this.input.type === 'timerange') {
-            let input, min, max;
+            let inputIndex;
             switch (this._rangeMode) {
                 case 'unit':
-                    // choose same side for all three:
-                    input = this.input.eval(feature).startValue;
-                    min = castTimeRange(this.min.eval()).startValue;
-                    max = castTimeRange(this.max.eval()).startValue;
+                    inputIndex = 0; // start
                     break;
                 case 'start':
-                    input = this.input.eval(feature).startValue;
-                    min = castTimeRange(this.min.eval()).startValue;
-                    max = castTimeRange(this.max.eval()).endValue;
+                    inputIndex = 0; // start
                     break;
                 case 'end':
-                    input = this.input.eval(feature).endValue;
-                    min = castTimeRange(this.min.eval()).startValue;
-                    max = castTimeRange(this.max.eval()).endValue;
+                    inputIndex = 1; // end
                     break;
             }
-            return (input - min) / (max - min);
+            const input = feature._dataframe.properties[this._metadata.decodedProperties(this.input.propertyName)[inputIndex]][feature._index];
+
+            return (input - this._internalMin) / (this._internalMax - this._internalMin);
         }
 
         const input = this.input.eval(feature);
@@ -184,6 +179,9 @@ export default class Linear extends BaseExpression {
                     // max in ms is castTimeRange(this.max.eval()).endValue;
                     break;
             }
+
+            this._internalMin = min;
+            this._internalMax = max;
 
             this.inlineMaker = (inline) => `((${inline.input[inputIndex]}-(${min.toFixed(20)}))/(${(max - min).toFixed(20)}))`;
         } else {
