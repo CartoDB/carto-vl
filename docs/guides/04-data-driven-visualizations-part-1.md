@@ -27,7 +27,7 @@ The style below assigns the feature with the lowest population density in the so
 color: ramp($population_density, [midnightblue, gold])
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-unclassed"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-unclassed.html"
@@ -63,7 +63,7 @@ color: ramp($population_density, [midnightblue, deeppink, gold])
 color: ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
@@ -99,7 +99,7 @@ color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-outliers.html"
@@ -139,7 +139,7 @@ color: ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 
 Do you see how `viewport*` classifiers are dynamic and change the results according to the map bounds? Be sure to keep an eye on the dynamic legend!
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-classified"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
@@ -159,7 +159,7 @@ It's important to note that there is always one more class break than set breakp
 color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-buckets-numeric"
         src="/developers/carto-vl/examples/maps/guides/ramp/population-density-buckets.html"
@@ -198,7 +198,7 @@ The map below is a categorical map of election results in the UK. Using a field 
 // Color regions where the conservatives won blue and progressives red
 color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue, crimson])
 ```
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="election-basic"
         src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
@@ -221,7 +221,7 @@ If you want to overwrite the defualt `others` color (`gray`), you can add a thir
 // Overwrite the default others color to orange
 ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], orange)
 ```
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="election-others-bucket"
         src="/developers/carto-vl/examples/maps/guides/ramp/election-others-bucket.html"
@@ -242,7 +242,7 @@ The map below visually summarizes the top three most common weather conditions f
 color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-top"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-top.html"
@@ -263,7 +263,7 @@ In the rail accident dataset, there are six types of weather conditions defined.
 color: ramp($weather,[darkorange,darkviolet,darkturquoise]
 ```
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all"
         src="/developers/carto-vl/examples/maps/guides/ramp/accidents-all.html"

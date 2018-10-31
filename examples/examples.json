@@ -151,6 +151,10 @@
                 {
                     "title": "Widgets - Railroad accidents - Category Widget",
                     "file": "guides/ramp/accidents-category-histogram.html"
+                },
+                {
+                    "title": "Zoom-based styling: get started",
+                    "file": "guides/zoom-based-styling/zoom-based-get-started.html"
                 }
             ]
         },

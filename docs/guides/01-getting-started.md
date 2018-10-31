@@ -16,7 +16,7 @@ After completing this guide, you will have your first CARTO VL map!
 
 ### Basic setup
 
-The most straight-forward way to use CARTO VL is to include the required files from our CDN as you seen in the code below. If you prefer to use the minified file, which is lighter and therefore loads faster, you can use `https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js`. You will also need to add Mapbox GL JavaScript and CSS files. This enables you to use both `carto` and `mapboxgl` in your code.
+The most straight-forward way to use CARTO VL is to include the required files from our CDN as seen in the code below. If you prefer to use the minified file, which is lighter and therefore loads faster, you can use `https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js`. You will also need to add Mapbox GL JavaScript and CSS files. This enables you to use both `carto` and `mapboxgl` in your code.
 
 ```html
 <head>
@@ -199,7 +199,7 @@ For more information about styling, check out the guide [Introduction to Styling
         // Define Viz object and custom style
         const viz = new carto.Viz(`
             color: purple
-            width: 10
+            width: 5
         `);
 
         // Define map layer

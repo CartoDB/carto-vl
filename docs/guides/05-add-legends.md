@@ -8,7 +8,7 @@ CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it
 
 If you completed the XXX guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map. 
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
@@ -26,9 +26,9 @@ The map below is the same one as above, a category map that symbolizes US rail a
 
 Let's add that information!
 
-To get started, copying and paste the code for this map and save it as `accidents.html`:
+To get started, copy and paste the code for this map and save it as `accidents.html`:
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="population-density-buckets-numeric"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-no-legend.html"
@@ -98,7 +98,7 @@ If you load your map after the previous step, you will see that there is still n
 
 That's because we have to define a place for the last step of the process (`document.getElementById('content').innerHTML = colorLegendList;`) to place the information on the map once it is received. 
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all-legend-no-content"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend-no-content.html"
@@ -128,7 +128,7 @@ To define where the content should be placed on the map, add a `<section>` in th
 ```
 Now, when you load the map, you will see the complete legend. You will also notice that the CARTO VL interpolated `ramp` colors (we only provided three colors for six categories) are also brought into the legend with the associated category name.
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
@@ -145,7 +145,7 @@ In the map above, we are symbolizing all six weather categories in the data and 
 
 For example, the map below symbolizes only the `top` three weather conditions in the rail accident data. The legend labels the top three categories with all other categories labeled as `CARTO_VL_OTHERS`:
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all-top-others-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-others-legend.html"
@@ -165,7 +165,7 @@ colorLegendList +=
 
 With that change, the final map will now label other categories as "Other weather" in the legend:
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="accidents-all-top-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-legend.html"
@@ -178,7 +178,7 @@ With that change, the final map will now label other categories as "Other weathe
 
 #### Unclassified numerical data
 
-<div class="example-map" style="margin: 20px auto !important">
+<div class="example-map">
     <iframe
         id="legend-number"
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
@@ -212,7 +212,6 @@ With that change, the final map will now label other categories as "Other weathe
         src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
