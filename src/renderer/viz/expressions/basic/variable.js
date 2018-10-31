@@ -34,10 +34,6 @@ export class Variable extends BaseExpression {
     }
 }
 
-function isFunction (functionToCheck) {
-    return functionToCheck && {}.toString.call(functionToCheck) === '[object Function]';
-}
-
 export default function variable (name) {
     checkMaxArguments(arguments, 1, 'variable');
     checkString('variable', 'name', 0, name);
