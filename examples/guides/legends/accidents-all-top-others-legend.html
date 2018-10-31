@@ -57,7 +57,7 @@
         // Define Viz object and custom style
         const viz = new carto.Viz(`
             width: 7
-            color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            color: ramp(top($weather,3),[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
             strokeColor: black 
         `);
