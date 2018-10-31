@@ -4,7 +4,8 @@ export const IDENTITY = {};
 /*
 const mns = {
     price:  [{type: 'unaggregated'}],
-    amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}]
+    amount: [{type: 'aggregated', op: 'avg'}, {type: 'aggregated', op: 'max'}}],
+    dow:    [{type: 'dimension', dimension: { group: {units: 'dayOfWeek'}}}]
 };
 
 */
@@ -41,25 +42,20 @@ function simplify (MNS) {
     return result;
 }
 
+// TODO: this is Windsshaft-specific, so move to WindshaftMetadata
+
 const AGG_PREFIX = '_cdb_agg_';
-const AGG_PATTERN = new RegExp('^' + AGG_PREFIX + '[a-zA-Z0-9]+_');
+const DIM_PREFIX = '_cdb_dim_';
 
 export const CLUSTER_FEATURE_COUNT = '_cdb_feature_count';
 
 // column information functions
 export const column = {
-    isAggregated: function isAggregated (name) {
-        return name.startsWith(AGG_PREFIX);
-    },
-    getBase: function getBase (name) {
-        return name.replace(AGG_PATTERN, '');
-    },
-    getAggFN: function getAggFN (name) {
-        let s = name.substr(AGG_PREFIX.length);
-        return s.substr(0, s.indexOf('_'));
-    },
     aggColumn (name, aggFN) {
         return `${AGG_PREFIX}${aggFN}_${name}`;
+    },
+    dimColumn (name, groupBy) {
+        return `${DIM_PREFIX}${groupBy}_${name}`;
     }
 };
 

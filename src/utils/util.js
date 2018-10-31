@@ -1,3 +1,5 @@
+import TimeRange from './time/TimeRange';
+
 /**
  * Export util functions
  */
@@ -32,7 +34,8 @@ export function regExpThatContains (text) {
 
 /**
  * Transform the given parameter into a Date object.
- * When a number is given as a parameter is assumed to be a milliseconds epoch.
+ * When a number is given as a parameter is assumed to be a milliseconds epoch (UTC).
+ * The result is a local Date.
  * @param {Date|number|string} date
  */
 export function castDate (date) {
@@ -40,16 +43,17 @@ export function castDate (date) {
         return date;
     }
     if (typeof (date) === 'number') {
-        const msEpoch = date;
-        date = new Date(0);
-        date.setUTCMilliseconds(msEpoch);
-        return date;
+        return msToDate(date);
     }
     if (isString(date)) {
         return new Date(date);
     } else {
         throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid Date type`);
     }
+}
+
+export function msToDate (msEpoch) {
+    return new Date(msEpoch);
 }
 
 export function isSetsEqual (a, b) {
@@ -103,3 +107,28 @@ export default {
     computeMatrixZoom,
     computeMatrixCenter
 };
+
+export function castTimeRange (v, tz = null) {
+    if (v === undefined || isTimeRange(v)) {
+        if (v && tz) {
+            return timeRange({ iso: v.text, timeZone: tz });
+        }
+        return v;
+    }
+    if (typeof v === 'string') {
+        return timeRange({ iso: v, timeZone: tz });
+    }
+}
+
+export function timeRange (parameters) {
+    const { start, end, iso, timeZone } = parameters;
+    if (iso) {
+        return TimeRange.fromText(iso, timeZone);
+    } else {
+        return TimeRange.fromStartEndValues(start, end, timeZone);
+    }
+}
+
+export function isTimeRange (t) {
+    return t instanceof TimeRange;
+}

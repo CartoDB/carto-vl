@@ -2,6 +2,7 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import { validateTypeErrors, validateStaticType, validateMaxArgumentsError } from './utils';
 import GlobalMin from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMin';
 import GlobalMax from '../../../../../src/renderer/viz/expressions/aggregation/global/GlobalMax';
+import { mockMetadata } from './utils';
 
 describe('src/renderer/viz/expressions/linear', () => {
     describe('error control', () => {
@@ -11,7 +12,7 @@ describe('src/renderer/viz/expressions/linear', () => {
         validateTypeErrors('linear', ['number', 'color', 'number']);
         validateTypeErrors('linear', ['category', 'number', 'number']);
         validateTypeErrors('linear', ['number', 'number', 'category']);
-        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number']);
+        validateMaxArgumentsError('linear', ['number', 'number', 'number', 'number', 'number']);
     });
 
     describe('type', () => {
@@ -44,18 +45,20 @@ describe('src/renderer/viz/expressions/linear', () => {
     describe('regression', () => {
         it('should eval correctly with date properties', () => {
             const l = s.linear(s.prop('wadus'), s.time('1880-01-01T00:00:07Z'), s.time('1880-01-01T00:00:09Z'));
-            l._bindMetadata({
-                properties: {
-                    wadus: {
-                        type: 'date',
-                        min: new Date('1880-01-01T00:00:07Z'),
-                        max: new Date('1880-01-01T00:00:09Z')
+            l._bindMetadata(
+                mockMetadata({
+                    properties: {
+                        wadus: {
+                            type: 'date',
+                            min: new Date('1880-01-01T00:00:07Z'),
+                            max: new Date('1880-01-01T00:00:09Z')
+                        }
                     }
-                }
-            });
+                })
+            );
             expect(l.eval({
                 wadus: 0.5
-            })).toEqual(0.5);
+            })).toEqual(1420070396.50025);
         });
     });
 });

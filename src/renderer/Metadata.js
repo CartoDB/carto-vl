@@ -1,3 +1,4 @@
+import IdentityCodec from '../codecs/Identity';
 import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 
 // The IDENTITY metadata contains zero properties
@@ -23,7 +24,7 @@ export default class Metadata {
             property.categories.map(category => this.categorizeString(property, category.name, true));
         });
 
-        this.propertyKeys = Object.keys(this.properties);
+        this.propertyKeys = Object.keys(properties);
     }
 
     categorizeString (propertyName, category, init = false) {
@@ -33,30 +34,44 @@ export default class Metadata {
         if (this.categoryToID.has(category)) {
             return this.categoryToID.get(category);
         }
-        if (!init) {
+        if (!init && category !== null) {
             this.properties[propertyName].categories.push({
                 name: category,
                 frequency: Number.NaN
             });
         }
-        if (category !== null) {
-            this.categoryToID.set(category, this.numCategories);
-            this.IDToCategory.set(this.numCategories, category);
-            this.numCategories++;
-            return this.numCategories - 1;
-        } else {
-            this.categoryToID.set(category, FP32_DESIGNATED_NULL_VALUE);
-            this.IDToCategory.set(FP32_DESIGNATED_NULL_VALUE, category);
-            this.numCategories++;
-            return FP32_DESIGNATED_NULL_VALUE;
-        }
+        const categoryId = category === null ? FP32_DESIGNATED_NULL_VALUE : this.numCategories;
+        this.categoryToID.set(category, categoryId);
+        this.IDToCategory.set(categoryId, category);
+        this.numCategories++;
+        return categoryId;
     }
 
-    propertyNames (propertyName) {
-        const prop = this.properties[propertyName];
-        if (prop.aggregations) {
-            return Object.keys(prop.aggregations).map(fn => prop.aggregations[fn]);
-        }
+    // dataframe properties into which a single source property is decoded
+    // TODO: rename as encodedProperties or dataframeProperties
+    decodedProperties (propertyName) {
         return [propertyName];
+    }
+
+    // property of the data origin (dataset, query) from which
+    // a (source or dataframe) property is derived
+    baseName (propertyName) {
+        return propertyName;
+    }
+
+    // property transferred from the source from which
+    // a (source or dataframe) property it so be computed
+    // TODO: move to windshaft metadata
+    sourcePropertyName (propertyName) {
+        return propertyName;
+    }
+
+    stats (propertyName) {
+        return this.properties[propertyName];
+    }
+
+    codec (propertyName) {
+        // FIXME: default identity code for debugging purposes
+        return this.properties[this.baseName(propertyName)].codec || new IdentityCodec();
     }
 }

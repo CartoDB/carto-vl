@@ -53,6 +53,10 @@ export default class Property extends BaseExpression {
         return this.eval();
     }
 
+    get propertyName () {
+        return this.name;
+    }
+
     eval (feature) {
         if (!feature) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);

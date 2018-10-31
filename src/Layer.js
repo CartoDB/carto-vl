@@ -263,6 +263,7 @@ export default class Layer {
         viz.onChange(this._vizChanged.bind(this));
         this.viz._bindMetadata(metadata);
         this.viz.gl = this.gl;
+
         this._needRefresh();
 
         source.bindLayer(this._onDataframeAdded.bind(this));

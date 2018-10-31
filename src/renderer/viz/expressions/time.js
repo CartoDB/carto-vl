@@ -29,7 +29,7 @@ export default class Time extends BaseExpression {
         checkMaxArguments(arguments, 1, 'time');
 
         super({});
-        this.type = 'time';
+        this.type = 'date';
         try {
             this.date = util.castDate(date);
         } catch (error) {

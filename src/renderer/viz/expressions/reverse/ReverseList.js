@@ -3,7 +3,7 @@ import { checkType } from '../utils';
 
 export default class ReverseList extends Base {
     _bindMetadata (metadata) {
-        checkType('reverse', 'array', 0, ['number-list', 'category-list', 'color-list', 'time-list', 'image-list'], this.input);
+        checkType('reverse', 'array', 0, ['number-list', 'category-list', 'color-list', 'date-list', 'image-list'], this.input);
 
         this.type = this.input.type;
         this.childType = this.input.childType;

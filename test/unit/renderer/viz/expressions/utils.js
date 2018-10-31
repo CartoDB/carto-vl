@@ -1,5 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
+import IdentityCodec from '../../../../../src/codecs/Identity';
 
 const metadata = new Metadata({
     properties: {
@@ -52,12 +53,12 @@ export function validateMaxArgumentsError (expressionName, args) {
     });
 }
 
-export function validateStaticType (expressionName, argTypes, expectedType) {
+export function validateStaticType (expressionName, argTypes, expectedType, skipPropertiesAtConstructorTime = false) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
         validateConstructorTimeType(expressionName, simpleArgs, expectedType);
-        if (!equalArgs(simpleArgs, propertyArgs)) {
+        if (!equalArgs(simpleArgs, propertyArgs) && !skipPropertiesAtConstructorTime) {
             validateConstructorTimeType(expressionName, propertyArgs, expectedType);
         }
         validateCompileTimeType(expressionName, propertyArgs, expectedType);
@@ -164,4 +165,23 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
             expression._bindMetadata(metadata);
         }).toThrowError(regex);
     });
+}
+
+class MockMetadata {
+    constructor (data) {
+        Object.keys(data).forEach(key => {
+            this[key] = data[key];
+        });
+        this._codec = new IdentityCodec();
+    }
+    stats (propertyName) {
+        return this.properties[propertyName];
+    }
+    codec () {
+        return this._codec;
+    }
+}
+
+export function mockMetadata (properties) {
+    return new MockMetadata(properties);
 }
