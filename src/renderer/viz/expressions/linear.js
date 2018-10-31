@@ -202,6 +202,7 @@ export default class Linear extends BaseExpression {
                 const smax = codec.externalToInternal(this.max.eval());
                 this.inlineMaker = (inline) => `((${inline.input}-(${smin.toFixed(20)}))/(${(smax - smin).toFixed(20)}))`;
             }
+            console.log(123, this, this.inlineMaker);
         }
     }
 

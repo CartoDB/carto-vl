@@ -1,9 +1,9 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, checkMaxArguments } from './utils';
-import VariantExpression from './Variant';
 import AnimationGeneral from './AnimationGeneral';
 import AnimationRange from './AnimationRange';
+import Base from './base';
 
 /**
  * Create an animated temporal filter (animation). Read more about the {@link expression.Animation|Animation Class}
@@ -68,21 +68,25 @@ import AnimationRange from './AnimationRange';
  * @api
  */
 
-export class Animation extends VariantExpression {
+export class Animation extends Base {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
         duration = implicitCast(duration);
         input = implicitCast(input);
         super({ input, duration, fade });
     }
-    _choose () {
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         if (this.input.type || !(this.input instanceof BaseExpression)) {
             if (this.input.type === 'timerange') {
-                return new AnimationRange(this.input, this.duration, this.fade);
+                Object.setPrototypeOf(this, AnimationRange.prototype);
             } else {
-                return new AnimationGeneral(this.input, this.duration, this.fade);
+                Object.setPrototypeOf(this, AnimationGeneral.prototype);
             }
         }
-        return null;
+        return this._bindMetadata(metadata);
+    }
+    getProgressValue () {
+        return undefined;
     }
 }

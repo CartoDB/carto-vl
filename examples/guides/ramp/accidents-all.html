@@ -78,14 +78,10 @@
                 document.getElementById('loader').style.opacity = '0';
             }
             colorLegend.data.forEach((legend, index) => {
-                const color = legend.value
-                    ? rgbToHex(legend.value)
-                    : 'white'
+                const color = rgbToHex(legend.value);
 
-                if (color) {
-                    colorLegendList +=
-                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
-                }
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
             });
 
             document.getElementById('content').innerHTML = colorLegendList;
