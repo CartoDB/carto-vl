@@ -45,21 +45,14 @@
     });
 
     const s = carto.expressions;
-    const source = new carto.source.SQL(`
-      select*from taxi_50k
-    `);
+    const source = new carto.source.Dataset('taxi_50k');
 
     const viz = new carto.Viz(`
-      // @hour: clusterTime($tpep_pickup_datetime, 'hour')
       @hour: clusterTime($tpep_pickup_datetime, 'hour', 'America/New_York')
 
-      // linear uses start date value
-      // width: linear(@hour)*60
       width: 10
       strokeWidth: 0
-      // color: ramp(linear(@hour), SUNSET)
       color: opacity(rgb(255,255,0),0.5)
-
 
       filter: animation(@hour, 130, fade(0.0,0.0))
 
@@ -78,7 +71,7 @@
         console.log(viz);
         console.log("Min hour", viz.variables.minhour.value.text);
         console.log("Max hour", viz.variables.maxhour.value.text);
-        console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f).text));
+        console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f.properties).text));
         // console.log('Hours:',viz.variables.list.value.map(f => f[viz.variables.hour.propertyName]));
       }
       if (animation) {
