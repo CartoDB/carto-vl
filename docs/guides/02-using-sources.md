@@ -1,4 +1,4 @@
-## Using data in your visualization with Sources
+## Add data from multiple Sources
 In this guide you will learn how to use different data sources in your CARTO VL visualizations. After finishing this guide, you will be able to connect to datasets in several ways, and know which option is best for you.
 
 This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started) and know how to make a basic map.
@@ -15,8 +15,7 @@ By the end of this guide, you will be able to create this CARTO VL map:
     </iframe>
 </div>
 
-
-### How to get data
+### Supported data types
 CARTO VL is a library that visualizes geographical datasets in a powerful and flexible way. Those datasets can be yours or they can be served by some other provider, but the first step to know is where they are hosted and how they can be accessed.
 
 CARTO VL currently supports these three options:
@@ -29,7 +28,7 @@ Every option is a different kind of **Source**, and CARTO VL provides you with a
 Both *Dataset* and *SQL* are based in [Vector Tiles](https://carto.com/help/glossary/#vectortile), following the *Mapbox Vector Tile Specification* or [MVT](https://www.mapbox.com/vector-tiles/specification/). This advanced technology allows transferring geographic data from the server to your browser in small chunks, allowing good performance and powerful dynamic styling.
 > In fact, there is a fourth type of source in CARTO VL called [carto.source.MVT](/developers/carto-vl/reference/#cartosourcemvt) but it is not meant to be used directly by the users, except in very precise / advanced cases.
 
-
+### Getting started
 In the following section you will see how to use three main source types. Before getting started with that, you will need to create a basic map.
 
 You can start from this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html). Go ahead and copy its source code into a new file called `sources.html`.
@@ -41,10 +40,10 @@ const nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-left');
 ```
 
-### Dataset
+### Dataset source
 A `Dataset` can be managed using [carto.source.Dataset](/developers/carto-vl/reference/#cartosourcedataset). It is a source with geographic information related to a specific topic (such as *stores*, *streets* or *counties*). If you have a GIS background, this is like a local vector file with points, lines or polygons, hosted in CARTO. If you don't, you can think of it as a table on the server with a geometry field you can use to draw it on a map.
 
-#### Add a Dataset
+#### Add a Dataset source
 You already know how to add a `Dataset` thanks to the *Getting Started* guide:
 ```js
 const aSource = new carto.source.Dataset('name_of_your_dataset');
@@ -87,13 +86,13 @@ The result should look like this:
     </iframe>
 </div>
 
-#### When to use a Dataset?
+#### When to use a Dataset source?
 You have a CARTO account, with several custom datasets, and you want to visualize one of them on a map, with all its rows.
 
-
-### GeoJSON
+### GeoJSON source
 A `GeoJSON` can be used in CARTO VL with [carto.source.GeoJSON](/developers/carto-vl/reference/#cartosourcegeojson). GeoJSON is a standard format to encode geographic data using JavaScript. It is indeed a common JSON, extended with spatial features, and you can create some *.geojson* contents online at [geojson.io](http://geojson.io/).
 
+#### Add a GeoJSON source
 In the next set of steps, you'll create a new GeoJSON layer, to visualize the main *CARTO offices* around the world.
 
 You can include GeoJSON content and embed it directly in your JavaScript, like this:
@@ -180,13 +179,13 @@ Now the map should look like this:
     </iframe>
 </div>
 
-#### When to use a GeoJSON?
+#### When to use a GeoJSON source?
 You already have your data in GeoJSON format, and you don't have access to a CARTO account (if you do have a CARTO account, you should import it to get a better performance and more capabilities, and then use a `Dataset` source). This can also be a useful format for some quick tests, using inline GeoJSON if you are managing just a few rows or a *.geojson* file just next to your *.html*.
 
-
-### SQL
+### SQL source
 SQL is a very common language to make queries in databases and geospatial software. It provides a flexible mechanism to adapt your dataset to your specific needs. 
 
+#### Add a SQL source
 Let's see how to add a SQL source to your map!
 
 Define a query (select only the largest cities (`megacity`) in the world from the `populated_places` dataset):

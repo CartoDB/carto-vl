@@ -100,7 +100,7 @@ That's because we have to define a place for the last step of the process (`docu
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
-        id="population-density-buckets-numeric"
+        id="accidents-all-legend-no-content"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend-no-content.html"
         width="100%"
         height="500"
@@ -130,7 +130,7 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
-        id="accidents-all"
+        id="accidents-all-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
         width="100%"
         height="500"
@@ -147,7 +147,7 @@ For example, the map below symbolizes only the `top` three weather conditions in
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
-        id="accidents-all"
+        id="accidents-all-top-others-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-others-legend.html"
         width="100%"
         height="500"
@@ -167,7 +167,7 @@ With that change, the final map will now label other categories as "Other weathe
 
 <div class="example-map" style="margin: 20px auto !important">
     <iframe
-        id="accidents-all"
+        id="accidents-all-top-legend"
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-legend.html"
         width="100%"
         height="500"
@@ -178,13 +178,12 @@ With that change, the final map will now label other categories as "Other weathe
 
 #### Unclassified numerical data
 
-<div class="example-map">
+<div class="example-map" style="margin: 20px auto !important">
     <iframe
         id="legend-number"
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
