@@ -17,7 +17,7 @@ export default class DummyDataframe {
         this.metadata = metadata;
         this.propertyCount = 0;
         this._aabb = computeAABB(geom, type);
-        this._centroids = computeCentroid(geom, type);
+        this._centroids = computeCentroid(this.decodedGeom, type);
         this.t1 = [0.1, 0.1, 0.1, 0.1];
         this.t2 = [0.1, 0.1, 0.1, 0.1];
         this.t3 = [0.1, 0.1, 0.1, 0.1];

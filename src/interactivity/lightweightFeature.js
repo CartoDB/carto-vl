@@ -36,7 +36,6 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
             centroid.x = centroid.x * dataframe.scale + dataframe.center.x;
             centroid.y = centroid.y * dataframe.scale + dataframe.center.y;
             const g = unprojectFromWebMercator(centroid);
-            // debugger;
 
             return [g.lng, g.lat];
         }

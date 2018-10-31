@@ -173,18 +173,17 @@ export function computeCentroid (geometry, type) {
         case 'line':
         case 'polygon':
             const centroids = [];
+            let breakpoint;
+            for (let i = 0; i < geometry.vertices.length / 2; i++) {
+                geometry.breakpoints;
 
-            for (let i = 0; i < geometry.length; i++) {
-                const feature = geometry[i];
-                const polygon = feature[0];
-                // const [vertices, numVertices] = [polygon.flat, polygon.holes[0] || polygon.flat.length / 2];
-                let centroid = {
-                    x: polygon.flat[0],
-                    y: polygon.flat[1]
-                };
-                debugger;
+                // https://en.wikipedia.org/wiki/Centroid#Of_a_triangle_2
+
+                // let centroid = {
+                //     x: polygon.flat[0],
+                //     y: polygon.flat[1]
+                // };
                 centroids.push(centroid);
-                // console.log(centroid);
             }
 
             return centroids;
