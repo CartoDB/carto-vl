@@ -7,6 +7,7 @@ With CARTO VL you can make animated maps of points, lines and polygons using the
         src="/developers/carto-vl/examples/maps/guides/animation/step-7.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -37,6 +38,7 @@ const viz = new carto.Viz(`
         src="/developers/carto-vl/examples/maps/guides/animation/step-0.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -88,6 +90,7 @@ const viz = new carto.Viz(`
         src="/developers/carto-vl/examples/maps/guides/animation/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -108,6 +111,7 @@ const viz = new carto.Viz(`
         src="/developers/carto-vl/examples/maps/guides/animation/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -126,6 +130,7 @@ filter: animation($date_time, 30, fade(0, 0.5))
         src="/developers/carto-vl/examples/maps/guides/animation/step-3.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -152,6 +157,7 @@ const viz = new carto.Viz(`
         src="/developers/carto-vl/examples/maps/guides/animation/step-4.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -287,6 +293,7 @@ Remember you can style your HTML controls using CSS. These styles are very simpl
         src="/developers/carto-vl/examples/maps/guides/animation/step-5.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -403,6 +410,7 @@ As you can see in the result, you are able to visualize, via color, where each b
         src="/developers/carto-vl/examples/maps/guides/animation/step-6.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

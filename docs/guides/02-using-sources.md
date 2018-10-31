@@ -11,6 +11,7 @@ By the end of this guide, you will be able to create this CARTO VL map:
         src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -82,6 +83,7 @@ The result should look like this:
         src="/developers/carto-vl/examples/maps/guides/sources/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -175,6 +177,7 @@ Now the map should look like this:
         src="/developers/carto-vl/examples/maps/guides/sources/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -231,6 +234,7 @@ Congrats! You have finished this guide. The final map should look like this:
         src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

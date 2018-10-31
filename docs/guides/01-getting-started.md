@@ -82,6 +82,7 @@ At this point you will have a basic map with Voyager as the base, that opens at 
         src="/developers/carto-vl/examples/maps/guides/getting-started/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -154,6 +155,7 @@ For more information about styling, check out the guide [Introduction to Styling
         src="/developers/carto-vl/examples/maps/guides/getting-started/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

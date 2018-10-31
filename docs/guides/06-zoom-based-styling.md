@@ -35,6 +35,7 @@ After you explore each one independently, you will bring them together to create
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-8.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -49,6 +50,7 @@ To get started, copy and paste the code below into your favorite text editor and
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/zoom-based-get-started.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -79,6 +81,7 @@ With these adjustments, the distribution of trees around the city is clearer:
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -105,6 +108,7 @@ In the resulting map, as you zoom in and out, you'll notice that the `1` point s
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-3.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -134,6 +138,7 @@ This sets the width of symbols to `1` at zoom levels less than or equal to `12` 
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-4.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -163,6 +168,7 @@ At zooms less than `12` the point color is `white` and the stroke color is `gree
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-5.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -208,6 +214,7 @@ As you zoom in and out of the resulting map, you will notice that the colors (pu
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-6.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -229,6 +236,7 @@ With this filter, all points will draw when both criteria are met. This means th
         src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-7.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

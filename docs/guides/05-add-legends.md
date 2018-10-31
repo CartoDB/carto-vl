@@ -14,6 +14,7 @@ If you completed the XXX guide, the map below will look familiar. In that guide,
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -34,6 +35,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-no-legend.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -104,6 +106,7 @@ That's because we have to define a place for the last step of the process (`docu
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend-no-content.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -151,6 +154,7 @@ For example, the map below symbolizes only the `top` three weather conditions in
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-others-legend.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -171,6 +175,7 @@ With that change, the final map will now label other categories as "Other weathe
         src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-legend.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -184,6 +189,7 @@ With that change, the final map will now label other categories as "Other weathe
         src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -212,6 +218,7 @@ With that change, the final map will now label other categories as "Other weathe
         src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
