@@ -6,7 +6,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
  */
 export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
-    let prevPoint, currentPoint, nextPoint;
+    let prevPoint, currentPoint;
     let prevNormal, nextNormal;
     let drawLine;
 
@@ -17,54 +17,44 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         currentPoint = [lineString[2], lineString[3]];
         prevNormal = getLineNormal(prevPoint, currentPoint);
 
-        if (prevPoint[0] === currentPoint[0] && prevPoint[1] === currentPoint[1]) {
-            return index;
-        }
-
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
-            if (drawLine) {
-                // First triangle
-                geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
-                geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
-                geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
-                geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
-                geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
-                geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
+            const nextPoint = i <= lineString.length - 2
+                ? [lineString[i], lineString[i + 1]]
+                : [lineString[2], lineString[3]];
 
-                // Second triangle
-                geomBuffer.vertices[index] = prevPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
-                geomBuffer.vertices[index] = prevPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
-                geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = prevNormal[0];
-                geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = prevNormal[1];
-                geomBuffer.vertices[index] = currentPoint[0];
-                geomBuffer.normals[index++] = -prevNormal[0];
-                geomBuffer.vertices[index] = currentPoint[1];
-                geomBuffer.normals[index++] = -prevNormal[1];
-            }
+            if (!(nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1])) {
+                if (drawLine) {
+                    // First triangle
+                    geomBuffer.vertices[index] = prevPoint[0];
+                    geomBuffer.normals[index++] = -prevNormal[0];
+                    geomBuffer.vertices[index] = prevPoint[1];
+                    geomBuffer.normals[index++] = -prevNormal[1];
+                    geomBuffer.vertices[index] = prevPoint[0];
+                    geomBuffer.normals[index++] = prevNormal[0];
+                    geomBuffer.vertices[index] = prevPoint[1];
+                    geomBuffer.normals[index++] = prevNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = prevNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = prevNormal[1];
 
-            // If there is a next point, compute its properties
-            if (i <= lineString.length - 2) {
-                nextPoint = [lineString[i], lineString[i + 1]];
-            } else if (isPolygon) {
-                nextPoint = [lineString[2], lineString[3]];
-            }
-
-            if (nextPoint) {
-                if (nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1]) {
-                    return index;
+                    // Second triangle
+                    geomBuffer.vertices[index] = prevPoint[0];
+                    geomBuffer.normals[index++] = -prevNormal[0];
+                    geomBuffer.vertices[index] = prevPoint[1];
+                    geomBuffer.normals[index++] = -prevNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = prevNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = prevNormal[1];
+                    geomBuffer.vertices[index] = currentPoint[0];
+                    geomBuffer.normals[index++] = -prevNormal[0];
+                    geomBuffer.vertices[index] = currentPoint[1];
+                    geomBuffer.normals[index++] = -prevNormal[1];
                 }
+
                 nextNormal = getLineNormal(currentPoint, nextPoint);
 
                 if (drawLine) {
@@ -115,7 +105,6 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
             prevPoint = currentPoint;
             currentPoint = nextPoint;
             prevNormal = nextNormal;
-            nextPoint = null;
         }
     }
     return index;
