@@ -45,7 +45,7 @@
 <li><strong>strokeColor</strong>: stroke/border color of points and polygons, not applicable to lines</li>
 <li><strong>width</strong>: fill diameter of points, thickness of lines, not applicable to polygons</li>
 <li><strong>strokeWidth</strong>: stroke width of points and polygons, not applicable to lines</li>
-<li><strong>filter</strong>: filter features by removing from rendering and interactivity all the features that don't pass the test</li>
+<li><strong>filter</strong>: filter features by removing from rendering and interactivity all the features that don't pass the test.</li>
 <li><strong>symbol</strong> - show an image instead in the place of points</li>
 <li><strong>symbolPlacement</strong> - when using <code>symbol</code>, offset to apply to the image</li>
 <li><strong>order</strong>: - rendering order of the features, only applicable to points. See <a href="carto.expressions.html#.asc">carto.expressions.asc</a>, <a href="carto.expressions.html#.desc">carto.expressions.desc</a> and <a href="carto.expressions.html#.noOrder">carto.expressions.noOrder</a></li>
@@ -3582,6 +3582,265 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".ClusterTime"><span class="type-signature">(static) </span>ClusterTime<span class="signature">(property, units, timezone)</span><span class="type-signature"> &rarr; {TimeRange|Number}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Use discretised property as aggregate dimension. This operation disables the access to the property
+except within <code>clusterTime</code> expressions with the same parameters.</p>
+<p>Note: <code>clusterTime</code> can only be created with a <a href="carto.expressions.html#.prop">carto.expressions.prop</a>,
+as the first parameter, not other expressions.</p>
+<p>When the units of resolution are cyclic periods such as 'dayOfWeek' (day of the week) or 'monthOfYear' (month of the year),
+the resulting expression takes a numeric value to represent the period, e.g. 1 for Monday or January.</p>
+<p>When the units are not cyclic (e.g. 'week' or 'month'), the resulting expression is a <code>TimeRange</code> that
+encompass each individual calendar period, for example week 2018-W03 (third week of 2018 from 2018-01-15 to 2018-01-21)
+or 2018-03 (March 2018, from 2018-03-01 to 2018-04-01).</p>
+<p>Accepted values for cyclic resolution periods are:</p>
+<ul>
+<li><code>semesterOfYear</code> (6-month term) takes values from 1 to 2</li>
+<li><code>trimesterOfYear</code> (4-month term) takes values from 1 to 3</li>
+<li><code>quarterOfYear</code> (3-month term) takes values from 1 to 4</li>
+<li><code>monthOfYear</code> takes values from 1 (January) to 12 (December)</li>
+<li><code>weekOfYear</code> follows <a href="https://en.wikipedia.org/wiki/ISO_week_date">ISO 8601 numbering</a> taking values from 1 up to 53</li>
+<li><code>dayOfWeek</code> (as per ISO 8601, 1 = Monday, to 7 = Sunday</li>
+<li><code>dayOfMonth</code> takes values from 1 to 31</li>
+<li><code>dayOfYear</code> takes values from 1 to 366</li>
+<li><code>hourOfDay</code> takes values from 0 to 23</li>
+<li><code>minuteOfHour</code> takes values from 0 to 59</li>
+</ul>
+<p>Accepted values for serial resolution units are:</p>
+<ul>
+<li><code>year</code>, e.g. '2017'</li>
+<li><code>month</code>, e.g. '2017-03'</li>
+<li><code>day</code>, e.g. '2017-03-01'</li>
+<li><code>hour</code>, e.g. '2017-03-01T13'</li>
+<li><code>minute</code>, e.g. '2017-03-01T13:22'</li>
+<li><code>second</code>, e.g. '2017-03-01T13:22:31'</li>
+<li><code>week</code> represented as '2018-W03' (third week of 2018:, 2018-01-15 to 2018-01-21)</li>
+<li><code>quarter</code> as '2018-Q2' (second quarter of 2018, i.e. 2018-04 to 2018-06)</li>
+<li><code>semester</code> as '2018S2' (second semester of 2018, i.e. 2018-07 to 2018-12)</li>
+<li><code>trimester</code> as '2018t2' (second trimester of 2018, i.e. 2018-05 to 2018-08)</li>
+<li><code>decade</code> as 'D201' (decade 201, i.e. 2010 to 2019)</li>
+<li><code>century</code> as 'C21' (21st century, ie. 2001 to 2100)</li>
+<li><code>millennium</code> as 'M3' (3rd millennium: 2001 to 3000)</li>
+</ul>
+<p>The time zone is optional. By default UTC time will be used.
+It admits a fixed offset from UTC as a signed number of seconds,
+or <a href="https://www.iana.org/time-zones">IANA</a> timezone <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">names</a>
+such as <code>America/New_York</code> or <code>Europe/Madrid</code>, which not only define a time offset,
+but also rules for DST (daylight savings time).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>property</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Date</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Column of the table to be discretised as dimension</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>units</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Units of resolution for the discretization</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>timezone</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Time zone in which the dates are discretised. UTC by default.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Dimension column; takes time range values (intervals) for serial units of resolutions and numbers for recurrent units.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">TimeRange</span>
+|
+
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Use months as a dimension of the cluster aggregations as `month`.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  month: s.clusterTime(s.prop('date', 'month', 'America/New_York'))
+});</code></pre>
+
+        <p class="code-caption">Use months as a dimension of the cluster aggregations as `month`. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  month: clusterTime($date, 'month', 'America/New_York')
+`);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".constant"><span class="type-signature">(static) </span>constant<span class="signature">(x)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
@@ -5008,7 +5267,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".globalCount"><span class="type-signature">(static) </span>globalCount<span class="signature">(property)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id=".globalCount"><span class="type-signature">(static) </span>globalCount<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -5017,7 +5276,6 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Return the feature count for the entire source data.</p>
-<p>Note: <code>globalCount</code> can only be created by <a href="carto.expressions.html#.prop">carto.expressions.prop</a>, not other expressions.</p>
 </div>
 
 
@@ -5026,55 +5284,6 @@ const viz = new carto.Viz({
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>property</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>property expression</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -5132,7 +5341,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Result of the aggregation</p>
+    <p>feature count</p>
 </div>
 
 
@@ -5156,19 +5365,19 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Assign the global count of the `amount` property to a variable.</p>
+        <p class="code-caption">Assign the global count of features to a variable.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
-     g_count: s.globalCount(s.prop('amount'))
+     g_count: s.globalCount()
   }
 });</code></pre>
 
-        <p class="code-caption">Assign the global count of the `amount` property to a variable. (String)</p>
+        <p class="code-caption">Assign the global count of features. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  @g_count: globalCount($amount)
+  @g_count: globalCount()
 `);</code></pre>
 
 
@@ -5804,7 +6013,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>Numeric expression in the [0, 100] range</p></td>
+            <td class="description last"><p>Numeric expression in the [0, 100] range, must be feature independent</p></td>
         </tr>
 
     
@@ -8301,7 +8510,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".isNaN"><span class="type-signature">(static) </span>isNaN<span class="signature">(x)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id=".isNull"><span class="type-signature">(static) </span>isNull<span class="signature">(x)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -8309,7 +8518,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Check if a numeric expression is NaN.</p>
+    <p>Check if a numerical or categorical property is missing (NULL value).</p>
 <p>This returns a numeric expression where 0 means <code>false</code> and 1 means <code>true</code>.</p>
 </div>
 
@@ -8445,17 +8654,17 @@ const viz = new carto.Viz({
 
     <h5>Examples</h5>
     
-        <p class="code-caption">Filter NaN values of the `numeric` property.</p>
+        <p class="code-caption">Filter NULL values of the `numeric` property.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
-  filter: s.not(s.isNaN(s.prop('numeric')))
+  filter: s.not(s.isNull(s.prop('numeric')))
 });</code></pre>
 
-        <p class="code-caption">Filter NaN values of the `numeric` property. (String)</p>
+        <p class="code-caption">Filter NULL values of the `numeric` property. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  filter: not(isNaN($numeric))
+  filter: not(isNull($numeric))
 `);</code></pre>
 
 
@@ -12109,7 +12318,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(x)</span><span class="type-signature"> &rarr; {Palette|List}</span></h4>
+    <h4 class="name" id=".reverse"><span class="type-signature">(static) </span>reverse<span class="signature">(input)</span><span class="type-signature"> &rarr; {Palette|List}</span></h4>
     
 
     
@@ -12153,7 +12362,7 @@ const viz = new carto.Viz({
 
         <tr>
             
-                <td class="name"><code>x</code></td>
+                <td class="name"><code>input</code></td>
             
 
             <td class="type">
@@ -12917,7 +13126,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".scale"><span class="type-signature">(static) </span>scale<span class="signature">(width, zoomlevel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id=".scaled"><span class="type-signature">(static) </span>scaled<span class="signature">(width, zoomlevel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -14003,7 +14212,7 @@ const viz = new carto.Viz({
 
 
 <div class="description">
-    <p>Time contant expression</p>
+    <p>Time constant expression</p>
 </div>
 
 
@@ -14049,6 +14258,9 @@ const viz = new carto.Viz({
 |
 
 <span class="param-type">string</span>
+|
+
+<span class="param-type">number</span>
 
 
             
@@ -14058,7 +14270,7 @@ const viz = new carto.Viz({
 
             
 
-            <td class="description last"><p>The date from a JavaScript Date() object or encoded as a string</p></td>
+            <td class="description last"><p>The date from a JavaScript Date() object or a date encoded as a string or the number of milliseconds since Epoch.</p></td>
         </tr>
 
     
@@ -14153,6 +14365,164 @@ const viz = new carto.Viz({
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   filter: time('2022-03-09T00:00:00Z') &lt; $date &lt; time('2033-08-12T00:00:00Z')
 `);</code></pre>
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id=".TimeRangeExpr"><span class="type-signature">(static) </span>TimeRangeExpr<span class="signature">(value)</span><span class="type-signature"> &rarr; {TimeRange}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Define a time range: an interval between two time points.</p>
+<p>ISO-formatted strings (based on ISO 8601) are used to define ranges.
+Since <code>timeRange</code> doesn't support arbitrary intervals, but only
+intervals based on single units of time (e.g. a month, an hour),
+we don't use the general ISO interval format, but simply an
+abbreviated form of the date point format, so that '2018-03' represents
+the month of March, 2018 (i.e. the interval 2018-03-01T00:00:00/2018-04-01T00:00:00).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>value</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>abbreviated ISO-formatted interval</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>It retuns a TimeRange object.</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">TimeRange</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
 
 
@@ -15035,7 +15405,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportCount"><span class="type-signature">(static) </span>viewportCount<span class="signature">(input)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+    <h4 class="name" id=".viewportCount"><span class="type-signature">(static) </span>viewportCount<span class="signature">()</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
     
@@ -15052,55 +15422,6 @@ const viz = new carto.Viz({
 
 
 
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>input</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>numeric expression</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
 
 
 
@@ -15158,7 +15479,7 @@ const viz = new carto.Viz({
 
         
 <div class="param-desc">
-    <p>Result of the aggregation</p>
+    <p>feature count in the viewport</p>
 </div>
 
 
@@ -15187,14 +15508,14 @@ const viz = new carto.Viz({
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz({
   variables: {
-     v_count: s.viewportCount(s.prop('amount'))
+     v_count: s.viewportCount()
   }
 });</code></pre>
 
         <p class="code-caption">Assign the feature count in the viewport to a variable. (String)</p>
     
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
-  @v_count: viewportCount($amount)
+  @v_count: viewportCount()
 `);</code></pre>
 
 
@@ -15681,7 +16002,7 @@ at regular intervals between the minimum and maximum. The number of bars in this
 
             
 
-            <td class="description last"><p>Weight each occurrence differently based on this weight, defaults to <code>1</code>, whioinch will generate a simple, non-weighted count.</p></td>
+            <td class="description last"><p>Weight each occurrence differently based on this weight, defaults to <code>1</code>, which will generate a simple, non-weighted count.</p></td>
         </tr>
 
     
@@ -17371,13 +17692,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 17:21:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 02 2018 17:50:08 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -254,18 +254,95 @@
 
         
             
-<h4 class="name" id=".viz"><span class="type-signature">(static) </span>viz<span class="type-signature"></span></h4>
+<h4 class="name" id=".viz"><span class="type-signature">(static, readonly) </span>viz<span class="type-signature"> :<a href="carto.Viz.html">carto.Viz</a></span></h4>
 
 
 
 
 <div class="description">
     <p>Viz attached to this layer.</p>
-<p>Calls to <code>blendToViz</code> and <code>update</code> wont' update the viz until those calls &quot;commit&quot;,
+<p>Calls to <code>blendToViz</code> and <code>update</code> won't update the viz until those calls &quot;commit&quot;,
 having performed and completed all asynchronous necessary sanity checks.</p>
 </div>
 
 
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type"><a href="carto.Viz.html">carto.Viz</a></span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="visible"><span class="type-signature"></span>visible<span class="type-signature"> :boolean</span></h4>
+
+
+
+
+<div class="description">
+    <p>Layer visibility property.</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">boolean</span>
+
+
+        </li>
+    </ul>
 
 
 
@@ -505,7 +582,18 @@ having performed and completed all asynchronous necessary sanity checks.</p>
 
 <div class="description">
     <p>Blend the current viz with another viz.</p>
-<p>This allows smooth transforms between two different vizs.</p>
+<p>This allows smooth transitions between two different Vizs.</p>
+<p>Blending won't be performed when convenient for the attached Source. This
+happens with Maps API sources when the new Viz uses a different set of properties or
+aggregations. In these cases a hard transition will be used instead.</p>
+<p>This method returns a promise that will be resolved if validations passed.</p>
+<p>The promise will be rejected if the validation fails, for example
+because the visualization expects a property name that is not present in the source.</p>
+<p>The promise will be rejected also if this method is invoked again before the first promise is resolved.
+If the promise is rejected the layer's viz won't be changed by this call.</p>
+<p>Concurrent calls to <code>update</code> will override the effects of <code>blendToViz</code>:
+if a call to <code>blendToViz</code> is performed after a call to <code>update</code>, but the <code>update</code> hasn't been resolved yet,
+the call to <code>update</code> will override the call to <code>blendToViz</code> is it resolves.</p>
 </div>
 
 
@@ -843,7 +931,7 @@ layer.blendToViz(viz1, 500);</code></pre>
 
             
 
-            <td class="description last"><p>Type of event to unregister</p></td>
+            <td class="description last"><p>Type of event to unregister. Valid names are: <code>loaded</code>, <code>updated</code>.</p></td>
         </tr>
 
     
@@ -944,7 +1032,7 @@ layer.blendToViz(viz1, 500);</code></pre>
 
 
 <div class="description">
-    <p>Register an event handler for the given event name. Valid names are: <code>loaded</code>, <code>updated</code>.</p>
+    <p>Register an event handler for the given event name.</p>
 </div>
 
 
@@ -996,7 +1084,7 @@ layer.blendToViz(viz1, 500);</code></pre>
 
             
 
-            <td class="description last"><p>Type of event to listen for</p></td>
+            <td class="description last"><p>Type of event to listen for. Valid names are: <code>loaded</code>, <code>updated</code>.</p></td>
         </tr>
 
     
@@ -1264,11 +1352,14 @@ layer.blendToViz(viz1, 500);</code></pre>
 
 
 <div class="description">
-    <p>Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.: the viz will be changed with the source, not before it.
-This method will return a promise that will be resolved once the source and the visualization are validated.
-The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
-The promise will be rejected also if this method is invoked again before the first promise is resolved.
-If the promise is rejected the layer's source and viz won't be changed.</p>
+    <p>Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.:
+the viz will be changed with the source, not before it.</p>
+<p>This method will return a promise that will be resolved once the source and the visualization are validated.</p>
+<p>The promise will be rejected if the validation fails, for example
+because the visualization expects a property name that is not present in the source.</p>
+<p>The promise will be rejected also if this method is invoked again before the first promise is resolved.
+If the promise is rejected the layer's source and viz won't be changed by this call.</p>
+<p>Concurrent calls to <code>blendToViz</code> or <code>blendTo</code> won't override calls to update (like calls to <code>update</code> do).</p>
 </div>
 
 
@@ -1330,7 +1421,7 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
 
             
 
-            <td class="description last"><p>The new Source object</p></td>
+            <td class="description last"><p>The new Source object.</p></td>
         </tr>
 
     
@@ -1363,7 +1454,7 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
 
             
 
-            <td class="description last"><p>Optional. The new Viz object</p></td>
+            <td class="description last"><p>Optional. The new Viz object. Defaults to the current viz.</p></td>
         </tr>
 
     
@@ -1443,13 +1534,13 @@ If the promise is rejected the layer's source and viz won't be changed.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 17:21:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 02 2018 17:50:08 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

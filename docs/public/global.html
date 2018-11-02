@@ -96,6 +96,404 @@
     
 
     
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromStartEndValues"><span class="type-signature"></span>fromStartEndValues<span class="signature">(startValue, endValue, tz)</span><span class="type-signature"> &rarr; {TimeRange}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Construct a TimeRange from start and end epoch values in milliseconds
+interpreted as in the specified time zone (UTC by default).</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>startValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>start of the range as elapsed milliseconds since a timezone-specific epoch</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>endValue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>end of the range as elapsed milliseconds since a timezone-specific epoch</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tz</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last"><p>Optional time zone identification</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">TimeRange</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="fromText"><span class="type-signature"></span>fromText<span class="signature">(iso, tz)</span><span class="type-signature"> &rarr; {TimeRange}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Construct a TimeRange from a time range string</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>iso</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"><p>Abbreviated ISO-formatted string (e.g. <code>'2018-03'</code>)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>tz</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+                <td class="default">
+                
+                    null
+                
+                </td>
+            
+
+            <td class="description last"><p>Optional time zone identification</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">TimeRange</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+    
 
     
         <h3 class="subsection-title">Type Definitions</h3>
@@ -246,6 +644,98 @@
         <tr>
             
                 <td class="name"><code>widthStroke</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FeatureVizProperty">FeatureVizProperty</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>symbol</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FeatureVizProperty">FeatureVizProperty</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>symbolPlacement</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FeatureVizProperty">FeatureVizProperty</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>filter</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#FeatureVizProperty">FeatureVizProperty</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>transform</code></td>
             
 
             <td class="type">
@@ -1995,13 +2485,13 @@ The list of features that are no longer behind the cursor and that were before i
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3><a href="global.html">Global</a></h3>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Oct 09 2018 17:21:28 GMT+0200 (CEST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Fri Nov 02 2018 17:50:08 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
