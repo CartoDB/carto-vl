@@ -105,11 +105,8 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     layer.on('updated', () => {
-      const value = animation.getProgressValue();
-      if (value) {
-        const time = value.toISOString();
-        document.getElementById("timer").textContent = time;
-      }
+      const time = animation.getProgressValue().toISOString();
+      document.getElementById("timer").textContent = time;
     });
   </script>
 </body>
