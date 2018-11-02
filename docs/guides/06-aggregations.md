@@ -70,6 +70,7 @@ The result using the global functions in the previous step should look like this
         src="/developers/carto-vl/examples/maps/guides/aggregations/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -209,6 +210,7 @@ At this point, you have created this great visualization, using global and viewp
         src="/developers/carto-vl/examples/maps/guides/aggregations/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -299,6 +301,7 @@ Congrats, you made your way through this guide!. This is the result:
         src="/developers/carto-vl/examples/maps/guides/aggregations/step-3.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>

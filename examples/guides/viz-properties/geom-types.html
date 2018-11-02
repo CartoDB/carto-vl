@@ -15,11 +15,15 @@
 </head>
 
 <body>
+
+  <!-- Add map container -->
   <div id="map"></div>
+
+  <!-- Add title/legend box -->
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Visualization properties and geometries</h1>
+        <h1>Visualization properties by geometry</h1>
       </header>
       <section>
         <p class="description open-sans">Styling properties adapt to each geometry type. Some geometry types will
@@ -28,43 +32,41 @@
           <ul class="actions">
             <li>
               <input type="radio" name="source" onclick="usePoints()" id="points" checked>
-              <label for="points">Points dataset</label>
+              <label for="points">Points</label>
             </li>
             <li>
               <input type="radio" name="source" onclick="useLines()" id="lines">
-              <label for="lines">Lines dataset</label>
+              <label for="lines">Lines</label>
             </li>
             <li>
               <input type="radio" name="source" onclick="usePolygons()" id="polygons">
-              <label for="polygons">Polygons dataset</label>
+              <label for="polygons">Polygons</label>
             </li>
           </ul>
           <div id="info"></div>
         </div>
       </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
-  <div id="loader">
-    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-      </svg>
-    </div>
-  </div>
+
   <script>
+
+    // Add basemap and set properties
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 0],
-      zoom: 0,
+      center: [7, 25],
+      zoom: 2,
       scrollZoom: false,
     });
 
+    // Add zoom controls
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
     });
     map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
 
     // Define user
     carto.setDefaultAuth({
@@ -72,19 +74,24 @@
       apiKey: 'default_public'
     });
 
-    // Define layer
+    // Define source
     const source = new carto.source.Dataset('populated_places_small');
+
+    // Define Viz object and custom style
     const viz = new carto.Viz(`
-        color: blue       // 'color' is never ignored
-        width: 10         // 'width' is ignored for polygons
-        strokeColor: red  // 'strokeColor' is ignored for lines
-        strokeWidth: 3    // 'strokeWidth' is ignored for lines
+        color: navy           // 'color' is never ignored
+        width: 8             // 'width' is ignored for polygons
+        strokeColor: fuchsia // 'strokeColor' is ignored for lines
+        strokeWidth: 2     // 'strokeWidth' is ignored for lines
     `);
+
+    // Define map layer
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', hideLoader);
+    // Add map layer
+    layer.addTo(map);
 
+    // Define selection behavior
     function usePoints() {
       layer.update(new carto.source.Dataset('populated_places_small'), viz)
     }
@@ -95,10 +102,7 @@
       layer.update(new carto.source.Dataset('world_borders'), viz)
     }
 
-    function hideLoader() {
-      document.getElementById('loader').style.opacity = '0';
-    }
   </script>
-</body>
 
+</body>
 </html>

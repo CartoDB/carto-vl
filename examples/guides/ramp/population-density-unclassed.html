@@ -2,27 +2,39 @@
 <html>
 
 <head>
-    <title>Add layer | CARTO</title>
+    <title>Unclassed map| CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
     <div id="map"></div>
 
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Unclassed Map</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Change the visualization of the layer</p>
+            </section>
+        </div>
+    </aside>
+
     <script>
+
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-0.815850, 52.087124],
-            zoom: 6,
+            center: [60, 19],
+            zoom: 2,
         });
 
         carto.setDefaultAuth({
@@ -30,11 +42,12 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("uk_elections ");
+        const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
-            color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue, crimson])
-            strokeColor: rgba(255,255,255,0.6)`
-        );
+            width: 2.5
+            color: ramp($dn, [midnightblue,gold])
+            strokeWidth: 0
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');

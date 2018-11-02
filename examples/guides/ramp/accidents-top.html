@@ -19,7 +19,7 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Type of accident</h1>
+                <h1>Weather Conditions</h1>
             </header>
             <section>
                 <div id="controls">
@@ -42,7 +42,7 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-96, 41],
-            zoom: 3.5,
+            zoom: 2.75,
         });
 
         carto.setDefaultAuth({
@@ -52,10 +52,11 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            width: 10
+            width: 5
+            color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
             strokeWidth: 0.2
-            color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
-`);
+            strokeColor: black 
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
@@ -79,7 +80,7 @@
 
                 if (color) {
                     colorLegendList +=
-                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Rest of types')}</span></li>\n`;
+                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
                 }
             });
 

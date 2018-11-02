@@ -2,86 +2,99 @@
 <html>
 
 <head>
-    <title>Railroad accidents | CARTO</title>
+    <title>Rail accident weather | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
+    <!-- Add map container -->
     <div id="map"></div>
+
+    <!-- Add title/legend box -->
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Weather Conditions</h1>
+                <h1>Rail Accidents by Weather</h1>
             </header>
+            <!-- Add legend data -->
             <section>
                 <div id="controls">
                     <ul id="content"></ul>
                 </div>
             </section>
-            <footer class="js-footer"></footer>
         </div>
     </aside>
-    <div id="loader">
-        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-            </svg>
-        </div>
-    </div>
-
+    
     <script>
+
+        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-96, 41],
-            zoom: 2.75,
+            zoom: 4,
         });
-
+        
+        //** CARTO VL functionality begins here **//
+        
+        // Define user
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-
+        
+        // Define source
         const source = new carto.source.Dataset("railroad_accidents");
+        
+        // Define Viz object and custom style
         const viz = new carto.Viz(`
-            width: 5
+            width: 7
             color: ramp($weather,[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
-            strokeColor: black
+            strokeColor: black 
         `);
+        
+        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
-
-        layer.addTo(map, 'watername_ocean');
-
+        
+        // Add layer to map
+        layer.addTo(map);
+        
+        //** ADD LEGEND **//
+        // When layer loads, trigger legend event
         layer.on('loaded', () => {
-            hideLoader();
-
+            
+            // Request data for legend from the layer viz
             const colorLegend = layer.viz.color.getLegendData();
             let colorLegendList = '';
-
+            
+            // A function to convert map colors to HEX values for legend
             function rgbToHex(color) {
                 return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
             }
-            function hideLoader() {
-                document.getElementById('loader').style.opacity = '0';
-            }
+            
+            // Create list elements for legend
             colorLegend.data.forEach((legend, index) => {
                 const color = rgbToHex(legend.value);
+                
+                // Style for legend items based on geometry type
                 colorLegendList +=
-                    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
+                    `<li><span class="point-mark" style="background-color:${color};border: 1px solid black;"></span> <span>${legend.key}</span></li>\n`;
             });
-
+            
+            // Place list items in the content section of the title/legend box
             document.getElementById('content').innerHTML = colorLegendList;
         });
-    </script>
-</body>
 
+    </script>
+
+</body>
 </html>
