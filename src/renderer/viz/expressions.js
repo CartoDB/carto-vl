@@ -6,7 +6,7 @@
  *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
- *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
+ *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test.
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
@@ -481,6 +481,8 @@ import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
+import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
+
 import Constant from './expressions/basic/constant';
 
 import Hex from './expressions/color/hex';
@@ -510,7 +512,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import reverseFn from './expressions/reverse/reverse';
+import Reverse from './expressions/reverse/Reverse';
 
 import Property from './expressions/basic/property';
 
@@ -529,6 +531,7 @@ import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
+import TimeRangeExpr from './expressions/timeRange';
 
 import Top from './expressions/top';
 
@@ -541,7 +544,7 @@ import { Sin } from './expressions/unary';
 import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
-import { Abs, IsNaN } from './expressions/unary';
+import { Abs, IsNull } from './expressions/unary';
 import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
@@ -621,6 +624,8 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
+export const clusterTime = (...args) => new ClusterTime(...args);
+
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
@@ -654,7 +659,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = reverseFn;
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
@@ -678,6 +683,8 @@ export const category = (...args) => new BaseCategory(...args);
 export const time = (...args) => new Time(...args);
 export { time as date };
 
+export const timeRange = (...args) => new TimeRangeExpr(...args);
+
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
@@ -690,7 +697,7 @@ export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const abs = (...args) => new Abs(...args);
-export const isNaN = (...args) => new IsNaN(...args);
+export const isNull = (...args) => new IsNull(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);

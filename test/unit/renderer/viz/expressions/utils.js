@@ -1,5 +1,6 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
+import IdentityCodec from '../../../../../src/codecs/Identity';
 
 const metadata = new Metadata({
     properties: {
@@ -21,9 +22,10 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
         const args = argTypes.map(type => type === 'dependent' ? 'number-property' : type).map(getPropertyArg);
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
-            expect(() =>
-                expr._bindMetadata(metadata)
-            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+            expect(() => {
+                expr._resolveAliases();
+                expr._bindMetadata(metadata);
+            }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
         });
     }
     {
@@ -31,10 +33,10 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
         const args = argTypes.map(type => type === 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
-            v._resolveAliases({ var1: s.property('number') });
-            expect(() =>
-                expr._bindMetadata(metadata)
-            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+            expect(() => {
+                expr._resolveAliases({ var1: s.property('number') });
+                expr._bindMetadata(metadata);
+            }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
         });
     }
 }
@@ -52,12 +54,12 @@ export function validateMaxArgumentsError (expressionName, args) {
     });
 }
 
-export function validateStaticType (expressionName, argTypes, expectedType) {
+export function validateStaticType (expressionName, argTypes, expectedType, skipPropertiesAtConstructorTime = false) {
     describe(`valid ${expressionName}(${argTypes.join(', ')})`, () => {
         const simpleArgs = argTypes.map(getSimpleArg);
         const propertyArgs = argTypes.map(getPropertyArg);
         validateConstructorTimeType(expressionName, simpleArgs, expectedType);
-        if (!equalArgs(simpleArgs, propertyArgs)) {
+        if (!equalArgs(simpleArgs, propertyArgs) && !skipPropertiesAtConstructorTime) {
             validateConstructorTimeType(expressionName, propertyArgs, expectedType);
         }
         validateCompileTimeType(expressionName, propertyArgs, expectedType);
@@ -143,6 +145,7 @@ function getPropertyArg (type) {
 }
 
 function compile (expression) {
+    expression._resolveAliases({});
     expression._bindMetadata(metadata);
     return expression;
 }
@@ -164,4 +167,23 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
             expression._bindMetadata(metadata);
         }).toThrowError(regex);
     });
+}
+
+class MockMetadata {
+    constructor (data) {
+        Object.keys(data).forEach(key => {
+            this[key] = data[key];
+        });
+        this._codec = new IdentityCodec();
+    }
+    stats (propertyName) {
+        return this.properties[propertyName];
+    }
+    codec () {
+        return this._codec;
+    }
+}
+
+export function mockMetadata (properties) {
+    return new MockMetadata(properties);
 }

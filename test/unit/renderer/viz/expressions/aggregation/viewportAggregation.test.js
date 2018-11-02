@@ -8,7 +8,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         validateMaxArgumentsError('viewportMin', ['number', 'number']);
         validateMaxArgumentsError('viewportSum', ['number', 'number']);
         validateMaxArgumentsError('viewportAvg', ['number', 'number']);
-        validateMaxArgumentsError('viewportCount', ['number', 'number']);
+        validateMaxArgumentsError('viewportCount', ['number']);
         validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
         validateMaxArgumentsError('viewportHistogram', ['number', 'number', 'number', 'number']);
     });
@@ -36,7 +36,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         function fakeDrawMetadata (expr) {
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: null });
             expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
             expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });
             expr.accumViewportAgg({ price: 0, cat: 'a', numeric_with_nulls: 0 });
@@ -99,14 +99,8 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         });
 
         describe('viewportCount', () => {
-            it('($price) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($price);
-                fakeDrawMetadata(viewportCount);
-                expect(viewportCount.eval()).toEqual(4);
-            });
-
-            it('($nulls) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($nulls);
+            it('() should return the metadata count', () => {
+                const viewportCount = s.viewportCount();
                 fakeDrawMetadata(viewportCount);
                 expect(viewportCount.eval()).toEqual(4);
             });
@@ -119,13 +113,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
 
+            viewportPercentile = s.viewportPercentile($price, 1);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(0);
+
             viewportPercentile = s.viewportPercentile($price, 24);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
             viewportPercentile = s.viewportPercentile($price, 26);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
-
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
@@ -136,11 +133,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(1.5);
+
             viewportPercentile = s.viewportPercentile($price, 76);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
 
             viewportPercentile = s.viewportPercentile($price, 100);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(2);
+
+            viewportPercentile = s.viewportPercentile($price, 999);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
         });

@@ -1,5 +1,5 @@
 import * as s from '../../../../../../src/renderer/viz/expressions';
-import { validateMaxArgumentsError } from '../utils';
+import { validateMaxArgumentsError, validateTypeErrors, mockMetadata } from '../utils';
 
 describe('src/renderer/viz/expressions/globalAggregation', () => {
     describe('error control', () => {
@@ -7,24 +7,27 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
         validateMaxArgumentsError('globalMin', ['number', 'number']);
         validateMaxArgumentsError('globalSum', ['number', 'number']);
         validateMaxArgumentsError('globalAvg', ['number', 'number']);
-        validateMaxArgumentsError('globalCount', ['number', 'number']);
+        validateMaxArgumentsError('globalCount', ['number']);
         validateMaxArgumentsError('globalPercentile', ['number', 'number', 'number']);
+        validateTypeErrors('globalPercentile', ['number-property', 'number-property'], () =>
+            new RegExp('[\\s\\S]*\invalid second parameter \'percentile\'[\\s\\S]*parameter cannot be feature dependent', 'g'));
+        validateTypeErrors('globalPercentile', ['category', 'number-property']);
     });
 
     const $price = s.property('price');
     describe('global filtering', () => {
-        const fakeMetadata = {
+        const fakeMetadata = mockMetadata({
             properties: {
                 price: {
                     type: 'number',
                     min: 0,
                     avg: 1,
                     max: 2,
-                    sum: 3,
-                    count: 4
+                    sum: 3
                 }
-            }
-        };
+            },
+            featureCount: 4
+        });
 
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);
@@ -50,8 +53,8 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
             expect(globalSum.value).toEqual(3);
         });
 
-        it('globalCount($price) should return the metadata count', () => {
-            const globalCount = s.globalCount($price);
+        it('globalCount() should return the metadata count', () => {
+            const globalCount = s.globalCount();
             globalCount._bindMetadata(fakeMetadata);
             expect(globalCount.value).toEqual(4);
         });

@@ -2,7 +2,7 @@ import { VectorTile } from '@mapbox/vector-tile';
 import * as Protobuf from 'pbf';
 import * as rsys from '../client/rsys';
 import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
-import Metadata from '../renderer/Metadata';
+import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
@@ -44,7 +44,7 @@ export class MVTWorker {
     async processEvent (event) {
         const params = event.data;
         if (params.metadata) {
-            Object.setPrototypeOf(params.metadata, Metadata.prototype);
+            this.castMetadata(params.metadata);
             this.metadata = params.metadata;
         }
         const dataframe = await this._requestDataframe(params.x, params.y, params.z, params.url, params.layerID, this.metadata);
@@ -52,6 +52,11 @@ export class MVTWorker {
             mID: params.mID,
             dataframe
         };
+    }
+
+    castMetadata (metadata) {
+        Object.setPrototypeOf(metadata, MVTMetadata.prototype);
+        metadata.setCodecs();
     }
 
     async _requestDataframe (x, y, z, url, layerID, metadata) {
@@ -127,7 +132,9 @@ export class MVTWorker {
         if (geometries) {
             pointGeometries = new Float32Array(geometries);
         }
-        const { properties, propertyNames } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        const { properties } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        const scalarPropertyCodecs = this._scalarPropertyCodecs(metadata);
+        const rangePropertyCodecs = this._rangePropertyCodecs(metadata);
         for (let i = 0; i < mvtLayer.length; i++) {
             const f = mvtLayer.feature(i);
             this._checkType(f, metadata.geomType);
@@ -156,7 +163,7 @@ export class MVTWorker {
                     `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
-            this._decodeProperties(metadata, propertyNames, properties, f, numFeatures);
+            this._decodeProperties(scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
             numFeatures++;
         }
 
@@ -180,15 +187,17 @@ export class MVTWorker {
         return { propertyNames, properties };
     }
 
+    _getSourcePropertyNamesFrom (metadata) {
+        return metadata.propertyKeys.filter(name => metadata.properties[metadata.baseName(name)].type !== 'geometry');
+    }
+
     _getPropertyNamesFrom (metadata) {
         const propertyNames = [];
-        for (let i = 0; i < metadata.propertyKeys.length; i++) {
-            const propertyName = metadata.propertyKeys[i];
-            if (metadata.properties[propertyName].type === 'geometry') {
-                continue;
-            }
-            propertyNames.push(...metadata.propertyNames(propertyName));
-        }
+        this._getSourcePropertyNamesFrom(metadata).forEach(sourceName => {
+            metadata.decodedProperties(sourceName).forEach(propertyName => {
+                propertyNames.push(propertyName);
+            });
+        });
         return propertyNames;
     }
 
@@ -206,31 +215,33 @@ export class MVTWorker {
         return properties;
     }
 
-    _decodeProperties (metadata, propertyNames, properties, feature, i) {
-        const length = propertyNames.length;
-        for (let j = 0; j < length; j++) {
-            const propertyName = propertyNames[j];
-            const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = this.decodeProperty(metadata, propertyName, propertyValue);
-        }
+    _scalarPropertyCodecs (metadata) {
+        return this._getSourcePropertyNamesFrom(metadata)
+            .map(prop => [prop, metadata.codec(prop)])
+            .filter(([_, codec]) => !codec.isRange());
     }
 
-    decodeProperty (metadata, propertyName, propertyValue) {
-        const metadataPropertyType = metadata.properties[propertyName].type;
-        if (typeof propertyValue === 'string') {
-            if (metadataPropertyType !== 'category') {
-                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'string': '${propertyValue}'`);
-            }
-            return metadata.categorizeString(propertyName, propertyValue);
-        } else if (propertyValue === null || propertyValue === undefined || Number.isNaN(propertyValue)) {
-            return Number.MIN_SAFE_INTEGER;
-        } else if (typeof propertyValue === 'number') {
-            if (metadataPropertyType !== 'number') {
-                throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property '${propertyName}' is of type '${metadataPropertyType}' but the MVT tile contained a feature property of type 'number': '${propertyValue}'`);
-            }
-            return propertyValue;
-        } else {
-            throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`);
+    _rangePropertyCodecs (metadata) {
+        return this._getSourcePropertyNamesFrom(metadata)
+            .map(prop => [prop, metadata.decodedProperties(prop), metadata.codec(prop)])
+            .filter(([_prop, _dprop, codec]) => codec.isRange());
+    }
+
+    _decodeProperties (scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
+        let length = scalarPropertyCodecs.length;
+        for (let j = 0; j < length; j++) {
+            const [propertyName, codec] = scalarPropertyCodecs[j];
+            const propertyValue = feature.properties[propertyName];
+            properties[propertyName][i] = codec.sourceToInternal(propertyValue);
+        }
+
+        length = rangePropertyCodecs.length;
+        for (let j = 0; j < length; j++) {
+            const [propertyName, [loPropertyName, hiPropertyName], codec] = rangePropertyCodecs[j];
+            const propertyValue = feature.properties[propertyName];
+            const [loValue, hiValue] = codec.sourceToInternal(propertyValue);
+            properties[loPropertyName][i] = loValue;
+            properties[hiPropertyName][i] = hiValue;
         }
     }
 

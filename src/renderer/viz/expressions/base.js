@@ -123,23 +123,24 @@ export default class Base {
     }
 
     /**
-     * Linear interpolation between this and finalValue with the specified duration
+     * Linear interpolate between `this` and `final` with the specified duration
+     *
      * @api
      * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
      * @memberof Expression
      * @instance
+     * @async
      * @name blendTo
      */
-    blendTo (final, duration = 500) {
+    async blendTo (final, duration = 500) {
         // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
-        return final;
     }
 
     isA (expressionClass) {
@@ -147,7 +148,7 @@ export default class Base {
     }
 
     notify () {
-        this.parent.notify();
+        return this.parent.notify();
     }
 
     accumViewportAgg (feature) {
@@ -293,6 +294,7 @@ export default class Base {
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
+        replacer.notify().catch(() => { }); // ignore change rejections when using blend
     }
 
     _blendFrom (final, duration = 500, interpolator = null) {

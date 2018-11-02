@@ -1,10 +1,6 @@
 // CartoMap depends on gl-matrix, which after imported is globally available as 'mat4'
 // Constants extracted from /carto-vl/src/constants/layer.js
 const RESOLUTION_ZOOMLEVEL_ZERO = 512;
-const layerVisibility = Object.freeze({
-    VISIBLE: 'visible',
-    HIDDEN: 'none'
-});
 
 /**
  * @description A simple non-interactive map used for tests
@@ -70,24 +66,6 @@ class CartoMap { // eslint-disable-line no-unused-vars
 
     getCenter () {
         return { lat: 0, lng: 0 };
-    }
-
-    getBounds () {
-        return {
-            getNorthWest: () => ({ lat: 85, lng: -180 }),
-            getSouthWest: () => ({ lat: -85.1, lng: -180 })
-        };
-    }
-
-    changeVisibility (layer) {
-        switch (layer.visibility) {
-            case layerVisibility.VISIBLE:
-                this.show(layer);
-                break;
-            case layerVisibility.HIDDEN:
-                this.hide(layer);
-                break;
-        }
     }
 
     hide (layer) {

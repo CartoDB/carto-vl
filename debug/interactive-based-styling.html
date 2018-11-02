@@ -1,17 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Interactive based styling | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO VL JS -->
   <script src="../dist/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
   <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -29,7 +28,7 @@
       </section>
       <footer class="js-footer"></footer>
     </div>
-    </aside>
+  </aside>
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -74,9 +73,11 @@
       if (event.features.length > 0) {
         const feature = event.features[0];
         if (feature.id !== clickedFeatureId) {
-          feature.color.blendTo('opacity(DeepPink, 0.5)', delay)
-          feature.strokeWidth.blendTo('4', delay);
-          feature.strokeColor.blendTo('opacity(DeepPink, 0.8)', delay);
+          feature.blendTo({
+            color: 'opacity(DeepPink, 0.5)',
+            strokeWidth: '4',
+            strokeColor: 'opacity(DeepPink, 0.8)'
+          }, delay);
         }
       }
     });
@@ -84,9 +85,7 @@
       if (event.features.length > 0) {
         const feature = event.features[0];
         if (feature.id !== clickedFeatureId) {
-          feature.color.reset(delay);
-          feature.strokeWidth.reset(delay);
-          feature.strokeColor.reset(delay);
+          feature.reset(delay);
         }
       }
     });
@@ -94,17 +93,17 @@
       if (event.features.length > 0) {
         const feature = event.features[0];
         clickedFeatureId = feature.id;
-        feature.color.blendTo('opacity(LimeGreen, 0.5)', delay)
-        feature.strokeWidth.blendTo('7', delay);
-        feature.strokeColor.blendTo('opacity(LimeGreen, 0.8)', delay);
+        feature.blendTo({
+          color: 'opacity(LimeGreen, 0.5)',
+          strokeWidth: '7',
+          strokeColor: 'opacity(LimeGreen, 0.8)'
+        }, delay);
       }
     });
     interactivity.on('featureClickOut', event => {
       if (event.features.length > 0) {
         const feature = event.features[0];
-        feature.color.reset(delay);
-        feature.strokeWidth.reset(delay);
-        feature.strokeColor.reset(delay);
+        feature.reset(delay);
       }
     });
 
@@ -116,4 +115,5 @@
     }
   </script>
 </body>
+
 </html>

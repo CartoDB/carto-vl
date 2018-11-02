@@ -3,29 +3,19 @@ const webpack = require('webpack');
 const banner = require('./banner');
 
 module.exports = {
-    entry: './src/index.js',
+    entry: {
+        'carto-vl': './src/index.js'
+    },
     output: {
         path: path.resolve(__dirname, '..', 'dist'),
-        filename: 'carto-vl.js',
+        filename: '[name].js',
         library: 'carto',
         libraryTarget: 'umd'
     },
-    devtool: 'sourcemap',
+    devtool: 'source-map',
     mode: 'development',
     module: {
         rules: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            '@babel/preset-env'
-                        ]
-                    }
-                }
-            },
             { test: /\.glsl$/, use: 'webpack-glsl-loader' },
             { test: /\.svg$/, use: 'svg-inline-loader' },
             {

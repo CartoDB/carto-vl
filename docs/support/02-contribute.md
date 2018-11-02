@@ -4,7 +4,7 @@ CARTO VL platform is an open-source library. We are more than happy to receive y
 
 ### Filling a ticket
 
-If you want to open a new issue in our repository, please follow these instructions:
+If you want to [open a new issue in our repository](https://github.com/cartodb/carto-vl/issues/new), please follow these instructions:
 
 - Add a descriptive title.
 - Write a good description, answering the following questions:
@@ -16,7 +16,7 @@ If you want to open a new issue in our repository, please follow these instructi
 
 ### Contributing code
 
-The best part of open source: collaborate directly with our CARTO VL code! If you have fixed a bug or have a new functionality on your hands, we'd love to see it! These are the steps you should follow:
+The best part of open source: collaborate directly with our [CARTO VL code](https://github.com/cartodb/carto-vl)! If you have fixed a bug or have a new functionality on your hands, we'd love to see it! These are the steps you should follow:
 
 - Sign our Contributor License Agreement (CLA) [Learn more here](https://carto.com/contributions/)
 - Fork the carto-vl repository.

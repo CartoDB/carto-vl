@@ -6,7 +6,7 @@ import { getJoinNormal, getLineNormal, neg } from '../../utils/geometry';
  * https://github.com/CartoDB/carto-vl/wiki/Line-rendering
  */
 export function addLineString (lineString, geomBuffer, index, isPolygon, skipCallback) {
-    let prevPoint, currentPoint, nextPoint;
+    let prevPoint, currentPoint;
     let prevNormal, nextNormal;
     let drawLine;
 
@@ -14,17 +14,29 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
     if (lineString.length >= 4) {
         // Initialize the first two points
         prevPoint = [lineString[0], lineString[1]];
-        currentPoint = [lineString[2], lineString[3]];
-        prevNormal = getLineNormal(prevPoint, currentPoint);
-
-        if (prevPoint[0] === currentPoint[0] && prevPoint[1] === currentPoint[1]) {
-            return index;
+        let i = 2;
+        // The second point may be the same as the first one, iterate to find the first different one
+        for (;i <= lineString.length; i += 2) {
+            currentPoint = [lineString[i], lineString[i + 1]];
+            if (prevPoint[0] !== currentPoint[0] || prevPoint[1] !== currentPoint[1]) {
+                i += 2;
+                break;
+            }
         }
-
-        for (let i = 4; i <= lineString.length; i += 2) {
+        prevNormal = getLineNormal(prevPoint, currentPoint);
+        for (;i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
-            if (drawLine) {
+            let nextPoint;
+            // With lines, the ending point won't have a nextPoint
+            if (i <= lineString.length - 2) {
+                nextPoint = [lineString[i], lineString[i + 1]];
+            } else if (isPolygon) {
+                nextPoint = [lineString[2], lineString[3]];
+            }
+
+            if (drawLine &&
+                !(prevPoint[0] === currentPoint[0] && prevPoint[1] === currentPoint[1])) {
                 // First triangle
                 geomBuffer.vertices[index] = prevPoint[0];
                 geomBuffer.normals[index++] = -prevNormal[0];
@@ -54,24 +66,14 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                 geomBuffer.normals[index++] = -prevNormal[1];
             }
 
-            // If there is a next point, compute its properties
-            if (i <= lineString.length - 2) {
-                nextPoint = [lineString[i], lineString[i + 1]];
-            } else if (isPolygon) {
-                nextPoint = [lineString[2], lineString[3]];
-            }
-
-            if (nextPoint) {
-                if (nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1]) {
-                    return index;
-                }
+            if (nextPoint && !(nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1])) {
                 nextNormal = getLineNormal(currentPoint, nextPoint);
 
                 if (drawLine) {
                     // `turnLeft` indicates that the nextLine turns to the left
                     // `joinNormal` contains the direction and size for the `miter` vertex
                     //  If this is not defined means that the join must be `bevel`.
-                    let {turnLeft, joinNormal} = getJoinNormal(prevNormal, nextNormal);
+                    let { turnLeft, joinNormal } = getJoinNormal(prevNormal, nextNormal);
 
                     let leftNormal = turnLeft ? prevNormal : neg(nextNormal);
                     let rightNormal = turnLeft ? nextNormal : neg(prevNormal);
@@ -109,13 +111,14 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                         geomBuffer.normals[index++] = leftNormal[1];
                     }
                 }
+            } else {
+                nextNormal = prevNormal;
             }
 
             // Update the variables for the next iteration
             prevPoint = currentPoint;
             currentPoint = nextPoint;
             prevNormal = nextNormal;
-            nextPoint = null;
         }
     }
     return index;

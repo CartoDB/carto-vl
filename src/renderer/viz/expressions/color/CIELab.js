@@ -40,9 +40,10 @@ export default class CIELab extends BaseExpression {
         super({ l, a, b });
         this.type = 'color';
 
-        this._setGenericGLSL(inline =>
-            `cielabToSRGBA(vec4(${inline.l}, ${inline.a}, ${inline.b}, 1.))`
-            , CIELabGLSL);
+        this._setGenericGLSL(
+            inline => `cielabToSRGBA(vec4(${inline.l}, ${inline.a}, ${inline.b}, 1.))`,
+            CIELabGLSL
+        );
     }
     // TODO EVAL
 

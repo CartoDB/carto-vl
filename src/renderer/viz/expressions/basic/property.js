@@ -1,7 +1,7 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
-
+import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
 /**
  * Evaluates the value of a column for every row in the dataset.
  *
@@ -53,13 +53,17 @@ export default class Property extends BaseExpression {
         return this.eval();
     }
 
+    get propertyName () {
+        return this.name;
+    }
+
     eval (feature) {
         if (!feature) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
 
-        return feature[this.name] && feature[this.name] === Number.MIN_SAFE_INTEGER
-            ? Number.NaN
+        return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE
+            ? null
             : feature[this.name];
     }
 
@@ -83,7 +87,7 @@ export default class Property extends BaseExpression {
         this._metadata = metadata;
         this.type = metaColumn.type;
 
-        if (this.type === 'category' && !this.numCategories) {
+        if (this.type === 'category' && this.numCategories === undefined) {
             Object.defineProperty(this, 'numCategories', {
                 get: function () {
                     return metaColumn.categories.length;

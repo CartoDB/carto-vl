@@ -1,5 +1,6 @@
 import carto from '../../../../src';
 import * as util from '../../util';
+import VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/properties';
 
 const feature1 = {
     type: 'Feature',
@@ -29,17 +30,17 @@ const feature2 = {
 
 const features = {
     type: 'FeatureCollection',
-    features: [ feature1, feature2 ]
+    features: [feature1, feature2]
 };
 
-function checkFeatures (list, expectedList) {
+function checkFeatures (featureList, expectedList) {
     // FIXME: this shouldn't require list to have the same order as expected
-    expect(list.length).toEqual(expectedList.length);
-    for (let i = 0; i < list.length; ++i) {
+    expect(featureList.length).toEqual(expectedList.length);
+    for (let i = 0; i < featureList.length; ++i) {
         const actual = {};
         const expected = expectedList[i];
         Object.keys(expected).forEach(prop => {
-            actual[prop] = list[i][prop];
+            actual[prop] = featureList[i].properties[prop];
         });
         expect(actual).toEqual(expected);
     }
@@ -93,6 +94,27 @@ describe('viewportFeatures', () => {
             ];
             checkFeatures(viz2.variables.list2all.eval(), expectedAll);
             checkFeatures(viz2.variables.list2value.eval(), expectedValue);
+            done();
+        });
+    });
+
+    it('should get interactivity-like features, with vizProperties', done => {
+        layer1.on('loaded', () => {
+            // 1. keep required properties
+            const expected = [
+                { value: 10, category: 'a' },
+                { value: 1000, category: 'b' }
+            ];
+            const featureList = viz1.variables.list.eval();
+            checkFeatures(featureList, expected);
+
+            // 2. and featureVizProperties / variables are available
+            featureList.forEach(feature => {
+                VIZ_PROPERTIES.forEach(propertyName => {
+                    expect(feature[propertyName]).toBeTruthy();
+                });
+                expect(feature['variables']).toBeTruthy();
+            });
             done();
         });
     });
@@ -250,7 +272,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [0, 50], [0, 0], [50, 0], [0, 50] ]
+                [[0, 50], [0, 0], [50, 0], [0, 50]]
             ]
         },
         properties: {
@@ -265,7 +287,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [165, 50], [165, 0], [215, 0], [165, 50] ]
+                [[165, 50], [165, 0], [215, 0], [165, 50]]
             ]
         },
         properties: {
@@ -280,7 +302,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [200, 50], [200, 0], [250, 0], [200, 50] ]
+                [[200, 50], [200, 0], [250, 0], [200, 50]]
             ]
         },
         properties: {
@@ -295,7 +317,7 @@ describe('viewportFeatures collision', () => {
         geometry: {
             type: 'Polygon',
             coordinates: [
-                [ [-226, -70], [-226, -85], [-176, -85], [-226, -70] ]
+                [[-226, -70], [-226, -85], [-176, -85], [-226, -70]]
             ]
         },
         properties: {

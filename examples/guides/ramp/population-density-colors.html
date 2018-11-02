@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Select Visualization</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Change the visualization of the layer</p>
+                <div id="controls">
+                    <ul class="actions">
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')"
+                                id="viz1" checked>
+                            <label for="viz1">
+                                <h2>ramp($dn, [green, yellow, red])</h2>
+                                <p class="description open-sans"> Take colors from a color list. Since the input is an unclassified numeric property, interpolation of the colors values will be performed.</p>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')" id="viz2">
+                            <label for="viz2">
+                                <h2>ramp($dn, temps)</h2>
+                                <p class="description open-sans"> Use the "temps" CARTOColors palette.</p>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])')"
+                                id="viz3">
+                            <label for="viz3">
+                                <h2>'ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])'</h2>
+                                <p class="description open-sans">Take colors from a color list with HSV color constructors.</p>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
+                                id="viz4">
+                            <label for="viz4">
+                                <h2>'ramp($dn, [transparent, gray, yellow])'</h2>
+                                <p class="description open-sans">The same as the first example, but showing that `ramp` supports transparency too.</p>
+                            </label>
+                        </li>
+                    </ul>
+                    <div id="info"></div>
+                    <p id="content-title"></p>
+                    <ul id="content"></ul>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [60,19],
+            zoom: 2,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("pop_density_points");
+        const viz = new carto.Viz(`
+            width: scaled(0.7)
+            color: ramp($dn, [green, yellow, red])
+            strokeWidth: 0
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('updated', () => {
+            // Get the legend
+            if (!layer.viz.color.getLegendData) {
+                return;
+            }
+
+            const colorLegend = layer.viz.color.getLegendData();
+
+            let colorLegendList = '';
+
+            colorLegend.data.forEach((legend) => {
+                const colorHex = rgbToHex(legend.value);
+                const key = legend.key.toFixed(2);
+
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
+            });
+            // Update the information
+            document.getElementById('content').innerHTML = colorLegendList;
+            document.getElementById('content-title').innerHTML = `Legend of ${colorLegend.name}`;
+        });
+
+        function rgbToHex(color) {
+            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+        }
+    </script>
+</body>
+
+</html>

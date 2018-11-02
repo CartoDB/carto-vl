@@ -1,6 +1,6 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
-import Metadata from '../renderer/Metadata';
+import Metadata from './GeoJSONMetadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
@@ -65,9 +65,8 @@ export default class GeoJSON extends Base {
         this._setCoordinatesCenter();
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestMetadata (viz) {
@@ -81,7 +80,7 @@ export default class GeoJSON extends Base {
             Object.keys(newProperties).forEach(propertyName => {
                 this._boundColumns.add(propertyName);
             });
-            return;
+            return Promise.resolve(Object.keys(newProperties).length > 0);
         }
         const dataframe = new Dataframe({
             active: true,
@@ -96,7 +95,7 @@ export default class GeoJSON extends Base {
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
-        this._dataLoadedCallback();
+        return Promise.resolve(true);
     }
 
     requiresNewMetadata () {
@@ -157,7 +156,7 @@ export default class GeoJSON extends Base {
         const idProperty = 'cartodb_id';
 
         this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
-
+        this._metadata.setCodecs();
         return this._metadata;
     }
 
@@ -232,6 +231,9 @@ export default class GeoJSON extends Base {
         if (Number.isFinite(value)) {
             return this._addNumericPropertyToMetadata(propertyName, value);
         }
+        if (value === null) {
+            return;
+        }
         this._addCategoryPropertyToMetadata(propertyName, value);
     }
 
@@ -270,31 +272,17 @@ export default class GeoJSON extends Base {
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
+        const fields = [...catFields, ...numFields, ...dateFields];
 
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
-
-            catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
-            });
-            numFields.forEach(name => {
+            fields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                const numericValue = Number(f.properties[name]);
-                properties[name][i] = Number.isNaN(numericValue)
-                    ? Number.MIN_SAFE_INTEGER
-                    : numericValue;
-            });
-            dateFields.forEach(name => {
-                const property = this._properties[name];
-                // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d = util.castDate(f.properties[name]).getTime();
-                const min = property.min;
-                const max = property.max;
-                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[name][i] = n;
+                // note that GeoJSON does not support multi-value properties
+                properties[name][i] = this._metadata.codec(name).sourceToInternal(f.properties[name]);
             });
         }
         return properties;
@@ -333,7 +321,7 @@ export default class GeoJSON extends Base {
         if (this._type === 'Point') {
             return new Float32Array(this._features.length * 6);
         }
-        return [];
+        return ([]);
     }
 
     _decodeGeometry () {

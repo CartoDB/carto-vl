@@ -295,7 +295,7 @@ describe('sources/GeoJSON', () => {
         });
     });
 
-    it('should call the dataLoaded callback when the dataframe is added', () => {
+    it('should call the addDataframe callback when the dataframe is added', () => {
         const source = new GeoJSON({
             type: 'Feature',
             geometry: {
@@ -305,10 +305,9 @@ describe('sources/GeoJSON', () => {
         });
 
         const fakeAddDataframe = jasmine.createSpy('addDataframe');
-        const fakeDataLoaded = jasmine.createSpy('dataLoaded');
-        source.bindLayer(fakeAddDataframe, fakeDataLoaded);
-        expect(fakeDataLoaded).not.toHaveBeenCalled();
+        source.bindLayer(fakeAddDataframe);
+        expect(fakeAddDataframe).not.toHaveBeenCalled();
         source.requestData();
-        expect(fakeDataLoaded).toHaveBeenCalled();
+        expect(fakeAddDataframe).toHaveBeenCalled();
     });
 });

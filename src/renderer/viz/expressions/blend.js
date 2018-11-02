@@ -44,10 +44,6 @@ export default class Blend extends BaseExpression {
         checkExpression('blend', 'b', 1, b);
         checkExpression('blend', 'mix', 2, mix);
 
-        if (a.type && b.type) {
-            abTypeCheck(a, b);
-        }
-
         // TODO check interpolator type
         const originalMix = mix;
         if (interpolator) {
@@ -85,7 +81,6 @@ export default class Blend extends BaseExpression {
         super._preDraw(...args);
         if (this.originalMix.isA(Transition) && !this.originalMix.isAnimated()) {
             this.parent.replaceChild(this, this.b);
-            this.notify();
         }
     }
 }
