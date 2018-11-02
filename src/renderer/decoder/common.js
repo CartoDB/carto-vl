@@ -19,9 +19,13 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         for (let i = 4; i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
-            const nextPoint = i <= lineString.length - 2
-                ? [lineString[i], lineString[i + 1]]
-                : [lineString[2], lineString[3]];
+            let nextPoint;
+            // With lines, the ending point won't have a nextPoint
+            if (i <= lineString.length - 2) {
+                nextPoint = [lineString[i], lineString[i + 1]];
+            } else if (isPolygon) {
+                nextPoint = [lineString[2], lineString[3]];
+            }
 
             if (drawLine &&
                 !(prevPoint[0] === currentPoint[0] && prevPoint[1] === currentPoint[1])) {
@@ -54,7 +58,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
                 geomBuffer.normals[index++] = -prevNormal[1];
             }
 
-            if (!(nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1])) {
+            if (nextPoint && !(nextPoint[0] === currentPoint[0] && nextPoint[1] === currentPoint[1])) {
                 nextNormal = getLineNormal(currentPoint, nextPoint);
 
                 if (drawLine) {
