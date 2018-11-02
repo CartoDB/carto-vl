@@ -31,25 +31,13 @@ export default class Dataframe extends DummyDataframe {
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
-
-        this.texColor = this._createStyleDataframeTexture(this.numFeatures);
-        this.texWidth = this._createStyleDataframeTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleDataframeTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleDataframeTexture(this.numFeatures);
-        this.texFilter = this._createStyleDataframeTexture(this.numFeatures);
+        this._createStyleDataframeTextures(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
         const inc = 1 / (1024 * 64);
         let index = 0;
-        let tableX = {};
-        let tableY = {};
 
-        for (let k = 0; k < this.numFeatures; k++) {
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
-            // output IDs will be in the `vec2([0,1], [0,1])` range
-            tableX[k] = (k % width) / (width - 1);
-            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
-        }
+        let [tableX, tableY] = this._createTablesXY(this.numFeatures, width, height);
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
@@ -167,6 +155,19 @@ export default class Dataframe extends DummyDataframe {
         });
 
         this.freed = true;
+    }
+
+    _createTablesXY (numFeatures, width, height) {
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
+        return [tableX, tableY];
     }
 
     _isPointInViewport (featureIndex) {
@@ -372,12 +373,12 @@ export default class Dataframe extends DummyDataframe {
                     : this._computePolygonWidthScale(feature, viz);
 
                 if (this._isFeatureFiltered(feature, viz.filter) ||
-                !this._isPointInAABB(pos, offset,
-                    geometryType === 'line'
-                        ? viz.width.eval(feature)
-                        : viz.strokeWidth.eval(feature)
-                    ,
-                    featureIndex)
+                    !this._isPointInAABB(pos, offset,
+                        geometryType === 'line'
+                            ? viz.width.eval(feature)
+                            : viz.strokeWidth.eval(feature)
+                        ,
+                        featureIndex)
                 ) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -557,6 +558,14 @@ export default class Dataframe extends DummyDataframe {
             this._addProperty(propertyName);
         }
         this._genFeatureClass();
+    }
+
+    _createStyleDataframeTextures (numFeatures) {
+        this.texColor = this._createStyleDataframeTexture(numFeatures);
+        this.texWidth = this._createStyleDataframeTexture(numFeatures);
+        this.texStrokeColor = this._createStyleDataframeTexture(numFeatures);
+        this.texStrokeWidth = this._createStyleDataframeTexture(numFeatures);
+        this.texFilter = this._createStyleDataframeTexture(numFeatures);
     }
 
     _createStyleDataframeTexture (numFeatures) {
