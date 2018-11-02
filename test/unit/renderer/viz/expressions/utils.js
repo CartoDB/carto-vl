@@ -22,9 +22,10 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
         const args = argTypes.map(type => type === 'dependent' ? 'number-property' : type).map(getPropertyArg);
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
-            expect(() =>
-                expr._bindMetadata(metadata)
-            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+            expect(() => {
+                expr._resolveAliases();
+                expr._bindMetadata(metadata);
+            }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
         });
     }
     {
@@ -32,10 +33,10 @@ export function validateFeatureDependentErrors (expressionName, argTypes) {
         const args = argTypes.map(type => type === 'dependent' ? [v, '{alias to numeric property}'] : getPropertyArg(type));
         it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time a feature dependent error`, () => {
             const expr = s[expressionName](...args.map(arg => arg[0]));
-            v._resolveAliases({ var1: s.property('number') });
-            expect(() =>
-                expr._bindMetadata(metadata)
-            ).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
+            expect(() => {
+                expr._resolveAliases({ var1: s.property('number') });
+                expr._bindMetadata(metadata);
+            }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*dependent[\\s\\S]*`, 'g'));
         });
     }
 }
@@ -144,6 +145,7 @@ function getPropertyArg (type) {
 }
 
 function compile (expression) {
+    expression._resolveAliases({});
     expression._bindMetadata(metadata);
     return expression;
 }
