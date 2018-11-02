@@ -115,6 +115,11 @@ export function throwInvalidString (expressionName, parameterName, parameterInde
     expected type was 'string', but ${str}' is not a string`);
 }
 
+export function throwInvalidStringValue (expressionName, parameterName, parameterIndex, str, validValues) {
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    value '${str}' is not valid. It should be one of ${validValues.map(v => `'${v}'`).join(', ')}`);
+}
+
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
 export function isArgConstructorTimeTyped (arg) {
     switch (arg) {
@@ -168,6 +173,14 @@ export function checkNumber (expressionName, parameterName, parameterIndex, numb
 export function checkString (expressionName, parameterName, parameterIndex, str) {
     if (typeof str !== 'string') {
         throwInvalidString(expressionName, parameterName, parameterIndex, str);
+    }
+}
+
+export function checkStringValue (expressionName, parameterName, parameterIndex, str, validValues) {
+    if (typeof str !== 'string') {
+        throwInvalidString(expressionName, parameterName, parameterIndex, str);
+    } else if (!validValues.includes(str)) {
+        throwInvalidStringValue(expressionName, parameterName, parameterIndex, str, validValues);
     }
 }
 

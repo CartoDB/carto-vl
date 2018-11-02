@@ -312,9 +312,10 @@ export default class Viz {
         };
         const unmarked = this._getRootExpressions().map(
             expr => expr._getDependencies()
-        ).reduce((a, b) =>
-            [...a, ...b]
-        , []);
+        ).reduce(
+            (a, b) => [...a, ...b],
+            []
+        );
         while (unmarked.length) {
             visit(unmarked.pop());
         }

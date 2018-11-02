@@ -30,6 +30,6 @@ export default class GlobalMax extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalMax');
 
-        super({ property, name: 'max', type: 'number' });
+        super({ property, name: 'max', type: 'number' }); // FIXME: type might differ for dates...
     }
 }

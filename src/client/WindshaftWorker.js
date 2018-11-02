@@ -1,37 +1,9 @@
 import { MVTWorker } from '../sources/MVTWorker';
-import schema from '../renderer/schema';
-import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
-import { FP32_DESIGNATED_NULL_VALUE } from '../renderer/viz/expressions/constants';
+import WindshaftMetadata from './WindshaftMetadata';
 
 export class WindshaftWorker extends MVTWorker {
-    decodeProperty (metadata, propertyName, propertyValue) {
-        const basename = schema.column.getBase(propertyName);
-        const column = metadata.properties[basename];
-        if (!column) {
-            return;
-        }
-        switch (column.type) {
-            case 'date':
-                return decodeDate(column, propertyValue);
-            case 'category':
-                return metadata.categorizeString(basename, propertyValue);
-            case 'number':
-                if (isNaN(propertyValue) || propertyValue == null) {
-                    return FP32_DESIGNATED_NULL_VALUE;
-                }
-                return propertyValue;
-            default:
-                throw new CartoMapsAPIError(
-                    `${cmt.NOT_SUPPORTED} Windshaft MVT decoding error. Feature property value of type '${typeof propertyValue}' cannot be decoded.`
-                );
-        }
+    castMetadata (metadata) {
+        Object.setPrototypeOf(metadata, WindshaftMetadata.prototype);
+        metadata.setCodecs();
     }
-}
-
-function decodeDate (column, propertyValue) {
-    const d = new Date();
-    d.setTime(1000 * propertyValue);
-    const { min, max } = column;
-    const n = (d - min) / (max.getTime() - min.getTime());
-    return n;
 }

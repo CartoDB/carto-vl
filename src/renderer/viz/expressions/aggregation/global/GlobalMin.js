@@ -30,6 +30,9 @@ export default class GlobalMin extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalMin');
 
+        // FIXME: type should actually be the property type (number/date)
+        // but if a variable it's too soon to know here
+
         super({ property, name: 'min', type: 'number' });
     }
 }
