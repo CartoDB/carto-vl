@@ -68,7 +68,6 @@ export default class AnimationGeneral extends BaseExpression {
         checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
         checkType('animation', 'duration', 1, 'number', this.duration);
 
-        checkType('animation', 'input', 0, 'number', this.input);
         checkType('animation', 'fade', 2, 'fade', this.fade);
         checkFeatureIndependent('animation', 'duration', 1, this.duration);
     }
