@@ -4,6 +4,7 @@ import { castDate } from '../../../utils/util';
 import ClusterTime from './aggregation/cluster/ClusterTime';
 import { linear, globalMin, globalMax, number } from '../expressions';
 import { checkType, checkFeatureIndependent, clamp, checkMaxArguments, implicitCast } from './utils';
+import { Fade } from './Fade';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();

@@ -1,8 +1,8 @@
-import { Fade } from './Fade';
 import { implicitCast, checkMaxArguments } from './utils';
 import AnimationGeneral from './AnimationGeneral';
 import AnimationRange from './AnimationRange';
 import Base from './base';
+import { Fade } from './Fade';
 
 /**
  * Create an animated temporal filter (animation). Read more about the {@link expression.Animation|Animation Class}
@@ -82,5 +82,9 @@ export class Animation extends Base {
             Object.setPrototypeOf(this, AnimationGeneral.prototype);
         }
         this._init();
+    }
+    _bindMetadata (metadata) {
+        this._resolveAliases({});
+        this._bindMetadata(metadata);
     }
 }
