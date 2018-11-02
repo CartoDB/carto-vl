@@ -14,9 +14,16 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
     if (lineString.length >= 4) {
         // Initialize the first two points
         prevPoint = [lineString[0], lineString[1]];
-        currentPoint = [lineString[2], lineString[3]];
+        let i = 2;
+        // The second point may be the same as the first one, iterate to find the first different one
+        for (;i <= lineString.length; i += 2) {
+            currentPoint = [lineString[i], lineString[i + 1]];
+            if (prevPoint[0] !== currentPoint[0] || prevPoint[1] !== currentPoint[1]) {
+                break;
+            }
+        }
         prevNormal = getLineNormal(prevPoint, currentPoint);
-        for (let i = 4; i <= lineString.length; i += 2) {
+        for (;i <= lineString.length; i += 2) {
             drawLine = !(skipCallback && skipCallback(i));
 
             let nextPoint;
