@@ -1,4 +1,3 @@
-import BaseExpression from './base';
 import { Fade } from './Fade';
 import { implicitCast, checkMaxArguments } from './utils';
 import AnimationGeneral from './AnimationGeneral';
@@ -75,18 +74,13 @@ export class Animation extends Base {
         input = implicitCast(input);
         super({ input, duration, fade });
     }
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-        if (this.input.type || !(this.input instanceof BaseExpression)) {
-            if (this.input.type === 'timerange') {
-                Object.setPrototypeOf(this, AnimationRange.prototype);
-            } else {
-                Object.setPrototypeOf(this, AnimationGeneral.prototype);
-            }
+    _resolveAliases (aliases) {
+        this._getChildren().map(child => child._resolveAliases(aliases));
+        if (this.input.type === 'timerange') {
+            Object.setPrototypeOf(this, AnimationRange.prototype);
+        } else {
+            Object.setPrototypeOf(this, AnimationGeneral.prototype);
         }
-        return this._bindMetadata(metadata);
-    }
-    getProgressValue () {
-        return undefined;
+        this._init();
     }
 }

@@ -3,13 +3,20 @@ import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTime from './aggregation/cluster/ClusterTime';
 import { linear, globalMin, globalMax, number } from '../expressions';
-import { checkType, checkFeatureIndependent, clamp } from './utils';
+import { checkType, checkFeatureIndependent, clamp, checkMaxArguments, implicitCast } from './utils';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
 
 export default class AnimationGeneral extends BaseExpression {
-    _bindMetadata (metadata) {
+    constructor (input, duration = 10, fade = new Fade()) {
+        checkMaxArguments(arguments, 3, 'animation');
+        duration = implicitCast(duration);
+        input = implicitCast(input);
+        super({ input, duration, fade });
+        this._init();
+    }
+    _init () {
         const input = this.input;
         const originalInput = input;
 
@@ -50,8 +57,11 @@ export default class AnimationGeneral extends BaseExpression {
     `;
 
         this.inlineMaker = inline => `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
-
-        this._originalInput._bindMetadata(metadata);
+    }
+    _bindMetadata (metadata) {
+        this._input._bindMetadata(metadata);
+        this.progress._bindMetadata(metadata);
+        this.fade._bindMetadata(metadata);
         this.duration._bindMetadata(metadata);
 
         checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
@@ -166,7 +176,7 @@ export default class AnimationGeneral extends BaseExpression {
      * @api
      */
     getProgressValue () {
-        const progress = this.progress.eval(); // from 0 to 1
+        const progress = this.progress.eval();
         return this._input.converse(progress);
     }
 

@@ -1,10 +1,10 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
 import { linear, globalMin, globalMax, HOLD, mul } from '../expressions';
-import { Animation } from './Animation';
+import AnimationGeneral from './AnimationGeneral';
 
 export default class AnimationRange extends BaseExpression {
-    _bindMetadata (metadata) {
+    _init () {
         const input = this.input;
         const duration = this.duration;
         const fade = this.fade;
@@ -17,8 +17,8 @@ export default class AnimationRange extends BaseExpression {
         Object.setPrototypeOf(input2, input);
 
         const end = linear(input2, globalMin(input2), globalMax(input2), 'end');
-        const startAnim = new Animation(start, duration, new Fade(fade.fadeIn, HOLD));
-        const endAnim = new Animation(end, duration, new Fade(HOLD, fade.fadeOut));
+        const startAnim = new AnimationGeneral(start, duration, new Fade(fade.fadeIn, HOLD));
+        const endAnim = new AnimationGeneral(end, duration, new Fade(HOLD, fade.fadeOut));
         const combinedAnimation = mul(startAnim, endAnim);
 
         this.combinedAnimation = combinedAnimation;
@@ -27,13 +27,14 @@ export default class AnimationRange extends BaseExpression {
 
         this.type = 'number';
 
-        this.combinedAnimation._bindMetadata(metadata);
-
         this._startAnim = startAnim;
         this._endAnim = endAnim;
 
         this.expressionName = 'animation';
         this.inlineMaker = inline => inline.combinedAnimation;
+    }
+    _bindMetadata (metadata) {
+        this.combinedAnimation._bindMetadata(metadata);
     }
 
     eval (feature) {
