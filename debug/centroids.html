@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels | CARTO VL</title>
+  <title>Centroids | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
@@ -33,47 +33,64 @@
     });
 
     map.on('load', () => {
-      fetch('/test/common/sources/points.geojson')
-        // fetch('/test/common/sources/polygon-collection-with-multipolygon.geojson')
+      //fetch('/test/common/sources/points.geojson')
+      fetch('/test/common/sources/polygon-collection-with-multipolygon.geojson')
         .then(response => response.json())
         .then(function (polygons) {
 
+          const field = 'name'; // points --> 'cat' | polygons --> 'name'
+
           const source = new carto.source.GeoJSON(polygons);
           const viz = new carto.Viz(`
-            // @v_features: viewportFeatures($name)
-            @v_features: viewportFeatures($cat)
+            @field: $${field}
+            @v_features: viewportFeatures(@field)
+            color: ramp(@field, prism)
+            width: 15
           `);
-          const layer = new carto.Layer('layer', source, viz);
+          const layer = new carto.Layer('original', source, viz);
+          layer.addTo(map, 'watername_ocean');
 
-
-          const created = false;
+          let created = false;
           layer.on('updated', () => {
-            if (!created) {
-              const polygons = viz.variables.v_features.value;
+            const polygons = viz.variables.v_features.value;
+
+            if (!created && polygons.length > 0) {
               addLayerWithCentroidsFrom(polygons);
               created = true;
             }
+
+            function addLayerWithCentroidsFrom(features) {
+              const geojsonFeatures = features.map(f => {
+                return {
+                  "type": "Feature",
+                  "geometry": {
+                    "type": "Point",
+                    "coordinates": f.getCenter()
+                  },
+                  "properties": {
+                    "field": f.properties[field]
+                  }
+                }
+              });
+
+              const sourceCentroids = new carto.source.GeoJSON({
+                type: 'FeatureCollection',
+                features: geojsonFeatures
+              });
+              const centroids = new carto.Layer('centroids', sourceCentroids,
+                new carto.Viz(`
+                  symbol: cross
+                  color: red
+                  width: 20
+                  symbolPlacement: ALIGN_CENTER
+                `)
+              );
+              centroids.addTo(map);
+            }
           });
 
-          function addLayerWithCentroidsFrom(features) {
-            const geojsonFeatures = features.map(f => {
-              return {
-                "type": "Feature",
-                "geometry": {
-                  "type": "Point",
-                  "coordinates": f.getCenter()
-                }
-              }
-            });
 
-            const centroids = new carto.source.GeoJSON({
-              type: 'FeatureCollection',
-              features: geojsonFeatures
-            });
-            map.addLayer(new carto.Layer('centroids', centroids, new carto.Viz()));
-          }
 
-          layer.addTo(map, 'watername_ocean');
         });
     });
 

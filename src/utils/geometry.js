@@ -1,5 +1,6 @@
 import { vec4 } from 'gl-matrix';
 import { average } from '../renderer/viz/expressions/stats';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
@@ -169,29 +170,22 @@ export function computeAABB (geometry, type) {
 
 export function computeCentroids (decodedGeometry, type) {
     const centroids = [];
+
     switch (type) {
         case 'point':
-            /*
-                        //     x: dataframe._aabb[this._rawFeature._index].minx,
-            //     y: dataframe._aabb[this._rawFeature._index].miny
-            */
-            // const points = [];
-
-            // Points
-            // const x = dataframe.decodedGeom.vertices[6 * this._rawFeature._index];
-            // const y = dataframe.decodedGeom.vertices[6 * this._rawFeature._index + 1];
-            // const centroid = { x, y };
-
-            /*
+            // Compute centroids as just average coordinates
             for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
-                const vertices = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
-                const centroid = _centroidForTriangles(vertices);
+                const [xA, yA, xB, yB, xC, yC] = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
+                let centroid = {
+                    x: average([xA, xB, xC]),
+                    y: average([yA, yB, yC])
+                };
                 centroids.push(centroid);
-            } */
-
+            }
             break;
         case 'line':
         case 'polygon':
+            // Compute centroids using triangles ponderated by its area
             let startVertex = 0;
             decodedGeometry.breakpoints.forEach((breakpoint) => {
                 const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
@@ -201,8 +195,9 @@ export function computeCentroids (decodedGeometry, type) {
             });
             break;
         default:
-            throw new CartoValidationError();
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid type argument, decoded geometry must have a point, line or polygon type.`);
     }
+
     return centroids;
 }
 
