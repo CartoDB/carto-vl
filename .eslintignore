@@ -3,5 +3,6 @@
 /doc
 /docs
 /example
+/examples/ignore
 /test/acceptance/docker/Windshaft-cartodb
 /temp

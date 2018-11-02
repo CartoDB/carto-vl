@@ -455,11 +455,8 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             a = implicitCast(a);
             b = implicitCast(b);
 
-            const signature = getSignatureLoose(a, b);
-
             super({ a, b });
             this.expressionName = name;
-            this.type = getReturnTypeFromSignature(signature);
             this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
         get value () {
@@ -479,35 +476,6 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             this.type = getReturnTypeFromSignature(signature);
         }
     };
-}
-
-function getSignatureLoose (a, b) {
-    if (!a.type || !b.type) {
-        if (!a.type && !b.type) {
-            return undefined;
-        }
-        const knownType = a.type || b.type;
-        if (knownType === 'color') {
-            return NUMBER_AND_COLOR_TO_COLOR;
-        }
-    } else if (a.type === 'number' && b.type === 'number') {
-        return NUMBERS_TO_NUMBER;
-    } else if (a.type === 'number' && b.type === 'color') {
-        return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type === 'color' && b.type === 'number') {
-        return NUMBER_AND_COLOR_TO_COLOR;
-    } else if (a.type === 'color' && b.type === 'color') {
-        return COLORS_TO_COLOR;
-    } else if (a.type === 'category' && b.type === 'category') {
-        return CATEGORIES_TO_NUMBER;
-    } else if ((a.type === 'image' && b.type === 'color') ||
-        (a.type === 'image' && b.type === 'color') ||
-        (a.type === 'image' && b.type === 'image') ||
-        (a.type === 'color' && b.type === 'image')) {
-        return IMAGES_TO_IMAGE;
-    } else {
-        return UNSUPPORTED_SIGNATURE;
-    }
 }
 
 function getSignature (a, b) {

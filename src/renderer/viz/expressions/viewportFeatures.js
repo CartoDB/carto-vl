@@ -1,9 +1,12 @@
 import BaseExpression from './base';
 import Property from './basic/property';
+import ClusterTimeDimension from './aggregation/cluster/ClusterTimeDimension';
+import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 import { implicitCast } from './utils';
-import schema from '../../schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
+
+import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -83,35 +86,19 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg () {
+    _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
-            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
+            if (!this._requiredProperties.every(p => validProperty(p))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
-            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            this._FeatureProxy = this.genViewportFeatureClass(columns);
+            const columns = this._requiredProperties.map(p => p.propertyName);
+            this._FeatureProxy = genLightweightFeatureClass(columns, renderLayer);
         }
         this.expr = [];
     }
 
     accumViewportAgg (feature) {
         this.expr.push(new this._FeatureProxy(feature));
-    }
-
-    genViewportFeatureClass (properties) {
-        const cls = class ViewportFeature {
-            constructor (feature) {
-                this._feature = feature;
-            }
-        };
-        properties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function () {
-                    return this._feature[prop];
-                }
-            });
-        });
-        return cls;
     }
 }
 
@@ -122,4 +109,8 @@ function _childrenFromProperties (properties) {
         childContainer['p' + ++i] = property;
     });
     return childContainer;
+}
+
+function validProperty (property) {
+    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension);
 }

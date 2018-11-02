@@ -3,7 +3,7 @@ import { Asc, Desc } from './viz/expressions';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-
+import { parseVizExpression } from './viz/parser';
 const INITIAL_TIMESTAMP = Date.now();
 
 /**
@@ -60,34 +60,6 @@ export default class Renderer {
      */
     initialize (gl) {
         this._initGL(gl);
-    }
-
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (center) {
-        this._center.x = center.x;
-        this._center.y = center.y;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const sx = this._zoom * this._getAspect();
-        const sy = this._zoom;
-        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
     }
 
     _initGL (gl) {
@@ -156,11 +128,10 @@ export default class Renderer {
         }
 
         // Assume that all dataframes of a renderLayer share the same metadata
-        const metadata = dataframes.length ? dataframes[0].metadata : null;
+        const metadata = viz.metadata;
 
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
-
-        const viewportExpressionsLength = viewportExpressions.length;
+        renderLayer.parseVizExpression = parseVizExpression; // to avoid a circular dependency problem
+        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));
 
         // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
         const processedFeaturesIDs = new Set();
@@ -187,11 +158,19 @@ export default class Renderer {
                     continue;
                 }
 
-                for (let j = 0; j < viewportExpressionsLength; j++) {
-                    viewportExpressions[j].accumViewportAgg(feature);
-                }
+                // Pass the rawFeature to all viewport aggregations
+                this._accumViewportAggregations(viewportExpressions, feature, renderLayer);
             }
         });
+    }
+
+    _accumViewportAggregations (viewportExpressions, rawFeature, renderLayer) {
+        const viewportExpressionsLength = viewportExpressions.length;
+
+        for (let j = 0; j < viewportExpressionsLength; j++) {
+            const currentViewportExp = viewportExpressions[j];
+            currentViewportExp.accumViewportAgg(rawFeature);
+        }
     }
 
     /**
@@ -223,6 +202,9 @@ export default class Renderer {
         this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
+        if (!viz) {
+            return;
+        }
         const gl = this.gl;
 
         this._updateDataframeMatrices(dataframes);
@@ -241,8 +223,9 @@ export default class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const styleDataframe = (dataframe, dataframeTexture, shader, vizExpr) => {
-            const textureId = shader.textureIds.get(viz);
+        const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr) => {
+            const shader = metashader.shader;
+            const textureId = metashader.textureIds;
 
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
@@ -268,11 +251,15 @@ export default class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorShader, viz.color));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthShader, viz.width));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterShader, viz.filter));
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
+        if (dataframes[0].type !== 'polygon') {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
+        }
+        if (dataframes[0].type !== 'line') {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth));
+        }
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter));
 
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
@@ -318,16 +305,17 @@ export default class Renderer {
 
         const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
-            let renderer = null;
+            let metaRenderer = null;
             if (!viz.symbol.default) {
-                renderer = viz.symbolShader;
+                metaRenderer = viz.symbolMetaShader;
             } else if (dataframe.type === 'point') {
-                renderer = viz.pointShader;
+                metaRenderer = viz.pointMetaShader;
             } else if (dataframe.type === 'line') {
-                renderer = viz.lineShader;
+                metaRenderer = viz.lineMetaShader;
             } else {
-                renderer = viz.polygonShader;
+                metaRenderer = viz.polygonMetaShader;
             }
+            const renderer = metaRenderer.shader;
             gl.useProgram(renderer.program);
 
             // Set filtering condition on "... AND feature is in current order bucket"
@@ -367,14 +355,14 @@ export default class Renderer {
             gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
 
             if (!viz.symbol.default) {
-                const textureId = viz.symbolShader.textureIds.get(viz);
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbol._preDraw(renderer.program, drawMetadata, gl);
 
                 viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbolPlacement._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -402,7 +390,7 @@ export default class Renderer {
             }
 
             if (!viz.transform.default) {
-                const textureId = renderer.textureIds.get(viz);
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
                 viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);

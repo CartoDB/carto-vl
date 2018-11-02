@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Animation demo / SQL source without time zone | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../../dist/carto-vl.js"></script>
+  <script src="../dist/carto-vl.js"></script>
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-<style>
+  <style>
     body {
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
     #timer {
       position: absolute;
       top: 20px;
@@ -27,6 +30,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="timer"></div>
@@ -42,8 +46,8 @@
         version: 8,
         sources: {},
         layers: [{
-            id: 'background', type: 'background',
-            paint: { 'background-color': 'black' }
+          id: 'background', type: 'background',
+          paint: { 'background-color': 'black' }
         }]
       },
       center: [0, 0],
@@ -90,20 +94,21 @@
     const animation = s.animation(
       s.prop('sim_time'),
       duration,
-      s.fade(duration/10, duration/5)
+      s.fade(duration / 10, duration / 5)
     );
     const viz = new carto.Viz({
-        strokeWidth: 1,
-        color: s.hsv(animation, 1, 1),
-        width: s.add(1,s.mul(animation,30)),
-        order: s.desc(s.width())
+      strokeWidth: 1,
+      color: s.hsv(animation, 1, 1),
+      width: s.add(1, s.mul(animation, 30)),
+      order: s.desc(s.width())
     });
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     layer.on('updated', () => {
-        const time = animation.getProgressValue().toISOString();
-        document.getElementById("timer").textContent = time;
+      const time = animation.getProgressValue().toISOString();
+      document.getElementById("timer").textContent = time;
     });
   </script>
 </body>
+
 </html>

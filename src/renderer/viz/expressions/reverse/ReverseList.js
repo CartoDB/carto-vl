@@ -1,31 +1,16 @@
 import Base from '../base';
-import { checkType, checkExpression } from '../utils';
+import { checkType } from '../utils';
 
 export default class ReverseList extends Base {
-    constructor (array) {
-        super({ array });
-
-        checkExpression('reverseList', 'array', 0, array);
-
-        if (this.array.elems) {
-            const childType = this.array.elems[0].type;
-            this.type = `${childType}-list`;
-        }
-    }
-
     _bindMetadata (metadata) {
-        this.array._bindMetadata(metadata);
+        checkType('reverse', 'array', 0, ['number-list', 'category-list', 'color-list', 'date-list', 'image-list'], this.input);
 
-        checkType('reverse', 'array', 0, ['palette', 'number-list', 'category-list', 'color-list', 'time-list', 'image-list'], this.array);
-
-        this.type = this.array.type;
-        this.childType = this.array.childType;
-
-        super._bindMetadata(metadata);
+        this.type = this.input.type;
+        this.childType = this.input.childType;
     }
 
     get elems () {
-        return [...this.array.elems].reverse();
+        return [...this.input.elems].reverse();
     }
 
     get value () {

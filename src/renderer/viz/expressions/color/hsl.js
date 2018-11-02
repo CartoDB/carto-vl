@@ -1,3 +1,4 @@
+
 import BaseExpression from '../base';
 import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
@@ -128,13 +129,13 @@ function genHSL (name, alpha) {
                 }
                 return '';
             };
-            super._setGenericGLSL(inline =>
-                `vec4(HSLtoRGB(vec3(
+            super._setGenericGLSL(
+                inline => `vec4(HSLtoRGB(vec3(
                     ${inline.h}${normalize(this.h, true)},
                     clamp(${inline.s}${normalize(this.s)}, 0., 1.),
                     clamp(${inline.l}${normalize(this.l)}, 0., 1.)
-                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
-            , `
+                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`,
+                `
                     #ifndef HSL2RGB
                     #define HSL2RGB
                     vec3 HSLtoRGB(vec3 HSL) {

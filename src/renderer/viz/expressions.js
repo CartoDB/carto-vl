@@ -481,6 +481,8 @@ import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
+import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
+
 import Constant from './expressions/basic/constant';
 
 import Hex from './expressions/color/hex';
@@ -510,7 +512,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import reverseFn from './expressions/reverse/reverse';
+import Reverse from './expressions/reverse/Reverse';
 
 import Property from './expressions/basic/property';
 
@@ -529,6 +531,7 @@ import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
+import TimeRangeExpr from './expressions/timeRange';
 
 import Top from './expressions/top';
 
@@ -621,6 +624,8 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
+export const clusterTime = (...args) => new ClusterTime(...args);
+
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
@@ -654,7 +659,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = reverseFn;
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
@@ -677,6 +682,8 @@ export const category = (...args) => new BaseCategory(...args);
 
 export const time = (...args) => new Time(...args);
 export { time as date };
+
+export const timeRange = (...args) => new TimeRangeExpr(...args);
 
 export const top = (...args) => new Top(...args);
 

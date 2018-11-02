@@ -8,9 +8,9 @@
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -55,7 +55,7 @@
             width: 5
             color: ramp($weather,[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
-            strokeColor: black 
+            strokeColor: black
         `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -74,14 +74,9 @@
                 document.getElementById('loader').style.opacity = '0';
             }
             colorLegend.data.forEach((legend, index) => {
-                const color = legend.value
-                    ? rgbToHex(legend.value)
-                    : 'white'
-
-                if (color) {
-                    colorLegendList +=
-                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
-                }
+                const color = rgbToHex(legend.value);
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
             });
 
             document.getElementById('content').innerHTML = colorLegendList;

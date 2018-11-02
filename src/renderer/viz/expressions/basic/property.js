@@ -53,6 +53,10 @@ export default class Property extends BaseExpression {
         return this.eval();
     }
 
+    get propertyName () {
+        return this.name;
+    }
+
     eval (feature) {
         if (!feature) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
@@ -83,7 +87,7 @@ export default class Property extends BaseExpression {
         this._metadata = metadata;
         this.type = metaColumn.type;
 
-        if (this.type === 'category' && !this.numCategories) {
+        if (this.type === 'category' && this.numCategories === undefined) {
             Object.defineProperty(this, 'numCategories', {
                 get: function () {
                     return metaColumn.categories.length;

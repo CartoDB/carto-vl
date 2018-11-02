@@ -2,7 +2,6 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -17,10 +16,6 @@ const AABBTestResults = {
 };
 
 export default class Dataframe extends DummyDataframe {
-    setFreeObserver (freeObserver) {
-        this.freeObserver = freeObserver;
-    }
-
     bindRenderer (renderer) {
         const gl = renderer.gl;
         this.renderer = renderer;
@@ -165,17 +160,12 @@ export default class Dataframe extends DummyDataframe {
             gl.deleteBuffer(this.vertexBuffer);
             gl.deleteBuffer(this.featureIDBuffer);
         }
-        const freeObserver = this.freeObserver;
 
         Object.keys(this).map(key => {
             this[key] = null;
         });
 
         this.freed = true;
-
-        if (freeObserver) {
-            freeObserver(this);
-        }
     }
 
     _isPointInViewport (featureIndex) {
@@ -286,7 +276,9 @@ export default class Dataframe extends DummyDataframe {
         const WIDTH = this.renderer.gl.canvas.width / window.devicePixelRatio;
         const HEIGHT = this.renderer.gl.canvas.height / window.devicePixelRatio;
 
-        for (let i = 0; i < points.length; i += 6) {
+        // FIXME: points.length includes rejected points (out of tile)
+        // so we use numFeatures here, but should fix the points size
+        for (let i = 0; i < this.numFeatures * 6; i += 6) {
             const featureIndex = i / 6;
 
             const feature = this.getFeature(featureIndex);
@@ -502,35 +494,27 @@ export default class Dataframe extends DummyDataframe {
     _buildGetters () {
         const getters = {};
         const metadata = this.metadata;
-        for (let i = 0; i < this.metadata.propertyKeys.length; i++) {
-            const propertyName = this.metadata.propertyKeys[i];
-            if (this.metadata.properties[propertyName].aggregations) {
-                Object.values(this.metadata.properties[propertyName].aggregations).forEach(aggName => {
-                    getters[aggName] = {
-                        get: function () {
-                            const index = this._index;
-                            if (metadata.properties[propertyName].type === 'category') {
-                                return metadata.IDToCategory.get(this._dataframe.properties[aggName][index]);
-                            } else {
-                                return this._dataframe.properties[aggName][index];
-                            }
-                        }
-                    };
-                });
-            }
-            getters[propertyName] = {
-                get: function () {
-                    const index = this._index;
-                    if (metadata.properties[propertyName].type === 'category') {
-                        return metadata.IDToCategory.get(this._dataframe.properties[propertyName][index]);
-                    } else {
-                        return this._dataframe.properties[propertyName][index] === FP32_DESIGNATED_NULL_VALUE
-                            ? null
-                            : this._dataframe.properties[propertyName][index];
+        metadata.propertyKeys.forEach(propertyName => {
+            const codec = metadata.codec(propertyName);
+            if (codec.isRange()) {
+                const decodedProperties = metadata.decodedProperties(propertyName);
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
+                        return codec.internalToExternal(args);
                     }
-                }
-            };
-        }
+                };
+            } else {
+                getters[propertyName] = {
+                    get: function () {
+                        const index = this._index;
+                        const value = this._dataframe.properties[propertyName][index];
+                        return codec.internalToExternal(value);
+                    }
+                };
+            }
+        });
         return getters;
     }
 

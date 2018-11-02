@@ -28,8 +28,23 @@ $propertyPreface
 $transform_preface
 
 vec2 transform(vec2 p){
-    return $transform_inline(p*resolution)/resolution;
+    return $transform_inline(2.*p)/resolution;
 }
+
+// We'll need a square inscribed in a triangle
+// The triangle will be equilateral
+// The square side length will be equal to 1
+// Each triangle edge length will be equal to 1+2*A (by definition of A)
+// The triangle height will be equal to H by definition
+// The square inscription will generate 3 smaller triangles
+// Each one of these will have an hypotenuse equal to Y
+//
+// Therefore:
+// Y*sin(60) = 1  =>  Y = 2 / sqrt(3)
+// A=Y*cos(60)    =>  A = 1 / sqrt(3)
+// tan(60) = H / (0.5 + A)   =>  H = sqrt(3)*(0.5 + 1 / sqrt(3))
+#define A (0.577350269189625)
+#define H (1.86603)
 
 void main(void) {
     featureIDVar = abs(featureID);
@@ -37,24 +52,21 @@ void main(void) {
     filtering = texture2D(filterTex, abs(featureID)).a;
 
     float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);
-    float fillSize = size;
 
     vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
     p/=p.w;
-    float sizeNormalizer = (size +2.)/size;
-    vec2 size2 = (2.*size+4.)/resolution;
 
     if (featureID.y<0.){
-        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
-        p.xy += transform(size2*vec2(0.866025, -0.5));
+        pointCoord = vec2((0.5+A)/(0.5), 0.);
+        p.xy += transform(size*vec2(0.5+A, -H/2. + (H/2. - 0.5) ));
     }else if (featureID.x<0.){
-        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;
-        p.xy += transform(size2*vec2(-0.866025, -0.5));
+        pointCoord = vec2(-(0.5+A)/(0.5), 0.);
+        p.xy += transform(size*vec2(-(0.5+A), -H/2. + (H/2. - 0.5)));
     }else{
-        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;
-        p.xy += transform(vec2(0.,size2.y));
+        pointCoord = vec2(0., H);
+        p.xy += transform(size*vec2(0., H/2. + (H/2. - 0.5)));
     }
-    pointCoord.y = -pointCoord.y;
+    pointCoord.y = 1.-pointCoord.y;
 
 
     p.xy += ($symbolPlacement_inline)*size/resolution;

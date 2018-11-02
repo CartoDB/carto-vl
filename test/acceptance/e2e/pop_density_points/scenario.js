@@ -10,7 +10,7 @@ carto.setDefaultAuth({
     apiKey: '1234'
 });
 carto.setDefaultConfig({
-    serverURL: 'http://{user}.localhost.lan:8181'
+    serverURL: 'http://127.0.0.1:8181/user/{user}'
 });
 
 const source = new carto.source.Dataset('pop_density_points');
