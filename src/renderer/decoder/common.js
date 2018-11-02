@@ -19,6 +19,7 @@ export function addLineString (lineString, geomBuffer, index, isPolygon, skipCal
         for (;i <= lineString.length; i += 2) {
             currentPoint = [lineString[i], lineString[i + 1]];
             if (prevPoint[0] !== currentPoint[0] || prevPoint[1] !== currentPoint[1]) {
+                i += 2;
                 break;
             }
         }
