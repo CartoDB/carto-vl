@@ -40,22 +40,15 @@
                                 id="viz2">
                             <label for="viz2">
                                 <h2>ramp(globalEqIntervals($dn, 3), [green, yellow, red])</h2>
-                                <p class="description open-sans">Classify by getting the minimum and maximum values on
-                                    the entire dataset and setting the buckets as <span> [MIN, MIN*66%+MAX*33%],
-                                        [MIN*66%+MAX*33%, MIN*33%+MAX*66%], [MIN*33%+MAX*66%, MAX]</span></p>
+                                <p class="description open-sans">Classify by getting the minimum and maximum values on the entire dataset and setting the buckets as <span> [MIN, MIN*66%+MAX*33%], [MIN*66%+MAX*33%, MIN*33%+MAX*66%], [MIN*33%+MAX*66%, MAX]</span></p>
                             </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [green, yellow, red])')"
                                 id="viz3">
                             <label for="viz3">
-                                <h2>ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow,
-                                    red])</h2>
-                                <p class="description open-sans">Equivalent to <span>ramp(globalQuantiles($dn, 3),
-                                        [green,
-                                        yellow, red])</span> but by only using the samples that are shown on the
-                                    viewport. Zoom
-                                    in to see the dynamic effect. Note that the legend is updated accordingly.</p>
+                                <h2>ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow, red])</h2>
+                                <p class="description open-sans">Equivalent to <span>ramp(globalQuantiles($dn, 3), [green, yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom in to see the dynamic effect. Note that the legend is updated accordingly.</p>
                             </label>
                         </li>
                         <li>
