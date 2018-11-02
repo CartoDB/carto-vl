@@ -22,12 +22,13 @@
                 <h1>Widgets</h1>
             </header>
             <p class="description open-sans">Displaying additional information</p>
-            <div id="widgets">
+            <br/>
+            <div id="widgets" class="open-sans">
                 <div>
                     <label>Viewport accidents:</label>
                     <div id="widget-viewport-accidents"></div>
-                    <label>Total accidents:</label>
-                    <div id="widget-total-accidents"></div>
+                    <!-- <label>Total accidents:</label>
+                    <div id="widget-total-accidents"></div> -->
                     <label>Viewport damage:</label>
                     <div id="widget-viewport-damage"></div>
                     <label>Total damage:</label>
@@ -64,7 +65,7 @@
             @viewportAccidents: viewportCount()
             @totalDamage: globalSum($total_damage)
             @viewportDamage: viewportSum($total_damage)
-`);
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
