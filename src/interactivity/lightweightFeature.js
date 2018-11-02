@@ -17,26 +17,12 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
         }
-        getCenter () {
+        getCentroid () {
             const dataframe = this._rawFeature._dataframe;
-
-            // Polygons and lines
             const centroid = { ...dataframe._centroids[this._rawFeature._index] };
-
-            // const centroid = {
-            //     x: dataframe._aabb[this._rawFeature._index].minx,
-            //     y: dataframe._aabb[this._rawFeature._index].miny
-            // };
-
-            // Points
-            // const x = dataframe.decodedGeom.vertices[6 * this._rawFeature._index];
-            // const y = dataframe.decodedGeom.vertices[6 * this._rawFeature._index + 1];
-            // const centroid = { x, y };
-
             centroid.x = centroid.x * dataframe.scale + dataframe.center.x;
             centroid.y = centroid.y * dataframe.scale + dataframe.center.y;
             const g = unprojectFromWebMercator(centroid);
-
             return [g.lng, g.lat];
         }
     };
