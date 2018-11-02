@@ -8,9 +8,9 @@
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -40,20 +40,15 @@
                                 id="viz2">
                             <label for="viz2">
                                 <h2>ramp(globalEqIntervals($dn, 3), [green, yellow, red])</h2>
-                                <p class="description open-sans">Classify by getting the minimum and maximum values on
-                                    the entire dataset and setting the buckets as <span> [MIN, MIN*66%+MAX*33%],
-                                    [MIN*66%+MAX*33%, MIN*33%+MAX*66%], [MIN*33%+MAX*66%, MAX]</span></p>
+                                <p class="description open-sans">Classify by getting the minimum and maximum values on the entire dataset and setting the buckets as <span> [MIN, MIN*66%+MAX*33%], [MIN*66%+MAX*33%, MIN*33%+MAX*66%], [MIN*33%+MAX*66%, MAX]</span></p>
                             </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [green, yellow, red])')"
                                 id="viz3">
                             <label for="viz3">
-                                <h2>ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow,
-                                    red])</h2>
-                                <p class="description open-sans">Equivalent to <span>ramp(globalQuantiles($dn, 3), [green,
-                                    yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom
-                                    in to see the dynamic effect. Note that the legend is updated accordingly.</p>
+                                <h2>ramp(viewportQuantiles($dn, 3), globalMin($dn), globalMax($dn)), [green, yellow, red])</h2>
+                                <p class="description open-sans">Equivalent to <span>ramp(globalQuantiles($dn, 3), [green, yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom in to see the dynamic effect. Note that the legend is updated accordingly.</p>
                             </label>
                         </li>
                         <li>
@@ -61,7 +56,9 @@
                                 id="viz4">
                             <label for="viz4">
                                 <h2>ramp(viewportEqIntervals($dn, 3), 0, 160), [green, yellow, red])</h2>
-                                <p class="description open-sans">Equivalent to <span>ramp(globalEqIntervals($dn, 3), [green, yellow, red])</span> but by only using the samples that are shown on the viewport. Zoom
+                                <p class="description open-sans">Equivalent to <span>ramp(globalEqIntervals($dn, 3),
+                                        [green, yellow, red])</span> but by only using the samples that are shown on
+                                    the viewport. Zoom
                                     in to see the dynamic effect. Note that the legend is updated accordingly.</p>
                             </label>
                         </li>
@@ -70,7 +67,8 @@
                                 id="viz5">
                             <label for="viz5">
                                 <h2>ramp(buckets($dn, [80, 160]), [green, yellow, red])</h2>
-                                <p class="description open-sans">Cities with a population density less than 80 will be set green, between 80 and 160
+                                <p class="description open-sans">Cities with a population density less than 80 will be
+                                    set green, between 80 and 160
                                     will be set yellow, and greater than 160 will be set red.
                                 </p>
                             </label>
@@ -110,7 +108,7 @@
 
         layer.on('updated', () => {
             // Get the legend
-            if (!layer.viz.color.getLegendData){
+            if (!layer.viz.color.getLegendData) {
                 return;
             }
 
