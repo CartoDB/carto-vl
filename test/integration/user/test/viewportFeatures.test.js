@@ -119,6 +119,23 @@ describe('viewportFeatures', () => {
         });
     });
 
+    it('should have a working getCentroid method', done => {
+        layer1.on('loaded', () => {
+            const featureList = viz1.variables.list.eval();
+            const [[x1, y1], [x2, y2]] = featureList.map(f => {
+                return f.getCentroid();
+            });
+
+            expect(x1).toBeCloseTo(0, 6);
+            expect(y1).toBeCloseTo(0, 6);
+
+            expect(x2).toBeCloseTo(10, 6);
+            expect(y2).toBeCloseTo(12, 6);
+
+            done();
+        });
+    });
+
     afterEach(() => {
         document.body.removeChild(setup.div);
     });

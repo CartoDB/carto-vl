@@ -135,10 +135,14 @@ describe('Interactivity', () => {
 
             it('should fire a featureClick event with the proper feature attributes', done => {
                 interactivity.on('featureClick', event => {
-                    expect(event.features[0].reset).toBeDefined();
-                    expect(event.features[0].color.blendTo).toBeDefined();
-                    expect(event.features[0].color.reset).toBeDefined();
-                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    const feature = event.features[0];
+                    expect(feature.reset).toBeDefined();
+                    expect(feature.blendTo).toBeDefined();
+                    expect(feature.getCentroid).toBeDefined();
+                    expect(feature.color.blendTo).toBeDefined();
+                    expect(feature.color.reset).toBeDefined();
+                    expect(feature.variables.wadus.value).toEqual(123);
+                    expect();
                     done();
                 });
 
@@ -347,7 +351,7 @@ describe('Interactivity', () => {
         });
     });
 
-    function onLoaded (callback) {
+    function onLoaded(callback) {
         carto.on('loaded', [layer1, layer2], callback);
     }
 
@@ -568,7 +572,7 @@ describe('regression with blendTo', () => {
         });
     });
 
-    function onLoaded (callback) {
+    function onLoaded(callback) {
         layer.on('loaded', callback);
     }
 
