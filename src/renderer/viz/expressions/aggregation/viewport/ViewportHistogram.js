@@ -2,6 +2,8 @@ import BaseExpression from '../../base';
 import { implicitCast } from '../../utils';
 import { checkMaxArguments, checkArray } from '../../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import CartoRuntimeError from '../../../../../errors/carto-runtime-error';
+import TimeRange from '../../../../../utils/time/TimeRange';
 
 /**
  * Generates a histogram.
@@ -64,9 +66,13 @@ export default class ViewportHistogram extends BaseExpression {
     }
 
     accumViewportAgg (feature) {
-        const x = this.x.eval(feature);
+        let x = this.x.eval(feature);
 
         if (x !== undefined) {
+            if (this.x.type === 'timerange') {
+                this._timeZone = x._timeZone;
+                x = x.text;
+            }
             const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
             const weight = clusterCount * this.weight.eval(feature);
             const count = this._histogram.get(x) || 0;
@@ -80,10 +86,19 @@ export default class ViewportHistogram extends BaseExpression {
                 return null;
             }
 
-            this._cached = this.x.type === 'number'
-                ? _getNumericValue(this._histogram, this._size)
-                : _getCategoryValue(this._histogram);
-
+            switch (this.x.type) {
+                case 'number':
+                    this._cached = _getNumericValue(this._histogram, this._size);
+                    break;
+                case 'category':
+                    this._cached = _getCategoryValue(this._histogram);
+                    break;
+                case 'timerange':
+                    this._cached = _getTimeRangeValue(this._histogram, this._timeZone);
+                    break;
+                default:
+                    throw new CartoRuntimeError(`viewportHistogram unimplemented for type ${this.x.type}`);
+            }
             return this._cached;
         }
 
@@ -242,6 +257,13 @@ function _getCategoryValue (histogram) {
             return { x, y };
         })
         .sort(_sortNumerically);
+}
+
+function _getTimeRangeValue (histogram, timeZone) {
+    return [...histogram]
+        .map(([x, y]) => {
+            return { x: TimeRange.fromText(x, timeZone), y };
+        }).sort((x, y) => x.startValue - y.startValue);
 }
 
 function _sortNumerically (a, b) {
