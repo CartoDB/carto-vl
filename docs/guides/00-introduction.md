@@ -2,7 +2,7 @@
 
 Welcome to the CARTO VL guides! Here you will find a series of guides that are meant to lead you from the basics of creating a map to more advanced techniques for developing powerful interactive visualizations with CARTO VL.
 
-If you aren't sure where to start, no problem! Below are brief descriptions of each guide to help you make that choice.
+The guides are designed to build on top of concepts from previous guides and are ordered in that way. If you are new to CARTO VL, we recommend the "Getting Started" guide first. If you are more interested in a specific topic, the short descriptions of each guide below will help you find what you are looking for.
 
 * **Getting started**: the basics of getting started with CARTO VL from setting up your `.html` file to adding data and visualizing it.
 * **Add data sources**: gain a better understanding of what data sources CARTO VL supports, how to add them to your map, and when to choose one source type or another.
