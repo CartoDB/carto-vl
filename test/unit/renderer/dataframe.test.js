@@ -248,6 +248,141 @@ describe('src/renderer/Dataframe', () => {
             expect(pointInTriangle({ x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 0, y: -1 })).toBe(false);
         });
     });
+
+    describe('.getCentroid', () => {
+        describe('when dataframe is point type', () => {
+            const dataframe = new Dataframe({
+                center: { x: 0, y: 0 },
+                scale: 1,
+                geom: new Float32Array([
+                    0, 0,
+                    0, 0,
+                    0, 0,
+
+                    1, 1,
+                    1, 1,
+                    1, 1
+                ]),
+                properties: {
+                    id: [1]
+                },
+                type: 'point',
+                size: 1,
+                active: true,
+                metadata: new Metadata({
+                    properties: {
+                        id: {
+                            type: 'number'
+                        }
+                    },
+                    idProperty: 'id'
+                })
+            });
+            const feature1 = { id: 1 };
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } } };
+            dataframe.matrix = m;
+
+            it('should return the centroid for the required feature', () => {
+                const [x1, y1] = dataframe.getCentroid(feature1.id);
+                expect(x1).toBeCloseTo(180.00, 2);
+                expect(y1).toBeCloseTo(85.05, 2);
+            });
+        });
+
+        xdescribe('when dataframe is line type', () => {
+            const segment = [
+                0, 0,
+                9, 0
+            ];
+            const dataframe = new Dataframe({
+                center: { x: 0, y: 0 },
+                scale: 1,
+                geom: [[segment]],
+                properties: {
+                    id: [0],
+                    numeric_prop: [1],
+                    cartodb_id: [0]
+                },
+                type: 'line',
+                size: 1,
+                active: true,
+                metadata: new Metadata({
+                    properties: {
+                        numeric_prop: {
+                            type: 'number'
+                        },
+                        cartodb_id: {
+                            type: 'number'
+                        }
+                    },
+                    idProperty: 'cartodb_id'
+                })
+            });
+            const feature1 = {
+                id: 0,
+                numeric_prop: 1,
+                cartodb_id: 0
+            };
+            dataframe.matrix = m;
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
+
+            it('should return the centroid for the required feature', () => {
+                const [x1, y1] = dataframe.getCentroid(feature1.id);
+                expect(x1).toBeCloseTo(0.0, 2); // whatever
+                expect(y1).toBeCloseTo(0.0, 2);
+            });
+        });
+
+        xdescribe('when dataframe is polygon type', () => {
+            const polygon1 = {
+                flat: [
+                    0, 0,
+                    0, 1,
+                    1, 0
+                ],
+                holes: [],
+                clipped: []
+            };
+            const dataframe = new Dataframe({
+                center: { x: 0, y: 0 },
+                scale: 1,
+                geom: [[polygon1]],
+                properties: {
+                    id: [0],
+                    numeric_property: [0],
+                    cartodb_id: [0]
+                },
+                type: 'polygon',
+                size: 1,
+                active: true,
+                metadata: new Metadata({
+                    properties: {
+                        cartodb_id: {
+                            type: 'number'
+                        },
+                        numeric_property: {
+                            type: 'number'
+                        }
+                    },
+                    idProperty: 'cartodb_id'
+                })
+            });
+            dataframe.matrix = m;
+            dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
+
+            const feature1 = {
+                id: 0,
+                numeric_property: 0,
+                cartodb_id: 0
+            };
+
+            it('should return the centroid for the required feature', () => {
+                const [x1, y1] = dataframe.getCentroid(feature1.id);
+                expect(x1).toBeCloseTo(0, 2); // whatever
+                expect(y1).toBeCloseTo(0, 2);
+            });
+        });
+    });
 });
 
 function expectEqualFeatures (result, expected) {
