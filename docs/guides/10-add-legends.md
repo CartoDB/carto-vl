@@ -1,4 +1,4 @@
-## Legends
+## Add legends
 
 Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with **legends** to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent. 
 
@@ -20,7 +20,7 @@ If you completed the XXX guide, the map below will look familiar. In that guide,
 
 At the end of this guide, we also provide a series of examples, that are meant to serve as legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
-### Getting Started
+### Getting started
 
 The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right hand corner, but is missing the legend information to help interpret what weather type each color on the map represents. 
 

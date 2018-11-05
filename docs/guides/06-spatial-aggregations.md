@@ -1,4 +1,4 @@
-## Aggregating data
+## Spatial aggregations
 
 In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*), just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
 

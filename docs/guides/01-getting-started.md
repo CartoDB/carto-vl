@@ -213,5 +213,4 @@ For more information about styling, check out the guide [Introduction to Styling
 </body>
 
 </html>
-
 ```

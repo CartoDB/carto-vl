@@ -1,4 +1,4 @@
-## Widgets
+## Add widgets
 
 - **Widgets**: provide additional pieces of information that accompany a map to facilitate understanding and exploration. Widgets often provide additional information about a dataset that is not symbolized on a map itself. For example, on a election map, you can style the map by winner, but also provide addtional information from the data. For example, how many total votes did each party receive? or how many people voted?
 
