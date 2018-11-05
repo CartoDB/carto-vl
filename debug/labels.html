@@ -59,7 +59,7 @@
       layer.on('updated', () => {
         const features = viz.variables.f.value;
         const geojsonFeatures = features.filter(f =>
-          f.pop_max > viz.variables.p80.value
+          f.properties.pop_max > viz.variables.p80.value
         ).map(f => {
           return {
             "type": "Feature",
