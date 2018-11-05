@@ -10,11 +10,10 @@ If you completed the XXX guide, the map below will look familiar. In that guide,
 
 <div class="example-map">
     <iframe
-        id="accidents-all"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
+        id="legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-3.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
@@ -25,21 +24,84 @@ At the end of this guide, we also provide a series of examples, that are meant t
 
 The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right hand corner, but is missing the legend information to help interpret what weather type each color on the map represents. 
 
-Let's add that information!
-
-To get started, copy and paste the code for this map and save it as `accidents.html`:
-
 <div class="example-map">
     <iframe
-        id="population-density-buckets-numeric"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-no-legend.html"
+        id="legend-step-1"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---no-legend">Copy my source code!</a>
+
+Let's add that information!
+
+To get started, copy and paste the code for this map and save it as `accidents.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rail accident weather | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <!-- Include CARTO VL JS -->
+    <script src="../../../dist/carto-vl.js"></script>
+    <!-- Include Mapbox GL JS -->
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <!-- Include Mapbox GL CSS -->
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <!-- Add title/legend box -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Rail Accidents by Weather</h1>
+            </header>
+        </div>
+    </aside>
+    
+    <script>
+
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 4,
+        });
+        
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+        
+        const source = new carto.source.Dataset("railroad_accidents");
+        
+        const viz = new carto.Viz(`
+            width: 7
+            color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            strokeWidth: 0.2
+            strokeColor: black 
+        `);
+        
+        const layer = new carto.Layer('layer', source, viz);
+        
+        layer.addTo(map);
+
+    </script>
+
+</body>
+</html>
+```
 
 ### Access data from `ramp`
 
@@ -66,8 +128,6 @@ If styling isn't tied directly to a styling property, you will need to use a var
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded. 
 
 ```js
-//** ADD LEGEND **//
-
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
     
@@ -102,8 +162,8 @@ That's because we have to define a place for the last step of the process (`docu
 
 <div class="example-map">
     <iframe
-        id="accidents-all-legend-no-content"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend-no-content.html"
+        id="legend-step-2"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -133,14 +193,13 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map">
     <iframe
-        id="accidents-all-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
+        id="legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---legend">View my source code!</a>
 
 ### Overwrite defaults
 
@@ -150,8 +209,8 @@ For example, the map below symbolizes only the `top` three weather conditions in
 
 <div class="example-map">
     <iframe
-        id="accidents-all-top-others-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-others-legend.html"
+        id="legend-step-4"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -172,14 +231,13 @@ With that change, the final map will now label other categories as "Other weathe
 <div class="example-map">
     <iframe
         id="accidents-all-top-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-legend.html"
+        src="/developers/carto-vl/examples/maps/guides/legends/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---top-legend">View my source code!</a>
 
 #### Unclassified numerical data
 
