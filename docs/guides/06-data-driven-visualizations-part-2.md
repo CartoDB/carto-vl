@@ -34,6 +34,8 @@ color: ramp($dn, [green, yellow, red])
 
 // Style 2: apply colors from a color list including "transparent"
 
+color: ramp($dn, [transparent, gray, yellow])
+
 // Style 3: apply colors from a color list with HSV color constructors
 
 color: ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])
