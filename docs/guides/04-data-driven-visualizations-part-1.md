@@ -104,6 +104,7 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
         id="explicit-ranges"
         src="/developers/carto-vl/examples/maps/guides/ramp/step-3.html"
         width="100%"
+        height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
