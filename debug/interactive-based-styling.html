@@ -98,6 +98,10 @@
           strokeWidth: '7',
           strokeColor: 'opacity(LimeGreen, 0.8)'
         }, delay);
+
+        map.flyTo({
+          center: feature.getCentroid()
+        });
       }
     });
     interactivity.on('featureClickOut', event => {
