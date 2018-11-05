@@ -1,6 +1,6 @@
 ## Getting started
 
-In this guide, you will learn the basics of visualizing data with CARTO VL on top of a world basemap.There are no previous requirements to complete this guide, but a basic knowledge of HTML, CSS and JavaScript would be helpful. In order to start creating maps, you will need text editor and an internet connection.
+In this guide, you will learn the basics of visualizing data with CARTO VL on top of a world basemap. There are no previous requirements to complete this guide, but a basic knowledge of HTML, CSS and JavaScript would be helpful.
 
 After completing this guide, you will have your first CARTO VL map!
 
@@ -16,12 +16,12 @@ After completing this guide, you will have your first CARTO VL map!
 
 ### Basic setup
 
-The most straight-forward way to use CARTO VL is to include the required files from our CDN as seen in the code below. If you prefer to use the minified file, which is lighter and therefore loads faster, you can use `https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js`. You will also need to add Mapbox GL JavaScript and CSS files. This enables you to use both `carto` and `mapboxgl` in your code.
+The most straight-forward way to use CARTO VL is to include the required files from our CDN as seen in the code below. You will also need to add Mapbox GL JavaScript and CSS files.
 
 ```html
 <head>
   <!-- Include CARTO VL JS from the CARTO CDN-->
-  <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+  <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
 
   <!-- Include Mapbox GL from the Mapbox CDN-->
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
@@ -29,7 +29,7 @@ The most straight-forward way to use CARTO VL is to include the required files f
 </head>
 ```
 **Note:**
-CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](https://carto.com/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided with patched MGL bundles, but this is no longer required.
+CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](https://carto.com/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
 
 #### Add map container
 
@@ -39,7 +39,7 @@ Next, you need to create a `div` where the map will be drawn:
   <div id="map"></div>
 ```
 
-Style the map `div` to ensure the map displays properly: 
+Style the map `div` to ensure the map displays properly:
 
 ```css
 #map {
@@ -51,13 +51,12 @@ Style the map `div` to ensure the map displays properly:
 
 #### Add basemap and set properties
 
-Once you have a `div` for your map, you have to use the `mapboxgl` object to initialize it using the following parameters:
+Once you have a `div` for your map, you have to use the [`mapboxgl.Map`](https://www.mapbox.com/mapbox-gl-js/api/#map) constructor to create a new map with the following parameters:
 
-- **`container`** indicates where the map is going to be placed
+- **`container`** [element ID](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) to indicate where the map is going to be placed
 - **`style`** sets the basemap style to use
-- **`center`** sets the opening extent of the basemap
-- **`zoom`** sets the default zoom level of the basemap
-- **`dragRotate`** disables map rotation
+- **`center`** sets the opening extent of the map
+- **`zoom`** sets the default zoom level of the map
 
 ```js
 const map = new mapboxgl.Map({
@@ -100,17 +99,17 @@ carto.setDefaultAuth({
 });
 ```
 
-### Define source
+### Create source
 
-The next step is to define the [`source`](/developers/carto-vl/guides/02-using-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
+The next step is to create the [`source`](/developers/carto-vl/guides/using-sources/) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
 
 ```js
 const source = new carto.source.Dataset('populated_places');
 ```
 
-### Define Viz object
+### Create Viz object
 
-A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map. 
+A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map.
 
 Create an empty Viz object that uses the default CARTO VL styling:
 
@@ -118,9 +117,9 @@ Create an empty Viz object that uses the default CARTO VL styling:
 const viz = new carto.Viz();
 ```
 
-### Define map layer
+### Create map layer
 
-Now that you have defined a `source` and a `Viz object`, you need to create a new [`layer`](/developers/carto-vl/reference/#cartolayer) that can be added to the map.
+Now that you have created a `source` and a `Viz object`, you need to create a new [`layer`](/developers/carto-vl/reference/#cartolayer) that can be added to the map.
 
 ```js
 const layer = new carto.Layer('layer', source, viz);
@@ -128,15 +127,15 @@ const layer = new carto.Layer('layer', source, viz);
 
 ### Add map layer
 
-Once you have defined the `layer`, you need to use the [`addTo`](/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
+Once you have created the `layer`, you need to use the [`addTo`](/developers/carto-vl/reference/#cartolayeraddto) method to add it to the map.
 
 ```js
 layer.addTo(map);
 ```
 
-### Set custom style to Viz object
+### Defining a custom style for the Viz object
 
-Using the Viz object you created in a previous step, override the default by adding styling for the `color` and `size` of the points on your map:
+Instead of using the Viz object you created in a previous step, with the default values, we can set custom values for the `color` and `size` of the points on your map:
 
 ```js
 const viz = new carto.Viz(`
@@ -167,7 +166,7 @@ For more information about styling, check out the guide [Introduction to Styling
 <head>
     <meta charset="utf-8">
 
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 

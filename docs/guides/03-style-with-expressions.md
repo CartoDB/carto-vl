@@ -4,7 +4,7 @@ CARTO VL styling is based on the concept of visualizations. A [visualization](/d
 
 ### Styling properties
 
-Visualizations have a fixed set of styling properties like `color` or `width` that adapt automatically to the geometry type. Select between the different geometry types in the map below to see how these styling properties work. 
+Visualizations have a fixed set of styling properties like `color` or `width` that adapt automatically to the geometry type. Select between the different geometry types in the map below to see how these styling properties work.
 
 <div class="example-map">
     <iframe
@@ -21,7 +21,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 
 ### What is an expression?
 
-As seen above, each styling property is assigned a value that is considered to be an expression. 
+As seen above, each styling property is assigned a value: a CARTO VL expression.
 
 Expressions assigned to properties can be constants (`red`, `#FFF`,`7`) or functions (`sqrt`, `+`, or `ramp`):
 
@@ -38,7 +38,7 @@ color: white
 ```
 
 **Note:**
-The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology. 
+The concept of *function* and its related terms *function call* and *function parameter* are borrowed from programming terminology.
 A **function** is a transformation between inputs, the **function parameters**, to an output. A **function call** is the application of the function to some values as the **function parameters**.
 
 Each styling property imposes limitations on the types of expressions that can be used as its input parameters.
@@ -63,7 +63,7 @@ There are multiple ways to get color expressions (expressions whose type is `col
 - **Color constants**: are colors defined by name (`red`, `blue`, `white`...) or by hexadecimal RGB(A) composition (`#F88`, `#F88A`, `#F08080`, `#F08080A0`).
 - **Color constructors**: are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
 - **`opacity`**: a function that overrides an input color's alpha channel.
-- **`ramp`**: a function that is covered in more detail in [part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) of the Data-driven visualizations guide.
+- **`ramp`**: a function that is covered in more detail in the [Data-driven visualization guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/).
 - **Other**: the use of advanced expressions like color arithmetic or blending.
 
 <div class="example-map">
@@ -118,13 +118,13 @@ The map below demonstrates how to access and modify the `color` property:
 
 ### The String and JavaScript Visualization APIs
 
-CARTO VL provides two equivalent and similar APIs to define visualizations: **String** and **JavaScript**. 
+CARTO VL provides two equivalent and similar APIs to define visualizations: **String** and **JavaScript**.
 
 Throughout this guide, you have seen the String API syntax which is nothing more than a small layer of syntax sugar for the JavaScript API. In fact, internally, the usage of the String API is implemented through the usage of the public JavaScript API.
 
 Usage of the JavaScript API can facilitate some advanced topics, but both are equivalent and everything that can be done through the JavaScript API can be done with the String API and vice versa.
 
-In the [reference](/developers/carto-vl/reference/) documentation examples are shown with both APIs for each expression. 
+In the [reference](/developers/carto-vl/reference/) documentation examples are shown with both APIs for each expression.
 
 This basic example of coloring a feature `red` and setting its width to `5` shows how the String API provides syntax sugar for things like named colors:
 
@@ -182,3 +182,10 @@ Below is a comparison between both approaches to get the gist of it (it's ok if 
 }
 ```
 
+```CARTO_VL_Viz
+// CARTO VL valid visualization
+// The buckets expression will classify the input property in two buckets: features with prices less than 100, and features with prices larger or equal than 100
+// The ramp expression will assign 5 to the first bucket and 15 to the second
+// Finally, we'll use ramp's output as the width
+width: ramp(buckets($price, [100]), [5, 15])
+```

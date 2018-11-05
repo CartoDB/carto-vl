@@ -43,12 +43,12 @@ const displayCenter = () => {
 map.on('move', displayCenter);
 ```
 
-To see the "reactions" (callback functions) to each map event above, open your file in a browser and then open the console through the browser's developer tools. Once the map loads you will see the first message: 'Map has loaded!'. Next, with the console still open, use the zoom controls to interact with the map and watch as the values for `Center:` and `Zoom:` update. 
+To see the "reactions" (callback functions) to each map event above, open your file in a browser and then open the console through the browser's developer tools. Once the map loads you will see the first message: 'Map has loaded!'. Next, with the console still open, use the zoom controls to interact with the map and watch as the values for `Center:` and `Zoom:` update.
 
 For more information on Mapbox GL JS map events see their [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map).
 
 ### Layer events
-In the previous section you saw how to add _map events_ once you have a basemap added. In this section, we will look at how to listen to _layer events_ with CARTO VL. 
+In the previous section you saw how to add _map events_ once you have a basemap added. In this section, we will look at how to listen to _layer events_ with CARTO VL.
 
 All [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events you can listen to: _`loaded`_ and _`updated`_.
 
@@ -72,17 +72,17 @@ layer.on('loaded', () => {
 });
 ```
 
-Load the file in your browser and open the console. This time, you will see two messages. First, `Map has loaded!` from the _map event_ and then, `Cities layer has loaded!` from the _layer event_. 
+Load the file in your browser and open the console. This time, you will see two messages. First, `Map has loaded!` from the _map event_ and then, `Cities layer has loaded!` from the _layer event_.
 
 If you were adding more than one layer to your map, you could use a single function to handle all of them. For these cases, **on** and **off** methods are available at the `carto` namespace. For example: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })` would show the message `All layers have loaded` once layer1 and layer2 draw on the map.
 
-There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). 
+There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)).
 
 **Note:**
 It is important to note that the name of this event is **`loaded`**, not `load`.
 
 #### Updated event
-The `updated` event, is useful for cases when a layer's viz changes, for example when you have an [animated visualization](/developers/carto-vl/guides/playing-with-animations).
+The `updated` event, is useful for cases when a layer gets updated. It will be triggered when the map is panned or zoomed, when the source is changed, when the viz changes or when the viz is animated.
 
 If you check your work now, it should look like this:
 <div class="example-map">
@@ -97,8 +97,7 @@ If you check your work now, it should look like this:
 
 You should now open the [map](/developers/carto-vl/examples/maps/guides/interactivity/step-2.html) and explore the _console_ to check the current events.
 
-
-### Using dynamic variables
+### Using variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
@@ -121,7 +120,7 @@ layer.on('updated', displayNumberOfCities);
 **Note:**
 Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible because the expression has no `properties` related to the features themselves.
 
-You can imagine `layer:updated` event as a "kind of" `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
+`layer:updated` will notify you of every change that may result in a change of the variables value.
 
 If you want to reduce the number of current `console.log` entries, to better see the new one, you can remove the previous handler on `map:move` with:
 ```js
@@ -157,7 +156,7 @@ const viz = new carto.Viz(`
 **Note:**
 Both properties, `$name` and `$pop_max` are columns in the original dataset.
 
-As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
+As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You'll need to refer to a specific set of features: the ones clicked or hovered by using [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity) or all the ones that are on the viewport by using viewportFeatures.
 
 
 ### Feature events
@@ -280,7 +279,7 @@ Here it is the full example:
 <head>
     <meta charset="utf-8">
 
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 
@@ -298,11 +297,6 @@ Here it is the full example:
             center: [0, 30],
             zoom: 2
         });
-
-        // Add zoom controls
-        const nav = new mapboxgl.NavigationControl();
-        map.addControl(nav, 'top-left');
-
 
         // MAP EVENTS
         // Wait for the map to render for the first time

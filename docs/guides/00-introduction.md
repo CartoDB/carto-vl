@@ -1,8 +1,8 @@
 ### Introduction
 
-Welcome to the CARTO VL guides! This documentation is meant to lead you from the basics of creating a map to advanced techniques for developing powerful interactive visualizations. 
+Welcome to the CARTO VL guides! This documentation is meant to lead you from the basics of creating a map to advanced techniques for developing powerful interactive visualizations.
 
-If there is any word or term you do not understand while reading the guides, please take a look to our [Glossary](https://carto.com/help/glossary).
+If there is any word or term you do not understand while reading the guides, please take a look to our [CARTO VL Glossary] (/developers/carto-vl/guides/Glossary/) or, if it is not just related to CARTO VL, to our [CARTO Glossary](https://carto.com/help/glossary).
 
 ### What is CARTO VL?
 
