@@ -8,7 +8,7 @@ By the end of this guide, you will be able to create this CARTO VL map:
 <div class="example-map">
     <iframe
         id="guides-sources-step-final"
-        src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/add-data-sources/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -80,7 +80,7 @@ The result should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-step-1"
-        src="/developers/carto-vl/examples/maps/guides/sources/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/add-data-sources/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -174,7 +174,7 @@ Now the map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-step-2"
-        src="/developers/carto-vl/examples/maps/guides/sources/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/add-data-sources/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -231,14 +231,14 @@ Congrats! You have finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-sources-step-3"
-        src="/developers/carto-vl/examples/maps/guides/sources/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/add-data-sources/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/add-data-sources/step-3.html)
 
 
 This is the complete code:

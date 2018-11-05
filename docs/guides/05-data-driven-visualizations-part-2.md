@@ -22,8 +22,8 @@ Let's see all these options in actions!
 
 <div class="example-map">
     <iframe
-        id="population-density-colors"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-colors.html"
+        id="guides-data-driven-2-step-1"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/population-density-colors.html"
         width="100%"
         height="1000"
         style="margin: 20px auto !important"
@@ -39,8 +39,8 @@ When dealing with point data, an interesting visualization is the bubble-map. In
 Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections we'll see both approaches, learning how to create bubble maps like this:
 <div class="example-map">
     <iframe
-        id="accidents-bubblemap"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-bubblemap.html"
+        id="guides-data-driven-2-step-2"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/accidents-bubblemap.html"
         width="100%"
         height="900"
         style="margin: 20px auto !important"
@@ -96,7 +96,7 @@ The last supported type of value for `ramp` is the `Image` type. Let's see some 
 
 <div class="example-map">
     <iframe
-        id="image-multiple"
+        id="guides-data-driven-2-step-3"
         src="/developers/carto-vl/examples/maps/styling/image-multiple.html"
         width="100%"
         height="500"

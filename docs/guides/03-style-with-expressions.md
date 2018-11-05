@@ -9,7 +9,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 <div class="example-map">
     <iframe
         id="geometry-types"
-        src="/developers/carto-vl/examples/maps/guides/expressions/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/style-with-expressions/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -68,8 +68,8 @@ There are multiple ways to get color expressions (expressions whose type is `col
 
 <div class="example-map">
     <iframe
-        id="color-spaces"
-        src="/developers/carto-vl/examples/maps/styling/color-spaces.html"
+        id="guides-expressions-step-2"
+        src="/developers/carto-vl/examples/maps/guides/style-with-expressions/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -107,8 +107,8 @@ The map below demonstrates how to access and modify the `color` property:
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/expressions/step-2.html"
+        id="guides-expressions-step-3"
+        src="/developers/carto-vl/examples/maps/guides/style-with-expressions/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

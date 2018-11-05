@@ -31,8 +31,8 @@ Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) 
 After you explore each one independently, you will bring them together to create a map like this one (go ahead, zoom in and out!):
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-8"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-8.html"
+        id="guides-zoom-based-style-step-8"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -58,6 +58,7 @@ To get started, copy and paste the code below into your favorite text editor and
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <style>
+        <!-- Zoom level indicator style -->
         #js-zoom {
             position: absolute;
             bottom: 0;
@@ -71,14 +72,14 @@ To get started, copy and paste the code below into your favorite text editor and
 </head>
 
 <body>
-    <!-- Add map container -->
+
     <div id="map"></div>
 
-    <!-- Zoom level indicator -->
+    <!-- Zoom level indicator container -->
     <div id="js-zoom"></div>
 
     <script>
-        // Add basemap and set properties
+       
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
@@ -86,11 +87,10 @@ To get started, copy and paste the code below into your favorite text editor and
             zoom: 11
         });
 
-        // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
-        // Zoom level
+        // Zoom level indicator
         function updateZoom() {
             const zoom = map.getZoom().toFixed(2);
             document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
@@ -98,15 +98,11 @@ To get started, copy and paste the code below into your favorite text editor and
         map.on('load', updateZoom);
         map.on('move', updateZoom);
 
-        //** CARTO VL functionality begins here **//
-
-        // Define user
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Define source
         const source = new carto.source.Dataset('vancouver_trees');
 
         // Define Viz object and custom style
@@ -115,10 +111,8 @@ To get started, copy and paste the code below into your favorite text editor and
             strokeColor: green
         `);
 
-        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
 
-        // Add map layer
         layer.addTo(map, 'watername_ocean');
     </script>
 </body>
@@ -134,8 +128,8 @@ As you can see on the map, there are a lot of trees in Vancouver!
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-1"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-1.html"
+        id="guides-zoom-based-style-step-1"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -158,8 +152,8 @@ With these adjustments, the distribution of trees around the city is clearer:
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-2"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-2.html"
+        id="guides-zoom-based-style-step-2"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -185,8 +179,8 @@ In the resulting map, as you zoom in and out, you'll notice that the `1` point s
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-3"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-3.html"
+        id="guides-zoom-based-style-step-3"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -215,8 +209,8 @@ This sets the width of symbols to `1` at zoom levels less than or equal to `12` 
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-4"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-4.html"
+        id="guides-zoom-based-style-step-4"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -245,8 +239,8 @@ At zooms less than `12` the point color is `white` and the stroke color is `gree
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-5"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-5.html"
+        id="guides-zoom-based-style-step-5"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -291,8 +285,8 @@ As you zoom in and out of the resulting map, you will notice that the colors (pu
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-6"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-6.html"
+        id="guides-zoom-based-style-step-6"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -313,8 +307,8 @@ With this filter, all points will draw when both criteria are met. This means th
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-7"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-7.html"
+        id="guides-zoom-based-style-step-7"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -335,8 +329,8 @@ Take a look at the map, zoom in and out to see the changes in the styling and vi
 
 <div class="example-map">
     <iframe
-        id="guides-zoom-based-styling-step-8"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-8.html"
+        id="guides-zoom-based-style-step-8"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-8.html"
         width="100%"
         height="500"
         frameBorder="0">

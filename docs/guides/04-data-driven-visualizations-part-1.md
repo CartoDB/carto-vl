@@ -29,8 +29,8 @@ color: ramp($population_density, [midnightblue, gold])
 
 <div class="example-map">
     <iframe
-        id="population-density-unclassed"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-1.html"
+        id="guides-data-driven-1-step-1"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -65,8 +65,8 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-2.html"
+        id="guides-data-driven-1-step-2"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -101,8 +101,8 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
 
 <div class="example-map">
     <iframe
-        id="explicit-ranges"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-3.html"
+        id="guides-data-driven-1-step-3"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -141,8 +141,8 @@ Do you see how `viewport*` classifiers are dynamic and change the results accord
 
 <div class="example-map">
     <iframe
-        id="population-density-classified"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-4.html"
+        id="guides-data-driven-1-step-4"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -161,8 +161,8 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 
 <div class="example-map">
     <iframe
-        id="population-density-buckets-numeric"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-5.html"
+        id="guides-data-driven-1-step-5"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -200,8 +200,8 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue
 ```
 <div class="example-map">
     <iframe
-        id="election-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-6.html"
+        id="guides-data-driven-1-step-6"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -223,8 +223,8 @@ ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], or
 ```
 <div class="example-map">
     <iframe
-        id="election-others-bucket"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-7.html"
+        id="guides-data-driven-1-step-7"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -244,8 +244,8 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 
 <div class="example-map">
     <iframe
-        id="accidents-top"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-8.html"
+        id="guides-data-driven-1-step-8"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -265,8 +265,8 @@ color: ramp($weather,[darkorange,darkviolet,darkturquoise]
 
 <div class="example-map">
     <iframe
-        id="accidents-all"
-        src="/developers/carto-vl/examples/maps/guides/ramp/step-9.html"
+        id="guides-data-driven-1-step-9"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-9.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

@@ -10,8 +10,8 @@ If you completed the XXX guide, the map below will look familiar. In that guide,
 
 <div class="example-map">
     <iframe
-        id="legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-3.html"
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -26,8 +26,8 @@ The map below is the same one as above, a category map that symbolizes US rail a
 
 <div class="example-map">
     <iframe
-        id="legend-step-1"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-1.html"
+        id="guides-legend-step-1"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -47,11 +47,8 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     <title>Rail accident weather | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
     <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
     <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -71,7 +68,6 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     
     <script>
 
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
@@ -100,6 +96,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     </script>
 
 </body>
+
 </html>
 ```
 
@@ -162,8 +159,8 @@ That's because we have to define a place for the last step of the process (`docu
 
 <div class="example-map">
     <iframe
-        id="legend-step-2"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-2.html"
+        id="guides-legend-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -193,8 +190,8 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map">
     <iframe
-        id="legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-3.html"
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -209,8 +206,8 @@ For example, the map below symbolizes only the `top` three weather conditions in
 
 <div class="example-map">
     <iframe
-        id="legend-step-4"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-4.html"
+        id="guides-legend-step-4"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -221,7 +218,6 @@ For example, the map below symbolizes only the `top` three weather conditions in
 You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()`:
 
 ```js
-// Style for legend items based on geometry type
 colorLegendList +=
     `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
 ```
@@ -231,7 +227,7 @@ With that change, the final map will now label other categories as "Other weathe
 <div class="example-map">
     <iframe
         id="accidents-all-top-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/step-5.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

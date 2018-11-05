@@ -45,7 +45,7 @@ You can see all together on this example:
 <div class="example-map">
     <iframe
         id="accidents-widgets"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-widgets.html"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-widgets.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -119,7 +119,7 @@ Let's see the full example!
 <div class="example-map">
     <iframe
         id="accidents-numeric-histogram"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-numeric-histogram.html"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-numeric-histogram.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -171,7 +171,7 @@ function drawHistogram() {
 <div class="example-map">
     <iframe
         id="accidents-category-histogram"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-category-histogram.html"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-category-histogram.html"
         width="100%"
         height="800"
         style="margin: 20px auto !important"
