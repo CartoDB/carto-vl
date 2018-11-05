@@ -1,6 +1,6 @@
 ## Data-driven visualizations (part 2): Ramp values
 
-In the previous section we talked about using different types of input for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
+In the previous section we talked about using different types of inputs for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
 
 ### Color values
 

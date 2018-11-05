@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Add layer | CARTO</title>
+    <title>Color values | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
@@ -70,7 +70,7 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [60,19],
+            center: [60, 19],
             zoom: 2,
         });
 
@@ -90,7 +90,6 @@
         layer.addTo(map, 'watername_ocean');
 
         layer.on('updated', () => {
-            // Get the legend
             if (!layer.viz.color.getLegendData) {
                 return;
             }
@@ -106,7 +105,6 @@
                 colorLegendList +=
                     `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
             });
-            // Update the information
             document.getElementById('content').innerHTML = colorLegendList;
             document.getElementById('content-title').innerHTML = `Legend of ${colorLegend.name}`;
         });
