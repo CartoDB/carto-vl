@@ -8,14 +8,14 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/viz-properties/geom-types.html"
+        id="geometry-types"
+        src="/developers/carto-vl/examples/maps/guides/expressions/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
- <a href="/developers/carto-vl/examples/#example-geometry-types">View my source code!</a>
 
  The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
@@ -68,14 +68,14 @@ There are multiple ways to get color expressions (expressions whose type is `col
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
+        id="color-spaces"
         src="/developers/carto-vl/examples/maps/styling/color-spaces.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-color-spaces">View my source code!</a>
 
 You can take a look at the [reference](/developers/carto-vl/reference/) for a detailed description of all color expressions.
 
@@ -108,13 +108,13 @@ The map below demonstrates how to access and modify the `color` property:
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/viz-properties/accessing-viz-properties.html"
+        src="/developers/carto-vl/examples/maps/guides/expressions/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-color-spaces">View my source code!</a>
 
 ### The String and JavaScript Visualization APIs
 

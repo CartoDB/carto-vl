@@ -44,23 +44,104 @@ After you explore each one independently, you will bring them together to create
 ### Getting started
 To get started, copy and paste the code below into your favorite text editor and save it to a file `vancouver-trees.html`.
 
-<div class="example-map">
-    <iframe
-        id="zoom-based-styling-get-started"
-        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/zoom-based-get-started.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-<a href="/developers/carto-vl/examples#example-zoom-based---get-started">Copy my source code!</a>
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style>
+        #js-zoom {
+            position: absolute;
+            bottom: 0;
+            padding: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            color: rgba(0, 0, 0, 0.75);
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Add map container -->
+    <div id="map"></div>
+
+    <!-- Zoom level indicator -->
+    <div id="js-zoom"></div>
+
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-123.098599, 49.240685],
+            zoom: 11
+        });
+
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        // Zoom level
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+        }
+        map.on('load', updateZoom);
+        map.on('move', updateZoom);
+
+        //** CARTO VL functionality begins here **//
+
+        // Define user
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const source = new carto.source.Dataset('vancouver_trees');
+
+        // Define Viz object and custom style
+        const viz = new carto.Viz(`
+            color: white
+            strokeColor: green
+        `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add map layer
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>
+```
 
 **Note:**
 Notice how there is a little zoom level indicator, in the bottom-left hand corner. There is an `updateZoom` function in the JavaScript code that updates its content once the maps loads and every time it is moved.
 
 ### Adjust symbol size
 As you can see on the map, there are a lot of trees in Vancouver!
+
+<div class="example-map">
+    <iframe
+        id="guides-zoom-based-styling-step-1"
+        src="/developers/carto-vl/examples/maps/guides/zoom-based-styling/step-1.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
 
 To better visualize the high density of information, override the default point `width` and set it to `1` and set the `strokeWidth` to `0.5`:
 

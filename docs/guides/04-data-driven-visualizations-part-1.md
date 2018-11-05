@@ -30,13 +30,13 @@ color: ramp($population_density, [midnightblue, gold])
 <div class="example-map">
     <iframe
         id="population-density-unclassed"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-unclassed.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-1.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-population-density---unclassed">View my source code!</a>
 
 To see more variation in the data, you can even set intermediate colors in the color list for example, here we are adding an intermediate color, `deeppink`:
 
@@ -66,13 +66,13 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 <div class="example-map">
     <iframe
         id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-basic.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-2.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-population-density---basic">View my source code!</a>
 
 #### Explicit ranges
 
@@ -101,14 +101,13 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
 
 <div class="example-map">
     <iframe
-        id="population-density-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-outliers.html"
+        id="explicit-ranges"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-3.html"
         width="100%"
-        height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-population-density---outliers">View my source code!</a>
 
 #### Classed numeric data
 
@@ -142,13 +141,13 @@ Do you see how `viewport*` classifiers are dynamic and change the results accord
 <div class="example-map">
     <iframe
         id="population-density-classified"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-classified.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-4.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-population-density---classified">View my source code!</a>
 
 You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10,features that have a price between 10 and 200, and features that have a price higher than 200. 
 
@@ -162,13 +161,13 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 <div class="example-map">
     <iframe
         id="population-density-buckets-numeric"
-        src="/developers/carto-vl/examples/maps/guides/ramp/population-density-buckets.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-5.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-population-density---buckets">View my source code!</a>
 
 **Note:**
 **`filter:`** is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
@@ -201,13 +200,13 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue
 <div class="example-map">
     <iframe
         id="election-basic"
-        src="/developers/carto-vl/examples/maps/guides/ramp/election-basic.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-6.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-election---basic">View my source code!</a>
 
 #### Other categories
 
@@ -224,13 +223,13 @@ ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], or
 <div class="example-map">
     <iframe
         id="election-others-bucket"
-        src="/developers/carto-vl/examples/maps/guides/ramp/election-others-bucket.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-7.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-election---others-bucket">View my source code!</a>
 
 #### Color most common categories
 
@@ -245,13 +244,13 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 <div class="example-map">
     <iframe
         id="accidents-top"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-top.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-8.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---top-expression">View my source code!</a>
 
 #### Color all categories
 
@@ -266,13 +265,13 @@ color: ramp($weather,[darkorange,darkviolet,darkturquoise]
 <div class="example-map">
     <iframe
         id="accidents-all"
-        src="/developers/carto-vl/examples/maps/guides/ramp/accidents-all.html"
+        src="/developers/carto-vl/examples/maps/guides/ramp/step-9.html"
         width="100%"
         height="500"
+        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---all-types">View my source code!</a>
 
 As mentioned above, this is a useful method for exploring data and/or if there are fewer categories in your dataset. If you have a dataset with over 11 categories, we recommend using `buckets` or `top` since it is difficult for the human eye to distinguish between so many different colors.
 
