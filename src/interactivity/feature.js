@@ -147,6 +147,6 @@ export default class Feature {
     }
 
     getCentroid () {
-        return this._rawFeature_dataframe.getCentroid(this._rawFeature._index);
+        return this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
     }
 }
