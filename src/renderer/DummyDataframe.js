@@ -22,6 +22,5 @@ export default class DummyDataframe {
         this.t2 = [0.1, 0.1, 0.1, 0.1];
         this.t3 = [0.1, 0.1, 0.1, 0.1];
         this.t4 = [0.1, 0.1, 0.1, 0.1];
-        // debugger;
     }
 }

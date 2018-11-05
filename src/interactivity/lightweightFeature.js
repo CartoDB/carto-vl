@@ -1,6 +1,5 @@
 import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
-import { WM_R } from '../utils/util';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 /**
@@ -17,14 +16,6 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
         }
-        getCentroid () {
-            const dataframe = this._rawFeature._dataframe;
-            const centroid = { ...dataframe._centroids[this._rawFeature._index] };
-            centroid.x = centroid.x * dataframe.scale + dataframe.center.x;
-            centroid.y = centroid.y * dataframe.scale + dataframe.center.y;
-            const g = unprojectFromWebMercator(centroid);
-            return [g.lng, g.lat];
-        }
     };
 
     _defineIdProperty(cls.prototype, renderLayer);
@@ -33,17 +24,9 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineFeatureProperties(cls.prototype, propertyNames);
     _defineRootBlendToMethod(cls.prototype);
     _defineRootResetMethod(cls.prototype);
+    _defineGetCentroidMethod(cls.prototype);
 
     return cls;
-}
-
-function unprojectFromWebMercator ({ x, y }) {
-    const DEG2RAD = Math.PI / 180;
-    const EARTH_RADIUS = 6378137;
-    return {
-        lng: x * WM_R / EARTH_RADIUS / DEG2RAD,
-        lat: (Math.atan(Math.pow(Math.E, y * WM_R / EARTH_RADIUS)) - Math.PI / 4) * 2 / DEG2RAD
-    };
 }
 
 function _defineIdProperty (targetObject, renderLayer) {
@@ -151,6 +134,17 @@ function _defineRootResetMethod (targetObject) {
                 }
             };
             return reset;
+        }
+    });
+}
+
+function _defineGetCentroidMethod (targetObject) {
+    Object.defineProperty(targetObject, 'getCentroid', {
+        get: function () {
+            const getCentroid = () => {
+                return this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
+            };
+            return getCentroid;
         }
     });
 }

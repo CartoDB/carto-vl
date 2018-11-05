@@ -2,6 +2,8 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
+import { WM_R } from '../utils/util';
+
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -112,6 +114,14 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
+    getCentroid (featureIndex) {
+        const centroid = { ...this._centroids[featureIndex] };
+        centroid.x = centroid.x * this.scale + this.center.x;
+        centroid.y = centroid.y * this.scale + this.center.y;
+        const g = this._unprojectFromWebMercator(centroid);
+        return [g.lng, g.lat];
+    }
+
     getPropertyTexture (propertyName) {
         if (this.propertyTex[propertyName]) {
             return this.propertyTex[propertyName];
@@ -196,6 +206,15 @@ export default class Dataframe extends DummyDataframe {
         }
 
         return aabbResult === AABBTestResults.INSIDE;
+    }
+
+    _unprojectFromWebMercator ({ x, y }) {
+        const DEG2RAD = Math.PI / 180;
+        const EARTH_RADIUS = 6378137;
+        return {
+            lng: x * WM_R / EARTH_RADIUS / DEG2RAD,
+            lat: (Math.atan(Math.pow(Math.E, y * WM_R / EARTH_RADIUS)) - Math.PI / 4) * 2 / DEG2RAD
+        };
     }
 
     _compareAABBs (featureAABB) {
