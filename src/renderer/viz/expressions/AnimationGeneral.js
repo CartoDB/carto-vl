@@ -1,10 +1,10 @@
 import BaseExpression from './base';
-import { Fade } from './Fade';
-import { implicitCast, clamp, checkType, checkFeatureIndependent, checkMaxArguments } from './utils';
-import { number, linear, globalMin, globalMax } from '../expressions';
 import Property from './basic/property';
 import { castDate } from '../../../utils/util';
 import ClusterTime from './aggregation/cluster/ClusterTime';
+import { linear, globalMin, globalMax, number } from '../expressions';
+import { checkType, checkFeatureIndependent, clamp, checkMaxArguments, implicitCast } from './utils';
+import { Fade } from './Fade';
 
 let waitingForLayer = new Set();
 let waitingForOthers = new Set();
@@ -12,21 +12,30 @@ let waitingForOthers = new Set();
 export default class AnimationGeneral extends BaseExpression {
     constructor (input, duration = 10, fade = new Fade()) {
         checkMaxArguments(arguments, 3, 'animation');
-
         duration = implicitCast(duration);
         input = implicitCast(input);
+        super({ input, duration, fade });
+        this._init();
+    }
+    _init () {
+        const input = this.input;
         const originalInput = input;
 
         if (input.isA(Property) || (input.isA(ClusterTime) && input.type === 'timerange')) {
-            input = linear(input, globalMin(input), globalMax(input), 'start');
+            this._input = linear(input, globalMin(input), globalMax(input), 'start');
+        } else {
+            this._input = this.input;
         }
+        this.childrenNames = this.childrenNames.filter(x => x === '_input');
+        this.childrenNames.push('_input');
+        this.childrenNames.push('fade');
+        this.childrenNames.push('duration');
 
-        const progress = number(0);
-        super({ _input: input, progress, fade, duration });
-        // TODO improve type check
         this.type = 'number';
         this._originalInput = originalInput;
         this._paused = false;
+        this.progress = number(0);
+        this.childrenNames.push('progress');
 
         this.expressionName = 'animation';
 
@@ -48,8 +57,19 @@ export default class AnimationGeneral extends BaseExpression {
         #endif
     `;
 
-        this.inlineMaker = inline =>
-            `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
+        this.inlineMaker = inline => `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
+    }
+    _bindMetadata (metadata) {
+        this._input._bindMetadata(metadata);
+        this.progress._bindMetadata(metadata);
+        this.fade._bindMetadata(metadata);
+        this.duration._bindMetadata(metadata);
+
+        checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
+        checkType('animation', 'duration', 1, 'number', this.duration);
+
+        checkType('animation', 'fade', 2, 'fade', this.fade);
+        checkFeatureIndependent('animation', 'duration', 1, this.duration);
     }
 
     isAnimated () {
@@ -156,7 +176,7 @@ export default class AnimationGeneral extends BaseExpression {
      * @api
      */
     getProgressValue () {
-        const progress = this.progress.eval(); // from 0 to 1
+        const progress = this.progress.eval();
         return this._input.converse(progress);
     }
 
@@ -248,19 +268,5 @@ export default class AnimationGeneral extends BaseExpression {
     stop () {
         this.progress.expr = 0;
         this._paused = true;
-    }
-
-    _bindMetadata (meta) {
-        this._originalInput._bindMetadata(meta);
-        this.duration._bindMetadata(meta);
-
-        checkType('animation', 'input', 0, ['number', 'date', 'timerange'], this._originalInput);
-        checkType('animation', 'duration', 1, 'number', this.duration);
-
-        super._bindMetadata(meta);
-
-        checkType('animation', 'input', 0, 'number', this._input);
-        checkType('animation', 'fade', 2, 'fade', this.fade);
-        checkFeatureIndependent('animation', 'duration', 1, this.duration);
     }
 }

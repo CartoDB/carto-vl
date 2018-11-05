@@ -417,7 +417,9 @@ export default class Layer {
             this._needRefresh();
         }
 
-        this._fire('updated');
+        if (this._state !== states.INIT) {
+            this._fire('updated');
+        }
     }
 
     _paintLayer () {

@@ -1,22 +1,40 @@
 import BaseExpression from './base';
 import { Fade } from './Fade';
-import { linear, globalMin, globalMax, HOLD, and } from '../expressions';
+import { linear, globalMin, globalMax, HOLD, mul } from '../expressions';
 import AnimationGeneral from './AnimationGeneral';
 
 export default class AnimationRange extends BaseExpression {
-    constructor (input, duration = 10, fade = new Fade()) {
+    _init () {
+        const input = this.input;
+        const duration = this.duration;
+        const fade = this.fade;
+
         const start = linear(input, globalMin(input), globalMax(input), 'start');
-        const end = linear(input, globalMin(input), globalMax(input), 'end');
+
+        const input2 = {};
+        Object.keys(input).forEach(key => { input2[key] = input[key]; });
+
+        Object.setPrototypeOf(input2, input);
+
+        const end = linear(input2, globalMin(input2), globalMax(input2), 'end');
         const startAnim = new AnimationGeneral(start, duration, new Fade(fade.fadeIn, HOLD));
         const endAnim = new AnimationGeneral(end, duration, new Fade(HOLD, fade.fadeOut));
-        const combinedAnimation = and(startAnim, endAnim);
-        super({ combinedAnimation });
+        const combinedAnimation = mul(startAnim, endAnim);
+
+        this.combinedAnimation = combinedAnimation;
+        this.childrenNames.push('combinedAnimation');
+        combinedAnimation.parent = this;
+
         this.type = 'number';
+
         this._startAnim = startAnim;
         this._endAnim = endAnim;
-        this.input = input;
+
         this.expressionName = 'animation';
         this.inlineMaker = inline => inline.combinedAnimation;
+    }
+    _bindMetadata (metadata) {
+        this.combinedAnimation._bindMetadata(metadata);
     }
 
     eval (feature) {
@@ -29,11 +47,6 @@ export default class AnimationRange extends BaseExpression {
 
     getProgressValue () {
         return this._startAnim.getProgressValue();
-    }
-
-    setTimestamp (timestamp) {
-        this._startAnim.setTimestamp(timestamp);
-        this._endAnim.setTimestamp(timestamp);
     }
 
     getProgressPct () {

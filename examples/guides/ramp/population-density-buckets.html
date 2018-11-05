@@ -8,9 +8,9 @@
     <!-- Include CARTO VL JS -->
     <script src="../../../dist/carto-vl.js"></script>
     <!-- Include Mapbox GL JS -->
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
     <!-- Include Mapbox GL CSS -->
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -19,31 +19,16 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Classification Methods</h1>
+                <h1>Manual Classification</h1>
             </header>
             <section>
-                <p class="description open-sans">Click on a style</p>
+                <p class="description open-sans">Use buckets to set custom breaks</p>
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])')"
                                 id="viz1" checked>
-                            <label for="viz1">Style 1: Quantiles Global</label>
-                        </li>
-                        <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz2">
-                            <label for="viz2">Style 2: Equal Intervals Global</label>
-                        </li>
-                        <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz3">
-                            <label for="viz3">Style 3: Quantiles Viewport</label>
-                        </li>
-                        <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz4">
-                            <label for="viz4">Style 4: Equal Interval Viewport</label>
+                            <label for="viz1">Style 1: Manual Breaks</label>
                         </li>
                     </ul>
                     <div id="info"></div>
@@ -71,7 +56,7 @@
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
             width: 2
-            color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
+            color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
@@ -80,7 +65,7 @@
 
         layer.on('updated', () => {
             // Get the legend
-            if (!layer.viz.color.getLegendData) {
+            if (!layer.viz.color.getLegendData){
                 return;
             }
 
