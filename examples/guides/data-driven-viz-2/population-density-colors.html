@@ -29,31 +29,27 @@
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')"
                                 id="viz1" checked>
                             <label for="viz1">
-                                <h2>ramp($dn, [green, yellow, red])</h2>
-                                <p class="description open-sans"> Take colors from a color list. Since the input is an unclassified numeric property, interpolation of the colors values will be performed.</p>
+                                <h2>Style 1</h2>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')" id="viz2">
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
+                                id="viz2">
                             <label for="viz2">
-                                <h2>ramp($dn, temps)</h2>
-                                <p class="description open-sans"> Use the "temps" CARTOColors palette.</p>
+                                <h2>Style 2</h2>
                             </label>
                         </li>
                         <li>
                             <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])')"
                                 id="viz3">
                             <label for="viz3">
-                                <h2>'ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])'</h2>
-                                <p class="description open-sans">Take colors from a color list with HSV color constructors.</p>
+                                <h2>Style 3</h2>
                             </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
-                                id="viz4">
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')" id="viz4">
                             <label for="viz4">
-                                <h2>'ramp($dn, [transparent, gray, yellow])'</h2>
-                                <p class="description open-sans">The same as the first example, but showing that `ramp` supports transparency too.</p>
+                                <h2>Style 4</h2>
                             </label>
                         </li>
                     </ul>
