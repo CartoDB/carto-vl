@@ -2,7 +2,7 @@
 
 Welcome to the CARTO VL guides! 
 
-Here you will find a series of guides that are meant to lead you from the basics of creating a map to more advanced techniques for developing powerful interactive visualizations with CARTO VL.
+Here you will find a series of guides that are meant to lead you from the basics of creating a map to more advanced techniques for developing powerful, interactive visualizations with CARTO VL.
 
 Below are short descriptions for each guide to help you get started:
 
@@ -10,11 +10,11 @@ Below are short descriptions for each guide to help you get started:
 * **Add data sources**: gain a better understanding of what data sources CARTO VL supports, how to add them to your map, and when to choose one source type or another.
 * **Style with expressions**: learn about the foundational pieces of styling properties in CARTO VL, the use of expressions and the visualization API. 
 * **Data-driven visualizations (part 1)**: get introduced to the `ramp` expression and explore its use to match inputs to values over a variety of data properties.
-* **Data-driven visualizations (part 2)**: build upon the use of `ramp` (from Data-driven visualizations part 1) to explore its use for a wider variety of map types. 
+* **Data-driven visualizations (part 2)**: build upon the use of `ramp` and explore its use for a wider variety of map types. 
 * **Spatial aggregations**:
 * **Zoom-based styles**:
 * **Animated visualizations**:
-* **Add interactivity and events**:
+* **Add interactivity and events**: learn how to add user interactions to make your visualization more dynamic and provide a richer experience for the end-user. 
 * **Add legends**:
 * **Add widgets**:
 

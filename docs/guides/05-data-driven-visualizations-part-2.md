@@ -48,7 +48,7 @@ color: ramp($dn, temps)
 <div class="example-map">
     <iframe
         id="guides-data-driven-2-step-1"
-        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/population-density-colors.html"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
