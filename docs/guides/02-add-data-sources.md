@@ -1,4 +1,4 @@
-## Using Data Sources
+## Add Data Sources
 In this guide you will learn how to use different data sources in your CARTO VL layers. After finishing this guide, you will be able to use different type of sources, and know which type is best for you.
 
 This guide assumes that you have previously gone through the [Getting Started Guide](/developers/carto-vl/guides/getting-started) and know how to make a basic map.
