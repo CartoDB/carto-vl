@@ -24,12 +24,12 @@ The most straight-forward way to use CARTO VL is to include the required files f
   <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
 
   <!-- Include Mapbox GL from the Mapbox CDN-->
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
 </head>
 ```
 **Note:**
-CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
+CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
 
 #### Add map container
 
@@ -55,7 +55,7 @@ Once you have a `div` for your map, you have to use the [`mapboxgl.Map`](https:/
 
 - **`container`** [element ID](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) to indicate where the map is going to be placed
 - **`style`** sets the basemap style to use
-- **`center`** sets the opening extent of the map
+- **`center`** sets the opening center coordinates of the map
 - **`zoom`** sets the default zoom level of the map
 
 ```js
@@ -73,7 +73,7 @@ For the basemap `style` parameter, you can add either [Mapbox custom styles](htt
 - **Positron:** `carto.basemaps.positron` [positron-gl-style](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
 - **Dark Matter:** `carto.basemaps.darkmatter` [dark-matter-gl-style](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
 
-At this point you will have a basic map with Voyager as the base, that opens at zoom level 2 and centered on the world:
+At this point you will have a basic map with *Voyager* as the base, that opens at zoom level 2 and centered on the world:
 
 <div class="example-map">
     <iframe
@@ -101,7 +101,7 @@ carto.setDefaultAuth({
 
 ### Create source
 
-The next step is to define the [`source`](/developers/carto-vl/guides/add-data-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
+The next step is to define the [`source`](/developers/carto-vl/guides/add-data-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the most populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
 
 ```js
 const source = new carto.source.Dataset('populated_places');
@@ -162,17 +162,13 @@ For more information about styling, check out the guide [Style with Expressions]
 ```html
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
-
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
-
 <body>
     <!-- Add map container -->
     <div id="map"></div>
@@ -209,6 +205,5 @@ For more information about styling, check out the guide [Style with Expressions]
         layer.addTo(map);
     </script>
 </body>
-
 </html>
 ```
