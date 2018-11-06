@@ -64,7 +64,6 @@
         layer.addTo(map, 'watername_ocean');
 
         layer.on('updated', () => {
-            // Get the legend
             if (!layer.viz.color.getLegendData) {
                 return;
             }
@@ -81,7 +80,6 @@
                 colorLegendList +=
                     `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
             });
-            // Update the information
             document.getElementById('content').innerHTML = colorLegendList;
         });
 
