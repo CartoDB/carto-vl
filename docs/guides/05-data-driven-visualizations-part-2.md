@@ -1,16 +1,18 @@
 ## Data-driven visualizations (part 2)
 
-In the [previous guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/) we talked about using different types of inputs for `ramp`, but we always output colors picked from a list. `ramp` supports the use of other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
+In the [previous guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/) we talked about using different types of inputs for `ramp` that were output to colors picked from a list. In this guide, you will see how `ramp` supports the use of other types of outputs (like numbers and images) as well as CARTO VL's fixed constant palettes of colors.
 
 ### Color values
 
-One way to output colors is to specify a list of colors, as demonstrated in [Part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) with expressions like `ramp($dn, [blue, red])`. In those examples, you mainly saw the usage of named colors (`blue`, `red`, `green`). With CARTO VL any valid color expression (not just named colors) can be used:
+One way to output colors is to specify a list of colors, as demonstrated in [Part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) with expressions like `ramp($dn, [blue, red])`. In those examples, you mainly saw the usage of named colors (`blue`, `red`, `green`). 
+
+With CARTO VL any valid color expression (not just named colors) can be used:
 
 - `ramp($dn, [rgb(200,220,222), rgba(200,120,22, 0.8)])`
 - `ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)]`
 - `ramp($dn, [#00F, #F00])`
 - `ramp($dn, [blue, #F00])`
-- `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6),])`
+- `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6)])`
 
 Another way to specify colors is to use built-in color schemes. CARTO VL, by default, supports the use of both [CARTOColors](https://carto.com/carto-colors/) and [ColorBrewer](http://colorbrewer2.org) schemes.
 
@@ -55,6 +57,7 @@ color: ramp($dn, temps)
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-1.html)
 
 ### Numeric values
 
@@ -91,6 +94,7 @@ width: ramp(globalEqIntervals($total_damage, 3), [1, 25])
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-2.html)
 
 #### The `ramp` way
 
@@ -114,9 +118,8 @@ Using `ramp($number, [0, 50])` works, and it probably works as expected. If `$nu
 
 However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. Basic geometry tells us that the area of a circle is proportional to the square of its radius.
 
-If we don't want to accentuate differences we'll need to take the square root. This can be done with:
+If you don't want to accentuate differences you can take the square root of the output values to specify the widths and not the areas:
 ```CARTO_VL_Viz
-// We'll need to take the square of the output values to specify the widths and not the areas
 width: sqrt(ramp($number, [0, 50^2]))
 ```
 Similarly, classifiers can be re-mapped in the same way:
@@ -130,9 +133,9 @@ width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 
 For this case, using regular math is probably simpler and easier, while having the same, correct, results.
 
-For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])` is equivalent to `width: sqrt($number/globalMax($number))*50`. And since sometimes we don't want to normalize by the maximum value in the dataset, this could be reduced further to get `width: sqrt($number)`.
+For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])` is equivalent to `width: sqrt($number/globalMax($number))*50`. And since sometimes we don't want to normalize by the maximum value in the dataset, this could be reduced further to `width: sqrt($number)`.
 
-### Images values
+### Image values
 
 The last supported type of value for `ramp` is the `image` type.
 
@@ -174,4 +177,4 @@ width: 20
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-4.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-4.html)
