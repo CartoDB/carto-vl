@@ -44,15 +44,14 @@ You can see all together on this example:
 
 <div class="example-map">
     <iframe
-        id="accidents-widgets"
-        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-widgets.html"
+        id="guides-widgets-step-1"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---widgets">View my source code!</a>
 
 ### Histograms: distribution of data
 
@@ -118,15 +117,14 @@ Let's see the full example!
 
 <div class="example-map">
     <iframe
-        id="accidents-numeric-histogram"
-        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-numeric-histogram.html"
+        id="guides-widgets-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---numeric-histogram">View my source code!</a>
 
 ##### Categorical histograms: how many votes did each party receive?
 
@@ -170,12 +168,12 @@ function drawHistogram() {
 
 <div class="example-map">
     <iframe
-        id="accidents-category-histogram"
-        src="/developers/carto-vl/examples/maps/guides/add-widgets/accidents-category-histogram.html"
+        id="guides-widgets-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-widgets/step-3.html"
         width="100%"
         height="800"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-railroad-accidents---category-widget">View my source code!</a>
+

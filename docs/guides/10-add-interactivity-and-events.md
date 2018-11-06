@@ -1,7 +1,7 @@
 ## Add interactivity and events
 In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being visualized.
 
-By the end of the guide you will have built a visualization like this one where the color of features change as you mover your mouse over them and display pop-up information when you click on them:
+By the end of the guide you will have built a visualization like this one where the color of features change as you move the mouse over them and display pop-up information when you click on them:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
