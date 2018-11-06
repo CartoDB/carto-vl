@@ -24,26 +24,19 @@
 </head>
 
 <body>
-    <!-- Add map container -->
     <div id="map"></div>
-
-    <!-- Zoom indicator -->
     <div id="js-zoom"></div>
 
     <script>
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
             zoom: 11
         });
-
-        // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
-        // Zoom level
         function updateZoom() {
             const zoom = map.getZoom().toFixed(2);
             document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
@@ -53,27 +46,20 @@
 
         //** CARTO VL functionality begins here **//
 
-        // Define user
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-
-        // Define source
         const source = new carto.source.Dataset('vancouver_trees');
 
-        // Define Viz object and custom style
+        // Define Viz object and custom style using `scaled`
         const viz = new carto.Viz(`
             color: white
             width: scaled(1,11)
             strokeColor: green
             strokeWidth: 0.5
         `);
-
-        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
-
-        // Add map layer
         layer.addTo(map, 'watername_ocean');
     </script>
 </body>
