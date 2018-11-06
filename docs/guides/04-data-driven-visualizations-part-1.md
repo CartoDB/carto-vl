@@ -13,7 +13,7 @@ Throughout this guide, you will explore different ways to use `ramp` to match *i
 The following sections will cover **style by value** for different data properties and map types. For example, by the end of this guide, you will better understand the options available when dealing with something like a transaction dataset and how to style by numeric data like the amount of each payment, or by categorical data like the method of payment (credit card, cash, etc.).
 
 **Note:**
-To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ablitiy to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
+To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ability to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
 ### Numeric properties
 
@@ -47,7 +47,7 @@ color: ramp($population_density, [midnightblue, deeppink, gold])
 
 Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call *implicit casts*.
 
-Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicity cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
+Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicitly cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
 
 ```CARTO_VL_Viz
 // Style 1: this will be implicitly cast to Style 2
@@ -117,7 +117,7 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
 
 Usage of `linear` reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes it easier to detect patterns since it is difficult to perceive small differences in color or size, which can arise when using `linear`.
 
-There are multiple classification methods aviailable in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied using two different samples of data:
+There are multiple classification methods available in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied using two different samples of data:
 - **The entire dataset**. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
@@ -200,7 +200,7 @@ To assign a specific color to a specific category in your data, use the `buckets
 
 Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors.
 
-The map below is a categorical map of election results in the UK. Using a field (`$winner`), regions where the Conseravative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
+The map below is a categorical map of election results in the UK. Using a field (`$winner`), regions where the Conservative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
 
 ```CARTO_VL_Viz
 // Color regions where the conservatives won royalblue and progressives crimson
@@ -224,7 +224,7 @@ In the map above, any region where a party other than Conservative or Labour won
 
 Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to a `others` bucket. Once you use `buckets` any category that isn't explicitly defined, will be sent to this bucket. If you want to display more categories, you can add them to the list and assign them a color.
 
-If you want to overwrite the defualt `others` color (`gray`), you can add a third parameter to `ramp`. In this case, all other parties will be colored `orange`:
+If you want to overwrite the default `others` color (`gray`), you can add a third parameter to `ramp`. In this case, all other parties will be colored `orange`:
 
 ```CARTO_VL_Viz
 // Overwrite the default others color to orange
@@ -244,7 +244,7 @@ ramp(buckets($winner, ["Conservative Party", "Labour Party"], [royalblue,crimson
 
 #### Color most common categories
 
-Another useful function for coloring categorical data is [`top`](/developers/carto-vl/reference/#cartoexpressionstop). `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket.
+Another useful function for coloring categorical data is [`top`](/developers/carto-vl/reference/#cartoexpressionstop). `top` allows you to select a number of most commonly occurring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket.
 
 The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (`darkorange`,`darkviolet`,`darkturquoise`) and all other weather conditions are colored `white` in the *others* bucket:
 
