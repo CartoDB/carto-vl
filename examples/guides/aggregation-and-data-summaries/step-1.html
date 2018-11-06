@@ -3,25 +3,22 @@
 
 <head>
     <meta charset="utf-8">
-
     <script src="../../../dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
     <div id="map"></div>
+
     <script>
-       
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
             zoom: 2
         });
-        
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 

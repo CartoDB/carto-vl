@@ -122,7 +122,7 @@ There are multiple classification methods aviailable in CARTO VL (quantiles, equ
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 
 **Note:**
-Learn more about using `global*` and `viewport*` methods in the [Spatial aggregations guide](/developers/carto-vl/guides/spatial-aggregations/).
+Learn more about using `global*` and `viewport*` methods in the [Aggregation and data summaries guide](/developers/carto-vl/guides/aggregation-and-data-summaries).
 
 Use the map below to see how classification of data varies between these two sample types:
 
