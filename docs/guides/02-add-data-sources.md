@@ -77,6 +77,8 @@ The result should look like this:
         frameBorder="0">
     </iframe>
 </div>
+> View this step [here](/developers/carto-vl/examples/maps/guides/add-data-sources/step-1.html)
+
 
 #### When to use a Dataset source?
 You have a CARTO account, with several custom datasets, and you want to visualize one of them on a map, with all its rows.
@@ -155,6 +157,8 @@ Now the map should look like this:
         frameBorder="0">
     </iframe>
 </div>
+> View this step [here](/developers/carto-vl/examples/maps/guides/add-data-sources/step-2.html)
+
 
 #### When to use a GeoJSON source?
 You already have your data in GeoJSON format, and you don't have access to a CARTO account (if you do have a CARTO account, you should import it to get a better performance and more capabilities, and then use a `Dataset` source). This can also be a useful format for some quick tests, using inline GeoJSON if you are managing just a few rows or a *.geojson* file just next to your *.html*.
