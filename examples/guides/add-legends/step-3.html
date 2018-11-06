@@ -56,17 +56,18 @@
         layer.addTo(map);
 
         //** ADD LEGEND **//
+
+        // A function to convert map colors to HEX values for legend
+        function rgbToHex(color) {
+            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+        }
+
         // When layer loads, trigger legend event
         layer.on('loaded', () => {
 
             // Request data for legend from the layer viz
             const colorLegend = layer.viz.color.getLegendData();
             let colorLegendList = '';
-
-            // A function to convert map colors to HEX values for legend
-            function rgbToHex(color) {
-                return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
-            }
 
             // Create list elements for legend
             colorLegend.data.forEach((legend, index) => {
