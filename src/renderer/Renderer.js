@@ -4,7 +4,14 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-run
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import { parseVizExpression } from './viz/parser';
+
 const INITIAL_TIMESTAMP = Date.now();
+let timestamp = INITIAL_TIMESTAMP;
+requestAnimationFrame(refreshClock);
+function refreshClock () {
+    timestamp = (Date.now() - INITIAL_TIMESTAMP) / 1000.0;
+    requestAnimationFrame(refreshClock);
+}
 
 /**
  * The renderer use fuzzy logic where < 0.5 means false and >= 0.5 means true
@@ -234,7 +241,7 @@ export default class Renderer {
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(textureId).length;
-            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+            vizExpr._setTimestamp(timestamp);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(textureId).forEach((name, i) => {
@@ -358,10 +365,10 @@ export default class Renderer {
                 const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.symbol._setTimestamp(timestamp);
                 viz.symbol._preDraw(renderer.program, drawMetadata, gl);
 
-                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.symbolPlacement._setTimestamp(timestamp);
                 viz.symbolPlacement._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
@@ -393,7 +400,7 @@ export default class Renderer {
                 const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.transform._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+                viz.transform._setTimestamp(timestamp);
                 viz.transform._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
