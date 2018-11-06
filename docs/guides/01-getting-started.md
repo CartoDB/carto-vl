@@ -1,10 +1,6 @@
 ## Getting started
 
-<<<<<<< HEAD
 In this guide, you will learn the basics of visualizing data with CARTO VL on top of a world basemap. There are no previous requirements to complete this guide, but a basic knowledge of HTML, CSS and JavaScript would be helpful.
-=======
-In this guide, you will learn the basics of adding data and visualizing it with CARTO VL on top of a world basemap. There are no previous requirements to complete this guide,but a basic knowledge of HTML, CSS and JavaScript would be helpful. In order to start creating maps, you will need text editor and an internet connection.
->>>>>>> origin/guides-public-copy-edits
 
 After completing this guide, you will have your first CARTO VL map!
 
