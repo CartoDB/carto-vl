@@ -77,7 +77,7 @@ width: sqrt(ramp($total_damage, [0, 50^2]))
 
 width: sqrt($total_damage/globalMax($total_damage))*50)
 
-// Style 4: In this example, the Equal Intervals method allows to detect the outliers quickly.
+// Style 4: The Equal Intervals method allows to detect the outliers quickly.
 
 width: ramp(globalEqIntervals($total_damage, 3), [1, 25])
 ```
