@@ -16,6 +16,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-1.html)
 
 The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
@@ -76,6 +77,7 @@ There are multiple ways to get color expressions (expressions whose type is `col
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-2.html)
 
 You can take a look at the [reference](/developers/carto-vl/reference/) for a detailed description of all color expressions.
 
@@ -115,7 +117,7 @@ The map below demonstrates how to access and modify the `color` property:
         frameBorder="0">
     </iframe>
 </div>
-> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-3.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-3.html)
 
 ### The String and JavaScript Visualization APIs
 
@@ -166,28 +168,29 @@ The use of variables is covered more in-depth in the [Add interactivity and even
 
 In contrast with cascading languages like CSS and CSS-derived languages, CARTO VL styling properties cannot be redefined based on selectors. Instead, CARTO VL expressions like `ramp` are used to select the expected values based on some input (the selector).
 
-Below is a comparison between both approaches to get the gist of it (it's ok if you don't fully understand them now since we'll cover this in depth later in the Data driven visualization guides):
+Below is a comparison between both approaches to get the gist of it (it's ok if you don't fully understand them now since we'll cover this in depth later in the Data driven visualization guides).
+
+#### CSS-derived language
 
 ```CartoCSS
-// CSS-derived language (NOT a CARTO VL valid visualization)
-
-// We use a selector
+// Use a selector
 [price < 100] {
-  // We set the width if the feature match with the previous selector
+  // Set the width if the feature match with the previous selector
   marker-width: 5
 }
 
 // Selector for the other case
 [price >= 100] {
-  // We set the width for this other case, redefining the width
+  // Set the width for this other case, redefining the width
   marker-width: 15
 }
 ```
+#### CARTO VL valid visualization
 
 ```CARTO_VL_Viz
-// CARTO VL valid visualization
-// The buckets expression will classify the input property in two buckets: features with prices less than 100, and features with prices larger or equal than 100
+// The buckets expression will classify the input property in two buckets: features with prices less than 100, and features with prices greater than or equal to 100
 // The ramp expression will assign 5 to the first bucket and 15 to the second
 // Finally, we'll use ramp's output as the width
+
 width: ramp(buckets($price, [100]), [5, 15])
 ```
