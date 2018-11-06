@@ -17,7 +17,7 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
     </iframe>
 </div>
 
- The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
+The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
 ### What is an expression?
 
@@ -129,15 +129,16 @@ In the [reference](/developers/carto-vl/reference/) documentation examples are s
 This basic example of coloring a feature `red` and setting its width to `5` shows how the String API provides syntax sugar for things like named colors:
 
 Usage of the JS API:
-```CARTO_VL_Viz
+```js
 const s = carto.expressions;
 const viz = new carto.Viz({
     width: 5
     color: s.namedColor(‘red’)
 });
 ```
+
 Usage of the String API:
-```CARTO_VL_Viz
+```js
 const viz = new carto.Viz(`
     width: 5
     color: red
@@ -149,22 +150,22 @@ The String API also provides easier usage of:
 - Boolean operators (`and`, `or`, `not`...)
 - Color constants (`#FFF`)
 - Access to data properties (`$propertyName`)
-- Eliminates the need to access the [`carto.expressions`](developers/carto-vl/reference/#cartoexpressions) namespace
-- The use of Variables
+- Eliminates the need to access the [`carto.expressions`](/developers/carto-vl/reference/#cartoexpressions) namespace
+- The use of *Variables*
 
 ### Variables
 
-As we’ve seen, the CARTO VL visualization language follows the pattern `property: expression`, where expression can be a constant or a function call of the form `functionName(param1, param2, …)` or a built-in infix function call like `param1/param2`.
+As we’ve seen, the CARTO VL visualization language follows the pattern `property: expression`, where expression can be a constant or a function call of the form `functionName (param1, param2, …)` or a built-in infix function call like `param1/param2`.
 
 Variables are not required to apply any of the CARTO VL styling capabilities although they can be used to simplify some visualizations. However, variables are required for [Interactivity](/developers/carto-vl/reference/#cartointeractivity).
 
-The use of variables is covered more in-depth in the [Interactivity guide](/developers/carto-vl/guides/interactivity-events/).
+The use of variables is covered more in-depth in the [Add interactivity and events guide](/developers/carto-vl/guides/add-interactivity-and-events/).
 
 ### Comparison to CSS-derived languages
 
 In contrast with cascading languages like CSS and CSS-derived languages, CARTO VL styling properties cannot be redefined based on selectors. Instead, CARTO VL expressions like `ramp` are used to select the expected values based on some input (the selector).
 
-Below is a comparison between both approaches to get the gist of it (it's ok if you don't fully understand them now since we'll cover this in depth later in the Data driven visualization guide):
+Below is a comparison between both approaches to get the gist of it (it's ok if you don't fully understand them now since we'll cover this in depth later in the Data driven visualization guides):
 
 ```CartoCSS
 // CSS-derived language (NOT a CARTO VL valid visualization)

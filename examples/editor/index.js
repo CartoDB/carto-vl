@@ -98,8 +98,6 @@ let map = new mapboxgl.Map({
     zoom: 0
 });
 
-map.touchZoomRotate.disableRotation();
-
 examples.forEach(addExample);
 
 let layer = null;

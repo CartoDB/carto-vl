@@ -39,18 +39,16 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [-73.954323, 40.711743],
-      zoom: 15.7,
-
+      zoom: 15.7
     });
-    map.touchZoomRotate.disableRotation();
-   
+
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
-    
+
     const source = new carto.source.Dataset('table_311_complaints');
-    
+
     // Define Viz object and custom style
     const viz = new carto.Viz(`
       symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus])
@@ -58,15 +56,15 @@
       width: 20
     `);
 
-    
+
     const layer = new carto.Layer('layer', source, viz);
-    
+
     layer.addTo(map);
 
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegendData({othersLabel: 'Default'});
+      const symbolLegend = layer.viz.symbol.getLegendData({ othersLabel: 'Default' });
       const colorLegend = layer.viz.color.getLegendData();
 
       let symbolLegendList = '';

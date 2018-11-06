@@ -57,7 +57,6 @@ To get started, copy and paste the code below into your favorite text editor and
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <style>
-        <!-- Zoom level indicator style -->
         #js-zoom {
             position: absolute;
             bottom: 0;
@@ -71,25 +70,19 @@ To get started, copy and paste the code below into your favorite text editor and
 </head>
 
 <body>
-
     <div id="map"></div>
-
-    <!-- Zoom level indicator container -->
     <div id="js-zoom"></div>
 
     <script>
-       
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
             zoom: 11
         });
-
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
-        // Zoom level indicator
         function updateZoom() {
             const zoom = map.getZoom().toFixed(2);
             document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
@@ -109,9 +102,7 @@ To get started, copy and paste the code below into your favorite text editor and
             color: white
             strokeColor: green
         `);
-
         const layer = new carto.Layer('layer', source, viz);
-
         layer.addTo(map, 'watername_ocean');
     </script>
 </body>
@@ -138,7 +129,7 @@ As you can see on the map, there are a lot of trees in Vancouver!
 
 To better visualize the high density of information, override the default point `width` and set it to `1` and set the `strokeWidth` to `0.5`:
 
-```CARTO_VL_Viz
+```js
 const viz = new carto.Viz(`
     color: white
     width: 1
@@ -147,7 +138,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-With these adjustments, the distribution of trees around the city is clearer: 
+With these adjustments, the distribution of trees around the city is clearer:
 
 <div class="example-map">
     <iframe
@@ -348,7 +339,6 @@ If you would like to take a closer look, the full code for the example is here:
 
 <head>
     <meta charset="utf-8">
-
     <script src='https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js'></script>
 
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
@@ -369,26 +359,19 @@ If you would like to take a closer look, the full code for the example is here:
 </head>
 
 <body>
-    <!-- Add map container -->
     <div id="map"></div>
-
-    <!-- Zoom indicator -->
     <div id="js-zoom"></div>
 
     <script>
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-123.098599, 49.240685],
             zoom: 11
         });
-
-        // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
-        // Zoom level
         function updateZoom() {
             const zoom = map.getZoom().toFixed(2);
             document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
@@ -398,19 +381,16 @@ If you would like to take a closer look, the full code for the example is here:
 
         //** CARTO VL functionality begins here **//
 
-        // Define user
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Define source
         const source = new carto.source.Dataset('vancouver_trees');
 
         // Define Viz object and custom style
         const viz = new carto.Viz(`
             @category: ramp($common_name,prism)
-
             width: ramp(zoomRange([10,15]),[1,scaled($diameter/2,15)])
             color: ramp(zoomRange([12,13]),[green,opacity(@category,0.7)])
             strokeColor: ramp(zoomRange([12,13]),[black,@category])
@@ -423,11 +403,7 @@ If you would like to take a closer look, the full code for the example is here:
                         true]
                     )
         `);
-
-        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
-
-        // Add map layer
         layer.addTo(map,'watername_ocean');
     </script>
 </body>

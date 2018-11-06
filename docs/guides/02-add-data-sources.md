@@ -159,11 +159,12 @@ SQL is a very common language to make queries in databases and geospatial softwa
 #### Add a SQL source
 Let's see how to add a SQL source to your map!
 
-Define a query (select only the largest cities (`megacity`) in the world from the `populated_places` dataset):
+Define a query (select only the largest cities - category `megacity`) in the world from the `populated_places` dataset):
 ```js
 const query = 'SELECT * FROM populated_places WHERE megacity = 1';
 ```
-> This is a simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
+**Note:**
+This is a simple query but the SQL runs on CARTO's backend, which is powered by PostGIS, so you could also execute more sophisticated queries and even spatial analysis.
 
 Create a SQL source:
 ```js
@@ -230,7 +231,6 @@ This is the complete code:
     <div id="map"></div>
 
     <script>
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -238,7 +238,6 @@ This is the complete code:
             zoom: 2
         });
 
-        // Add zoom controls
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
@@ -253,16 +252,11 @@ This is the complete code:
             apiKey: 'default_public'
         });
 
-        // Define Viz object with custom style
         const citiesViz = new carto.Viz(`
             color: grey
             width: 4
         `);
-
-        // Define map Layer
         const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
-
-        // Add map Layer
         citiesLayer.addTo(map);
 
 
@@ -317,16 +311,11 @@ This is the complete code:
         // Define GeoJSON source
         const officesSource = new carto.source.GeoJSON(offices);
 
-        // Define Viz object with custom style
         const officesViz = new carto.Viz(`
             color: red
             width: 20
         `);
-
-        // Define map Layer
         const officesLayer = new carto.Layer('offices', officesSource, officesViz);
-
-        // Add map Layer
         officesLayer.addTo(map);
 
 
@@ -340,13 +329,8 @@ This is the complete code:
             apiKey: 'default_public'
         });
 
-        // Define Viz object with custom style
         const megacitiesViz = new carto.Viz('color: blue');
-
-        // Define map Layer
         const megacitiesLayer = new carto.Layer('megacities', megacitiesSource, megacitiesViz);
-
-        // Add map Layer
         megacitiesLayer.addTo(map);
     </script>
 </body>

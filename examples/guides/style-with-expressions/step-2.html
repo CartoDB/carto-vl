@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Color spaces | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO VL JS -->
-  <script src="../../dist/carto-vl.js"></script>
+
+  <script src="../../../dist/carto-vl.js"></script>
+
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
+
 <body>
   <div id="map"></div>
+
   <aside class="toolbox">
     <div class="box">
       <header>
@@ -58,15 +63,13 @@
       </svg>
     </div>
   </div>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [0, 30],
-      zoom: 2,
-      scrollZoom: false,
-
-
+      zoom: 2
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -74,7 +77,6 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
@@ -100,13 +102,13 @@
       color: cielab(90, 10, 60)
     `);
 
-    // Define layer
     const source = new carto.source.Dataset('populated_places');
     const layer = new carto.Layer('layer', source, vizGreen);
-
     layer.addTo(map, 'watername_ocean');
+
     layer.on('loaded', hideLoader);
 
+    // Change styles
     function setHEXGreen() {
       layer.blendToViz(vizGreen);
     }
@@ -125,9 +127,11 @@
     function setCIELABYellow() {
       layer.blendToViz(vizYellow);
     }
+
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>

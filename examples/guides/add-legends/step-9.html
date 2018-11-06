@@ -2,10 +2,12 @@
 <html>
 
 <head>
-  <script src="https://libs.cartocdn.com/carto-vl/v0.10.0/carto-vl.min.js"></script>
+  <script src="../../../dist/carto-vl.js"></script>
+
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-  <link href="https://carto.com/developers/carto-vl/examples/maps/style.css" rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
@@ -36,28 +38,20 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [0, 43],
-      zoom: 1,
-
+      zoom: 1
     });
-    map.touchZoomRotate.disableRotation();
 
-    // Authenticate the client
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define the source
     const source = new carto.source.Dataset('populated_places');
-
-    // Define the visualization
     const viz = new carto.Viz(`
       color: ramp(linear($latitude), sunset)
       width: 5
       strokeWidth: 0
     `);
-
-    // Create the layer
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -84,7 +78,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 

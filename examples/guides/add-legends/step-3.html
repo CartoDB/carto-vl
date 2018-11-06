@@ -5,19 +5,17 @@
     <title>Rail accident weather | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <!-- Include CARTO VL JS -->
+
     <script src="../../../dist/carto-vl.js"></script>
-    <!-- Include Mapbox GL JS -->
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <!-- Include Mapbox GL CSS -->
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
     <div id="map"></div>
-
-    <!-- Add title/legend box -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -31,60 +29,54 @@
             </section>
         </div>
     </aside>
-    
-    <script>
 
+    <script>
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-96, 41],
-            zoom: 3,
+            zoom: 3
         });
-        
+
         //** CARTO VL functionality begins here **//
-        
-        // Define user
+
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        
+
         const source = new carto.source.Dataset("railroad_accidents");
-        
-        // Define Viz object and custom style
         const viz = new carto.Viz(`
             width: 5
             color: ramp($weather,[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
-            strokeColor: black 
+            strokeColor: black
         `);
-        
         const layer = new carto.Layer('layer', source, viz);
-        
         layer.addTo(map);
-        
+
         //** ADD LEGEND **//
         // When layer loads, trigger legend event
         layer.on('loaded', () => {
-            
+
             // Request data for legend from the layer viz
             const colorLegend = layer.viz.color.getLegendData();
             let colorLegendList = '';
-            
+
             // A function to convert map colors to HEX values for legend
             function rgbToHex(color) {
                 return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
             }
-            
+
             // Create list elements for legend
             colorLegend.data.forEach((legend, index) => {
                 const color = rgbToHex(legend.value);
-                
+
                 // Style for legend items based on geometry type
                 colorLegendList +=
                     `<li><span class="point-mark" style="background-color:${color};border: 1px solid black;"></span> <span>${legend.key}</span></li>\n`;
             });
-            
+
             // Place list items in the content section of the title/legend box
             document.getElementById('content').innerHTML = colorLegendList;
         });
@@ -92,4 +84,5 @@
     </script>
 
 </body>
+
 </html>

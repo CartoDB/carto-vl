@@ -289,7 +289,7 @@ Here it is the full example:
 <body>
     <div id="map"></div>
     <script>
-    
+
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -315,7 +315,6 @@ Here it is the full example:
         map.on('move', displayCenter);
 
         // LAYER EVENTS & VARIABLES
-        // Add layer as usual
         carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
 

@@ -36,10 +36,9 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-73.954323, 40.711743],
-      zoom: 15.7,
-
+      zoom: 15.7
     });
-    map.touchZoomRotate.disableRotation();
+
     // Autenticate the client
     carto.setDefaultAuth({
       username: 'cartovl',
@@ -63,7 +62,7 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegendData({othersLabel: 'Default'});
+      const symbolLegend = layer.viz.symbol.getLegendData({ othersLabel: 'Default' });
       const colorLegend = layer.viz.color.getLegendData();
 
       let symbolLegendList = '';

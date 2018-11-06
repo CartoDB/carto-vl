@@ -48,8 +48,10 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -65,7 +67,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
             </header>
         </div>
     </aside>
-    
+
     <script>
 
         const map = new mapboxgl.Map({
@@ -74,23 +76,23 @@ To get started, copy and paste the code for this map and save it as `accidents.h
             center: [-96, 41],
             zoom: 4,
         });
-        
+
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
-        
+
         const source = new carto.source.Dataset("railroad_accidents");
-        
+
         const viz = new carto.Viz(`
             width: 7
             color: ramp($weather,[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
-            strokeColor: black 
+            strokeColor: black
         `);
-        
+
         const layer = new carto.Layer('layer', source, viz);
-        
+
         layer.addTo(map);
 
     </script>
@@ -102,7 +104,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
 
 ### Access data from `ramp`
 
-To get the necessary information to populate the legend, you use the [`getLegendData()`](developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
+To get the necessary information to populate the legend, you use the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
 
 Take a look at the point styling for the accidents map. This is the styling that we want to bring into our legend and associate each legend item to each category type that we are symbolizing from the `$weather` property.
 
@@ -290,4 +292,3 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
-
