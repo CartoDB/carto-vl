@@ -14,7 +14,6 @@ For example, major highways don’t display until zoom 5 and when they do, the a
 **Note:**
 The CARTO VL renderer provides a native/built-in way to do zoom-based styling without "popping" (by interpolating), which results in smooth transitions.
 
-
 ### Overview
 In the past, zoom-based styling has been overly complex creating a barrier of entry for many. It is no wonder that it was “easier” to put too much information on a map and/or only design a map for one zoom level.
 

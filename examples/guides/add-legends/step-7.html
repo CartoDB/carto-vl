@@ -13,7 +13,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>San Francisco</h1>
+        <h1>San Francisco Streets</h1>
       </header>
       <section>
         <div id="controls">
@@ -35,35 +35,30 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-122.40432, 37.804421878656186],
-      zoom: 11.2,
-
+      center: [-122.424335, 37.771521],
+      zoom: 12,
     });
 
     map.touchZoomRotate.disableRotation();
-    // Autenticate the client
+
     carto.setDefaultAuth({
-      username: 'dmanzanares',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define the source
     const source = new carto.source.Dataset('sf_stclines');
 
-    // Define the visualization
     const viz = new carto.Viz(`
       color: ramp(top($st_type, 5), bold)
       width: 2
     `);
 
-    // Create the layer
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
-      // Get the information for legend
       const colorLegend = layer.viz.color.getLegendData({
         othersLabel: 'Default'
       });
@@ -75,7 +70,6 @@
           `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
       });
 
-      // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
     });
 
