@@ -3,8 +3,10 @@
 
 <head>
   <script src="../../../dist/carto-vl.js"></script>
+
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -44,9 +46,9 @@
       username: 'cartovl',
       apiKey: 'default_public'
     });
-  
+
     const source = new carto.source.Dataset('table_311_complaints');
-    
+
     const viz = new carto.Viz(`
       symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
       color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
@@ -55,13 +57,13 @@
     `);
 
     const layer = new carto.Layer('layer', source, viz);
-    
+
     layer.addTo(map);
 
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegendData({othersLabel: 'Default'});
+      const symbolLegend = layer.viz.symbol.getLegendData({ othersLabel: 'Default' });
       const colorLegend = layer.viz.color.getLegendData();
 
       let symbolLegendList = '';
