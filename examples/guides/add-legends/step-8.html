@@ -38,26 +38,22 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-73.954323, 40.711743],
-      zoom: 15.7,
-
+      zoom: 15.7
     });
-    map.touchZoomRotate.disableRotation();
+
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
     const source = new carto.source.Dataset('table_311_complaints');
-
     const viz = new carto.Viz(`
       symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
       color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
       symbolPlacement: align_bottom
       width: 30
     `);
-
     const layer = new carto.Layer('layer', source, viz);
-
     layer.addTo(map);
 
     layer.on('loaded', () => {
@@ -95,7 +91,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 

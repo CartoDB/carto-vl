@@ -16,8 +16,6 @@
 
 <body>
     <div id="map"></div>
-
-    <!-- Add title/legend box -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -33,34 +31,28 @@
     </aside>
 
     <script>
-
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-96, 41],
-            zoom: 3,
+            zoom: 3
         });
 
         //** CARTO VL functionality begins here **//
 
-        // Define user
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
         const source = new carto.source.Dataset("railroad_accidents");
-
-        // Define Viz object and custom style
         const viz = new carto.Viz(`
             width: 5
             color: ramp($weather,[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
             strokeColor: black
         `);
-
         const layer = new carto.Layer('layer', source, viz);
-
         layer.addTo(map);
 
         //** ADD LEGEND **//

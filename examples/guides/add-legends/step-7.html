@@ -38,10 +38,8 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.424335, 37.771521],
-      zoom: 12,
+      zoom: 12
     });
-
-    map.touchZoomRotate.disableRotation();
 
     carto.setDefaultAuth({
       username: 'cartovl',
@@ -49,12 +47,10 @@
     });
 
     const source = new carto.source.Dataset('sf_stclines');
-
     const viz = new carto.Viz(`
       color: ramp(top($st_type, 5), bold)
       width: 2
     `);
-
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -82,7 +78,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 

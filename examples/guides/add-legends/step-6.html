@@ -35,15 +35,12 @@
   </div>
 
   <script>
-
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.424335, 37.771521],
-      zoom: 12,
+      zoom: 12
     });
-
-    map.touchZoomRotate.disableRotation();
 
     carto.setDefaultAuth({
       username: 'cartovl',
@@ -51,19 +48,15 @@
     });
 
     const source = new carto.source.Dataset('demographics_sf');
-
     const viz = new carto.Viz(`
       color: ramp(globalquantiles($masters_percent,5),purp)
       strokeWidth: 1
     `);
-
     const layer = new carto.Layer('layer', source, viz);
-
     layer.addTo(map, 'watername_ocean');
 
     layer.on('loaded', () => {
       hideLoader();
-
       const colorLegend = layer.viz.color.getLegendData({
         othersLabel: 'Default',
         samples: 20
@@ -79,9 +72,7 @@
         colorLegendList +=
           `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${keyMin} - ${keyMax}</span></li>\n`;
       });
-
       document.getElementById('content').innerHTML = colorLegendList;
-
     });
 
     function hideLoader() {
@@ -91,7 +82,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 
