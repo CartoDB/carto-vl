@@ -1,5 +1,5 @@
 ## Add interactivity and events
-In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being visualized.
+In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being clicked on or hovered.
 
 By the end of the guide you will have built a visualization like this one where the color of features change as you move the mouse over them and display pop-up information when you click on them:
 <div class="example-map">
@@ -15,13 +15,6 @@ By the end of the guide you will have built a visualization like this one where 
 ### Getting started
 To start, grab the source from a working template like this [basemap](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html) one and copy the source code into a new file named `interactivity.html` and test it by opening the file in a browser before moving forward.
 
-Next, add navigation controls to the map by pasting this code underneath the basemap definition:
-```js
-// Add zoom controls
-const nav = new mapboxgl.NavigationControl();
-map.addControl(nav, 'top-left');
-```
-
 ### Map events
 Let's start with _map events_. These are events you can listen to from the **map** itself. For example, if you want to listen to an event for when a map loads or even display the current map's center coordinates, you can use a set of events provided by **Mapbox GL JS Map**, such as [load](https://www.mapbox.com/mapbox-gl-js/api#map.event:load) and [move](https://www.mapbox.com/mapbox-gl-js/api#map.event:move) respectively, and attach callback functions to react to them.
 
@@ -31,6 +24,7 @@ Try these map events out by adding a pair of listeners to your code, just after 
 map.on('load', () => {
     console.log('Map has loaded!');
 });
+
 // Listen for every move event by the user
 const displayCenter = () => {
     const center = map.getCenter();
@@ -275,21 +269,17 @@ Here it is the full example:
 ```html
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
-
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
     <div id="map"></div>
     <script>
-
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -392,6 +382,5 @@ Here it is the full example:
         });
     </script>
 </body>
-
 </html>
 ```

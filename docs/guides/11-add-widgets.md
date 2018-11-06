@@ -1,8 +1,8 @@
 ## Add widgets
 
-- **Widgets**: provide additional pieces of information that accompany a map to facilitate understanding and exploration. Widgets often provide additional information about a dataset that is not symbolized on a map itself. For example, on a election map, you can style the map by winner, but also provide addtional information from the data. For example, how many total votes did each party receive? or how many people voted?
+**Widgets** often provide additional information about a dataset that is not symbolized on a map to facilitate understanding and exploration. On an election map, you can style the map by the winner, but also provide additional information from the data, for example, how many total votes did each party receive? Or, how many people voted?
 
-The first thing you need to know to create widgets is the concept of [variables](). A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myAwesomeWidgetExpression()`, how do we actually get that information?
+The first thing you need to know to create widgets is the concept of **variables**. A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myWidgetExpression()`, how do we actually get that information?
 
 Firstly, we'll need to bind that expression to a new name so our visualization could be created like this:
 
@@ -11,20 +11,20 @@ const myViz = new carto.Viz(`
     color: red
     width: 7
 
-    @myAwesomeVariable: myAwesomeWidgetExpression()
+    @myVariable: myWidgetExpression()
 `);
 ```
 
-Then, we'll need to ask for the value of the expression when needed. Since our awesome widget expression may change its value dynamically, for example, due to panning or filtering we should probably read it each time its layer is changed:
+Then, we'll need to ask for the value of the expression when needed. Since our widget expression may change its value dynamically, for example, due to panning or filtering we should probably read it each time its layer is changed:
 
 ```js
 myLayer.on('updated', ()=>{
-    const myWidgetData = myViz.variables.myAwesomeVariable.value;
-    updateMyAwesomeWidget(myWidgetData);
+    const myWidgetData = myViz.variables.myVariable.value;
+    updateMyWidget(myWidgetData);
 })
 ```
 
-If, however, myAwesomeWidgetExpression was static, we could just use `myLayer.on('loaded', ()=>{...});`.
+If, however, `myWidgetExpression` was static, we could just use `myLayer.on('loaded', ()=>{...});`.
 
 ### Scalars: what is the total of ...? what is the average of ...? what is the maximum ...?
 
@@ -57,7 +57,7 @@ You can see all together on this example:
 
 CARTO VL provides access to the necessary data for creating histograms. However, it is not trivial to create beautiful histograms on the screens.
 
-To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read its [documentation](/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
+To overcome this, we are going to use [Airship](https://carto.com/airship/), a design library for building Location Intelligence applications. You may want to read [Airship documentation](/developers/airship/) too since this guide will only show the basics for making histograms with CARTO VL and Airship, but Airship provides much more functionality than this.
 
 The first thing you'll need is to include Airship with:
 ```html
@@ -176,4 +176,3 @@ function drawHistogram() {
         frameBorder="0">
     </iframe>
 </div>
-
