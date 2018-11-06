@@ -58,6 +58,11 @@ export default class AnimationGeneral extends BaseExpression {
     `;
 
         this.inlineMaker = inline => `animation(${inline._input}, ${inline.progress}, ${inline.duration}, ${inline.fade.in}, ${inline.fade.out})`;
+
+        waitingForLayer.add(this);
+        if (!this._paused) {
+            this._paused = 'default';
+        }
     }
     _bindMetadata (metadata) {
         this._input._bindMetadata(metadata);
@@ -81,34 +86,34 @@ export default class AnimationGeneral extends BaseExpression {
             waitingForLayer.delete(this);
             waitingForOthers.add(this);
         }
-        if (waitingForOthers.has(this)) {
-            waitingForLayer = new Set([...waitingForLayer].filter(expr => {
-                while (expr.parent) {
-                    expr = expr.parent;
+        // setTimeout is needed to avoid the possibility of a de-synchronization of 1 frame
+        // if the last layer to be loaded is not the first one on the painting loop
+        setTimeout(() => {
+            if (waitingForOthers.has(this)) {
+                waitingForLayer = new Set([...waitingForLayer].filter(expr => {
+                    while (expr.parent) {
+                        expr = expr.parent;
+                    }
+                    if (expr._getRootExpressions) {
+                        // The animation hasn't been removed from the viz
+                        return true;
+                    }
+                    return false;
+                }));
+                if (waitingForLayer.size > 0) {
+                    return;
                 }
-                if (expr._getRootExpressions) {
-                    // The animation hasn't been removed from the viz
-                    return true;
-                }
-                return false;
-            }));
-            if (waitingForLayer.size > 0) {
-                return;
+                [...waitingForOthers.values()].map(anim => {
+                    if (anim._paused === 'default') {
+                        anim.play();
+                    }
+                });
+                waitingForOthers.clear();
             }
-            [...waitingForOthers.values()].map(anim => {
-                if (anim._paused === 'default') {
-                    anim.play();
-                }
-            });
-            waitingForOthers.clear();
-        }
+        }, 0);
     }
 
     _postShaderCompile (program, gl) {
-        waitingForLayer.add(this);
-        if (!this._paused) {
-            this._paused = 'default';
-        }
         super._postShaderCompile(program, gl);
     }
 
@@ -133,6 +138,7 @@ export default class AnimationGeneral extends BaseExpression {
         }
 
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
+        console.log(timestamp, this.progress.expr);
     }
 
     eval (feature) {
