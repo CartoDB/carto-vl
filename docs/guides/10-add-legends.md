@@ -235,46 +235,59 @@ With that change, the final map will now label other categories as "Other weathe
     </iframe>
 </div>
 
-#### Unclassified numerical data
+### More examples
+
+View the source of the maps below to see how legends work for different map and geometry types.
+
+#### Choropleth map
 
 <div class="example-map">
     <iframe
-        id="legend-number"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
+        id="guides-legend-step-6"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-legends---unclassified-numerical-data">View my source code!</a>
 
-
-#### Categorical data
+#### Categorical lines
 
 <div class="example-map">
     <iframe
-        id="legend-buckets"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
+        id="guides-legend-step-7"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-legends---categorical-data">View my source code!</a>
 
-##### Showing images
+##### Image markers
 
 <div class="example-map">
     <iframe
-        id="legend-image"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
+        id="guides-legend-step-8"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
+
+##### Unclassed latitudes
+
+<div class="example-map">
+    <iframe
+        id="guides-legend-step-9"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
 

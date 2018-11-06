@@ -147,7 +147,7 @@ width: 20
 <div class="example-map">
     <iframe
         id="guides-data-driven-2-step-3"
-        src="/developers/carto-vl/examples/maps/styling/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -167,7 +167,7 @@ width: 20
 <div class="example-map">
     <iframe
         id="guides-data-driven-2-step-4"
-        src="/developers/carto-vl/examples/maps/styling/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

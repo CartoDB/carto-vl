@@ -33,6 +33,7 @@
   </div>
 
   <script>
+
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
@@ -42,22 +43,18 @@
 
     map.touchZoomRotate.disableRotation();
 
-    // Autenticate the client
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define the source
     const source = new carto.source.Dataset('demographics_sf');
 
-    // Define the visualization
     const viz = new carto.Viz(`
       color: ramp(globalquantiles($masters_percent,5),purp)
       strokeWidth: 1
     `);
 
-    // Create the layer
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -81,7 +78,6 @@
           `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${keyMin} - ${keyMax}</span></li>\n`;
       });
 
-      // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
       
     });
