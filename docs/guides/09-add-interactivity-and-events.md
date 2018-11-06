@@ -43,12 +43,12 @@ const displayCenter = () => {
 map.on('move', displayCenter);
 ```
 
-To see the "reactions" (callback functions) to each map event above, open your file in a browser and then open the console through the browser's developer tools. Once the map loads you will see the first message: 'Map has loaded!'. Next, with the console still open, use the zoom controls to interact with the map and watch as the values for `Center:` and `Zoom:` update. 
+To see the "reactions" (callback functions) to each map event above, open your file in a browser and then open the console through the browser's developer tools. Once the map loads you will see the first message: 'Map has loaded!'. Next, with the console still open, use the zoom controls to interact with the map and watch as the values for `Center:` and `Zoom:` update.
 
 For more information on Mapbox GL JS map events see their [Map reference](https://www.mapbox.com/mapbox-gl-js/api/#map).
 
 ### Layer events
-In the previous section you saw how to add _map events_ once you have a basemap added. In this section, we will look at how to listen to _layer events_ with CARTO VL. 
+In the previous section you saw how to add _map events_ once you have a basemap added. In this section, we will look at how to listen to _layer events_ with CARTO VL.
 
 All [carto.Layer](/developers/carto-vl/reference/#cartolayer) objects have two events you can listen to: _`loaded`_ and _`updated`_.
 
@@ -72,11 +72,11 @@ layer.on('loaded', () => {
 });
 ```
 
-Load the file in your browser and open the console. This time, you will see two messages. First, `Map has loaded!` from the _map event_ and then, `Cities layer has loaded!` from the _layer event_. 
+Load the file in your browser and open the console. This time, you will see two messages. First, `Map has loaded!` from the _map event_ and then, `Cities layer has loaded!` from the _layer event_.
 
 If you were adding more than one layer to your map, you could use a single function to handle all of them. For these cases, **on** and **off** methods are available at the `carto` namespace. For example: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })` would show the message `All layers have loaded` once layer1 and layer2 draw on the map.
 
-There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)). 
+There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)).
 
 **Note:**
 It is important to note that the name of this event is **`loaded`**, not `load`.
@@ -290,7 +290,7 @@ Here it is the full example:
 <body>
     <div id="map"></div>
     <script>
-    
+
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -320,7 +320,6 @@ Here it is the full example:
         map.on('move', displayCenter);
 
         // LAYER EVENTS & VARIABLES
-        // Add layer as usual
         carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
 
