@@ -1,4 +1,4 @@
-## Legends
+## Add legends
 
 Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with **legends** to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent.
 
@@ -10,36 +10,95 @@ If you completed the data-driven visualization guide, the map below will look fa
 
 <div class="example-map">
     <iframe
-        id="accidents-all"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
         width="100%"
         height="500"
-        style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
 
 At the end of this guide, we also provide a series of examples, that are meant to serve as legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
-### Getting Started
+### Getting started
 
 The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right hand corner, but is missing the legend information to help interpret what weather type each color on the map represents.
 
-Let's add that information!
-
-To get started, copy and paste the code for this map and save it as `accidents.html`:
-
 <div class="example-map">
     <iframe
-        id="population-density-buckets-numeric"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-no-legend.html"
+        id="guides-legend-step-1"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---no-legend">Copy my source code!</a>
+
+Let's add that information!
+
+To get started, copy and paste the code for this map and save it as `accidents.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Rail accident weather | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+    <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <!-- Add title/legend box -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Rail Accidents by Weather</h1>
+            </header>
+        </div>
+    </aside>
+    
+    <script>
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 4,
+        });
+        
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+        
+        const source = new carto.source.Dataset("railroad_accidents");
+        
+        const viz = new carto.Viz(`
+            width: 7
+            color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            strokeWidth: 0.2
+            strokeColor: black 
+        `);
+        
+        const layer = new carto.Layer('layer', source, viz);
+        
+        layer.addTo(map);
+
+    </script>
+
+</body>
+
+</html>
+```
 
 ### Access data from `ramp`
 
@@ -66,8 +125,6 @@ If styling isn't tied directly to a styling property, you will need to use a var
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 
 ```js
-//** ADD LEGEND **//
-
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
 
@@ -102,8 +159,8 @@ That's because we have to define a place for the last step of the process (`docu
 
 <div class="example-map">
     <iframe
-        id="accidents-all-legend-no-content"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend-no-content.html"
+        id="guides-legend-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -133,14 +190,13 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map">
     <iframe
-        id="accidents-all-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-legend.html"
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---legend">View my source code!</a>
 
 ### Overwrite defaults
 
@@ -150,8 +206,8 @@ For example, the map below symbolizes only the `top` three weather conditions in
 
 <div class="example-map">
     <iframe
-        id="accidents-all-top-others-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-others-legend.html"
+        id="guides-legend-step-4"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -162,7 +218,6 @@ For example, the map below symbolizes only the `top` three weather conditions in
 You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()`:
 
 ```js
-// Style for legend items based on geometry type
 colorLegendList +=
     `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
 ```
@@ -172,55 +227,67 @@ With that change, the final map will now label other categories as "Other weathe
 <div class="example-map">
     <iframe
         id="accidents-all-top-legend"
-        src="/developers/carto-vl/examples/maps/guides/legends/accidents-all-top-legend.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples#example-accidents-all---top-legend">View my source code!</a>
 
-#### Unclassified numerical data
+### More examples
+
+View the source of the maps below to see how legends work for different map and geometry types.
+
+#### Choropleth map
 
 <div class="example-map">
     <iframe
-        id="legend-number"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-number.html"
+        id="guides-legend-step-6"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-legends---unclassified-numerical-data">View my source code!</a>
 
-
-#### Categorical data
+#### Categorical lines
 
 <div class="example-map">
     <iframe
-        id="legend-buckets"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-buckets.html"
+        id="guides-legend-step-7"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-legends---categorical-data">View my source code!</a>
 
-##### Showing images
+##### Image markers
 
 <div class="example-map">
     <iframe
-        id="legend-image"
-        src="/developers/carto-vl/examples/maps/misc/legends/legend-image.html"
+        id="guides-legend-step-8"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
+
+##### Unclassed latitudes
+
+<div class="example-map">
+    <iframe
+        id="guides-legend-step-9"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
 

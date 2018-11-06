@@ -1,4 +1,4 @@
-## Aggregating data
+## Spatial aggregations
 
 In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*), just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
 
@@ -67,7 +67,7 @@ The result using the global functions in the previous step should look like this
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-1"
-        src="/developers/carto-vl/examples/maps/guides/aggregations/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -75,7 +75,7 @@ The result using the global functions in the previous step should look like this
     </iframe>
 </div>
 
-To open the map at this step, use this [link to the map](/developers/carto-vl/examples/maps/guides/aggregations/step-1.html), where you can check the console messages.
+To open the map at this step, use this [link to the map](/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-1.html), where you can check the console messages.
 
 **Note:**
 To display only the biggest city in the world change your filter to `filter: $pop_max == @g_max // biggest city is Tokyo!`.
@@ -207,7 +207,7 @@ At this point, you have created this great visualization, using global and viewp
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-2"
-        src="/developers/carto-vl/examples/maps/guides/aggregations/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -215,7 +215,7 @@ At this point, you have created this great visualization, using global and viewp
     </iframe>
 </div>
 
-To explore the map at full screen size, have a look at [this link](/developers/carto-vl/examples/maps/guides/aggregations/step-2.html) and see the biggest cities in the world (Tokyo, New York, Mumbay...).
+To explore the map at full screen size, have a look at [this link](/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-2.html) and see the biggest cities in the world (Tokyo, New York, Mumbay...).
 
 
 ### Resolution
@@ -298,7 +298,7 @@ Congrats, you made your way through this guide!. This is the result:
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-3"
-        src="/developers/carto-vl/examples/maps/guides/aggregations/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

@@ -1,11 +1,11 @@
-## Interactivity and events
+## Add interactivity and events
 In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being visualized.
 
-By the end of the guide you will have built a visualization like this one where the color of features change as you mover your mouse over them and display pop-up information when you click on them:
+By the end of the guide you will have built a visualization like this one where the color of features change as you move the mouse over them and display pop-up information when you click on them:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -88,14 +88,14 @@ If you check your work now, it should look like this:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-2"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-You should now open the [map](/developers/carto-vl/examples/maps/guides/interactivity/step-2.html) and explore the _console_ to check the current events.
+You should now open the [map](/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html) and explore the _console_ to check the current events.
 
 ### Using variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
@@ -131,14 +131,14 @@ You have already advanced a lot in this guide. Now take a small rest and check y
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-3"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-Open the map at [this step](/developers/carto-vl/examples/maps/guides/interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
+Open the map at [this step](/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
 
 
 #### Data-driven variables
@@ -261,14 +261,14 @@ Congrats! You've finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
-        src="/developers/carto-vl/examples/maps/guides/interactivity/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/interactivity/step-4.html)
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html)
 
 
 Here it is the full example:
@@ -287,10 +287,9 @@ Here it is the full example:
 </head>
 
 <body>
-    <!-- Add map container -->
     <div id="map"></div>
     <script>
-        // Add basemap and set properties
+    
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
@@ -314,10 +313,6 @@ Here it is the full example:
             console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing} degrees`);
         };
         map.on('move', displayCenter);
-
-
-        //** CARTO VL functionality begins here **//
-
 
         // LAYER EVENTS & VARIABLES
         // Add layer as usual

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Add layer | CARTO</title>
+    <title>Color values | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <!-- Include CARTO VL JS -->
@@ -19,36 +19,43 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Classification Methods</h1>
+                <h1>Color values</h1>
             </header>
             <section>
-                <p class="description open-sans">Click on a style</p>
+                <p class="description open-sans">Select a style</p>
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')"
                                 id="viz1" checked>
-                            <label for="viz1">Style 1: Quantiles Global</label>
+                            <label for="viz1">
+                                <h2>Style 1</h2>
+                            </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
                                 id="viz2">
-                            <label for="viz2">Style 2: Equal Intervals Global</label>
+                            <label for="viz2">
+                                <h2>Style 2</h2>
+                            </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])')"
                                 id="viz3">
-                            <label for="viz3">Style 3: Quantiles Viewport</label>
+                            <label for="viz3">
+                                <h2>Style 3</h2>
+                            </label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz4">
-                            <label for="viz4">Style 4: Equal Interval Viewport</label>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')" id="viz4">
+                            <label for="viz4">
+                                <h2>Style 4</h2>
+                            </label>
                         </li>
                     </ul>
                     <div id="info"></div>
-                    <h1 id="content-title"></h1>
-                    <ul id="content" class="description open-sans"></ul>
+                    <p id="content-title"></p>
+                    <ul id="content"></ul>
                 </div>
             </section>
             <footer class="js-footer"></footer>
@@ -70,8 +77,8 @@
 
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
-            width: 2
-            color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
+            width: scaled(0.7)
+            color: ramp($dn, [green, yellow, red])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
@@ -79,7 +86,6 @@
         layer.addTo(map, 'watername_ocean');
 
         layer.on('updated', () => {
-            // Get the legend
             if (!layer.viz.color.getLegendData) {
                 return;
             }
@@ -90,14 +96,13 @@
 
             colorLegend.data.forEach((legend) => {
                 const colorHex = rgbToHex(legend.value);
-                const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
-                const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
+                const key = legend.key.toFixed(2);
 
                 colorLegendList +=
-                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
+                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
             });
-            // Update the information
             document.getElementById('content').innerHTML = colorLegendList;
+            document.getElementById('content-title').innerHTML = `Legend`;
         });
 
         function rgbToHex(color) {

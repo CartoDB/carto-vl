@@ -19,47 +19,36 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Select Visualization</h1>
+                <h1>Classification Methods</h1>
             </header>
             <section>
-                <p class="description open-sans">Change the visualization of the layer</p>
+                <p class="description open-sans">Click on a style</p>
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [green, yellow, red])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
                                 id="viz1" checked>
-                            <label for="viz1">
-                                <h2>ramp($dn, [green, yellow, red])</h2>
-                                <p class="description open-sans"> Take colors from a color list. Since the input is an unclassified numeric property, interpolation of the colors values will be performed.</p>
-                            </label>
+                            <label for="viz1">Style 1: Quantiles Global</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, temps)')" id="viz2">
-                            <label for="viz2">
-                                <h2>ramp($dn, temps)</h2>
-                                <p class="description open-sans"> Use the "temps" CARTOColors palette.</p>
-                            </label>
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
+                                id="viz2">
+                            <label for="viz2">Style 2: Equal Intervals Global</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
                                 id="viz3">
-                            <label for="viz3">
-                                <h2>'ramp($dn, [hsv(0.5, 1,1), hsv(1, 1, 1)])'</h2>
-                                <p class="description open-sans">Take colors from a color list with HSV color constructors.</p>
-                            </label>
+                            <label for="viz3">Style 3: Quantiles Viewport</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [transparent, gray, yellow])')"
+                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
                                 id="viz4">
-                            <label for="viz4">
-                                <h2>'ramp($dn, [transparent, gray, yellow])'</h2>
-                                <p class="description open-sans">The same as the first example, but showing that `ramp` supports transparency too.</p>
-                            </label>
+                            <label for="viz4">Style 4: Equal Interval Viewport</label>
                         </li>
                     </ul>
                     <div id="info"></div>
-                    <p id="content-title"></p>
-                    <ul id="content"></ul>
+                    <h1 id="content-title"></h1>
+                    <ul id="content" class="description open-sans"></ul>
                 </div>
             </section>
             <footer class="js-footer"></footer>
@@ -70,7 +59,7 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [60,19],
+            center: [60, 19],
             zoom: 2,
         });
 
@@ -81,8 +70,8 @@
 
         const source = new carto.source.Dataset("pop_density_points");
         const viz = new carto.Viz(`
-            width: scaled(0.7)
-            color: ramp($dn, [green, yellow, red])
+            width: 2
+            color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
             strokeWidth: 0
         `);
         const layer = new carto.Layer('layer', source, viz);
@@ -90,7 +79,6 @@
         layer.addTo(map, 'watername_ocean');
 
         layer.on('updated', () => {
-            // Get the legend
             if (!layer.viz.color.getLegendData) {
                 return;
             }
@@ -101,14 +89,13 @@
 
             colorLegend.data.forEach((legend) => {
                 const colorHex = rgbToHex(legend.value);
-                const key = legend.key.toFixed(2);
+                const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
+                const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
 
                 colorLegendList +=
-                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
+                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
             });
-            // Update the information
             document.getElementById('content').innerHTML = colorLegendList;
-            document.getElementById('content-title').innerHTML = `Legend of ${colorLegend.name}`;
         });
 
         function rgbToHex(color) {

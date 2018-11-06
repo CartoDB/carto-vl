@@ -13,11 +13,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Percent Master's Degree</h1>
+        <h1>San Francisco Streets</h1>
       </header>
       <section>
         <div id="controls">
-          <p id="content-title"></p>
           <ul id="content"></ul>
         </div>
       </section>
@@ -42,48 +41,36 @@
 
     map.touchZoomRotate.disableRotation();
 
-    // Autenticate the client
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define the source
-    const source = new carto.source.Dataset('demographics_sf');
+    const source = new carto.source.Dataset('sf_stclines');
 
-    // Define the visualization
     const viz = new carto.Viz(`
-      color: ramp(globalquantiles($masters_percent,5),purp)
-      strokeWidth: 1
+      color: ramp(top($st_type, 5), bold)
+      width: 2
     `);
 
-    // Create the layer
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
-
     layer.on('loaded', () => {
       hideLoader();
 
       const colorLegend = layer.viz.color.getLegendData({
-        othersLabel: 'Default',
-        samples: 20
+        othersLabel: 'Default'
       });
 
       let colorLegendList = '';
-
       colorLegend.data.forEach((legend) => {
         const colorHex = rgbToHex(legend.value);
-        const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
-        const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
-
         colorLegendList +=
-          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${keyMin} - ${keyMax}</span></li>\n`;
+          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
       });
 
-      // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
-      
     });
 
     function hideLoader() {

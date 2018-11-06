@@ -13,11 +13,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Percent Master's Degree</h1>
+        <h1>Legend</h1>
       </header>
       <section>
         <div id="controls">
-          <p id="content-title"></p>
           <ul id="content"></ul>
         </div>
       </section>
@@ -36,54 +35,55 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-122.424335, 37.771521],
-      zoom: 12,
+      center: [-73.954323, 40.711743],
+      zoom: 15.7,
+
     });
-
     map.touchZoomRotate.disableRotation();
-
-    // Autenticate the client
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
-
-    // Define the source
-    const source = new carto.source.Dataset('demographics_sf');
-
-    // Define the visualization
+  
+    const source = new carto.source.Dataset('table_311_complaints');
+    
     const viz = new carto.Viz(`
-      color: ramp(globalquantiles($masters_percent,5),purp)
-      strokeWidth: 1
+      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
+      color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
+      symbolPlacement: align_bottom
+      width: 30
     `);
 
-    // Create the layer
     const layer = new carto.Layer('layer', source, viz);
-
-    layer.addTo(map, 'watername_ocean');
+    
+    layer.addTo(map);
 
     layer.on('loaded', () => {
       hideLoader();
 
-      const colorLegend = layer.viz.color.getLegendData({
-        othersLabel: 'Default',
-        samples: 20
+      const symbolLegend = layer.viz.symbol.getLegendData({othersLabel: 'Default'});
+      const colorLegend = layer.viz.color.getLegendData();
+
+      let symbolLegendList = '';
+
+      symbolLegend.data.forEach((legend, index) => {
+        const colorHex = rgbToHex(colorLegend.data[index].value);
+        symbolLegendList +=
+          `
+          <li>
+              <span
+                class="image-mark"
+                style="
+                  background-color: ${colorHex};
+                  mask-image:url(${legend.value});
+                  -webkit-mask-image:url(${legend.value})
+              "></span>
+              <span>${legend.key}</span>
+          </li>
+        `
       });
 
-      let colorLegendList = '';
-
-      colorLegend.data.forEach((legend) => {
-        const colorHex = rgbToHex(legend.value);
-        const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
-        const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
-
-        colorLegendList +=
-          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${keyMin} - ${keyMax}</span></li>\n`;
-      });
-
-      // Update the legend with the legend information
-      document.getElementById('content').innerHTML = colorLegendList;
-      
+      document.getElementById('content').innerHTML = symbolLegendList;
     });
 
     function hideLoader() {
