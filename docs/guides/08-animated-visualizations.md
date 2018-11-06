@@ -310,16 +310,14 @@ const map = new mapboxgl.Map({
 const nav = new mapboxgl.NavigationControl();
 map.addControl(nav, 'top-left');
 
-// Autenticate the client
 carto.setDefaultAuth({
     username: 'cartovl',
     apiKey: 'default_public'
 });
 
-// Create the source
 const source = new carto.source.Dataset('bird_journey');
 
-// Add better styles
+// Define Animation
 const viz = new carto.Viz(`
     @duration: 30
     @animation: animation($date_time, @duration, fade(0, 0.5))
@@ -329,7 +327,6 @@ const viz = new carto.Viz(`
     color: #1785FB
 `);
 
-// Create the layer
 const layer = new carto.Layer('layer', source, viz);
 
 // Get animation control elements
@@ -339,7 +336,7 @@ const $pauseButton = document.getElementById('js-pause-button');
 const $durationRange = document.getElementById('js-duration-range');
 const $currentTime = document.getElementById('js-current-time');
 
-// Listen to interaction events
+// Listen to interaction events with the UI
 $playButton.addEventListener('click', () => {
     viz.variables.animation.play();
 });
@@ -352,7 +349,7 @@ $durationRange.addEventListener('change', () => {
     viz.variables.duration = parseInt($durationRange.value, 10);
 });
 
-// Update progress each 100 milliseconds
+// Update progress bar each 100 milliseconds
 function updateProgress () {
     $progressRange.value = viz.variables.animation.getProgressPct();
     $currentTime.innerText = viz.variables.animation.getProgressValue();
@@ -360,7 +357,6 @@ function updateProgress () {
 
 setInterval(updateProgress, 100);
 
-// Add the layer to the map
 layer.addTo(map);
 ```
 
