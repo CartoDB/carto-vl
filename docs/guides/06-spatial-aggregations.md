@@ -328,7 +328,6 @@ This is the complete code:
 </head>
 
 <body>
-    <!-- Add map container -->
     <div id="map"></div>
     <!-- Add panel -->
     <aside class="toolbox">
@@ -346,19 +345,15 @@ This is the complete code:
     </aside>
 
     <script>
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
             zoom: 2
         });
-        // Add zoom controls
+        
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
-
-
-        //** CARTO VL functionality begins here **//
 
         carto.setDefaultAuth({
             username: 'cartovl',
