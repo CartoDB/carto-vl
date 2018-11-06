@@ -3,7 +3,9 @@ import AnimationGeneral from '../../../../../src/renderer/viz/expressions/Animat
 import * as s from '../../../../../src/renderer/viz/expressions';
 
 function anim (...args) {
-    return new AnimationGeneral(...args);
+    const a = new AnimationGeneral(...args);
+    a._paused = false; // avoid sync code
+    return a;
 }
 
 describe('src/renderer/viz/expressions/Animation', () => {
