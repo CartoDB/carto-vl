@@ -23,7 +23,7 @@ In this guide, we will demonstrate how this complexity has been greatly reduced 
 
 Using a [street trees](https://data.vancouver.ca/datacatalogue/streetTrees.htm) dataset from the City of Vancouver, first, you will explore the following zoom-based functionalities:
 
-- [`scaled`](/developers/carto-vl/reference/#cartoexpressionsscaled): how to keep symbol sizes consistent through zoom level.
+- [`scaled`](/developers/carto-vl/reference/#cartoexpressionsscaled): how to keep symbol sizes constant in real-life meters through zoom levels.
 - [`zoomRange`](/developers/carto-vl/reference/#cartoexpressionszoomrange): how to introduce detail through zoom across multiple visualization properties.
 - [`zoom`](/developers/carto-vl/reference/#cartoexpressionszoom): how to filter the amount or type of data that is visible at each zoom.
 
@@ -46,15 +46,11 @@ To get started, copy and paste the code below into your favorite text editor and
 ```html
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
-
     <script src="../../../dist/carto-vl.js"></script>
-
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <style>
         #js-zoom {
@@ -72,7 +68,6 @@ To get started, copy and paste the code below into your favorite text editor and
 <body>
     <div id="map"></div>
     <div id="js-zoom"></div>
-
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
@@ -97,7 +92,6 @@ To get started, copy and paste the code below into your favorite text editor and
 
         const source = new carto.source.Dataset('vancouver_trees');
 
-        // Define Viz object and custom style
         const viz = new carto.Viz(`
             color: white
             strokeColor: green
@@ -379,8 +373,6 @@ If you would like to take a closer look, the full code for the example is here:
         map.on('load', updateZoom);
         map.on('move', updateZoom);
 
-        //** CARTO VL functionality begins here **//
-
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
@@ -388,7 +380,7 @@ If you would like to take a closer look, the full code for the example is here:
 
         const source = new carto.source.Dataset('vancouver_trees');
 
-        // Define Viz object and custom style
+        // Define zoom-based style
         const viz = new carto.Viz(`
             @category: ramp($common_name,prism)
             width: ramp(zoomRange([10,15]),[1,scaled($diameter/2,15)])
