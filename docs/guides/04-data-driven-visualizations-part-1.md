@@ -244,7 +244,7 @@ ramp(buckets($winner, ["Conservative Party", "Labour Party"], [royalblue,crimson
 
 #### Color most common categories
 
-Another useful function for coloring categorical data is [`top](/developers/carto-vl/reference/#cartoexpressionstop). `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket.
+Another useful function for coloring categorical data is [`top`](/developers/carto-vl/reference/#cartoexpressionstop). `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket.
 
 The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (`darkorange`,`darkviolet`,`darkturquoise`) and all other weather conditions are colored `white` in the *others* bucket:
 
