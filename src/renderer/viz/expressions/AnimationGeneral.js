@@ -138,7 +138,6 @@ export default class AnimationGeneral extends BaseExpression {
         }
 
         this.progress.expr = (this.progress.expr + speed * deltaTime) % 1;
-        console.log(timestamp, this.progress.expr);
     }
 
     eval (feature) {
