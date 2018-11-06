@@ -52,7 +52,7 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            @histogram: viewportHistogram($total_damage, 1, 6)
+            @histogram: viewportHistogram($total_damage, 6)
 `);
         const layer = new carto.Layer('layer', source, viz);
 

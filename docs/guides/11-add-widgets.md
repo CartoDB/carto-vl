@@ -85,14 +85,14 @@ After that, we'll need to make sure to tell CARTO VL to process a histogram as a
 ```js
 const viz = new carto.Viz(`
     // The rest of the style should go here too
-    @histogram: viewportHistogram($total_damage, 1, 6)
+    @histogram: viewportHistogram($total_damage, 6)
 `);
 ```
 The [`viewportHistogram`](/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
 
-The second parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case, we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
+The second parameter is the number of buckets of the histogram, by default it has a value of 20, we'll use a different value here.
 
-The third parameter is the number of buckets of the histogram, by default it has a high value (1000), we'll simplify this a little bit here.
+The third parameter is optional, defaults to `1` and it is a way to weight each feature differently. For this case, we want to see the distribution of damage for each accident, without weighting each accident, but we could weight for example by the train size.
 
 The last step is to connect CARTO VL data with the Airship *as-histogram-widget* component. We do this with:
 ```js
