@@ -22,4 +22,4 @@ Below are short descriptions for each guide to help you get started:
 * **Add legends**: explore how to enrich your visualizations with legends to aid interpretation of symbolized features.
 * **Add widgets**: explore how to enrich your visualizations with widgets to provide additional context from your datasets.
 
-If there is any word or term you do not understand while reading the guides, please take a look to our [CARTO VL Glossary] (/developers/carto-vl/guides/Glossary/) or, if it is not just related to CARTO VL, to our [CARTO Glossary](https://carto.com/help/glossary).
+If there is any word or term you do not understand while reading the guides, please take a look to our [CARTO VL Glossary](/developers/carto-vl/guides/Glossary/) or, if it is not just related to CARTO VL, to our [CARTO Glossary](https://carto.com/help/glossary).
