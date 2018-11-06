@@ -198,6 +198,7 @@ Now, when you load the map, you will see the complete legend. You will also noti
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
 
 ### Overwrite defaults
 
@@ -235,6 +236,7 @@ With that change, the final map will now label other categories as "Other weathe
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
 
 ### More examples
 
@@ -252,6 +254,7 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
 
 #### Categorical lines
 
@@ -265,8 +268,9 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
 
-##### Image markers
+#### Image markers
 
 <div class="example-map">
     <iframe
@@ -278,8 +282,9 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
 
-##### Unclassed latitudes
+#### Unclassed latitudes
 
 <div class="example-map">
     <iframe
@@ -291,3 +296,4 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
