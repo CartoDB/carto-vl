@@ -29,7 +29,7 @@ The most straight-forward way to use CARTO VL is to include the required files f
 </head>
 ```
 **Note:**
-CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](https://carto.com/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided with patched MGL bundles, but this is no longer required.
+CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from version **`0.50.0`** should work. Historically, we provided with patched MGL bundles, but this is no longer required.
 
 #### Add map container
 
@@ -39,7 +39,7 @@ Next, you need to create a `div` where the map will be drawn:
   <div id="map"></div>
 ```
 
-Style the map `div` to ensure the map displays properly: 
+Style the map `div` to ensure the map displays properly:
 
 ```css
 #map {
@@ -55,24 +55,23 @@ Once you have a `div` for your map, you have to use the `mapboxgl` object to ini
 
 - **`container`** indicates where the map is going to be placed
 - **`style`** sets the basemap style to use
-- **`center`** sets the opening extent of the basemap
+- **`center`** sets the opening center of the basemap
 - **`zoom`** sets the default zoom level of the basemap
-- **`dragRotate`** disables map rotation
 
 ```js
 const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [0, 30],
-      zoom: 2,
+      zoom: 2
     });
 ```
 
 For the basemap `style` parameter, you can add either [Mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or one of the three predefined styles offered by CARTO:
 
-- **Voyager:** `carto.basemaps.voyager` [https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json)
-- **Positron:** `carto.basemaps.positron` [https://basemaps.cartocdn.com/gl/positron-gl-style/style.json](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
-- **Dark Matter:** `carto.basemaps.darkmatter` [https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
+- **Voyager:** `carto.basemaps.voyager` [voyager-gl-style](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json)
+- **Positron:** `carto.basemaps.positron` [positron-gl-style](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
+- **Dark Matter:** `carto.basemaps.darkmatter` [dark-matter-gl-style](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
 
 At this point you will have a basic map with Voyager as the base, that opens at zoom level 2 and centered on the world:
 
@@ -102,7 +101,7 @@ carto.setDefaultAuth({
 
 ### Define source
 
-The next step is to define the [`source`](/developers/carto-vl/guides/02-using-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
+The next step is to define the [`source`](/developers/carto-vl/guides/add-data-sources) from your account to be displayed on the map. In the example below, the `source` is a dataset named `populated_places` with all the populated places around the world from [Natural Earth](https://www.naturalearthdata.com/).
 
 ```js
 const source = new carto.source.Dataset('populated_places');
@@ -110,7 +109,7 @@ const source = new carto.source.Dataset('populated_places');
 
 ### Define Viz object
 
-A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map. 
+A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map.
 
 Create an empty Viz object that uses the default CARTO VL styling:
 
@@ -140,12 +139,12 @@ Using the Viz object you created in a previous step, override the default by add
 
 ```js
 const viz = new carto.Viz(`
-    color: red
-    width: 10
+    color: purple
+    width: 5
 `);
 ```
 
-For more information about styling, check out the guide [Introduction to Styling](/developers/carto-vl/guides/introduction-to-styling/).
+For more information about styling, check out the guide [Style with Expressions](/developers/carto-vl/guides/style-with-expressions/).
 
 ### All together
 
@@ -183,8 +182,7 @@ For more information about styling, check out the guide [Introduction to Styling
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
-            zoom: 2,
-            dragRotate: false,
+            zoom: 2
         });
 
         //** CARTO VL functionality begins here **//
