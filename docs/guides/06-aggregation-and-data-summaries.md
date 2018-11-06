@@ -1,4 +1,4 @@
-## Spatial aggregations
+## Aggregation and data summaries
 
 In this guide you will explore a set of functions called **aggregations**, that allow you to extract different values from your datasets by considering either the whole set of features (*global aggregations*), just the ones displayed in the current map extent (*viewport aggregations*) or those derived from spatial aggregations (*cluster aggregations*).
 
@@ -67,7 +67,7 @@ The result using the global functions in the previous step should look like this
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-1"
-        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-1.html"
+        src="/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-1.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -75,7 +75,7 @@ The result using the global functions in the previous step should look like this
     </iframe>
 </div>
 
-To open the map at this step, use this [link to the map](/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-1.html), where you can check the console messages.
+To open the map at this step, use this [link to the map](/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-1.html), where you can check the console messages.
 
 **Note:**
 To display only the biggest city in the world change your filter to `filter: $pop_max == @g_max // biggest city is Tokyo!`.
@@ -207,7 +207,7 @@ At this point, you have created this great visualization, using global and viewp
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-2"
-        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-2.html"
+        src="/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-2.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -215,7 +215,7 @@ At this point, you have created this great visualization, using global and viewp
     </iframe>
 </div>
 
-To explore the map at full screen size, have a look at [this link](/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-2.html) and see the biggest cities in the world (Tokyo, New York, Mumbay...).
+To explore the map at full screen size, have a look at [this link](/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-2.html) and see the biggest cities in the world (Tokyo, New York, Mumbay...).
 
 
 ### Resolution
@@ -298,7 +298,7 @@ Congrats, you made your way through this guide!. This is the result:
 <div class="example-map">
     <iframe
         id="guides-aggregations-step-3"
-        src="/developers/carto-vl/examples/maps/guides/spatial-aggregations/step-3.html"
+        src="/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -315,20 +315,16 @@ This is the complete code:
 
 <head>
     <meta charset="utf-8">
-
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
-
     <!-- Numeral.js for number formatting -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
 </head>
 
 <body>
     <div id="map"></div>
-    <!-- Add panel -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -350,7 +346,6 @@ This is the complete code:
             center: [0, 30],
             zoom: 2
         });
-        
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
@@ -366,7 +361,6 @@ This is the complete code:
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
-
         const layer = new carto.Layer('cities', source, viz);
         layer.addTo(map);
 
@@ -406,7 +400,6 @@ This is the complete code:
         // Deactivate after removing viewport variables from viz
         layer.off('loaded', displayGlobalValues)
         layer.off('updated', displayViewportValues);
-
     </script>
 </body>
 

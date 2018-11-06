@@ -3,21 +3,16 @@
 
 <head>
     <meta charset="utf-8">
-
     <script src="../../../dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-
     <link rel="stylesheet" type="text/css" href="../../style.css">
-
     <!-- Numeral.js for number formatting -->
     <script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
 </head>
 
 <body>
     <div id="map"></div>
-
-    <!-- Add panel -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -33,14 +28,12 @@
     </aside>
 
     <script>
-       
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.voyager,
             center: [0, 30],
             zoom: 2
         });
-        
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
@@ -56,7 +49,6 @@
             width: sqrt(clusterSum($pop_max) / 50000) + 5
             resolution: 16
         `);
-
         const layer = new carto.Layer('cities', source, viz);
         layer.addTo(map);
 
@@ -96,7 +88,6 @@
         // Deactivate after removing viewport variables from viz
         layer.off('loaded', displayGlobalValues)
         layer.off('updated', displayViewportValues);
-
     </script>
 </body>
 
