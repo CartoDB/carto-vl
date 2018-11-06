@@ -119,8 +119,8 @@ The map below demonstrates how to access and modify the `color` property:
         frameBorder="0">
     </iframe>
 </div>
-> View this step [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-3.html)
 
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-3.html)
 
 ### The String and JavaScript Visualization APIs
 
