@@ -111,7 +111,7 @@ const source = new carto.source.Dataset('populated_places');
 
 A [`Viz object`](/developers/carto-vl/reference/#cartoviz) is one of the core elements of CARTO VL. It defines how the data will be styled and displayed on your map.
 
-Create an empty Viz object that uses the default CARTO VL styling:
+Create an empty `Viz` object that uses the default CARTO VL styling:
 
 ```js
 const viz = new carto.Viz();
@@ -135,7 +135,7 @@ layer.addTo(map);
 
 ### Defining a custom style for the Viz object
 
-Instead of using the Viz object you created in a previous step, with the default values, we can set custom values for the `color` and `size` of the points on your map:
+Instead of using the `Viz` object you created in a previous step, with the default values, we can set custom values for the `color` and `size` of the points on your map:
 
 ```js
 const viz = new carto.Viz(`
@@ -158,6 +158,7 @@ For more information about styling, check out the guide [Style with Expressions]
         frameBorder="0">
     </iframe>
 </div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/getting-started/step-2.html)
 
 ```html
 <!DOCTYPE html>
