@@ -102,7 +102,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
 
 ### Access data from `ramp`
 
-To get the necessary information to populate the legend, you use the [`getLegendData()`](https://carto.com/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
+To get the necessary information to populate the legend, you use the [`getLegendData()`](developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
 
 Take a look at the point styling for the accidents map. This is the styling that we want to bring into our legend and associate each legend item to each category type that we are symbolizing from the `$weather` property.
 
@@ -120,7 +120,7 @@ const viz = new carto.Viz(`
 Since the `ramp` expression is the root expression of a styling property (in this case, `color`) it can be accessed directly with `layer.viz.color.getLegendData()`.
 
 **Note:**
-If styling isn't tied directly to a styling property, you will need to use a variable. We will explore that method in detail in the [Add Widgets](##_Widgets) guide.
+If styling isn't tied directly to a styling property, you will need to use a variable. We will explore that method in detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
 
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 

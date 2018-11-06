@@ -156,7 +156,7 @@ const viz = new carto.Viz(`
 **Note:**
 Both properties, `$name` and `$pop_max` are columns in the original dataset.
 
-As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You'll need to refer to a specific set of features: the ones clicked or hovered by using [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity) or all the ones that are on the viewport by using viewportFeatures.
+As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You'll need to refer to a specific set of features: the ones clicked or hovered by using [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity) or all the ones that are on the viewport by using [viewportFeatures](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewportfeatures).
 
 
 ### Feature events
