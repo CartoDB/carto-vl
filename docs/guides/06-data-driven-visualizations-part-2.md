@@ -1,4 +1,4 @@
-## Data-driven visualizations (part 2): Ramp values
+## Data-driven visualizations (part 2)
 
 In the previous section we talked about using different types of inputs for ramp, but we always output colors picked from a list. `ramp` supports to use other types of outputs and also CARTO VL includes some fixed constant palettes of colors. Let's see it!
 
@@ -43,7 +43,6 @@ color: ramp($dn, [hsv(0,1,1), hsv(0.5,1,1)])
 // Style 4: apply color using the CARTOColor scheme "temps"
 
 color: ramp($dn, temps)
-
 ```
 
 <div class="example-map">
@@ -51,45 +50,62 @@ color: ramp($dn, temps)
         id="guides-data-driven-2-step-1"
         src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/population-density-colors.html"
         width="100%"
-        height="1000"
+        height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
-    <a href="/developers/carto-vl/examples#example-population-density---colors">View my source code!</a>
 </div>
 
-### Numeric values / Bubble-maps
+### Numeric values
 
-When dealing with point data, an interesting visualization is the bubble-map. In a bubble-map, each point has a width that depends on a feature property.
+Proportional symbols (aka "bubble-maps") are a method of symbolizing points using a numeric property. The symbol size of each point is scaled according to its value in the data.
 
-Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. In the following subsections we'll see both approaches, learning how to create bubble maps like this:
+Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. 
+
+In the following sections you will see both approaches, and learn how to create proportional symbol maps like the ones below.
+
+```CARTO_VL_Viz
+// Style 1: Sets a pixel width of 0 to accidents with the lowest damage amounts and 50 pixels to the highest damage amount
+
+width: ramp($total_damage, [0, 50])
+
+// Style 2: The same as before for the extreme points, but the interpolation will be linear in area, not in width. An intermediate accident with half the damage of the worst accident will get half the area of the worst (50²/2), but not half its width. Unless you want to accentuate differences, this is usually the proper way to make a bubble map
+
+width: sqrt(ramp($total_damage, [0, 50^2]))
+
+// Style 3: The same as before since the dataset has accidents with zero damage
+
+width: sqrt($total_damage/globalMax($total_damage))*50)
+
+// Style 4: In this example, the Equal Intervals method allows to detect the outliers quickly.
+
+width: ramp(globalEqIntervals($total_damage, 3), [1, 25])
+```
 <div class="example-map">
     <iframe
         id="guides-data-driven-2-step-2"
-        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/accidents-bubblemap.html"
+        src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-2.html"
         width="100%"
-        height="900"
+        height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-railroad-accidents---bubble-map">View my source code!</a>
 
 #### The `ramp` way
 
-`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same [*implicit casts*](/developers/carto-vl/guides/Glossary/) we talked before will be performed.
-```
+`ramp` can be used in the same way it can be used with colors by replacing the colors with numbers. With this approach, the same [*implicit casts*](/developers/carto-vl/guides/Glossary/)we talked before will be performed.
+```CARTO_VL_Viz
 width: ramp($number, [0, 50])
 ```
 
 Classified numerical properties are similar too:
-```
+```CARTO_VL_Viz
 width: ramp(globalQuantiles($number, 7), [1, 50])
 ```
 
-
 Categorical properties can be used like before too, although normally, it doesn't make sense to set the width by a categorical property:
-```
+```CARTO_VL_Viz
 width: ramp(buckets($cat, 'categoryA', 'categoryB'), [1, 50])
 ```
 
@@ -99,12 +115,12 @@ Using `ramp($number, [0, 50])` works, and it probably works as expected. If `$nu
 However, this is probably not what you want. The reason for this is that a change of `3x` in width is not perceive as a change of `3x`, because we perceive the change of area, not the change of width, and the change of area when triplicating the width is not a `3x`, but a `9x`. Basic geometry tells us that the area of a circle is proportional to the square of its radius.
 
 If we don't want to accentuate differences we'll need to take the square root. This can be done with:
-```
+```CARTO_VL_Viz
 // We'll need to take the square of the output values to specify the widths and not the areas
 width: sqrt(ramp($number, [0, 50^2]))
 ```
 Similarly, classifiers can be re-mapped in the same way:
-```
+```CARTO_VL_Viz
 width: sqrt(ramp(globalQuantiles($number, 7), [1, 50^2]))
 ```
 
@@ -118,21 +134,43 @@ For example, the `ramp` expression `width: ramp(sqrt(linear($number)), [0, 50])`
 
 ### Images values
 
-The last supported type of value for `ramp` is the `Image` type. Let's see some examples:
+The last supported type of value for `ramp` is the `image` type.
+
+The map below, assigns different image markers and colors to two categories in the data (`car` and `bus`). The features labeled "Default" in the legend are ones that weren't specified in the `buckets` list. Because of this, they are symbolized with default image symbology: colored gray with a circle image.
+
+```CARTO_VL_Viz
+symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus])
+color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
+width: 20
+```
 
 <div class="example-map">
     <iframe
         id="guides-data-driven-2-step-3"
-        src="/developers/carto-vl/examples/maps/styling/image-multiple.html"
+        src="/developers/carto-vl/examples/maps/styling/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-<a href="/developers/carto-vl/examples/#example-multiple-images">View my source code!</a>
 
-As you can see, the features that weren't specified in the `buckets` list received the color gray and were represented with circles. As discussed above, this *others bucket* receive default values, but they can be overridden, even when working with images. Let's see that:
+As discussed above, the *others bucket* receives default values, but they can be overwritten, even when working with images. 
+
+In the map below, the defaults are overwritten to `cross` for the image and `gold` for the color:
+
+```CARTO_VL_Viz
+symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
+color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff], gold)
+width: 20
 ```
-symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [star,triangle,marker], square)
-```
+<div class="example-map">
+    <iframe
+        id="guides-data-driven-2-step-4"
+        src="/developers/carto-vl/examples/maps/styling/step-4.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>

@@ -19,10 +19,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Select Visualization</h1>
+                <h1>Color values</h1>
             </header>
             <section>
-                <p class="description open-sans">Change the visualization of the layer</p>
+                <p class="description open-sans">Select a style</p>
                 <div id="controls">
                     <ul class="actions">
                         <li>
@@ -102,7 +102,7 @@
                     `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${key}</span></li>\n`;
             });
             document.getElementById('content').innerHTML = colorLegendList;
-            document.getElementById('content-title').innerHTML = `Legend of ${colorLegend.name}`;
+            document.getElementById('content-title').innerHTML = `Legend`;
         });
 
         function rgbToHex(color) {
