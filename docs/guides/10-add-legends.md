@@ -18,11 +18,11 @@ If you completed the data-driven visualization guide, the map below will look fa
     </iframe>
 </div>
 
-At the end of this guide, we also provide a series of examples, that are meant to serve as legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
+At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
 ### Getting started
 
-The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right hand corner, but is missing the legend information to help interpret what weather type each color on the map represents.
+The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right-hand corner, but is missing the legend information to help interpret what weather type each color on the map represents.
 
 <div class="example-map">
     <iframe
@@ -59,7 +59,6 @@ To get started, copy and paste the code for this map and save it as `accidents.h
 
     <div id="map"></div>
 
-    <!-- Add title/legend box -->
     <aside class="toolbox">
         <div class="box">
             <header>
@@ -111,7 +110,7 @@ Take a look at the point styling for the accidents map. This is the styling that
 ```CARTO_VL_Viz
 const viz = new carto.Viz(`
     width: 7
-    color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+    color: ramp($weather, [darkorange, darkviolet, darkturquoise])
     strokeWidth: 0.2
     strokeColor: black
 `);
@@ -127,17 +126,17 @@ If styling isn't tied directly to a styling property, you will need to use a var
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 
 ```js
+// A function to convert map colors to HEX values for legend
+function rgbToHex(color) {
+    return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+}
+
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
 
     // Request data for legend from the layer viz
     const colorLegend = layer.viz.color.getLegendData();
     let colorLegendList = '';
-
-    // A function to convert map colors to HEX values for legend
-    function rgbToHex(color) {
-        return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
-    }
 
     // Create list elements for legend
     colorLegend.data.forEach((legend, index) => {
@@ -204,7 +203,7 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 In the map above, we are symbolizing all six weather categories in the data and therefore have an entry for each type in the legend. There are other times when there is symbology applied to some categories but not all of them. In this case, you will have an "others" legend item.
 
-For example, the map below symbolizes only the `top` three weather conditions in the rail accident data. The legend labels the top three categories with all other categories labeled as `CARTO_VL_OTHERS`:
+For example, the map below symbolizes only the `top` three weather conditions in the rail accident data. The legend labels the top three categories with all other categories labelled as `CARTO_VL_OTHERS`:
 
 <div class="example-map">
     <iframe
