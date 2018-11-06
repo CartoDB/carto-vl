@@ -85,6 +85,7 @@ At this point you will have a basic map with *Voyager* as the base, that opens a
         frameBorder="0">
     </iframe>
 </div>
+> View this step [here](/developers/carto-vl/examples/maps/guides/getting-started/step-1.html)
 
 ### Define user
 
@@ -158,6 +159,8 @@ For more information about styling, check out the guide [Style with Expressions]
         frameBorder="0">
     </iframe>
 </div>
+> You can explore the final step [here](/developers/carto-vl/examples/maps/guides/getting-started/step-2.html)
+
 
 ```html
 <!DOCTYPE html>
