@@ -51,12 +51,15 @@ Use the map below to toggle between three styles. You will notice that the map d
 
 ```CARTO_VL_Viz
 // Style 1: this will be implicitly cast to Style 2
+
 color: ramp($population_density,[midnightblue, deeppink, gold])
 
 // Style 2: will be implicitly cast to Style 3
+
 color: ramp(linear($population_density), [midnightblue, deeppink, gold])
 
 // Style 3
+
 color: ramp(linear($population_density, globalMin($population_density), globalMax($population_density)), [midnightblue, deeppink, gold])
 ```
 
@@ -87,12 +90,15 @@ In the map below, as you toggle between styles, you will notice how **Style 4** 
 
 ```CARTO_VL_Viz
 // Style 3: equivalent to Style 3 above
+
 color: ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])
 
 // Style 4: the data range has been fixed to the [0, 160] range
+
 color: ramp(linear($dn, 0, 160), [midnightblue, deeppink, gold])
 
 // Style 5: the data range has been set to avoid taking into account the first 1% of the data and the last 1% of the data
+
 color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [midnightblue, deeppink, gold])
 ```
 
@@ -122,15 +128,19 @@ Use the map below to see how classification of data varies between these two sam
 
 ```CARTO_VL_Viz
 // Style 1: Quantiles with 3 class breaks (global). The first bucket contains the lower 33% of the data, the second the middle 33%, and the third, the last 33%.
+
 color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
 // Style 2: Equal intervals with 3 class breaks (global). The range of data is divided by the number of class breaks, giving the common difference.
+
 color: ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 
 // Style 3: Quantiles with 3 class breaks (viewport).
+
 color: ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
 // Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport.
+
 color: ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 ```
 
@@ -153,6 +163,7 @@ It's important to note that there is always one more class break than set breakp
 
 ```CARTO_VL_Viz
 // Style 1: Features with population density less than 80 will be set midnightblue, between 80 and 160 will be set deeppink, and greater than 160 will be set gold.
+
 color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
 ```
 
@@ -217,6 +228,7 @@ If you want to overwrite the defualt `others` color (`gray`), you can add a thir
 
 ```CARTO_VL_Viz
 // Overwrite the default others color to orange
+
 ramp(buckets($winner, ["Conservative Party", "Labour Party"], [royalblue,crimson], orange)
 ```
 <div class="example-map">

@@ -49,13 +49,11 @@
 
     const source = new carto.source.Dataset('table_311_complaints');
 
-    // Define Viz object and custom style
     const viz = new carto.Viz(`
       symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus])
       color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
       width: 20
     `);
-
 
     const layer = new carto.Layer('layer', source, viz);
 
