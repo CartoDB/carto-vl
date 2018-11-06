@@ -33,7 +33,7 @@ layer.addTo(map);
 **Note:**
 The use of `g_` prefix is not required but it can be useful as an indicator of a _global_ variable.
 
-For a review of these variables, add a `console.log` sentence once the layer has `loaded` (to know more about _events_, have a look at the [Interactivity and events Guide](/developers/carto-vl/guides/interactivity-events/):
+For a review of these variables, add a `console.log` sentence once the layer has `loaded` (to know more about _events_, have a look at the [Add interactivity and events Guide](/developers/carto-vl/guides/add-interactivity-and-events):
 ```js
 function displayGlobalValues() {
     console.log(`
@@ -184,13 +184,13 @@ layer.on('updated', displayViewportValues);
 **Note:**
 Notice how we have used `numeral` from the external library, and its `.format` method to display millions of people.
 
-As a nice complement, you can now change the _color_ and _size_ of the city with highest population on the screen using this code (replace `color: grey` and `width: 10` in the current viz with):
+As a nice complement, you can now change the _color_ and _size_ of the city with highest population on the screen using this code (replace `color: grey` and `width: 10` in the current `viz` with):
 ```CARTO_VL_Viz
 color: blend(gray, red, @f_isBiggest)
 width: blend(10, 40, @f_isBiggest)
 ```
 
-And add this new variable to the same viz:
+And add this new variable to the same `viz`:
 ```CARTO_VL_Viz
 @f_isBiggest: ($pop_max == @v_max)
 ```
@@ -275,9 +275,9 @@ width: sqrt(clusterSum($pop_max) / 5000) + 5
 
 In the previous expression, the aggregated population in the cluster is used to determine the circle size (helped with some maths to manually adjust values to pixels).
 
-But if you just replace that property in the current viz configuration, you'll get a `CartoValidationError: [Incorrect value]: Incompatible combination of cluster aggregation usages`, because you are mixing aggregated and unaggregated usages of the same property *pop_max*. So it is better if you just simplify the viz.
+But if you just replace that property in the current `viz` configuration, you'll get a `CartoValidationError: [Incorrect value]: Incompatible combination of cluster aggregation usages`, because you are mixing aggregated and unaggregated usages of the same property *pop_max*. So it is better if you just simplify the viz.
 
-Change your viz code to this:
+Change your `viz` code to this:
 ```js
 const viz = new carto.Viz(`
     color: red
@@ -306,7 +306,7 @@ Congrats, you made your way through this guide!. This is the result:
     </iframe>
 </div>
 
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/aggregation-and-data-summaries/step-3.html)
 
 This is the complete code:
 ```html
