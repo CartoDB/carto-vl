@@ -15,7 +15,7 @@ The following sections will cover **style by value** for different data properti
 **Note:**
 To introduce the use of `ramp`, this guide covers use-cases with the styling property `color`. `ramp` values don't always have to be colors. `ramp` gives you the ability to create a variety of map types like bubble, flow, and more which we will explore in more detail in [Part 2](/developers/carto-vl/guides/data-driven-visualizations-part-2/) of this guide.
 
-### Numeric properties
+### Numeric data
 
 #### Unclassed maps
 
@@ -37,6 +37,7 @@ color: ramp($population_density, [midnightblue, gold])
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-1.html)
 
 To see more variation in the data, you can even set intermediate colors in the color list for example, here we are adding an intermediate color, `deeppink`:
 
@@ -73,6 +74,7 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-2.html)
 
 #### Explicit ranges
 
@@ -112,6 +114,7 @@ color: ramp(linear($dn, globalPercentile($dn, 1), globalPercentile($dn, 99)), [m
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-3.html)
 
 #### Classed numeric data
 
@@ -156,6 +159,7 @@ Do you see how `viewport*` classifiers are dynamic and change the results accord
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-4.html)
 
 You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10,features that have a price between 10 and 200, and features that have a price higher than 200.
 
@@ -177,6 +181,7 @@ color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-5.html)
 
 **Note:**
 **`filter:`** is a special styling property. Apart from multiplying the feature's color alpha channel by its value, it is used semantically to filter the dataset, which affects the `viewport*` classifiers and `viewport*` aggregators. When a feature's `filter:` value is above `0.5` we consider that the feature pass the filter, and the feature will be taken into account. When the value is below `0.5`, the feature is ignored (treated as non-existent) in all `viewport*` functions.
@@ -241,6 +246,7 @@ ramp(buckets($winner, ["Conservative Party", "Labour Party"], [royalblue,crimson
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-7.html)
 
 #### Color most common categories
 
@@ -262,6 +268,7 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-8.html)
 
 #### Color all categories
 
@@ -283,6 +290,7 @@ color: ramp($weather,[darkorange,darkviolet,darkturquoise]
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-1/step-9.html)
 
 As mentioned above, this is a useful method for exploring data and/or if there are fewer categories in your dataset. If you have a dataset with over 11 categories, we recommend using `buckets` or `top` since it is difficult for the human eye to distinguish between so many different colors.
 
