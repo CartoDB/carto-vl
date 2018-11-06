@@ -37,10 +37,8 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.424335, 37.771521],
-      zoom: 12,
+      zoom: 12
     });
-
-    map.touchZoomRotate.disableRotation();
 
     // Autenticate the client
     carto.setDefaultAuth({
@@ -83,7 +81,7 @@
 
       // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
-      
+
     });
 
     function hideLoader() {
