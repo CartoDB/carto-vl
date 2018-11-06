@@ -147,8 +147,8 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             expect(viewportPercentile.value).toEqual(2);
         });
 
-        it('viewportHistogram($price, 1, 3) should eval to the correct histogram', () => {
-            const viewportHistogram = s.viewportHistogram($price, 1, 3);
+        it('viewportHistogram($price, 3, 1) should eval to the correct histogram', () => {
+            const viewportHistogram = s.viewportHistogram($price, 3, 1);
             fakeDrawMetadata(viewportHistogram);
             expect(viewportHistogram.value).toEqual([
                 {

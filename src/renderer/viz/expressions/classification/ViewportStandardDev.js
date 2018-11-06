@@ -58,7 +58,7 @@ export default class ViewportStandardDev extends Classifier {
             throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
         }
 
-        const children = { input, _histogram: viewportHistogram(input) };
+        const children = { input, _histogram: viewportHistogram(input, 1000) };
         super(children, buckets);
         this._classSize = classSize;
     }
