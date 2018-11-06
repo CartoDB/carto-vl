@@ -21,7 +21,7 @@ The complete list of CARTO VL styling properties and their semantics can be seen
 
 ### What is an expression?
 
-As seen above, each styling property is assigned a value that is considered to be an expression.
+As seen above, each styling property is assigned a value: a CARTO VL expression.
 
 Expressions assigned to properties can be constants (`red`, `#FFF`,`7`) or functions (`sqrt`, `+`, or `ramp`):
 
@@ -63,7 +63,7 @@ There are multiple ways to get color expressions (expressions whose type is `col
 - **Color constants**: are colors defined by name (`red`, `blue`, `white`...) or by hexadecimal RGB(A) composition (`#F88`, `#F88A`, `#F08080`, `#F08080A0`).
 - **Color constructors**: are functions that define colors by the components of its color space: `rgba(255, 255, 255, 0.6)`, `hsv(0, 1, 1)`.
 - **`opacity`**: a function that overrides an input color's alpha channel.
-- **`ramp`**: a function that is covered in more detail in [part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) of the Data-driven visualizations guide.
+- **`ramp`**: a function that is covered in more detail in the [Data-driven visualization guide](/developers/carto-vl/guides/data-driven-visualizations-part-1/).
 - **Other**: the use of advanced expressions like color arithmetic or blending.
 
 <div class="example-map">
@@ -181,4 +181,12 @@ Below is a comparison between both approaches to get the gist of it (it's ok if 
   // We set the width for this other case, redefining the width
   marker-width: 15
 }
+```
+
+```CARTO_VL_Viz
+// CARTO VL valid visualization
+// The buckets expression will classify the input property in two buckets: features with prices less than 100, and features with prices larger or equal than 100
+// The ramp expression will assign 5 to the first bucket and 15 to the second
+// Finally, we'll use ramp's output as the width
+width: ramp(buckets($price, [100]), [5, 15])
 ```

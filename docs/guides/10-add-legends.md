@@ -6,7 +6,7 @@ Maps that symbolize data without the necessary information to decode the symbols
 
 CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application.
 
-If you completed the XXX guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map.
+If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map.
 
 <div class="example-map">
     <iframe
@@ -122,7 +122,7 @@ const viz = new carto.Viz(`
 Since the `ramp` expression is the root expression of a styling property (in this case, `color`) it can be accessed directly with `layer.viz.color.getLegendData()`.
 
 **Note:**
-If styling isn't tied directly to a styling property, you will need to use a variable. We will explore that method in detail in the [Add Widgets](##_Widgets) guide.
+If styling isn't tied directly to a styling property, you will need to use a variable. We will explore that method in detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
 
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 

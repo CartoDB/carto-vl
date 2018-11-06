@@ -2,7 +2,7 @@
 
 Welcome to the CARTO VL guides!
 
-[CARTO VL](https://github.com/cartodb/carto-vl) is a JavaScript library to create custom location intelligence applications that leverage the power of [CARTO](https://carto.com/). It uses [WebGL](https://www.khronos.org/webgl/) to enable powerful vector maps.
+This documentation is meant to lead you from the basics of creating a map to advanced techniques for developing powerful interactive visualizations.
 
 It relies on [Mapbox GL](https://www.mapbox.com/mapbox-gl-js/api) to render basemaps. Mapbox GL can be used for other functionality too, read [Mapbox GL documentation](https://www.mapbox.com/mapbox-gl-js/api/) for more information. However, keep in mind that CARTO VL layers can only be controlled with the [CARTO VL API](/developers/carto-vl/reference/) and that Mapbox GL native layers can **only** be controlled with the Mapbox GL API. Therefore, CARTO VL expressions cannot be used for Mapbox GL layers and vice versa.
 
@@ -22,4 +22,4 @@ Below are short descriptions for each guide to help you get started:
 * **Add legends**: explore how to enrich your visualizations with legends to aid interpretation of symbolized features.
 * **Add widgets**: explore how to enrich your visualizations with widgets to provide additional context from your datasets.
 
-If there is any word or term you do not understand while reading the guides, please take a look to our [Glossary](https://carto.com/help/glossary).
+If there is any word or term you do not understand while reading the guides, please take a look to our [CARTO VL Glossary] (/developers/carto-vl/guides/Glossary/) or, if it is not just related to CARTO VL, to our [CARTO Glossary](https://carto.com/help/glossary).

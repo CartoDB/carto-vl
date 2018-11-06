@@ -82,7 +82,7 @@ There are multiple ways you can build on the `loaded` event. For example, you co
 It is important to note that the name of this event is **`loaded`**, not `load`.
 
 #### Updated event
-The `updated` event, is useful for cases when a layer's viz changes, for example when you have an [animated visualization](/developers/carto-vl/guides/playing-with-animations).
+The `updated` event, is useful for cases when a layer gets updated. It will be triggered when the map is panned or zoomed, when the source is changed, when the viz changes or when the viz is animated.
 
 If you check your work now, it should look like this:
 <div class="example-map">
@@ -97,8 +97,7 @@ If you check your work now, it should look like this:
 
 You should now open the [map](/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html) and explore the _console_ to check the current events.
 
-
-### Using dynamic variables
+### Using variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
 
 #### Variables without properties
@@ -121,7 +120,7 @@ layer.on('updated', displayNumberOfCities);
 **Note:**
 Notice how the variable can be accessed directly from the `carto.Viz` object, inside its `variables` array, without the `@` symbol. Its content is accessible using `.value`, and this is possible because the expression has no `properties` related to the features themselves.
 
-You can imagine `layer:updated` event as a "kind of" `layer:viz-updated` event, notifying you whenever something relevant has changed in the viz attached to the layer.
+`layer:updated` will notify you of every change that may result in a change of the variables value.
 
 If you want to reduce the number of current `console.log` entries, to better see the new one, you can remove the previous handler on `map:move` with:
 ```js
@@ -157,7 +156,7 @@ const viz = new carto.Viz(`
 **Note:**
 Both properties, `$name` and `$pop_max` are columns in the original dataset.
 
-As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value` on `layer:updated`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You need to use [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity).
+As the variables depend on properties, you can't just access them by using something like `viz.variables.name.value`. That will throw an error saying: _property needs to be evaluated in a 'feature'_. You'll need to refer to a specific set of features: the ones clicked or hovered by using [carto.Interactivity](/developers/carto-vl/reference/#cartointeractivity) or all the ones that are on the viewport by using [viewportFeatures](https://carto.com/developers/carto-vl/reference/#cartoexpressionsviewportfeatures).
 
 
 ### Feature events
@@ -280,7 +279,7 @@ Here it is the full example:
 <head>
     <meta charset="utf-8">
 
-    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.js"></script>
+    <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
 
@@ -297,10 +296,6 @@ Here it is the full example:
             center: [0, 30],
             zoom: 2
         });
-
-        const nav = new mapboxgl.NavigationControl();
-        map.addControl(nav, 'top-left');
-
 
         // MAP EVENTS
         // Wait for the map to render for the first time

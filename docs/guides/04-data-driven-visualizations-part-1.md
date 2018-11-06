@@ -2,7 +2,7 @@
 
 ### What is a ramp?
 
-The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs *values* based on an *input*. 
+The most common expression you will use for data-driven visualizations is [`ramp`](/developers/carto-vl/reference/#cartoexpressionsramp) a special CARTO VL expression that outputs *values* based on an *input*.
 
 Depending on the type of input, the matching output is performed in two different ways:
 - **One-to-one**: is performed when the number of possible categories in the input matches the number of values.
@@ -42,7 +42,7 @@ To see more variation in the data, you can even set intermediate colors in the c
 
 ```CARTO_VL_Viz
 color: ramp($population_density, [midnightblue, deeppink, gold])
-```  
+```
 #### Implicit casts
 
 Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call *implicit casts*.
@@ -56,7 +56,7 @@ color: ramp($population_density,[midnightblue, deeppink, gold])
 
 // Style 2: will be implicitly cast to Style 3
 
-color: ramp($population_density, [midnightblue, deeppink, gold])
+color: ramp(linear($population_density), [midnightblue, deeppink, gold])
 
 // Style 3
 
@@ -76,11 +76,11 @@ color: ramp(linear($population_density, globalMin($population_density), globalMa
 
 #### Explicit ranges
 
-When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3**: 
+When `linear` is called with only one parameter (as seen in **Style 2** above), it will transform to what we see in **Style 3**:
 
 ```CARTO_VL_Viz
 color: linear($population_density, globalMin($population_density), globalMax($population_density))
-``` 
+```
 
 The second and third parameters of `linear` (`globalMin()` and `globalMax()`) are what set the values of the lowest and highest population densities for `ramp`.
 
@@ -130,10 +130,10 @@ color: ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])
 // Style 2: Equal intervals with 3 class breaks (global). The range of data is divided by the number of class breaks, giving the common difference.
 color: ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 
-// Style 3: Quantiles with 3 class breaks (viewport). 
+// Style 3: Quantiles with 3 class breaks (viewport).
 color: ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])
 
-// Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport. 
+// Style 4: Equal Intervals classification equivalent to Style 2 but only using the samples that are shown in the viewport.
 color: ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])
 ```
 
@@ -150,7 +150,7 @@ Do you see how `viewport*` classifiers are dynamic and change the results accord
     </iframe>
 </div>
 
-You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10,features that have a price between 10 and 200, and features that have a price higher than 200. 
+You can also classify data with a fixed list of breakpoints (manual classification) with the [`buckets()`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function. For example, the expression `buckets($price, [10, 200])` will classify features, based on their value into 3 different buckets: features that have a price less than 10,features that have a price between 10 and 200, and features that have a price higher than 200.
 
 It's important to note that there is always one more class break than set breakpoints. The `buckets` function can also be used with categorical inputs, we'll explore that functionality later in this guide.
 
@@ -190,7 +190,7 @@ Before starting with your category map, it is important to note that in CARTO VL
 
 To assign a specific color to a specific category in your data, use the [`buckets`](/developers/carto-vl/reference/#cartoexpressionsbuckets) function.
 
-Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors. 
+Using `buckets` you can pick some or all categories from a property. You can list them in a particular order, and use `ramp` to do a one-to-one match between those categories and an associated list of colors.
 
 The map below is a categorical map of election results in the UK. Using a field (`$winner`), regions where the Conseravative Party won are colored `royalblue` and regions where the Labour Party won are colored `crimson`. These two parties are matched to their unique color using `buckets`:
 
@@ -211,9 +211,9 @@ color: ramp(buckets($winner, ["Conservative Party", "Labour Party"]), [royalblue
 
 #### Other categories
 
-In the map above, any region where a party other than Conservative or Labour won is colored `gray` by default. This is because in the data, there are additional political parties. 
+In the map above, any region where a party other than Conservative or Labour won is colored `gray` by default. This is because in the data, there are additional political parties.
 
-Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to a `others` bucket. Once you use `buckets` any category that isn't explicitly defined, will be sent to this bucket. If you want to display more categories, you can add them to the list and assign them a color. 
+Since the other winning parties weren't placed in the `bucket` function list, they are automatically assigned to a `others` bucket. Once you use `buckets` any category that isn't explicitly defined, will be sent to this bucket. If you want to display more categories, you can add them to the list and assign them a color.
 
 If you want to overwrite the defualt `others` color (`gray`), you can add a third parameter to `ramp`. In this case, all other parties will be colored `orange`:
 
@@ -234,7 +234,7 @@ ramp(buckets($winner, ['conservatives', 'progressives'], [royalblue,crimson], or
 
 #### Color most common categories
 
-Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket. 
+Another useful function for coloring categorical data is `top`. `top` allows you to select a number of most commonly occuring categories in a dataset and assign them a color. Similar to the map above, remaining categories are assigned to the `others` bucket.
 
 The map below visually summarizes the top three most common weather conditions for rail accidents in the US between the years of 2010-2014 using the `top` function. The top three categories are matched to the listed colors (`darkorange`,`darkviolet`,`darkturquoise`) and all other weather conditions are colored `white` in the *others* bucket:
 
@@ -255,9 +255,9 @@ color: ramp(top($weather, 3), [darkorange,darkviolet,darkturquoise], white)
 
 #### Color all categories
 
-There are times, in the initial phases of exploring a dataset, where it is helpful to have all categories in a property assigned a color. This is the default behavior in CARTO VL if you use a property as the `ramp` input (with no `buckets`) and a color list.  
+There are times, in the initial phases of exploring a dataset, where it is helpful to have all categories in a property assigned a color. This is the default behavior in CARTO VL if you use a property as the `ramp` input (with no `buckets`) and a color list.
 
-In the rail accident dataset, there are six types of weather conditions defined. In the map below, each type of condition is assigned a color even though there are only three colors in the list. To generate these intermediate colors, CARTO VL interpolates between the ones provided because the number of colors doesn't match the number of categories in the input. 
+In the rail accident dataset, there are six types of weather conditions defined. In the map below, each type of condition is assigned a color even though there are only three colors in the list. To generate these intermediate colors, CARTO VL interpolates between the ones provided because the number of colors doesn't match the number of categories in the input.
 
 ```CARTO_VL_Viz
 color: ramp($weather,[darkorange,darkviolet,darkturquoise]
@@ -277,4 +277,4 @@ color: ramp($weather,[darkorange,darkviolet,darkturquoise]
 As mentioned above, this is a useful method for exploring data and/or if there are fewer categories in your dataset. If you have a dataset with over 11 categories, we recommend using `buckets` or `top` since it is difficult for the human eye to distinguish between so many different colors.
 
 **Note:**
-The color interpolation done by `ramp` is always in the CIELab color space. This is especially important the sRGB color space is not a perceptual one. CIELab assures a better perception of color since it models, more closely, the way the human eye perceives color. If for example, you are interpolating between two colors, (colorA and colorB) CIELab interploation will be at 50% (in the middle) between them which is not the case  in sRGB.
+The color interpolation done by `ramp` is always in the CIELab color space. This is especially important the sRGB color space is not a perceptually uniform color space. CIELab assures a correct perception of color since it models the way the human eye perceives color.
