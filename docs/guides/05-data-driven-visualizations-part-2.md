@@ -60,7 +60,7 @@ color: ramp($dn, temps)
 
 Proportional symbols (aka "bubble-maps") are a method of symbolizing points using a numeric property. The symbol size of each point is scaled according to its value in the data.
 
-Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages. 
+Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages.
 
 In the following sections you will see both approaches, and learn how to create proportional symbol maps like the ones below.
 
@@ -155,7 +155,7 @@ width: 20
     </iframe>
 </div>
 
-As discussed above, the *others bucket* receives default values, but they can be overwritten, even when working with images. 
+As discussed above, the *others bucket* receives default values, but they can be overwritten, even when working with images.
 
 In the map below, the defaults are overwritten to `cross` for the image and `gold` for the color:
 
@@ -174,3 +174,4 @@ width: 20
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-4.html)

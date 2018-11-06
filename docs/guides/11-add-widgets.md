@@ -176,3 +176,4 @@ function drawHistogram() {
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/add-widgets/step-3.html)

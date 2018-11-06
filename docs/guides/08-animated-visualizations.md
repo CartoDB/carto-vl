@@ -279,7 +279,7 @@ setInterval(updateProgress, 100);
 ```
 
 **Note:**
-The `setInterval()` is a commond method available at the browser, that calls a function or evaluates an expression at specified intervals, in milliseconds. You can also do this update by listening to `carto.layer` events. This topic is covered more in-depth in the [Interactivity and Events Guide](/developers/carto-vl/guides/interactivity-events/); once you know how, the second options is preferred.
+The `setInterval()` is a common method available at the browser, that calls a function or evaluates an expression at specified intervals, in milliseconds. You can also do this update by listening to `carto.layer` events. This topic is covered more in-depth in the [Add interactivity and events Guide](/developers/carto-vl/guides/add-interactivity-and-events/); once you know how, the second options is preferred.
 
 
 #### All together
@@ -410,3 +410,4 @@ As you can see in the result, you are able to visualize, via color, where each b
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-6.html)

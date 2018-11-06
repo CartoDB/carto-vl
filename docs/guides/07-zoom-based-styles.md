@@ -253,7 +253,7 @@ color: ramp(globalQuantiles($diameter,7),sunset)
 width: ramp(zoomrange([12,18]),[1,20])
 strokeWidth: 0
 ```
-Next, add a `filter` and set the visible `diameter` criteria with `zoomrange` to gradually introduce larger and larger trees until zoom `16` and greater, where all trees are displyed (`true`):
+Next, add a `filter` and set the visible `diameter` criteria with `zoomrange` to gradually introduce larger and larger trees until zoom `16` and greater, where all trees are displayed (`true`):
 
 ```CARTO_VL_Viz
 filter:ramp(zoomrange([12,13,14,15,16]),
@@ -320,6 +320,8 @@ Take a look at the map, zoom in and out to see the changes in the styling and vi
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/zoom-based-styles/step-8.html)
+
 
 Pretty neat, right?!
 
