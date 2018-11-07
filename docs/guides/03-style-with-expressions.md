@@ -16,12 +16,8 @@ Visualizations have a fixed set of styling properties like `color` or `width` th
         frameBorder="0">
     </iframe>
 </div>
-<<<<<<< HEAD
-> View this step [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-1.html)
 
-=======
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-1.html)
->>>>>>> 0bf5db8d0... added map links and adjusted some formatting
+> You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-1.html)
 
 The complete list of CARTO VL styling properties and their semantics can be seen [here](/developers/carto-vl/reference/#vizspec).
 
@@ -82,12 +78,8 @@ There are multiple ways to get color expressions (expressions whose type is `col
         frameBorder="0">
     </iframe>
 </div>
-<<<<<<< HEAD
-> View this step [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-2.html)
 
-=======
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-2.html)
->>>>>>> 0bf5db8d0... added map links and adjusted some formatting
+> You can explore this map [here](/developers/carto-vl/examples/maps/guides/style-with-expressions/step-2.html)
 
 You can take a look at the [reference](/developers/carto-vl/reference/) for a detailed description of all color expressions.
 
