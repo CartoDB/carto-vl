@@ -26,24 +26,28 @@
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz1" checked>
-                            <label for="viz1">Style 1: Quantiles Global</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
+                                    id="viz1" checked>
+                                Style 1: Quantiles Global</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz2">
-                            <label for="viz2">Style 2: Equal Intervals Global</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(globalEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
+                                    id="viz2">
+                                Style 2: Equal Intervals Global</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz3">
-                            <label for="viz3">Style 3: Quantiles Viewport</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportQuantiles($dn, 3), [midnightblue, deeppink, gold])')"
+                                    id="viz3">
+                                Style 3: Quantiles Viewport</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
-                                id="viz4">
-                            <label for="viz4">Style 4: Equal Interval Viewport</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(viewportEqIntervals($dn, 3), [midnightblue, deeppink, gold])')"
+                                    id="viz4">
+                                Style 4: Equal Interval Viewport</label>
                         </li>
                     </ul>
                     <div id="info"></div>

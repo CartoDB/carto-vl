@@ -25,19 +25,22 @@
                 <div id="controls">
                     <ul class="actions">
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [midnightblue, deeppink, gold])')"
-                                id="viz1" checked>
-                            <label for="viz1">Style 1</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [midnightblue, deeppink, gold])')"
+                                    id="viz1" checked>
+                                Style 1</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [midnightblue, deeppink, gold])')"
-                                id="viz2">
-                            <label for="viz2">Style 2</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [midnightblue, deeppink, gold])')"
+                                    id="viz2">
+                                Style 2</label>
                         </li>
                         <li>
-                            <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])')"
-                                id="viz3">
-                            <label for="viz3">Style 3</label>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])')"
+                                    id="viz3">
+                                Style 3</label>
                         </li>
                     </ul>
                     <div id="info"></div>
