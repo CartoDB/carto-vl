@@ -3,8 +3,8 @@
 
 <head>
   <script src="../../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -37,10 +37,8 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.424335, 37.771521],
-      zoom: 12,
+      zoom: 12
     });
-
-    map.touchZoomRotate.disableRotation();
 
     // Autenticate the client
     carto.setDefaultAuth({
@@ -74,16 +72,22 @@
 
       colorLegend.data.forEach((legend) => {
         const colorHex = rgbToHex(legend.value);
-        const keyMin = legend.key[0].toFixed(2).replace('Infinity', '<');
-        const keyMax = legend.key[1].toFixed(2).replace('Infinity', '>');
+        const keyMin = legend.key[0].toFixed(2);
+        const keyMax = legend.key[1].toFixed(2);
+        let bucket = `${keyMin} - ${keyMax}`;
+        if (keyMin==='-Infinity'){
+          bucket = `<${keyMax}`;
+        }else if (keyMax==='Infinity'){
+          bucket = `>${keyMin}`;
+        }
 
         colorLegendList +=
-          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${keyMin} - ${keyMax}</span></li>\n`;
+          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${bucket}</span></li>\n`;
       });
 
       // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
-      
+
     });
 
     function hideLoader() {

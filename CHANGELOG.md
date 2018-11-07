@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Changed
+- Change signature in `viewportHistogram` from `(x, weight = 1, size = 1000)` to `(x, size = 20, weight = 1)`.
+
 ## [0.10.0] - 2018-11-02
 
 ### Added

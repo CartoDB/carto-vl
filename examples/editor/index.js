@@ -98,8 +98,6 @@ let map = new mapboxgl.Map({
     zoom: 0
 });
 
-map.touchZoomRotate.disableRotation();
-
 examples.forEach(addExample);
 
 let layer = null;
@@ -212,11 +210,6 @@ function getJSONConfig () {
 
 function setConfig (input) {
     let c = JSON.parse(atob(input));
-
-    if (c.c === 'dmanzanares-ded13') {
-        c.c = 'cartovl';
-        c.d = 'https://{user}.carto.com';
-    }
 
     if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
@@ -432,8 +425,8 @@ function generateSnippet (config) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <script src="http://libs.cartocdn.com/carto-vl/v${carto.version}/carto-vl.js"></script>
-        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+        <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+        <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
         <style>
            html, body {
                margin: 0;
