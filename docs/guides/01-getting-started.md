@@ -53,10 +53,10 @@ Style the map `div` to ensure the map displays properly:
 
 Once you have a `div` for your map, you have to use the [`mapboxgl.Map`](https://www.mapbox.com/mapbox-gl-js/api/#map) constructor to create a new map with the following parameters:
 
-- **`container`** [element ID](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) to indicate where the map is going to be placed
-- **`style`** sets the basemap style to use
-- **`center`** sets the opening center coordinates of the map
-- **`zoom`** sets the default zoom level of the map
+- **`container`**: [element ID](https://developer.mozilla.org/en-US/docs/Web/API/Element/id) to indicate where the map is going to be placed
+- **`style`**: sets the basemap style to use
+- **`center`**: sets the opening center coordinates of the map (longitude, latitude)
+- **`zoom`**: sets the default zoom level of the map
 
 ```js
 const map = new mapboxgl.Map({
@@ -69,9 +69,9 @@ const map = new mapboxgl.Map({
 
 For the basemap `style` parameter, you can add either [Mapbox custom styles](https://www.mapbox.com/mapbox-gl-js/style-spec/) or one of the three predefined styles offered by CARTO:
 
-- **Voyager:** `carto.basemaps.voyager` [voyager-gl-style](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json)
-- **Positron:** `carto.basemaps.positron` [positron-gl-style](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json)
-- **Dark Matter:** `carto.basemaps.darkmatter` [dark-matter-gl-style](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json)
+- **Voyager**: `carto.basemaps.voyager` (see style details at [voyager-gl-style](https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json))
+- **Positron**: `carto.basemaps.positron` ([positron-gl-style](https://basemaps.cartocdn.com/gl/positron-gl-style/style.json))
+- **Dark Matter**: `carto.basemaps.darkmatter` ([dark-matter-gl-style](https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json))
 
 At this point you will have a basic map with *Voyager* as the base, that opens at zoom level 2 and centered on the world:
 
