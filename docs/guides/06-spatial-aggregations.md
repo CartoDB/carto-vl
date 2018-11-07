@@ -308,7 +308,6 @@ Congrats, you made your way through this guide!. This is the result:
 
 You can explore the final step [here](/developers/carto-vl/examples/maps/guides/sources/step-3.html)
 
-
 This is the complete code:
 ```html
 <!DOCTYPE html>
