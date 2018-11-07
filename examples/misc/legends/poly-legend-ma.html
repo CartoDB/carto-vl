@@ -74,11 +74,11 @@
         const colorHex = rgbToHex(legend.value);
         const keyMin = legend.key[0].toFixed(2);
         const keyMax = legend.key[1].toFixed(2);
-        let bucket = `[${keyMin},  ${keyMax})`;
+        let bucket = `${keyMin} - ${keyMax}`;
         if (keyMin==='-Infinity'){
           bucket = `<${keyMax}`;
         }else if (keyMax==='Infinity'){
-          bucket = `>=${keyMin}`;
+          bucket = `>${keyMin}`;
         }
 
         colorLegendList +=

@@ -4,7 +4,7 @@ In the [previous guide](/developers/carto-vl/guides/data-driven-visualizations-p
 
 ### Color values
 
-One way to output colors is to specify a list of colors, as demonstrated in [Part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) with expressions like `ramp($dn, [blue, red])`. In those examples, you mainly saw the usage of named colors (`blue`, `red`, `green`). 
+One way to output colors is to specify a list of colors, as demonstrated in [Part 1](/developers/carto-vl/guides/data-driven-visualizations-part-1/) with expressions like `ramp($dn, [blue, red])`. In those examples, you mainly saw the usage of named colors (`blue`, `red`, `green`).
 
 With CARTO VL any valid color expression (not just named colors) can be used:
 
@@ -52,7 +52,7 @@ color: ramp($dn, temps)
         id="guides-data-driven-2-step-1"
         src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-1.html"
         width="100%"
-        height="500"
+        height="700"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
@@ -89,7 +89,7 @@ width: ramp(globalEqIntervals($total_damage, 3), [1, 25])
         id="guides-data-driven-2-step-2"
         src="/developers/carto-vl/examples/maps/guides/data-driven-viz-2/step-2.html"
         width="100%"
-        height="500"
+        height="550"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
