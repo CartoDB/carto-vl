@@ -32,7 +32,7 @@ export class MVTWorker {
         this.processEvent(event).then(message => {
             const transferables = [];
             if (!message.dataframe.empty) {
-                transferables.push(this._propertiesArrayBuffer);
+                transferables.push(message.dataframe.propertiesArrayBuffer);
                 transferables.push(message.dataframe.decodedGeom.verticesArrayBuffer);
                 if (message.dataframe.decodedGeom.normalsArrayBuffer) {
                     transferables.push(message.dataframe.decodedGeom.normalsArrayBuffer);
@@ -85,16 +85,16 @@ export class MVTWorker {
             return { empty: true };
         }
 
-        const { geometries, properties, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
+        const { geometries, properties, propertiesArrayBuffer, numFeatures } = this._decodeMVTLayer(mvtLayer, metadata, MVT_EXTENT);
         const rs = rsys.getRsysFromTile(x, y, z);
-        const dataframe = this._generateDataFrame(rs, geometries, properties, numFeatures, metadata.geomType, metadata);
+        const dataframe = this._generateDataFrame(rs, geometries, properties, propertiesArrayBuffer, numFeatures, metadata.geomType, metadata);
 
         return dataframe;
     }
 
     _decodeMVTLayer (mvtLayer, metadata, mvtExtent) {
         if (!mvtLayer.length) {
-            return { properties: [], geometries: {}, numFeatures: 0 };
+            return { properties: [], geometries: {}, propertiesArrayBuffer: [], numFeatures: 0 };
         }
         if (!metadata.geomType) {
             metadata.geomType = this._autoDiscoverType(mvtLayer);
@@ -132,7 +132,7 @@ export class MVTWorker {
         if (geometries) {
             pointGeometries = new Float32Array(geometries);
         }
-        const { properties } = this._initializePropertyArrays(metadata, mvtLayer.length);
+        const { properties, propertiesArrayBuffer } = this._initializePropertyArrays(metadata, mvtLayer.length);
         const scalarPropertyCodecs = this._scalarPropertyCodecs(metadata);
         const rangePropertyCodecs = this._rangePropertyCodecs(metadata);
         for (let i = 0; i < mvtLayer.length; i++) {
@@ -167,7 +167,7 @@ export class MVTWorker {
             numFeatures++;
         }
 
-        return { properties, geometries, numFeatures };
+        return { properties, propertiesArrayBuffer, geometries, numFeatures };
     }
 
     // Currently only mvtLayers with the same type in every feature are supported
@@ -183,8 +183,8 @@ export class MVTWorker {
 
     _initializePropertyArrays (metadata, length) {
         const propertyNames = this._getPropertyNamesFrom(metadata);
-        const properties = this._getPropertiesFor(propertyNames, length);
-        return { propertyNames, properties };
+        const { properties, propertiesArrayBuffer } = this._getPropertiesFor(propertyNames, length);
+        return { propertyNames, properties, propertiesArrayBuffer };
     }
 
     _getSourcePropertyNamesFrom (metadata) {
@@ -206,13 +206,13 @@ export class MVTWorker {
         const size = Math.ceil(length / RTT_WIDTH) * RTT_WIDTH;
 
         const arrayBuffer = new ArrayBuffer(4 * size * propertyNames.length);
-        this._propertiesArrayBuffer = arrayBuffer;
+        const propertiesArrayBuffer = arrayBuffer;
         for (let i = 0; i < propertyNames.length; i++) {
             const propertyName = propertyNames[i];
             properties[propertyName] = new Float32Array(arrayBuffer, i * 4 * size, size);
         }
 
-        return properties;
+        return { properties, propertiesArrayBuffer };
     }
 
     _scalarPropertyCodecs (metadata) {
@@ -245,12 +245,13 @@ export class MVTWorker {
         }
     }
 
-    _generateDataFrame (rs, geometry, properties, size, type, metadata) {
+    _generateDataFrame (rs, geometry, properties, propertiesArrayBuffer, size, type, metadata) {
         return new DummyDataframe({
             active: false,
             center: rs.center,
             geom: geometry,
             properties: properties,
+            propertiesArrayBuffer: propertiesArrayBuffer,
             scale: rs.scale,
             size: size,
             type: type,

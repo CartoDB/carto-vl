@@ -2,10 +2,11 @@ import { decodeGeom } from './decoder';
 import { computeAABB } from '../utils/geometry';
 
 export default class DummyDataframe {
-    constructor ({ center, scale, geom, properties, type, active, size, metadata }) {
+    constructor ({ center, scale, geom, properties, propertiesArrayBuffer, type, active, size, metadata }) {
         this.active = active;
         this.center = center;
         this.properties = properties;
+        this.propertiesArrayBuffer = propertiesArrayBuffer;
         this.scale = scale;
         this.type = type;
         this.decodedGeom = decodeGeom(type, geom);
