@@ -3,8 +3,8 @@
 
 <head>
   <script src="../../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../style.css">
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
@@ -38,10 +38,8 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [5, 40.5],
-      zoom: 5,
-
+      zoom: 5
     });
-    map.touchZoomRotate.disableRotation();
 
     const nav = new mapboxgl.NavigationControl({
       showCompass: false
@@ -58,7 +56,7 @@
     const source = new carto.source.Dataset('populated_places');
     // Define the visualization
     const viz = new carto.Viz(
-    ` @color: ramp($featurecla, bold)
+      ` @color: ramp($featurecla, bold)
       @histogram: viewportHistogram($featurecla)
       color: @color
       width: 5

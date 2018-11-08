@@ -3,8 +3,8 @@
 
 <head>
     <script src="../../../dist/carto-vl.js"></script>
-    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -15,10 +15,8 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [2.2021031855412048, 41.3982014758933],
-            zoom: 14,
-
+            zoom: 14
         });
-        map.touchZoomRotate.disableRotation();
 
         const nav = new mapboxgl.NavigationControl({
             showCompass: false

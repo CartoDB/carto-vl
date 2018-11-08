@@ -3,8 +3,8 @@
 
 <head>
   <script src="../../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../style.css">
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
@@ -38,10 +38,8 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [2.187695966305114, 41.38802296362937],
-      zoom: 12.073961457702497,
-
+      zoom: 12.073961457702497
     });
-    map.touchZoomRotate.disableRotation();
 
     carto.setDefaultAuth({
       username: 'cartovl',
@@ -61,7 +59,7 @@
     // Define the visualization
     const viz = new carto.Viz(
       `
-      @histogram: viewportHistogram($hour, 1, 12)
+      @histogram: viewportHistogram($hour, 12)
       color: ramp($hour, bold)
       width: 5
       strokeWidth: 0

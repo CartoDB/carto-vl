@@ -13,15 +13,15 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
  * @param {Number} input - expression to base the histogram
- * @param {Number} weight - Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
- * @param {Number} size - Optional (defaults to 1000). Number of bars to use if `x` is a numeric expression
+ * @param {Number} size - Optional (defaults to 20). Number of bars to use if `x` is a numeric expression
+ * @param {Number} weight - Optional. Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
  * @return {Histogram} Histogram
  *
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz(`
  *          \@categoryHistogram: viewportHistogram($type)
- *          \@numericHistogram:  viewportHistogram($amount, 1, 3)
+ *          \@numericHistogram:  viewportHistogram($amount, 3, 1)
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
@@ -52,7 +52,7 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * @api
  */
 export default class ViewportHistogram extends BaseExpression {
-    constructor (x, weight = 1, size = 1000) {
+    constructor (x, size = 20, weight = 1) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
         super({ x: implicitCast(x), weight: implicitCast(weight) });
 

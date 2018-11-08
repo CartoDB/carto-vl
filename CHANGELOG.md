@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [1.0.0] - 2018-11-08
+
+### Changed
+- Change signature in `viewportHistogram` from `(x, weight = 1, size = 1000)` to `(x, size = 20, weight = 1)`.
+
+### Fixed
+- Workaround buggy browser implementation of Web Worker transferables objects.
+
 ## [0.10.0] - 2018-11-02
 
 ### Added

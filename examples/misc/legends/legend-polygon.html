@@ -3,8 +3,8 @@
 
 <head>
   <script src="../../../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -37,13 +37,12 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-73.98076101209858, 40.751681063],
-      zoom: 13,
-
+      zoom: 13
     });
-    map.touchZoomRotate.disableRotation();
+
     // Autenticate the client
     carto.setDefaultAuth({
-      username: 'dmanzanares',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
