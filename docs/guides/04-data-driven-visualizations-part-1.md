@@ -120,7 +120,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-d
 
 Usage of `linear` reduces the loss of precision compared to the usage of classifiers. However, correctly classified data makes it easier to detect patterns since it is difficult to perceive small differences in color or size, which can arise when using `linear`.
 
-There are multiple classification methods available in CARTO VL (quantiles, equal intervals and standard deviation). These classification methods can be applied using two different samples of data:
+There are multiple [classification methods](https://carto.com/help/glossary/#classificationmethods) available in CARTO VL ([quantiles](https://carto.com/help/glossary/#quantiles), [equal intervals](https://carto.com/help/glossary/#equalintervals) and standard deviation). These classification methods can be applied using two different samples of data:
 - **The entire dataset**. `global*` classifiers will apply the classification to all source data. Ignoring filters or the presence of each feature in the viewport.
 - **Data in the viewport**. `viewport*` classifiers will apply the classification only to the features that are in the viewport. This includes filtering by the `filter` styling property and filtering by checking that the feature is within the region covered by the screen at each moment. Changes in the view (map center/map zoom) will trigger an automatic re-computation of the classification.
 

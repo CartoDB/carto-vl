@@ -20,9 +20,9 @@ By the end of this guide, you will be able to create this CARTO VL map:
 CARTO VL is a library that visualizes geographical datasets in a powerful and flexible way. Those datasets can be yours or they can be served by some other provider, but the first step to know is where they are hosted and how they can be accessed.
 
 CARTO VL currently supports three basic types of data sources:
-* **Dataset**: a vector dataset hosted by CARTO and available with your credentials (for example, a dataset with all the *stores in your city*).
-* **SQL**: a Dataset with a SQL query applied to it (e.g. just the *stores with > 500 sq meters*).
-* **GeoJSON**: a vector dataset in GeoJSON format.
+* **Dataset**: a vector [dataset](https://carto.com/help/glossary/#dataset) hosted by CARTO and available with your credentials (for example, a dataset with all the *stores in your city*).
+* **SQL**: a dataset with a [SQL query](https://carto.com/help/glossary/#query) applied to it (e.g. just the *stores with > 500 sq meters*).
+* **GeoJSON**: a vector dataset in [GeoJSON](https://carto.com/help/glossary/#geojson) format.
 
 Every type is a different kind of **Source**, and CARTO VL provides you with a suitable object in its API to use them under the namespace `carto.source` (for example `carto.source.Dataset`).
 
