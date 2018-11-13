@@ -223,7 +223,7 @@ export default class Renderer {
         }
         viz._getRootExpressions().map(expr => expr._dataReady());
 
-        gl.enable(gl.CULL_FACE);
+        gl.enable(gl.CULL_FACE); // this enables an optimization but it forces a particular vertices orientation
         gl.disable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.STENCIL_TEST);
