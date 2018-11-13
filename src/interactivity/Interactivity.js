@@ -99,16 +99,16 @@ export default class Interactivity {
 
     _setInteractiveCursor () {
         const map = this._layerList[0].map; // All layers belong to the same map
-        if (!map.__carto_interacivities) {
-            map.__carto_interacivities = new Set();
+        if (!map.__carto_interactivities) {
+            map.__carto_interactivities = new Set();
         }
         this.on('featureHover', event => {
             if (event.features.length) {
-                map.__carto_interacivities.add(this);
+                map.__carto_interactivities.add(this);
             } else {
-                map.__carto_interacivities.delete(this);
+                map.__carto_interactivities.delete(this);
             }
-            map.getCanvas().style.cursor = (map.__carto_interacivities.size > 0) ? 'pointer' : '';
+            map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
         });
     }
 
