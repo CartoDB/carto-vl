@@ -72,8 +72,8 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/car
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
  * @property {FeatureVizProperty} width
- * @property {FeatureVizProperty} colorStroke
- * @property {FeatureVizProperty} widthStroke
+ * @property {FeatureVizProperty} strokeColor
+ * @property {FeatureVizProperty} strokeWidth
  * @property {FeatureVizProperty} symbol
  * @property {FeatureVizProperty} symbolPlacement
  * @property {FeatureVizProperty} filter
