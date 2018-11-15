@@ -351,7 +351,7 @@ describe('Interactivity', () => {
         });
     });
 
-    function onLoaded(callback) {
+    function onLoaded (callback) {
         carto.on('loaded', [layer1, layer2], callback);
     }
 
@@ -572,7 +572,7 @@ describe('regression with blendTo', () => {
         });
     });
 
-    function onLoaded(callback) {
+    function onLoaded (callback) {
         layer.on('loaded', callback);
     }
 
