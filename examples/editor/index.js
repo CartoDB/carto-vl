@@ -98,8 +98,6 @@ let map = new mapboxgl.Map({
     zoom: 0
 });
 
-map.touchZoomRotate.disableRotation();
-
 examples.forEach(addExample);
 
 let layer = null;
@@ -212,11 +210,6 @@ function getJSONConfig () {
 
 function setConfig (input) {
     let c = JSON.parse(atob(input));
-
-    if (c.c === 'dmanzanares-ded13') {
-        c.c = 'cartovl';
-        c.d = 'https://{user}.carto.com';
-    }
 
     if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
@@ -423,60 +416,59 @@ function generateSnippet (config) {
 
     const source = config.i === sourceTypes.DATASET
         ? `new carto.source.Dataset("${config.a}")`
-        : `new carto.source.SQL("${config.a}")`;
+        : `new carto.source.SQL(\`${config.a}\`)`;
 
     return `<!DOCTYPE html>
-        <html>
-        <head>
-        <title>Add layer | CARTO</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta charset="UTF-8">
-        <script src="http://libs.cartocdn.com/carto-vl/v${carto.version}/carto-vl.js"></script>
-        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-        <style>
-           html, body {
-               margin: 0;
-           }
-           #map {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-            }
-        </style>
-        </head>
-        <body>
-        <div id="map"></div>
+<html>
+<head>
+<title>Exported map | CARTO VL</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<script src="http://libs.cartocdn.com/carto-vl/v${carto.version}/carto-vl.js"></script>
+<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+    html, body {
+        margin: 0;
+    }
+    #map {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+</head>
+<body>
+<div id="map"></div>
+<script>
+    const map = new mapboxgl.Map({
+        container: 'map',
+        style: '${basemap}',
+        center: [${center.lng}, ${center.lat}],
+        zoom: ${zoom}
+    });
 
-        <script>
-            const map = new mapboxgl.Map({
-                container: 'map',
-                style: '${basemap}',
-                center: [${center.lng}, ${center.lat}],
-                zoom: ${zoom},
+    carto.setDefaultConfig({
+        serverURL: '${serverURL}'
+    });
 
-
-            });
-
-            carto.setDefaultConfig({
-                serverURL: '${serverURL}'
-            });
-
-            carto.setDefaultAuth({
-                username: '${username}',
-                apiKey: '${apiKey}'
-            });
+    carto.setDefaultAuth({
+        username: '${username}',
+        apiKey: '${apiKey}'
+    });
 
 
-            const source = ${source};
-            const viz = new carto.Viz(\`${vizSpec}\`);
-            const layer = new carto.Layer('layer', source, viz);
+    const source = ${source};
+    const viz = new carto.Viz(\`
+        ${vizSpec}
+    \`);
+    const layer = new carto.Layer('layer', source, viz);
 
-            layer.addTo(map, 'watername_ocean');
-        </script>
-        </body>
-        </html>
-    `;
+    layer.addTo(map, 'watername_ocean');
+</script>
+</body>
+</html>
+`;
 }
 
 function showLoader () {
