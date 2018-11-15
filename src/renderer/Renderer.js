@@ -106,7 +106,7 @@ export default class Renderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-        this._AATex = gl.createTexture();
+        this._AATex = gl.createTexture(); // Antialiasing
         this._AAFB = gl.createFramebuffer();
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -230,6 +230,8 @@ export default class Renderer {
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
+        // To execute once per daframe and style property
+        // (geometries, properties and ids have been already loaded to GPU)
         const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr) => {
             const shader = metashader.shader;
             const textureId = metashader.textureIds;
@@ -258,6 +260,7 @@ export default class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
+        // Draw dataframe style textures
         dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
         if (dataframes[0].type !== 'polygon') {
             dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
@@ -268,13 +271,15 @@ export default class Renderer {
         }
         dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter));
 
+        // Final drawing (to screen). In the case of lines / polygons, there is an extra step (for antialiasing)
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        if (renderLayer.type !== 'point') {
+        if (renderLayer.type === 'point') {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        } else {
+            // lines & polygon (antialiasing)
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -329,7 +334,9 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
+            // Define some scalar uniforms
             gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
+            gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -345,21 +352,24 @@ export default class Renderer {
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
             }
 
+            // Common Style textures
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
             gl.uniform1i(renderer.colorTexture, freeTexUnit);
             freeTexUnit++;
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
-            gl.uniform1i(renderer.widthTexture, freeTexUnit);
-            freeTexUnit++;
-
-            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
-            gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
+
+            // Specific Style textures
+            if (dataframe.type === 'point' || dataframe.type === 'line') {
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
+                gl.uniform1i(renderer.widthTexture, freeTexUnit);
+                freeTexUnit++;
+            }
 
             if (!viz.symbol.default) {
                 const textureId = metaRenderer.textureIds;
@@ -393,7 +403,7 @@ export default class Renderer {
             }
 
             if (dataframe.type === 'line' || dataframe.type === 'polygon') {
-                gl.clear(gl.DEPTH_BUFFER_BIT);
+                gl.clear(gl.DEPTH_BUFFER_BIT); // antialising-related
             }
 
             if (!viz.transform.default) {
@@ -412,13 +422,14 @@ export default class Renderer {
                     freeTexUnit++;
                 });
 
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height); // remove it ? (duplicated)
             }
 
             gl.uniformMatrix4fv(renderer.matrix, false, dataframe.matrix);
 
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
+            // Some cleaning...
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
             if (dataframe.type === 'line' || dataframe.type === 'polygon') {
@@ -448,7 +459,7 @@ export default class Renderer {
             gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
         }
 
-        gl.disable(gl.CULL_FACE);
+        gl.disable(gl.CULL_FACE); // ? not needed from v0.50?
     }
 
     _updateDataframeMatrices (dataframes) {
