@@ -130,6 +130,17 @@ export default class Dataframe extends DummyDataframe {
         }
 
         const propertiesFloat32Array = this.properties[propertyName];
+
+        let props = propertiesFloat32Array;
+        if (props) {
+            props = new Float32Array(propertiesFloat32Array.length * 4);
+            for (let i = 0, len = propertiesFloat32Array.length; i < len; i++) {
+                props[4 * i + 0] = propertiesFloat32Array[i];
+                props[4 * i + 1] = propertiesFloat32Array[i];
+                props[4 * i + 2] = propertiesFloat32Array[i];
+                props[4 * i + 3] = propertiesFloat32Array[i];
+            }
+        }
         // Dataframe is already bound to this context, "hot update" it
         const gl = this.renderer.gl;
         const width = this.renderer.RTT_WIDTH;
@@ -138,9 +149,9 @@ export default class Dataframe extends DummyDataframe {
 
         this.propertyTex[propertyName] = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, this.propertyTex[propertyName]);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA,
-            width, height, 0, gl.ALPHA, gl.FLOAT,
-            propertiesFloat32Array);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
+            width, height, 0, gl.RGBA, gl.FLOAT,
+            props);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
