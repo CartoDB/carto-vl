@@ -292,6 +292,8 @@ export default class Windshaft {
                     options: {
                         sql: aggSQL,
                         aggregation: agg,
+                        vector_extent: 4096,
+                        vector_simplify_extent: 2048,
                         dates_as_numbers: true
                     }
                 }
