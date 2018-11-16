@@ -7,7 +7,7 @@ export const IDENTITY = {
 };
 
 export default class Metadata {
-    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
+    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty, extent } = { properties: {} }) {
         this.properties = properties;
         this.featureCount = featureCount;
         this.sample = sample;
@@ -18,6 +18,7 @@ export default class Metadata {
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
+        this.extent = extent || 4096;
 
         Object.values(properties).map(property => {
             property.categories = property.categories || [];
