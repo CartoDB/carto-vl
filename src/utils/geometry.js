@@ -169,39 +169,54 @@ export function computeAABB (geometry, type) {
 }
 
 export function computeCentroids (decodedGeometry, type) {
-    const centroids = [];
-
     switch (type) {
         case 'point':
-            // Compute centroids as just average coordinates
-            for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
-                const [xA, yA, xB, yB, xC, yC] = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
-                let centroid = {
-                    x: average([xA, xB, xC]),
-                    y: average([yA, yB, yC])
-                };
-                centroids.push(centroid);
-            }
-            break;
+            return _computeCentroidsForPoints(decodedGeometry);
         case 'line':
         case 'polygon':
-            // Compute centroids using triangles ponderated by its area
-            let startVertex = 0;
-            decodedGeometry.breakpoints.forEach((breakpoint) => {
-                const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
-                const centroid = _centroidForTriangles(vertices);
-                centroids.push(centroid);
-                startVertex = breakpoint;
-            });
-            break;
+            return _computeCentroidsForLinesOrPolygons(decodedGeometry);
         default:
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid type argument, decoded geometry must have a point, line or polygon type.`);
+    }
+}
+
+function _computeCentroidsForPoints (decodedGeometry) {
+    const centroids = [];
+
+    // 'Compute' centroids is just getting one exemplar of the 3 repeated points
+    for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
+        const [, , , , xC, yC] = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
+        let centroid = { x: xC, y: yC };
+        centroids.push(centroid);
     }
 
     return centroids;
 }
 
+function _computeCentroidsForLinesOrPolygons (decodedGeometry) {
+    const centroids = [];
+
+    let startVertex = 0;
+    decodedGeometry.breakpoints.forEach((breakpoint) => {
+        const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
+        const centroid = _centroidForTriangles(vertices);
+        centroids.push(centroid);
+        startVertex = breakpoint;
+    });
+
+    return centroids;
+}
+
 function _centroidForTriangles (vertices) {
+    // Special case: simple segment with 2 points (2 triangles with no area)
+    if (vertices.length / 6 === 2) {
+        const [xA, yA, , , xC, yC] = vertices.slice(0, 6);
+        return {
+            x: average([xA, xC]),
+            y: average([yA, yC])
+        };
+    }
+
     // Triangles average coordinates, ponderated by area
     const weightedXs = [];
     const weightedYs = [];
@@ -210,12 +225,14 @@ function _centroidForTriangles (vertices) {
         const [xA, yA, xB, yB, xC, yC] = vertices.slice(i * 6, 6 + i * 6);
         const triangle = [[xA, yA], [xB, yB], [xC, yC]];
         const area = triangleArea(triangle);
-        const averageX = average([xA, xB, xC]);
-        const averageY = average([yA, yB, yC]);
+        if (area > 0) {
+            const averageX = average([xA, xB, xC]);
+            const averageY = average([yA, yB, yC]);
 
-        weightedXs.push(averageX * area);
-        weightedYs.push(averageY * area);
-        areas.push(area);
+            weightedXs.push(averageX * area);
+            weightedYs.push(averageY * area);
+            areas.push(area);
+        }
     }
     const totalWeight = _sumArray(areas);
 
@@ -234,10 +251,10 @@ function _sumArray (array) {
 * Calculate the area of a triangle using its coordinates.
 * From https://en.wikipedia.org/wiki/Triangle#Computing_the_area_of_a_triangle
 */
-export function triangleArea (threeVertexArray) {
-    let [xA, yA] = threeVertexArray[0];
-    let [xB, yB] = threeVertexArray[1];
-    let [xC, yC] = threeVertexArray[2];
+export function triangleArea (threeVerticesArray) {
+    let [xA, yA] = threeVerticesArray[0];
+    let [xB, yB] = threeVerticesArray[1];
+    let [xC, yC] = threeVerticesArray[2];
 
     const area = Math.abs((xA - xC) * (yB - yA) - (xA - xB) * (yC - yA)) / 2.0;
     return area;
