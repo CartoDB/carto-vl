@@ -2,6 +2,10 @@ import { vec4 } from 'gl-matrix';
 import { average } from '../renderer/viz/expressions/stats';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
+const POINT_GEOMETRY_TYPE = 'point';
+const LINE_GEOMETRY_TYPE = 'line';
+const POLYGON_GEOMETRY_TYPE = 'polygon';
+
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
 export function intersect (a, b, c, d) {
@@ -137,10 +141,10 @@ export function pointInRectangle (point, bbox) {
 
 export function computeAABB (geometry, type) {
     switch (type) {
-        case 'point':
+        case POINT_GEOMETRY_TYPE:
             return [];
-        case 'line':
-        case 'polygon':
+        case LINE_GEOMETRY_TYPE:
+        case POLYGON_GEOMETRY_TYPE:
             const aabbList = [];
 
             for (let i = 0; i < geometry.length; i++) {
@@ -170,11 +174,11 @@ export function computeAABB (geometry, type) {
 
 export function computeCentroids (decodedGeometry, type) {
     switch (type) {
-        case 'point':
+        case POINT_GEOMETRY_TYPE:
             return _computeCentroidsForPoints(decodedGeometry);
-        case 'line':
-        case 'polygon':
-            return _computeCentroidsForLinesOrPolygons(decodedGeometry);
+        case LINE_GEOMETRY_TYPE:
+        case POLYGON_GEOMETRY_TYPE:
+            return _computeCentroidsForLinesOrPolygons(decodedGeometry, type);
         default:
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid type argument, decoded geometry must have a point, line or polygon type.`);
     }
@@ -183,7 +187,7 @@ export function computeCentroids (decodedGeometry, type) {
 function _computeCentroidsForPoints (decodedGeometry) {
     const centroids = [];
 
-    // 'Compute' centroids is just getting one exemplar of the 3 repeated points
+    // 'Compute' centroids for points is just getting one exemplar from the 3 repeated points
     for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
         const [, , , , xC, yC] = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
         let centroid = { x: xC, y: yC };
@@ -193,13 +197,18 @@ function _computeCentroidsForPoints (decodedGeometry) {
     return centroids;
 }
 
-function _computeCentroidsForLinesOrPolygons (decodedGeometry) {
+function _computeCentroidsForLinesOrPolygons (decodedGeometry, type) {
     const centroids = [];
 
     let startVertex = 0;
     decodedGeometry.breakpoints.forEach((breakpoint) => {
         const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
-        const centroid = _centroidForTriangles(vertices);
+        let centroid = null;
+        if (type === LINE_GEOMETRY_TYPE) {
+            centroid = _centroidForLines(vertices);
+        } else {
+            centroid = _centroidForPolygons(vertices);
+        }
         centroids.push(centroid);
         startVertex = breakpoint;
     });
@@ -207,17 +216,39 @@ function _computeCentroidsForLinesOrPolygons (decodedGeometry) {
     return centroids;
 }
 
-function _centroidForTriangles (vertices) {
-    // Special case: simple segment with 2 points (2 triangles with no area)
-    if (vertices.length / 6 === 2) {
-        const [xA, yA, , , xC, yC] = vertices.slice(0, 6);
-        return {
-            x: average([xA, xC]),
-            y: average([yA, yC])
-        };
+function _centroidForLines (vertices) {
+    // Triangles don't have any area in this case, so just average coordinates are calculated
+    const Xs = [];
+    const Ys = [];
+    for (let i = 0; i < vertices.length / 6; i++) {
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(i * 6, 6 + i * 6);
+
+        const AequalB = (xA === xB && yA === yB);
+        const BequalC = (xB === xC && yB === yC);
+
+        if (AequalB && BequalC) {
+            continue; // spurious triangles (useful for rendering strokes with normals, not here)
+        }
+
+        const firstPoint = [xA, yA];
+        const secondPoint = !AequalB ? [xB, yB] : [xC, yC];
+
+        Xs.push(firstPoint[0]);
+        Xs.push(secondPoint[0]);
+
+        Ys.push(firstPoint[1]);
+        Ys.push(secondPoint[1]);
     }
 
-    // Triangles average coordinates, ponderated by area
+    let centroid = {
+        x: average(Xs),
+        y: average(Ys)
+    };
+    return centroid;
+}
+
+function _centroidForPolygons (vertices) {
+    // Triangles average coordinates, ponderated by their area
     const weightedXs = [];
     const weightedYs = [];
     const areas = [];
