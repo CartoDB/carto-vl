@@ -12,7 +12,7 @@
       "properties": {
         "cartodb_id": 11,
         "value": 11,
-        "category": "aa",
+        "cat": "aa",
         "name": "innerLine"
       }
     },
@@ -28,7 +28,7 @@
       "properties": {
         "cartodb_id": 12,
         "value": 12,
-        "category": "bb",
+        "cat": "bb",
         "name": "intersectingLine"
       }
     },
@@ -44,7 +44,7 @@
       "properties": {
         "cartodb_id": 13,
         "value": 13,
-        "category": "cc",
+        "cat": "cc",
         "name": "outerLine"
       }
     },
@@ -60,7 +60,7 @@
       "properties": {
         "cartodb_id": 14,
         "value": 14,
-        "category": "dd",
+        "cat": "dd",
         "name": "outerBBOXLine"
       }
     }

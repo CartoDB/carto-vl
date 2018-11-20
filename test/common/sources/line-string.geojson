@@ -9,5 +9,7 @@
       [ 50, 0 ]
     ]
   },
-  "properties": {}
+  "properties": {
+    "cat": "1"
+  }
 }
