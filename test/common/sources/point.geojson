@@ -4,5 +4,7 @@
     "type": "Point",
     "coordinates": [ 0, 0 ]
   },
-  "properties": {}
+  "properties": {
+    "cat": "a"
+  }
 }
