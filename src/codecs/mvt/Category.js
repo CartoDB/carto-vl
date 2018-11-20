@@ -2,7 +2,7 @@ import CategoryCodec from '../Category';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
 
 export default class MVTCategoryCodec extends CategoryCodec {
-    sourceToInternal (propertyValue) {
+    sourceToInternal (metadata, propertyValue) {
         const propertyValueType = typeof propertyValue;
         if (propertyValue !== null && propertyValueType !== 'undefined' && propertyValueType !== 'string') {
             // TODO: It would be nice to include the name of the source property in the error message.
@@ -12,6 +12,6 @@ export default class MVTCategoryCodec extends CategoryCodec {
             // For more general solutions we'd need to provide the source property name as an argument to this method.
             throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property is of type 'category' but the MVT tile contained a feature property of type '${propertyValueType}': '${propertyValue}'`);
         }
-        return super.sourceToInternal(propertyValue);
+        return super.sourceToInternal(metadata, propertyValue);
     }
 }

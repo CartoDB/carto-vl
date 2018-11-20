@@ -41,7 +41,7 @@ export default class GlobalAggregation extends BaseExpression {
         if (!stats || stats[this._name] === undefined) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Metadata ${this._name} for property ${propertyName} is not defined`);
         }
-        this._value.expr = metadata.codec(propertyName).sourceToExternal(stats[this._name]);
+        this._value.expr = metadata.codec(propertyName).sourceToExternal(metadata, stats[this._name]);
     }
 
     _getMinimumNeededSchema () {
