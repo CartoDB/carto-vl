@@ -30,6 +30,7 @@
         ]]
       },
       "properties": {
+        "cat": "1",
         "color": "blue"
       }
     },
@@ -58,6 +59,7 @@
         ]]
       },
       "properties": {
+        "cat": "2",
         "color": "red"
       }
     }
