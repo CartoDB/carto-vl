@@ -28,21 +28,23 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-87.69990112331521, 41.84453868528371],
+      center: [0, 0],
       zoom: 0,
+      renderWorldCopies: false
     });
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
 
     map.on('load', () => {
-      //fetch('/test/common/sources/points.geojson')
-      fetch('/test/common/sources/polygon-collection-with-multipolygon.geojson')
+      // fetch('/test/common/sources/point-collection.geojson') // points
+      // fetch('/test/common/sources/line-string.geojson') // lines
+      fetch('/test/common/sources/polygon-collection-with-multipolygon.geojson') // polygons
         .then(response => response.json())
-        .then(function (polygons) {
-
-          const field = 'name'; // points --> 'cat' | polygons --> 'name'
-
-          const source = new carto.source.GeoJSON(polygons);
+        .then(function (geojson) {
+          const FIELD = 'cat';
+          const source = new carto.source.GeoJSON(geojson);
           const viz = new carto.Viz(`
-            @field: $${field}
+            @field: $${FIELD}
             @v_features: viewportFeatures(@field)
             color: ramp(@field, prism)
             width: 15
@@ -51,16 +53,19 @@
           layer.addTo(map, 'watername_ocean');
 
           let created = false;
-          layer.on('updated', () => {
-            const polygons = viz.variables.v_features.value;
 
-            if (!created && polygons.length > 0) {
-              addLayerWithCentroidsFrom(polygons);
-              created = true;
+          layer.on('updated', () => {
+            const originalFeatures = viz.variables.v_features.value;
+            if (originalFeatures.length > 0) {
+              addLayerWithCentroidsFrom(originalFeatures);
             }
 
             function addLayerWithCentroidsFrom(features) {
-              const geojsonFeatures = features.map(f => {
+              if (created) {
+                return; // centroids created just once from first viewportFeatures (initial zoom: 0)
+              }
+
+              const centroidFeatures = features.map(f => {
                 return {
                   "type": "Feature",
                   "geometry": {
@@ -68,16 +73,16 @@
                     "coordinates": f.getCentroid()
                   },
                   "properties": {
-                    "field": f.properties[field]
+                    "field": f.properties[FIELD]
                   }
                 }
               });
 
               const sourceCentroids = new carto.source.GeoJSON({
                 type: 'FeatureCollection',
-                features: geojsonFeatures
+                features: centroidFeatures
               });
-              const centroids = new carto.Layer('centroids', sourceCentroids,
+              const centroidsLayer = new carto.Layer('centroids' + Date.now(), sourceCentroids,
                 new carto.Viz(`
                   symbol: cross
                   color: red
@@ -85,12 +90,10 @@
                   symbolPlacement: ALIGN_CENTER
                 `)
               );
-              centroids.addTo(map);
+              centroidsLayer.addTo(map);
+              created = true;
             }
           });
-
-
-
         });
     });
 
