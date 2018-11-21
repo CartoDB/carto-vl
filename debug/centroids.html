@@ -35,13 +35,16 @@
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
 
+    // const URL = '/test/common/sources/point-collection.geojson'; // points
+    // const URL = '/test/common/sources/line-string.geojson'; // lines
+    const URL = '/test/common/sources/polygon-collection-with-multipolygon.geojson'; // polygons
+    // const URL = 'https://cartovl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, name as cat FROM world_borders'; // complex polygons
+
     map.on('load', () => {
-      // fetch('/test/common/sources/point-collection.geojson') // points
-      // fetch('/test/common/sources/line-string.geojson') // lines
-      fetch('/test/common/sources/polygon-collection-with-multipolygon.geojson') // polygons
+      fetch(URL)
         .then(response => response.json())
         .then(function (geojson) {
-          const FIELD = 'cat';
+          const FIELD = 'cat'; // the field to style with
           const source = new carto.source.GeoJSON(geojson);
           const viz = new carto.Viz(`
             @field: $${FIELD}
@@ -82,7 +85,7 @@
                 type: 'FeatureCollection',
                 features: centroidFeatures
               });
-              const centroidsLayer = new carto.Layer('centroids' + Date.now(), sourceCentroids,
+              const centroidsLayer = new carto.Layer('centroids_' + Date.now(), sourceCentroids,
                 new carto.Viz(`
                   symbol: cross
                   color: red
