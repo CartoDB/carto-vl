@@ -66,7 +66,7 @@ export class MVTWorker {
     }
 
     async urlToDataframeTransformer (response, x, y, z, layerID, metadata) {
-        const MVT_EXTENT = 4096;
+        const MVT_EXTENT = metadata.extent;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength === 0 || response === 'null') {
             return { empty: true };

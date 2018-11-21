@@ -11,6 +11,8 @@ const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
 
+const TILE_EXTENT = 2048;
+
 export default class Windshaft {
     constructor (source) {
         this._source = source;
@@ -165,12 +167,12 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(urlTemplates);
+        metadata.extent = TILE_EXTENT;
+        this._mvtClient = new MVT(urlTemplates, metadata);
         this._mvtClient._workerName = 'windshaft';
         this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
-        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
@@ -292,6 +294,8 @@ export default class Windshaft {
                     options: {
                         sql: aggSQL,
                         aggregation: agg,
+                        vector_extent: TILE_EXTENT,
+                        vector_simplify_extent: TILE_EXTENT,
                         dates_as_numbers: true
                     }
                 }
