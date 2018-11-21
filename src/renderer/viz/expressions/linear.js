@@ -146,7 +146,8 @@ export default class Linear extends BaseExpression {
             : new IdentityCodec();
         const min = codec.externalToInternal(this.min.eval(feature));
         const max = codec.externalToInternal(this.max.eval(feature));
-        return (input - min) / (max - min);
+        const inputValue = codec.externalToInternal(input);
+        return (inputValue - min) / (max - min);
     }
 
     _bindMetadata (metadata) {
