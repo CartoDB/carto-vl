@@ -2,65 +2,59 @@
 <html>
 
 <head>
-  <title>Labels | CARTO VL</title>
+  <title>Labels & points | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
 
-    #map {
-      position: absolute;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
+  <script src="../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link href="../examples/style.css" rel="stylesheet">
 </head>
 
 <body>
   <div id="map"></div>
+
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
-      center: [-87.69990112331521, 41.84453868528371],
-      zoom: 8,
+      style: carto.basemaps.voyager,
+      center: [7, 25],
+      zoom: 2,
+      renderWorldCopies: false
     });
 
-    const auth = {
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    carto.setDefaultAuth({
       user: 'cartovl',
       apiKey: 'default_public'
-    };
+    });
 
-    carto.setDefaultAuth(auth);
-
-    const source = new carto.source.Dataset('populated_places');
+    // Points layer
+    const source = new carto.source.Dataset('populated_places_small');
     const viz = new carto.Viz(`
-          color: ramp(linear($pop_max, 0, globalPercentile($pop_max, 95)), temps)
-          width: ramp(sqrt(linear($pop_max, 0, globalPercentile($pop_max, 95))), [1, 40])
-          @f:    viewportFeatures($pop_max)
-          @p80:    viewportPercentile($pop_max, 80)
-        `);
+      color: navy
+      width: 10
+      strokeColor: fuchsia
+      strokeWidth: 2
+      @v_features: viewportFeatures($pop_max)
+    `);
+    const layer = new carto.Layer('points', source, viz);
 
-    const layer = new carto.Layer('layer', source, viz);
 
     layer.on('loaded', () => {
+      map.addSource('labels', { type: 'geojson', data: null });
+      const labelSource = map.getSource('labels');
 
-      map.addSource('labels', {
-        type: 'geojson', data: null
-      });
-      const source = map.getSource('labels');
-
-      layer.on('updated', () => {
-        const features = viz.variables.f.value;
-        const geojsonFeatures = features.filter(f =>
-          f.properties.pop_max > viz.variables.p80.value
-        ).map(f => {
+      const layerUpdated = function () {
+        const features = viz.variables.v_features.value;
+        const geojsonFeatures = features.map(f => {
           return {
             "type": "Feature",
             "geometry": {
@@ -68,33 +62,43 @@
               "coordinates": f.getCentroid()
             },
             "properties": {
-              "pop_max": `${f.properties.pop_max}`,
+              "label_field": `${f.properties['pop_max']}`,
             }
           }
         });
 
-        source.setData({
+        labelSource.setData({
           type: 'FeatureCollection',
           features: geojsonFeatures
         });
-      });
+      };
 
+      layer.on('updated', layerUpdated);
+
+      // Labels layer
       map.addLayer({
-        "id": "points",
+        "id": "my-labels",
         "type": "symbol",
         "source": "labels",
         "layout": {
           "icon-image": "monument-15",
-          "text-field": "{pop_max}",
+          "text-field": "{label_field}",
           "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-          "text-offset": [0, -0.5],
-          "text-anchor": "top"
-        }
+          "text-offset": [1.5, 1.0],
+          "text-anchor": "center"
+        },
+        "paint": {
+          "text-color": "#202",
+          "text-halo-color": "#fff",
+          "text-halo-width": 2
+        },
       });
     });
 
-    layer.addTo(map, 'watername_ocean');
+    layer.addTo(map);
+
   </script>
+
 </body>
 
 </html>

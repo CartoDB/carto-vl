@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & useLines | CARTO</title>
+  <title>Labels & lines | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
 
@@ -36,14 +36,14 @@
       apiKey: 'default_public'
     });
 
-    // Polygons layer
-    const source = new carto.source.Dataset('world_borders');
+    // Lines layer
+    const source = new carto.source.Dataset('world_rivers_small');
     const viz = new carto.Viz(`
-      color: rgb(219,233,200)
-      strokeColor: rgb(40,40,40)
+      color: navy
+      width: 2
       @v_features: viewportFeatures($name)
     `);
-    const layer = new carto.Layer('polygons', source, viz);
+    const layer = new carto.Layer('lines', source, viz);
 
     layer.on('loaded', () => {
       map.addSource('labels', { type: 'geojson', data: null });
@@ -85,7 +85,7 @@
           "text-anchor": "center"
         },
         "paint": {
-          "text-color": "#333",
+          "text-color": "#30A",
           "text-halo-color": "#fff",
           "text-halo-width": 2
         },
@@ -93,16 +93,6 @@
     });
 
     layer.addTo(map);
-
-    function usePoints() {
-      layer.update(new carto.source.Dataset(POINT_LAYER), createVizFor('points'));
-    }
-    function useLines() {
-      layer.update(new carto.source.Dataset(LINE_LAYER), createVizFor('lines'));
-    }
-    function usePolygons() {
-      layer.update(new carto.source.Dataset(POLYGON_LAYER), createVizFor('polygons'));
-    }
 
   </script>
 
