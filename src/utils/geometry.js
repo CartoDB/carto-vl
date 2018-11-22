@@ -188,12 +188,13 @@ function _computeCentroidsForPoints (decodedGeometry) {
     const centroids = [];
 
     // 'Compute' centroids for points is just getting one exemplar from the 3 repeated points
-    for (let i = 0; i < decodedGeometry.vertices.length / 6; i++) {
-        const [, , , , xC, yC] = decodedGeometry.vertices.slice(i * 6, 6 + i * 6);
-        let centroid = { x: xC, y: yC };
-        centroids.push(centroid);
+    const STEP = 6;
+    for (let i = 0; i < decodedGeometry.vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [, , , , x, y] = decodedGeometry.vertices.slice(start, end);
+        centroids.push({ x, y });
     }
-
     return centroids;
 }
 
@@ -220,8 +221,11 @@ function _centroidForLines (vertices) {
     // Triangles don't have any area in this case, so just average coordinates are calculated
     const Xs = [];
     const Ys = [];
-    for (let i = 0; i < vertices.length / 6; i++) {
-        const [xA, yA, xB, yB, xC, yC] = vertices.slice(i * 6, 6 + i * 6);
+    const STEP = 6;
+    for (let i = 0; i < vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(start, end);
 
         const AequalB = (xA === xB && yA === yB);
         const BequalC = (xB === xC && yB === yC);
@@ -252,8 +256,12 @@ function _centroidForPolygons (vertices) {
     const weightedXs = [];
     const weightedYs = [];
     const areas = [];
-    for (let i = 0; i < vertices.length / 6; i++) {
-        const [xA, yA, xB, yB, xC, yC] = vertices.slice(i * 6, 6 + i * 6);
+
+    const STEP = 6;
+    for (let i = 0; i < vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(start, end);
         const triangle = [[xA, yA], [xB, yB], [xC, yC]];
         const area = triangleArea(triangle);
         if (area > 0) {
