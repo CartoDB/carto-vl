@@ -124,58 +124,54 @@ export default class Renderer {
      * Run aggregation functions over the visible features.
      */
     _runViewportAggregations (renderLayer) {
-        const dataframes = renderLayer.getActiveDataframes();
-        const viz = renderLayer.viz;
-
         // Performance optimization to avoid doing DFS at each feature iteration
-        const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
+        const viewportExpressions = this._getViewportExpressions(renderLayer.viz._getRootExpressions());
         if (!viewportExpressions.length) {
             return;
         }
+        renderLayer.parseVizExpression = parseVizExpression; // Important! to avoid a circular dependency problem
+        this._resetViewportAggregations(viewportExpressions, renderLayer);
+        this._runViewportAggregationsInActiveDataframes(viewportExpressions, renderLayer);
+    }
 
-        // Assume that all dataframes of a renderLayer share the same metadata
-        const metadata = viz.metadata;
-
-        renderLayer.parseVizExpression = parseVizExpression; // to avoid a circular dependency problem
+    _resetViewportAggregations (viewportExpressions, renderLayer) {
+        const metadata = renderLayer.viz.metadata; // assumes that all dataframes of a renderLayer share the same metadata
         viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));
+    }
 
-        // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
-        const processedFeaturesIDs = new Set();
-
+    _runViewportAggregationsInActiveDataframes (viewportExpressions, renderLayer) {
+        const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
+        const dataframes = renderLayer.getActiveDataframes();
         dataframes.forEach(dataframe => {
-            for (let i = 0; i < dataframe.numFeatures; i++) {
-                const featureId = dataframe.properties[metadata.idProperty][i];
-
-                // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(featureId)) {
-                    continue;
-                }
-                // Ignore features outside viewport
-                if (!dataframe.inViewport(i)) {
-                    continue;
-                }
-
-                processedFeaturesIDs.add(featureId);
-
-                const feature = this._featureFromDataFrame(dataframe, i);
-
-                // Ignore filtered features
-                if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
-                    continue;
-                }
-
-                // Pass the rawFeature to all viewport aggregations
-                this._accumViewportAggregations(viewportExpressions, feature);
-            }
+            this._runViewportAggregationsInDataframe(renderLayer.viz, viewportExpressions, dataframe, processedFeaturesIDs);
         });
     }
 
-    _accumViewportAggregations (viewportExpressions, rawFeature) {
-        const viewportExpressionsLength = viewportExpressions.length;
+    _runViewportAggregationsInDataframe (viz, viewportExpressions, dataframe, processedFeaturesIDs) {
+        for (let i = 0; i < dataframe.numFeatures; i++) {
+            const featureId = dataframe.properties[viz.metadata.idProperty][i];
 
-        for (let j = 0; j < viewportExpressionsLength; j++) {
-            const currentViewportExp = viewportExpressions[j];
-            currentViewportExp.accumViewportAgg(rawFeature);
+            const featureAlreadyAccumulated = processedFeaturesIDs.has(featureId);
+            if (featureAlreadyAccumulated) {
+                continue;
+            }
+
+            const featureOutsideViewport = !dataframe.inViewport(i);
+            if (featureOutsideViewport) {
+                continue;
+            }
+
+            // a new feature, inside the viewport
+            processedFeaturesIDs.add(featureId);
+            const feature = this._featureFromDataFrame(dataframe, i);
+
+            const featureIsFilteredOut = viz.filter.eval(feature) < FILTERING_THRESHOLD;
+            if (featureIsFilteredOut) {
+                continue;
+            }
+
+            // not a filtered feature, so pass the rawFeature to all viewport aggregations
+            viewportExpressions.forEach(expr => expr.accumViewportAgg(feature));
         }
     }
 
