@@ -2,9 +2,12 @@ import { vec4 } from 'gl-matrix';
 import { average } from '../renderer/viz/expressions/stats';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
-const POINT_GEOMETRY_TYPE = 'point';
-const LINE_GEOMETRY_TYPE = 'line';
-const POLYGON_GEOMETRY_TYPE = 'polygon';
+export const GEOMETRY_TYPE = {
+    UNKNOWN: 'unknown',
+    POINT: 'point',
+    LINE: 'line',
+    POLYGON: 'polygon'
+};
 
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
@@ -141,10 +144,10 @@ export function pointInRectangle (point, bbox) {
 
 export function computeAABB (geometry, type) {
     switch (type) {
-        case POINT_GEOMETRY_TYPE:
+        case GEOMETRY_TYPE.POINT:
             return [];
-        case LINE_GEOMETRY_TYPE:
-        case POLYGON_GEOMETRY_TYPE:
+        case GEOMETRY_TYPE.LINE:
+        case GEOMETRY_TYPE.POLYGON:
             const aabbList = [];
 
             for (let i = 0; i < geometry.length; i++) {
@@ -174,10 +177,10 @@ export function computeAABB (geometry, type) {
 
 export function computeCentroids (decodedGeometry, type) {
     switch (type) {
-        case POINT_GEOMETRY_TYPE:
+        case GEOMETRY_TYPE.POINT:
             return _computeCentroidsForPoints(decodedGeometry);
-        case LINE_GEOMETRY_TYPE:
-        case POLYGON_GEOMETRY_TYPE:
+        case GEOMETRY_TYPE.LINE:
+        case GEOMETRY_TYPE.POLYGON:
             return _computeCentroidsForLinesOrPolygons(decodedGeometry, type);
         default:
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid type argument, decoded geometry must have a point, line or polygon type.`);
@@ -205,7 +208,7 @@ function _computeCentroidsForLinesOrPolygons (decodedGeometry, type) {
     decodedGeometry.breakpoints.forEach((breakpoint) => {
         const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
         let centroid = null;
-        if (type === LINE_GEOMETRY_TYPE) {
+        if (type === GEOMETRY_TYPE.LINE) {
             centroid = _centroidForLines(vertices);
         } else {
             centroid = _centroidForPolygons(vertices);
