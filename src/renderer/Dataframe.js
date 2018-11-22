@@ -3,6 +3,7 @@ import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import { WM_R } from '../utils/util';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
@@ -87,12 +88,11 @@ export default class Dataframe extends DummyDataframe {
             return [];
         }
         switch (this.type) {
-            case 'point':
+            case GEOMETRY_TYPE.POINT:
                 return this._getPointsAtPosition(pos, viz);
-            case 'line':
-                return this._getFeaturesAtPositionFromTriangles('line', pos, viz);
-            case 'polygon':
-                return this._getFeaturesAtPositionFromTriangles('polygon', pos, viz);
+            case GEOMETRY_TYPE.LINE:
+            case GEOMETRY_TYPE.POLYGON:
+                return this._getFeaturesAtPositionFromTriangles(this.type, pos, viz);
             default:
                 return [];
         }
@@ -103,11 +103,11 @@ export default class Dataframe extends DummyDataframe {
             return false;
         }
         switch (this.type) {
-            case 'point':
+            case GEOMETRY_TYPE.POINT:
                 return this._isPointInViewport(featureIndex);
-            case 'line':
+            case GEOMETRY_TYPE.LINE:
                 return this._isPolygonInViewport(featureIndex);
-            case 'polygon':
+            case GEOMETRY_TYPE.POLYGON:
                 return this._isPolygonInViewport(featureIndex);
             default:
                 return false;
@@ -388,13 +388,13 @@ export default class Dataframe extends DummyDataframe {
                     offset.y = vizOffset[1];
                 }
 
-                strokeWidthScale = geometryType === 'line'
+                strokeWidthScale = geometryType === GEOMETRY_TYPE.LINE
                     ? this._computeLineWidthScale(feature, viz)
                     : this._computePolygonWidthScale(feature, viz);
 
                 if (this._isFeatureFiltered(feature, viz.filter) ||
                     !this._isPointInAABB(pos, offset,
-                        geometryType === 'line'
+                        geometryType === GEOMETRY_TYPE.LINE
                             ? viz.width.eval(feature)
                             : viz.strokeWidth.eval(feature)
                         ,

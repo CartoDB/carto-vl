@@ -19,6 +19,7 @@ import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
 import VIZ_PROPERTIES from './renderer/viz/utils/properties';
+import { GEOMETRY_TYPE } from './utils/geometry';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -265,21 +266,21 @@ export default class Viz {
     }
 
     _getDefaultGeomStyle (geomType) {
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(7)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        } else if (geomType === 'line') {
+        } else if (geomType === GEOMETRY_TYPE.LINE) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1)) // Not used in lines
             };
-        } else if (geomType === 'polygon') {
+        } else if (geomType === GEOMETRY_TYPE.POLYGON) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons

@@ -1,9 +1,9 @@
-import { computeCentroids, triangleArea } from '../../../src/utils/geometry';
+import { computeCentroids, triangleArea, GEOMETRY_TYPE } from '../../../src/utils/geometry';
 
 describe('utils/geometry', () => {
     describe('computeCentroids', () => {
         describe('should compute centroid of points', () => {
-            const type = 'point';
+            const type = GEOMETRY_TYPE.POINT;
             const t1 = [-0.1, 0.0, -0.1, 0.0, -0.1, 0.0]; // x1, y1, x2, y2, x3, y3. Notice x1=x2=x3 and y1=y2=y3 --> no area
 
             it('should work for one point', () => {
@@ -18,7 +18,7 @@ describe('utils/geometry', () => {
             });
         });
         describe('should compute centroid of polygons', () => {
-            const type = 'polygon';
+            const type = GEOMETRY_TYPE.POLYGON;
             const t1 = [0, 0, 10, 0, 5, 10]; // x1, y1, x2, y2, x3, y3
             const t2 = [10, 0, 10, 10, 5, 10];
 

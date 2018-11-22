@@ -1,5 +1,5 @@
 import { decodeGeom } from './decoder';
-import { computeAABB, computeCentroids } from '../utils/geometry';
+import { GEOMETRY_TYPE, computeAABB, computeCentroids } from '../utils/geometry';
 
 export default class DummyDataframe {
     constructor ({ center, scale, geom, properties, propertiesArrayBuffer, type, active, size, metadata }) {
@@ -10,10 +10,8 @@ export default class DummyDataframe {
         this.scale = scale;
         this.type = type;
         this.decodedGeom = decodeGeom(type, geom);
-        this.numVertex = type === 'point'
-            ? size * 3
-            : this.decodedGeom.vertices.length / 2;
-        this.numFeatures = type === 'point' ? size : this.decodedGeom.breakpoints.length || this.numVertex;
+        this.numVertex = (type === GEOMETRY_TYPE.POINT) ? size * 3 : this.decodedGeom.vertices.length / 2;
+        this.numFeatures = type === GEOMETRY_TYPE.POINT ? size : this.decodedGeom.breakpoints.length || this.numVertex;
         this.propertyTex = [];
         this.metadata = metadata;
         this.propertyCount = 0;

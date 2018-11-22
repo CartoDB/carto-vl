@@ -350,9 +350,9 @@ export function unproject (inv, x, y) {
 
 function _updateAABBForGeometry (feature, aabb, geometryType) {
     switch (geometryType) {
-        case 'line':
+        case GEOMETRY_TYPE.LINE:
             return _updateAABBLine(feature, aabb);
-        case 'polygon':
+        case GEOMETRY_TYPE.POLYGON:
             return _updateAABBPolygon(feature, aabb);
     }
 }

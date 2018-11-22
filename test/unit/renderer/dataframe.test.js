@@ -1,6 +1,6 @@
 import Dataframe from '../../../src/renderer/Dataframe';
 import Metadata from '../../../src/renderer/Metadata';
-import { pointInTriangle } from '../../../src/utils/geometry';
+import { pointInTriangle, GEOMETRY_TYPE } from '../../../src/utils/geometry';
 import { mat4 } from 'gl-matrix';
 
 describe('src/renderer/Dataframe', () => {
@@ -30,7 +30,7 @@ describe('src/renderer/Dataframe', () => {
                 properties: {
                     id: [1, 2]
                 },
-                type: 'point',
+                type: GEOMETRY_TYPE.POINT,
                 size: 2,
                 active: true,
                 metadata: new Metadata({
@@ -114,7 +114,7 @@ describe('src/renderer/Dataframe', () => {
                     numeric_prop: [1],
                     cartodb_id: [0]
                 },
-                type: 'line',
+                type: GEOMETRY_TYPE.LINE,
                 size: 1,
                 active: true,
                 metadata: new Metadata({
@@ -181,7 +181,7 @@ describe('src/renderer/Dataframe', () => {
                     numeric_property: [0],
                     cartodb_id: [0]
                 },
-                type: 'polygon',
+                type: GEOMETRY_TYPE.POLYGON,
                 size: 1,
                 active: true,
                 metadata: new Metadata({
@@ -261,7 +261,7 @@ describe('src/renderer/Dataframe', () => {
                     properties: {
                         id: [1]
                     },
-                    type: 'point',
+                    type: GEOMETRY_TYPE.POINT,
                     size: 1,
                     active: true,
                     metadata: new Metadata({
@@ -309,7 +309,7 @@ describe('src/renderer/Dataframe', () => {
                         numeric_prop: [1],
                         cartodb_id: [0]
                     },
-                    type: 'line',
+                    type: GEOMETRY_TYPE.LINE,
                     size: 1,
                     active: true,
                     metadata: new Metadata({
@@ -364,7 +364,7 @@ describe('src/renderer/Dataframe', () => {
                         numeric_property: [0],
                         cartodb_id: [0]
                     },
-                    type: 'polygon',
+                    type: GEOMETRY_TYPE.POLYGON,
                     size: 1,
                     active: true,
                     metadata: new Metadata({
