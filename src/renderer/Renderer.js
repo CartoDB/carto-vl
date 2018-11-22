@@ -129,7 +129,6 @@ export default class Renderer {
 
         // Performance optimization to avoid doing DFS at each feature iteration
         const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
-
         if (!viewportExpressions.length) {
             return;
         }
@@ -152,13 +151,13 @@ export default class Renderer {
                     continue;
                 }
                 // Ignore features outside viewport
-                if (!dataframe.inViewport(i, viz)) {
+                if (!dataframe.inViewport(i)) {
                     continue;
                 }
 
                 processedFeaturesIDs.add(featureId);
 
-                const feature = this._featureFromDataFrame(dataframe, i, metadata);
+                const feature = this._featureFromDataFrame(dataframe, i);
 
                 // Ignore filtered features
                 if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
@@ -166,12 +165,12 @@ export default class Renderer {
                 }
 
                 // Pass the rawFeature to all viewport aggregations
-                this._accumViewportAggregations(viewportExpressions, feature, renderLayer);
+                this._accumViewportAggregations(viewportExpressions, feature);
             }
         });
     }
 
-    _accumViewportAggregations (viewportExpressions, rawFeature, renderLayer) {
+    _accumViewportAggregations (viewportExpressions, rawFeature) {
         const viewportExpressionsLength = viewportExpressions.length;
 
         for (let j = 0; j < viewportExpressionsLength; j++) {
@@ -201,7 +200,7 @@ export default class Renderer {
     /**
      * Build a feature object from a dataframe and an index copying all the properties.
      */
-    _featureFromDataFrame (dataframe, index, metadata) {
+    _featureFromDataFrame (dataframe, index) {
         return dataframe.getFeature(index);
     }
 
