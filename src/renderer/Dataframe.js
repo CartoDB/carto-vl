@@ -373,12 +373,12 @@ export default class Dataframe extends DummyDataframe {
                     : this._computePolygonWidthScale(feature, viz);
 
                 if (this._isFeatureFiltered(feature, viz.filter) ||
-                !this._isPointInAABB(pos, offset,
-                    geometryType === 'line'
-                        ? viz.width.eval(feature)
-                        : viz.strokeWidth.eval(feature)
-                    ,
-                    featureIndex)
+                    !this._isPointInAABB(pos, offset,
+                        geometryType === 'line'
+                            ? viz.width.eval(feature)
+                            : viz.strokeWidth.eval(feature)
+                        ,
+                        featureIndex)
                 ) {
                     i = breakpoints[featureIndex] - 6;
                     continue;
@@ -518,6 +518,9 @@ export default class Dataframe extends DummyDataframe {
         return getters;
     }
 
+    /**
+     * Build a feature object for an index, copying all the properties.
+     */
     getFeature (index) {
         if (!this.cachedFeatures) {
             this.cachedFeatures = new Array(this.numFeatures);

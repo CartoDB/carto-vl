@@ -4,6 +4,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-run
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import { parseVizExpression } from './viz/parser';
+import { runViewportAggregations } from './viz/expressions/aggregation/viewport/ViewportAggCalculator';
 
 const INITIAL_TIMESTAMP = Date.now();
 let timestamp = INITIAL_TIMESTAMP;
@@ -16,7 +17,7 @@ function refreshClock () {
 /**
  * The renderer use fuzzy logic where < 0.5 means false and >= 0.5 means true
  */
-const FILTERING_THRESHOLD = 0.5;
+export const FILTERING_THRESHOLD = 0.5;
 
 /**
  * @typedef {Object} RPoint - Point in renderer coordinates space
@@ -120,86 +121,6 @@ export default class Renderer {
         return 1;
     }
 
-    /**
-     * Run aggregation functions over the visible features.
-     */
-    _runViewportAggregations (renderLayer) {
-        // Performance optimization to avoid doing DFS at each feature iteration
-        const viewportExpressions = this._getViewportExpressions(renderLayer.viz._getRootExpressions());
-        if (!viewportExpressions.length) {
-            return;
-        }
-        renderLayer.parseVizExpression = parseVizExpression; // Important! to avoid a circular dependency problem
-        this._resetViewportAggregations(viewportExpressions, renderLayer);
-        this._runViewportAggregationsInActiveDataframes(viewportExpressions, renderLayer);
-    }
-
-    _resetViewportAggregations (viewportExpressions, renderLayer) {
-        const metadata = renderLayer.viz.metadata; // assumes that all dataframes of a renderLayer share the same metadata
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata, renderLayer));
-    }
-
-    _runViewportAggregationsInActiveDataframes (viewportExpressions, renderLayer) {
-        const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
-        const dataframes = renderLayer.getActiveDataframes();
-        dataframes.forEach(dataframe => {
-            this._runViewportAggregationsInDataframe(renderLayer.viz, viewportExpressions, dataframe, processedFeaturesIDs);
-        });
-    }
-
-    _runViewportAggregationsInDataframe (viz, viewportExpressions, dataframe, processedFeaturesIDs) {
-        for (let i = 0; i < dataframe.numFeatures; i++) {
-            const featureId = dataframe.properties[viz.metadata.idProperty][i];
-
-            const featureAlreadyAccumulated = processedFeaturesIDs.has(featureId);
-            if (featureAlreadyAccumulated) {
-                continue;
-            }
-
-            const featureOutsideViewport = !dataframe.inViewport(i);
-            if (featureOutsideViewport) {
-                continue;
-            }
-
-            // a new feature, inside the viewport
-            processedFeaturesIDs.add(featureId);
-            const feature = this._featureFromDataFrame(dataframe, i);
-
-            const featureIsFilteredOut = viz.filter.eval(feature) < FILTERING_THRESHOLD;
-            if (featureIsFilteredOut) {
-                continue;
-            }
-
-            // not a filtered feature, so pass the rawFeature to all viewport aggregations
-            viewportExpressions.forEach(expr => expr.accumViewportAgg(feature));
-        }
-    }
-
-    /**
-     * Perform a depth first search through the expression tree collecting all viewport expressions.
-     */
-    _getViewportExpressions (rootExpressions) {
-        const viewportExpressions = [];
-
-        function dfs (expr) {
-            if (expr._isViewport) {
-                viewportExpressions.push(expr);
-            } else {
-                expr._getChildren().map(dfs);
-            }
-        }
-
-        rootExpressions.map(dfs);
-        return viewportExpressions;
-    }
-
-    /**
-     * Build a feature object from a dataframe and an index copying all the properties.
-     */
-    _featureFromDataFrame (dataframe, index) {
-        return dataframe.getFeature(index);
-    }
-
     renderLayer (renderLayer, drawMetadata) {
         this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
@@ -211,7 +132,8 @@ export default class Renderer {
 
         this._updateDataframeMatrices(dataframes);
 
-        this._runViewportAggregations(renderLayer);
+        renderLayer.parseVizExpression = parseVizExpression; // Important! to avoid a circular dependency problem (eg. viewportFeatures)
+        runViewportAggregations(renderLayer);
 
         if (!dataframes.length) {
             return;
