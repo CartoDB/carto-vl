@@ -109,7 +109,7 @@ Lastly, check out [CONTRIBUTING.md](https://github.com/CartoDB/carto-vl/blob/mas
 
 ## Feedback
 
-CARTO VL is still in Beta but we encourage you to start playing with it and to please [send us feedback](https://github.com/CartoDB/carto-vl/issues) so we can create an even better library, suited to your needs.
+We encourage you to start playing with CARTO VL and to please [send us feedback](https://github.com/CartoDB/carto-vl/issues) so we can create an even better library, suited to your needs.
 
 ## Works with
 
