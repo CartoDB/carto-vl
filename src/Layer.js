@@ -10,6 +10,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
 import { unproject } from './utils/geometry';
+import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -69,24 +70,9 @@ export default class Layer {
         this._emitter = mitt();
         this._renderLayer = new RenderLayer();
 
-        this._initializeUIDS();
+        this.concurrencyHelper = new LayerConcurrencyHelper();
         this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
-    }
-
-    /**
-     * Initialize unique identifiers to detect concurrent updates
-     */
-    _initializeUIDS () {
-        // There are 2 type of changes in a layer source or viz:
-        //    - Major changes. Major changes are performed by the `update` method and they will override (have priority over) minor changes
-        //    - Minor changes. Minor changes are performed by the `blendToViz` and `blendTo` method and they won't override concurrent calls to `update`
-        // The public docs of `update` and `blendToViz` explains this API particularity in more detail, which is implemented with these counters
-
-        this._majorNextUID = 0;
-        this._majorCurrentUID = null;
-        this._minorNextUID = 0;
-        this._minorCurrentUID = null;
     }
 
     /**
@@ -224,16 +210,32 @@ export default class Layer {
         this._checkViz(viz);
 
         const safeSource = this._cloneSourceIfDifferent(source);
-        let uid = this._getUID(majorChange);
 
+        let change = this._initChange(majorChange);
         const [, metadata] = await Promise.all([
             viz.loadImages(), // start requesting images ASAP
             safeSource.requestMetadata(viz)
         ]);
         await this._context;
 
-        this._detectConcurrentChanges(majorChange, uid);
+        this._endChange(majorChange, change);
+
         this._commitSuccesfulUpdate(metadata, viz, safeSource);
+    }
+
+    _initChange (majorChange) {
+        if (majorChange) {
+            return this.concurrencyHelper.initMajorChange();
+        }
+        return this.concurrencyHelper.initMinorChange();
+    }
+
+    _endChange (majorChange, change) {
+        if (majorChange) {
+            this.concurrencyHelper.endMajorChange(change);
+        } else {
+            this.concurrencyHelper.endMinorChange(change);
+        }
     }
 
     /**
@@ -300,45 +302,6 @@ export default class Layer {
             safeSource = source;
         }
         return safeSource;
-    }
-
-    /**
-     * Get an object with UID counters, that serve as a guard against concurrent changes
-     * @param {Boolean} majorChange
-     */
-    _getUID (majorChange) {
-        let uid;
-        if (majorChange) {
-            uid = { major: this._majorNextUID, minor: 0 };
-            this._majorNextUID++;
-            this._minorNextUID = 1;
-        } else {
-            uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
-            this._minorNextUID++;
-        }
-        return uid;
-    }
-
-    /**
-     * Check & update internal counters to avoid concurrency problems (raise an error if any is found)
-     * @param {Boolean} majorChange
-     * @param {Object} uid
-     */
-    _detectConcurrentChanges (majorChange, uid) {
-        if (majorChange) {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._majorCurrentUID}.`);
-            }
-        } else {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this viz change. Commit ${uid} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-            if (this._minorCurrentUID > uid.minor) {
-                throw new CartoRuntimeError(`Another \`viz change\` finished before this one. Commit ${uid.major}.${uid.minor} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-        }
-        this._majorCurrentUID = uid.major;
-        this._minorCurrentUID = uid.minor;
     }
 
     /**
