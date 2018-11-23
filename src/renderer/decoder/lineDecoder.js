@@ -1,6 +1,6 @@
 import { addLineString, resizeBuffer } from './common';
 
-// If the geometry type is 'line' it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
+// If the geometry type is GEOMETRY_TYPE.LINE it will generate the appropriate zero-sized, vertex-shader expanded triangle list with `miter` and `bevel` joins.
 // The geom will be an array of coordinates in this case
 
 const STATIC_INITIAL_BUFFER_SIZE = 1024 * 1024; // 4 MB

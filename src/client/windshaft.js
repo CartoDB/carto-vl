@@ -6,6 +6,7 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -394,7 +395,7 @@ export default class Windshaft {
             }
         });
 
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
         }
 
@@ -410,12 +411,12 @@ function adaptGeometryType (type) {
     switch (type) {
         case 'ST_MultiPolygon':
         case 'ST_Polygon':
-            return 'polygon';
+            return GEOMETRY_TYPE.POLYGON;
         case 'ST_Point':
-            return 'point';
+            return GEOMETRY_TYPE.POINT;
         case 'ST_MultiLineString':
         case 'ST_LineString':
-            return 'line';
+            return GEOMETRY_TYPE.LINE;
         default:
             throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
     }

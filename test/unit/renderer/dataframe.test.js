@@ -1,6 +1,6 @@
 import Dataframe from '../../../src/renderer/Dataframe';
 import Metadata from '../../../src/renderer/Metadata';
-import { pointInTriangle } from '../../../src/utils/geometry';
+import { pointInTriangle, GEOMETRY_TYPE } from '../../../src/utils/geometry';
 import { mat4 } from 'gl-matrix';
 
 describe('src/renderer/Dataframe', () => {
@@ -30,7 +30,7 @@ describe('src/renderer/Dataframe', () => {
                 properties: {
                     id: [1, 2]
                 },
-                type: 'point',
+                type: GEOMETRY_TYPE.POINT,
                 size: 2,
                 active: true,
                 metadata: new Metadata({
@@ -114,7 +114,7 @@ describe('src/renderer/Dataframe', () => {
                     numeric_prop: [1],
                     cartodb_id: [0]
                 },
-                type: 'line',
+                type: GEOMETRY_TYPE.LINE,
                 size: 1,
                 active: true,
                 metadata: new Metadata({
@@ -181,7 +181,7 @@ describe('src/renderer/Dataframe', () => {
                     numeric_property: [0],
                     cartodb_id: [0]
                 },
-                type: 'polygon',
+                type: GEOMETRY_TYPE.POLYGON,
                 size: 1,
                 active: true,
                 metadata: new Metadata({
@@ -246,6 +246,165 @@ describe('src/renderer/Dataframe', () => {
 
         it('should return false if the triangle has zero area', () => {
             expect(pointInTriangle({ x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0, y: -1 }, { x: 0, y: -1 })).toBe(false);
+        });
+    });
+
+    describe('.getCentroid', () => {
+        const MAX_LATITUDE_MERCATOR = 85.0511287798066; // +/-85.0511287798066 are max north & south limits of tile
+
+        describe('when dataframe is point type', () => {
+            function dataFrameWithPoint (vertices) {
+                const dataframe = new Dataframe({
+                    center: { x: 0, y: 0 },
+                    scale: 1,
+                    geom: new Float32Array(vertices),
+                    properties: {
+                        id: [1]
+                    },
+                    type: GEOMETRY_TYPE.POINT,
+                    size: 1,
+                    active: true,
+                    metadata: new Metadata({
+                        properties: {
+                            id: {
+                                type: 'number'
+                            }
+                        },
+                        idProperty: 'id'
+                    })
+                });
+
+                dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } } };
+                dataframe.matrix = m;
+                return dataframe;
+            }
+
+            const feature1 = { id: 1 };
+
+            it('should return the centroid for the required feature', () => {
+                const points = [
+                    { coordinates: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], expected: [0, 0] },
+                    { coordinates: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], expected: [180, MAX_LATITUDE_MERCATOR] },
+                    { coordinates: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1], expected: [-180, -MAX_LATITUDE_MERCATOR] },
+                    { coordinates: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1], expected: [0, MAX_LATITUDE_MERCATOR] }
+                ];
+
+                points.forEach((point) => {
+                    const dataframe = dataFrameWithPoint(point.coordinates);
+
+                    const [x1, y1] = dataframe.getCentroid(feature1.id);
+                    expect(x1).toBeCloseTo(point.expected[0], 2);
+                    expect(y1).toBeCloseTo(point.expected[1], 2);
+                });
+            });
+        });
+
+        describe('when dataframe is line type', () => {
+            function dataFrameWithLine (segment) {
+                const dataframe = new Dataframe({
+                    center: { x: 0, y: 0 },
+                    scale: 1,
+                    geom: [[segment]],
+                    properties: {
+                        numeric_prop: [1],
+                        cartodb_id: [0]
+                    },
+                    type: GEOMETRY_TYPE.LINE,
+                    size: 1,
+                    active: true,
+                    metadata: new Metadata({
+                        properties: {
+                            numeric_prop: {
+                                type: 'number'
+                            },
+                            cartodb_id: {
+                                type: 'number'
+                            }
+                        },
+                        idProperty: 'cartodb_id'
+                    })
+                });
+                dataframe.matrix = m;
+                dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
+
+                return dataframe;
+            }
+
+            const feature1 = {
+                numeric_prop: 1,
+                cartodb_id: 0
+            };
+
+            it('should return the centroid for the required feature', () => {
+                const lines = [
+                    { segment: [0.0, 0.0, 1.0, 0.0], expected: [90, 0], description: '0,0 to 180,0' },
+                    { segment: [-1.0, 0.0, 1.0, 0.0], expected: [0, 0], description: '-180,0 to 180,0' },
+                    { segment: [0.5, 1.0, 1.0, 1.0], expected: [135, MAX_LATITUDE_MERCATOR], description: '90,85.05 to 180,85.05' },
+                    { segment: [-1.0, -1.0, 1.0, 1.0], expected: [0, 0], description: '-180,-85.05 to 180,85.05' },
+                    { segment: [0.0, 0.0, 0.0, 1.0], expected: [0, 66.51], description: '0,0 to 0,85.05' } // 66.51 is the center
+                ];
+
+                lines.forEach(line => {
+                    const dataframe = dataFrameWithLine(line.segment);
+
+                    const [x1, y1] = dataframe.getCentroid(feature1.cartodb_id);
+                    expect(x1).toBeCloseTo(line.expected[0], 2, 'line: ' + line.description);
+                    expect(y1).toBeCloseTo(line.expected[1], 2, 'line: ' + line.description);
+                });
+            });
+        });
+
+        describe('when dataframe is polygon type', () => {
+            function dataFrameWithPolygon (polygon) {
+                const dataframe = new Dataframe({
+                    center: { x: 0, y: 0 },
+                    scale: 1,
+                    geom: [[polygon]],
+                    properties: {
+                        numeric_property: [0],
+                        cartodb_id: [0]
+                    },
+                    type: GEOMETRY_TYPE.POLYGON,
+                    size: 1,
+                    active: true,
+                    metadata: new Metadata({
+                        properties: {
+                            cartodb_id: {
+                                type: 'number'
+                            },
+                            numeric_property: {
+                                type: 'number'
+                            }
+                        },
+                        idProperty: 'cartodb_id'
+                    })
+                });
+                dataframe.matrix = m;
+                dataframe.renderer = { _zoom: 1, gl: { canvas: { width: 1024 * window.devicePixelRatio, height: 1024 * window.devicePixelRatio } }, drawMetadata: { zoomLevel: 0 } };
+
+                return dataframe;
+            }
+
+            const feature1 = {
+                numeric_property: 0,
+                cartodb_id: 0
+            };
+
+            it('should return the centroid for the required feature', () => {
+                const polygons = [
+                    { flat: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0], holes: [], clipped: [], expected: [90, 66.51], description: 'NE quadrant' },
+                    { flat: [0, 0, -1, 0, -1, -1, 0, -1, 0, 0], holes: [], clipped: [], expected: [-90, -66.51], description: 'SW quadrant' },
+                    { flat: [-1, -1, 1, -1, 1, 1, -1, 1, -1, -1], holes: [], clipped: [], expected: [0, 0], description: 'Whole world' }
+                ];
+
+                polygons.forEach(polygon => {
+                    const dataframe = dataFrameWithPolygon(polygon);
+
+                    const [x1, y1] = dataframe.getCentroid(feature1.cartodb_id);
+                    expect(x1).toBeCloseTo(polygon.expected[0], 2, 'polygon: ' + polygon.description);
+                    expect(y1).toBeCloseTo(polygon.expected[1], 2, 'polygon: ' + polygon.description);
+                });
+            });
         });
     });
 });

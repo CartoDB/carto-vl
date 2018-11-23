@@ -4,6 +4,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-run
 import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import { parseVizExpression } from './viz/parser';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const INITIAL_TIMESTAMP = Date.now();
 let timestamp = INITIAL_TIMESTAMP;
@@ -259,10 +260,10 @@ export default class Renderer {
         };
 
         dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
-        if (dataframes[0].type !== 'polygon') {
+        if (dataframes[0].type !== GEOMETRY_TYPE.POLYGON) {
             dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
         }
-        if (dataframes[0].type !== 'line') {
+        if (dataframes[0].type !== GEOMETRY_TYPE.LINE) {
             dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor));
             dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth));
         }
@@ -274,7 +275,7 @@ export default class Renderer {
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-        if (renderLayer.type !== 'point') {
+        if (renderLayer.type !== GEOMETRY_TYPE.POINT) {
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -302,7 +303,7 @@ export default class Renderer {
 
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
-        if (dataframes[0].type === 'line' || dataframes[0].type === 'polygon') {
+        if (dataframes[0].type === GEOMETRY_TYPE.LINE || dataframes[0].type === GEOMETRY_TYPE.POLYGON) {
             gl.clearDepth(1);
             gl.depthRange(0, 1);
             gl.depthFunc(gl.NOTEQUAL);
@@ -315,9 +316,9 @@ export default class Renderer {
             let metaRenderer = null;
             if (!viz.symbol.default) {
                 metaRenderer = viz.symbolMetaShader;
-            } else if (dataframe.type === 'point') {
+            } else if (dataframe.type === GEOMETRY_TYPE.POINT) {
                 metaRenderer = viz.pointMetaShader;
-            } else if (dataframe.type === 'line') {
+            } else if (dataframe.type === GEOMETRY_TYPE.LINE) {
                 metaRenderer = viz.lineMetaShader;
             } else {
                 metaRenderer = viz.polygonMetaShader;
@@ -339,7 +340,7 @@ export default class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
@@ -379,7 +380,7 @@ export default class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-            } else if (dataframe.type !== 'line') {
+            } else if (dataframe.type !== GEOMETRY_TYPE.LINE) {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeColor);
@@ -392,7 +393,7 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.clear(gl.DEPTH_BUFFER_BIT);
             }
 
@@ -421,7 +422,7 @@ export default class Renderer {
 
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
             }
@@ -430,7 +431,7 @@ export default class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type !== 'point') {
+        if (renderLayer.type !== GEOMETRY_TYPE.POINT) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
