@@ -145,4 +145,8 @@ export default class Feature {
             this.variables[key].reset(duration);
         }
     }
+
+    getCentroid () {
+        return this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
+    }
 }
