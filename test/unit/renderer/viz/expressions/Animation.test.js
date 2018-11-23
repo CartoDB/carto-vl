@@ -97,7 +97,7 @@ describe('src/renderer/viz/expressions/Animation', () => {
             t.pause();
             expect(t.isPlaying()).toBe(false);
         });
-    })
+    });
 
     describe('.setProgressPct', () => {
         it('should update the simulation progress percentage', () => {
