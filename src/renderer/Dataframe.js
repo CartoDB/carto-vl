@@ -2,6 +2,9 @@ import { pointInTriangle, pointInCircle } from '../../src/utils/geometry';
 import { triangleCollides } from '../utils/collision';
 import DummyDataframe from './DummyDataframe';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
+import { WM_R } from '../utils/util';
+import { GEOMETRY_TYPE } from '../utils/geometry';
+
 // Maximum number of property textures that will be uploaded automatically to the GPU
 // in a non-lazy manner
 const MAX_GPU_AUTO_UPLOAD_TEXTURE_LIMIT = 32;
@@ -30,25 +33,13 @@ export default class Dataframe extends DummyDataframe {
 
         this.vertexBuffer = gl.createBuffer();
         this.featureIDBuffer = gl.createBuffer();
-
-        this.texColor = this._createStyleDataframeTexture(this.numFeatures);
-        this.texWidth = this._createStyleDataframeTexture(this.numFeatures);
-        this.texStrokeColor = this._createStyleDataframeTexture(this.numFeatures);
-        this.texStrokeWidth = this._createStyleDataframeTexture(this.numFeatures);
-        this.texFilter = this._createStyleDataframeTexture(this.numFeatures);
+        this._createStyleDataframeTextures(this.numFeatures);
 
         const ids = new Float32Array(vertices.length);
         const inc = 1 / (1024 * 64);
         let index = 0;
-        let tableX = {};
-        let tableY = {};
 
-        for (let k = 0; k < this.numFeatures; k++) {
-            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
-            // output IDs will be in the `vec2([0,1], [0,1])` range
-            tableX[k] = (k % width) / (width - 1);
-            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
-        }
+        let [tableX, tableY] = this._createTablesXY(this.numFeatures, width, height);
 
         if (!breakpoints.length) {
             for (let i = 0; i < vertices.length; i += 6) {
@@ -97,12 +88,11 @@ export default class Dataframe extends DummyDataframe {
             return [];
         }
         switch (this.type) {
-            case 'point':
+            case GEOMETRY_TYPE.POINT:
                 return this._getPointsAtPosition(pos, viz);
-            case 'line':
-                return this._getFeaturesAtPositionFromTriangles('line', pos, viz);
-            case 'polygon':
-                return this._getFeaturesAtPositionFromTriangles('polygon', pos, viz);
+            case GEOMETRY_TYPE.LINE:
+            case GEOMETRY_TYPE.POLYGON:
+                return this._getFeaturesAtPositionFromTriangles(this.type, pos, viz);
             default:
                 return [];
         }
@@ -113,15 +103,23 @@ export default class Dataframe extends DummyDataframe {
             return false;
         }
         switch (this.type) {
-            case 'point':
+            case GEOMETRY_TYPE.POINT:
                 return this._isPointInViewport(featureIndex);
-            case 'line':
+            case GEOMETRY_TYPE.LINE:
                 return this._isPolygonInViewport(featureIndex);
-            case 'polygon':
+            case GEOMETRY_TYPE.POLYGON:
                 return this._isPolygonInViewport(featureIndex);
             default:
                 return false;
         }
+    }
+
+    getCentroid (featureIndex) {
+        const centroid = { ...this._centroids[featureIndex] };
+        centroid.x = centroid.x * this.scale + this.center.x;
+        centroid.y = centroid.y * this.scale + this.center.y;
+        const g = this._unprojectFromWebMercator(centroid);
+        return [g.lng, g.lat];
     }
 
     getPropertyTexture (propertyName) {
@@ -168,6 +166,19 @@ export default class Dataframe extends DummyDataframe {
         this.freed = true;
     }
 
+    _createTablesXY (numFeatures, width, height) {
+        let tableX = {};
+        let tableY = {};
+
+        for (let k = 0; k < numFeatures; k++) {
+            // Transform integer ID into a `vec2` to overcome WebGL 1 limitations,
+            // output IDs will be in the `vec2([0,1], [0,1])` range
+            tableX[k] = (k % width) / (width - 1);
+            tableY[k] = height > 1 ? Math.floor(k / width) / (height - 1) : 0.5;
+        }
+        return [tableX, tableY];
+    }
+
     _isPointInViewport (featureIndex) {
         const matrix = this.matrix;
         const x = this.decodedGeom.vertices[6 * featureIndex + 0];
@@ -195,6 +206,15 @@ export default class Dataframe extends DummyDataframe {
         }
 
         return aabbResult === AABBTestResults.INSIDE;
+    }
+
+    _unprojectFromWebMercator ({ x, y }) {
+        const DEG2RAD = Math.PI / 180;
+        const EARTH_RADIUS = 6378137;
+        return {
+            lng: x * WM_R / EARTH_RADIUS / DEG2RAD,
+            lat: (Math.atan(Math.pow(Math.E, y * WM_R / EARTH_RADIUS)) - Math.PI / 4) * 2 / DEG2RAD
+        };
     }
 
     _compareAABBs (featureAABB) {
@@ -368,13 +388,13 @@ export default class Dataframe extends DummyDataframe {
                     offset.y = vizOffset[1];
                 }
 
-                strokeWidthScale = geometryType === 'line'
+                strokeWidthScale = geometryType === GEOMETRY_TYPE.LINE
                     ? this._computeLineWidthScale(feature, viz)
                     : this._computePolygonWidthScale(feature, viz);
 
                 if (this._isFeatureFiltered(feature, viz.filter) ||
                     !this._isPointInAABB(pos, offset,
-                        geometryType === 'line'
+                        geometryType === GEOMETRY_TYPE.LINE
                             ? viz.width.eval(feature)
                             : viz.strokeWidth.eval(feature)
                         ,
@@ -553,6 +573,14 @@ export default class Dataframe extends DummyDataframe {
             this._addProperty(propertyName);
         }
         this._genFeatureClass();
+    }
+
+    _createStyleDataframeTextures (numFeatures) {
+        this.texColor = this._createStyleDataframeTexture(numFeatures);
+        this.texWidth = this._createStyleDataframeTexture(numFeatures);
+        this.texStrokeColor = this._createStyleDataframeTexture(numFeatures);
+        this.texStrokeWidth = this._createStyleDataframeTexture(numFeatures);
+        this.texFilter = this._createStyleDataframeTexture(numFeatures);
     }
 
     _createStyleDataframeTexture (numFeatures) {

@@ -7,7 +7,9 @@
         "type": "Point",
         "coordinates": [ 0, 0 ]
       },
-      "properties": {}
+      "properties": {
+        "cat": "a"
+      }
     },
     {
       "type": "Feature",
@@ -15,7 +17,9 @@
         "type": "Point",
         "coordinates": [ 10, 10 ]
       },
-      "properties": {}
+      "properties": {
+        "cat": "b"
+      }
     }
   ]
 }
