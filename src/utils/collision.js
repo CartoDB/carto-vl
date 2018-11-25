@@ -1,9 +1,14 @@
-import { halfPlaneSign } from './geometry';
+import { halfPlaneSign, equalPoints } from './geometry';
+import { lineclip } from './lineclip';
 
 const SEPARATING_LINE_FOUND = 'separatingLineFound';
 const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
 
 export function triangleCollides (triangle, viewportAABB) {
+    if (_triangleForLine(triangle)) {
+        return _triangleForLineCollides(triangle, viewportAABB);
+    }
+
     /*
      * TODO
      *
@@ -17,6 +22,7 @@ export function triangleCollides (triangle, viewportAABB) {
      *   return true;
      * }
      */
+
     if (_viewportLineSeparatesTriangle(viewportAABB, triangle) === SEPARATING_LINE_FOUND) {
         return false;
     }
@@ -32,6 +38,30 @@ export function triangleCollides (triangle, viewportAABB) {
     }
 
     return true;
+}
+
+/**
+ * When dealing with line's triangles, repeated vertices are generated (not strictly triangles,
+ * as they don't have any area).
+ */
+function _triangleForLine (triangle) {
+    const [v1, v2, v3] = triangle;
+    return (equalPoints(v1, v2) || equalPoints(v2, v3));
+}
+
+/**
+ * Calculates the collision for the special case of a triangle from a line.
+ * With repeated vertices, the triangle can be simplified to a line and calculate using `lineclip`.
+ * This algorithm also solves the problem when line vertices are completely outside the viewport and the
+ * line wasn't considered an intersecting one by the 'separating line' algorithm
+ */
+function _triangleForLineCollides (triangle, viewportAABB) {
+    const [v1, v2, v3] = triangle;
+    const a = v1;
+    const b = equalPoints(v2, a) ? v3 : v2;
+    const bbox = [viewportAABB.minx, viewportAABB.miny, viewportAABB.maxx, viewportAABB.maxy];
+    const collides = lineclip([[a.x, a.y], [b.x, b.y]], bbox);
+    return (collides.length > 0);
 }
 
 /*
