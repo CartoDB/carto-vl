@@ -12,7 +12,6 @@ uniform mat4 matrix;
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D filterTex;
-//TODO order bucket texture
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;

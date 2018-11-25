@@ -13,7 +13,6 @@ uniform sampler2D widthTex;
 uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
-//TODO order bucket texture
 
 varying highp vec4 color;
 varying highp vec4 stroke;

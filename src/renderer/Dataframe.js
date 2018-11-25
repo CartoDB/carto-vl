@@ -106,7 +106,6 @@ export default class Dataframe extends DummyDataframe {
             case GEOMETRY_TYPE.POINT:
                 return this._isPointInViewport(featureIndex);
             case GEOMETRY_TYPE.LINE:
-                return this._isPolygonInViewport(featureIndex);
             case GEOMETRY_TYPE.POLYGON:
                 return this._isPolygonInViewport(featureIndex);
             default:
@@ -590,7 +589,7 @@ export default class Dataframe extends DummyDataframe {
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,
             width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-            null);
+            null); // it just reserves the space for this intermediate texture
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);

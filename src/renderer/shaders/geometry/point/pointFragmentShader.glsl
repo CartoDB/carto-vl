@@ -8,6 +8,7 @@ varying highp float strokeScale;
 varying highp vec2 pointCoord;
 
 float distanceAntialias(vec2 p){
+    // return length(p) > 1 ? 0. : 1. ; // to disable antialias
     return 1. - smoothstep(1.-dp*1.4142, 1.+dp*1.4142, length(p));
 }
 
