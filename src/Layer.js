@@ -10,6 +10,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
 import { unproject } from './utils/geometry';
+import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -29,6 +30,8 @@ const states = Object.freeze({
 *
 * - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
+*
+* Note: This Layer implements {@link https://www.mapbox.com/mapbox-gl-js/api/#customlayerinterface|Mapbox GL JS - Custom Layer Interface}
 *
 * @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source} source - The source of the data
@@ -57,6 +60,7 @@ export default class Layer {
         this.type = 'custom';
 
         viz._boundLayer = this;
+
         this._context = new Promise(resolve => {
             this._contextInitialize = resolve;
         });
@@ -66,17 +70,8 @@ export default class Layer {
         this._emitter = mitt();
         this._renderLayer = new RenderLayer();
 
-        // There are 2 type of changes in a layer source or viz:
-        //  - Major changes. Major changes are performed by the `update` method and they will override (have priority over) minor changes
-        //  - Minor changes. Minor changes are performed by the `blendToViz` and `blendTo` method and they won't override concurrent calls to `update`
-        // The public docs of `update` and `blendToViz` explains this API particularity in more detail, which is implemented with these counters
-        this._majorNextUID = 0;
-        this._majorCurrentUID = null;
-        this._minorNextUID = 0;
-        this._minorCurrentUID = null;
-
+        this.concurrencyHelper = new LayerConcurrencyHelper();
         this._sourcePromise = this.update(source, viz);
-
         this._renderWaiters = [];
     }
 
@@ -159,16 +154,16 @@ export default class Layer {
     addTo (map, beforeLayerID) {
         const STYLE_ERROR_REGEX = /Style is not done loading/;
 
+        const addTheLayer = () => { map.addLayer(this, beforeLayerID); };
         try {
-            map.addLayer(this, beforeLayerID);
+            addTheLayer();
+            // Note: map.isStyleLoaded() has been tested here without success
         } catch (error) {
             if (!STYLE_ERROR_REGEX.test(error)) {
                 throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
 
-            map.on('load', () => {
-                map.addLayer(this, beforeLayerID);
-            });
+            map.on('load', addTheLayer);
         }
     }
 
@@ -209,69 +204,104 @@ export default class Layer {
     async update (source, viz = this._viz) {
         return this._update(source, viz, true);
     }
+
     async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
 
-        if (source !== this._source) {
-            source = source._clone();
-        }
+        const safeSource = this._cloneSourceIfDifferent(source);
 
-        let uid;
-        if (majorChange) {
-            uid = { major: this._majorNextUID, minor: 0 };
-            this._majorNextUID++;
-            this._minorNextUID = 1;
-        } else {
-            uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
-            this._minorNextUID++;
-        }
-
-        const loadImagesPromise = viz.loadImages();
-
-        // Don't await directly to start requesting the images as soon as possible
-        const metadataPromise = source.requestMetadata(viz);
-        await loadImagesPromise;
-        const metadata = await metadataPromise;
-
+        let change = this._initChange(majorChange);
+        const [, metadata] = await Promise.all([
+            viz.loadImages(), // start requesting images ASAP
+            safeSource.requestMetadata(viz)
+        ]);
         await this._context;
 
-        if (majorChange) {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._majorCurrentUID}.`);
-            }
-        } else {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this viz change. Commit ${uid} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-            if (this._minorCurrentUID > uid.minor) {
-                throw new CartoRuntimeError(`Another \`viz change\` finished before this one. Commit ${uid.major}.${uid.minor} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-        }
-        this._majorCurrentUID = uid.major;
-        this._minorCurrentUID = uid.minor;
+        this._endChange(majorChange, change);
 
-        // Everything was ok => commit changes
+        this._commitSuccesfulUpdate(metadata, viz, safeSource);
+    }
+
+    _initChange (majorChange) {
+        if (majorChange) {
+            return this.concurrencyHelper.initMajorChange();
+        }
+        return this.concurrencyHelper.initMinorChange();
+    }
+
+    _endChange (majorChange, change) {
+        if (majorChange) {
+            this.concurrencyHelper.endMajorChange(change);
+        } else {
+            this.concurrencyHelper.endMinorChange(change);
+        }
+    }
+
+    /**
+     * Updating viz and source, after having checked them and having required new metadata
+     *
+     * @param {Metadata} metadata
+     * @param {carto.Viz} newViz
+     * @param {carto.source} newSource
+     */
+    _commitSuccesfulUpdate (metadata, newViz, newSource) {
         this.metadata = metadata;
 
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-        viz.setDefaultsIfRequired(this._renderLayer.type);
+        this._commitVizChange(newViz);
+        this._commitSourceChange(newSource);
+
+        // to force pre-render (which gives us the matrix to request data from the source...)
+        this._needRefresh();
+    }
+
+    /**
+     * Updates the viz with the newViz
+     *
+     * @param {carto.Viz} newViz
+     */
+    _commitVizChange (newViz) {
         if (this._viz) {
             this._viz.onChange(null);
         }
-        this._viz = viz;
-        viz.onChange(this._vizChanged.bind(this));
-        this.viz._bindMetadata(metadata);
-        this.viz.gl = this.gl;
+        newViz.setDefaultsIfRequired(this.metadata.geomType);
+        newViz.setDefaultsIfRequired(this._renderLayer.type);
+        newViz.onChange(this._vizChanged.bind(this));
+        newViz._bindMetadata(this.metadata);
+        newViz.gl = this.gl;
+        this._viz = newViz;
+    }
 
-        this._needRefresh();
-
-        source.bindLayer(this._onDataframeAdded.bind(this));
-        if (this._source !== source) {
+    /**
+     * Updates the source with the newSource
+     *
+     * @param {carto.source} newSource
+     */
+    _commitSourceChange (newSource) {
+        newSource.bindLayer(this._onDataframeAdded.bind(this));
+        if (newSource !== this._source) {
             this._freeSource();
         }
+        this._source = newSource;
+    }
 
-        this._source = source;
+    /**
+     * Returns a safe source from the new required source.
+     *
+     * @param {carto.source} source
+     * @returns {carto.source} safeSource
+     */
+    _cloneSourceIfDifferent (source) {
+        // The cloning allows the source to be safely used in other layers.
+        // That's because using `source.requestMetadata()` can update later on its internal state (depending on what's required by the viz)
+
+        let safeSource;
+        if (source !== this._source) {
+            safeSource = source._clone();
+        } else {
+            safeSource = source;
+        }
+        return safeSource;
     }
 
     /**
@@ -317,6 +347,8 @@ export default class Layer {
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
         await this._sourcePromise;
+
+        // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
                 viz.variables[varName] = this._viz.variables[varName];
@@ -370,8 +402,8 @@ export default class Layer {
      * Custom Layer API: `onAdd` function
      */
     onAdd (map, gl) {
-        this.gl = gl;
         this.map = map;
+        this.gl = gl;
         this.renderer = _getRenderer(map, gl);
 
         // Initialize render layer
@@ -391,8 +423,8 @@ export default class Layer {
     prerender (gl, matrix) {
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesChanged => {
-                if (dataframesChanged) {
+            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesHaveChanged => {
+                if (dataframesHaveChanged) {
                     this._needRefresh().then(() => {
                         if (this._state === states.INIT) {
                             this._state = states.IDLE;
@@ -425,7 +457,7 @@ export default class Layer {
     _paintLayer () {
         this._renderLayer.setViz(this._viz);
         this.renderer.renderLayer(this._renderLayer, {
-            zoomLevel: this.map.getZoom()
+            zoomLevel: this.map.getZoom() // for zoom expressions
         });
     }
 
@@ -498,6 +530,7 @@ export default class Layer {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
+            // Not the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
     }
@@ -517,7 +550,7 @@ export default class Layer {
             c.map(x => x * 2 - 1)
         );
 
-        // Rotation no longer gurantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
+        // Rotation no longer guarantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
         // we need to compute the AABB min/max by iterating
         const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
         const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
