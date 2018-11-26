@@ -5,8 +5,9 @@ const SEPARATING_LINE_FOUND = 'separatingLineFound';
 const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
 
 export function triangleCollides (triangle, viewportAABB) {
-    if (_triangleForLine(triangle)) {
-        return _triangleForLineCollides(triangle, viewportAABB);
+    if (_noArea(triangle)) {
+        // throw new Error('NOT IMPLEMENTED');
+        return _noAreaTriangleCollides(triangle, viewportAABB);
     }
 
     /*
@@ -41,21 +42,21 @@ export function triangleCollides (triangle, viewportAABB) {
 }
 
 /**
- * When dealing with line's triangles, repeated vertices are generated (not strictly triangles,
- * as they don't have any area).
+ * When dealing with some triangles (such as line's triangles), repeated vertices are generated.
+ * Those are not strictly triangles, as they don't have any area.
  */
-function _triangleForLine (triangle) {
+function _noArea (triangle) {
     const [v1, v2, v3] = triangle;
     return (equalPoints(v1, v2) || equalPoints(v2, v3));
 }
 
 /**
- * Calculates the collision for the special case of a triangle from a line.
- * With repeated vertices, the triangle can be simplified to a line and calculate using `lineclip`.
- * This algorithm also solves the problem when line vertices are completely outside the viewport and the
- * line wasn't considered an intersecting one by the 'separating line' algorithm
+ * Calculates the collision for the special case of a no area triangle.
+ * Having 2 repeated vertices, the triangle can be simplified to a line and calculate the collision using `lineclip`.
+ * This algorithm also solves the issue when line vertices are completely outside the viewport and the
+ * line wasn't considered an intersecting one (by the 'separating line' algorithm).
  */
-function _triangleForLineCollides (triangle, viewportAABB) {
+function _noAreaTriangleCollides (triangle, viewportAABB) {
     const [v1, v2, v3] = triangle;
     const a = v1;
     const b = equalPoints(v2, a) ? v3 : v2;
