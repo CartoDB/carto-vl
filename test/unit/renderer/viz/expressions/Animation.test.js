@@ -84,6 +84,21 @@ describe('src/renderer/viz/expressions/Animation', () => {
         });
     });
 
+    describe('.isPlaying', () => {
+        it('should return true if animation is not playing', () => {
+            const t = anim(1, 10, s.fade(1));
+            t.play();
+            expect(t.isPlaying()).toBe(true);
+        });
+
+        it('should return false if animation is not playing', () => {
+            const t = anim(1, 10, s.fade(1));
+            t.play();
+            t.pause();
+            expect(t.isPlaying()).toBe(false);
+        });
+    });
+
     describe('.setProgressPct', () => {
         it('should update the simulation progress percentage', () => {
             const t = anim(1, 10, s.fade(1));

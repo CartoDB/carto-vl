@@ -293,6 +293,7 @@
             viz.variables.animation.play()
             $playbutton.disabled = true;
             $pausebutton.disabled = false;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
         });
 
         $pausebutton.addEventListener('click', () => {
@@ -300,6 +301,7 @@
             viz.variables.animation.pause();
             $playbutton.disabled = false;
             $pausebutton.disabled = true;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
         });
     </script>
 </body>
