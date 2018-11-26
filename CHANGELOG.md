@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Add `getCentroid` method to features
+- Add `isPlaying` method to animations
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature.

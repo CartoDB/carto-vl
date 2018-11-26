@@ -239,6 +239,18 @@ export default class AnimationGeneral extends BaseExpression {
     }
 
     /**
+     * Returns whether the animation is playing or not
+     *
+     * @api
+     * @memberof expressions.Animation
+     * @instance
+     * @name isPlaying
+     */
+    isPlaying () {
+        return this._paused === false;
+    }
+
+    /**
      * Pause the animation
      *
      * @api
