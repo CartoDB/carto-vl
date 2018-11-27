@@ -12,8 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `isPlaying` method to animations
 
 ### Fixed
-- Fix `linear` error when evaluating a date property in a feature.
-- Fix `transparent` color
+- Fix `linear` error when evaluating a date property in a feature
+- Fix `transparent` color displayed as black
+- Fix `symbol` color when setting symbol with blendTo after initializing viz
 
 ## [1.0.0] - 2018-11-08
 
