@@ -1,4 +1,4 @@
-import { number, category, list } from '../expressions';
+import { number, category, list, rgba } from '../expressions';
 import BaseExpression from './base';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoParsingError from '../../../errors/carto-parsing-error';
@@ -75,6 +75,10 @@ export function hexToRgb (hex) {
     }
 
     throw new CartoParsingError('Invalid hexadecimal color');
+}
+
+export function noOverrideColor () {
+    return rgba(255, 255, 255, 0);
 }
 
 export function getOrdinalFromIndex (index) {
