@@ -137,6 +137,7 @@ export default class Base {
     async blendTo (final, duration = 500) {
         // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
+        this.keepDefaultsOnBlend && this.keepDefaultsOnBlend();
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
