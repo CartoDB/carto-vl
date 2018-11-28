@@ -61,7 +61,7 @@ const examples = [
         {
             a: 'wwi',
             b: '',
-            c: 'cartogl',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width:  zoom() * (animation($day, 140, fade(0.05, 0.2)) + 0.5)
 color:  ramp(linear(clusterAvg($temp), 0,30), tealrose)
@@ -82,7 +82,7 @@ filter: animation($day, 140, fade(0.05, 0.2)) + 0.05
         {
             a: 'monarch_migration_1',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: sqrt(clusterMax($number)/10)
 color: opacity(ramp(linear(clusterMax($number)^0.5, 0, 50), Sunset),0.7)
@@ -103,7 +103,7 @@ strokeWidth: 1
         {
             a: 'table_5yr_county_acs_copy_1',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: sqrt(($asian_pop+$black_pop+$hispanic_o)/$white_pop)*2
 color: hsva(0.5, 1, 1, 0.7)
@@ -183,7 +183,7 @@ strokeWidth: 0
         {
             a: 'pop_density_points',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: zoom()
 color: ramp(buckets($dn, [80, 100, 140]), prism)
@@ -204,7 +204,7 @@ filter: $dn > 60
         {
             a: 'commuter_flow_by_county_5',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: $workers_in_flow/2903461*100*4
 color: opacity(ramp(linear($workers_in_flow,0,100000) ,ag_GrnYl), $residence_fips_concat-$work_fips_concat)
@@ -224,7 +224,7 @@ strokeWidth: 0
         {
             a: 'table_5yr_county_acs_copy_1',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `@sum_asian: clusterSum($asian_pop)
 @sum_black: clusterSum($black_pop)
@@ -256,7 +256,7 @@ resolution: 4
         {
             a: 'mnmappluto',
             b: '',
-            c: 'dmanzanares',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `color: ramp(linear(log($numfloors), 1, 4), Earth)
 strokeColor: opacity(white, 0.2)
@@ -275,7 +275,7 @@ strokeColor: opacity(white, 0.2)
         {
             a: 'mnmappluto',
             b: '',
-            c: 'dmanzanares',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `color: ramp(linear(log($numfloors), 2, 4), temps)
 strokeColor: opacity(white, 0.5)
@@ -295,7 +295,7 @@ filter: between($numfloors, 10, 120)
         {
             a: 'sf_stclines',
             b: '',
-            c: 'dmanzanares',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `color: ramp($st_type, prism)
 width: 1.5
@@ -334,7 +334,7 @@ resolution: 0.25`,
         {
             a: 'tx_0125_copy_copy',
             b: '',
-            c: 'cartogl',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/4000+0.01)*1.5
 color: ramp(clusterMode($category), Prism)
