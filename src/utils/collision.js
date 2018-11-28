@@ -1,5 +1,5 @@
 import { halfPlaneSign, equalPoints } from './geometry';
-import { lineclip } from './lineclip';
+import * as lineclip from 'lineclip';
 
 const SEPARATING_LINE_FOUND = 'separatingLineFound';
 const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
