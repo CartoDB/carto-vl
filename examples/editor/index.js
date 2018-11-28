@@ -56,22 +56,341 @@ strokeWidth:      2*zoom()/50000`
 ];
 
 const examples = [
-    ['WWI ships', 'eyJhIjoid3dpIiwiYiI6IiIsImMiOiJjYXJ0b2dsIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogIHpvb20oKSAqIChhbmltYXRpb24oJGRheSwgMTQwLCBmYWRlKDAuMDUsIDAuMikpICsgMC41KVxuY29sb3I6ICByYW1wKGxpbmVhcihjbHVzdGVyQXZnKCR0ZW1wKSwgMCwzMCksIHRlYWxyb3NlKVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogYW5pbWF0aW9uKCRkYXksIDE0MCwgZmFkZSgwLjA1LCAwLjIpKSArIDAuMDUiLCJmIjp7ImxuZyI6MjQuNzM1NTY4NTIwNDAyOTIsImxhdCI6MTkuMTYzNDcwOTc4NzU0OTQ0fSwiZyI6MC44NDM4NjY0MzkyMzEyODQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Butterfly migrations', 'eyJhIjoibW9uYXJjaF9taWdyYXRpb25fMSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogc3FydChjbHVzdGVyTWF4KCRudW1iZXIpLzEwKVxuY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsIDAsIDUwKSwgU3Vuc2V0KSwwLjcpXG5zdHJva2VDb2xvcjogcmFtcChsaW5lYXIoY2x1c3Rlck1heCgkbnVtYmVyKV4wLjUsMCwgNTApLCBTdW5zZXQpXG5zdHJva2VXaWR0aDogMVxuXG5cblxuXG4iLCJmIjp7ImxuZyI6LTg3LjcwOTk1MzA1MDcwODAxLCJsYXQiOjM3LjM3MDA0OTU5OTg5MzQzNH0sImciOjIuODM3NzkyNTAzNjMyNTY3NSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
-    ['Non-white', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KCgkYXNpYW5fcG9wKyRibGFja19wb3ArJGhpc3BhbmljX28pLyR3aGl0ZV9wb3ApKjJcbmNvbG9yOiBoc3ZhKDAuNSwgMSwgMSwgMC43KVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogJHdoaXRlX3BvcCA+IDEgIiwiZiI6eyJsbmciOi04OS44MjAyMzQxODU0NDk4LCJsYXQiOjM4LjAyMDA5MTA5MTA1NzM0fSwiZyI6My4xMzM3MjI0MzM3MjQ2OTQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Denver accidents', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogICAkY291bnQvMlxuY29sb3I6IG9wYWNpdHkoIHJhbXAobGluZWFyKCRjb3VudCwgMCwxMjApLCBSZWRPciksICRjb3VudC8yMClcbnN0cm9rZVdpZHRoOiAwXG5cblxuIiwiZiI6eyJsbmciOi0xMDQuOTY1MDU2MjE1NjY3NDYsImxhdCI6MzkuNzQ5NjE5Mzc4MjQ2MjJ9LCJnIjoxMS40MTg3MTg3NzA5MDQ0OTQsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['California Wildfires by acreage', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICAgJGdpc19hY3Jlcy8xMDAwMFxuY29sb3I6IHJnYmEoMCwwLDAsMClcbnN0cm9rZUNvbG9yOiAgaHN2KDAuMSwgJGdpc19hY3Jlcy8yMDAwMDAsICRnaXNfYWNyZXMvNDAwMDAwKVxuc3Ryb2tlV2lkdGg6ICRnaXNfYWNyZXMvNTAwMDAiLCJmIjp7ImxuZyI6LTExNi4yMTM4NzgzNjYzMjYzNiwibGF0IjozOC4wNzI3ODMxODgzNjE5NH0sImciOjUuMTgxMTg5ODYxNjUyMTg2LCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
-    ['California Wildfires size/opacity by acres burned colored by cause ', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMTAwMDBcbmNvbG9yOiBvcGFjaXR5KHJhbXAobGluZWFyKCRjYXVzZSwgMSwxNCksIFByaXNtKSwkZ2lzX2FjcmVzLzEwMDAwMClcbnN0cm9rZVdpZHRoOiAwXG5cblxuXG5cbiIsImYiOnsibG5nIjotMTE5LjY3MzA3NjMzNzkwNDgzLCJsYXQiOjM3LjQ3ODE1Mjg2ODA2NzU1fSwiZyI6NC45NDY5MTE0NDI1NTk3MTMsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Population Density - Filtering & Buckets', 'eyJhIjoicG9wX2RlbnNpdHlfcG9pbnRzIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiB6b29tKClcbmNvbG9yOiByYW1wKGJ1Y2tldHMoJGRuLCBbODAsIDEwMCwgMTQwXSksIHByaXNtKVxuc3Ryb2tlV2lkdGg6IDBcbmZpbHRlcjogJGRuID4gNjBcblxuXG5cbiIsImYiOnsibG5nIjoyMy40NTMwMTgxOTIzNzI2MSwibGF0IjoxMS4yMzk5NTYwNjg2NDAxNTR9LCJnIjoxLjM1NTk2MDUzMDY0MTEzNzMsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Commuters who travel outside home county for work', 'eyJhIjoiY29tbXV0ZXJfZmxvd19ieV9jb3VudHlfNSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogJHdvcmtlcnNfaW5fZmxvdy8yOTAzNDYxKjEwMCo0XG5jb2xvcjogb3BhY2l0eShyYW1wKGxpbmVhcigkd29ya2Vyc19pbl9mbG93LDAsMTAwMDAwKSAsYWdfR3JuWWwpLCAkcmVzaWRlbmNlX2ZpcHNfY29uY2F0LSR3b3JrX2ZpcHNfY29uY2F0KVxuc3Ryb2tlV2lkdGg6IDBcblxuXG5cblxuXG5cbiIsImYiOnsibG5nIjotMTAxLjA3NzAxNDQ2Nzk0NTg0LCJsYXQiOjQwLjkxMzYxMTY4MDk2MjM2fSwiZyI6My4zNDgzNzM4MTkzMDE4NjM3LCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
-    ['Ethnic', 'eyJhIjoidGFibGVfNXlyX2NvdW50eV9hY3NfY29weV8xIiwiYiI6IiIsImMiOiJtYW1hdGFha2VsbGEiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IkBzdW1fYXNpYW46IGNsdXN0ZXJTdW0oJGFzaWFuX3BvcClcbkBzdW1fYmxhY2s6IGNsdXN0ZXJTdW0oJGJsYWNrX3BvcClcbkBzdW1fd2hpdGU6IGNsdXN0ZXJTdW0oJHdoaXRlX3BvcClcbkBzdW1faGlzcGFuaWM6IGNsdXN0ZXJTdW0oJGhpc3BhbmljX28pXG5Ac3VtX2FsbDogQHN1bV9hc2lhbiArIEBzdW1fYmxhY2sgKyBAc3VtX2hpc3BhbmljICsgQHN1bV93aGl0ZVxuXG53aWR0aDogc3FydChAc3VtX2FsbCkgLyA0MDAgKiB6b29tKClcbmNvbG9yOiBvcGFjaXR5KGhzdigwLjAwLDEsMSkgKiBAc3VtX2JsYWNrIC8gQHN1bV9hbGwgKiAxICtcbiAgICAgICAgICAgICAgIGhzdigwLjY2LDEsMSkgKiBAc3VtX2FzaWFuIC8gQHN1bV9hbGwgKiAzICtcbiAgICAgICAgICAgICAgIGhzdigwLjE1LDAsMSkgKiBAc3VtX3doaXRlIC8gQHN1bV9hbGwgKiAwLjggK1xuICAgICAgICAgICAgICAgaHN2KDAuMzMsMSwxKSAqIEBzdW1faGlzcGFuaWMgLyBAc3VtX2FsbCAqIDEsIDAuOClcbnN0cm9rZVdpZHRoOiAxXG5zdHJva2VDb2xvcjogIzAwMFxub3JkZXI6IGRlc2Mod2lkdGgoKSlcbnJlc29sdXRpb246IDQiLCJmIjp7ImxuZyI6LTkzLjg5NzI0MjE0OTA1MTA3LCJsYXQiOjM1Ljg3NTA1MDE3MjkzNjN9LCJnIjozLjEwODA4MjQ3OTIxNTU5MDgsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Pluto', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDEsIDQpLCBFYXJ0aClcbnN0cm9rZUNvbG9yOiBvcGFjaXR5KHdoaXRlLCAwLjIpIiwiZiI6eyJsbmciOi03My45OTAyNzc5MTQwMjQ3MiwibGF0Ijo0MC43MzU2MTIxMDYwNzE3M30sImciOjExLjg4MzM3NzcxNjEzNzEzMywiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
-    ['Pluto - filtered', 'eyJhIjoibW5tYXBwbHV0byIsImIiOiIiLCJjIjoiZG1hbnphbmFyZXMiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6ImNvbG9yOiByYW1wKGxpbmVhcihsb2coJG51bWZsb29ycyksIDIsIDQpLCB0ZW1wcylcbnN0cm9rZUNvbG9yOiBvcGFjaXR5KHdoaXRlLCAwLjUpXG5maWx0ZXI6IGJldHdlZW4oJG51bWZsb29ycywgMTAsIDEyMCkiLCJmIjp7ImxuZyI6LTczLjk4MzUzMzQ0MzgwNjMyLCJsYXQiOjQwLjc0Nzk3Njc1MTMyN30sImciOjEyLjU2MjkzNjMwNTQ0ODY4MiwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
-    ['SF Lines', 'eyJhIjoic2Zfc3RjbGluZXMiLCJiIjoiIiwiYyI6ImRtYW56YW5hcmVzIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJjb2xvcjogcmFtcCgkc3RfdHlwZSwgcHJpc20pIFxud2lkdGg6IDEuNSIsImYiOnsibG5nIjotMTIyLjQ0NDA4NDg2ODYxMTkyLCJsYXQiOjM3Ljc3MzcwNjczNjE0OTcwNX0sImciOjExLjY2NDMxMDgwMjg2NjgwNSwiaCI6IkRhcmtNYXR0ZXIiLCJpIjoiZGF0YXNldCJ9'],
-    ['Gecat', 'eyJhIjoic2VsZWN0ICosIDEgYXMgY28gZnJvbSBnZWNhdF9nZW9kYXRhX2NvcHkiLCJiIjoiIiwiYyI6ImNkYnNvbC1hZG1pbiIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoiY29sb3I6IG9wYWNpdHkocmFtcChsaW5lYXIobG9nKGNsdXN0ZXJBdmcoJHNwZWVkKSksIDAsIDQpLCBHZXlzZXIpLCBjbHVzdGVyU3VtKCRjbykqem9vbSgpLzEwMDAwMCoxLjgqNClcbndpZHRoOiAyXG5zdHJva2VXaWR0aDogMFxucmVzb2x1dGlvbjogMC4yNSIsImYiOnsibG5nIjoyLjE3LCJsYXQiOjQxLjM4fSwiZyI6MTMsImgiOiJEYXJrTWF0dGVyIiwiaSI6InF1ZXJ5In0='],
-    ['BC Category filtering', 'eyJhIjoidHhfMDEyNV9jb3B5X2NvcHkiLCJiIjoiIiwiYyI6ImNhcnRvZ2wiLCJkIjoiaHR0cHM6Ly97dXNlcn0uY2FydG8uY29tIiwiZSI6IndpZHRoOiBzcXJ0KGNsdXN0ZXJTdW0oJGFtb3VudCkvNTAwMDApKjIwKih6b29tKCkvNDAwMCswLjAxKSoxLjVcbmNvbG9yOiByYW1wKGNsdXN0ZXJNb2RlKCRjYXRlZ29yeSksIFByaXNtKVxuc3Ryb2tlQ29sb3I6IG9wYWNpdHkod2hpdGUsIDAuNSlcbmZpbHRlcjogaW4oY2x1c3Rlck1vZGUoJGNhdGVnb3J5KSwgW1wiVHJhbnNwb3J0ZXNcIiwgXCJTYWx1ZFwiXSkiLCJmIjp7ImxuZyI6Mi4xNzgxNzMwMjI4ODkwNDEsImxhdCI6NDEuMzk5MzA1OTE0MDc5MDR9LCJnIjoxMS44ODI5MTkwNDI3MTc0MzIsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ=='],
-    ['Crazy images', 'eyJhIjoidHJhZmZpY19hY2NpZGVudHNfY29weSIsImIiOiIiLCJjIjoibWFtYXRhYWtlbGxhIiwiZCI6Imh0dHBzOi8ve3VzZXJ9LmNhcnRvLmNvbSIsImUiOiJ3aWR0aDogJGNvdW50LzIgKzhcbmNvbG9yOiBvcGFjaXR5KCByYW1wKGxpbmVhcigkY291bnQsIDAsMTIwKSwgUmVkT3IpLCAkY291bnQvMjArMC40KVxuc3ltYm9sUGxhY2VtZW50OiBwbGFjZW1lbnQoc2luKDAuMSokY291bnQqbm93KCkpICwgY29zKDAuMSokY291bnQqbm93KCkpKVxuc3ltYm9sOiByYW1wKGJ1Y2tldHMoMTAwKigwLjEqbm93KCklMSA+MC41KSwgIFs1MF0pLCBbXG4gICAgaW1hZ2UoJy4uL3N0eWxpbmcvbWFya2VyLnN2ZycpLFxuICAgIGltYWdlKCcuLi9zdHlsaW5nL3N0YXIuc3ZnJylcbl0pXG4gIiwiZiI6eyJsbmciOi0xMDQuOTYyNjA1NDMxMjU4MjgsImxhdCI6MzkuNzI5MzYwMjIwMTUzNDk1fSwiZyI6MTIuNDg5NjU1NDg5ODk4OTkzLCJoIjoiRGFya01hdHRlciIsImkiOiJkYXRhc2V0In0='],
-    ['Flower image', 'eyJhIjoiZmlyZV9wZXJpbWV0ZXJzX2NvcHkiLCJiIjoiIiwiYyI6Im1hbWF0YWFrZWxsYSIsImQiOiJodHRwczovL3t1c2VyfS5jYXJ0by5jb20iLCJlIjoid2lkdGg6ICRnaXNfYWNyZXMvMzAwMCAgICAgICAgICAgICAgICAgICBcbnN5bWJvbDogcmFtcChsaW5lYXIoJGNhdXNlLCAxLDE0KSwgUHJpc20pICogaW1hZ2UoJy4uL3N0eWxpbmcvZmxvd2VyLnN2ZycpIiwiZiI6eyJsbmciOi0xMTkuNDU0OTIyODYwNjI3MTYsImxhdCI6MzguMDQ0NDg4NTUzMTIyOTZ9LCJnIjo1LjQ1MDQ4NzM0MDMyMjUxMDUsImgiOiJEYXJrTWF0dGVyIiwiaSI6ImRhdGFzZXQifQ==']
+    [
+        'WWI ships',
+        {
+            a: 'wwi',
+            b: '',
+            c: 'cartogl',
+            d: 'https://{user}.carto.com',
+            e: `width:  zoom() * (animation($day, 140, fade(0.05, 0.2)) + 0.5)
+color:  ramp(linear(clusterAvg($temp), 0,30), tealrose)
+strokeWidth: 0
+filter: animation($day, 140, fade(0.05, 0.2)) + 0.05
+`,
+            f: {
+                lng: 24.73556852040292,
+                lat: 19.163470978754944
+            },
+            g: 0.843866439231284,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Butterfly migrations',
+        {
+            a: 'monarch_migration_1',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: sqrt(clusterMax($number)/10)
+color: opacity(ramp(linear(clusterMax($number)^0.5, 0, 50), Sunset),0.7)
+strokeColor: ramp(linear(clusterMax($number)^0.5,0, 50), Sunset)
+strokeWidth: 1
+`,
+            f: {
+                lng: -87.70995305070801,
+                lat: 37.370049599893434
+            },
+            g: 2.8377925036325675,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Non-white',
+        {
+            a: 'table_5yr_county_acs_copy_1',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: sqrt(($asian_pop+$black_pop+$hispanic_o)/$white_pop)*2
+color: hsva(0.5, 1, 1, 0.7)
+strokeWidth: 0
+filter: $white_pop > 1 `,
+            f: {
+                lng: -89.8202341854498,
+                lat: 38.02009109105734
+            },
+            g: 3.133722433724694,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Denver accidents',
+        {
+            a: 'traffic_accidents_copy',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width:   $count/2
+color: opacity( ramp(linear($count, 0,120), RedOr), $count/20)
+strokeWidth: 0
+`,
+            f: {
+                lng: -104.96505621566746,
+                lat: 39.74961937824622
+            },
+            g: 11.418718770904494,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'California Wildfires by acreage',
+        {
+            a: 'fire_perimeters_copy',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width:   $gis_acres/10000
+color: rgba(0,0,0,0)
+strokeColor:  hsv(0.1, $gis_acres/200000, $gis_acres/400000)
+strokeWidth: $gis_acres/50000`,
+            f: {
+                lng: -116.21387836632636,
+                lat: 38.07278318836194
+            },
+            g: 5.181189861652186,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'California Wildfires size/opacity by acres burned colored by cause ',
+        {
+            a: 'fire_perimeters_copy',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: $gis_acres/10000
+color: opacity(ramp(linear($cause, 1,14), Prism),$gis_acres/100000)
+strokeWidth: 0
+`,
+            f: {
+                lng: -119.67307633790483,
+                lat: 37.47815286806755
+            },
+            g: 4.946911442559713,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Population Density - Filtering & Buckets',
+        {
+            a: 'pop_density_points',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: zoom()
+color: ramp(buckets($dn, [80, 100, 140]), prism)
+strokeWidth: 0
+filter: $dn > 60
+`,
+            f: {
+                lng: 23.45301819237261,
+                lat: 11.239956068640154
+            },
+            g: 1.3559605306411373,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Commuters who travel outside home county for work',
+        {
+            a: 'commuter_flow_by_county_5',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: $workers_in_flow/2903461*100*4
+color: opacity(ramp(linear($workers_in_flow,0,100000) ,ag_GrnYl), $residence_fips_concat-$work_fips_concat)
+strokeWidth: 0
+`,
+            f: {
+                lng: -101.07701446794584,
+                lat: 40.91361168096236
+            },
+            g: 3.3483738193018637,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Ethnic',
+        {
+            a: 'table_5yr_county_acs_copy_1',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `@sum_asian: clusterSum($asian_pop)
+@sum_black: clusterSum($black_pop)
+@sum_white: clusterSum($white_pop)
+@sum_hispanic: clusterSum($hispanic_o)
+@sum_all: @sum_asian + @sum_black + @sum_hispanic + @sum_white
+
+width: sqrt(@sum_all) / 400 * zoom()
+color: opacity(hsv(0.00,1,1) * @sum_black / @sum_all * 1 +
+               hsv(0.66,1,1) * @sum_asian / @sum_all * 3 +
+               hsv(0.15,0,1) * @sum_white / @sum_all * 0.8 +
+               hsv(0.33,1,1) * @sum_hispanic / @sum_all * 1, 0.8)
+strokeWidth: 1
+strokeColor: #000
+order: desc(width())
+resolution: 4
+`,
+            f: {
+                lng: -93.89724214905107,
+                lat: 35.8750501729363
+            },
+            g: 3.1080824792155908,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Pluto',
+        {
+            a: 'mnmappluto',
+            b: '',
+            c: 'dmanzanares',
+            d: 'https://{user}.carto.com',
+            e: `color: ramp(linear(log($numfloors), 1, 4), Earth)
+strokeColor: opacity(white, 0.2)
+`,
+            f: {
+                lng: -73.99027791402472,
+                lat: 40.73561210607173
+            },
+            g: 11.883377716137133,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Pluto - filtered',
+        {
+            a: 'mnmappluto',
+            b: '',
+            c: 'dmanzanares',
+            d: 'https://{user}.carto.com',
+            e: `color: ramp(linear(log($numfloors), 2, 4), temps)
+strokeColor: opacity(white, 0.5)
+filter: between($numfloors, 10, 120)
+`,
+            f: {
+                lng: -73.98353344380632,
+                lat: 40.747976751327
+            },
+            g: 12.562936305448682,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'SF Lines',
+        {
+            a: 'sf_stclines',
+            b: '',
+            c: 'dmanzanares',
+            d: 'https://{user}.carto.com',
+            e: `color: ramp($st_type, prism)
+width: 1.5
+`,
+            f: {
+                lng: -122.44408486861192,
+                lat: 37.773706736149705
+            },
+            g: 11.664310802866805,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Gecat',
+        {
+            a: 'select *, 1 as co from gecat_geodata_copy',
+            b: '',
+            c: 'cdbsol-admin',
+            d: 'https://{user}.carto.com',
+            e: `color: opacity(ramp(linear(log(clusterAvg($speed)), 0, 4), Geyser), clusterSum($co)*zoom()/100000*1.8*4)
+width: 2
+strokeWidth: 0
+resolution: 0.25`,
+            f: {
+                lng: 2.17,
+                lat: 41.38
+            },
+            g: 13,
+            h: 'DarkMatter',
+            i: 'query'
+        }
+    ],
+    [
+        'BC Category filtering',
+        {
+            a: 'tx_0125_copy_copy',
+            b: '',
+            c: 'cartogl',
+            d: 'https://{user}.carto.com',
+            e: `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+color: ramp(clusterMode($category), Prism)
+strokeColor: opacity(white, 0.5)
+filter: in(clusterMode($category), [\'Transportes\', \'Salud\'])`,
+            f: {
+                lng: 2.178173022889041,
+                lat: 41.39930591407904
+            },
+            g: 11.882919042717432,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Crazy images',
+        {
+            a: 'traffic_accidents_copy',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: $count/2 +8
+color: opacity( ramp(linear($count, 0,120), RedOr), $count/20+0.4)
+symbolPlacement: placement(sin(0.1*$count*now()) , cos(0.1*$count*now()))
+symbol: ramp(buckets(100*(0.1*now()%1 >0.5),  [50]), [
+    image('../styling/marker.svg'),
+    image('../styling/star.svg')
+])
+ `,
+            f: {
+                lng: -104.96260543125828,
+                lat: 39.729360220153495
+            },
+            g: 12.489655489898993,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ],
+    [
+        'Flower image',
+        {
+            a: 'fire_perimeters_copy',
+            b: '',
+            c: 'mamataakella',
+            d: 'https://{user}.carto.com',
+            e: `width: $gis_acres/3000
+symbol: ramp(linear($cause, 1,14), Prism) * image('../styling/flower.svg')`,
+            f: {
+                lng: -119.45492286062716,
+                lat: 38.04448855312296
+            },
+            g: 5.4504873403225105,
+            h: 'DarkMatter',
+            i: 'dataset'
+        }
+    ]
 ];
 
 const BASEMAPS = {
@@ -178,7 +497,8 @@ map.on('load', () => {
     document.getElementById('serverURL').addEventListener('input', superRefresh);
 
     if (location.hash.length > 1) {
-        setConfig(location.hash.substring(1));
+        const config = JSON.parse(atob(location.hash.substring(1)));
+        setConfig(config);
     } else {
         barcelona();
     }
@@ -208,9 +528,7 @@ function getJSONConfig () {
     };
 }
 
-function setConfig (input) {
-    let c = JSON.parse(atob(input));
-
+function setConfig (c) {
     if (c.d === 'carto.com') {
         c.d = 'https://{user}.carto.com';
     }
@@ -480,11 +798,11 @@ function hideLoader () {
 }
 
 function addExample (example) {
-    const [name, code] = example;
+    const [name, config] = example;
     let button = document.createElement('button');
     button.innerText = name;
     button.onclick = () => {
-        setConfig(code);
+        setConfig(config);
     };
     document.getElementById('buttonlist').appendChild(button);
 }
