@@ -9,7 +9,8 @@ import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
  * It will classify the input based on the filtered dataset, filtering by viewport and by `filter`.
  *
  * @param {Number} input - The input expression used in the quantiles
- * @param {number} n - Number of buckets to be returned
+ * @param {Number} n - Number of buckets to be returned
+ * @param {Number?} histogramSize - Optional (DEFAULT_HISTOGRAM_SIZE = 1000).  Histogram 'size' used for calculations (the bigger, the more precision)
  * @return {Category}
  *
  * @example <caption>Use viewportQuantiles to define a color ramp.</caption>
@@ -29,11 +30,12 @@ import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
  * @api
  */
 export default class ViewportQuantiles extends Classifier {
-    constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'viewportQuantiles');
+    constructor (input, buckets, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
+        checkMaxArguments(arguments, 3, 'viewportQuantiles');
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
+        checkNumber('viewportQuantiles', 'histogramSize', 2, histogramSize);
 
-        const children = { input, _histogram: viewportHistogram(input, DEFAULT_HISTOGRAM_SIZE) };
+        const children = { input, _histogram: viewportHistogram(input, histogramSize) };
         super(children, buckets);
     }
 
