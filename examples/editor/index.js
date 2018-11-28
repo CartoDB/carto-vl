@@ -121,9 +121,9 @@ filter: $white_pop > 1 `,
     [
         'Denver accidents',
         {
-            a: 'traffic_accidents_copy',
+            a: 'traffic_accidents',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width:   $count/2
 color: opacity( ramp(linear($count, 0,120), RedOr), $count/20)
@@ -141,9 +141,9 @@ strokeWidth: 0
     [
         'California Wildfires by acreage',
         {
-            a: 'fire_perimeters_copy',
+            a: 'fire_perimeter_centroids',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width:   $gis_acres/10000
 color: rgba(0,0,0,0)
@@ -161,9 +161,9 @@ strokeWidth: $gis_acres/50000`,
     [
         'California Wildfires size/opacity by acres burned colored by cause ',
         {
-            a: 'fire_perimeters_copy',
+            a: 'fire_perimeter_centroids',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: $gis_acres/10000
 color: opacity(ramp(linear($cause, 1,14), Prism),$gis_acres/100000)
@@ -314,9 +314,9 @@ width: 1.5
         {
             a: 'select *, 1 as co from gecat_geodata_copy',
             b: '',
-            c: 'cdbsol-admin',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
-            e: `color: opacity(ramp(linear(log(clusterAvg($speed)), 0, 4), Geyser), clusterSum($co)*zoom()/100000*1.8*4)
+            e: `color: opacity(ramp(linear(log(clusterAvg($speed)), 0, 4), Geyser), clusterCount()*zoom()/1000*1.8*4)
 width: 2
 strokeWidth: 0
 resolution: 0.25`,
@@ -352,9 +352,9 @@ filter: in(clusterMode($category), [\'Transportes\', \'Salud\'])`,
     [
         'Crazy images',
         {
-            a: 'traffic_accidents_copy',
+            a: 'traffic_accidents',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: $count/2 +8
 color: opacity( ramp(linear($count, 0,120), RedOr), $count/20+0.4)
@@ -376,9 +376,9 @@ symbol: ramp(buckets(100*(0.1*now()%1 >0.5),  [50]), [
     [
         'Flower image',
         {
-            a: 'fire_perimeters_copy',
+            a: 'fire_perimeter_centroids',
             b: '',
-            c: 'mamataakella',
+            c: 'cartovl',
             d: 'https://{user}.carto.com',
             e: `width: $gis_acres/3000
 symbol: ramp(linear($cause, 1,14), Prism) * image('../styling/flower.svg')`,
