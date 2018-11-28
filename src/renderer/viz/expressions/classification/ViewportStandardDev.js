@@ -2,6 +2,7 @@ import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalStandardDev';
+import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -58,7 +59,7 @@ export default class ViewportStandardDev extends Classifier {
             throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
         }
 
-        const children = { input, _histogram: viewportHistogram(input, 1000) };
+        const children = { input, _histogram: viewportHistogram(input, DEFAULT_HISTOGRAM_SIZE) };
         super(children, buckets);
         this._classSize = classSize;
     }

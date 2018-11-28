@@ -1,6 +1,7 @@
 import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
+import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -32,7 +33,7 @@ export default class ViewportQuantiles extends Classifier {
         checkMaxArguments(arguments, 2, 'viewportQuantiles');
         checkNumber('viewportQuantiles', 'buckets', 1, buckets);
 
-        const children = { input, _histogram: viewportHistogram(input) };
+        const children = { input, _histogram: viewportHistogram(input, DEFAULT_HISTOGRAM_SIZE) };
         super(children, buckets);
     }
 
