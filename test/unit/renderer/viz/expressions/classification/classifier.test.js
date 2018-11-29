@@ -197,13 +197,13 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 const q = viewportQuantiles($price, 3);
                 prepare(q);
                 expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._size).toEqual(DEFAULT_HISTOGRAM_SIZE);
+                expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
             });
-            it('viewportQuantiles($price, 3, 20)', () => {
-                const q = viewportQuantiles($price, 3, 20);
+            it('viewportQuantiles($price, 3, 30)', () => {
+                const q = viewportQuantiles($price, 3, 30);
                 prepare(q);
                 expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._size).toEqual(20);
+                expect(q._histogram._sizeOrBuckets).toEqual(30);
             });
 
             // viewportEqIntervals ---
@@ -236,7 +236,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
 
-                    expect(q._histogram._size).toEqual(DEFAULT_HISTOGRAM_SIZE);
+                    expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
                 });
 
                 it('viewportStandardDev($price, 4)', () => {
@@ -267,18 +267,18 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     it('viewportStandardDev($price, 3, 1, 2000) --> 2000 is precise...', () => {
                         const q = viewportStandardDev($price, 3, 1, 2000);
                         prepare(q);
-                        expect(q._histogram._size).toEqual(2000);
+                        expect(q._histogram._sizeOrBuckets).toEqual(2000);
 
                         expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
                         expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
                     });
-                    it('viewportStandardDev($price, 3, 1, 20) --> 20 is not!...', () => {
-                        const q = viewportStandardDev($price, 3, 1, 2000);
+                    it('viewportStandardDev($price, 3, 1, 30) --> 30 is not!...', () => {
+                        const q = viewportStandardDev($price, 3, 1, 30);
                         prepare(q);
-                        expect(q._histogram._size).toEqual(2000);
+                        expect(q._histogram._sizeOrBuckets).toEqual(30);
 
-                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 1); // vs (avg - std, 2);
-                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 1); // vs (avg + std, 2);
+                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 0); // vs (avg - std, 2);
+                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 0); // vs (avg + std, 2);
                     });
                 });
 
