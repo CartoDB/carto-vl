@@ -1,58 +1,58 @@
 /* global carto */
 const vizs = [
     `width: 7
-color: rgb(204,0,0)`,
+    color: rgb(204,0,0)`,
 
     `width: 7
-color: rgba(204,0,0,0.2)
-strokeColor: opacity(white, 0.2)`,
+    color: rgba(204,0,0,0.2)
+    strokeColor: opacity(white, 0.2)`,
 
     `width: 7
-color: hsv(0, 0, 1)`,
+    color: hsv(0, 0, 1)`,
 
     `width: 7
-color: hsv(0, 0.7, 1.)`,
+    color: hsv(0, 0.7, 1.)`,
 
     `width: 7
-color: hsv(0.2, 0.7, 1.)`,
+    color: hsv(0.2, 0.7, 1.)`,
 
     `width: 7
-color: hsv(0.7, 0.7, 1.)`,
+    color: hsv(0.7, 0.7, 1.)`,
 
     `width: 7
-color: hsv($category, 0.7, 1.)`,
+    color: hsv($category, 0.7, 1.)`,
 
     `width: 7
-color: ramp($category, PRISM)`,
+    color: ramp($category, PRISM)`,
 
     `width: 7
-color: ramp(top($category, 4), PRISM)`,
+    color: ramp(top($category, 4), PRISM)`,
 
     `width: 7
-color: opacity(ramp($category, PRISM), $amount/5000)
-strokeWidth: 0`,
+    color: opacity(ramp($category, PRISM), $amount/5000)
+    strokeWidth: 0`,
 
     `width: 7
-color: ramp($category, PRISM)
-strokeWidth: 0`,
+    color: ramp($category, PRISM)
+    strokeWidth: 0`,
 
     `width: sqrt($amount/5000)*20
-color: ramp($category, PRISM)
-strokeWidth: 0`,
+    color: ramp($category, PRISM)
+    strokeWidth: 0`,
 
     `width: sqrt($amount/5000)*20*(zoom()/20+0.01)*1.5
-color: ramp($category, PRISM)
-strokeWidth: 0`,
+    color: ramp($category, PRISM)
+    strokeWidth: 0`,
 
     `width: sqrt($amount/5000)*20*(zoom()/20+0.01)*1.5
-color: ramp($category, PRISM)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/25`,
+    color: ramp($category, PRISM)
+    strokeColor: rgba(0,0,0,0.7)
+    strokeWidth: 2*zoom()/25`,
 
     `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/20+0.01)*1.5
-color: ramp(clusterMode($category), PRISM)
-strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/25`
+    color: ramp(clusterMode($category), PRISM)
+    strokeColor: rgba(0,0,0,0.7)
+    strokeWidth: 2*zoom()/25`
 ];
 
 const BASEMAPS = {
