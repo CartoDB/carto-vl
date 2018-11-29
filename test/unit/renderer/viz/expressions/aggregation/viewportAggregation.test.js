@@ -166,6 +166,21 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             ]);
         });
 
+        it('viewportHistogram($price, [[0, 1], [1, 2]], 1) should eval to the correct histogram', () => {
+            const viewportHistogram = s.viewportHistogram($price, [[0, 1.5], [1.5, 3]], 1);
+            fakeDrawMetadata(viewportHistogram);
+            expect(viewportHistogram.value).toEqual([
+                {
+                    x: [0, 1.5],
+                    y: 2
+                },
+                {
+                    x: [1.5, 3],
+                    y: 2
+                }
+            ]);
+        });
+
         it('viewportHistogram($cat) should eval to the correct histogram', () => {
             const viewportHistogram = s.viewportHistogram($cat);
             fakeDrawMetadata(viewportHistogram);
