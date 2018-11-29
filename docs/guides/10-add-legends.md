@@ -1,6 +1,6 @@
 ## Add legends
 
-Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with [**legends**](https://carto.com/help/glossary/#legend) to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent.
+Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with [legends](https://carto.com/help/glossary/#legend) to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent.
 
 ### Overview
 
@@ -121,7 +121,7 @@ const viz = new carto.Viz(`
 Since the `ramp` expression is the root expression of a styling property (in this case, `color`) it can be accessed directly with `layer.viz.color.getLegendData()`.
 
 **Note:**
-If styling isn't tied directly to a styling property, you will need to use a [variable](https://carto.com/help/glossary/#variable). We will explore that method in detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
+If styling isn't tied directly to a styling property, you will need to use a [variable](/developers/carto-vl/guides/Glossary/#variables). We will explore that method in detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
 
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 
