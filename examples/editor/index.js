@@ -40,19 +40,19 @@ strokeWidth: 0`,
 color: ramp($category, PRISM)
 strokeWidth: 0`,
 
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
+    `width: sqrt($amount/5000)*20*(zoom()/20+0.01)*1.5
 color: ramp($category, PRISM)
 strokeWidth: 0`,
 
-    `width: sqrt($amount/5000)*20*(zoom()/4000+0.01)*1.5
+    `width: sqrt($amount/5000)*20*(zoom()/20+0.01)*1.5
 color: ramp($category, PRISM)
 strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`,
+strokeWidth:      2*zoom()/25`,
 
-    `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/4000+0.01)*1.5
+    `width: sqrt(clusterSum($amount)/50000)*20*(zoom()/20+0.01)*1.5
 color: ramp(clusterMode($category), PRISM)
 strokeColor:       rgba(0,0,0,0.7)
-strokeWidth:      2*zoom()/50000`
+strokeWidth:      2*zoom()/25`
 ];
 
 const BASEMAPS = {
