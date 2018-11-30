@@ -46,7 +46,7 @@ color: ramp($population_density, [midnightblue, deeppink, gold])
 ```
 #### Implicit casts
 
-Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call [implicit casts](developers/carto-vl/guides/Glossary/#implicit-cast).
+Matching the input with the context of the lowest population density and highest population density is done by the [`linear`](/developers/carto-vl/reference/#cartoexpressionslinear) function, which is used automatically by `ramp` when the input is a numeric property. This means that the CARTO VL `ramp` function makes transformations that we call [implicit casts](/developers/carto-vl/guides/Glossary/#implicit-cast).
 
 Use the map below to toggle between three styles. You will notice that the map does not change since **Style 1** is implicitly cast to **Style 2** which is implicitly cast to **Style 3**, making them all equal. In the following section, you will see how to take advantage of this behavior to further customize your map.
 
