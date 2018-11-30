@@ -46,6 +46,7 @@ import Dataset from './sources/Dataset';
 import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import SQL from './sources/SQL';
+import CommonGrid from './sources/CommonGrid';
 import { on, off } from './utils/events';
 
 /**
@@ -66,7 +67,7 @@ import * as basemaps from './basemaps';
  */
 import { version } from '../package.json';
 
-const source = { Dataset, SQL, GeoJSON, MVT };
+const source = { Dataset, SQL, GeoJSON, MVT, CommonGrid };
 
 export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
 export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
