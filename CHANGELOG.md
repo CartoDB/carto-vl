@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature.
+- Fix `layer:updated` event removing unnecessary emissions.
 
 ## [1.0.0] - 2018-11-08
 
