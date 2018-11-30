@@ -35,10 +35,12 @@ describe('Layer', () => {
         });
 
         describe('.updated', () => {
-            // auxiliary mocks for prerender
-            spyOn(layer, '_getZoom').and.callFake(() => 0);
-            spyOn(layer, '_getViewport').and.callFake(() => { });
-            spyOn(layer, '_needRefresh').and.callFake(() => Promise.resolve());
+            function mockPrerenderHelpers () {
+                // auxiliary mocks for prerender
+                spyOn(layer, '_getZoom').and.callFake(() => 0);
+                spyOn(layer, '_getViewport').and.callFake(() => { });
+                spyOn(layer, '_needRefresh').and.callFake(() => Promise.resolve());
+            }
 
             it('should fire an "updated" event when ready', (done) => {
                 layer.on('updated', done);
@@ -56,6 +58,7 @@ describe('Layer', () => {
             });
 
             it('should fire an "updated" event when the source is updated', (done) => {
+                mockPrerenderHelpers();
                 layer.on('loaded', async () => {
                     const newSource = new carto.source.GeoJSON(featureData);
                     spyOn(newSource, 'requestData').and.callFake(() => true);
@@ -72,6 +75,7 @@ describe('Layer', () => {
             });
 
             it('should fire an "updated" event when the viz is updated', (done) => {
+                mockPrerenderHelpers();
                 layer.on('loaded', async () => {
                     let update = jasmine.createSpy('update');
                     layer.on('updated', update);
