@@ -88,8 +88,12 @@ export default class Layer {
     }
 
     set visible (visible) {
+        const initial = this._visible;
         this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
         this._visible = visible;
+        if (visible !== initial) {
+            this._fire('updated');
+        }
     }
 
     /**
@@ -429,8 +433,8 @@ export default class Layer {
                         if (this._state === states.INIT) {
                             this._state = states.IDLE;
                             this._fire('loaded');
-                            this._fire('updated');
                         }
+                        this._fire('updated');
                     });
                 }
             });
@@ -446,11 +450,9 @@ export default class Layer {
         this._renderWaiters.forEach(resolve => resolve());
 
         if (this.isAnimated()) {
-            this._needRefresh();
-        }
-
-        if (this._state !== states.INIT) {
-            this._fire('updated');
+            this._needRefresh().then(() => {
+                this._fire('updated'); // this should be restricted to animation.isPlaying?
+            });
         }
     }
 
