@@ -2,6 +2,7 @@ import Classifier from './Classifier';
 import { checkNumber, checkType, checkMaxArguments } from '../utils';
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalStandardDev';
+import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -16,8 +17,9 @@ import { calculateBreakpoints } from './GlobalStandardDev';
  *
  *
  * @param {Number} input - The input expression to classify
- * @param {number} n - Number of buckets
- * @param {number?} classSize - Optional. The class size, defaults to 1.0 standard deviation (usual values are also 0.5 or 0.25)
+ * @param {Number} n - Number of buckets
+ * @param {Number?} classSize - Optional. The class size, defaults to 1.0 standard deviation (usual values are also 0.5 or 0.25)
+ * @param {Number?} histogramSize - Optional (DEFAULT_HISTOGRAM_SIZE = 1000).  Histogram 'size' used for calculations (the bigger, the more precision)
  * @return {Category}
  *
  * @example <caption>Use viewport mean-standard deviation to define a color ramp.</caption>
@@ -49,16 +51,17 @@ import { calculateBreakpoints } from './GlobalStandardDev';
  */
 
 export default class ViewportStandardDev extends Classifier {
-    constructor (input, buckets, classSize = 1.0) {
-        checkMaxArguments(arguments, 3, 'viewportStandardDev');
+    constructor (input, buckets, classSize = 1.0, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
+        checkMaxArguments(arguments, 4, 'viewportStandardDev');
         checkNumber('viewportStandardDev', 'buckets', 1, buckets);
         checkNumber('viewportStandardDev', 'classSize', 2, classSize);
+        checkNumber('viewportStandardDev', 'histogramSize', 3, histogramSize);
 
         if (classSize <= 0) {
             throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
         }
 
-        const children = { input, _histogram: viewportHistogram(input, 1000) };
+        const children = { input, _histogram: viewportHistogram(input, histogramSize) };
         super(children, buckets);
         this._classSize = classSize;
     }

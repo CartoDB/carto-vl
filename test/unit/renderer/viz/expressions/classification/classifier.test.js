@@ -4,6 +4,7 @@ import { average, standardDeviation } from '../../../../../../src/renderer/viz/e
 import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
 import Metadata from '../../../../../../src/renderer/Metadata';
+import { DEFAULT_HISTOGRAM_SIZE } from '../../../../../../src/renderer/viz/expressions/classification/Classifier';
 
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
@@ -36,7 +37,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportQuantiles', ['category', 2]);
             validateTypeErrors('viewportQuantiles', ['color', 2]);
             validateTypeErrors('viewportQuantiles', ['number', 'color']);
-            validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number']);
+            validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number', 'number']);
 
             validateTypeErrors('viewportEqIntervals', []);
             validateTypeErrors('viewportEqIntervals', ['number', 'category']);
@@ -50,7 +51,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportStandardDev', ['category', 2]);
             validateTypeErrors('viewportStandardDev', ['color', 2]);
             validateTypeErrors('viewportStandardDev', ['number', 'color']);
-            validateMaxArgumentsError('viewportStandardDev', ['number', 'number-array', 'number', 'number']);
+            validateMaxArgumentsError('viewportStandardDev', ['number', 'number-array', 'number', 'number', 'number']);
 
             validateTypeErrors('viewportPercentile', []);
             validateTypeErrors('viewportPercentile', ['number', 'category']);
@@ -62,8 +63,8 @@ describe('src/renderer/viz/expressions/classifier', () => {
     });
 
     describe('type', () => {
-        validateStaticType('viewportQuantiles', ['number-property', 2], 'category');
-        validateStaticType('viewportStandardDev', ['number-property', 2, 0.5], 'category');
+        validateStaticType('viewportQuantiles', ['number-property', 2, 100], 'category');
+        validateStaticType('viewportStandardDev', ['number-property', 2, 0.5, 100], 'category');
         validateStaticType('viewportPercentile', ['number', 'number'], 'number');
     });
 
@@ -196,6 +197,13 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 const q = viewportQuantiles($price, 3);
                 prepare(q);
                 expect(q.getBreakpointList()).toEqual([2, 4]);
+                expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
+            });
+            it('viewportQuantiles($price, 3, 30)', () => {
+                const q = viewportQuantiles($price, 3, 30);
+                prepare(q);
+                expect(q.getBreakpointList()).toEqual([2, 4]);
+                expect(q._histogram._sizeOrBuckets).toEqual(30);
             });
 
             // viewportEqIntervals ---
@@ -227,6 +235,8 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
+
+                    expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
                 });
 
                 it('viewportStandardDev($price, 4)', () => {
@@ -251,6 +261,25 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     prepare(q);
                     expect(q.getBreakpointList()[0]).toBeCloseTo(avg - 0.5 * std, 2);
                     expect(q.getBreakpointList()[1]).toBeCloseTo(avg + 0.5 * std, 2);
+                });
+
+                describe('.histogramSize influence...', () => {
+                    it('viewportStandardDev($price, 3, 1, 2000) --> 2000 is precise...', () => {
+                        const q = viewportStandardDev($price, 3, 1, 2000);
+                        prepare(q);
+                        expect(q._histogram._sizeOrBuckets).toEqual(2000);
+
+                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 2);
+                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 2);
+                    });
+                    it('viewportStandardDev($price, 3, 1, 30) --> 30 is not!...', () => {
+                        const q = viewportStandardDev($price, 3, 1, 30);
+                        prepare(q);
+                        expect(q._histogram._sizeOrBuckets).toEqual(30);
+
+                        expect(q.getBreakpointList()[0]).toBeCloseTo(avg - std, 0); // vs (avg - std, 2);
+                        expect(q.getBreakpointList()[1]).toBeCloseTo(avg + std, 0); // vs (avg + std, 2);
+                    });
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {

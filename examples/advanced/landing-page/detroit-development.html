@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>US Population by County | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <div id="loader">
@@ -23,15 +25,10 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [-83.10625163016755, 42.34316296632727],
-      zoom: 12,
-      scrollZoom: false,
-
-
+      zoom: 12
     });
 
-    const nav = new mapboxgl.NavigationControl({
-      showCompass: false
-    });
+    const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
 
     // Define user
@@ -58,4 +55,5 @@
     }
   </script>
 </body>
+
 </html>

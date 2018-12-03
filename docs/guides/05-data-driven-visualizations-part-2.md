@@ -14,7 +14,7 @@ With CARTO VL any valid color expression (not just named colors) can be used:
 - `ramp($dn, [blue, #F00])`
 - `ramp($dn, [opacity(blue, 0.4), opacity( #F00, 0.6)])`
 
-Another way to specify colors is to use built-in color schemes. CARTO VL, by default, supports the use of both [CARTOColors](https://carto.com/carto-colors/) and [ColorBrewer](http://colorbrewer2.org) schemes.
+Another way to specify colors is to use built-in [color schemes](https://carto.com/help/glossary/#colorscheme). CARTO VL, by default, supports the use of both [CARTOColors](https://carto.com/carto-colors/) and [ColorBrewer](http://colorbrewer2.org) schemes.
 
 To access CARTOColors, replace the list of colors with the name of the scheme you want to use:
 
@@ -61,7 +61,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/data-d
 
 ### Numeric values
 
-Proportional symbols (aka "bubble-maps") are a method of symbolizing points using a numeric property. The symbol size of each point is scaled according to its value in the data.
+[Proportional symbols](https://carto.com/help/glossary/#proportionalsymbols) (aka "bubble-maps") are a method of symbolizing points using a numeric property. The symbol size of each point is scaled according to its value in the data.
 
 Matching between numbers (the feature's data) and other numbers (the point sizes) is a special case because basic math can create the required match without the need for the special function `ramp`. However, using `ramp` facilitates some advanced usages.
 

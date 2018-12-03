@@ -1,6 +1,8 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
 
+export const DEFAULT_HISTOGRAM_SIZE = 1000;
+
 let classifierUID = 0;
 export default class Classifier extends BaseExpression {
     constructor (children, buckets) {
@@ -38,7 +40,7 @@ export default class Classifier extends BaseExpression {
         return this.breakpoints.map(br => br.expr);
     }
 
-    _genBreakpoints () {}
+    _genBreakpoints () { }
 
     _applyToShaderSource (getGLSLforProperty) {
         const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));

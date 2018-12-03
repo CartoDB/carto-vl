@@ -15,5 +15,20 @@ describe('utils/collision/', () => {
         it('should return false when the triangle is partially inside the AABB', () => {
             expect(triangleCollides([{ x: -0.1, y: -0.1 }, { x: 0.2, y: -0.1 }, { x: -0.1, y: 0.2 }], aabb)).toEqual(true);
         });
+
+        describe('triangle from line', () => {
+            it('should return true when it intersects the AABB', () => {
+                expect(triangleCollides([{ x: 0, y: -6 }, { x: 0, y: -6 }, { x: 0, y: 8 }], aabb)).toEqual(true);
+            });
+            it('should return false when it doesn\'t intersect the AABB', () => {
+                expect(triangleCollides([{ x: 10, y: -6 }, { x: 10, y: -6 }, { x: 10, y: 8 }], aabb)).toEqual(false);
+            });
+            it('should return true when it is partially inside the AABB', () => {
+                expect(triangleCollides([{ x: 0, y: 0.5 }, { x: 0, y: 0.5 }, { x: 0, y: 2 }], aabb)).toEqual(true);
+            });
+            it('should return true when it is completely inside the AABB', () => {
+                expect(triangleCollides([{ x: 0, y: 0.5 }, { x: 0, y: 0.5 }, { x: 0, y: 0.6 }], aabb)).toEqual(true);
+            });
+        });
     });
 });

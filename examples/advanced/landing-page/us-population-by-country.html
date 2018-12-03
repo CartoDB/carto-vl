@@ -25,15 +25,10 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [-99.6404893, 38.5480718],
-      zoom: 4,
-      scrollZoom: false,
-
-
+      zoom: 4
     });
 
-    const nav = new mapboxgl.NavigationControl({
-      showCompass: false
-    });
+    const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
 
     // Define user
