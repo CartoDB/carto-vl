@@ -3,7 +3,7 @@ import shaders from './renderer/shaders/index';
 import { compileShader } from './renderer/shaders/shaderCompiler';
 import * as s from './renderer/viz/expressions';
 import BaseExpression from './renderer/viz/expressions/base';
-import { implicitCast } from './renderer/viz/expressions/utils';
+import { implicitCast, noOverrideColor } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
@@ -428,8 +428,7 @@ export default class Viz {
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
-            const NO_OVERRIDE_COLOR = s.rgba(255, 255, 255, 0);
-            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : NO_OVERRIDE_COLOR;
+            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : noOverrideColor();
         }
         if (util.isUndefined(vizSpec.width)) {
             vizSpec.width = DEFAULT_WIDTH_EXPRESSION();

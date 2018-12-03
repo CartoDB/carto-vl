@@ -142,6 +142,10 @@ export function pointInRectangle (point, bbox) {
     return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));
 }
 
+/**
+ * Axis-Aligned Bounding Box (AABB). This creates a wrapping box around the geometry, without rotation.
+ * This allows the use of a common technique to detect collision between features (using their corresponding AABBs).
+ */
 export function computeAABB (geometry, type) {
     switch (type) {
         case GEOMETRY_TYPE.POINT:

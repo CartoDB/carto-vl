@@ -51,11 +51,13 @@
     });
 
     const source = new carto.source.Dataset('walmarts');
+    const wallmartIcon = 'https://libs.cartocdn.com/carto-vl/assets/walmart.svg';
     const viz = new carto.Viz(`
       width: 25
-      symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
+      // symbol: image('${wallmartIcon}') // symbol not set here...
       symbolPlacement: ALIGN_CENTER
     `);
+    viz.symbol.blendTo(`image('${wallmartIcon}')`); // ...but here, with same results
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
 
@@ -74,12 +76,12 @@
 
     interactivity.on('featureEnter', (event) => {
       event.features.forEach((feature) => {
-        feature.color.blendTo('green', DURATION);
+        feature.blendTo({ 'color': 'green', 'width': 50 }, DURATION);
       });
     });
     interactivity.on('featureLeave', (event) => {
       event.features.forEach((feature) => {
-        feature.color.reset(DURATION);
+        feature.reset(DURATION);
       });
     });
 

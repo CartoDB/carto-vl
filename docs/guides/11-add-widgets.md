@@ -1,8 +1,8 @@
 ## Add widgets
 
-**Widgets** often provide additional information about a dataset that is not symbolized on a map to facilitate understanding and exploration. On an election map, you can style the map by the winner, but also provide additional information from the data, for example, how many total votes did each party receive? Or, how many people voted?
+[Widgets](https://carto.com/help/glossary/#widget) provide additional information about a dataset that is not symbolized on a map to facilitate understanding and exploration. On an election map, you can style the map by the winner, but also provide additional information from the data, for example, how many total votes did each party receive? Or, how many people voted?
 
-The first thing you need to know to create widgets is the concept of **variables**. A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myWidgetExpression()`, how do we actually get that information?
+The first thing you need to know to create widgets is the concept of [variables](/developers/carto-vl/guides/Glossary/#variables). A variable is a name in a CARTO VL visualization that has an expression bound to it. It's simply a way to name expressions to be referenced later. For example, let's say there was a magic function that returned our widget information like `myWidgetExpression()`, how do we actually get that information?
 
 Firstly, we'll need to bind that expression to a new name so our visualization could be created like this:
 
@@ -30,13 +30,13 @@ If, however, `myWidgetExpression` was static, we could just use `myLayer.on('loa
 
 #### What is the average price in the entire dataset?
 
-To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](/carto-vl/reference/#cartoexpressionsglobalavg) expression.
+To get the average of a property in the entire dataset we'll need to use the [`globalAvg()`](/developers/carto-vl/reference/#cartoexpressionsglobalavg) expression.
 
 There are similar expressions for getting the minimum, the maximum, the sum, and percentiles.
 
 #### What is the average price in the features shown?
 
-There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](/carto-vl/reference/#cartoexpressionsviewportavg).
+There are similar functions that only take the features on the screen into account. For example, see [viewportAvg](/developers/carto-vl/reference/#cartoexpressionsviewportavg).
 
 All the _viewport*_ like expressions will take only the features that are on the viewport region and that pass the filter set in the `filter:` visualization property.
 
@@ -88,7 +88,7 @@ const viz = new carto.Viz(`
     @histogram: viewportHistogram($total_damage, 6)
 `);
 ```
-The [`viewportHistogram`](/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
+The [`viewportHistogram`](/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) function accepts up to 3 parameters. The first parameter is the numeric expression that will be used to produce the histogram, this is usually your property.
 
 The second parameter is the number of buckets of the histogram, by default it has a value of 20, we'll use a different value here.
 
