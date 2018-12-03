@@ -537,6 +537,9 @@ export default class Dataframe extends DummyDataframe {
         return getters;
     }
 
+    /**
+     * Build a feature object for an index, copying all the properties.
+     */
     getFeature (index) {
         if (!this.cachedFeatures) {
             this.cachedFeatures = new Array(this.numFeatures);
