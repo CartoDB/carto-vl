@@ -38,8 +38,10 @@
 
         <h3>Animation</h3>
         <button id="btnPlayPause">Play / Pause</button>
+
+        <br />
+        <h4 id="js-animationDate"></h4>
       </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
 
@@ -75,7 +77,10 @@
     `);
     const animationLayer = new carto.Layer('animation', source, animationViz);
     animationLayer.on('updated', function updateWidgets() {
-      console.log('* animation: updated - progress', animationViz.variables.animation.getProgressPct());
+      const animation = animationViz.variables.animation;
+
+      console.log('* animation: updated - progress', animation.getProgressPct());
+      document.getElementById('js-animationDate').innerText = animation.getProgressValue().toISOString();
     });
     animationLayer.addTo(map, 'watername_ocean');
 
@@ -163,7 +168,7 @@
         const animation = animationViz.variables.animation;
         const playing = animation.isPlaying();
         playing ? animation.pause() : animation.play();
-        console.log(`now playing? ${!playing}`);
+        console.log(`now playing? ${!playing} (progress ${animation.getProgressPct()})`);
       });
     }
 
