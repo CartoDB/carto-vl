@@ -1,5 +1,5 @@
 import Base from './base';
-import { checkString, checkMaxArguments } from './utils';
+import { checkString, checkMaxArguments, noOverrideColor } from './utils';
 
 /**
  * Image. Load an image and use it as a symbol.
@@ -49,6 +49,13 @@ export default class Image extends Base {
     loadImages () {
         this.count = this.count + 1 || 1;
         return this._promise;
+    }
+
+    keepDefaultsOnBlend () {
+        // Keep default image color if setting a symbol after viz initialization with defaults
+        if (this.default && this.parent.color.default) {
+            this.parent.color = noOverrideColor();
+        }
     }
 
     eval () {
