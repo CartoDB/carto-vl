@@ -11,7 +11,7 @@ With CARTO VL you can make animated maps of points, lines and polygons using the
         frameBorder="0">
     </iframe>
 </div>
-
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html)
 
 ### Create a basic animation
 Before getting into the details, it is important to understand the general syntax for animating data in CARTO VL:
@@ -42,6 +42,7 @@ const viz = new carto.Viz(`
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-0.html)
 
 **Note:**
 If you are wondering about the points, this is an animation of the journey of three birds, from January to April of 2014. It is using data from [movebank.org](https://www.movebank.org/) and the *date_time* column represents the date of the bird track and its associated timestamp. You can check the code of the previous map to see how to configure this *bird_journey* as the `carto.source.Dataset` for the visualization.
@@ -115,7 +116,7 @@ const viz = new carto.Viz(`
         frameBorder="0">
     </iframe>
 </div>
-
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-2.html)
 
 #### Adjust fade
 Since you are visualizing bird migration, the journey the birds took should be shown more clearly through symbology. You can get this added effect by adjusting the `fade` parameters. By setting `fadeIn` to `0` and `fadeOut` to `0.5`, the previous point from the journey is visible for longer in the animation which helps to better visualize the flight path of the migration journey.
@@ -134,6 +135,7 @@ filter: animation($date_time, 30, fade(0, 0.5))
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-3.html)
 
 
 #### Final touches
@@ -161,6 +163,7 @@ const viz = new carto.Viz(`
         frameBorder="0">
     </iframe>
 </div>
+You can explore the final map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-4.html)
 
 
 ### Animation controls
@@ -184,7 +187,6 @@ The variables are now available in the `viz` object. If you want to access the a
 ```js
 viz.variables.animation.play();
 ```
-
 
 #### Add animation controls
 The next step is to add buttons and elements that allow you to control and interact with the animation.
@@ -285,7 +287,7 @@ The `setInterval()` is a common method available at the browser, that calls a fu
 #### All together
 Well done! In the example below you will find the full code, including the animation controls. You can play with it and make adjustments.
 
-Remember you can style your HTML controls using CSS. These styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. This example is also available in the [examples section](/developers/carto-vl/examples/#example-animation-controls).
+Remember you can style your HTML controls using CSS. These styles are very simple, but at the beginning of this guide you have a complete example that includes beautiful styles. A similar example is available in the [examples section](/developers/carto-vl/examples/#example-animation-controls).
 
 <div class="example-map">
     <iframe
@@ -297,6 +299,7 @@ Remember you can style your HTML controls using CSS. These styles are very simpl
         frameBorder="0">
     </iframe>
 </div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-5.html)
 
 ```js
 const map = new mapboxgl.Map({
@@ -402,12 +405,12 @@ As you can see in the result, you are able to visualize, via color, where each b
 
 <div class="example-map">
     <iframe
-        id="guides-animation-step-6"
-        src="/developers/carto-vl/examples/maps/guides/animated-viz/step-6.html"
+        id="guides-animation-step-7"
+        src="/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-6.html)
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html)

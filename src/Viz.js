@@ -85,7 +85,7 @@ const SUPPORTED_PROPERTIES = [
 * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
 * @property {Transformation} transform - transformation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.
 * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
-* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256, and power of 2 values work better (no visual artifacts). A resolution of N means points are aggregated to grid cells NxN pixels. Unlike {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
 * @property {Object} variables - An object describing the variables used.
 * @api
 *
@@ -428,7 +428,7 @@ export default class Viz {
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
-            const NO_OVERRIDE_COLOR = s.rgba(0, 0, 0, 0); // TODO move to contant expressions
+            const NO_OVERRIDE_COLOR = s.rgba(255, 255, 255, 0);
             vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : NO_OVERRIDE_COLOR;
         }
         if (util.isUndefined(vizSpec.width)) {

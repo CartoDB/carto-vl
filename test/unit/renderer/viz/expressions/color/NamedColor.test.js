@@ -10,6 +10,7 @@ describe('src/core/viz/expressions/NamedColor', () => {
         validateStaticType('namedColor', ['blue'], 'color');
         validateStaticType('namedColor', ['AliceBlue'], 'color');
         validateStaticType('namedColor', ['BLACK'], 'color');
+        validateStaticType('namedColor', ['transparent'], 'color');
         validateMaxArgumentsError('namedColor', ['blue', 'red']);
     });
 
@@ -20,6 +21,9 @@ describe('src/core/viz/expressions/NamedColor', () => {
         it('should work with red', () => {
             expect(namedColor('red').value).toEqual({ r: 255, g: 0, b: 0, a: 1 });
         });
+        it('should work with transparent', () => {
+            expect(namedColor('transparent').value).toEqual({ r: 0, g: 0, b: 0, a: 0 });
+        });
     });
 
     describe('.eval', () => {
@@ -28,6 +32,9 @@ describe('src/core/viz/expressions/NamedColor', () => {
         });
         it('should work with red', () => {
             expect(namedColor('red').eval()).toEqual({ r: 255, g: 0, b: 0, a: 1 });
+        });
+        it('should work with transparent', () => {
+            expect(namedColor('transparent').eval()).toEqual({ r: 0, g: 0, b: 0, a: 0 });
         });
     });
 });
