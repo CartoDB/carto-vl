@@ -456,7 +456,7 @@ export default class Layer {
         if (this.isAnimated()) {
             this._needRefresh().then(() => {
                 if (this.isPlaying()) {
-                    this._fire('updated'); // this should be restricted to animation.isPlaying?
+                    this._fire('updated');
                 }
             });
         }
