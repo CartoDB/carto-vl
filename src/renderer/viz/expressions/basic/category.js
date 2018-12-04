@@ -35,6 +35,10 @@ export default class BaseCategory extends BaseExpression {
         return false;
     }
 
+    isPlaying () {
+        return false;
+    }
+
     _bindMetadata (metadata) {
         this._metadata = metadata;
     }

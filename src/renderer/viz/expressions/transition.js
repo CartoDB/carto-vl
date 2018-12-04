@@ -36,6 +36,11 @@ export default class Transition extends BaseExpression {
     isAnimated () {
         return !this.mix || this.mix <= 1.0;
     }
+
+    isPlaying () {
+        return this.isAnimated();
+    }
+
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform float anim${this._uid};\n`),

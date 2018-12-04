@@ -123,6 +123,18 @@ export default class Base {
     }
 
     /**
+     *
+     * @api
+     * @returns `true` if the expression it is currently changing
+     * @memberof Expression
+     * @instance
+     * @name isPlaying
+     */
+    isPlaying () {
+        return this._getChildren().some(child => child.isPlaying());
+    }
+
+    /**
      * Linear interpolate between `this` and `final` with the specified duration
      *
      * @api

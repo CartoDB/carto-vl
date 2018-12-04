@@ -402,6 +402,10 @@ export default class Layer {
         return this._viz && this._viz.isAnimated();
     }
 
+    isPlaying () {
+        return this._viz && this._viz.isPlaying();
+    }
+
     /**
      * Custom Layer API: `onAdd` function
      */
@@ -451,7 +455,9 @@ export default class Layer {
 
         if (this.isAnimated()) {
             this._needRefresh().then(() => {
-                this._fire('updated'); // this should be restricted to animation.isPlaying?
+                if (this.isPlaying()) {
+                    this._fire('updated'); // this should be restricted to animation.isPlaying?
+                }
             });
         }
     }
