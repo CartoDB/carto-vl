@@ -75,6 +75,10 @@
       filter: @animation
     `);
     const animationLayer = new carto.Layer('animation', source, animationViz);
+    animationLayer.on('loaded', () => {
+      console.log('animation: loaded');
+      animationViz.variables.animation.pause(); // start with a paused animation
+    });
     animationLayer.on('updated', () => {
       const animation = animationViz.variables.animation;
 
@@ -86,12 +90,16 @@
     // 2. Simple Layer
     const simpleViz = new carto.Viz(`
       @histogram: viewportHistogram($cartodb_id, 10)
+      @features: viewportFeatures($currentuse)
       strokeWidth: 0
       color: opacity(gray, 0.3)
       width: 8
       filter: 1
     `)
     const simpleLayer = new carto.Layer('simple', source, simpleViz);
+    simpleLayer.on('loaded', () => {
+      console.log('simple layer: loaded');
+    });
     simpleLayer.on('updated', () => {
       console.log('* simple layer: updated');
     });
