@@ -100,8 +100,17 @@
     simpleLayer.on('loaded', () => {
       console.log('simple layer: loaded');
     });
+    let firstTimeUpdate = true;
     simpleLayer.on('updated', () => {
       console.log('* simple layer: updated');
+      const features = simpleViz.variables.features.value;
+      if (firstTimeUpdate) {
+        firstTimeUpdate = false;
+        console.log('1 feature blendTo & reset change');
+        features[0].blendTo({ color: 'red' });
+        features[0].strokeColor.blendTo('orange');
+        features[0].reset();
+      }
     });
     simpleLayer.addTo(map, 'animation');
     let simpleCurrentSource = source; // to enable toggling sources
