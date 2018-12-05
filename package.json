@@ -83,8 +83,7 @@
     "webpack-glsl-loader": "^1.0.1",
     "worker-loader": "^2.0.0"
   },
-  "module": "dist/carto-vl.js",
-  "main": "dist/carto-vl.js",
+  "main": "dist/carto-vl.min.js",
   "scripts": {
     "build": "yarn build:dev && yarn build:min",
     "build:dev": "webpack --config webpack/webpack.config.js",
