@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const banner = require('./banner');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     entry: {
@@ -52,7 +53,8 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.BannerPlugin(banner)
+        new webpack.BannerPlugin(banner),
+        new BundleAnalyzerPlugin({ analyzerPort: 8889 })
     ],
     performance: {
         maxEntrypointSize: 435200,
