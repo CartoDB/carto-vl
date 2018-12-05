@@ -118,7 +118,7 @@
     "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",
     "prepublishOnly": "./scripts/release.sh",
-    "cdn:branch:publish": "./scripts/publish-branch.sh",
+    "cdn:branch:publish": "yarn build && ./scripts/publish-branch.sh",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
     "loc": "sloc src/ examples/"
   },
