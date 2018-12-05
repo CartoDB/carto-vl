@@ -79,7 +79,7 @@
 
     // Define styles
     const rampQuantilesViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
+      color: ramp(globalQuantiles($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
     const rampBucketsViz = new carto.Viz(`
@@ -91,11 +91,11 @@
       strokeWidth: 0
     `);
     const rampEqualIntervalsViz = new carto.Viz(`
-      color: ramp(viewportEqIntervals($total_pop, 5), sunsetdark)
+      color: ramp(globalEqIntervals($total_pop, 5), sunsetdark)
       strokeWidth: 0
     `);
     const rampStandardDevViz = new carto.Viz(`
-      color: ramp(viewportStandardDev($total_pop, 5), tealrose)
+      color: ramp(globalStandardDev($total_pop, 5), tealrose)
       strokeWidth: 0
     `);
 
