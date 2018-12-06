@@ -115,6 +115,56 @@
             ]
         },
         {
+            "title": "Legends",
+            "samples": [
+                {
+                    "title": "Category points",
+                    "file": "legends/category-points.html"
+                },
+                {
+                    "title": "Category lines",
+                    "file": "legends/category-lines.html"
+                },
+                {
+                    "title": "Category images",
+                    "file": "legends/category-images.html"
+                },
+                {
+                    "title": "Classed polygons",
+                    "file": "legends/classified-polygons.html"
+                },
+                {
+                    "title": "Unclassed polygons",
+                    "file": "legends/linear-polygons.html"
+                },
+                {
+                    "title": "Unclassed points",
+                    "file": "legends/linear-points.html"
+                },
+                {
+                    "title": "Category chart",
+                    "file": "legends/category-chart.html"
+                }
+            ]
+        },
+        {
+            "title": "Widgets",
+            "samples": [
+                {
+                    "title": "Viewport summary",
+                    "file": "widgets/viewport-summary.html"
+                },
+                {
+                    "title": "Viewport categories",
+                    "file": "widgets/viewport-categories.html"
+                },
+                {
+                    "title": "Viewport histogram",
+                    "file": "widgets/viewport-histogram.html"
+                }
+            ]
+        },
+        {
             "title": "Advanced",
             "samples": [
                 {
