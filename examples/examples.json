@@ -144,7 +144,12 @@
                 {
                     "title": "Category chart",
                     "file": "legends/category-chart.html"
+                },
+                {
+                    "title": "Numeric chart",
+                    "file": "legends/numeric-chart.html"
                 }
+
             ]
         },
         {
