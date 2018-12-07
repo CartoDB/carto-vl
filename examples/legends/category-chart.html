@@ -2,15 +2,15 @@
 <html>
 
 <head>
-    <title>Category Chart | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../../style.css">
-    <!-- Include Chart JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <title>Category Chart | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+  <!-- Include Chart JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
 
 <body>
@@ -61,10 +61,10 @@
     // Define the source
     const source = new carto.source.Dataset('trees_sf');
     // Define the visualization
-    const viz = new carto.Viz(` 
+    const viz = new carto.Viz(`
       @color: ramp($common_species, bold)
       @histogram: viewportHistogram($common_species)
-      
+
       color: @color
       width: ramp(zoomrange([8,16]),[1,8])
       strokeWidth: ramp(zoomrange([8,16]),[0,2])
