@@ -3187,6 +3187,18 @@ glob-slash@1.0.0:
   resolved "https://registry.yarnpkg.com/glob-slash/-/glob-slash-1.0.0.tgz#fe52efa433233f74a2fe64c7abb9bc848202ab95"
   integrity sha1-/lLvpDMjP3Si/mTHq7m8hIICq5U=
 
+glob@7.1.1:
+  version "7.1.1"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.1.tgz#805211df04faaf1c63a3600306cdf5ade50b2ec8"
+  integrity sha1-gFIR3wT6rxxjo2ADBs31reULLsg=
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^3.0.2"
+    once "^1.3.0"
+    path-is-absolute "^1.0.0"
+
 glob@7.1.2:
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.2.tgz#c19c9df9a028702d678612384a6552404c636d15"
@@ -3259,6 +3271,15 @@ growl@1.10.5:
   version "1.10.5"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.10.5.tgz#f2735dc2283674fa67478b10181059355c369e5e"
   integrity sha512-qBr4OuELkhPenW6goKVXiv47US3clb3/IbuWF9KNKEijAy9oeHxU9IgzjvJhHkUzhaj7rOUD7+YGWqUjLp5oSA==
+
+gzip-all@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/gzip-all/-/gzip-all-1.0.0.tgz#d3587f2d44611963aeedb6af282945df5103c23e"
+  integrity sha1-01h/LURhGWOu7bavKClF31EDwj4=
+  dependencies:
+    glob "7.1.1"
+    p-map "1.1.0"
+    then-denodeify "1.0.0"
 
 gzip-size@^5.0.0:
   version "5.0.0"
@@ -4929,6 +4950,11 @@ p-locate@^3.0.0:
   dependencies:
     p-limit "^2.0.0"
 
+p-map@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-1.1.0.tgz#8fc54b3057cca902d223a2950ddd76ffa6582e8d"
+  integrity sha1-j8VLMFfMqQLSI6KVDd12/6ZYLo0=
+
 p-try@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
@@ -6322,6 +6348,11 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
+
+then-denodeify@1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/then-denodeify/-/then-denodeify-1.0.0.tgz#88d607d9c4769d8a49dec090c247f3d245b08706"
+  integrity sha1-iNYH2cR2nYpJ3sCQwkfz0kWwhwY=
 
 through2@^2.0.0, through2@~2.0.3:
   version "2.0.3"
