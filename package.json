@@ -25,7 +25,7 @@
   "license": "BSD-3-Clause",
   "files": [
     "src",
-    "dist"
+    "dist/carto-vl*.*"
   ],
   "dependencies": {
     "@babel/runtime": "^7.0.0",
