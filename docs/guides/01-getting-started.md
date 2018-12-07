@@ -29,7 +29,10 @@ The most straight-forward way to use CARTO VL is to include the required files f
 </head>
 ```
 **Note:**
-CARTO VL is not compatible with every Mapbox GL version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
+**Mapbox GL**: CARTO VL is not compatible with every version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
+
+**Note:**
+**Developers**: if you have experience with `npm` and a build system in your project (*webpack*, *rollup*...), you can install CARTO VL library with `npm install @carto/carto-vl`. You can import it with `import carto from '@carto/carto-vl'` and then you will have access to an already babelified version of the library, ready to be used.
 
 #### Add map container
 
