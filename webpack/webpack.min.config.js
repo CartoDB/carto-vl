@@ -54,7 +54,10 @@ module.exports = {
     },
     plugins: [
         new webpack.BannerPlugin(banner),
-        new BundleAnalyzerPlugin({ analyzerPort: 8889 })
+        new BundleAnalyzerPlugin({
+            analyzerMode: 'disabled',
+            generateStatsFile: true
+        })
     ],
     performance: {
         maxEntrypointSize: 435200,
