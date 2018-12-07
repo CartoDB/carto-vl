@@ -10,10 +10,18 @@ const viz = new carto.Viz(`
     width: 50
     // symbol: image('${symbol}') // it is not set here...
 `);
-viz.symbol.blendTo(`image('${symbol}')`); // ...but here, and the result is the same
 const layer = new carto.Layer('layer', source, viz);
-
 layer.addTo(map);
-layer.on('loaded', () => {
-    window.loaded = true;
+
+layer.on('loaded', async () => {
+    layer.on('updated', debounce(() => { window.loaded = true; }));
+    await viz.symbol.blendTo(`image('${symbol}')`); // ...but here, and the result is the same
 });
+
+const debounce = (func, delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+    };
+};
