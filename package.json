@@ -43,6 +43,7 @@
     "@babel/core": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.0.0",
+    "aws-sdk": "^2.372.0",
     "babel-loader": "^8.0.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
