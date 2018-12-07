@@ -40,29 +40,56 @@ const toXYZ = quadKey => {
     return { x, y, z };
 };
 
-export default class CommonGrid extends Base {
-    constructor (measurements = null, options = { serverURL: 'https://us-central1-cartodb-on-gcp-poc.cloudfunctions.net/tile?z={z}&x={x}&y={y}', maxZoom: 15 }) {
-        super();
-        this._measurements = measurements || {
-            id: {
-                type: 'category'
-            },
+class CommonGridMetadata {
+    constructor () {
+        this.META = {
             addresses: {
-                type: 'number',
                 min: 0,
-                max: 20
+                max: 25
+            },
+            total_pop: {
+                min: 0,
+                max: 300
             }
         };
+    }
+
+    getMinMax (measurement, min = 0, max = 100) {
+        return Object.assign(this.META[measurement] || {}, { min, max });
+    }
+}
+
+export default class CommonGrid extends Base {
+    constructor (measurements = ['addresses'], options = { serverURL: 'https://us-central1-cartodb-on-gcp-poc.cloudfunctions.net/tile?z={z}&x={x}&y={y}' }) {
+        super();
+        this.commonGridMetadata = new CommonGridMetadata();
+        this._measurements = measurements;
+        this._measurementsIndex = measurements.reduce((idx, m, i) => {
+            idx[m] = i;
+            return idx;
+        }, {});
+        const properties = measurements.reduce((props, m) => {
+            props[m] = {
+                type: 'number',
+                min: this.commonGridMetadata.getMinMax(m).min,
+                max: this.commonGridMetadata.getMinMax(m).max
+            };
+            return props;
+        }, { id: { type: 'category' } });
+
         this._options = options;
 
         this._metadata = new MVTMetadata({
             idProperty: 'id',
-            properties: this._measurements,
-            geomType: GEOMETRY_TYPE.POLYGON
+            geomType: GEOMETRY_TYPE.POLYGON,
+            properties
         });
         this._metadata.setCodecs();
-
-        this._tileClient = new TileClient(options.serverURL);
+        let serverUrls = Array.isArray(options.serverURL) ? options.serverURL : [options.serverURL];
+        serverUrls = serverUrls.map(serverUrl => {
+            return `${serverUrl}&${measurements.map(m => `measurement=${m}`).join('&')}`;
+        });
+        this._tileClient = new TileClient(serverUrls);
     }
 
     _clone () {
@@ -181,7 +208,8 @@ export default class CommonGrid extends Base {
             if (propertyName === 'id') {
                 properties[propertyName][i] = codec.sourceToInternal(k);
             } else {
-                const propertyValue = cell[1];
+                const idx = this._measurementsIndex[propertyName];
+                const propertyValue = cell[idx + 1];
                 properties[propertyName][i] = codec.sourceToInternal(propertyValue);
             }
         }
