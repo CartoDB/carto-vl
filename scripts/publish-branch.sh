@@ -9,5 +9,5 @@ read -n1 -r -p "Press Ctrl+C to cancel, or any other key to continue." key
 
 echo "Uploading to CDN..."
 
-node scripts/cdn/branch/publish.js
+node scripts/cdn/branch/publish.js CURRENT_BRANCH
 node scripts/cdn/invalidate.js

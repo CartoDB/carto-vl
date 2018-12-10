@@ -16,8 +16,9 @@ const gzip = promisify(zlib.gzip);
 let semver = require('semver');
 let S3;
 
-const TARGET = 'carto-vl';
-// const TARGET = 'carto-vl-test';
+// const BASE_LIBRARY = 'carto-vl-test';
+const BASE_LIBRARY = 'carto-vl';
+const BASE_DIST = 'dist';
 
 function checkSecrets () {
     if (!secrets ||
@@ -28,7 +29,7 @@ function checkSecrets () {
     }
 }
 
-function verifiedPackageVersion () {
+function versionFromPackage () {
     let version = require('../../package.json').version;
 
     if (!version || !semver.valid(version)) {
@@ -38,9 +39,7 @@ function verifiedPackageVersion () {
     return version;
 }
 
-function publishToCDN (version) {
-    configureS3Connection();
-
+function cdnReleaseUrlsFor (version) {
     // Publish to CDN
     // E.g.
     //   v1.2.3: v1 / v1.2 / v1.2.3
@@ -50,25 +49,27 @@ function publishToCDN (version) {
     let patch = semver.patch(version);
     let prerelease = semver.prerelease(version);
 
+    const cdnPaths = [];
     if (prerelease) {
         /**
         * Publish prerelease URLs
         */
         let base = 'v' + major + '.' + minor + '.' + patch + '-';
         if (prerelease[0]) { // alpha, beta, rc
-            uploadFiles(base + prerelease[0]);
+            cdnPaths.push(base + prerelease[0]);
         }
         if (prerelease[1]) { // number
-            uploadFiles(base + prerelease[0] + '.' + prerelease[1]);
+            cdnPaths.push(base + prerelease[0] + '.' + prerelease[1]);
         }
     } else {
         /**
         * Publish release URLs
         */
-        uploadFiles('v' + major);
-        uploadFiles('v' + major + '.' + minor);
-        uploadFiles('v' + major + '.' + minor + '.' + patch);
+        cdnPaths.push('v' + major);
+        cdnPaths.push('v' + major + '.' + minor);
+        cdnPaths.push('v' + major + '.' + minor + '.' + patch);
     }
+    return cdnPaths;
 }
 
 function configureS3Connection () {
@@ -80,54 +81,109 @@ function configureS3Connection () {
     S3 = new AWS.S3();
 }
 
-async function uploadFiles (version) {
-    console.log('Publish', version);
+async function uploadFiles (folder) {
+    console.log('Publish', folder);
 
     let files;
     try {
-        files = await readdir('dist');
+        files = await readdir(BASE_DIST);
     } catch (e) {
         console.error(e);
         return;
     }
 
-    const uploadExtensions = ['.js', '.map'];
     for (const fileName of files) {
-        const validFile = uploadExtensions.includes(path.extname(fileName));
-        if (validFile) {
-            await compressAndUploadFile(version, fileName);
+        if (isValidFile(fileName)) {
+            compressAndUploadFile(folder, fileName);
         }
     }
 }
 
-async function compressAndUploadFile (version, fileName) {
-    // gzip file
-    const localFile = `dist/${fileName}`;
-    let fileContent = await readFile(localFile);
-    fileContent = await gzip(fileContent);
+function isValidFile (fileName) {
+    const validExtensions = ['.js', '.map'];
+    const validExt = validExtensions.includes(path.extname(fileName));
+    return validExt && fileName.startsWith('carto-vl');
+}
 
-    // upload gzipped content
+async function compressAndUploadFile (folder, fileName) {
+    const gzfileContent = await gzippedFileContent(fileName);
+    const fileToUpload = `${folder}/${fileName}`;
+
+    if (SMOKE_MODE) {
+        // no effective upload
+        console.log(`[SMOKE MODE] ${fileToUpload} upload`);
+    } else {
+        // real CDN upload!
+        await uploadFileToS3(fileToUpload, gzfileContent);
+    }
+}
+
+async function uploadFileToS3 (filePath, gzFileContent) {
     const s3Params = {
         ACL: 'public-read',
         Bucket: secrets.AWS_S3_BUCKET,
-        Key: `${TARGET}/${version}/${fileName}`,
-        ContentEncoding: 'gzip',
-        Body: fileContent
+        Key: filePath,
+        Body: gzFileContent,
+        ContentEncoding: 'gzip'
     };
 
     await S3.upload(s3Params, function (err, data) {
         if (err) {
-            console.log(`Error uploading ${fileName}: ${err}`);
+            console.log(`Error uploading ${filePath}: ${err}`);
         } if (data) {
-            console.log(`[${fileName}] uploaded to ${version}`);
+            console.log(`[${filePath}] uploaded!`);
         }
     });
 }
 
-function publish () {
-    checkSecrets();
-    const version = verifiedPackageVersion();
-    publishToCDN(version);
+async function gzippedFileContent (fileName) {
+    const localFile = `${BASE_DIST}/${fileName}`;
+    let fileContent = await readFile(localFile);
+    fileContent = await gzip(fileContent);
+    return fileContent;
 }
 
-publish();
+async function publishRelease () {
+    const version = versionFromPackage();
+    const cdnUrls = cdnReleaseUrlsFor(version);
+    cdnUrls.forEach(async (url) => {
+        const targetFolder = `${BASE_LIBRARY}/${url}`;
+        await uploadFiles(targetFolder);
+    });
+}
+
+function getCurrentBranch () {
+    const currentGitBranch = require('current-git-branch');
+    const branch = currentGitBranch();
+    return branch;
+}
+
+function publishCurrentBranch () {
+    const branch = getCurrentBranch();
+    const targetFolder = `${BASE_LIBRARY}/branches/${branch}`;
+    uploadFiles(targetFolder);
+}
+
+function publish (mode) {
+    checkSecrets();
+    configureS3Connection();
+
+    if (mode === 'RELEASE') {
+        console.log('VAMOS! let\'s go for a Release...');
+        publishRelease();
+    } else if (mode === 'CURRENT_BRANCH') {
+        console.log('Let\'s just publish the current Branch...');
+        publishCurrentBranch();
+    } else {
+        throw new Error('Not a valid publishing mode, use RELEASE or CURRENT_BRANCH');
+    }
+}
+
+// main -----------------------------------------------
+const args = process.argv;
+const mode = args[2];
+const SMOKE_MODE = args[3] === 'SMOKE' || false; // to simulate a publication without hitting the CDN
+const prefix = SMOKE_MODE ? '[SMOKE_MODE]' : '[CDN PUBLICATION]';
+console.log(`${prefix} Publishing ${mode} for ${BASE_LIBRARY}`);
+
+publish(mode);
