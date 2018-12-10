@@ -1,5 +1,6 @@
 import MVT from '../../../src/sources/MVT';
 import MVTMetadata from '../../../src/sources/MVTMetadata';
+import { FP32_DESIGNATED_NULL_VALUE } from '../../../src/renderer/viz/expressions/constants';
 
 describe('sources/MVT', () => {
     describe('constructor', () => {
@@ -60,6 +61,44 @@ describe('sources/MVT', () => {
             expect(() => {
                 metadata.codec('wadus').sourceToInternal(123);
             }).toThrowError(/MVT decoding error. Metadata property is of type \'category\' but the MVT tile contained a feature property of type 'number': \'123\'/);
+        });
+        it('Category property should work with undefined value', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'category'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(metadata.codec('wadus').sourceToInternal(undefined)).toEqual(FP32_DESIGNATED_NULL_VALUE);
+        });
+        it('Category property should work with null value', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'category'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(metadata.codec('wadus').sourceToInternal(null)).toEqual(FP32_DESIGNATED_NULL_VALUE);
+        });
+        it('should throw an error when the property type is number and the metadata declared type is category', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'category'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(() => {
+                metadata.codec('wadus').sourceToInternal(0);
+            }).toThrowError(/MVT decoding error. Metadata property is of type \'category\' but the MVT tile contained a feature property of type 'number': \'0\'/);
         });
     });
 });
