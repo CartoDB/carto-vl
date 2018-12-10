@@ -515,7 +515,7 @@ describe('regression with a category filter', () => {
     });
 });
 
-fdescribe('regression with blendTo', () => {
+describe('regression with blendTo', () => {
     let div, map, source, viz, layer, interactivity;
 
     beforeEach(() => {
