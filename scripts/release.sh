@@ -8,7 +8,7 @@ read -n1 -r -p "Press Ctrl+C to cancel, or any other key to continue." key
 
 echo "Uploading to CDN..."
 
-node scripts/cdn/publish.js RELEASE
+node scripts/cdn/publish.js 'release'
 node scripts/cdn/invalidate.js
 
 echo "Uploading to npm..."

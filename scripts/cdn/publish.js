@@ -16,7 +16,6 @@ const gzip = promisify(zlib.gzip);
 let semver = require('semver');
 let S3;
 
-// const BASE_LIBRARY = 'carto-vl-test';
 const BASE_LIBRARY = 'carto-vl';
 const BASE_DIST = 'dist';
 
@@ -109,11 +108,9 @@ async function compressAndUploadFile (folder, fileName) {
     const gzfileContent = await gzippedFileContent(fileName);
     const fileToUpload = `${folder}/${fileName}`;
 
-    if (SMOKE_MODE) {
-        // no effective upload
-        console.log(`[SMOKE MODE] ${fileToUpload} upload`);
-    } else {
-        // real CDN upload!
+    if (DRY_RUN) { // no effective upload
+        console.log(`[DRY_RUN] ${fileToUpload} fake upload`);
+    } else { // real CDN upload!
         await uploadFileToS3(fileToUpload, gzfileContent);
     }
 }
@@ -168,10 +165,10 @@ function publish (mode) {
     checkSecrets();
     configureS3Connection();
 
-    if (mode === 'RELEASE') {
+    if (mode === 'release') {
         console.log('VAMOS! let\'s go for a Release...');
         publishRelease();
-    } else if (mode === 'CURRENT_BRANCH') {
+    } else if (mode === 'current_branch') {
         console.log('Let\'s just publish the current Branch...');
         publishCurrentBranch();
     } else {
@@ -182,8 +179,8 @@ function publish (mode) {
 // main -----------------------------------------------
 const args = process.argv;
 const mode = args[2];
-const SMOKE_MODE = args[3] === 'SMOKE' || false; // to simulate a publication without hitting the CDN
-const prefix = SMOKE_MODE ? '[SMOKE_MODE]' : '[CDN PUBLICATION]';
+const DRY_RUN = args.some(arg => arg === '--dry-run');
+const prefix = DRY_RUN ? '[DRY_RUN]' : '[CDN PUBLICATION]';
 console.log(`${prefix} Publishing ${mode} for ${BASE_LIBRARY}`);
 
 publish(mode);
