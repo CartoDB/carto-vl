@@ -25,7 +25,7 @@ describe('Layer', () => {
             color: @myColor
         `);
         layer = new carto.Layer('layer', source, viz);
-        layer._paintLayer = () => {};
+        layer._paintLayer = () => { };
         layer.addTo(map);
     });
 
@@ -34,53 +34,74 @@ describe('Layer', () => {
             layer.on('loaded', done);
         });
 
-        it('should fire a "updated" event when ready', (done) => {
-            layer.on('updated', done);
-        });
+        describe('.updated', () => {
+            function mockPrerenderHelpers () {
+                // auxiliary mocks for prerender
+                spyOn(layer, '_getZoom').and.callFake(() => 0);
+                spyOn(layer, '_getViewport').and.callFake(() => { });
+                spyOn(layer, '_needRefresh').and.callFake(() => Promise.resolve());
+            }
 
-        it('should fire a "updated" event only once when ready', (done) => {
-            let update = jasmine.createSpy('update');
-            layer.on('updated', update);
-            layer.on('loaded', () => {
-                setTimeout(() => {
+            it('should fire an "updated" event when ready', (done) => {
+                layer.on('updated', done);
+            });
+
+            it('should fire an "updated" event only once when ready', (done) => {
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
+                layer.on('loaded', () => {
+                    setTimeout(() => {
+                        expect(update).toHaveBeenCalled();
+                        done();
+                    }, 0);
+                });
+            });
+
+            it('should fire an "updated" event when the source is updated', (done) => {
+                mockPrerenderHelpers();
+                layer.on('loaded', async () => {
+                    const newSource = new carto.source.GeoJSON(featureData);
+                    spyOn(newSource, 'requestData').and.callFake(() => true);
+
+                    let update = jasmine.createSpy('update');
+                    layer.on('updated', update);
+
+                    await layer.update(newSource);
+                    layer.prerender();
+
+                    expect(update).toHaveBeenCalledTimes(1);
+                    done();
+                });
+            });
+
+            it('should fire an "updated" event when the viz is updated', (done) => {
+                mockPrerenderHelpers();
+                layer.on('loaded', async () => {
+                    let update = jasmine.createSpy('update');
+                    layer.on('updated', update);
+
+                    await layer.update(source, new carto.Viz('color: blue'));
+                    layer.prerender();
+
                     expect(update).toHaveBeenCalled();
                     done();
-                }, 0);
+                });
             });
-        });
 
-        it('should fire a "updated" event when the source is updated', (done) => {
-            layer.on('loaded', async () => {
-                await layer.update(new carto.source.GeoJSON(featureData));
+            it('should fire an "updated" event when the viz is animated', async (done) => {
                 let update = jasmine.createSpy('update');
                 layer.on('updated', update);
-                layer.render();
-                expect(update).toHaveBeenCalledTimes(1);
-                done();
-            });
-        });
 
-        it('should fire a "updated" event when the viz is updated', (done) => {
-            layer.on('loaded', async () => {
-                await layer.update(source, new carto.Viz('color: blue'));
-                let update = jasmine.createSpy('update');
-                layer.on('updated', update);
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                done();
-            });
-        });
+                await layer.update(source, new carto.Viz('width: now()'));
 
-        it('should fire a "updated" event when the viz is animated', async (done) => {
-            let update = jasmine.createSpy('update');
-            await layer.update(source, new carto.Viz('width: now()'));
-            layer.on('updated', update);
-            layer.on('loaded', () => {
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                done();
+                layer.on('loaded', () => {
+                    layer.render();
+                    expect(update).toHaveBeenCalled();
+
+                    layer.render();
+                    expect(update).toHaveBeenCalled();
+                    done();
+                });
             });
         });
 
