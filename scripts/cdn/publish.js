@@ -91,10 +91,9 @@ async function uploadFiles (version) {
         return;
     }
 
-    const uploadExtensions = ['.JS', '.MAP'];
+    const uploadExtensions = ['.js', '.map'];
     for (const fileName of files) {
-        const extension = path.extname(fileName).toUpperCase();
-        const validFile = uploadExtensions.includes(extension);
+        const validFile = uploadExtensions.includes(path.extname(fileName));
         if (validFile) {
             await compressAndUploadFile(version, fileName);
         }
