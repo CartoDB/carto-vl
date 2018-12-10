@@ -24,6 +24,7 @@ module.exports = {
                     loader: 'worker-loader',
                     options: {
                         publicPath: '/dist/',
+                        name: 'carto-vl-[hash].worker.js',
                         inline: true
                     }
                 }
