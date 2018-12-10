@@ -6,7 +6,6 @@ const SEPARATING_LINE_NOT_FOUND = 'separatingLineNotFound';
 
 export function triangleCollides (triangle, viewportAABB) {
     if (_noArea(triangle)) {
-        // throw new Error('NOT IMPLEMENTED');
         return _noAreaTriangleCollides(triangle, viewportAABB);
     }
 
