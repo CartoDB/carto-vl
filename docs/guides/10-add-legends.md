@@ -224,7 +224,7 @@ With that change, the map labels other categories as "Other weather" in the lege
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
 
-### Assign opacity through variables
+### Assign opacity with variables
 
 If you want to assign opacity to mapped features, you will construct your `ramp` using [variables](/developers/carto-vl/guides/Glossary/#variables). 
 
