@@ -429,20 +429,40 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
+        const isNewMatrix = this._isNewMatrix(matrix);
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesHaveChanged => {
-                if (dataframesHaveChanged) {
-                    this._needRefresh().then(() => {
-                        if (this._state === states.INIT) {
-                            this._state = states.IDLE;
-                            this._fire('loaded');
-                        }
-                        this._fire('updated');
-                    });
-                }
-            });
+            this._checkSourceRequestsAndFireEvents(isNewMatrix);
         }
+    }
+
+    _isNewMatrix (matrix) {
+        const currentMatrix = this.renderer.matrix;
+        if (!currentMatrix) {
+            return true;
+        }
+        return !mat4.exactEquals(matrix, currentMatrix);
+    }
+
+    _checkSourceRequestsAndFireEvents (isNewMatrix) {
+        const viewport = this._getViewport(this.renderer.matrix);
+        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), viewport);
+
+        checkForDataframesUpdate.then(dataframesHaveChanged => {
+            if (dataframesHaveChanged) {
+                this._needRefresh().then(() => {
+                    if (this._state === states.INIT) {
+                        this._state = states.IDLE;
+                        this._fire('loaded');
+                    }
+                    this._fire('updated');
+                });
+            } else {
+                if (isNewMatrix) {
+                    this._fire('updated');
+                }
+            }
+        });
     }
 
     /**
