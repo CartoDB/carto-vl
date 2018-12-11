@@ -73,7 +73,7 @@ describe('viewportHistogram', () => {
             coordinates: [10, 12]
         },
         properties: {
-            id: 5,
+            id: 6,
             value: 1000
         }
     };
@@ -123,7 +123,9 @@ describe('viewportHistogram', () => {
             const histogram = viz.variables.histogram.value;
             expect(histogram).toEqual([
                 { x: 'a', y: 2 },
-                { x: 'b', y: 1 }
+                { x: null, y: 2 },
+                { x: 'b', y: 1 },
+                { x: '', y: 1 }
             ]);
             done();
         });
