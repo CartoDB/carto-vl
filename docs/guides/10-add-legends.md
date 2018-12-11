@@ -249,7 +249,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, we set the data to come from the `color` property but since the symbology is assigned through variables in this case, we need to modify where it is read from in `const colorLegend`:
+Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables and you need to modify where it is read from in `const colorLegend`:
 
 ```html
 // Request data for legend from the layer variable myRamp
