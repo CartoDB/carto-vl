@@ -272,9 +272,17 @@ function _getCategoryValue (histogram) {
 }
 
 function _sortNumerically (a, b) {
-    if (b.y - a.y === 0) {
-        return a.x.localeCompare(b.x);
+    const frequencyDifference = (b.y - a.y);
+    if (frequencyDifference === 0) {
+        const categoryA = a.x;
+        const categoryB = b.x;
+
+        if (!categoryA && !categoryB) { return 0; } // both null or undefined
+        if (!categoryA) { return 1; } // categoryB first
+        if (!categoryB) { return -1; } // categoryA first
+
+        return categoryA.localeCompare(categoryB);
     }
 
-    return b.y - a.y;
+    return frequencyDifference;
 }
