@@ -474,12 +474,22 @@ export default class Layer {
         this._renderWaiters.forEach(resolve => resolve());
 
         if (this.isAnimated()) {
-            this._needRefresh().then(() => {
-                if (this.isPlaying()) {
-                    this._fire('updated');
-                }
-            });
+            if (this.isPlaying()) {
+                this._needRefresh().then(() => {
+                    this._fire('updated', 'animation is playing');
+                });
+            } else {
+                this._keepTimestampIfPaused();
+            }
         }
+    }
+
+    _keepTimestampIfPaused () {
+        let timestamp = this.renderer.timestamp;
+        // to avoid 'jumps' after resume playing.
+        this._viz._getRootStyleExpressions().forEach(vizExpr => {
+            vizExpr._setTimestamp(timestamp);
+        });
     }
 
     _paintLayer () {
