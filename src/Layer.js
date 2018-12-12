@@ -92,7 +92,7 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
         this._visible = visible;
         if (visible !== initial) {
-            this._fire('updated');
+            this._fire('updated', 'visibility change');
         }
     }
 
@@ -447,11 +447,11 @@ export default class Layer {
                         this._state = states.IDLE;
                         this._fire('loaded');
                     }
-                    this._fire('updated');
+                    this._fire('updated', 'different dataframes required from source');
                 });
             } else {
                 if (isNewMatrix) {
-                    this._fire('updated');
+                    this._fire('updated', 'new camara view');
                 }
             }
         });
