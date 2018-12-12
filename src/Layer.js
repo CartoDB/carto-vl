@@ -429,19 +429,11 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        const isNewMatrix = this._isNewMatrix(matrix);
+        const isNewCameraMatrix = this.renderer.isNewMatrix(matrix);
         this.renderer.matrix = matrix;
         if (this._source && this.visible) {
-            this._checkSourceRequestsAndFireEvents(isNewMatrix);
+            this._checkSourceRequestsAndFireEvents(isNewCameraMatrix);
         }
-    }
-
-    _isNewMatrix (matrix) {
-        const currentMatrix = this.renderer.matrix;
-        if (!currentMatrix) {
-            return true;
-        }
-        return !mat4.exactEquals(matrix, currentMatrix);
     }
 
     _checkSourceRequestsAndFireEvents (isNewMatrix) {

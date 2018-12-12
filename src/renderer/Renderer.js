@@ -380,6 +380,13 @@ export default class Renderer {
         gl.disable(gl.CULL_FACE); // ? not needed from v0.50?
     }
 
+    isNewMatrix (newMatrix) {
+        if (!this.matrix && newMatrix) {
+            return true;
+        }
+        return !mat4.exactEquals(newMatrix, this.matrix);
+    }
+
     _updateDataframeMatrices (dataframes) {
         dataframes.forEach(dataframe => {
             let m2 = [];
