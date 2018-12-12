@@ -82,28 +82,29 @@ describe('Layer', () => {
                 });
             });
 
-            // it('should fire a new "updated" after moving the map (even if not requiring new dataframes)', (done) => {
-            //     mockPrerenderHelpers();
+            it('should fire a new "updated" after moving the map (even if not requiring new dataframes)', (done) => {
+                mockPrerenderHelpers();
 
-            //     let numberOfUpdates = 0;
-            //     let update = () => {
-            //         numberOfUpdates++;
+                let numberOfUpdates = 0;
+                let update = () => {
+                    numberOfUpdates++;
 
-            //         if (numberOfUpdates === 2) {
-            //             resetMocks();
-            //             done(); // ...(b) but we should get a second update
-            //         }
+                    if (numberOfUpdates === 2) {
+                        resetMocks();
+                        done(); // ...(b) we get a second update
+                        return;
+                    }
 
-            //         // Emulate a user interaction, like dragging the map, using the underlying matrix
-            //         const matrix = layer.renderer.matrix;
-            //         let newMatrix = mat4.create();
-            //         mat4.translate(newMatrix, matrix, [10, 0, 0]); // 10 units translation in x
+                    // // Emulate a user interaction, like dragging the map, using the underlying matrix
+                    const matrix = layer.renderer.matrix;
+                    let newMatrix = mat4.create();
+                    mat4.translate(newMatrix, matrix, [10, 0, 0]); // 10 units translation in x
 
-            //         // (a) as it is a geojson, no dataframesHaveChange, but...
-            //         layer.prerender(null, newMatrix);
-            //     };
-            //     layer.on('updated', update);
-            // });
+                    // (a) as it is a geojson, no dataframesHaveChange, but we need a new update anyway...
+                    layer.prerender(null, newMatrix);
+                };
+                layer.on('updated', update);
+            });
 
             it('should fire an "updated" event when the viz is updated', (done) => {
                 mockPrerenderHelpers();
