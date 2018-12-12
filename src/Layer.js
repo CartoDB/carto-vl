@@ -9,7 +9,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
-import { unproject } from './utils/geometry';
+import { computeViewportFromCameraMatrix } from './utils/util';
 import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
@@ -446,7 +446,7 @@ export default class Layer {
     }
 
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
-        const viewport = this._getViewport(this._cameraMatrix);
+        const viewport = computeViewportFromCameraMatrix(this._cameraMatrix);
         const checkForDataframesUpdate = this._source.requestData(this._getZoom(), viewport);
 
         checkForDataframesUpdate.then(dataframesHaveChanged => {
@@ -572,42 +572,6 @@ export default class Layer {
             // Not the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
-    }
-
-    _getViewport (matrix) { // TODO move to util, check rsys
-        const inv = mat4.invert([], matrix);
-
-        const corners = [
-            [-1, -1],
-            [-1, 1],
-            [1, -1],
-            [1, 1]
-        ].map(NDC =>
-            unproject(inv, ...NDC)
-        ).map(c =>
-            // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
-            c.map(x => x * 2 - 1)
-        );
-
-        // Rotation no longer guarantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
-        // we need to compute the AABB min/max by iterating
-        const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
-        const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
-        corners.forEach(corner => {
-            min[0] = Math.min(min[0], corner[0]);
-            min[1] = Math.min(min[1], corner[1]);
-            max[0] = Math.max(max[0], corner[0]);
-            max[1] = Math.max(max[1], corner[1]);
-        });
-
-        // Our API flips the `y` coordinate, we need to convert the values accordingly
-        min[1] = -min[1];
-        max[1] = -max[1];
-        const temp = min[1];
-        min[1] = max[1];
-        max[1] = temp;
-
-        return [...min, ...max];
     }
 
     _getZoom () {
