@@ -73,6 +73,7 @@ export default class Layer {
         this.concurrencyHelper = new LayerConcurrencyHelper();
         this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
+        this._cameraMatrix = mat4.identity([]);
     }
 
     /**
@@ -429,15 +430,23 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        const isNewCameraMatrix = this.renderer.isNewMatrix(matrix);
-        this.renderer.matrix = matrix;
+        const isNewCameraMatrix = this._detectAndSetNewMatrix(matrix);
         if (this._source && this.visible) {
             this._checkSourceRequestsAndFireEvents(isNewCameraMatrix);
         }
     }
 
+    _detectAndSetNewMatrix (newMatrix) {
+        const isNewMatrix = !mat4.exactEquals(newMatrix, this._cameraMatrix);
+        if (isNewMatrix) {
+            this._cameraMatrix = newMatrix;
+            this.renderer.matrix = newMatrix; // in case it is not set yet (first layer)
+        }
+        return isNewMatrix;
+    }
+
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
-        const viewport = this._getViewport(this.renderer.matrix);
+        const viewport = this._getViewport(this._cameraMatrix);
         const checkForDataframesUpdate = this._source.requestData(this._getZoom(), viewport);
 
         checkForDataframesUpdate.then(dataframesHaveChanged => {
