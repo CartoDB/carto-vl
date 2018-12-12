@@ -446,8 +446,7 @@ export default class Layer {
     }
 
     _checkSourceRequestsAndFireEvents (isNewMatrix) {
-        const viewport = computeViewportFromCameraMatrix(this._cameraMatrix);
-        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), viewport);
+        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
 
         checkForDataframesUpdate.then(dataframesHaveChanged => {
             if (dataframesHaveChanged) {
@@ -464,6 +463,10 @@ export default class Layer {
                 }
             }
         });
+    }
+
+    _getViewport () {
+        return computeViewportFromCameraMatrix(this._cameraMatrix);
     }
 
     /**
