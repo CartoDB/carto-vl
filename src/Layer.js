@@ -521,7 +521,7 @@ export default class Layer {
     }
 
     _needRefresh () {
-        if (this._state !== states.INIT) {
+        if (this._state === states.IDLE) {
             this._state = states.UPDATING;
         }
         return new Promise(resolve => {
