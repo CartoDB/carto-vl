@@ -482,6 +482,11 @@ export default class Layer {
             } else {
                 this._keepTimestampIfPaused();
             }
+        } else {
+            if (this._state === states.UPDATING) {
+                this._state = states.IDLE;
+                this._fire('updated', 'updated viz');
+            }
         }
     }
 
