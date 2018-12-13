@@ -249,16 +249,16 @@ const viz = new carto.Viz(`
 `);
 ```
 
-Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables and you need to modify where it is read from in `const colorLegend`:
+Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `myRamp`:
 
 ```html
 // Request data for legend from the layer variable myRamp
-            const colorLegend = layer.viz.variables.myRamp.getLegendData();
-            let colorLegendList = '';
+    const colorLegend = layer.viz.variables.myRamp.getLegendData();
+    let colorLegendList = '';
 ```
 At this point, if you refresh your map, you will see that the features on the map have the set opacity, but the features in the legend do not.
 
-If you want to add opacity to the legend items, you need to remove the `function rgbToHex(color)`, add constants for opacity (`const alpha`) and color (`const rgba`) where you can reference `alpha` for the `a` value of `const rgba`. Finally, you need to set the legend list items to draw from `const rgba`: 
+To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined (`const alpha`) which is read in when building the visual legend entries (thus using RGBA colors).
 
 ```html
 // When layer loads, trigger legend event
@@ -278,7 +278,7 @@ layer.on('loaded', () => {
 
         // Style for legend items based on geometry type
         colorLegendList +=
-            `<li><span class="point-mark" style="background-color:${rgba}; border: 0px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
+            `<li><span class="point-mark" style="background-color:${rgba}; border: 0px solid black;"></span><span>${legend.key}</span></li>\n`;
     });
 
     // Place list items in the content section of the title/legend box
@@ -286,6 +286,18 @@ layer.on('loaded', () => {
 });
 ```
 Now when you load the map, you will see that both the features on the map and the legend have the assigned opacity:
+
+<div class="example-map">
+    <iframe
+        id="accidents-all-transparent-legend"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-10.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-10.html)
 
 ### More examples
 
