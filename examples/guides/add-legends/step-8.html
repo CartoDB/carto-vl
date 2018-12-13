@@ -15,7 +15,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Legend</h1>
+        <h1>San Francisco Streets</h1>
       </header>
       <section>
         <div id="controls">
@@ -37,8 +37,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-73.954323, 40.711743],
-      zoom: 15.7
+      center: [-122.424335, 37.771521],
+      zoom: 12
     });
 
     carto.setDefaultAuth({
@@ -46,42 +46,29 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('table_311_complaints');
+    const source = new carto.source.Dataset('sf_stclines');
     const viz = new carto.Viz(`
-      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
-      color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
-      symbolPlacement: align_bottom
-      width: 30
+      color: ramp(top($st_type, 5), bold)
+      width: 2
     `);
     const layer = new carto.Layer('layer', source, viz);
-    layer.addTo(map);
 
+    layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
-      const symbolLegend = layer.viz.symbol.getLegendData({ othersLabel: 'Default' });
-      const colorLegend = layer.viz.color.getLegendData();
-
-      let symbolLegendList = '';
-
-      symbolLegend.data.forEach((legend, index) => {
-        const colorHex = rgbToHex(colorLegend.data[index].value);
-        symbolLegendList +=
-          `
-          <li>
-              <span
-                class="image-mark"
-                style="
-                  background-color: ${colorHex};
-                  mask-image:url(${legend.value});
-                  -webkit-mask-image:url(${legend.value})
-              "></span>
-              <span>${legend.key}</span>
-          </li>
-        `
+      const colorLegend = layer.viz.color.getLegendData({
+        othersLabel: 'Default'
       });
 
-      document.getElementById('content').innerHTML = symbolLegendList;
+      let colorLegendList = '';
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        colorLegendList +=
+          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+      });
+
+      document.getElementById('content').innerHTML = colorLegendList;
     });
 
     function hideLoader() {

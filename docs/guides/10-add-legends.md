@@ -103,7 +103,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
 
 ### Access data from `ramp`
 
-To get the necessary information to populate the legend, you use the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
+To get the necessary information to populate the legend, you use the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method will reference the `ramp` expression where the symbology for your map is defined.
 
 Take a look at the point styling for the accidents map. This is the styling that we want to bring into our legend and associate each legend item to each category type that we are symbolizing from the `$weather` property.
 
@@ -184,7 +184,7 @@ Now, when you load the map, you will see the complete legend. You will also noti
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
 
 ### Overwrite defaults
 
@@ -203,7 +203,7 @@ For example, the map below symbolizes only the `top` three weather conditions in
     </iframe>
 </div>
 
-You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()`:
+You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()}`:
 
 ```js
 colorLegendList +=
@@ -249,7 +249,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `myRamp`:
+Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `@myRamp`:
 
 ```html
 // Request data for legend from the layer variable myRamp
@@ -290,7 +290,7 @@ Now when you load the map, you will see that both the features on the map and th
 <div class="example-map">
     <iframe
         id="accidents-all-transparent-legend"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-10.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -308,7 +308,7 @@ View the source of the maps below to see how legends work for different map and 
 <div class="example-map">
     <iframe
         id="guides-legend-step-6"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -322,7 +322,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-7"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -336,7 +336,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-8"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
