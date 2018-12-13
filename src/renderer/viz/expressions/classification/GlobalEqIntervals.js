@@ -30,7 +30,6 @@ import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArgumen
 export default class GlobalEqIntervals extends Classifier {
     constructor (input, buckets) {
         checkMaxArguments(arguments, 2, 'globalEqIntervals');
-        checkInstance('globalEqIntervals', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalEqIntervals', 'buckets', 1, buckets);
 
         super({ input }, buckets);
@@ -40,6 +39,7 @@ export default class GlobalEqIntervals extends Classifier {
         super._bindMetadata(metadata);
         checkExpression('globalEqIntervals', 'input', 0, this.input);
         checkType('globalEqIntervals', 'input', 0, 'number', this.input);
+
         const { min, max } = metadata.stats(this.input.name);
         this.min = min;
         this.max = max;

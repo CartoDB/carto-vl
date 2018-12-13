@@ -30,8 +30,8 @@ import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArgumen
 export default class GlobalQuantiles extends Classifier {
     constructor (input, buckets) {
         checkMaxArguments(arguments, 2, 'globalQuantiles');
-        checkInstance('globalQuantiles', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalQuantiles', 'buckets', 1, buckets);
+
         super({ input }, buckets);
     }
 

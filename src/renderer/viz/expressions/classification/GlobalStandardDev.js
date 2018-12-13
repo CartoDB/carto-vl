@@ -49,7 +49,6 @@ import { average, standardDeviation } from '../stats';
 export default class GlobalStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
         checkMaxArguments(arguments, 3, 'globalStandardDev');
-        checkInstance('globalStandardDev', 'input', 0, Property, input && (input.property || input));
         checkNumber('globalStandardDev', 'buckets', 1, buckets);
         checkNumber('globalStandardDev', 'classSize', 2, classSize);
 
