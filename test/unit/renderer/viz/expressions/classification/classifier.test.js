@@ -118,26 +118,27 @@ describe('src/renderer/viz/expressions/classifier', () => {
         }
 
         describe('global', () => {
-            // globalQuantiles ---
-            it('globalQuantiles($price, 2)', () => {
-                const q = globalQuantiles($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([3]);
-            });
-            it('globalQuantiles($price, 3)', () => {
-                const q = globalQuantiles($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-            });
-
-            // globalEqIntervals ---
-            it('globalEqIntervals($price, 2)', () => {
-                const q = globalEqIntervals($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2.5]);
+            describe('.globalQuantiles', () => {
+                it('globalQuantiles($price, 2)', () => {
+                    const q = globalQuantiles($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([3]);
+                });
+                it('globalQuantiles($price, 3)', () => {
+                    const q = globalQuantiles($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                });
             });
 
-            // globalStandardDev ---
+            describe('.globalEqIntervals', () => {
+                it('globalEqIntervals($price, 2)', () => {
+                    const q = globalEqIntervals($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2.5]);
+                });
+            });
+
             describe('.globalStandardDev', () => {
                 const avg = average(sampleValues());
                 const std = standardDeviation(sampleValues());
@@ -187,39 +188,40 @@ describe('src/renderer/viz/expressions/classifier', () => {
         });
 
         describe('viewport', () => {
-            // viewportQuantiles ---
-            it('viewportQuantiles($price, 2)', () => {
-                const q = viewportQuantiles($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([3]);
-            });
-            it('viewportQuantiles($price, 3)', () => {
-                const q = viewportQuantiles($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
-            });
-            it('viewportQuantiles($price, 3, 30)', () => {
-                const q = viewportQuantiles($price, 3, 30);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._sizeOrBuckets).toEqual(30);
-            });
-
-            // viewportEqIntervals ---
-            it('viewportEqIntervals($price, 2)', () => {
-                const q = viewportEqIntervals($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2.5]);
-            });
-            it('viewportEqIntervals($price, 3)', () => {
-                const q = viewportEqIntervals($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
-                expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+            describe('.viewportQuantiles', () => {
+                it('viewportQuantiles($price, 2)', () => {
+                    const q = viewportQuantiles($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([3]);
+                });
+                it('viewportQuantiles($price, 3)', () => {
+                    const q = viewportQuantiles($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
+                });
+                it('viewportQuantiles($price, 3, 30)', () => {
+                    const q = viewportQuantiles($price, 3, 30);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._histogram._sizeOrBuckets).toEqual(30);
+                });
             });
 
-            // viewportStandardDev ---
+            describe('.viewportEqIntervals', () => {
+                it('viewportEqIntervals($price, 2)', () => {
+                    const q = viewportEqIntervals($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2.5]);
+                });
+                it('viewportEqIntervals($price, 3)', () => {
+                    const q = viewportEqIntervals($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+                });
+            });
+
             describe('.viewportStandardDev', () => {
                 const avg = average(sampleValues());
                 const std = standardDeviation(sampleValues());
