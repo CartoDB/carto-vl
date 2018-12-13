@@ -142,6 +142,10 @@
                     "file": "legends/linear-points.html"
                 },
                 {
+                    "title": "Transparent points",
+                    "file": "legends/transparent-points.html"
+                },
+                {
                     "title": "Category chart",
                     "file": "legends/category-chart.html"
                 },

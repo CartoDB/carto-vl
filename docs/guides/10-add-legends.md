@@ -297,7 +297,7 @@ Now when you load the map, you will see that both the features on the map and th
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-10.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
 
 ### More examples
 
