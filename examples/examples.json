@@ -151,6 +151,14 @@
             "title": "Widgets",
             "samples": [
                 {
+                    "title": "Category chart",
+                    "file": "legends/category-chart.html"
+                },
+                {
+                    "title": "Numeric chart",
+                    "file": "legends/numeric-chart.html"
+                },
+                {
                     "title": "Viewport summary",
                     "file": "widgets/viewport-summary.html"
                 },
@@ -161,14 +169,6 @@
                 {
                     "title": "Viewport histogram",
                     "file": "widgets/viewport-histogram.html"
-                },
-                {
-                    "title": "Category chart",
-                    "file": "legends/category-chart.html"
-                },
-                {
-                    "title": "Numeric chart",
-                    "file": "legends/numeric-chart.html"
                 }
             ]
         },
