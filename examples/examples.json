@@ -144,16 +144,7 @@
                 {
                     "title": "Transparent points",
                     "file": "legends/transparent-points.html"
-                },
-                {
-                    "title": "Category chart",
-                    "file": "legends/category-chart.html"
-                },
-                {
-                    "title": "Numeric chart",
-                    "file": "legends/numeric-chart.html"
                 }
-
             ]
         },
         {
@@ -170,6 +161,14 @@
                 {
                     "title": "Viewport histogram",
                     "file": "widgets/viewport-histogram.html"
+                },
+                {
+                    "title": "Category chart",
+                    "file": "legends/category-chart.html"
+                },
+                {
+                    "title": "Numeric chart",
+                    "file": "legends/numeric-chart.html"
                 }
             ]
         },
