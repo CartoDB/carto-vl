@@ -272,6 +272,7 @@ export default class AnimationGeneral extends BaseExpression {
      */
     play () {
         this._paused = false;
+        this.notify();
     }
 
     /**

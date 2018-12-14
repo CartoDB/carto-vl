@@ -5,6 +5,7 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 function anim (...args) {
     const a = new AnimationGeneral(...args);
     a._paused = false; // avoid sync code
+    a.notify = () => { };
     return a;
 }
 
@@ -85,7 +86,7 @@ describe('src/renderer/viz/expressions/Animation', () => {
     });
 
     describe('.isPlaying', () => {
-        it('should return true if animation is not playing', () => {
+        it('should return true if animation is playing', () => {
             const t = anim(1, 10, s.fade(1));
             t.play();
             expect(t.isPlaying()).toBe(true);

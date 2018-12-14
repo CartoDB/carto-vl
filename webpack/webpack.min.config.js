@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const banner = require('./banner');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
     entry: {
@@ -44,6 +45,7 @@ module.exports = {
                     loader: 'worker-loader',
                     options: {
                         publicPath: '/dist/',
+                        name: 'carto-vl-[hash].worker.min.js',
                         inline: true
                     }
                 }
@@ -51,7 +53,11 @@ module.exports = {
         ]
     },
     plugins: [
-        new webpack.BannerPlugin(banner)
+        new webpack.BannerPlugin(banner),
+        new BundleAnalyzerPlugin({
+            analyzerMode: 'disabled',
+            generateStatsFile: true
+        })
     ],
     performance: {
         maxEntrypointSize: 435200,

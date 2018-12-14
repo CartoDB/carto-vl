@@ -544,11 +544,11 @@ describe('regression with blendTo', () => {
             util.simulateMove({ lng: -5, lat: -5 });
         });
         interactivity.on('featureEnter', async event => {
+            layer.on('updated', moveAway);
+
             const feature = event.features[0];
             await feature.color.blendTo('green', 50);
             await feature.strokeWidth.blendTo(40, 50);
-
-            layer.on('updated', moveAway);
         });
 
         const resetEnd = debounce(() => {

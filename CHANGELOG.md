@@ -16,7 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `transparent` color displayed as black
 - Fix `symbol` color when setting symbol with blendTo after initializing viz
 - Fix `viewportQuantiles` not getting proper buckets
-- Fix `viewportFeatures` error when line vertices were outside the viewport but there was an intersection.
+- Fix build to set production babelified library as default `main` in package (used at `import carto from '@carto/carto-vl'`)
+- Fix `viewportFeatures` error when line vertices were outside the viewport but there was an intersection
+- Fix `layer:updated` event removing unnecessary emissions
+- Fix issue sorting null key in `viewportHistogram`
 
 ## [1.0.0] - 2018-11-08
 
