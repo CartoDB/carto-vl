@@ -251,7 +251,7 @@ const viz = new carto.Viz(`
 
 Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `@myRamp`:
 
-```html
+```js
 // Request data for legend from the layer variable myRamp
     const colorLegend = layer.viz.variables.myRamp.getLegendData();
     let colorLegendList = '';
@@ -260,7 +260,7 @@ At this point, if you refresh your map, you will see that the features on the ma
 
 To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined (`const alpha`) which is read in when building the visual legend entries (thus using RGBA colors).
 
-```html
+```js
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
 
