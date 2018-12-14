@@ -9,7 +9,7 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
-import { unproject } from './utils/geometry';
+import { computeViewportFromCameraMatrix } from './utils/util';
 import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
@@ -73,6 +73,7 @@ export default class Layer {
         this.concurrencyHelper = new LayerConcurrencyHelper();
         this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
+        this._cameraMatrix = mat4.identity([]);
     }
 
     /**
@@ -92,7 +93,7 @@ export default class Layer {
         this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
         this._visible = visible;
         if (visible !== initial) {
-            this._fire('updated');
+            this._fire('updated', 'visibility change');
         }
     }
 
@@ -429,20 +430,43 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        this.renderer.matrix = matrix;
+        const isNewCameraMatrix = this._detectAndSetNewMatrix(matrix);
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesHaveChanged => {
-                if (dataframesHaveChanged) {
-                    this._needRefresh().then(() => {
-                        if (this._state === states.INIT) {
-                            this._state = states.IDLE;
-                            this._fire('loaded');
-                        }
-                        this._fire('updated');
-                    });
-                }
-            });
+            this._checkSourceRequestsAndFireEvents(isNewCameraMatrix);
         }
+    }
+
+    _detectAndSetNewMatrix (newMatrix) {
+        const isNewMatrix = !mat4.exactEquals(newMatrix, this._cameraMatrix);
+        if (isNewMatrix) {
+            this._cameraMatrix = newMatrix;
+            this.renderer.matrix = newMatrix; // in case it is not set yet (first layer)
+        }
+        return isNewMatrix;
+    }
+
+    _checkSourceRequestsAndFireEvents (isNewMatrix) {
+        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+
+        checkForDataframesUpdate.then(dataframesHaveChanged => {
+            if (dataframesHaveChanged) {
+                this._needRefresh().then(() => {
+                    if (this._state === states.INIT) {
+                        this._state = states.IDLE;
+                        this._fire('loaded');
+                    }
+                    this._fire('updated', 'different dataframes required from source');
+                });
+            } else {
+                if (isNewMatrix) {
+                    this._fire('updated', 'new camara view');
+                }
+            }
+        });
+    }
+
+    _getViewport () {
+        return computeViewportFromCameraMatrix(this._cameraMatrix);
     }
 
     /**
@@ -454,12 +478,27 @@ export default class Layer {
         this._renderWaiters.forEach(resolve => resolve());
 
         if (this.isAnimated()) {
-            this._needRefresh().then(() => {
-                if (this.isPlaying()) {
-                    this._fire('updated');
-                }
-            });
+            if (this.isPlaying()) {
+                this._needRefresh().then(() => {
+                    this._fire('updated', 'animation is playing');
+                });
+            } else {
+                this._keepTimestampIfPaused();
+            }
+        } else {
+            if (this._state === states.UPDATING) {
+                this._state = states.IDLE;
+                this._fire('updated', 'updated viz');
+            }
         }
+    }
+
+    _keepTimestampIfPaused () {
+        let timestamp = this.renderer.timestamp;
+        // to avoid 'jumps' after resume playing.
+        this._viz._getRootStyleExpressions().forEach(vizExpr => {
+            vizExpr._setTimestamp(timestamp);
+        });
     }
 
     _paintLayer () {
@@ -491,7 +530,7 @@ export default class Layer {
     }
 
     _needRefresh () {
-        if (this._state !== states.INIT) {
+        if (this._state === states.IDLE) {
             this._state = states.UPDATING;
         }
         return new Promise(resolve => {
@@ -541,42 +580,6 @@ export default class Layer {
             // Not the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
-    }
-
-    _getViewport (matrix) { // TODO move to util, check rsys
-        const inv = mat4.invert([], matrix);
-
-        const corners = [
-            [-1, -1],
-            [-1, 1],
-            [1, -1],
-            [1, 1]
-        ].map(NDC =>
-            unproject(inv, ...NDC)
-        ).map(c =>
-            // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
-            c.map(x => x * 2 - 1)
-        );
-
-        // Rotation no longer guarantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
-        // we need to compute the AABB min/max by iterating
-        const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
-        const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
-        corners.forEach(corner => {
-            min[0] = Math.min(min[0], corner[0]);
-            min[1] = Math.min(min[1], corner[1]);
-            max[0] = Math.max(max[0], corner[0]);
-            max[1] = Math.max(max[1], corner[1]);
-        });
-
-        // Our API flips the `y` coordinate, we need to convert the values accordingly
-        min[1] = -min[1];
-        max[1] = -max[1];
-        const temp = min[1];
-        min[1] = max[1];
-        max[1] = temp;
-
-        return [...min, ...max];
     }
 
     _getZoom () {

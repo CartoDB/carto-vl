@@ -42,6 +42,12 @@ describe('Layer', () => {
                 spyOn(layer, '_needRefresh').and.callFake(() => Promise.resolve());
             }
 
+            function resetMocks () {
+                layer._getZoom.calls.reset();
+                layer._getViewport.calls.reset();
+                layer._needRefresh.calls.reset();
+            }
+
             it('should fire an "updated" event when ready', (done) => {
                 layer.on('updated', done);
             });
@@ -67,11 +73,37 @@ describe('Layer', () => {
                     layer.on('updated', update);
 
                     await layer.update(newSource);
-                    layer.prerender();
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
 
                     expect(update).toHaveBeenCalledTimes(1);
+                    resetMocks();
                     done();
                 });
+            });
+
+            it('should fire a new "updated" after moving the map (even if not requiring new dataframes)', (done) => {
+                mockPrerenderHelpers();
+
+                let numberOfUpdates = 0;
+                let update = () => {
+                    numberOfUpdates++;
+
+                    if (numberOfUpdates === 2) {
+                        resetMocks();
+                        done(); // ...(b) we get a second update
+                        return;
+                    }
+
+                    // // Emulate a user interaction, like dragging the map, using the underlying matrix
+                    const matrix = layer.renderer.matrix;
+                    let newMatrix = mat4.create();
+                    mat4.translate(newMatrix, matrix, [10, 0, 0]); // 10 units translation in x
+
+                    // (a) as it is a geojson, no dataframesHaveChange, but we need a new update anyway...
+                    layer.prerender(null, newMatrix);
+                };
+                layer.on('updated', update);
             });
 
             it('should fire an "updated" event when the viz is updated', (done) => {
@@ -81,9 +113,11 @@ describe('Layer', () => {
                     layer.on('updated', update);
 
                     await layer.update(source, new carto.Viz('color: blue'));
-                    layer.prerender();
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
 
                     expect(update).toHaveBeenCalled();
+                    resetMocks();
                     done();
                 });
             });
@@ -126,7 +160,8 @@ describe('Layer', () => {
                 layer.on('loaded', () => {
                     const requestDataSourceSpy = spyOn(layer._source, 'requestData');
                     layer.hide();
-                    layer.prerender();
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
 
                     expect(requestDataSourceSpy).not.toHaveBeenCalled();
                     done();
