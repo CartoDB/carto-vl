@@ -159,12 +159,12 @@
                     "file": "widgets/viewport-summary.html"
                 },
                 {
-                    "title": "Viewport categories",
-                    "file": "widgets/viewport-categories.html"
+                    "title": "Viewport category widget",
+                    "file": "widgets/category-widget-viewport.html"
                 },
                 {
-                    "title": "Viewport histogram",
-                    "file": "widgets/viewport-histogram.html"
+                    "title": "Viewport histogram widget",
+                    "file": "widgets/histogram-widget-viewport.html"
                 }
             ]
         },
