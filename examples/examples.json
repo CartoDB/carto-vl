@@ -152,11 +152,11 @@
             "samples": [
                 {
                     "title": "Category chart",
-                    "file": "legends/category-chart.html"
+                    "file": "widgets/category-chart.html"
                 },
                 {
                     "title": "Numeric chart",
-                    "file": "legends/numeric-chart.html"
+                    "file": "widgets/numeric-chart.html"
                 },
                 {
                     "title": "Viewport summary",
