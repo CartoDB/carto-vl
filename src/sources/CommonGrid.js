@@ -9,6 +9,8 @@ import * as rsys from '../client/rsys';
 const RTT_WIDTH = 1024;
 const MAX_ZOOM = 19;
 
+const COMMON_GRID_COLUMN_METADATA = require('./CommonGridColumnMetadata.json');
+
 const toXYZ = quadKey => {
     let x = 0;
     let y = 0;
@@ -42,20 +44,14 @@ const toXYZ = quadKey => {
 
 class CommonGridMetadata {
     constructor () {
-        this.META = {
-            addresses: {
-                min: 0,
-                max: 25
-            },
-            total_pop: {
-                min: 0,
-                max: 300
-            }
-        };
+        this.META = COMMON_GRID_COLUMN_METADATA;
     }
 
-    getMinMax (measurement, min = 0, max = 100) {
-        return Object.assign(this.META[measurement] || {}, { min, max });
+    getMinMax (measurement) {
+        const meta = this.META[measurement] || { percentiles: {} };
+        const min = meta.min || 0;
+        const max = meta.percentiles['99.9'] || meta.max || 100;
+        return { min, max };
     }
 }
 
