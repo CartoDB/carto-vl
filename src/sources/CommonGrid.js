@@ -121,7 +121,8 @@ export default class CommonGrid extends Base {
 
     async _requestDataframe (x, y, z, url) {
         const response = await fetch(url);
-        const cells = await response.json();
+        const result = await response.json();
+        const cells = result.cells;
         if (cells.length === 0 || response === 'null') {
             return { empty: true };
         }
