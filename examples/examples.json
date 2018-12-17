@@ -118,32 +118,28 @@
             "title": "Legends",
             "samples": [
                 {
-                    "title": "Category points",
-                    "file": "legends/category-points.html"
+                    "title": "Point legend",
+                    "file": "legends/category-point-legend.html"
                 },
                 {
-                    "title": "Category lines",
-                    "file": "legends/category-lines.html"
+                    "title": "Line legend",
+                    "file": "legends/category-line-legend.html"
                 },
                 {
-                    "title": "Category images",
-                    "file": "legends/category-images.html"
+                    "title": "Image legend",
+                    "file": "legends/image-legend.html"
                 },
                 {
-                    "title": "Classed polygons",
-                    "file": "legends/classified-polygons.html"
+                    "title": "Choropleth legend",
+                    "file": "legends/choropleth-legend.html"
                 },
                 {
-                    "title": "Unclassed polygons",
-                    "file": "legends/linear-polygons.html"
+                    "title": "Unclassed legend",
+                    "file": "legends/unclassed-point-legend.html"
                 },
                 {
-                    "title": "Unclassed points",
-                    "file": "legends/linear-points.html"
-                },
-                {
-                    "title": "Transparent points",
-                    "file": "legends/transparent-points.html"
+                    "title": "Feature and legend opacity",
+                    "file": "legends/feature-and-legend-opacity.html"
                 }
             ]
         },

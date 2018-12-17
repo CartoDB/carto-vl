@@ -6,7 +6,7 @@ Maps that symbolize data without the necessary information to decode the symbols
 
 CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application.
 
-If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map.
+If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map. At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
 <div class="example-map">
     <iframe
@@ -17,8 +17,6 @@ If you completed the data-driven visualization guide, the map below will look fa
         frameBorder="0">
     </iframe>
 </div>
-
-At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
 ### Getting started
 
