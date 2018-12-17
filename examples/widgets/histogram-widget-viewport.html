@@ -9,9 +9,11 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
+    
     <!-- Include Airship -->
-    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.0-beta.0/airship.css">
-    <script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.3/airship.css">
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-icons/v1.0.3/icons.css">
+    <script src="https://libs.cartocdn.com/airship-components/v1.0.3/airship.js"></script>
 </head>
 
 <body>
@@ -50,7 +52,7 @@
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
             @histogram: viewportHistogram($total_damage, 6)
-`);
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
@@ -64,6 +66,7 @@
         function drawHistogram() {
             var histogramWidget = document.querySelector('as-histogram-widget');
             const histogram = layer.viz.variables.histogram.value;
+            histogramWidget.disableInteractivity = true;
             histogramWidget.data = histogram.map(entry => {
                 return {
                     start: entry.x[0] / 1e6,

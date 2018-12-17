@@ -8,7 +8,8 @@
   <script src="../../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
@@ -18,7 +19,7 @@
   <aside class="toolbox chart-toolbox chart-toolbox-large">
     <div class="box chart-box">
       <header>
-        <h1>Histogram with purchase hours</h1>
+        <h1>Transactions by hour</h1>
       </header>
       <section>
         <div id="controls">
@@ -61,8 +62,10 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
+      @color: ramp($hour,sunset)
       @histogram: viewportHistogram($hour, 12)
-      color: #86d7ff
+
+      color: @color
       width: 5
       strokeWidth: 0
     `);
