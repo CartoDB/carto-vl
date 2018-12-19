@@ -1,6 +1,11 @@
 import GlobalAggregation from './GlobalAggregation';
 import { checkMaxArguments, checkType } from '../../utils';
 
+import ClusterAggregation from '../cluster/ClusterAggregation';
+import ClusterAvg from '../cluster/ClusterAvg';
+
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+
 /**
  * Return the average of the feature property for the entire source data.
  *
@@ -30,8 +35,18 @@ import { checkMaxArguments, checkType } from '../../utils';
 export default class GlobalAvg extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalAvg');
+        let baseStats = false;
+        if (property.isA(ClusterAggregation)) {
+            if (property.isA(ClusterAvg)) {
+                // This is not strictly correct (the average of cluster averages is not the average of data)
+                // but we'll allow it
+                baseStats = 'avg';
+            } else {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid globlalAvg input`);
+            }
+        }
 
-        super({ property, name: 'avg', type: 'number' });
+        super({ property, name: 'avg', type: 'number', baseStats });
     }
 
     _bindMetadata (metadata) {

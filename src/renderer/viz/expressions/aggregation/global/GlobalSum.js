@@ -1,6 +1,9 @@
 import GlobalAggregation from './GlobalAggregation';
 import { checkMaxArguments } from '../../utils';
 
+import ClusterAggregation from '../cluster/ClusterAggregation';
+import ClusterCount from '../cluster/ClusterCount';
+import ClusterSum from '../cluster/ClusterSum';
 /**
  * Return the sum of the feature property for the entire source data.
  *
@@ -31,6 +34,17 @@ export default class GlobalSum extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalSum');
 
-        super({ property, name: 'sum' });
+        let baseStats = false;
+        if (property.isA(ClusterAggregation)) {
+            if (property.isA(ClusterSum)) {
+                baseStats = 'sum';
+            } else if (property.isA(ClusterCount)) {
+                baseStats = '_count';
+            } else {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid globlalAvg input`);
+            }
+        }
+
+        super({ property, name: 'sum', baseStats });
     }
 }
