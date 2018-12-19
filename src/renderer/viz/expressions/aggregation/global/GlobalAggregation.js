@@ -47,13 +47,13 @@ export default class GlobalAggregation extends BaseExpression {
                 value = metadata.featureCount;
             } else {
                 // Use some specific column stat
-                const stats =  metadata.stats(this.property.name);
+                const stats = metadata.stats(this.property.name);
                 value = stats && stats[this.baseStats];
             }
         } else {
             // Use stats from actual column corresponding to this aggregate function
             const stats = metadata.stats(propertyName);
-            value = stats && stats[this._name]
+            value = stats && stats[this._name];
         }
 
         // TODO improve type check

@@ -4,6 +4,9 @@ import { checkMaxArguments } from '../../utils';
 import ClusterAggregation from '../cluster/ClusterAggregation';
 import ClusterCount from '../cluster/ClusterCount';
 import ClusterSum from '../cluster/ClusterSum';
+
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+
 /**
  * Return the sum of the feature property for the entire source data.
  *
