@@ -42,7 +42,7 @@ export default class GlobalMin extends GlobalAggregation {
         // but if a variable it's too soon to know here
 
         let baseStats = false;
-        if (property.isA(ClusterAggregation)) {
+        if (property && property.isA(ClusterAggregation)) {
             if (property.isA(ClusterAvg) || property.isA(ClusterMin) || property.isA(ClusterMax)) {
                 // This is not correct for ClusterAvg, and specially not for clusterMax...
                 // but we allow for it

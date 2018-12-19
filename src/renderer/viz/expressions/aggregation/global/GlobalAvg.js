@@ -36,7 +36,7 @@ export default class GlobalAvg extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalAvg');
         let baseStats = false;
-        if (property.isA(ClusterAggregation)) {
+        if (property && property.isA(ClusterAggregation)) {
             if (property.isA(ClusterAvg)) {
                 // This is not strictly correct (the average of cluster averages is not the average of data)
                 // but we'll allow it

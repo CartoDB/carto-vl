@@ -39,7 +39,7 @@ export default class GlobalMax extends GlobalAggregation {
         checkMaxArguments(arguments, 1, 'globalMax');
 
         let baseStats = false;
-        if (property.isA(ClusterAggregation)) {
+        if (property && property.isA(ClusterAggregation)) {
             if (property.isA(ClusterAvg) || property.isA(ClusterMin) || property.isA(ClusterMax)) {
                 // This is not correct for ClusterAvg, and specially not for clusterMin...
                 // but we allow for it
