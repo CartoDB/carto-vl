@@ -29,33 +29,40 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
             featureCount: 4
         });
 
+        const fakeAliases = {};
+
         it('globalMin($price) should return the metadata min', () => {
             const globalMin = s.globalMin($price);
             globalMin._bindMetadata(fakeMetadata);
+            globalMin._resolveAliases(fakeAliases);
             expect(globalMin.value).toEqual(0);
         });
 
         it('globalAvg($price) should return the metadata avg', () => {
             const globalAvg = s.globalAvg($price);
             globalAvg._bindMetadata(fakeMetadata);
+            globalAvg._resolveAliases(fakeAliases);
             expect(globalAvg.value).toEqual(1);
         });
 
         it('globalMax($price) should return the metadata max', () => {
             const globalMax = s.globalMax($price);
             globalMax._bindMetadata(fakeMetadata);
+            globalMax._resolveAliases(fakeAliases);
             expect(globalMax.value).toEqual(2);
         });
 
         it('globalSum($price) should return the metadata sum', () => {
             const globalSum = s.globalSum($price);
             globalSum._bindMetadata(fakeMetadata);
+            globalSum._resolveAliases(fakeAliases);
             expect(globalSum.value).toEqual(3);
         });
 
         it('globalCount() should return the metadata count', () => {
             const globalCount = s.globalCount();
             globalCount._bindMetadata(fakeMetadata);
+            globalCount._resolveAliases(fakeAliases);
             expect(globalCount.value).toEqual(4);
         });
 
@@ -68,6 +75,7 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
             }
             const globalPercentile = s.globalPercentile($price, 30);
             globalPercentile._bindMetadata(fakeMetadata);
+            globalPercentile._resolveAliases(fakeAliases);
             expect(globalPercentile.value).toBeCloseTo(
                 0.3 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min,
                 2);
