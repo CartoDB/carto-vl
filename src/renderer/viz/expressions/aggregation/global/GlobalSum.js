@@ -38,7 +38,7 @@ export default class GlobalSum extends GlobalAggregation {
         checkMaxArguments(arguments, 1, 'globalSum');
 
         let baseStats = false;
-        if (property && property.isA(ClusterAggregation)) {
+        if (property && property.isA(ClusterAggregation) || property.isA(ClusterCount)) {
             if (property.isA(ClusterSum)) {
                 baseStats = 'sum';
             } else if (property.isA(ClusterCount)) {
