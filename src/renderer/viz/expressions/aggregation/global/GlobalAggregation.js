@@ -28,9 +28,9 @@ export default class GlobalAggregation extends BaseExpression {
     }
 
     _resolveAliases (aliases) {
-        // if (this.property) {
+        if (this.property) {
             this.property._resolveAliases(aliases);
-        // }
+        }
     }
 
     _bindMetadata (metadata) {
