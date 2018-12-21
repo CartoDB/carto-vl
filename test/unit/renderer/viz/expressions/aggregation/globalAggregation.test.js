@@ -72,5 +72,29 @@ describe('src/renderer/viz/expressions/globalAggregation', () => {
                 0.3 * (fakeMetadata.properties.price.max - fakeMetadata.properties.price.min) + fakeMetadata.properties.price.min,
                 2);
         });
+
+        it('globalMin(clusterMin($price)) should return the metadata min', () => {
+            const globalMin = s.globalMin(s.clusterMin($price));
+            globalMin._bindMetadata(fakeMetadata);
+            expect(globalMin.value).toEqual(0);
+        });
+
+        it('globalMax(clusterMax($price)) should return the metadata max', () => {
+            const globalMin = s.globalMax(s.clusterMax($price));
+            globalMin._bindMetadata(fakeMetadata);
+            expect(globalMin.value).toEqual(2);
+        });
+
+        it('globalSum(cluserSum($price)) should return the metadata sum', () => {
+            const globalSum = s.globalSum(s.clusterSum($price));
+            globalSum._bindMetadata(fakeMetadata);
+            expect(globalSum.value).toEqual(3);
+        });
+
+        it('globalSum(clusterCount()) should return the metadata count', () => {
+            const globalCount = s.globalSum(s.clusterCount());
+            globalCount._bindMetadata(fakeMetadata);
+            expect(globalCount.value).toEqual(4);
+        });
     });
 });
