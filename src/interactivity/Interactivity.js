@@ -82,6 +82,7 @@ export default class Interactivity {
     }
 
     _init (layerList, options) {
+        this._enabled = true;
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
@@ -135,6 +136,10 @@ export default class Interactivity {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
+        if (!this._enabled) {
+            return;
+        }
+
         if (!event ||
             (!this._numListeners['featureEnter'] &&
                 !this._numListeners['featureHover'] &&
@@ -143,8 +148,10 @@ export default class Interactivity {
         }
 
         const featureEvent = this._createFeatureEvent(event);
+
         const featuresLeft = this._manageFeatureLeaveEvent(featureEvent);
         const featuresEntered = this._manageFeatureEnterEvent(featureEvent);
+
         this._prevHoverFeatures = featureEvent.features;
         this._manageFeatureHoverEvent(featureEvent, { featuresLeft, featuresEntered }, emulated);
     }
@@ -181,6 +188,10 @@ export default class Interactivity {
     }
 
     _onClick (event) {
+        if (!this._enabled) {
+            return;
+        }
+
         if (!this._numListeners['featureClick'] &&
             !this._numListeners['featureClickOut']) {
             return;
@@ -202,6 +213,7 @@ export default class Interactivity {
     }
 
     _createFeatureEvent (eventData) {
+        // a potentially very intensive task
         const features = this._getFeaturesAtPosition(eventData.point);
         return {
             coordinates: eventData.lngLat,
