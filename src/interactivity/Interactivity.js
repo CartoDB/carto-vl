@@ -81,6 +81,39 @@ export default class Interactivity {
         return this._emitter.off(eventName, callback);
     }
 
+    /**
+    * Interactivity enabled property. When enabled, it can emit events
+    *
+    * @type {boolean}
+    * @memberof carto.Interactivity
+    * @instance
+    * @api
+    */
+    get isEnabled () {
+        return this._enabled;
+    }
+
+    /**
+     * Change interactivity state to disabled, so no event will be emitted
+     *
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    disable () {
+        this._enabled = false;
+    }
+
+    /**
+     * Change interactivity state to enabled, so events can be emitted
+     *
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    enable () {
+        this._enabled = true;
+    }
     _init (layerList, options) {
         this._enabled = true;
         this._emitter = mitt();
@@ -136,7 +169,7 @@ export default class Interactivity {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
-        if (!this._enabled) {
+        if (!this.isEnabled) {
             return;
         }
 
@@ -188,7 +221,7 @@ export default class Interactivity {
     }
 
     _onClick (event) {
-        if (!this._enabled) {
+        if (!this.isEnabled) {
             return;
         }
 
