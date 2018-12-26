@@ -201,6 +201,24 @@ describe('Interactivity', () => {
                     });
                 });
             });
+
+            it('should not fire a click-derived event if it is disabled', done => {
+                interactivity.disable();
+
+                const onClickSpy = spyOn(interactivity, '_onClick');
+                const createFeatureEventSpy = spyOn(interactivity, '_createFeatureEvent');
+
+                onLoaded(() => {
+                    // Click on the feature 1
+                    util.simulateClick({ lng: 5, lat: 5 });
+
+                    setTimeout(() => {
+                        expect(onClickSpy).toHaveBeenCalled();
+                        expect(createFeatureEventSpy).not.toHaveBeenCalled();
+                        done();
+                    }, 0);
+                });
+            });
         });
     });
 
@@ -279,6 +297,58 @@ describe('Interactivity', () => {
                 });
             });
         });
+
+        it('should not fire a featureHover / featureEnter or featureLeave event if it is disabled', done => {
+            interactivity.disable();
+
+            const onMouseMoveSpy = spyOn(interactivity, '_onMouseMove');
+            const createFeatureEventSpy = spyOn(interactivity, '_createFeatureEvent');
+
+            onLoaded(() => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+                // Move mouse outside any feature
+                util.simulateMove({ lng: -5, lat: -5 });
+
+                setTimeout(() => {
+                    expect(onMouseMoveSpy).toHaveBeenCalled();
+                    expect(createFeatureEventSpy).not.toHaveBeenCalled();
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    describe('when the map is being dragged', () => {
+        it('should be automatically disabled and enabled afterwards', done => {
+            const disableSpy = spyOn(interactivity, 'disable');
+            const enableSpy = spyOn(interactivity, 'enable');
+
+            onLoaded(() => {
+                // Emulate a dragPan on the map (over features)
+                const a = {
+                    lng: 31.200000442407003,
+                    lat: 35.811161555893094
+                };
+                const b = {
+                    lng: 30.000000425386474,
+                    lat: 35.81116155589309
+                };
+                const c = {
+                    lng: 31.200000442481354,
+                    lat: 33.84122074447299
+                };
+
+                map.on('moveend', () => {
+                    expect(disableSpy).toHaveBeenCalledTimes(1);
+                    expect(enableSpy).toHaveBeenCalledTimes(1);
+
+                    done();
+                });
+
+                util.simulateDrag([a, b, c]);
+            });
+        });
     });
 
     describe('when the layer changes', () => {
@@ -314,6 +384,16 @@ describe('Interactivity', () => {
     describe('.off', () => {
         it('should throw an error when unsubscribing to an invalid event', () => {
             expect(() => { interactivity.off('invalidEventName'); }).toThrowError(/Unrecognized event/);
+        });
+    });
+
+    describe('.enable / .disable', () => {
+        it('should allow turn on & off the whole interactivity', () => {
+            expect(interactivity.isEnabled).toBeTruthy(); // enabled by default
+            interactivity.disable();
+            expect(interactivity.isEnabled).toBeFalsy();
+            interactivity.enable();
+            expect(interactivity.isEnabled).toBeTruthy();
         });
     });
 

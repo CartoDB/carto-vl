@@ -114,6 +114,7 @@ export default class Interactivity {
     enable () {
         this._enabled = true;
     }
+
     _init (layerList, options) {
         this._enabled = true;
         this._emitter = mitt();
