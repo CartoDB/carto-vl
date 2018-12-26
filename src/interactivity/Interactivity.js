@@ -154,23 +154,16 @@ export default class Interactivity {
     _subscribeToMapEvents (map) {
         map.on('mousemove', this._onMouseMove.bind(this));
         map.on('click', this._onClick.bind(this));
-        this._disableDuringMapEvents(map);
+        this._disableWhileMovingMap(map);
     }
 
-    _disableDuringMapEvents (map) {
-        const disableEvents = ['movestart'];
-        const enableEvents = ['moveend'];
-
-        disableEvents.forEach((eventName) => {
-            map.on(eventName, () => {
-                this.disable();
-            });
+    _disableWhileMovingMap (map) {
+        map.on('movestart', () => {
+            this.disable();
         });
 
-        enableEvents.forEach((eventName) => {
-            map.on(eventName, () => {
-                this.enable();
-            });
+        map.on('moveend', () => {
+            this.enable();
         });
     }
 
