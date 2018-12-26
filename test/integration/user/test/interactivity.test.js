@@ -319,31 +319,32 @@ describe('Interactivity', () => {
         });
     });
 
-    describe('when the map is being dragged', () => {
-        it('should be automatically disabled and enabled afterwards', done => {
+    describe('while the map is being moved (eg. dragPan)', () => {
+        it('should be automatically disabled (and enabled afterwards)', done => {
             const disableSpy = spyOn(interactivity, 'disable');
             const enableSpy = spyOn(interactivity, 'enable');
 
             onLoaded(() => {
                 // Emulate a dragPan on the map (over features)
                 const a = {
-                    lng: 31.200000442407003,
-                    lat: 35.811161555893094
+                    lng: 31.20,
+                    lat: 35.81
                 };
                 const b = {
-                    lng: 30.000000425386474,
-                    lat: 35.81116155589309
+                    lng: 30.00,
+                    lat: 35.81
                 };
                 const c = {
-                    lng: 31.200000442481354,
-                    lat: 33.84122074447299
+                    lng: 31.20,
+                    lat: 33.84
                 };
 
                 map.on('moveend', () => {
-                    expect(disableSpy).toHaveBeenCalledTimes(1);
-                    expect(enableSpy).toHaveBeenCalledTimes(1);
-
-                    done();
+                    setTimeout(() => {
+                        expect(disableSpy).toHaveBeenCalledTimes(1);
+                        expect(enableSpy).toHaveBeenCalledTimes(1);
+                        done();
+                    }, 0);
                 });
 
                 util.simulateDrag([a, b, c]);
