@@ -320,9 +320,8 @@ describe('Interactivity', () => {
     });
 
     describe('while the map is being moved (eg. dragPan)', () => {
-        it('should be automatically disabled (and enabled afterwards)', done => {
-            const disableSpy = spyOn(interactivity, 'disable');
-            const enableSpy = spyOn(interactivity, 'enable');
+        it('should be automatically tracked (to later on control enabled / disabled state)', done => {
+            const setMapStateSpy = spyOn(interactivity, '_setMapState');
 
             onLoaded(() => {
                 // Emulate a dragPan on the map (over features)
@@ -341,8 +340,9 @@ describe('Interactivity', () => {
 
                 map.on('moveend', () => {
                     setTimeout(() => {
-                        expect(disableSpy).toHaveBeenCalledTimes(1);
-                        expect(enableSpy).toHaveBeenCalledTimes(1);
+                        expect(setMapStateSpy).toHaveBeenCalledTimes(2);
+                        expect(setMapStateSpy).toHaveBeenCalledWith('moving');
+                        expect(setMapStateSpy).toHaveBeenCalledWith('idle');
                         done();
                     }, 0);
                 });
@@ -394,6 +394,14 @@ describe('Interactivity', () => {
             interactivity.disable();
             expect(interactivity.isEnabled).toBeFalsy();
             interactivity.enable();
+            expect(interactivity.isEnabled).toBeTruthy();
+        });
+
+        it('should be disabled while map is moving', () => {
+            expect(interactivity.isEnabled).toBeTruthy(); // enabled by default
+            interactivity._mapState = 'moving';
+            expect(interactivity.isEnabled).toBeFalsy();
+            interactivity._mapState = 'idle';
             expect(interactivity.isEnabled).toBeTruthy();
         });
     });

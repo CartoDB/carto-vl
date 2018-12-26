@@ -10,6 +10,11 @@ const EVENTS = [
     'featureLeave'
 ];
 
+const MAP_STATE = {
+    IDLE: 'idle',
+    MOVING: 'moving'
+};
+
 export default class Interactivity {
     /**
     *
@@ -90,7 +95,7 @@ export default class Interactivity {
     * @api
     */
     get isEnabled () {
-        return this._enabled;
+        return this._enabled && this._mapState !== MAP_STATE.MOVING;
     }
 
     /**
@@ -117,6 +122,7 @@ export default class Interactivity {
 
     _init (layerList, options) {
         this._enabled = true;
+        this._mapState = MAP_STATE.IDLE;
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
@@ -159,12 +165,16 @@ export default class Interactivity {
 
     _disableWhileMovingMap (map) {
         map.on('movestart', () => {
-            this.disable();
+            this._setMapState(MAP_STATE.MOVING);
         });
 
         map.on('moveend', () => {
-            this.enable();
+            this._setMapState(MAP_STATE.IDLE);
         });
+    }
+
+    _setMapState (state) {
+        this._mapState = state;
     }
 
     _subscribeToLayerEvents (layers) {
