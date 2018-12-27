@@ -169,6 +169,27 @@
             ]
         },
         {
+            "title": "Basemap",
+            "samples": [
+                {
+                    "title": "Basemap labels on top",
+                    "file": "basemap/basemap-labels-on-top.html"
+                },
+                {
+                    "title": "Basemap labels under",
+                    "file": "basemap/basemap-labels-under.html"
+                },
+                {
+                    "title": "Color background",
+                    "file": "basemap/color-map-background.html"
+                },
+                {
+                    "title": "Project a layer",
+                    "file": "basemap/project-layer.html"
+                }
+            ]
+        },
+        {
             "title": "Advanced",
             "samples": [
                 {
