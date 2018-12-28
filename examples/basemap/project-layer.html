@@ -60,7 +60,8 @@
       apiKey: 'default_public'
     });
 
-    //Add SQL source layer with projection
+    //Add SQL source layer with projection information
+      //For more information visit https://carto.com/help/working-with-data/changing-map-projections/
     const source = new carto.source.SQL(`
       SELECT 
           cartodb_id,
