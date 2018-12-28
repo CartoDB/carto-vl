@@ -180,16 +180,16 @@
                     "file": "basemap/basemap-labels-under.html"
                 },
                 {
-                    "title": "Set pitch and bearing",
-                    "file": "basemap/color-map-background.html"
-                },
-                {
                     "title": "Color map background",
                     "file": "basemap/color-map-background.html"
                 },
                 {
-                    "title": "Project a layer",
+                    "title": "Project layer",
                     "file": "basemap/project-layer.html"
+                },
+                {
+                    "title": "Set pitch and bearing",
+                    "file": "basemap/pitch-bearing.html"
                 }
             ]
         },
