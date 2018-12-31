@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Color map background | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../../style.css">
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -30,21 +32,21 @@
     </div>
   </div>
   <script>
-    
+
     // Set paint properties for map's background layer
     const map = new mapboxgl.Map({
-    container: 'map',
-    style: {
-      version: 8,
-      sources: {},
-      layers: [
-       {
-        id: 'background',
-        type: 'background',
-        paint: { 'background-color': 'white' }
-       }
-      ]
-    },
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [
+          {
+            id: 'background',
+            type: 'background',
+            paint: { 'background-color': 'white' }
+          }
+        ]
+      },
       center: [0, 0],
       zoom: 2,
       scrollZoom: false,
@@ -80,4 +82,5 @@
     }
   </script>
 </body>
+
 </html>
