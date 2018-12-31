@@ -27,13 +27,17 @@
           <div id="map"></div>
 
           <div class="as-map-panels">
-            <div class="as-panel as-panel--top as-panel--right">
+            <div class="as-panel as-panel--bottom as-panel--left">
               <div class="as-panel__element as-p--32"></div>
             </div>
           </div>
 
         </div>
-        <footer class="as-map-footer" style="height: 250px;"></footer>
+        <footer class="as-map-footer" style="height: 250px;">
+          <div id="vlCodeContainer" style="width:100%; height: 100%;">
+
+          </div>
+        </footer>
       </main>
 
     </div>
@@ -49,6 +53,7 @@
     });
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
+    map.addControl(new mapboxgl.FullscreenControl());
   </script>
 </body>
 
