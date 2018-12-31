@@ -224,16 +224,16 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-l
 
 ### Assign opacity with variables
 
-If you want to assign opacity to mapped features, you will construct your `ramp` using [variables](/developers/carto-vl/guides/Glossary/#variables). 
+If you want to assign opacity to mapped features, you will construct your `ramp` using [variables](/developers/carto-vl/guides/Glossary/#variables).
 
 **Note:**
 The use of [variables](/developers/carto-vl/guides/Glossary/#variables) is explored in greater detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
 
-The styling below assigns a global `0.5` opacity to features, using two variables: 
-* `@myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])` for the colors assigned to each category 
-* `@myOpacity: 0.5` for the amount of opacity to assign to features 
+The styling below assigns a global `0.5` opacity to features, using two variables:
+* `@myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])` for the colors assigned to each category
+* `@myOpacity: 0.5` for the amount of opacity to assign to features
 
-The variables are then used in the `color` property inside of an `opacity` expression: 
+The variables are then used in the `color` property inside of an `opacity` expression:
 
 ```CARTO_VL_Viz
 const viz = new carto.Viz(`
@@ -241,7 +241,7 @@ const viz = new carto.Viz(`
     @myOpacity: 0.5
 
     width: 7
-    color: opacity(@myRamp,@myOpacity)
+    color: opacity(@myRamp, @myOpacity)
     strokeWidth: 0.2
     strokeColor: black
 `);
@@ -256,23 +256,24 @@ Next, you need to modify where the legend gets the data to draw (`getLegendData(
 ```
 At this point, if you refresh your map, you will see that the features on the map have the set opacity, but the features in the legend do not.
 
-To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined (`const alpha`) which is read in when building the visual legend entries (thus using RGBA colors).
+To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined previously as a variable (`@myOpacity`) which is read in when building the visual legend entries (thus using RGBA colors).
 
 ```js
 // When layer loads, trigger legend event
 layer.on('loaded', () => {
 
-    // Request data for legend from the layer viz variable myRamp
+    // Request data for legend from the layer viz variables 'myRamp' and 'myOpacity'
     const colorLegend = layer.viz.variables.myRamp.getLegendData();
+    const opacity = layer.viz.variables.myOpacity.value;
+
     let colorLegendList = '';
 
     // Create list elements for legend
     colorLegend.data.forEach((legend, index) => {
         const color = legend.value;
 
-        //Define and use alpha constant
-        const alpha = 0.5;
-        const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+        // Add the predefined opacity to the ramp color components
+        const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
 
         // Style for legend items based on geometry type
         colorLegendList +=
