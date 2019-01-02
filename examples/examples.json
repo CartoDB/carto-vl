@@ -169,6 +169,19 @@
             ]
         },
         {
+            "title": "Labeling",
+            "samples": [
+                {
+                    "title": "Label points",
+                    "file": "labeling/point-labels.html"
+                },
+                {
+                    "title": "Label polygons",
+                    "file": "labeling/polygon-labels.html"
+                }
+            ]
+        },
+        {
             "title": "Basemap",
             "samples": [
                 {
