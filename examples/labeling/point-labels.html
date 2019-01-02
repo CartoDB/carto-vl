@@ -34,17 +34,14 @@
   
       // Point layer
       const source = new carto.source.Dataset('points_of_interest');
-
       const viz = new carto.Viz(`
         color: fuchsia
         width: 6
         strokeColor: white
         strokeWidth: 2
         filter: $major == "YES"
-        
         @v_features: viewportFeatures($poi_name)
       `);
-
       const layer = new carto.Layer('points', source, viz);
       
       // Create labeling layer centroids
@@ -75,7 +72,7 @@
   
         layer.on('updated', layerUpdated);
   
-        // Add and style labeling layer
+        // Style labels
         map.addLayer({
           "id": "my-labels",
           "type": "symbol",

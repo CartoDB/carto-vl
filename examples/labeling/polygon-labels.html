@@ -35,16 +35,15 @@
 
     // Polygon layer
     const source = new carto.source.Dataset('sf_neighborhoods');
-
     const viz = new carto.Viz(`
       color: ramp($name,vivid)
       strokeWidth: 1
       strokeColor: black
-      
       @v_features: viewportFeatures($name)
     `);
     const layer = new carto.Layer('polygons', source, viz);
-
+    
+    // Create labeling layer centroids
     layer.on('loaded', () => {
       map.addSource('labels', { type: 'geojson', data: null });
       const labelSource = map.getSource('labels');
@@ -72,7 +71,7 @@
 
       layer.on('updated', layerUpdated);
 
-      // Labels layer
+      // Style labels
       map.addLayer({
         "id": "my-labels",
         "type": "symbol",
