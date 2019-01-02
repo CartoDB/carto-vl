@@ -1,27 +1,23 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Line legend | CARTO</title>
+  <title>Basemap labels on top | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
-
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>San Francisco Streets</h1>
+        <h1>Labels on top</h1>
       </header>
       <section>
-        <div id="controls">
-          <ul id="content"></ul>
-        </div>
+        <p class="description open-sans">Basemap labels on top of layer</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -33,13 +29,13 @@
       </svg>
     </div>
   </div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-122.424335, 37.771521],
-      zoom: 12
+      center: [0, 0],
+      zoom: 2,
+      scrollZoom: false,
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -52,41 +48,24 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('sf_stclines');
+    const source = new carto.source.Dataset('countries_110m_admin_0');
     const viz = new carto.Viz(`
-      color: ramp(top($st_type, 5), bold)
-      width: 2
+      @country: ramp($mapcolor7,pastel)
+
+      color: opacity(@country,0.8)
+      strokeColor: @country
+      strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, viz);
 
+    // Add layer below first basemap labeling layer
     layer.addTo(map, 'watername_ocean');
-    layer.on('loaded', () => {
-      hideLoader();
 
-      const colorLegend = layer.viz.color.getLegendData({
-        othersLabel: 'Default'
-      });
-
-      let colorLegendList = '';
-      colorLegend.data.forEach((legend) => {
-        const colorHex = rgbToHex(legend.value);
-        const type = legend.key;
-        const entry = type !== 'CARTO_VL_OTHERS' ? type : 'Others';
-        colorLegendList +=
-          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${entry}</span></li>\n`;
-      });
-
-      document.getElementById('content').innerHTML = colorLegendList;
-    });
+    layer.on('loaded', hideLoader);
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
-
-    function rgbToHex(color) {
-      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
-    }
   </script>
 </body>
-
 </html>
