@@ -81,7 +81,11 @@ export default class GlobalAggregation extends BaseExpression {
         super._bindMetadata(metadata);
         this.property._bindMetadata(metadata);
         const propertyName = this.property.propertyName || this.property.name;
+        const value = this._getValueFromStats(metadata, propertyName);
+        this._value.expr = metadata.codec(propertyName).sourceToExternal(value);
+    }
 
+    _getValueFromStats (metadata, propertyName) {
         let value;
         if (this.baseStats) {
             // Use base stats (pre-aggregation)
@@ -99,11 +103,11 @@ export default class GlobalAggregation extends BaseExpression {
             value = stats && stats[this._name];
         }
 
-        // TODO improve type check
         if (value === undefined) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Metadata ${this._name} for property ${propertyName} is not defined`);
         }
-        this._value.expr = metadata.codec(propertyName).sourceToExternal(value);
+
+        return value;
     }
 
     _getMinimumNeededSchema () {
