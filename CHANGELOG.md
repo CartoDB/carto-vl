@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `layer:updated` event removing unnecessary emissions
 - Fix issue sorting null key in `viewportHistogram`
 - Fix unwanted `Interactivity` events while using dragPan (and performance improvement)
+- Fix `linear` applied to cluster aggregations without explicit limits
 
 ## [1.0.0] - 2018-11-08
 
