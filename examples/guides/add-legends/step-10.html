@@ -2,13 +2,16 @@
 <html>
 
 <head>
-  <title>Line legend | CARTO</title>
+  <title>Legend unclassed | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
+
   <script src="../../../dist/carto-vl.js"></script>
+
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
 <body>
@@ -16,7 +19,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>San Francisco Streets</h1>
+        <h1>Latitudes</h1>
       </header>
       <section>
         <div id="controls">
@@ -38,8 +41,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-122.424335, 37.771521],
-      zoom: 12
+      center: [0, 43],
+      zoom: 1
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -52,10 +55,11 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('sf_stclines');
+    const source = new carto.source.Dataset('populated_places');
     const viz = new carto.Viz(`
-      color: ramp(top($st_type, 5), bold)
-      width: 2
+      color: ramp(linear($latitude), sunset)
+      width: 5
+      strokeWidth: 0
     `);
     const layer = new carto.Layer('layer', source, viz);
 
@@ -63,19 +67,19 @@
     layer.on('loaded', () => {
       hideLoader();
 
-      const colorLegend = layer.viz.color.getLegendData({
-        othersLabel: 'Default'
-      });
-
+      const colorLegend = layer.viz.color.getLegendData();
       let colorLegendList = '';
-      colorLegend.data.forEach((legend) => {
+      // Get the information for legend
+      const entries = colorLegend.data;
+      entries.reverse();
+      entries.forEach((legend, index) => {
         const colorHex = rgbToHex(legend.value);
-        const type = legend.key;
-        const entry = type !== 'CARTO_VL_OTHERS' ? type : 'Others';
+        const entry = legend.key.toFixed(2);
         colorLegendList +=
-          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${entry}</span></li>\n`;
+          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${entry}</span></li>\n`;
       });
 
+      // Update the legend with the legend information
       document.getElementById('content').innerHTML = colorLegendList;
     });
 

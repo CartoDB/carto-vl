@@ -100,5 +100,41 @@ describe('sources/MVT', () => {
                 metadata.codec('wadus').sourceToInternal(0);
             }).toThrowError(/MVT decoding error. Metadata property is of type \'category\' but the MVT tile contained a feature property of type 'number': \'0\'/);
         });
+        it('Number property should work with null value', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'number'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(metadata.codec('wadus').sourceToInternal(null)).toEqual(FP32_DESIGNATED_NULL_VALUE);
+        });
+        it('Number property should work with undefined value', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'number'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(metadata.codec('wadus').sourceToInternal(undefined)).toEqual(FP32_DESIGNATED_NULL_VALUE);
+        });
+        it('Number property should properly handle 0 value', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'number'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(metadata.codec('wadus').sourceToInternal(0)).toEqual(0);
+        });
     });
 });

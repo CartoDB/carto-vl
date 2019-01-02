@@ -11,6 +11,7 @@ export function createMap (name, size) {
     div.style.width = `${size}px`;
     div.style.height = `${size}px`;
     div.style.position = 'absolute';
+    div.style.border = '1px red solid';
     document.body.style.margin = '0';
     document.body.style.padding = '0';
     document.body.appendChild(div);
@@ -25,31 +26,50 @@ export function createMap (name, size) {
     return { div, map };
 }
 
+function _mouseParamsFromCoords (coordinates) {
+    const position = project(coordinates);
+    const params = { clientX: position.x, clientY: position.y, bubbles: true };
+    return params;
+}
+
 export function simulateClick (coordinates) {
     const el = document.querySelector('.mapboxgl-canvas-container');
-    const position = project(coordinates);
-    const params = { clientX: position.x, clientY: position.y };
+    if (!el) return;
 
+    const params = _mouseParamsFromCoords(coordinates);
     const mousedown = new MouseEvent('mousedown', params);
     const click = new MouseEvent('click', params);
     const mouseup = new MouseEvent('mouseup', params);
 
-    if (el) {
-        el.dispatchEvent(mousedown);
-        el.dispatchEvent(click);
-        el.dispatchEvent(mouseup);
-    }
+    el.dispatchEvent(mousedown);
+    el.dispatchEvent(click);
+    el.dispatchEvent(mouseup);
 }
 
 export function simulateMove (coordinates) {
     const el = document.querySelector('.mapboxgl-canvas-container');
-    const position = project(coordinates);
-    const params = { clientX: position.x, clientY: position.y };
+    if (!el) return;
 
+    const params = _mouseParamsFromCoords(coordinates);
     const mousemove = new MouseEvent('mousemove', params);
-    if (el) {
-        el.dispatchEvent(mousemove);
-    }
+    el.dispatchEvent(mousemove);
+}
+
+export function simulateDrag (coordinatesList) {
+    const el = document.querySelector('.mapboxgl-canvas-container');
+    if (!el) return;
+
+    const first = coordinatesList[0];
+    const last = coordinatesList[coordinatesList.length - 1];
+
+    const mouseEvents = [];
+    mouseEvents.push(new MouseEvent('mousedown', _mouseParamsFromCoords(first)));
+    coordinatesList.forEach((coords) => {
+        mouseEvents.push(new MouseEvent('mousemove', _mouseParamsFromCoords(coords)));
+    });
+    mouseEvents.push(new MouseEvent('mouseup', _mouseParamsFromCoords(last)));
+
+    mouseEvents.forEach((event) => el.dispatchEvent(event));
 }
 
 function project (coordinates) {

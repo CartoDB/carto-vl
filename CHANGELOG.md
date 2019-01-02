@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Add `getCentroid` method to features
 - Add `isPlaying` method to animations
+- Add `enable`/`disable` methods and `isEnabled` property to `Interactivity`
+- Enable user-defined buckets in `viewportHistogram`
+- Add and improve examples (legends, widgets and basemaps)
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature
@@ -20,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix `viewportFeatures` error when line vertices were outside the viewport but there was an intersection
 - Fix `layer:updated` event removing unnecessary emissions
 - Fix issue sorting null key in `viewportHistogram`
+- Fix unwanted `Interactivity` events while using dragPan (and performance improvement)
 
 ## [1.0.0] - 2018-11-08
 
