@@ -4,8 +4,8 @@
 <head>
   <script src="../../../dist/carto-vl.js"></script>
 
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -53,7 +53,7 @@
       strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, viz);
-    
+
     layer.addTo(map, 'watername_ocean');
 
     layer.on('loaded', () => {
