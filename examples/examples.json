@@ -165,6 +165,10 @@
                 {
                     "title": "Viewport histogram widget",
                     "file": "widgets/histogram-widget-viewport.html"
+                },
+                {
+                    "title": "Viewport weighted-histogram table",
+                    "file": "widgets/weighted-histogram.html"
                 }
             ]
         },
