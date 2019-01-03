@@ -3839,9 +3839,9 @@ jsdoc@^3.5.5:
     taffydb "2.6.2"
     underscore "~1.8.3"
 
-jsep@CartoDB/jsep#additional-char-ids-packaged:
+jsep@CartoDB/jsep#additional-char-ids-packaged-update-1:
   version "0.3.4"
-  resolved "https://codeload.github.com/CartoDB/jsep/tar.gz/f27e7f181518ee94fcfb808a73b76b105b0cebb0"
+  resolved "https://codeload.github.com/CartoDB/jsep/tar.gz/f9873387e0165333c2d03b3a01a77f545982a587"
 
 jsesc@^2.5.1:
   version "2.5.1"
