@@ -37,24 +37,15 @@ To see
 
 ## I want to make a map
 
-To start, you will need a basic HTML file structure to display your map in a browser. We recommend you to follow this [Getting started](https://carto.com/developers/carto-vl/guides/getting-started/) guide to create a basic map.
-
-Then, start by getting familiarized with [CARTO VL's Syntax](https://carto.com/developers/carto-vl/guides/the-basics-of-syntax/) and follow up with all our available introduction guides:
-
-- [Expressions](https://carto.com/developers/carto-vl/guides/introduction-to-expressions/)
-- [Interpolation](https://carto.com/developers/carto-vl/guides/introduction-to-interpolation/)
-- [Styling](https://carto.com/developers/carto-vl/guides/introduction-to-styling/)
-- [Animation](https://carto.com/developers/carto-vl/guides/introduction-to-animation/)
-- [Interactivity](https://carto.com/developers/carto-vl/guides/introduction-to-interactivity/)
+To start, you will need a basic HTML file structure to display your map in a browser. We recommend you to follow this [Getting started](https://carto.com/developers/carto-vl/guides/getting-started/) guide to create a basic map. Then, you can get familiarized with the rest of the library following this link: https://carto.com/developers/carto-vl/guides/introduction/, which includes a list with more specific and advanced guides.
 
 Also, take a look at our [examples](https://carto.com/developers/carto-vl/examples/) to understand the possibilities and inspire you!
 
-An alternative way is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl). Take a look at an example [here](https://github.com/CartoDB/carto-vl-webpack-demo
-).
-
+An alternative way, if you already have a build system in your project (*webpack*, *rollup*...), is to use our [npm package](https://www.npmjs.com/package/@carto/carto-vl). You can install it with:
 ```
 npm i @carto/carto-vl
 ```
+Take a look at an example made with webpack [here](https://github.com/CartoDB/carto-vl-webpack-demo).
 
 Happy mapping!
 
@@ -86,7 +77,7 @@ For more information, please read [DEVELOPERS.md](https://github.com/CartoDB/car
 
 Get started using CARTO VL's documentation at [CARTO's Developer Center](https://carto.com/developers/carto-vl/).
 
- - [Guides](https://carto.com/developers/carto-vl/guides/): get to know the library!
+ - [Guides](https://carto.com/developers/carto-vl/guides/): get to know the library as a user!
  - [Full reference API](https://carto.com/developers/carto-vl/reference/): for specific methods, arguments, and sample code.
 
 ### Play with the examples
@@ -113,7 +104,7 @@ We encourage you to start playing with CARTO VL and to please [send us feedback]
 
 ## Works with
 
-CARTO VL is a geo-spatial data visualization library. However it doesn't include basemap rendering capabilities. Therefore, CARTO VL needs to be used with [Mapbox GL](https://github.com/mapbox/mapbox-gl-js) as a basemap provider. You'll need to use Mapbox GL for controlling the center and zoom level of your map too. The integration is seamless, but you will need to use one of our patched versions as shown in the examples.
+CARTO VL is a geo-spatial data visualization library. However it doesn't include basemap rendering capabilities. Therefore, CARTO VL needs to be used with [Mapbox GL](https://github.com/mapbox/mapbox-gl-js) as a basemap provider. You'll need to use Mapbox GL (>=v.0.50.0) for controlling the center and zoom level of your map too. The integration is seamless, check the examples!
 
 ## Versioning
 
@@ -133,4 +124,4 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE.txt](LICENSE.txt) file for details.
+This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE](LICENSE) file for details.
