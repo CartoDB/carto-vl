@@ -73,8 +73,11 @@
     const currentBuildSource = buildSourceFromWindshaft; // buildSourceFromGeoJSON; // vs buildSourceFromWindshaft
     const FIELD = 'name'; // 'cat' for geojson | 'name' for windshaft data sources
 
-    let centroidsLayer;
     map.on('load', async () => {
+      let mainLayer;
+      let centroidsLayer;
+      let currentMarkers = [];
+
       const source = await currentBuildSource();
       const viz = new carto.Viz(`
         @field: $${FIELD}
@@ -83,11 +86,14 @@
         width: 15
       `);
 
-      const layer = new carto.Layer('original', source, viz);
-      layer.addTo(map, 'watername_ocean');
+      mainLayer = new carto.Layer('original', source, viz);
+      mainLayer.addTo(map, 'watername_ocean');
 
       function sourceFrom(features) {
         const centroidFeatures = features.map(f => {
+          // f.properties[FIELD] is not exposed in Interactivity (it requires declaring the field as a variable in the viz, and accesing it from .variables)
+          const field = f.properties ? f.properties[FIELD] : f._rawFeature[FIELD];
+
           return {
             "type": "Feature",
             "geometry": {
@@ -95,10 +101,11 @@
               "coordinates": f.getCentroid()
             },
             "properties": {
-              "field": f.properties[FIELD]
+              "field": field
             }
           }
         });
+
         const sourceCentroids = new carto.source.GeoJSON({
           type: 'FeatureCollection',
           features: centroidFeatures
@@ -106,34 +113,46 @@
         return sourceCentroids;
       }
 
-      function updateCentroidsLayer() {
-        const originalFeatures = viz.variables.v_features.value;
-        if (originalFeatures.length === 0) return;
+      function updateCentroidsWith(features) {
+        const updatedSource = sourceFrom(features);
 
-        const updatedSource = sourceFrom(originalFeatures);
-
-        // updated with every change
         if (centroidsLayer) {
           centroidsLayer.update(updatedSource);
           console.log('updated centroids');
-          return;
+          return; // updates
         }
 
         // created just once
         centroidsLayer = new carto.Layer('centroids', updatedSource,
           new carto.Viz(`
-                  symbol: cross
-                  color: red
-                  width: 20
-                  symbolPlacement: ALIGN_CENTER
-                `)
+          symbol: cross
+          color: red
+          width: 20
+          symbolPlacement: ALIGN_CENTER
+        `)
         );
         centroidsLayer.addTo(map);
         console.log('centroid layer created');
+      }
 
+      function updateCentroidsFromViewportFeatures() {
+        const viewportFeatures = viz.variables.v_features.value;
+        if (viewportFeatures.length === 0) return;
+
+        updateCentroidsWith(viewportFeatures);
       };
 
-      layer.on('updated', debounce(updateCentroidsLayer));
+      // Display all centroids, from viewporFeatures
+      mainLayer.on('updated', debounce(updateCentroidsFromViewportFeatures));
+
+      // or display centroid on click from Interactivity
+      const interactivity = new carto.Interactivity(mainLayer);
+      interactivity.on('featureClick', event => {
+        const interactivityFeatures = event.features;
+        if (interactivityFeatures.length === 0) return;
+
+        updateCentroidsWith(event.features);
+      });
     });
 
 
