@@ -35,75 +35,105 @@
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
 
-    // const URL = '/test/common/sources/point-collection.geojson'; // points
-    // const URL = '/test/common/sources/line-string.geojson'; // lines
-    const URL = '/test/common/sources/polygon-collection-with-multipolygon.geojson'; // polygons
-    // const URL = 'https://cartovl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, name as cat FROM world_borders'; // complex polygons
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
 
-    let centroidsLayer;
-    map.on('load', () => {
-      fetch(URL)
+    const debounce = (func, delay = 250) => {
+      let timeoutId;
+      return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+      };
+    };
+
+    // GeoJSON
+    const buildSourceFromGeoJSON = () => {
+      // const URL = '/test/common/sources/point-collection.geojson'; // points
+      // const URL = '/test/common/sources/line-string.geojson'; // lines
+      const URL = '/test/common/sources/polygon-collection-with-multipolygon.geojson'; // polygons
+      // const URL = 'https://cartovl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, name as cat FROM world_borders'; // complex polygons
+
+      return fetch(URL)
         .then(response => response.json())
         .then(function (geojson) {
-          const FIELD = 'cat'; // the field to style with
           const source = new carto.source.GeoJSON(geojson);
-          const viz = new carto.Viz(`
-            @field: $${FIELD}
-            @v_features: viewportFeatures(@field)
-            color: opacity(ramp(@field, prism), 0.6)
-            width: 15
-          `);
+          return source;
+        });
+    };
 
-          const layer = new carto.Layer('original', source, viz);
-          layer.addTo(map, 'watername_ocean');
+    // Windshaft examples
+    const buildSourceFromWindshaft = () => {
+      // const sqlQuery = `SELECT * FROM sf_neighborhoods WHERE name='Chinatown'`;
+      const source = new carto.source.Dataset('sf_neighborhoods');
+      return Promise.resolve(source);
+    }
 
-          function updateCentroidsLayer() {
-            const originalFeatures = viz.variables.v_features.value;
+    const currentBuildSource = buildSourceFromWindshaft; // buildSourceFromGeoJSON; // vs buildSourceFromWindshaft
+    const FIELD = 'name'; // 'cat' for geojson | 'name' for windshaft data sources
 
-            function sourceFrom(features) {
-              const centroidFeatures = features.map(f => {
-                return {
-                  "type": "Feature",
-                  "geometry": {
-                    "type": "Point",
-                    "coordinates": f.getCentroid()
-                  },
-                  "properties": {
-                    "field": f.properties[FIELD]
-                  }
-                }
-              });
-              const sourceCentroids = new carto.source.GeoJSON({
-                type: 'FeatureCollection',
-                features: centroidFeatures
-              });
-              return sourceCentroids;
+    let centroidsLayer;
+    map.on('load', async () => {
+      const source = await currentBuildSource();
+      const viz = new carto.Viz(`
+        @field: $${FIELD}
+        @v_features: viewportFeatures(@field)
+        color: opacity(ramp(@field, prism), 0.6)
+        width: 15
+      `);
+
+      const layer = new carto.Layer('original', source, viz);
+      layer.addTo(map, 'watername_ocean');
+
+      function sourceFrom(features) {
+        const centroidFeatures = features.map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getCentroid()
+            },
+            "properties": {
+              "field": f.properties[FIELD]
             }
+          }
+        });
+        const sourceCentroids = new carto.source.GeoJSON({
+          type: 'FeatureCollection',
+          features: centroidFeatures
+        });
+        return sourceCentroids;
+      }
 
-            const updatedSource = sourceFrom(originalFeatures);
+      function updateCentroidsLayer() {
+        const originalFeatures = viz.variables.v_features.value;
+        if (originalFeatures.length === 0) return;
 
-            // updated with every change
-            if (centroidsLayer) {
-              centroidsLayer.update(updatedSource);
-              console.log('updated centroids');
-              return;
-            }
+        const updatedSource = sourceFrom(originalFeatures);
 
-            // created just once
-            centroidsLayer = new carto.Layer('centroids', updatedSource,
-              new carto.Viz(`
+        // updated with every change
+        if (centroidsLayer) {
+          centroidsLayer.update(updatedSource);
+          console.log('updated centroids');
+          return;
+        }
+
+        // created just once
+        centroidsLayer = new carto.Layer('centroids', updatedSource,
+          new carto.Viz(`
                   symbol: cross
                   color: red
                   width: 20
                   symbolPlacement: ALIGN_CENTER
                 `)
-            );
-            centroidsLayer.addTo(map);
-            console.log('centroid layer created');
-          };
+        );
+        centroidsLayer.addTo(map);
+        console.log('centroid layer created');
 
-          layer.on('updated', updateCentroidsLayer);
-        });
+      };
+
+      layer.on('updated', debounce(updateCentroidsLayer));
     });
 
 
