@@ -28,7 +28,6 @@ import { genLightweightFeatureClass } from '../../../interactivity/lightweightFe
  * });
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
@@ -42,7 +41,6 @@ import { genLightweightFeatureClass } from '../../../interactivity/lightweightFe
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
