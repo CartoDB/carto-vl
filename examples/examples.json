@@ -176,12 +176,12 @@
             "title": "Labeling",
             "samples": [
                 {
-                    "title": "Label points",
+                    "title": "Point labels",
                     "file": "labeling/point-labels.html"
                 },
                 {
-                    "title": "Label polygons",
-                    "file": "labeling/polygon-labels.html"
+                    "title": "Point labels conditional style",
+                    "file": "labeling/point-labels-conditional-style.html"
                 }
             ]
         },
