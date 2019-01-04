@@ -182,6 +182,10 @@
                 {
                     "title": "Point labels conditional style",
                     "file": "labeling/point-labels-conditional-style.html"
+                },
+                {
+                    "title": "Point labels size by zoom",
+                    "file": "labeling/point-labels-size-zoom.html"
                 }
             ]
         },
