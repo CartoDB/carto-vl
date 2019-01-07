@@ -65,7 +65,8 @@
 
     // Windshaft examples
     const buildSourceFromWindshaft = () => {
-      // const sqlQuery = `SELECT * FROM sf_neighborhoods WHERE name='Chinatown'`;
+      // const sqlQuery = `SELECT * FROM sf_neighborhoods WHERE name='Outer Richmond'`;
+      // const source = new carto.source.SQL(sqlQuery);
       const source = new carto.source.Dataset('sf_neighborhoods');
       return Promise.resolve(source);
     }
@@ -117,9 +118,11 @@
         const updatedSource = sourceFrom(features);
 
         if (centroidsLayer) {
-          centroidsLayer.update(updatedSource);
-          console.log('updated centroids');
-          return; // updates
+          setTimeout(() => {
+            centroidsLayer.update(updatedSource);
+            console.log('updated centroids'); // updates
+          }, 0);
+          return;
         }
 
         // created just once
@@ -151,6 +154,9 @@
         const interactivityFeatures = event.features;
         if (interactivityFeatures.length === 0) return;
 
+        interactivityFeatures.forEach((f) => {
+          console.log(`>> ${f._rawFeature[FIELD]}`);
+        });
         updateCentroidsWith(event.features);
       });
     });
