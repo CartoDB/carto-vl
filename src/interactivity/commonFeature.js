@@ -6,13 +6,15 @@ import { average } from '../renderer/viz/expressions/stats';
  * @param {Array} featurePieces
  */
 export function getCompoundFeature (featurePieces) {
-    if (featurePieces.length === 1) return featurePieces[0];
-
-    const centroids = featurePieces.map(piece => piece.getCentroid());
     const exemplar = featurePieces[0];
+    if (featurePieces.length === 1) return exemplar;
 
     // Unify geometry-related properties, into an 'exemplar'.
-    delete exemplar.getCentroid;
+    const allCentroids = featurePieces.map(piece => piece.getCentroid());
+    const centroids = allCentroids.filter(c => {
+        return !(isNaN(c[0]) || isNaN(c[1]));
+    });
+
     Object.defineProperty(exemplar, 'getCentroid', {
         get: function () {
             const getCentroid = () => {

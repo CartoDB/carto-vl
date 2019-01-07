@@ -145,6 +145,7 @@ function _defineGetCentroidMethod (targetObject) {
                 return this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
             };
             return getCentroid;
-        }
+        },
+        configurable: true
     });
 }
