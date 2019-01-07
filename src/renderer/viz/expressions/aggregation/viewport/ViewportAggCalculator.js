@@ -108,14 +108,11 @@ function _runInDataframe (viz, viewportExpressions, dataframe, processedFeatures
  * Rerun viewportFeatures to improve its results, including all feature pieces in dataframes
  */
 function _runForPartialViewportFeatures (viewportFeaturesExpressions, renderLayer, featuresIDs) {
-    const dataframes = renderLayer.getActiveDataframes();
-    const idProperty = renderLayer.viz.metadata.idProperty;
-
     // Reset previous expressions with (possibly 1 partial) features
     viewportFeaturesExpressions.forEach(expr => expr._resetViewportAgg(null, renderLayer));
 
-    // Gather pieces per feature
-    const piecesPerFeature = _getAllPiecesPerFeature(dataframes, featuresIDs, idProperty);
+    // Gather all pieces per feature
+    const piecesPerFeature = renderLayer.getAllPiecesPerFeature(featuresIDs);
 
     // Run viewportFeatures with the whole set of feature pieces
     viewportFeaturesExpressions.forEach(expr => {
@@ -123,30 +120,4 @@ function _runForPartialViewportFeatures (viewportFeaturesExpressions, renderLaye
             expr.accumViewportAgg(piecesPerFeature[featureId]);
         }
     });
-}
-
-/**
- * Gather all feature pieces in the dataframes
- */
-function _getAllPiecesPerFeature (dataframes, featuresIDs, idProperty) {
-    const piecesPerFeature = {};
-    featuresIDs.forEach((featureId) => { piecesPerFeature[featureId] = []; });
-
-    dataframes.forEach(dataframe => {
-        _addPartialFeaturesIfExistIn(dataframe, featuresIDs, idProperty, piecesPerFeature);
-    });
-    return piecesPerFeature;
-}
-
-/**
- * Add all the feature pieces, with selected featureIds, if present in the dataframe.
- */
-function _addPartialFeaturesIfExistIn (dataframe, featureIds, idProperty, result) {
-    for (let i = 0; i < dataframe.numFeatures; i++) {
-        const currentId = dataframe.properties[idProperty][i];
-        if (featureIds.has(currentId)) {
-            const pieces = result[currentId];
-            pieces.push(dataframe.getFeature(i));
-        }
-    }
 }

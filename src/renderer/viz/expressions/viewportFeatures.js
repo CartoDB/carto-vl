@@ -6,7 +6,7 @@ import { implicitCast } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
 import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
-import { average } from './stats';
+import { getCompoundFeature } from '../../../interactivity/commonFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -101,30 +101,10 @@ export default class ViewportFeatures extends BaseExpression {
         if (featurePieces.length === 1) {
             this.expr.push(new this._FeatureProxy(featurePieces[0]));
         } else {
-            const compoundFeature = this._getCompoundFeatureFrom(featurePieces);
+            const pieces = featurePieces.map((piece) => { return new this._FeatureProxy(piece); });
+            const compoundFeature = getCompoundFeature(pieces);
             this.expr.push(compoundFeature);
         }
-    }
-
-    _getCompoundFeatureFrom (featurePieces) {
-        const pieces = featurePieces.map((piece) => { return new this._FeatureProxy(piece); });
-        const centroids = pieces.map(piece => piece.getCentroid());
-        const exemplar = pieces[0];
-
-        // Unify geometry-related properties...
-        delete exemplar.getCentroid;
-        Object.defineProperty(exemplar, 'getCentroid', {
-            get: function () {
-                const getCentroid = () => {
-                    const avgX = average(centroids.map(c => c[0]));
-                    const avgY = average(centroids.map(c => c[1]));
-                    return [avgX, avgY]; // vs this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
-                };
-                return getCentroid;
-            }
-        });
-
-        return exemplar;
     }
 }
 
