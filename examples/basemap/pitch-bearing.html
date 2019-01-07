@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Set pitch and bearing | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../../style.css">
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -53,7 +55,7 @@
     });
 
     const source = new carto.source.Dataset('spend_data');
-  
+
     const viz = new carto.Viz(`
       width: 3
       color: ramp(top($category,5),vivid)
@@ -62,7 +64,7 @@
 
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map,'watername_ocean');
+    layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
     function hideLoader() {
@@ -70,4 +72,5 @@
     }
   </script>
 </body>
+
 </html>

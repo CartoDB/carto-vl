@@ -47,8 +47,8 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     <meta charset="UTF-8">
     <script src="../../../dist/carto-vl.js"></script>
 
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
