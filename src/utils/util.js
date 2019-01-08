@@ -1,4 +1,6 @@
 import TimeRange from './time/TimeRange';
+import { mat4 } from 'gl-matrix';
+import { unproject } from './geometry';
 
 /**
  * Export util functions
@@ -93,6 +95,42 @@ export function computeMatrixCenter (matrix) {
     };
 }
 
+export function computeViewportFromCameraMatrix (matrix) {
+    const inv = mat4.invert([], matrix);
+
+    const corners = [
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1]
+    ].map(NDC =>
+        unproject(inv, ...NDC)
+    ).map(c =>
+        // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
+        c.map(x => x * 2 - 1)
+    );
+
+    // Rotation no longer guarantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
+    // we need to compute the AABB min/max by iterating
+    const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+    const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    corners.forEach(corner => {
+        min[0] = Math.min(min[0], corner[0]);
+        min[1] = Math.min(min[1], corner[1]);
+        max[0] = Math.max(max[0], corner[0]);
+        max[1] = Math.max(max[1], corner[1]);
+    });
+
+    // Our API flips the `y` coordinate, we need to convert the values accordingly
+    min[1] = -min[1];
+    max[1] = -max[1];
+    const temp = min[1];
+    min[1] = max[1];
+    max[1] = temp;
+
+    return [...min, ...max];
+}
+
 export default {
     WM_R,
     WM_2R,
@@ -105,7 +143,8 @@ export default {
     equalArrays,
     projectToWebMercator,
     computeMatrixZoom,
-    computeMatrixCenter
+    computeMatrixCenter,
+    computeViewportFromCameraMatrix
 };
 
 export function castTimeRange (v, tz = null) {

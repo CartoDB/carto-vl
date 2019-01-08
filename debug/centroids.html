@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
   <style>
     body {
       margin: 0;
@@ -40,6 +40,7 @@
     const URL = '/test/common/sources/polygon-collection-with-multipolygon.geojson'; // polygons
     // const URL = 'https://cartovl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, name as cat FROM world_borders'; // complex polygons
 
+    let centroidsLayer;
     map.on('load', () => {
       fetch(URL)
         .then(response => response.json())
@@ -49,25 +50,17 @@
           const viz = new carto.Viz(`
             @field: $${FIELD}
             @v_features: viewportFeatures(@field)
-            color: ramp(@field, prism)
+            color: opacity(ramp(@field, prism), 0.6)
             width: 15
           `);
+
           const layer = new carto.Layer('original', source, viz);
           layer.addTo(map, 'watername_ocean');
 
-          let created = false;
-
-          layer.on('updated', () => {
+          function updateCentroidsLayer() {
             const originalFeatures = viz.variables.v_features.value;
-            if (originalFeatures.length > 0) {
-              addLayerWithCentroidsFrom(originalFeatures);
-            }
 
-            function addLayerWithCentroidsFrom(features) {
-              if (created) {
-                return; // centroids created just once from first viewportFeatures (initial zoom: 0)
-              }
-
+            function sourceFrom(features) {
               const centroidFeatures = features.map(f => {
                 return {
                   "type": "Feature",
@@ -80,23 +73,36 @@
                   }
                 }
               });
-
               const sourceCentroids = new carto.source.GeoJSON({
                 type: 'FeatureCollection',
                 features: centroidFeatures
               });
-              const centroidsLayer = new carto.Layer('centroids_' + Date.now(), sourceCentroids,
-                new carto.Viz(`
+              return sourceCentroids;
+            }
+
+            const updatedSource = sourceFrom(originalFeatures);
+
+            // updated with every change
+            if (centroidsLayer) {
+              centroidsLayer.update(updatedSource);
+              console.log('updated centroids');
+              return;
+            }
+
+            // created just once
+            centroidsLayer = new carto.Layer('centroids', updatedSource,
+              new carto.Viz(`
                   symbol: cross
                   color: red
                   width: 20
                   symbolPlacement: ALIGN_CENTER
                 `)
-              );
-              centroidsLayer.addTo(map);
-              created = true;
-            }
-          });
+            );
+            centroidsLayer.addTo(map);
+            console.log('centroid layer created');
+          };
+
+          layer.on('updated', updateCentroidsLayer);
         });
     });
 

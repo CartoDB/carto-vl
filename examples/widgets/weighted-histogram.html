@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Weighted histograms | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
+  <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.3/airship.css">
+  <link rel="stylesheet" href="https://libs.cartocdn.com/airship-icons/v1.0.3/icons.css">
+  <script src="https://libs.cartocdn.com/airship-components/v1.0.3/airship.js"></script>
+
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Weighted Histogram as a Table</h1>
+        <p>Airbnb, Madrid 2018</p>
+      </header>
+      <br />
+      <table class="as-table as-table--stripped">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Count</th>
+            <th>Sum ($/day)</th>
+            <th>Avg ($/day)</th>
+          </tr>
+        </thead>
+        <tbody id="js-table-body">
+          <!-- Example
+          <tr>
+            <td>Entire home/apt</td>
+            <td>10175</td>
+            <td>960312 $</td>
+            <td>94.37 $</td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+
+    </div>
+  </aside>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-3.70819, 40.42119],
+      zoom: 12,
+      dragRotate: false
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('airbnb_madrid_listings_2018');
+
+    const viz = new carto.Viz(`
+            @histogram: viewportHistogram($room_type, 3)
+            @histogramSum: viewportHistogram($room_type, 3, $price_dollars)
+            color: red
+            width: 4
+            strokeWidth: 0.5
+        `);
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.on('updated', () => {
+      const histogram = viz.variables.histogram.value;
+      const histogramSum = viz.variables.histogramSum.value;
+
+      let categories = histogram.reduce((categories, item) => {
+        categories[item.x] = {
+          name: item.x,
+          count: item.y
+        };
+        return categories;
+      }, {});
+
+      categories = histogramSum.reduce((categories, item) => {
+        categories[item.x].sum = item.y;
+        categories[item.x].avg = item.y / categories[item.x].count;
+        return categories;
+      }, categories);
+
+      updateTable(categories);
+    });
+
+    layer.addTo(map, 'watername_ocean');
+
+    function updateTable(categories) {
+      // console.table(categories);
+      const tableBody = document.getElementById('js-table-body');
+      while (tableBody.hasChildNodes()) {
+        tableBody.removeChild(tableBody.lastChild);
+      }
+
+      for (var key in categories) {
+        var category = categories[key];
+
+        let newRow = tableBody.insertRow(tableBody.length);
+
+        let type = newRow.insertCell(0);
+        type.innerText = category.name;
+        let count = newRow.insertCell(1);
+        count.innerText = category.count;
+        let sum = newRow.insertCell(2);
+        sum.innerText = category.sum;
+        let avg = newRow.insertCell(3);
+        avg.innerText = category.avg.toFixed(2);
+      }
+    }
+
+  </script>
+</body>
+
+</html>

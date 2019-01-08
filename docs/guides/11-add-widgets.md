@@ -62,8 +62,9 @@ To overcome this, we are going to use [Airship](https://carto.com/airship/), a d
 The first thing you'll need is to include Airship with:
 ```html
 <!-- Airship -->
-<link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.0-beta.0/airship.css">
-<script src="https://libs.cartocdn.com/airship-components/v1.0.0-beta.0/airship.js"></script>
+<link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.3/airship.css">
+<link rel="stylesheet" href="https://libs.cartocdn.com/airship-icons/v1.0.3/icons.css">
+<script src="https://libs.cartocdn.com/airship-components/v1.0.3/airship.js"></script>
 ```
 
 ### Numeric histograms: what is the distribution of the price?

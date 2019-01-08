@@ -115,6 +115,110 @@
             ]
         },
         {
+            "title": "Legends",
+            "samples": [
+                {
+                    "title": "Point legend",
+                    "file": "legends/category-point-legend.html"
+                },
+                {
+                    "title": "Line legend",
+                    "file": "legends/category-line-legend.html"
+                },
+                {
+                    "title": "Image legend",
+                    "file": "legends/image-legend.html"
+                },
+                {
+                    "title": "Choropleth legend",
+                    "file": "legends/choropleth-legend.html"
+                },
+                {
+                    "title": "Unclassed legend",
+                    "file": "legends/unclassed-point-legend.html"
+                },
+                {
+                    "title": "Feature and legend opacity",
+                    "file": "legends/feature-and-legend-opacity.html"
+                }
+            ]
+        },
+        {
+            "title": "Widgets",
+            "samples": [
+                {
+                    "title": "Category chart",
+                    "file": "widgets/category-chart.html"
+                },
+                {
+                    "title": "Numeric chart",
+                    "file": "widgets/numeric-chart.html"
+                },
+                {
+                    "title": "Viewport summary",
+                    "file": "widgets/viewport-summary.html"
+                },
+                {
+                    "title": "Viewport category widget",
+                    "file": "widgets/category-widget-viewport.html"
+                },
+                {
+                    "title": "Viewport histogram widget",
+                    "file": "widgets/histogram-widget-viewport.html"
+                },
+                {
+                    "title": "Viewport weighted-histogram table",
+                    "file": "widgets/weighted-histogram.html"
+                }
+            ]
+        },
+        {
+            "title": "Labeling",
+            "samples": [
+                {
+                    "title": "Point labels",
+                    "file": "labeling/point-labels.html"
+                },
+                {
+                    "title": "Point labels conditional style",
+                    "file": "labeling/point-labels-conditional-style.html"
+                },
+                {
+                    "title": "Point labels size by zoom",
+                    "file": "labeling/point-labels-size-zoom.html"
+                },
+                {
+                    "title": "Polygon labels",
+                    "file": "labeling/polygon-labels.html"
+                }
+            ]
+        },
+        {
+            "title": "Basemap",
+            "samples": [
+                {
+                    "title": "Basemap labels on top",
+                    "file": "basemap/basemap-labels-on-top.html"
+                },
+                {
+                    "title": "Basemap labels under",
+                    "file": "basemap/basemap-labels-under.html"
+                },
+                {
+                    "title": "Color map background",
+                    "file": "basemap/color-map-background.html"
+                },
+                {
+                    "title": "Project layer",
+                    "file": "basemap/project-layer.html"
+                },
+                {
+                    "title": "Set pitch and bearing",
+                    "file": "basemap/pitch-bearing.html"
+                }
+            ]
+        },
+        {
             "title": "Advanced",
             "samples": [
                 {

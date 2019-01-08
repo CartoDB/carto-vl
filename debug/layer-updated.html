@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js'></script>
-  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css' rel='stylesheet' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
   <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
 
@@ -79,10 +79,10 @@
       console.log('animation: loaded');
       animationViz.variables.animation.pause(); // start with a paused animation
     });
-    animationLayer.on('updated', () => {
+    animationLayer.on('updated', (eventData) => {
       const animation = animationViz.variables.animation;
-
-      console.log('* animation: updated - progress', animation.getProgressPct());
+      console.log(`* animation: updated (${eventData})`);
+      console.log('* animation: progress', animation.getProgressPct());
       document.getElementById('js-animationDate').innerText = animation.getProgressValue().toISOString();
     });
     animationLayer.addTo(map, 'watername_ocean');
@@ -101,15 +101,23 @@
       console.log('simple layer: loaded');
     });
     let firstTimeUpdate = true;
-    simpleLayer.on('updated', () => {
-      console.log('* simple layer: updated');
+    simpleLayer.on('updated', (eventData) => {
+      console.log(`* simple layer: updated (${eventData})`);
+
       const features = simpleViz.variables.features.value;
       if (firstTimeUpdate) {
         firstTimeUpdate = false;
         console.log('1 feature blendTo & reset change');
-        features[0].blendTo({ color: 'red' });
-        features[0].strokeColor.blendTo('orange');
-        features[0].reset();
+
+        // several blendTo
+        features[0].blendTo({
+          color: 'red',
+          strokeColor: 'orange',
+          strokeWidth: 80
+        });
+        setTimeout(() => {
+          features[0].reset();
+        }, 2000);
       }
     });
     simpleLayer.addTo(map, 'animation');
