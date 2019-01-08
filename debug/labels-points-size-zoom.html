@@ -39,12 +39,12 @@
     // Points layer
     const source = new carto.source.Dataset('world_population_2015');
     const viz = new carto.Viz(`
-        color: navy
+        color: opacity(navy, 0.75)
         width: sqrt($pop_2015)/100
         strokeColor: fuchsia
         strokeWidth: 2
         filter: $pop_2015 > 10000000
-        @v_features: viewportFeatures($country_code, $pop_max)
+        @v_features: viewportFeatures($country_code, $pop_2015)
       `);
     const layer = new carto.Layer('points', source, viz);
 
@@ -54,13 +54,13 @@
       const labelSource = map.getSource('labels');
 
       const layerUpdated = function () {
-        const features = viz.variables.v_features.value;
+        let features = viz.variables.v_features.value;
         const currentZoom = map.getZoom();
 
         features = features.filter(f => {
-          const pop = f.properties['pop_max'];
-          if (currentZoom > 10) {
-            return pop > 30000000;
+          const pop = f.properties['pop_2015'];
+          if (currentZoom < 4) {
+            return pop > 50000000;
           }
           return true;
         });
@@ -74,7 +74,7 @@
             },
             "properties": {
               "label_field": `${f.properties['country_code']}`,
-              "population": `${f.properties['pop_max']}`
+              "population": `${f.properties['pop_2015']}`
             }
           }
         });
@@ -97,6 +97,7 @@
           "text-size": {
             "stops": [
               [0, 0],
+              [4, 20],
               [9, 30],
               [14, 50]
             ]
