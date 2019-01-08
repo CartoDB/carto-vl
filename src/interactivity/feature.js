@@ -79,7 +79,9 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/car
  * @property {FeatureVizProperty} filter
  * @property {FeatureVizProperty} transform
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
+ * @property {function} blendTo - Blend custom feature vizs by fading in `duration` milliseconds
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @property {function} getCentroid - Get centroid from the displayed geometry as [longitude, latitude]. When using lines and polygons in a MVT source, it can be different from canonical feature's centroid (it can be the centroid from just some client-side pieces). Useful for labeling.
  * @api
  */
 
