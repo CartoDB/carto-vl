@@ -19,8 +19,7 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.406855, 37.744263],
-      zoom: 11,
-      scrollZoom: false,
+      zoom: 11
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -42,7 +41,7 @@
       @v_features: viewportFeatures($name)
     `);
     const layer = new carto.Layer('polygons', source, viz);
-    
+
     // Create labeling layer centroids
     layer.on('loaded', () => {
       map.addSource('labels', { type: 'geojson', data: null });
@@ -94,7 +93,8 @@
     });
 
     layer.addTo(map);
-  
+
   </script>
 </body>
+
 </html>

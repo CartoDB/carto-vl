@@ -19,8 +19,7 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [-105.005366, 39.749277],
-      zoom: 14,
-      scrollZoom: false,
+      zoom: 14
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -36,12 +35,12 @@
     // Point layer
     const source = new carto.source.Dataset('points_of_interest');
     const viz = new carto.Viz(`
-        color: ramp(buckets($poi_name, ['Union Station','Invesco Field at Mile High Stadium','Pepsi Center','Coors Field']), [ #0B9F95,#D36DFB,#ff9674,#F75869],white)
-        width: 6
-        strokeWidth: 0
-        filter: $major == "YES"
-        @v_features: viewportFeatures($poi_name)
-      `);
+      color: ramp(buckets($poi_name, ['Union Station', 'Invesco Field at Mile High Stadium', 'Pepsi Center', 'Coors Field']), [#0B9F95, #D36DFB, #ff9674, #F75869],white)
+      width: 6
+      strokeWidth: 0
+      filter: $major == "YES"
+      @v_features: viewportFeatures($poi_name)
+    `);
     const layer = new carto.Layer('points', source, viz);
 
     // Create labeling layer centroids
