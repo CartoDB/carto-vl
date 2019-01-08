@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & useLines | CARTO</title>
+  <title>Point labels conditional style | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -17,9 +17,9 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.voyager,
-      center: [-122.406855, 37.744263],
-      zoom: 11
+      style: carto.basemaps.darkmatter,
+      center: [-105.005366, 39.749277],
+      zoom: 14
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -32,15 +32,16 @@
       apiKey: 'default_public'
     });
 
-    // Polygon layer
-    const source = new carto.source.Dataset('sf_neighborhoods');
+    // Point layer
+    const source = new carto.source.Dataset('points_of_interest');
     const viz = new carto.Viz(`
-      color: ramp($name,vivid)
-      strokeWidth: 1
-      strokeColor: black
-      @v_features: viewportFeatures($name)
+      color: ramp(buckets($poi_name, ['Union Station', 'Invesco Field at Mile High Stadium', 'Pepsi Center', 'Coors Field']), [#0B9F95, #D36DFB, #ff9674, #F75869],white)
+      width: 6
+      strokeWidth: 0
+      filter: $major == "YES"
+      @v_features: viewportFeatures($poi_name)
     `);
-    const layer = new carto.Layer('polygons', source, viz);
+    const layer = new carto.Layer('points', source, viz);
 
     // Create labeling layer centroids
     layer.on('loaded', () => {
@@ -57,7 +58,7 @@
               "coordinates": f.getCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['name']}`,
+              "label_field": `${f.properties['poi_name']}`,
             }
           }
         });
@@ -70,25 +71,36 @@
 
       layer.on('updated', layerUpdated);
 
-      // Style labels
+      // Style labels add stops to paint properties for conditional label styles
       map.addLayer({
         "id": "my-labels",
         "type": "symbol",
         "source": "labels",
         "layout": {
           "text-field": "{label_field}",
-          "text-size": 10,
           "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-          "text-letter-spacing": 0.1,
-          "text-max-width": 7,
-          "text-transform": "uppercase"
+          "text-size": 10,
+          "text-offset": [0, 0.65],
+          "text-anchor": "top",
+          "text-max-width": 8,
+          "text-justify": "center",
+          "text-letter-spacing": 0.1
         },
         "paint": {
-          "text-color": "#333",
-          "text-halo-color": "#fff",
-          "text-halo-width": 1,
-          "text-halo-blur": 0.5
-        },
+          "text-color": {
+            "property": "label_field",
+            "type": "categorical",
+            "stops": [
+              ["Union Station", "#0B9F95"],
+              ["Invesco Field at Mile High Stadium", "#D36DFB"],
+              ["Pepsi Center", "#ff9674"],
+              ["Coors Field", "#F75869"]
+            ]
+          },
+          "text-halo-color": "#888",
+          "text-halo-width": 1.2,
+          "text-halo-blur": 1
+        }
       });
     });
 

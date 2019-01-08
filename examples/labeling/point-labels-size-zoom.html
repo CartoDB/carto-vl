@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & useLines | CARTO</title>
+  <title>Point labels text size by zoom | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -17,9 +17,9 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.voyager,
-      center: [-122.406855, 37.744263],
-      zoom: 11
+      style: carto.basemaps.darkmatter,
+      center: [-104.994105, 39.745939],
+      zoom: 13
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -32,15 +32,17 @@
       apiKey: 'default_public'
     });
 
-    // Polygon layer
-    const source = new carto.source.Dataset('sf_neighborhoods');
+    // Point layer
+    const source = new carto.source.Dataset('points_of_interest');
     const viz = new carto.Viz(`
-      color: ramp($name,vivid)
-      strokeWidth: 1
-      strokeColor: black
-      @v_features: viewportFeatures($name)
+      color: fuchsia
+      width: 6
+      strokeColor: white
+      strokeWidth: 2
+      filter: $major == "YES"
+      @v_features: viewportFeatures($poi_name)
     `);
-    const layer = new carto.Layer('polygons', source, viz);
+    const layer = new carto.Layer('points', source, viz);
 
     // Create labeling layer centroids
     layer.on('loaded', () => {
@@ -57,7 +59,7 @@
               "coordinates": f.getCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['name']}`,
+              "label_field": `${f.properties['poi_name']}`,
             }
           }
         });
@@ -70,25 +72,33 @@
 
       layer.on('updated', layerUpdated);
 
-      // Style labels
+      // Style labels add stops for text size through zoom
       map.addLayer({
         "id": "my-labels",
         "type": "symbol",
         "source": "labels",
         "layout": {
+          "text-size": {
+            "stops": [
+              [13, 8],
+              [14, 12],
+              [16, 16],
+              [18, 24]
+            ]
+          },
           "text-field": "{label_field}",
-          "text-size": 10,
           "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-          "text-letter-spacing": 0.1,
-          "text-max-width": 7,
-          "text-transform": "uppercase"
+          "text-offset": [0, 0.65],
+          "text-anchor": "top",
+          "text-max-width": 8,
+          "text-justify": "center"
         },
         "paint": {
-          "text-color": "#333",
-          "text-halo-color": "#fff",
-          "text-halo-width": 1,
+          "text-color": "white",
+          "text-halo-color": "fuchsia",
+          "text-halo-width": 0.5,
           "text-halo-blur": 0.5
-        },
+        }
       });
     });
 
