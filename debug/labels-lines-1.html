@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & points | CARTO</title>
+  <title>Labels & lines | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
 
@@ -21,8 +21,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [7, 25],
-      zoom: 2,
+      center: [-111.920119, 33.402974],
+      zoom: 11,
       renderWorldCopies: false
     });
 
@@ -36,18 +36,14 @@
       apiKey: 'default_public'
     });
 
-    // Points layer
-    const source = new carto.source.Dataset('world_population_2015');
+    // Lines layer
+    const source = new carto.source.Dataset('traffic_counts');
     const viz = new carto.Viz(`
-        color: navy
-        width: sqrt($pop_2015)/100
-        strokeColor: fuchsia
-        strokeWidth: 2
-        filter: $pop_2015 > 10000000
-        @v_features: viewportFeatures($country_code, $pop_max)
-      `);
-    const layer = new carto.Layer('points', source, viz);
-
+      color: navy
+      width: 2
+      @v_features: viewportFeatures($class)
+    `);
+    const layer = new carto.Layer('lines', source, viz);
 
     layer.on('loaded', () => {
       map.addSource('labels', { type: 'geojson', data: null });
@@ -55,16 +51,6 @@
 
       const layerUpdated = function () {
         const features = viz.variables.v_features.value;
-        const currentZoom = map.getZoom();
-
-        features = features.filter(f => {
-          const pop = f.properties['pop_max'];
-          if (currentZoom > 10) {
-            return pop > 30000000;
-          }
-          return true;
-        });
-
         const geojsonFeatures = features.map(f => {
           return {
             "type": "Feature",
@@ -73,8 +59,7 @@
               "coordinates": f.getCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['country_code']}`,
-              "population": `${f.properties['pop_max']}`
+              "label_field": `${f.properties['class']}`,
             }
           }
         });
@@ -93,25 +78,17 @@
         "id": "my-labels",
         "type": "symbol",
         "source": "labels",
+        "symbol-placement": "line",
         "layout": {
-          "text-size": {
-            "stops": [
-              [0, 0],
-              [9, 30],
-              [14, 50]
-            ]
-          },
-          //"icon-image": "marker-15",
           "text-field": "{label_field}",
-          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
-          "text-offset": [0, 1],
-          "text-anchor": "top"
+          "text-font": ["Open Sans Semibold Italic", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0],
         },
         "paint": {
-          "text-color": "#fff",
-          'text-halo-color': '#2d99b7',
-          'text-halo-width': 2
-        }
+          "text-color": "#30A",
+          "text-halo-color": "#fff",
+          "text-halo-width": 2
+        },
       });
     });
 
