@@ -165,6 +165,31 @@
                 {
                     "title": "Viewport histogram widget",
                     "file": "widgets/histogram-widget-viewport.html"
+                },
+                {
+                    "title": "Viewport weighted-histogram table",
+                    "file": "widgets/weighted-histogram.html"
+                }
+            ]
+        },
+        {
+            "title": "Labeling",
+            "samples": [
+                {
+                    "title": "Point labels",
+                    "file": "labeling/point-labels.html"
+                },
+                {
+                    "title": "Point labels conditional style",
+                    "file": "labeling/point-labels-conditional-style.html"
+                },
+                {
+                    "title": "Point labels size by zoom",
+                    "file": "labeling/point-labels-size-zoom.html"
+                },
+                {
+                    "title": "Polygon labels",
+                    "file": "labeling/polygon-labels.html"
                 }
             ]
         },
