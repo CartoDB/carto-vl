@@ -425,7 +425,7 @@ function getValidWebGLContextOrThrow (canvas, gl) {
 
 export function isBrowserSupported (canvas, gl) {
     const reasons = unsupportedBrowserReasons(canvas, gl);
-    return reasons.length > 0;
+    return reasons.length === 0;
 }
 
 export function unsupportedBrowserReasons (canvas, gl, early = false) {

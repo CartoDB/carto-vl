@@ -1,5 +1,5 @@
 import Renderer from '../../../src/renderer/Renderer';
-import { RTT_WIDTH } from '../../../src/renderer/Renderer';
+import { RTT_WIDTH, isBrowserSupported } from '../../../src/renderer/Renderer';
 
 describe('src/renderer/Renderer', () => {
     describe('WebGL errors', () => {
@@ -9,6 +9,10 @@ describe('src/renderer/Renderer', () => {
         const webGLWithInvalidParameter = {
             getExtension: () => ({}),
             getParameter: () => RTT_WIDTH - 1
+        };
+        const webGLValidContext = {
+            getExtension: () => ({}),
+            getParameter: () => RTT_WIDTH
         };
 
         const canvasWithNoWebGL = { getContext: () => null };
@@ -52,6 +56,12 @@ describe('src/renderer/Renderer', () => {
                     const renderer = new Renderer();
                     renderer.initialize(webGLWithInvalidParameter);
                 }).toThrowError(/WebGL parameter 'gl\.MAX_RENDERBUFFER_SIZE' is below the requirement.*/);
+            });
+        });
+
+        describe('isBrowserSupported', () => {
+            it('should return true for valid WebGL context', () => {
+                expect(isBrowserSupported(null, webGLValidContext)).toBe(true);
             });
         });
     });
