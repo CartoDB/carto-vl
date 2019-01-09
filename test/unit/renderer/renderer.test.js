@@ -4,10 +4,15 @@ import { RTT_WIDTH, isBrowserSupported } from '../../../src/renderer/Renderer';
 describe('src/renderer/Renderer', () => {
     describe('WebGL errors', () => {
         const webGLWithNoExtensions = {
-            getExtension: () => null
+            getExtension: () => null,
+            getParameter: () => RTT_WIDTH
         };
         const webGLWithInvalidParameter = {
             getExtension: () => ({}),
+            getParameter: () => RTT_WIDTH - 1
+        };
+        const webGLWithNoExtensionsAndInvalidParameter = {
+            getExtension: () => null,
             getParameter: () => RTT_WIDTH - 1
         };
         const webGLValidContext = {
@@ -62,6 +67,17 @@ describe('src/renderer/Renderer', () => {
         describe('isBrowserSupported', () => {
             it('should return true for valid WebGL context', () => {
                 expect(isBrowserSupported(null, webGLValidContext)).toBe(true);
+            });
+
+            const invalidWebGLContextScenarios = [
+                webGLWithNoExtensions,
+                webGLWithInvalidParameter,
+                webGLWithNoExtensionsAndInvalidParameter
+            ];
+            invalidWebGLContextScenarios.forEach((ctx, i) => {
+                it(`should return false for invalid WebGL context (${i})`, () => {
+                    expect(isBrowserSupported(null, ctx)).toBe(false);
+                });
             });
         });
     });
