@@ -79,6 +79,10 @@ describe('src/renderer/Renderer', () => {
                     expect(isBrowserSupported(null, ctx)).toBe(false);
                 });
             });
+
+            it('should return false when WebGL is not available', () => {
+                expect(isBrowserSupported(canvasWithNoWebGL)).toBe(false);
+            });
         });
     });
 });
