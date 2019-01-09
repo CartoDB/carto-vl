@@ -25,6 +25,10 @@
                 {
                     "title": "Select layer",
                     "file": "basics/select-layer.html"
+                },
+                {
+                    "title": "Check for browser support",
+                    "file": "basics/browser-support.html"
                 }
             ]
         },
