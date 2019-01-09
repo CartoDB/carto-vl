@@ -115,8 +115,7 @@ export default class RenderLayer {
      * Return is a nested Array; each entry includes an array with (potentially) several feature pieces
      */
     _getPartialFeaturesFromSingle (rawFeatures) {
-        const idProperty = this.viz.metadata.idProperty;
-        const featuresIds = new Set(rawFeatures.map(raw => raw[idProperty]));
+        const featuresIds = new Set(rawFeatures.map(raw => raw[this.idProperty]));
         return this.getAllPiecesPerFeature(featuresIds);
     }
 
@@ -128,9 +127,8 @@ export default class RenderLayer {
         featureIds.forEach((featureId) => { piecesPerFeature[featureId] = []; });
 
         const dataframes = this.getActiveDataframes();
-        const idProperty = this.viz.metadata.idProperty;
         dataframes.forEach(dataframe => {
-            this._addPartialFeaturesIfExistIn(dataframe, featureIds, idProperty, piecesPerFeature);
+            this._addPartialFeaturesIfExistIn(dataframe, featureIds, piecesPerFeature);
         });
 
         return piecesPerFeature;
@@ -139,9 +137,9 @@ export default class RenderLayer {
     /**
      * Add all the feature pieces, with selected featureIds, if present in the dataframe.
      */
-    _addPartialFeaturesIfExistIn (dataframe, featureIds, idProperty, result) {
+    _addPartialFeaturesIfExistIn (dataframe, featureIds, result) {
         for (let i = 0; i < dataframe.numFeatures; i++) {
-            const currentId = dataframe.properties[idProperty][i];
+            const currentId = dataframe.properties[this.idProperty][i];
             if (featureIds.has(currentId)) {
                 const pieces = result[currentId];
                 pieces.push(dataframe.getFeature(i));
