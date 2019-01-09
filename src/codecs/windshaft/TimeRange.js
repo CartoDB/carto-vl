@@ -15,12 +15,12 @@ export default class TimeRangeCodec extends BaseCodec {
         return true;
     }
 
-    sourceToInternal (propertyValue) {
+    sourceToInternal (metadata, propertyValue) {
         const tr = util.timeRange({ iso: propertyValue });
         return [tr.startValue / 1000, tr.endValue / 1000].map(v => (v - this._min));
     }
 
-    internalToExternal ([lo, hi]) {
+    internalToExternal (metadata, [lo, hi]) {
         return util.timeRange({
             start: (lo + this._min) * 1000,
             end: (hi + this._min) * 1000,
@@ -28,11 +28,11 @@ export default class TimeRangeCodec extends BaseCodec {
         });
     }
 
-    externalToSource (v) {
+    externalToSource (metadata, v) {
         return util.castTimeRange(v, this._timeZone).text;
     }
 
-    sourceToExternal (v) {
+    sourceToExternal (metadata, v) {
         return util.timeRange({ iso: v, timeZone: this._timeZone });
     }
 

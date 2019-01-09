@@ -24,28 +24,28 @@ export default class BaseCodec {
     // Convert source encoding to internal;
     // Result is an array [lo, hi] for ranges and a value for scalar codecs
     // Used to encode sources into dataframe properties.
-    sourceToInternal (v) {
+    sourceToInternal (metadata, v) {
         return v;
     }
 
     // Convert internal encoding to external;
     // Input may be one for scalar, or two values (hi, lo) for ranges.
     // Used to present dataframe features.
-    internalToExternal (v) {
+    internalToExternal (metadata, v) {
         return v;
     }
 
     // Convert external encoding back to source values.
     // Used to generate SQL filters: (apply to constant/global)
-    externalToSource (v) {
+    externalToSource (metadata, v) {
         return v;
     }
 
     // Convert source encoding to external encoding.
     // Used to present source stats values (global aggregations)
     // to match the format of constant expressions.
-    sourceToExternal (v) {
-        return this.internalToExternal(this.sourceToInternal(v));
+    sourceToExternal (metadata, v) {
+        return this.internalToExternal(metadata, this.sourceToInternal(metadata, v));
     }
 
     // Convert external to internal encoding.
@@ -53,8 +53,8 @@ export default class BaseCodec {
     // and [lo, hi] for range codecs.
     // used to to apply filters in GLSL inlined code;
     // evaluate binary operations property vs external (constant/global
-    externalToInternal (v) {
-        return this.sourceToInternal(this.externalToSource(v));
+    externalToInternal (metadata, v) {
+        return this.sourceToInternal(metadata, this.externalToSource(metadata, v));
     }
 
     // Generate GLSL inline expression to map a property value

@@ -8,23 +8,23 @@ export default class IdentityCodec extends BaseCodec {
         return true;
     }
 
-    sourceToInternal (v) {
+    sourceToInternal (metadata, v) {
         return v;
     }
 
-    internalToExternal (v) {
+    internalToExternal (metadata, v) {
         return v;
     }
 
-    sourceToExternal (v) {
+    sourceToExternal (metadata, v) {
         return v;
     }
 
-    externalToSource (v) {
+    externalToSource (metadata, v) {
         return v;
     }
 
-    externalToInternal (v) {
+    externalToInternal (metadata, v) {
         return v;
     }
 }
