@@ -201,6 +201,13 @@ export function checkFeatureIndependent (expressionName, parameterName, paramete
     }
 }
 
+export function checkFeatureDependent (expressionName, parameterName, parameterIndex, parameter) {
+    if (!parameter.isFeatureDependent()) {
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        parameter must be feature dependent`);
+    }
+}
+
 export function clamp (x, min, max) {
     return Math.min(Math.max(x, min), max);
 }
