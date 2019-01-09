@@ -1,5 +1,5 @@
 import Renderer from '../../../src/renderer/Renderer';
-import { RTT_WIDTH, isBrowserSupported } from '../../../src/renderer/Renderer';
+import { RTT_WIDTH, isBrowserSupported, unsupportedBrowserReasons } from '../../../src/renderer/Renderer';
 
 describe('src/renderer/Renderer', () => {
     describe('WebGL errors', () => {
@@ -82,6 +82,45 @@ describe('src/renderer/Renderer', () => {
 
             it('should return false when WebGL is not available', () => {
                 expect(isBrowserSupported(canvasWithNoWebGL)).toBe(false);
+            });
+        });
+
+        describe('unsupportedBrowserReasons', () => {
+            it('should return WebGL unavailable error', () => {
+                const reasons = unsupportedBrowserReasons(canvasWithNoWebGL);
+                expect(reasons.length).toBe(1);
+                expect(reasons[0].message).toMatch(/WebGL 1 is unsupported/);
+            });
+
+            const invalidWebGLContextScenarios = [
+                {
+                    ctx: webGLWithNoExtensions,
+                    errors: [
+                        /WebGL extension 'OES_texture_float' is unsupported/
+                    ]
+                },
+                {
+                    ctx: webGLWithInvalidParameter,
+                    errors: [
+                        /WebGL parameter 'gl\.MAX_RENDERBUFFER_SIZE' is below the requirement.*/
+                    ]
+                },
+                {
+                    ctx: webGLWithNoExtensionsAndInvalidParameter,
+                    errors: [
+                        /WebGL extension 'OES_texture_float' is unsupported/,
+                        /WebGL parameter 'gl\.MAX_RENDERBUFFER_SIZE' is below the requirement.*/
+                    ]
+                }
+            ];
+            invalidWebGLContextScenarios.forEach((scenario, i) => {
+                it(`should return false for invalid WebGL context (${i})`, () => {
+                    const reasons = unsupportedBrowserReasons(null, scenario.ctx);
+                    expect(reasons.length).toBe(scenario.errors.length);
+                    scenario.errors.forEach((errorRegex, i) => {
+                        expect(reasons[i]).toMatch(errorRegex);
+                    });
+                });
             });
         });
     });
