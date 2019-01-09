@@ -434,7 +434,7 @@ export function unsupportedBrowserReasons (canvas, gl, early = false) {
         if (!canvas) {
             canvas = document.createElement('canvas');
         }
-        gl = canvas.getContext('webgl');
+        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
     }
     if (!gl) {
         reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL 1 is unsupported`));
