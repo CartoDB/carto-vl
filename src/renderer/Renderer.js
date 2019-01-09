@@ -51,10 +51,7 @@ export const RTT_WIDTH = 1024;
 export default class Renderer {
     constructor (canvas) {
         if (canvas) {
-            this.gl = canvas.getContext('webgl');
-            if (!this.gl) {
-                throw new CartoRuntimeError(`${crt.WEB_GL} WebGL 1 is unsupported`);
-            }
+            this.gl = getValidWebGLContextOrThrow(canvas);
             this._initGL(this.gl);
         }
         this._center = { x: 0, y: 0 };
@@ -68,19 +65,12 @@ export default class Renderer {
      * @param {WebGLRenderingContext} gl - WebGL context
      */
     initialize (gl) {
+        gl = getValidWebGLContextOrThrow(null, gl);
         this._initGL(gl);
     }
 
     _initGL (gl) {
         this.gl = gl;
-        const OESTextureFloat = gl.getExtension('OES_texture_float');
-        if (!OESTextureFloat) {
-            throw new CartoRuntimeError(`${crt.WEB_GL} WebGL extension 'OES_texture_float' is unsupported`);
-        }
-        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-        if (supportedRTT < RTT_WIDTH) {
-            throw new CartoRuntimeError(`${crt.WEB_GL} WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-        }
         this._initShaders();
 
         this.auxFB = gl.createFramebuffer();
@@ -423,4 +413,46 @@ function getOrderingRenderBuckets (renderLayer) {
         orderingMins,
         orderingMaxs
     };
+}
+
+function getValidWebGLContextOrThrow (canvas, gl) {
+    const reasons = unsupportedBrowserReasons(canvas, gl, true);
+    if (reasons.length > 0) {
+        throw reasons[0];
+    }
+    return gl;
+}
+
+export function isBrowserSupported (canvas, gl) {
+    const reasons = unsupportedBrowserReasons(canvas, gl);
+    return reasons.length > 0;
+}
+
+export function unsupportedBrowserReasons (canvas, gl, early = false) {
+    const reasons = [];
+    if (!gl) {
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+        }
+        gl = canvas.getContext('webgl');
+    }
+    if (!gl) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL 1 is unsupported`));
+        return reasons;
+    }
+
+    const OESTextureFloat = gl.getExtension('OES_texture_float');
+    if (!OESTextureFloat) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL extension 'OES_texture_float' is unsupported`));
+        if (early) {
+            return reasons;
+        }
+    }
+
+    const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (supportedRTT < RTT_WIDTH) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`));
+    }
+
+    return reasons;
 }
