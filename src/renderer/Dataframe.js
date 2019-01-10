@@ -113,7 +113,7 @@ export default class Dataframe extends DummyDataframe {
         }
     }
 
-    getCentroid (featureIndex) {
+    getRenderedCentroid (featureIndex) {
         const centroid = { ...this._centroids[featureIndex] };
         centroid.x = centroid.x * this.scale + this.center.x;
         centroid.y = centroid.y * this.scale + this.center.y;

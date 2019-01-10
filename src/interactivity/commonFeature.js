@@ -1,7 +1,7 @@
 
 function _getGeomPropertiesFromPieces (pieces) {
     const geomPropertiesFromPieces = pieces.map(piece => {
-        const [x, y] = piece.getCentroid();
+        const [x, y] = piece.getRenderedCentroid();
         const aabb = piece._rawFeature._dataframe._aabb[piece._rawFeature._index];
         return { centroid: { x, y }, aabb };
     });
@@ -23,9 +23,9 @@ export function getCompoundFeature (featurePieces) {
     if (featurePieces.length === 1) return exemplar;
 
     const geomProperties = _getGeomPropertiesFromPieces(featurePieces);
-    Object.defineProperty(exemplar, 'getCentroid', {
+    Object.defineProperty(exemplar, 'getRenderedCentroid', {
         get: function () {
-            const getCentroid = () => {
+            const getRenderedCentroid = () => {
                 // average of centroids ponderated by aabb size
                 const [weightedXs, weightedYs, totalSize] = geomProperties.reduce((accumulator, currentValue) => {
                     const { minx, miny, maxx, maxy } = currentValue.aabb;
@@ -37,7 +37,7 @@ export function getCompoundFeature (featurePieces) {
 
                 return [weightedXs / totalSize, weightedYs / totalSize];
             };
-            return getCentroid;
+            return getRenderedCentroid;
         }
     });
 

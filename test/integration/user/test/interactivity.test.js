@@ -138,7 +138,7 @@ describe('Interactivity', () => {
                     const feature = event.features[0];
                     expect(feature.reset).toBeDefined();
                     expect(feature.blendTo).toBeDefined();
-                    expect(feature.getCentroid).toBeDefined();
+                    expect(feature.getRenderedCentroid).toBeDefined();
                     expect(feature.color.blendTo).toBeDefined();
                     expect(feature.color.reset).toBeDefined();
                     expect(feature.variables.wadus.value).toEqual(123);
