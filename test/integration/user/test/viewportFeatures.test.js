@@ -119,11 +119,11 @@ describe('viewportFeatures', () => {
         });
     });
 
-    it('should have a working getCentroid method', done => {
+    it('should have a working getRenderedCentroid method', done => {
         layer1.on('loaded', () => {
             const featureList = viz1.variables.list.eval();
             const [[x1, y1], [x2, y2]] = featureList.map(f => {
-                return f.getCentroid();
+                return f.getRenderedCentroid();
             });
 
             expect(x1).toBeCloseTo(0, 6);

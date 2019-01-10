@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Added
-- Add `getCentroid` method to features
+- Add `getRenderedCentroid` method to features
 - Add `isPlaying` method to animations
 - Add `enable`/`disable` methods and `isEnabled` property to `Interactivity`
 - Enable user-defined buckets in `viewportHistogram`
