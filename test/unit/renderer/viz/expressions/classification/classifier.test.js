@@ -1,5 +1,4 @@
-import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
-
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError, validateExactNumArgumentsError } from '../utils';
 import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
 import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
@@ -9,7 +8,7 @@ import { DEFAULT_HISTOGRAM_SIZE } from '../../../../../../src/renderer/viz/expre
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         describe('global', () => {
-            validateTypeErrors('globalQuantiles', []);
+            validateExactNumArgumentsError('globalQuantiles', []);
             validateTypeErrors('globalQuantiles', ['number', 'category']);
             validateTypeErrors('globalQuantiles', ['category', 2]);
             validateTypeErrors('globalQuantiles', ['color', 2]);
@@ -93,6 +92,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
         }
 
         function prepare (expr) {
+            expr._resolveAliases();
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
             expr.accumViewportAgg({

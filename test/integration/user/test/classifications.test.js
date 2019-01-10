@@ -41,8 +41,8 @@ describe('classifications with variables', () => {
 
             it('should allow variables in a ramp', (done) => {
                 const classificationViz = `
-                      @value: $wind_speed * 3
-                      // @breaks: 5
+                      @value: $wind_speed
+                      @breaks: 5
                       @palette: prism
                       color: ramp(globalEqIntervals(@value, 5), @palette)
                     `;
@@ -66,10 +66,10 @@ describe('classifications with variables', () => {
 
             it('should allow variables in a ramp', (done) => {
                 const classificationViz = `
-                      @value: $wind_speed * 3
-                      // @breaks: 5
+                      @value: $wind_speed
+                      @breaks: 5
                       @palette: reverse(sunset)
-                      color: ramp(globalQuantiles(@value, 5), @palette)
+                      color: ramp(globalQuantiles(@value, @breaks), @palette)
                     `;
                 createMapWith(classificationViz, featureCollection);
                 layer.on('loaded', () => {
