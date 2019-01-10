@@ -521,7 +521,7 @@ export default class Dataframe extends DummyDataframe {
                     get: function () {
                         const index = this._index;
                         const args = decodedProperties.map(name => this._dataframe.properties[name][index]);
-                        return codec.internalToExternal(args);
+                        return codec.internalToExternal(metadata, args);
                     }
                 };
             } else {
@@ -529,7 +529,7 @@ export default class Dataframe extends DummyDataframe {
                     get: function () {
                         const index = this._index;
                         const value = this._dataframe.properties[propertyName][index];
-                        return codec.internalToExternal(value);
+                        return codec.internalToExternal(metadata, value);
                     }
                 };
             }
