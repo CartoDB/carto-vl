@@ -20,7 +20,7 @@ describe('errors/CartoValidationError', () => {
         errors.push(new CartoValidationError(`${cvt.MISSING_REQUIRED} 'id'`));
         errors.push(new CartoValidationError(`${cvt.INCORRECT_TYPE} 'id' property must be a string.`));
         errors.push(new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than 100.`));
-        errors.push(new CartoValidationError(cvt.TOO_MANY_ARGS));
+        errors.push(new CartoValidationError(cvt.WRONG_NUMBER_ARGS));
 
         errors.forEach(error => {
             expect(error instanceof CartoValidationError);

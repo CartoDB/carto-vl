@@ -8,7 +8,13 @@ export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new CartoValidationError(`${cvt.TOO_MANY_ARGS} Expression '${expressionName}' accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkExactNumberOfArguments (constructorArguments, numArguments, expressionName) {
+    if (constructorArguments.length !== numArguments) {
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts exactly ${numArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
@@ -94,6 +100,7 @@ export function getOrdinalFromIndex (index) {
 export function getStringErrorPreface (expressionName, parameterName, parameterIndex) {
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
+
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was '${expectedType}', actual type was '${actualType}'`);
