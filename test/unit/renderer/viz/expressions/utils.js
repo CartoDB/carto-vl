@@ -1,6 +1,9 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import IdentityCodec from '../../../../../src/codecs/Identity';
+import { regExpThatContains } from '../../../../../src/utils/util';
+
+import { CartoValidationTypes as cvt } from '../../../../../src/errors/carto-validation-error';
 
 const metadata = new Metadata({
     properties: {
@@ -51,6 +54,14 @@ export function validateMaxArgumentsError (expressionName, args) {
         expect(() => {
             s[expressionName](...args.map(arg => arg[0]));
         }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*accepts.*arguments[\\s\\S]*passed[\\s\\S]*`, 'g'));
+    });
+}
+
+export function validateExactNumArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(regExpThatContains(cvt.WRONG_NUMBER_ARGS));
     });
 }
 
@@ -164,6 +175,7 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
+            expression._resolveAliases();
             expression._bindMetadata(metadata);
         }).toThrowError(regex);
     });
