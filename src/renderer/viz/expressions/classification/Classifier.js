@@ -1,22 +1,74 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
 
+import { checkType, checkNumber, checkInstance } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import Property from '../basic/property';
+import ClassifierGLSLHelper from './ClassifierGLSLHelper';
+
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
 
 let classifierUID = 0;
 export default class Classifier extends BaseExpression {
-    constructor (children, buckets) {
-        if (buckets <= 1) {
-            throw new RangeError(`The number of 'buckets' must be >=2, but ${buckets} was used.`);
-        }
-        const breakpoints = _genBreakpoints(children, buckets);
-
+    constructor (children) {
         super(children);
         this.classifierUID = classifierUID++;
+        this.type = 'category';
+
+        this._GLSLhelper = new ClassifierGLSLHelper(this);
+    }
+
+    _resolveAliases (aliases) {
+        this._getChildren().map(child => child._resolveAliases(aliases));
+
+        this._bucketsInitialization();
+    }
+
+    _bucketsInitialization () {
+        this._validateBucketsIsProperNumber();
+
+        const buckets = this.buckets.value;
         this.numCategories = buckets;
         this.numCategoriesWithoutOthers = buckets;
-        this.breakpoints = breakpoints;
-        this.type = 'category';
+
+        this._initBreakpointsChildren(buckets);
+    }
+
+    _initBreakpointsChildren (buckets) {
+        this.breakpoints = this._breakpointsWithZeros(buckets);
+
+        const breakpointsChildren = this.breakpoints.reduce((children, current, index) => {
+            children[`arg${index}`] = current;
+            return children;
+        }, {});
+        this._initializeChildren(breakpointsChildren);
+    }
+
+    _breakpointsWithZeros (buckets) {
+        const breakpoints = [];
+        for (let i = 0; i < buckets - 1; i++) {
+            breakpoints.push(number(0));
+        }
+        return breakpoints;
+    }
+
+    _validateBucketsIsProperNumber () {
+        const buckets = this.buckets.value;
+        checkNumber(this.expressionName, 'buckets', 1, buckets);
+        if (buckets <= 1) {
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The number of 'buckets' must be >=2, but ${buckets} was used`);
+        }
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+
+        this._validateInputIsNumericProperty();
+    }
+
+    _validateInputIsNumericProperty () {
+        checkInstance(this.expressionName, 'input', 0, Property, this.input);
+        checkType(this.expressionName, 'input', 0, 'number', this.input);
     }
 
     toString () {
@@ -24,9 +76,9 @@ export default class Classifier extends BaseExpression {
     }
 
     eval (feature) {
-        const input = this.input.eval(feature);
+        const inputValue = this.input.eval(feature);
         const breakpoint = this.breakpoints.findIndex((br) => {
-            return input <= br.expr;
+            return inputValue <= br.expr;
         });
 
         const divisor = this.numCategories - 1 || 1;
@@ -43,26 +95,7 @@ export default class Classifier extends BaseExpression {
     _genBreakpoints () { }
 
     _applyToShaderSource (getGLSLforProperty) {
-        const childSources = this.childrenNames.map(name => this[name]._applyToShaderSource(getGLSLforProperty));
-        let childInlines = {};
-        childSources.map((source, index) => {
-            childInlines[this.childrenNames[index]] = source.inline;
-        });
-        const funcName = `classifier${this.classifierUID}`;
-        const divisor = this.numCategories - 1 || 1;
-        const elif = (_, index) =>
-            `${index > 0 ? 'else' : ''} if (x<(${childInlines[`arg${index}`]})){
-                return ${(index / divisor).toFixed(20)};
-            }`;
-        const funcBody = this.breakpoints.map(elif).join('');
-        const preface = `float ${funcName}(float x){
-            ${funcBody}
-            return 1.;
-        }`;
-        return {
-            preface: this._prefaceCode(childSources.map(s => s.preface).reduce((a, b) => a + b, '') + preface),
-            inline: `${funcName}(${childInlines.input})`
-        };
+        return this._GLSLhelper.applyToShaderSource(getGLSLforProperty);
     }
 
     _preDraw (program, drawMetadata, gl) {
@@ -73,7 +106,6 @@ export default class Classifier extends BaseExpression {
     _getLegendData () {
         const breakpoints = this.getBreakpointList();
         const breakpointsLength = breakpoints.length;
-        const name = this.toString();
         const data = [];
 
         for (let i = 0; i <= breakpointsLength; i++) {
@@ -84,17 +116,6 @@ export default class Classifier extends BaseExpression {
             data.push({ key, value });
         }
 
-        return { name, data };
+        return { name: this.toString(), data };
     }
-}
-
-function _genBreakpoints (children, buckets) {
-    const breakpoints = [];
-
-    for (let i = 0; i < buckets - 1; i++) {
-        children[`arg${i}`] = number(0);
-        breakpoints.push(children[`arg${i}`]);
-    }
-
-    return breakpoints;
 }
