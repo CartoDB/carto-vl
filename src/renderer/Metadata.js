@@ -1,3 +1,4 @@
+import CartoRuntimeError from '../errors/carto-runtime-error';
 import IdentityCodec from '../codecs/Identity';
 import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
 
@@ -28,6 +29,10 @@ export default class Metadata {
         });
 
         this.propertyKeys = Object.keys(properties);
+    }
+
+    setCodecs () {
+        throw new CartoRuntimeError('You must call "setCodecs" once you have determined the proper subclass');
     }
 
     categorizeString (propertyName, category, init = false) {
