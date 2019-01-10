@@ -995,7 +995,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     let expected;
 
                     const r = ramp(globalEqIntervals($price, 2), [red, blue]);
-
+                    r._resolveAliases();
                     r._bindMetadata(METADATA);
 
                     actual = r.getLegendData().data;

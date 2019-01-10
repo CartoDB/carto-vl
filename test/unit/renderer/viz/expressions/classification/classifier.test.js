@@ -15,7 +15,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('globalQuantiles', ['number', 'color']);
             validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('globalEqIntervals', []);
+            validateExactNumArgumentsError('globalEqIntervals', []);
             validateTypeErrors('globalEqIntervals', ['number', 'category']);
             validateTypeErrors('globalEqIntervals', ['category', 2]);
             validateTypeErrors('globalEqIntervals', ['color', 2]);
