@@ -562,6 +562,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 4);
                         const r = ramp(q, [red, blue, yellow, purple, green]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -580,6 +581,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should not show interpolation', () => {
                         const q = globalQuantiles($price, 4);
                         const r = ramp(q, [red, blue, yellow, purple]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -603,6 +605,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 3);
                         const r = ramp(q, [red, blue]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -717,6 +720,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[3];
                         const q = globalQuantiles($price, 3);
                         const r = ramp(q, palettes.SUNSET);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -736,7 +740,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('and there more than 7 colors', () => {
+                describe('and there are more than 7 colors', () => {
                     const METADATA = new Metadata({
                         properties: {
                             price: { type: 'number', min: 0, max: 10 }
@@ -764,6 +768,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
                         const q = globalQuantiles($price, 10);
                         const r = ramp(q, palettes.SUNSET);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 0 });
