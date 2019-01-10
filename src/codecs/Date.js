@@ -9,22 +9,22 @@ export default class DateCodec extends BaseCodec {
         this._min_ms = this._min_date.getTime();
     }
 
-    sourceToInternal (propertyValue) {
+    sourceToInternal (metadata, propertyValue) {
         // numbers (epoch in milliseconds) or Dates are accepted
         return util.castDate(propertyValue).getTime() - this._min_ms;
     }
 
-    internalToExternal (propertyValue) {
+    internalToExternal (metadata, propertyValue) {
         let value = propertyValue;
         value += this._min_ms;
         return util.msToDate(value);
     }
 
-    externalToSource (v) {
+    externalToSource (metadata, v) {
         return v.getTime();
     }
 
-    sourceToExternal (v) {
+    sourceToExternal (metadata, v) {
         return util.castDate(v);
     }
 
