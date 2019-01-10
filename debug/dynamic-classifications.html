@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../examples/style.css">
 
   <style>
@@ -186,7 +186,7 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.voyager,
+      style: carto.basemaps.darkmatter,
       center: [0, 30],
       zoom: 1.5
     });
@@ -205,11 +205,11 @@
     function vizFromSettings(settings) {
       const stringViz = `
         @input: $${settings.input}
-        // @buckets: ${settings.buckets}
+        @buckets: ${settings.buckets}
         @palette: ${settings.palette}
         @opacity: ${settings.opacity}
 
-        color: opacity(ramp(globalQuantiles(@input, 3), @palette), @opacity)
+        color: opacity(ramp(globalQuantiles(@input, @buckets), @palette), @opacity)
       `
       return new carto.Viz(stringViz);
     }
@@ -226,6 +226,25 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
 
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event => {
+      if (event.features.length > 0) {
+        const firstFeature = event.features[0];
+        const value = firstFeature.variables.input.value.toFixed(2);
+        popup.setHTML(`<p>${selectedColumnName()}: ${value}</p>`);
+        popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
+        if (!popup.isOpen()) {
+          popup.addTo(map);
+        }
+      } else {
+        popup.remove();
+      }
+    });
 
     // Update variables with widgets
     const $valueSelector = document.getElementById('valueSelector');
@@ -233,25 +252,33 @@
     const $opacitySelector = document.getElementById('opacitySelector');
     const $paletteSelectors = document.querySelectorAll('.paletteSelector div');
 
-    function updateSettings(e) {
-      const columnName = $valueSelector.options[$valueSelector.selectedIndex].value;
+    function selectedColumnName() {
+      return $valueSelector.options[$valueSelector.selectedIndex].value;
+    }
+
+    function updateViz() {
+      const columnName = selectedColumnName();
       viz.variables['input'] = s.property(columnName);
       viz.variables['opacity'].blendTo(parseFloat($opacitySelector.value));
-      // viz.variables['buckets'] = parseInt($bucketsSelector.value);
+      viz.variables['buckets'] = parseInt($bucketsSelector.value);
+
       const paletteName = document.querySelector('.paletteSelector .selected p').innerText;
       viz.variables['palette'] = s.palettes[paletteName.toUpperCase()];
     }
 
     // Handle widget changes
-    $valueSelector.addEventListener('change', updateSettings);
+    $valueSelector.addEventListener('change', () => {
+      popup.remove();
+      updateViz();
+    });
     $bucketsSelector.addEventListener('input', () => {
       document.querySelector('#nBuckets').innerText = `${$bucketsSelector.value} buckets`;
-      updateSettings();
+      updateViz();
     });
 
     $opacitySelector.addEventListener('input', () => {
       document.querySelector('#nOpacity').innerText = `${$opacitySelector.value * 100}% opacity`;
-      updateSettings();
+      updateViz();
     });
 
     $paletteSelectors.forEach((p) => p.addEventListener('click', () => {
@@ -259,7 +286,7 @@
       $paletteSelectors.forEach((s) => s.classList.remove('selected'));
       p.classList.add('selected');
 
-      updateSettings(p);
+      updateViz();
     }));
   </script>
 </body>
