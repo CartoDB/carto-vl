@@ -17,6 +17,8 @@ If you wanted to load a previous version, `v1.0.0` for instance, you could use t
  1. https://libs.cartocdn.com/carto-vl/v1.0/carto-vl.min.js.
  1. https://libs.cartocdn.com/carto-vl/v1.0.0/carto-vl.min.js.
 
+We also distribute CARTO VL through the [npm registry](https://www.npmjs.com/), the CARTO VL npm package is [@carto/carto-vl](https://www.npmjs.com/package/@carto/carto-vl).
+
 #### Choosing a version number
 
 New versions usually bring new features, bug fixes, and performance improvements, so you might be thinking you should always use the latest available major version. It depends. If your application is already performing well and you don't plan to change it, it's OK to use a fixed version, `v1.1.0` for instance. If you want to benefit from latest bug fixes, you could go with the `v1.1` version.
