@@ -146,7 +146,8 @@ describe('api/layer', () => {
         it('should call onMapLoaded when the map is loaded', () => {
             const layer = new Layer('layer0', source, viz);
             const mapMock = {
-                addLayer: jasmine.createSpy('addLayer')
+                addLayer: jasmine.createSpy('addLayer'),
+                once: () => { }
             };
             layer.addTo(mapMock, 'beforeLayer');
             expect(mapMock.addLayer).toHaveBeenCalledWith(layer, 'beforeLayer');
@@ -159,7 +160,8 @@ describe('api/layer', () => {
             layer.onAdd = (map) => { layer.map = map; };
             const mapMock = {
                 addLayer: (layer) => { layer.onAdd(mapMock); },
-                removeLayer: jasmine.createSpy('removeLayer')
+                removeLayer: jasmine.createSpy('removeLayer'),
+                once: () => { }
             };
             layer.addTo(mapMock);
             layer.remove();
