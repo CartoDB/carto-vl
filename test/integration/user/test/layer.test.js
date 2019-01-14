@@ -226,14 +226,13 @@ describe('Layer', () => {
             map = new mapboxgl.Map({
                 container: name,
                 center: [0, 0],
-                zoom: 0,
-                style: { version: 8, sources: {}, layers: [] }
+                zoom: 0
             });
 
             const source = new carto.source.GeoJSON(featureData);
             const layer = new carto.Layer('layer', source, new carto.Viz());
 
-            const waitForMapToLoad = spyOn(layer, '_waitForMapToLoad').and.callFake(() => { });
+            const waitForMapToLoad = spyOn(layer, '_waitForMapToLoad').and.callThrough();
             layer.addTo(map, 'watername_ocean'); // << adding before setting basemap
             map.setStyle(carto.basemaps.voyager);
 

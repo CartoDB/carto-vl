@@ -166,7 +166,8 @@ export default class Layer {
             map.addLayer(this, beforeLayerID);
         } catch (error) {
             const STYLE_ERROR_REGEX = /Style is not done loading/;
-            if (!STYLE_ERROR_REGEX.test(error)) {
+            const NO_STYLE_AT_ALL = /Cannot read property 'addLayer' of undefined/;
+            if (!(STYLE_ERROR_REGEX.test(error) || NO_STYLE_AT_ALL.test(error))) {
                 throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
             this._waitForMapToLoad(map, beforeLayerID);
