@@ -226,8 +226,10 @@ describe('Layer', () => {
             map = new mapboxgl.Map({
                 container: name,
                 center: [0, 0],
-                zoom: 0
+                zoom: 0,
+                style: { version: 8, sources: {}, layers: [] }
             });
+
             const source = new carto.source.GeoJSON(featureData);
             const layer = new carto.Layer('layer', source, new carto.Viz());
 
