@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Enable user-defined buckets in `viewportHistogram`
 - Add and improve examples (legends, widgets, labeling and basemaps)
 - Add helpers to validate browser support (`isBrowserSupported` & `unsupportedBrowserReasons`)
+- Add tests to check for compatibility with several MGL versions
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature
