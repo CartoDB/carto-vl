@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix unwanted `Interactivity` events while using dragPan (and performance improvement)
 - Fix `linear` applied to cluster aggregations without explicit limits
 - Fix `MVT` category property returning a numeric value
+- Fix `Layer.addTo` for MGL v0.52
 
 ### Changed
 - Change examples to use Mapbox GL version 0.52
