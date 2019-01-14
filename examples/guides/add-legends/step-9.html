@@ -4,8 +4,8 @@
 <head>
   <script src="../../../dist/carto-vl.js"></script>
 
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -15,7 +15,7 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Latitudes</h1>
+        <h1>Legend</h1>
       </header>
       <section>
         <div id="controls">
@@ -37,8 +37,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [0, 43],
-      zoom: 1
+      center: [-73.954323, 40.711743],
+      zoom: 15.7
     });
 
     carto.setDefaultAuth({
@@ -46,29 +46,42 @@
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('populated_places');
+    const source = new carto.source.Dataset('table_311_complaints');
     const viz = new carto.Viz(`
-      color: ramp(linear($latitude), sunset)
-      width: 5
-      strokeWidth: 0
+      symbol: ramp(buckets($complaint,['Car','Bus']), [car,bus], cross)
+      color: ramp(buckets($complaint,['Car','Bus']), [#59ca22,#009fff])
+      symbolPlacement: align_bottom
+      width: 30
     `);
     const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map);
 
-    layer.addTo(map, 'watername_ocean');
     layer.on('loaded', () => {
       hideLoader();
 
+      const symbolLegend = layer.viz.symbol.getLegendData({ othersLabel: 'Default' });
       const colorLegend = layer.viz.color.getLegendData();
-      let colorLegendList = '';
-      // Get the information for legend
-      colorLegend.data.forEach((legend, index) => {
-        const colorHex = rgbToHex(legend.value);
-        colorLegendList +=
-          `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+
+      let symbolLegendList = '';
+
+      symbolLegend.data.forEach((legend, index) => {
+        const colorHex = rgbToHex(colorLegend.data[index].value);
+        symbolLegendList +=
+          `
+          <li>
+              <span
+                class="image-mark"
+                style="
+                  background-color: ${colorHex};
+                  mask-image:url(${legend.value});
+                  -webkit-mask-image:url(${legend.value})
+              "></span>
+              <span>${legend.key}</span>
+          </li>
+        `
       });
 
-      // Update the legend with the legend information
-      document.getElementById('content').innerHTML = colorLegendList;
+      document.getElementById('content').innerHTML = symbolLegendList;
     });
 
     function hideLoader() {

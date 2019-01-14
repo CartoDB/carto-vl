@@ -28,23 +28,32 @@ export default class Transition extends BaseExpression {
         this.bTime = this.aTime + Number(duration);
         this.type = 'number';
     }
+
     eval () {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         return Math.min(this.mix, 1.0);
     }
+
     isAnimated () {
         return !this.mix || this.mix <= 1.0;
     }
+
+    isPlaying () {
+        return this.isAnimated();
+    }
+
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform float anim${this._uid};\n`),
             inline: `anim${this._uid}`
         };
     }
+
     _postShaderCompile (program, gl) {
         this._getBinding(program).uniformLocation = gl.getUniformLocation(program, `anim${this._uid}`);
     }
+
     _preDraw (program, drawMetadata, gl) {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);

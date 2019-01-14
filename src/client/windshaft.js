@@ -401,9 +401,7 @@ export default class Windshaft {
 
         const idProperty = 'cartodb_id';
 
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
-        metadata.setCodecs();
-        return metadata;
+        return new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
     }
 }
 

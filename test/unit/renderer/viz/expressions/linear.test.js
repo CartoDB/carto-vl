@@ -29,6 +29,13 @@ describe('src/renderer/viz/expressions/linear', () => {
             expect(l.min.property.name).toEqual('wadus');
             expect(l.max.property.name).toEqual('wadus');
         });
+        it('should default to globalMin(input) and globalMax(input) for cluster aggr.', () => {
+            const l = s.linear(s.clusterAvg(s.prop('wadus')));
+            expect(l.min).toEqual(jasmine.any(GlobalMin));
+            expect(l.max).toEqual(jasmine.any(GlobalMax));
+            expect(l.min.property.name).toEqual('wadus');
+            expect(l.max.property.name).toEqual('wadus');
+        });
     });
 
     describe('.eval()', () => {

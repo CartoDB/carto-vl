@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Animation demo | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
-<style>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
     body {
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
     #timer {
       position: absolute;
       top: 20px;
@@ -27,6 +30,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="timer"></div>
@@ -37,8 +41,8 @@
         version: 8,
         sources: {},
         layers: [{
-            id: 'background', type: 'background',
-            paint: { 'background-color': 'black' }
+          id: 'background', type: 'background',
+          paint: { 'background-color': 'black' }
         }]
       },
       center: [0, 0],
@@ -103,29 +107,28 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     let info = true;
-    const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    const animation = ['animation'].includes(viz.filter.expressionName) ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
         info = !animation;
         console.log(viz);
         console.log("Min Month", viz.variables.minMonth.value);
         console.log("Max Month", viz.variables.maxMonth.value);
-        console.log('Months:',viz.variables.list.value.map(f => viz.variables.month.eval(f.properties).text));
+        console.log('Months:', viz.variables.list.value.map(f => viz.variables.month.eval(f.properties).text));
         // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
       }
       if (animation) {
         const time = animation.getProgressValue();
         if (time) {
-            const msg = `${time.text} (${time.timeZone})`;
-            document.getElementById("timer").textContent = msg;
+          const msg = `${time.text} (${time.timeZone})`;
+          document.getElementById("timer").textContent = msg;
         }
       }
     });
     const interactivity = new carto.Interactivity(layer);
-    let playing = true;
     interactivity.on('featureClick', event => {
       if (animation) {
-        // const playing = animation.isAnimated();
+        const playing = animation.isPlaying();
         if (playing) {
           console.log('PAUSE');
           animation.pause();
@@ -133,7 +136,6 @@
           console.log('PLAY');
           animation.play();
         }
-        playing = !playing;
       };
 
       if (event.features.length > 0) {
@@ -147,6 +149,5 @@
     });
   </script>
 </body>
+
 </html>
-
-

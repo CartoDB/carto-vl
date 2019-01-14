@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
@@ -23,24 +23,24 @@
         <div id="controls">
           <ul>
             <li>
-              <input type="radio" name="style" onclick="setRampQuantiles()" id="auto" checked>
-              <label for="auto">Quantiles</label>
+                  <input type="radio" name="style" onclick="setRampInterpolate()" id="auto" checked>
+                  <label for="auto">Interpolate</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setRampBuckets()" id="buckets">
-              <label for="buckets">Manual</label>
+                  <input type="radio" name="style" onclick="setRampQuantiles()" id="quantiles">
+                  <label for="quantiles">Quantiles</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setRampLinear()" id="linear">
-              <label for="linear">Interpolate</label>
+                <input type="radio" name="style" onclick="setRampEqualIntervals()" id="equalintervals">
+                <label for="equalintervals">Equal Interval</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setRampEqualIntervals()" id="equalintervals">
-              <label for="equalintervals">Equal intervals</label>
+                <input type="radio" name="style" onclick="setRampManual()" id="manual">
+                <label for="manual">Manual Classification</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setRampStandardDev()" id="standardDev">
-              <label for="standardDev">Mean-Standard Deviation</label>
+                <input type="radio" name="style" onclick="setRampStandardDev()" id="standardDev">
+                <label for="standardDev">Mean-Standard Deviation</label>
             </li>
           </ul>
         </div>
@@ -58,12 +58,10 @@
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: carto.basemaps.darkmatter,
+      style: carto.basemaps.voyager,
       center: [-100.3710, 38.4793],
-      zoom: 4,
+      zoom: 3.5,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -71,55 +69,63 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define styles
+    // Style numeric attributes
+    // Interpolate
+    const rampInterpolateViz = new carto.Viz(`
+      color: ramp(linear($pct_higher_ed,30,80),pinkyl)
+      strokeColor: rgba(0,0,0,0.2)
+      strokeWidth: 1
+    `);
+    // Quantiles
     const rampQuantilesViz = new carto.Viz(`
-      color: ramp(viewportQuantiles($total_pop, 5), sunsetdark)
-      strokeWidth: 0
+      color: ramp(globalQuantiles($pct_higher_ed, 5), pinkyl)
+      strokeColor: rgba(0,0,0,0.2)
+      strokeWidth: 1
     `);
-    const rampBucketsViz = new carto.Viz(`
-      color: ramp(buckets($total_pop, [10000, 25000, 100000, 500000, 1000000]), sunsetdark)
-      strokeWidth: 0
-    `);
-    const rampLinearViz = new carto.Viz(`
-      color: ramp(linear($total_pop, 10000, 500000), sunsetdark)
-      strokeWidth: 0
-    `);
+    // Equal Intervals
     const rampEqualIntervalsViz = new carto.Viz(`
-      color: ramp(viewportEqIntervals($total_pop, 5), sunsetdark)
-      strokeWidth: 0
+      color: ramp(globalEqIntervals($pct_higher_ed, 5), pinkyl)
+      strokeColor: rgba(0,0,0,0.2)
+      strokeWidth: 1
     `);
+    // Manual Classification
+    const rampManualViz = new carto.Viz(`
+      color: ramp(buckets($pct_higher_ed,[30,40,50,60,70]),pinkyl)
+      strokeColor: rgba(0,0,0,0.2)
+      strokeWidth: 1
+    `);
+    // Mean-Standard Deviation
     const rampStandardDevViz = new carto.Viz(`
-      color: ramp(viewportStandardDev($total_pop, 5), tealrose)
-      strokeWidth: 0
+      color: ramp(globalStandardDev($pct_higher_ed, 5), tealrose)
+      strokeColor: rgba(0,0,0,0.2)
+      strokeWidth: 1
     `);
 
-    // Define layer
-    const source = new carto.source.Dataset('us_county_points');
-    const layer = new carto.Layer('layer', source, rampQuantilesViz);
+    const source = new carto.source.Dataset('higher_edu_by_county');
+    const layer = new carto.Layer('layer', source, rampInterpolateViz);
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
 
+    function setRampInterpolate() {
+      layer.blendToViz(rampInterpolateViz);
+    }
     function setRampQuantiles() {
       layer.blendToViz(rampQuantilesViz);
-    }
-    function setRampBuckets() {
-      layer.blendToViz(rampBucketsViz);
-    }
-    function setRampLinear() {
-      layer.blendToViz(rampLinearViz);
     }
     function setRampEqualIntervals() {
       layer.blendToViz(rampEqualIntervalsViz);
     }
     function setRampStandardDev() {
       layer.blendToViz(rampStandardDevViz);
+    }
+    function setRampManual() {
+      layer.blendToViz(rampManualViz);
     }
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Project layer | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Project layer</h1>
+      </header>
+      <section>
+        <p class="description open-sans">World Robinson projection with SQL source</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+
+    // Set paint properties for map's background layer
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [
+          {
+            id: 'background',
+            type: 'background',
+            paint: { 'background-color': 'white' }
+          }
+        ]
+      },
+      center: [0, 0],
+      zoom: 1,
+      scrollZoom: false,
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    //Add SQL source layer with projection information
+    //For more information visit https://carto.com/help/working-with-data/changing-map-projections/
+    const source = new carto.source.SQL(`
+      SELECT
+          cartodb_id,
+          the_geom,
+      ST_Transform(the_geom_webmercator, 54030)
+      AS
+          the_geom_webmercator,
+          mapcolor7
+      FROM
+          countries_110m_admin_0
+    `);
+    const viz = new carto.Viz(`
+      @country: ramp($mapcolor7,pastel)
+
+      color: opacity(@country,0.8)
+      strokeColor: @country
+      strokeWidth: 1
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    // Add layer to map
+    layer.addTo(map);
+
+    layer.on('loaded', hideLoader);
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

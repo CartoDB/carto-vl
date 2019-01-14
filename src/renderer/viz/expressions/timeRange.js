@@ -40,4 +40,8 @@ export default class TimeRangeExpr extends BaseExpression {
     isAnimated () {
         return false;
     }
+
+    isPlaying () {
+        return false;
+    }
 }

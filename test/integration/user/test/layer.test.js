@@ -25,7 +25,7 @@ describe('Layer', () => {
             color: @myColor
         `);
         layer = new carto.Layer('layer', source, viz);
-        layer._paintLayer = () => {};
+        layer._paintLayer = () => { };
         layer.addTo(map);
     });
 
@@ -34,53 +34,108 @@ describe('Layer', () => {
             layer.on('loaded', done);
         });
 
-        it('should fire a "updated" event when ready', (done) => {
-            layer.on('updated', done);
-        });
+        describe('.updated', () => {
+            function mockPrerenderHelpers () {
+                // auxiliary mocks for prerender
+                spyOn(layer, '_getZoom').and.callFake(() => 0);
+                spyOn(layer, '_getViewport').and.callFake(() => { });
+                spyOn(layer, '_needRefresh').and.callFake(() => Promise.resolve());
+            }
 
-        it('should fire a "updated" event only once when ready', (done) => {
-            let update = jasmine.createSpy('update');
-            layer.on('updated', update);
-            layer.on('loaded', () => {
-                setTimeout(() => {
+            function resetMocks () {
+                layer._getZoom.calls.reset();
+                layer._getViewport.calls.reset();
+                layer._needRefresh.calls.reset();
+            }
+
+            it('should fire an "updated" event when ready', (done) => {
+                layer.on('updated', done);
+            });
+
+            it('should fire an "updated" event only once when ready', (done) => {
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
+                layer.on('loaded', () => {
+                    setTimeout(() => {
+                        expect(update).toHaveBeenCalled();
+                        done();
+                    }, 0);
+                });
+            });
+
+            it('should fire an "updated" event when the source is updated', (done) => {
+                mockPrerenderHelpers();
+                layer.on('loaded', async () => {
+                    const newSource = new carto.source.GeoJSON(featureData);
+                    spyOn(newSource, 'requestData').and.callFake(() => true);
+
+                    let update = jasmine.createSpy('update');
+                    layer.on('updated', update);
+
+                    await layer.update(newSource);
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
+
+                    expect(update).toHaveBeenCalledTimes(1);
+                    resetMocks();
+                    done();
+                });
+            });
+
+            it('should fire a new "updated" after moving the map (even if not requiring new dataframes)', (done) => {
+                mockPrerenderHelpers();
+
+                let numberOfUpdates = 0;
+                let update = () => {
+                    numberOfUpdates++;
+
+                    if (numberOfUpdates === 2) {
+                        resetMocks();
+                        done(); // ...(b) we get a second update
+                        return;
+                    }
+
+                    // // Emulate a user interaction, like dragging the map, using the underlying matrix
+                    const matrix = layer.renderer.matrix;
+                    let newMatrix = mat4.create();
+                    mat4.translate(newMatrix, matrix, [10, 0, 0]); // 10 units translation in x
+
+                    // (a) as it is a geojson, no dataframesHaveChange, but we need a new update anyway...
+                    layer.prerender(null, newMatrix);
+                };
+                layer.on('updated', update);
+            });
+
+            it('should fire an "updated" event when the viz is updated', (done) => {
+                mockPrerenderHelpers();
+                layer.on('loaded', async () => {
+                    let update = jasmine.createSpy('update');
+                    layer.on('updated', update);
+
+                    await layer.update(source, new carto.Viz('color: blue'));
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
+
+                    expect(update).toHaveBeenCalled();
+                    resetMocks();
+                    done();
+                });
+            });
+
+            it('should fire an "updated" event when the viz is animated', async (done) => {
+                let update = jasmine.createSpy('update');
+                layer.on('updated', update);
+
+                await layer.update(source, new carto.Viz('width: now()'));
+
+                layer.on('loaded', () => {
+                    layer.render();
+                    expect(update).toHaveBeenCalled();
+
+                    layer.render();
                     expect(update).toHaveBeenCalled();
                     done();
-                }, 0);
-            });
-        });
-
-        it('should fire a "updated" event when the source is updated', (done) => {
-            layer.on('loaded', async () => {
-                await layer.update(new carto.source.GeoJSON(featureData));
-                let update = jasmine.createSpy('update');
-                layer.on('updated', update);
-                layer.render();
-                expect(update).toHaveBeenCalledTimes(1);
-                done();
-            });
-        });
-
-        it('should fire a "updated" event when the viz is updated', (done) => {
-            layer.on('loaded', async () => {
-                await layer.update(source, new carto.Viz('color: blue'));
-                let update = jasmine.createSpy('update');
-                layer.on('updated', update);
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                done();
-            });
-        });
-
-        it('should fire a "updated" event when the viz is animated', async (done) => {
-            let update = jasmine.createSpy('update');
-            await layer.update(source, new carto.Viz('width: now()'));
-            layer.on('updated', update);
-            layer.on('loaded', () => {
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                layer.render();
-                expect(update).toHaveBeenCalled();
-                done();
+                });
             });
         });
 
@@ -105,7 +160,8 @@ describe('Layer', () => {
                 layer.on('loaded', () => {
                     const requestDataSourceSpy = spyOn(layer._source, 'requestData');
                     layer.hide();
-                    layer.prerender();
+                    const currentMatrix = layer.renderer.matrix;
+                    layer.prerender(null, currentMatrix);
 
                     expect(requestDataSourceSpy).not.toHaveBeenCalled();
                     done();

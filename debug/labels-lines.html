@@ -8,8 +8,8 @@
 
   <script src="../dist/carto-vl.js"></script>
 
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
   <link href="../examples/style.css" rel="stylesheet">
 </head>
@@ -56,7 +56,7 @@
             "type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": f.getCentroid()
+              "coordinates": f.getRenderedCentroid()
             },
             "properties": {
               "label_field": `${f.properties['name']}`,
@@ -68,6 +68,7 @@
           type: 'FeatureCollection',
           features: geojsonFeatures
         });
+        console.log('* labels updated');
       };
 
       layer.on('updated', layerUpdated);

@@ -196,6 +196,10 @@ export default class Viz {
         return this._getRootStyleExpressions().some(expr => expr.isAnimated());
     }
 
+    isPlaying () {
+        return this._getRootStyleExpressions().some(expr => expr.isPlaying());
+    }
+
     onChange (callback) {
         this._changeCallback = callback;
     }

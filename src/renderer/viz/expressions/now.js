@@ -44,6 +44,10 @@ export default class Now extends BaseExpression {
         return true;
     }
 
+    isPlaying () {
+        return true;
+    }
+
     _setTimestamp (timestamp) {
         this.now.expr = timestamp;
     }

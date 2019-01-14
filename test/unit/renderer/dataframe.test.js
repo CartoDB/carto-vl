@@ -249,7 +249,7 @@ describe('src/renderer/Dataframe', () => {
         });
     });
 
-    describe('.getCentroid', () => {
+    describe('.getRenderedCentroid', () => {
         const MAX_LATITUDE_MERCATOR = 85.0511287798066; // +/-85.0511287798066 are max north & south limits of tile
 
         describe('when dataframe is point type', () => {
@@ -292,7 +292,7 @@ describe('src/renderer/Dataframe', () => {
                 points.forEach((point) => {
                     const dataframe = dataFrameWithPoint(point.coordinates);
 
-                    const [x1, y1] = dataframe.getCentroid(feature1.id);
+                    const [x1, y1] = dataframe.getRenderedCentroid(feature1.id);
                     expect(x1).toBeCloseTo(point.expected[0], 2);
                     expect(y1).toBeCloseTo(point.expected[1], 2);
                 });
@@ -347,7 +347,7 @@ describe('src/renderer/Dataframe', () => {
                 lines.forEach(line => {
                     const dataframe = dataFrameWithLine(line.segment);
 
-                    const [x1, y1] = dataframe.getCentroid(feature1.cartodb_id);
+                    const [x1, y1] = dataframe.getRenderedCentroid(feature1.cartodb_id);
                     expect(x1).toBeCloseTo(line.expected[0], 2, 'line: ' + line.description);
                     expect(y1).toBeCloseTo(line.expected[1], 2, 'line: ' + line.description);
                 });
@@ -400,7 +400,7 @@ describe('src/renderer/Dataframe', () => {
                 polygons.forEach(polygon => {
                     const dataframe = dataFrameWithPolygon(polygon);
 
-                    const [x1, y1] = dataframe.getCentroid(feature1.cartodb_id);
+                    const [x1, y1] = dataframe.getRenderedCentroid(feature1.cartodb_id);
                     expect(x1).toBeCloseTo(polygon.expected[0], 2, 'polygon: ' + polygon.description);
                     expect(y1).toBeCloseTo(polygon.expected[1], 2, 'polygon: ' + polygon.description);
                 });
