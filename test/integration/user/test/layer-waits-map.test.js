@@ -14,7 +14,7 @@ const featureData = {
 describe('when map is not ready', () => {
     let div, map;
 
-    it('should wait for it load', (done) => {
+    it('Layer should wait for it load', (done) => {
         const name = 'map';
         div = util.createMapDivHolder(name);
         map = new mapboxgl.Map({
@@ -30,12 +30,8 @@ describe('when map is not ready', () => {
         layer.addTo(map, 'watername_ocean'); // << adding before setting basemap
         map.setStyle(carto.basemaps.voyager);
 
-        layer.on('loaded', () => {
-            setTimeout(() => {
-                expect(waitForMapToLoad).toHaveBeenCalled();
-                done();
-            }, 0);
-        });
+        expect(waitForMapToLoad).toHaveBeenCalled();
+        done();
     });
 
     afterEach(() => {
