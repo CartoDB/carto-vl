@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Add `enable`/`disable` methods and `isEnabled` property to `Interactivity`
 - Enable user-defined buckets in `viewportHistogram`
 - Add and improve examples (legends, widgets, labeling and basemaps)
+- Add helpers to validate browser support (`isBrowserSupported` & `unsupportedBrowserReasons`)
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature
