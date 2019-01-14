@@ -127,5 +127,9 @@
     "defaults",
     "not ie <12",
     "not edge <17"
+  ],
+  "previousMapboxGLVersions": [
+    "v0.50.0",
+    "v0.51.0"
   ]
 }
