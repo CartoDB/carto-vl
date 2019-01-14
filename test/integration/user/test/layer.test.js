@@ -1,5 +1,5 @@
 import carto from '../../../../src/';
-import mapboxgl from 'mapbox-gl';
+// import mapboxgl from 'mapbox-gl';
 import * as util from '../../util';
 import { mat4 } from 'gl-matrix';
 
@@ -219,31 +219,31 @@ describe('Layer', () => {
         });
     });
 
-    describe('when map is not ready', () => {
-        it('should wait for it load', (done) => {
-            const name = 'map';
-            div = util.createMapDivHolder(name);
-            map = new mapboxgl.Map({
-                container: name,
-                center: [0, 0],
-                zoom: 0
-            });
+    // describe('when map is not ready', () => {
+    //     it('should wait for it load', (done) => {
+    //         const name = 'map';
+    //         div = util.createMapDivHolder(name);
+    //         map = new mapboxgl.Map({
+    //             container: name,
+    //             center: [0, 0],
+    //             zoom: 0
+    //         });
 
-            const source = new carto.source.GeoJSON(featureData);
-            const layer = new carto.Layer('layer', source, new carto.Viz());
+    //         const source = new carto.source.GeoJSON(featureData);
+    //         const layer = new carto.Layer('layer', source, new carto.Viz());
 
-            const waitForMapToLoad = spyOn(layer, '_waitForMapToLoad').and.callThrough();
-            layer.addTo(map, 'watername_ocean'); // << adding before setting basemap
-            map.setStyle(carto.basemaps.voyager);
+    //         const waitForMapToLoad = spyOn(layer, '_waitForMapToLoad').and.callThrough();
+    //         layer.addTo(map, 'watername_ocean'); // << adding before setting basemap
+    //         map.setStyle(carto.basemaps.voyager);
 
-            layer.on('loaded', () => {
-                setTimeout(() => {
-                    expect(waitForMapToLoad).toHaveBeenCalled();
-                    done();
-                }, 0);
-            });
-        });
-    });
+    //         layer.on('loaded', () => {
+    //             setTimeout(() => {
+    //                 expect(waitForMapToLoad).toHaveBeenCalled();
+    //                 done();
+    //             }, 0);
+    //         });
+    //     });
+    // });
 
     afterEach(() => {
         map.remove();
