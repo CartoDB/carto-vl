@@ -42,6 +42,10 @@ class CartoMap { // eslint-disable-line no-unused-vars
         }
     }
 
+    once () {
+
+    }
+
     addLayer (layer, beforeLayerID) {
         if (!this._layers.has(layer)) {
             this._layers.add(layer);
