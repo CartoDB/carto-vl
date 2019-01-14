@@ -159,15 +159,22 @@ export default class Layer {
     addTo (map, beforeLayerID) {
         // Manage errors, whether they are an Evented Error or a common Error
         try {
-            map.once('error', () => { this._waitForMapToLoad(map, beforeLayerID); });
+            map.once('error', (data) => {
+                console.warn(data.error.message);
+                this._waitForMapToLoad(map, beforeLayerID);
+            });
             map.addLayer(this, beforeLayerID);
         } catch (error) {
+            const STYLE_ERROR_REGEX = /Style is not done loading/;
+            if (!STYLE_ERROR_REGEX.test(error)) {
+                throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
+            }
             this._waitForMapToLoad(map, beforeLayerID);
         }
     }
 
     _waitForMapToLoad (map, beforeLayerID) {
-        map.once('load', () => {
+        map.on('load', () => {
             map.addLayer(this, beforeLayerID);
         });
     }
