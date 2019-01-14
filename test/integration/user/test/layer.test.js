@@ -236,9 +236,11 @@ describe('Layer', () => {
             layer.addTo(map, 'watername_ocean'); // << adding before setting basemap
             map.setStyle(carto.basemaps.voyager);
 
-            map.on('load', () => {
-                expect(waitForMapToLoad).toHaveBeenCalled();
-                done();
+            layer.on('loaded', () => {
+                setTimeout(() => {
+                    expect(waitForMapToLoad).toHaveBeenCalled();
+                    done();
+                }, 0);
             });
         });
     });
