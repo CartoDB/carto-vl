@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Fixed
+- Fix regression in `viewportFeatures` including hidden polygons
+
 ## [1.1.0] - 2019-01-15
 
 ### Added
