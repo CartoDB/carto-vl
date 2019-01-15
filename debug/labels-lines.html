@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Labels & lines | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+
+  <script src="../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link href="../examples/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [7, 25],
+      zoom: 2,
+      renderWorldCopies: false
+    });
+
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Lines layer
+    const source = new carto.source.Dataset('world_rivers_small');
+    const viz = new carto.Viz(`
+      color: navy
+      width: 2
+      @v_features: viewportFeatures($name)
+    `);
+    const layer = new carto.Layer('lines', source, viz);
+
+    layer.on('loaded', () => {
+      map.addSource('labels', { type: 'geojson', data: null });
+      const labelSource = map.getSource('labels');
+
+      const layerUpdated = function () {
+        const features = viz.variables.v_features.value;
+        const geojsonFeatures = features.map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getRenderedCentroid()
+            },
+            "properties": {
+              "label_field": `${f.properties['name']}`,
+            }
+          }
+        });
+
+        labelSource.setData({
+          type: 'FeatureCollection',
+          features: geojsonFeatures
+        });
+        console.log('* labels updated');
+      };
+
+      layer.on('updated', layerUpdated);
+
+      // Labels layer
+      map.addLayer({
+        "id": "my-labels",
+        "type": "symbol",
+        "source": "labels",
+        "layout": {
+          "icon-image": "monument-15",
+          "text-field": "{label_field}",
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0],
+          "text-anchor": "center"
+        },
+        "paint": {
+          "text-color": "#30A",
+          "text-halo-color": "#fff",
+          "text-halo-width": 2
+        },
+      });
+    });
+
+    layer.addTo(map);
+
+  </script>
+
+</body>
+
+</html>

@@ -123,6 +123,18 @@ export default class Base {
     }
 
     /**
+     *
+     * @api
+     * @returns `true` if the expression it is currently changing
+     * @memberof Expression
+     * @instance
+     * @name isPlaying
+     */
+    isPlaying () {
+        return this._getChildren().some(child => child.isPlaying());
+    }
+
+    /**
      * Linear interpolate between `this` and `final` with the specified duration
      *
      * @api
@@ -135,8 +147,9 @@ export default class Base {
      * @name blendTo
      */
     async blendTo (final, duration = 500) {
-        // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
+        // The previous parsing of 'final' (if it is a string) is monkey-patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
+        this.keepDefaultsOnBlend && this.keepDefaultsOnBlend();
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);

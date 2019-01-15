@@ -1,5 +1,8 @@
+import CartoRuntimeError from '../errors/carto-runtime-error';
 import IdentityCodec from '../codecs/Identity';
 import { FP32_DESIGNATED_NULL_VALUE } from './viz/expressions/constants';
+
+const DEFAULT_MVT_EXTENT = 4096;
 
 // The IDENTITY metadata contains zero properties
 export const IDENTITY = {
@@ -7,7 +10,7 @@ export const IDENTITY = {
 };
 
 export default class Metadata {
-    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty } = { properties: {} }) {
+    constructor ({ properties, featureCount, sample, geomType, isAggregated, idProperty, extent } = { properties: {} }) {
         this.properties = properties;
         this.featureCount = featureCount;
         this.sample = sample;
@@ -18,6 +21,7 @@ export default class Metadata {
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
         this.numCategories = 0;
+        this.extent = extent || DEFAULT_MVT_EXTENT;
 
         Object.values(properties).map(property => {
             property.categories = property.categories || [];
@@ -25,6 +29,10 @@ export default class Metadata {
         });
 
         this.propertyKeys = Object.keys(properties);
+    }
+
+    setCodecs () {
+        throw new CartoRuntimeError('You must call "setCodecs" once you have determined the proper subclass');
     }
 
     categorizeString (propertyName, category, init = false) {

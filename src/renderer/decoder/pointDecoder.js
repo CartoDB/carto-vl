@@ -1,4 +1,4 @@
-// If the geometry type is 'point' it will pass trough the geom (the vertex array)
+// If the geometry type is GEOMETRY_TYPE.POINT it will pass through the geom (the vertex array)
 
 export function decodePoint (verticesArrayBuffer) {
     return {

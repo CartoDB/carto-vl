@@ -39,7 +39,7 @@ export default class NamedColor extends BaseExpression {
         this.name = colorName;
         this.expressionName = colorName;
         this.color = _nameToRGBA(this.name);
-        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(1).toFixed(4)})`;
+        this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
     }
 
     get value () {
@@ -69,8 +69,12 @@ function _nameToRGBA (name) {
     document.body.removeChild(fakeDiv);
 
     const match = colorRegex.exec(rgbSring);
-
-    const color = { r: Number(match[1]), g: Number(match[2]), b: Number(match[3]), a: match[4] || 1 };
+    const color = {
+        r: Number(match[1]),
+        g: Number(match[2]),
+        b: Number(match[3]),
+        a: Number(match[4] || 1)
+    };
 
     nameToRGBACache[name] = color;
     return color;

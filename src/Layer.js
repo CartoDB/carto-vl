@@ -9,7 +9,8 @@ import CartoRuntimeError from '../src/errors/carto-runtime-error';
 
 import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
-import { unproject } from './utils/geometry';
+import { computeViewportFromCameraMatrix } from './utils/util';
+import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -29,6 +30,8 @@ const states = Object.freeze({
 *
 * - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
+*
+* Note: This Layer implements {@link https://www.mapbox.com/mapbox-gl-js/api/#customlayerinterface|Mapbox GL JS - Custom Layer Interface}
 *
 * @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
 * @param {carto.source} source - The source of the data
@@ -57,6 +60,7 @@ export default class Layer {
         this.type = 'custom';
 
         viz._boundLayer = this;
+
         this._context = new Promise(resolve => {
             this._contextInitialize = resolve;
         });
@@ -66,18 +70,10 @@ export default class Layer {
         this._emitter = mitt();
         this._renderLayer = new RenderLayer();
 
-        // There are 2 type of changes in a layer source or viz:
-        //  - Major changes. Major changes are performed by the `update` method and they will override (have priority over) minor changes
-        //  - Minor changes. Minor changes are performed by the `blendToViz` and `blendTo` method and they won't override concurrent calls to `update`
-        // The public docs of `update` and `blendToViz` explains this API particularity in more detail, which is implemented with these counters
-        this._majorNextUID = 0;
-        this._majorCurrentUID = null;
-        this._minorNextUID = 0;
-        this._minorCurrentUID = null;
-
+        this.concurrencyHelper = new LayerConcurrencyHelper();
         this._sourcePromise = this.update(source, viz);
-
         this._renderWaiters = [];
+        this._cameraMatrix = mat4.identity([]);
     }
 
     /**
@@ -93,8 +89,12 @@ export default class Layer {
     }
 
     set visible (visible) {
+        const initial = this._visible;
         this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
         this._visible = visible;
+        if (visible !== initial) {
+            this._fire('updated', 'visibility change');
+        }
     }
 
     /**
@@ -157,19 +157,27 @@ export default class Layer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        const STYLE_ERROR_REGEX = /Style is not done loading/;
-
+        // Manage errors, whether they are an Evented Error or a common Error
         try {
+            map.once('error', (data) => {
+                console.warn(data.error.message);
+                this._waitForMapToLoad(map, beforeLayerID);
+            });
             map.addLayer(this, beforeLayerID);
         } catch (error) {
-            if (!STYLE_ERROR_REGEX.test(error)) {
+            const STYLE_ERROR_REGEX = /Style is not done loading/;
+            const NO_STYLE_AT_ALL = /Cannot read property 'addLayer' of undefined/;
+            if (!(STYLE_ERROR_REGEX.test(error) || NO_STYLE_AT_ALL.test(error))) {
                 throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
-
-            map.on('load', () => {
-                map.addLayer(this, beforeLayerID);
-            });
+            this._waitForMapToLoad(map, beforeLayerID);
         }
+    }
+
+    _waitForMapToLoad (map, beforeLayerID) {
+        map.on('load', () => {
+            map.addLayer(this, beforeLayerID);
+        });
     }
 
     /**
@@ -209,69 +217,104 @@ export default class Layer {
     async update (source, viz = this._viz) {
         return this._update(source, viz, true);
     }
+
     async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
 
-        if (source !== this._source) {
-            source = source._clone();
-        }
+        const safeSource = this._cloneSourceIfDifferent(source);
 
-        let uid;
-        if (majorChange) {
-            uid = { major: this._majorNextUID, minor: 0 };
-            this._majorNextUID++;
-            this._minorNextUID = 1;
-        } else {
-            uid = { major: this._majorCurrentUID, minor: this._minorNextUID };
-            this._minorNextUID++;
-        }
-
-        const loadImagesPromise = viz.loadImages();
-
-        // Don't await directly to start requesting the images as soon as possible
-        const metadataPromise = source.requestMetadata(viz);
-        await loadImagesPromise;
-        const metadata = await metadataPromise;
-
+        let change = this._initChange(majorChange);
+        const [, metadata] = await Promise.all([
+            viz.loadImages(), // start requesting images ASAP
+            safeSource.requestMetadata(viz)
+        ]);
         await this._context;
 
-        if (majorChange) {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this one. Commit ${uid} overridden by commit ${this._majorCurrentUID}.`);
-            }
-        } else {
-            if (this._majorCurrentUID > uid.major) {
-                throw new CartoRuntimeError(`Another \`Layer.update()\` finished before this viz change. Commit ${uid} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-            if (this._minorCurrentUID > uid.minor) {
-                throw new CartoRuntimeError(`Another \`viz change\` finished before this one. Commit ${uid.major}.${uid.minor} overridden by commit ${this._majorCurrentUID}.${this._minorCurrentUID}`);
-            }
-        }
-        this._majorCurrentUID = uid.major;
-        this._minorCurrentUID = uid.minor;
+        this._endChange(majorChange, change);
 
-        // Everything was ok => commit changes
+        this._commitSuccesfulUpdate(metadata, viz, safeSource);
+    }
+
+    _initChange (majorChange) {
+        if (majorChange) {
+            return this.concurrencyHelper.initMajorChange();
+        }
+        return this.concurrencyHelper.initMinorChange();
+    }
+
+    _endChange (majorChange, change) {
+        if (majorChange) {
+            this.concurrencyHelper.endMajorChange(change);
+        } else {
+            this.concurrencyHelper.endMinorChange(change);
+        }
+    }
+
+    /**
+     * Updating viz and source, after having checked them and having required new metadata
+     *
+     * @param {Metadata} metadata
+     * @param {carto.Viz} newViz
+     * @param {carto.source} newSource
+     */
+    _commitSuccesfulUpdate (metadata, newViz, newSource) {
         this.metadata = metadata;
 
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-        viz.setDefaultsIfRequired(this._renderLayer.type);
+        this._commitVizChange(newViz);
+        this._commitSourceChange(newSource);
+
+        // to force pre-render (which gives us the matrix to request data from the source...)
+        this._needRefresh();
+    }
+
+    /**
+     * Updates the viz with the newViz
+     *
+     * @param {carto.Viz} newViz
+     */
+    _commitVizChange (newViz) {
         if (this._viz) {
             this._viz.onChange(null);
         }
-        this._viz = viz;
-        viz.onChange(this._vizChanged.bind(this));
-        this.viz._bindMetadata(metadata);
-        this.viz.gl = this.gl;
+        newViz.setDefaultsIfRequired(this.metadata.geomType);
+        newViz.setDefaultsIfRequired(this._renderLayer.type);
+        newViz.onChange(this._vizChanged.bind(this));
+        newViz._bindMetadata(this.metadata);
+        newViz.gl = this.gl;
+        this._viz = newViz;
+    }
 
-        this._needRefresh();
-
-        source.bindLayer(this._onDataframeAdded.bind(this));
-        if (this._source !== source) {
+    /**
+     * Updates the source with the newSource
+     *
+     * @param {carto.source} newSource
+     */
+    _commitSourceChange (newSource) {
+        newSource.bindLayer(this._onDataframeAdded.bind(this));
+        if (newSource !== this._source) {
             this._freeSource();
         }
+        this._source = newSource;
+    }
 
-        this._source = source;
+    /**
+     * Returns a safe source from the new required source.
+     *
+     * @param {carto.source} source
+     * @returns {carto.source} safeSource
+     */
+    _cloneSourceIfDifferent (source) {
+        // The cloning allows the source to be safely used in other layers.
+        // That's because using `source.requestMetadata()` can update later on its internal state (depending on what's required by the viz)
+
+        let safeSource;
+        if (source !== this._source) {
+            safeSource = source._clone();
+        } else {
+            safeSource = source;
+        }
+        return safeSource;
     }
 
     /**
@@ -317,6 +360,8 @@ export default class Layer {
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
         await this._sourcePromise;
+
+        // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
                 viz.variables[varName] = this._viz.variables[varName];
@@ -366,12 +411,16 @@ export default class Layer {
         return this._viz && this._viz.isAnimated();
     }
 
+    isPlaying () {
+        return this._viz && this._viz.isPlaying();
+    }
+
     /**
      * Custom Layer API: `onAdd` function
      */
     onAdd (map, gl) {
-        this.gl = gl;
         this.map = map;
+        this.gl = gl;
         this.renderer = _getRenderer(map, gl);
 
         // Initialize render layer
@@ -389,20 +438,43 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        this.renderer.matrix = matrix;
+        const isNewCameraMatrix = this._detectAndSetNewMatrix(matrix);
         if (this._source && this.visible) {
-            this._source.requestData(this._getZoom(), this._getViewport(matrix)).then(dataframesChanged => {
-                if (dataframesChanged) {
-                    this._needRefresh().then(() => {
-                        if (this._state === states.INIT) {
-                            this._state = states.IDLE;
-                            this._fire('loaded');
-                            this._fire('updated');
-                        }
-                    });
-                }
-            });
+            this._checkSourceRequestsAndFireEvents(isNewCameraMatrix);
         }
+    }
+
+    _detectAndSetNewMatrix (newMatrix) {
+        const isNewMatrix = !mat4.exactEquals(newMatrix, this._cameraMatrix);
+        if (isNewMatrix) {
+            this._cameraMatrix = newMatrix;
+            this.renderer.matrix = newMatrix; // in case it is not set yet (first layer)
+        }
+        return isNewMatrix;
+    }
+
+    _checkSourceRequestsAndFireEvents (isNewMatrix) {
+        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+
+        checkForDataframesUpdate.then(dataframesHaveChanged => {
+            if (dataframesHaveChanged) {
+                this._needRefresh().then(() => {
+                    if (this._state === states.INIT) {
+                        this._state = states.IDLE;
+                        this._fire('loaded');
+                    }
+                    this._fire('updated', 'different dataframes required from source');
+                });
+            } else {
+                if (isNewMatrix) {
+                    this._fire('updated', 'new camara view');
+                }
+            }
+        });
+    }
+
+    _getViewport () {
+        return computeViewportFromCameraMatrix(this._cameraMatrix);
     }
 
     /**
@@ -414,18 +486,33 @@ export default class Layer {
         this._renderWaiters.forEach(resolve => resolve());
 
         if (this.isAnimated()) {
-            this._needRefresh();
+            if (this.isPlaying()) {
+                this._needRefresh().then(() => {
+                    this._fire('updated', 'animation is playing');
+                });
+            } else {
+                this._keepTimestampIfPaused();
+            }
+        } else {
+            if (this._state === states.UPDATING) {
+                this._state = states.IDLE;
+                this._fire('updated', 'updated viz');
+            }
         }
+    }
 
-        if (this._state !== states.INIT) {
-            this._fire('updated');
-        }
+    _keepTimestampIfPaused () {
+        let timestamp = this.renderer.timestamp;
+        // to avoid 'jumps' after resume playing.
+        this._viz._getRootStyleExpressions().forEach(vizExpr => {
+            vizExpr._setTimestamp(timestamp);
+        });
     }
 
     _paintLayer () {
         this._renderLayer.setViz(this._viz);
         this.renderer.renderLayer(this._renderLayer, {
-            zoomLevel: this.map.getZoom()
+            zoomLevel: this.map.getZoom() // for zoom expressions
         });
     }
 
@@ -451,7 +538,7 @@ export default class Layer {
     }
 
     _needRefresh () {
-        if (this._state !== states.INIT) {
+        if (this._state === states.IDLE) {
             this._state = states.UPDATING;
         }
         return new Promise(resolve => {
@@ -498,44 +585,9 @@ export default class Layer {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
+            // Not the required 1 on 1 relationship between layer & viz
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
-    }
-
-    _getViewport (matrix) { // TODO move to util, check rsys
-        const inv = mat4.invert([], matrix);
-
-        const corners = [
-            [-1, -1],
-            [-1, 1],
-            [1, -1],
-            [1, 1]
-        ].map(NDC =>
-            unproject(inv, ...NDC)
-        ).map(c =>
-            // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
-            c.map(x => x * 2 - 1)
-        );
-
-        // Rotation no longer gurantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
-        // we need to compute the AABB min/max by iterating
-        const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
-        const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
-        corners.forEach(corner => {
-            min[0] = Math.min(min[0], corner[0]);
-            min[1] = Math.min(min[1], corner[1]);
-            max[0] = Math.max(max[0], corner[0]);
-            max[1] = Math.max(max[1], corner[1]);
-        });
-
-        // Our API flips the `y` coordinate, we need to convert the values accordingly
-        min[1] = -min[1];
-        max[1] = -max[1];
-        const temp = min[1];
-        min[1] = max[1];
-        max[1] = temp;
-
-        return [...min, ...max];
     }
 
     _getZoom () {

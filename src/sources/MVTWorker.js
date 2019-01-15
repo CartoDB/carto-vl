@@ -6,6 +6,7 @@ import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 // TODO import correctly
 const RTT_WIDTH = 1024;
@@ -13,17 +14,10 @@ const RTT_WIDTH = 1024;
 // Constants for '@mapbox/vector-tile' geometry types, from https://github.com/mapbox/vector-tile-js/blob/v1.3.0/lib/vectortilefeature.js#L39
 const mvtDecoderGeomTypes = { point: 1, line: 2, polygon: 3 };
 
-const geometryTypes = {
-    UNKNOWN: 'unknown',
-    POINT: 'point',
-    LINE: 'line',
-    POLYGON: 'polygon'
-};
-
 const MVT_TO_CARTO_TYPES = {
-    1: geometryTypes.POINT,
-    2: geometryTypes.LINE,
-    3: geometryTypes.POLYGON
+    1: GEOMETRY_TYPE.POINT,
+    2: GEOMETRY_TYPE.LINE,
+    3: GEOMETRY_TYPE.POLYGON
 };
 
 export class MVTWorker {
@@ -66,7 +60,7 @@ export class MVTWorker {
     }
 
     async urlToDataframeTransformer (response, x, y, z, layerID, metadata) {
-        const MVT_EXTENT = 4096;
+        const MVT_EXTENT = metadata.extent;
         const arrayBuffer = await response.arrayBuffer();
         if (arrayBuffer.byteLength === 0 || response === 'null') {
             return { empty: true };
@@ -100,12 +94,12 @@ export class MVTWorker {
             metadata.geomType = this._autoDiscoverType(mvtLayer);
         }
         switch (metadata.geomType) {
-            case geometryTypes.POINT:
+            case GEOMETRY_TYPE.POINT:
                 const arrayBuffer = new ArrayBuffer(mvtLayer.length * 2 * 3 * 4);// SIZEOF
                 return this._decode(mvtLayer, metadata, mvtExtent, arrayBuffer);
-            case geometryTypes.LINE:
+            case GEOMETRY_TYPE.LINE:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodeLines);
-            case geometryTypes.POLYGON:
+            case GEOMETRY_TYPE.POLYGON:
                 return this._decode(mvtLayer, metadata, mvtExtent, [], decodePolygons);
             default:
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${metadata.geomType}'`);
@@ -116,11 +110,11 @@ export class MVTWorker {
         const type = mvtLayer.feature(0).type;
         switch (type) {
             case mvtDecoderGeomTypes.point:
-                return geometryTypes.POINT;
+                return GEOMETRY_TYPE.POINT;
             case mvtDecoderGeomTypes.line:
-                return geometryTypes.LINE;
+                return GEOMETRY_TYPE.LINE;
             case mvtDecoderGeomTypes.polygon:
-                return geometryTypes.POLYGON;
+                return GEOMETRY_TYPE.POLYGON;
             default:
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} MVT: invalid geometry type '${type}'`);
         }
@@ -163,7 +157,7 @@ export class MVTWorker {
                     `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
-            this._decodeProperties(scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
+            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
             numFeatures++;
         }
 
@@ -227,19 +221,19 @@ export class MVTWorker {
             .filter(([_prop, _dprop, codec]) => codec.isRange());
     }
 
-    _decodeProperties (scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
+    _decodeProperties (metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
         let length = scalarPropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, codec] = scalarPropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = codec.sourceToInternal(propertyValue);
+            properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue);
         }
 
         length = rangePropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, [loPropertyName, hiPropertyName], codec] = rangePropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            const [loValue, hiValue] = codec.sourceToInternal(propertyValue);
+            const [loValue, hiValue] = codec.sourceToInternal(metadata, propertyValue);
             properties[loPropertyName][i] = loValue;
             properties[hiPropertyName][i] = hiValue;
         }

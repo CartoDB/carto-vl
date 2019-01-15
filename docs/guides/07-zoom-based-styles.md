@@ -1,9 +1,9 @@
 ## Zoom-based styles
-An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different _zoom level_. At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed.
+An inherent feature of any map viewed on the web is the ability to zoom in and out. Each time you zoom in or out of a map, you are viewing a different [_zoom level_](https://carto.com/help/glossary/#zoomlevels). At each zoom level or range of zoom levels, there are important design considerations for how data are visualized and/or what information is displayed.
 
 With any map, the decisions that you as the map designer make are critical to the interpretability of your map by the end user. The zoom-based styling decisions that you make should be determined by the story you want to tell, the data that you are mapping, and the zoom levels at which your map will be viewed.
 
-We most often hear about zoom-based styling in the context of basemaps. As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view.
+We most often hear about zoom-based styling in the context of [basemaps](https://carto.com/help/glossary/#basemap). As an example, if we look at one of CARTO’s basemaps, Voyager, across different zoom levels, we see that as the zoom level gets larger (zooming into the map), more features and labels are added. As these features and labels appear, their styling is adjusted to support the current view.
 
 For example, major highways don’t display until zoom 5 and when they do, the appearance transitions from a single, small width line at low zoom levels, to cased lines at larger zoom levels.
 
@@ -49,8 +49,8 @@ To get started, copy and paste the code below into your favorite text editor and
 <head>
     <meta charset="utf-8">
     <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <style>
         #js-zoom {
@@ -337,8 +337,8 @@ If you would like to take a closer look, the full code for the example is here:
     <meta charset="utf-8">
     <script src='https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js'></script>
 
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
     <style>

@@ -13,7 +13,7 @@ void main(void) {
     vec2 imageUV = pointCoord;
     imageUV.x = imageUV.x * 0.5 + 0.5;
     vec4 symbolColor = $symbol_inline;
-    vec4 noOverrideColor = vec4(0.);
+    vec4 noOverrideColor = vec4(1., 1., 1., 0.);
 
     vec4 c;
     if (color != noOverrideColor){

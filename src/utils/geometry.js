@@ -1,4 +1,13 @@
 import { vec4 } from 'gl-matrix';
+import { average } from '../renderer/viz/expressions/stats';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+
+export const GEOMETRY_TYPE = {
+    UNKNOWN: 'unknown',
+    POINT: 'point',
+    LINE: 'line',
+    POLYGON: 'polygon'
+};
 
 // If AB intersects CD => return intersection point
 // Intersection method from Real Time Rendering, Third Edition, page 780
@@ -133,12 +142,16 @@ export function pointInRectangle (point, bbox) {
     return ((bbox.minx <= p.x) && (p.x <= bbox.maxx) && (bbox.miny <= p.y) && (p.y <= bbox.maxy));
 }
 
+/**
+ * Axis-Aligned Bounding Box (AABB). This creates a wrapping box around the geometry, without rotation.
+ * This allows the use of a common technique to detect collision between features (using their corresponding AABBs).
+ */
 export function computeAABB (geometry, type) {
     switch (type) {
-        case 'point':
+        case GEOMETRY_TYPE.POINT:
             return [];
-        case 'line':
-        case 'polygon':
+        case GEOMETRY_TYPE.LINE:
+        case GEOMETRY_TYPE.POLYGON:
             const aabbList = [];
 
             for (let i = 0; i < geometry.length; i++) {
@@ -164,6 +177,133 @@ export function computeAABB (geometry, type) {
 
             return aabbList;
     }
+}
+
+export function computeCentroids (decodedGeometry, type) {
+    switch (type) {
+        case GEOMETRY_TYPE.POINT:
+            return _computeCentroidsForPoints(decodedGeometry);
+        case GEOMETRY_TYPE.LINE:
+        case GEOMETRY_TYPE.POLYGON:
+            return _computeCentroidsForLinesOrPolygons(decodedGeometry, type);
+        default:
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid type argument, decoded geometry must have a point, line or polygon type.`);
+    }
+}
+
+function _computeCentroidsForPoints (decodedGeometry) {
+    const centroids = [];
+
+    // 'Compute' centroids for points is just getting one exemplar from the 3 repeated points
+    const STEP = 6;
+    for (let i = 0; i < decodedGeometry.vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [, , , , x, y] = decodedGeometry.vertices.slice(start, end);
+        centroids.push({ x, y });
+    }
+    return centroids;
+}
+
+function _computeCentroidsForLinesOrPolygons (decodedGeometry, type) {
+    const centroids = [];
+
+    let startVertex = 0;
+    decodedGeometry.breakpoints.forEach((breakpoint) => {
+        const vertices = decodedGeometry.vertices.slice(startVertex, breakpoint);
+        let centroid = null;
+        if (type === GEOMETRY_TYPE.LINE) {
+            centroid = _centroidForLines(vertices);
+        } else {
+            centroid = _centroidForPolygons(vertices);
+        }
+        centroids.push(centroid);
+        startVertex = breakpoint;
+    });
+
+    return centroids;
+}
+
+function _centroidForLines (vertices) {
+    // Triangles don't have any area in this case, so just average coordinates are calculated
+    const Xs = [];
+    const Ys = [];
+    const STEP = 6;
+    for (let i = 0; i < vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(start, end);
+
+        const AequalB = (xA === xB && yA === yB);
+        const BequalC = (xB === xC && yB === yC);
+
+        if (AequalB && BequalC) {
+            continue; // spurious triangles (useful for rendering strokes with normals, not here)
+        }
+
+        const firstPoint = [xA, yA];
+        const secondPoint = !AequalB ? [xB, yB] : [xC, yC];
+
+        Xs.push(firstPoint[0]);
+        Xs.push(secondPoint[0]);
+
+        Ys.push(firstPoint[1]);
+        Ys.push(secondPoint[1]);
+    }
+
+    let centroid = {
+        x: average(Xs),
+        y: average(Ys)
+    };
+    return centroid;
+}
+
+function _centroidForPolygons (vertices) {
+    // Triangles average coordinates, ponderated by their area
+    const weightedXs = [];
+    const weightedYs = [];
+    const areas = [];
+
+    const STEP = 6;
+    for (let i = 0; i < vertices.length / STEP; i++) {
+        const start = i * STEP;
+        const end = start + STEP;
+        const [xA, yA, xB, yB, xC, yC] = vertices.slice(start, end);
+        const triangle = [[xA, yA], [xB, yB], [xC, yC]];
+        const area = triangleArea(triangle);
+        if (area > 0) {
+            const averageX = average([xA, xB, xC]);
+            const averageY = average([yA, yB, yC]);
+
+            weightedXs.push(averageX * area);
+            weightedYs.push(averageY * area);
+            areas.push(area);
+        }
+    }
+    const totalWeight = _sumArray(areas);
+
+    let centroid = {
+        x: _sumArray(weightedXs) / totalWeight,
+        y: _sumArray(weightedYs) / totalWeight
+    };
+    return centroid;
+}
+
+function _sumArray (array) {
+    return array.reduce((p, c) => p + c, 0);
+}
+
+/*
+* Calculate the area of a triangle using its coordinates.
+* From https://en.wikipedia.org/wiki/Triangle#Computing_the_area_of_a_triangle
+*/
+export function triangleArea (threeVerticesArray) {
+    let [xA, yA] = threeVerticesArray[0];
+    let [xB, yB] = threeVerticesArray[1];
+    let [xC, yC] = threeVerticesArray[2];
+
+    const area = Math.abs((xA - xC) * (yB - yA) - (xA - xB) * (yC - yA)) / 2.0;
+    return area;
 }
 
 // Compute the WebMercator position at projected (x,y) NDC (Normalized Device Coordinates) reversing the projection of the point
@@ -214,9 +354,9 @@ export function unproject (inv, x, y) {
 
 function _updateAABBForGeometry (feature, aabb, geometryType) {
     switch (geometryType) {
-        case 'line':
+        case GEOMETRY_TYPE.LINE:
             return _updateAABBLine(feature, aabb);
-        case 'polygon':
+        case GEOMETRY_TYPE.POLYGON:
             return _updateAABBPolygon(feature, aabb);
     }
 }

@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [1.1.0] - 2019-01-15
+
+### Added
+- Add `getRenderedCentroid` method to features
+- Add `isPlaying` method to animations
+- Add `enable`/`disable` methods and `isEnabled` property to `Interactivity`
+- Enable user-defined buckets in `viewportHistogram`
+- Add and improve examples (legends, widgets, labeling and basemaps)
+- Add helpers to validate browser support (`isBrowserSupported` & `unsupportedBrowserReasons`)
+- Add tests to check for compatibility with several MGL versions
+
+### Fixed
+- Fix `linear` error when evaluating a date property in a feature
+- Fix `transparent` color displayed as black
+- Fix `symbol` color when setting symbol with blendTo after initializing viz
+- Fix `viewportQuantiles` not getting proper buckets
+- Fix build to set production babelified library as default `main` in package (used at `import carto from '@carto/carto-vl'`)
+- Fix `viewportFeatures` error when line vertices were outside the viewport but there was an intersection
+- Fix `layer:updated` event removing unnecessary emissions
+- Fix issue sorting null key in `viewportHistogram`
+- Fix unwanted `Interactivity` events while using dragPan (and performance improvement)
+- Fix `linear` applied to cluster aggregations without explicit limits
+- Fix `MVT` category property returning a numeric value
+- Fix `Layer.addTo` for MGL v0.52
+
+### Changed
+- Change examples to use Mapbox GL version 0.52
 
 ## [1.0.0] - 2018-11-08
 

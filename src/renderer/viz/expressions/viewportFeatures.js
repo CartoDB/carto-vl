@@ -5,8 +5,8 @@ import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
 import { implicitCast } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
-
 import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
+import { getCompoundFeature } from '../../../interactivity/commonFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -28,7 +28,6 @@ import { genLightweightFeatureClass } from '../../../interactivity/lightweightFe
  * });
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
@@ -42,7 +41,6 @@ import { genLightweightFeatureClass } from '../../../interactivity/lightweightFe
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
@@ -97,8 +95,16 @@ export default class ViewportFeatures extends BaseExpression {
         this.expr = [];
     }
 
-    accumViewportAgg (feature) {
-        this.expr.push(new this._FeatureProxy(feature));
+    accumViewportAgg (featurePieces) {
+        featurePieces = Array.isArray(featurePieces) ? featurePieces : [featurePieces];
+
+        if (featurePieces.length === 1) {
+            this.expr.push(new this._FeatureProxy(featurePieces[0]));
+        } else {
+            const pieces = featurePieces.map((piece) => { return new this._FeatureProxy(piece); });
+            const compoundFeature = getCompoundFeature(pieces);
+            this.expr.push(compoundFeature);
+        }
     }
 }
 

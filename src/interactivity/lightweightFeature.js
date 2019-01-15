@@ -24,6 +24,7 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineFeatureProperties(cls.prototype, propertyNames);
     _defineRootBlendToMethod(cls.prototype);
     _defineRootResetMethod(cls.prototype);
+    _defineGetRenderedCentroidMethod(cls.prototype);
 
     return cls;
 }
@@ -134,5 +135,17 @@ function _defineRootResetMethod (targetObject) {
             };
             return reset;
         }
+    });
+}
+
+function _defineGetRenderedCentroidMethod (targetObject) {
+    Object.defineProperty(targetObject, 'getRenderedCentroid', {
+        get: function () {
+            const getRenderedCentroid = () => {
+                return this._rawFeature._dataframe.getRenderedCentroid(this._rawFeature._index);
+            };
+            return getRenderedCentroid;
+        },
+        configurable: true
     });
 }

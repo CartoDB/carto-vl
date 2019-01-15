@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Numeric Chart | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
+  <!-- Include Chart JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox chart-toolbox chart-toolbox-large">
+    <div class="box chart-box">
+      <header>
+        <h1>Transactions by hour</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <canvas id="histogram" width="600" height="300"></canvas>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [2.2, 41.4],
+      zoom: 12
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const ctx = document.getElementById('histogram').getContext('2d');
+
+    // Define the source
+    const source = new carto.source.Dataset('spend_data');
+
+    // Define the visualization
+    const viz = new carto.Viz(`
+      @color: ramp($hour, sunset)
+      @histogram: viewportHistogram($hour, 12)
+
+      color: @color
+      width: 5
+      strokeWidth: 0
+    `);
+
+    // Draw chart using Chart.js library (https://www.chartjs.org/)
+    const chartOptionsDefault = {
+      animation: {
+        duration: 0
+      },
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            display: false
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            callback: function (tick, index, ticks) {
+              if (!Number.isNaN(tick[0])) {
+                return `${tick[0]}-${tick[1]}h`;
+              }
+            },
+            autoSkip: false,
+            maxRotation: 0,
+            minRotation: 0
+          },
+          barPercentage: 0.95,
+          categoryPercentage: 1.0
+        }]
+      }
+    };
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      options: chartOptionsDefault
+    });
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', () => {
+      hideLoader();
+      drawHistogramLegend();
+    });
+
+    layer.on('updated', drawHistogramLegend);
+
+    function drawHistogramLegend() {
+      // Get the color ramp
+      const colorRamp = layer.viz.color;
+      // Get the viewport histogram
+      const histogram = layer.viz.variables.histogram.value.map(roundedValue);
+      // Get labels (x)
+      const labels = histogram.map(value => value.x);
+      // Get data (y)
+      const data = histogram.map(value => value.y);
+
+      // Get chart bars colors
+      const colors = colorRamp
+        .getLegendData()
+        .data
+        .map(legend => computeColor(legend.value));
+
+      chart.data = {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: '#86d7ff'
+        }]
+      }
+
+      chart.update();
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function computeColor(color) {
+      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
+    }
+
+    function roundedValue(value) {
+      const x = [Math.round(value.x[0]), Math.round(value.x[1])];
+      const y = value.y;
+      return {
+        x,
+        y
+      };
+    }
+
+  </script>
+</body>
+
+</html>

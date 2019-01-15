@@ -12,7 +12,6 @@ uniform mat4 matrix;
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D filterTex;
-//TODO order bucket texture
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
@@ -72,8 +71,10 @@ void main(void) {
     p.xy += ($symbolPlacement_inline)*size/resolution;
 
 
-    vec4 noOverrideColor = vec4(0.);
-    if (size==0. || (color.a==0. && color != noOverrideColor) || size<orderMinWidth || size>=orderMaxWidth){
+    vec4 noOverrideColor = vec4(1., 1., 1., 0.);
+    bool alphaButNotOverrideColor = (color.a==0. && color != noOverrideColor);
+
+    if (size==0. || alphaButNotOverrideColor || size<orderMinWidth || size>=orderMaxWidth){
         p.x=10000.;
     }
 

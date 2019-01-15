@@ -7,8 +7,8 @@
     <meta charset="UTF-8">
 
     <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../../style.css">
@@ -293,6 +293,7 @@
             viz.variables.animation.play()
             $playbutton.disabled = true;
             $pausebutton.disabled = false;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
         });
 
         $pausebutton.addEventListener('click', () => {
@@ -300,6 +301,7 @@
             viz.variables.animation.pause();
             $playbutton.disabled = false;
             $pausebutton.disabled = true;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
         });
     </script>
 </body>

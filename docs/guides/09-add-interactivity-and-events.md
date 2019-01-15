@@ -1,5 +1,5 @@
 ## Add interactivity and events
-In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of interactivity events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and provide a richer experience for the end-user (e.g. changing the color of features on hover or click). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being clicked on or hovered.
+In this guide you will learn how to add user interactions to your CARTO VL visualization. By the end of this guide, you will have a better understanding of events (e.g. waiting for a layer to load or clicking on a feature) and how they can be used to make your visualization more dynamic and also provide a richer experience for the end-user (e.g. changing the color of features on hover or click, thanks to several [interactivity](https://carto.com/help/glossary/#interactivity) features). You will also learn how to add common add-ons like *pop-ups* with additional information about the data being clicked on or hovered.
 
 By the end of the guide you will have built a visualization like this one where the color of features change as you move the mouse over them and display pop-up information when you click on them:
 <div class="example-map">
@@ -272,8 +272,8 @@ Here it is the full example:
 <head>
     <meta charset="utf-8">
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 

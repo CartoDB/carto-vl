@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -25,7 +25,7 @@
   "license": "BSD-3-Clause",
   "files": [
     "src",
-    "dist"
+    "dist/carto-vl*.*"
   ],
   "dependencies": {
     "@babel/runtime": "^7.0.0",
@@ -33,7 +33,8 @@
     "cartocolor": "^4.0.0",
     "earcut": "^2.1.2",
     "gl-matrix": "^2.8.1",
-    "jsep": "CartoDB/jsep#additional-char-ids-packaged",
+    "jsep": "CartoDB/jsep#additional-char-ids-packaged-update-1",
+    "lineclip": "^1.1.5",
     "lru-cache": "^4.1.1",
     "mitt": "^1.1.3",
     "pbf": "^3.1.0"
@@ -42,6 +43,7 @@
     "@babel/core": "^7.0.0",
     "@babel/plugin-transform-runtime": "^7.1.0",
     "@babel/preset-env": "^7.0.0",
+    "aws-sdk": "^2.372.0",
     "babel-loader": "^8.0.0",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
@@ -69,25 +71,26 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.5",
     "lodash.template": "^4.4.0",
-    "mapbox-gl": "0.50.0",
+    "mapbox-gl": "0.52.0",
     "mocha": "^5.0.0",
     "puppeteer": "^1.1.0",
-    "s3": "^4.4.0",
     "serve": "^10.0.2",
     "sloc": "^0.2.0",
     "svg-inline-loader": "^0.8.0",
     "wait-on": "^3.1.0",
     "webpack": "^4.17.1",
+    "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^3.1.1",
     "webpack-glsl-loader": "^1.0.1",
     "worker-loader": "^2.0.0"
   },
-  "module": "dist/carto-vl.js",
-  "main": "dist/carto-vl.js",
+  "main": "dist/carto-vl.min.js",
   "scripts": {
-    "build": "yarn build:dev && yarn build:min",
+    "build": "yarn build:clean && yarn build:dev && yarn build:min",
+    "build:clean": "rm -rf dist/",
     "build:dev": "webpack --config webpack/webpack.config.js",
     "build:min": "webpack --config webpack/webpack.min.config.js",
+    "build:min:report": "webpack-bundle-analyzer --port 4200 dist/stats.json",
     "build:watch": "webpack -w --config webpack/webpack.config.js",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
@@ -103,20 +106,20 @@
     "test:user:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js",
     "test:user:watchc": "karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
-    "test:render": "yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000",
-    "test:render:min": "yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000",
+    "test:render": "yarn build:clean && yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000",
+    "test:render:min": "yarn build:clean && yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000",
     "test:render:clean": "rm -rf test/integration/render/scenarios/**/**/reference.png",
-    "test:render:prepare": "yarn build:dev && node test/integration/render/render.prepare.js ",
+    "test:render:prepare": "yarn build:clean && yarn build:dev && node test/integration/render/render.prepare.js ",
     "test:e2e": "./scripts/run-local-e2e.sh",
     "test:e2e:clean": "rm -rf test/acceptance/e2e/**/reference.png",
-    "test:e2e:prepare": "yarn build:dev && node test/acceptance/e2e.prepare.js ",
+    "test:e2e:prepare": "yarn build:clean && yarn build:dev && node test/acceptance/e2e.prepare.js ",
     "test:fps": "node test/benchmark/fps/benchmark.js",
     "test:perf": "karma start --single-run --browsers Chrome test/benchmark/karma.conf.js",
-    "serve": "yarn build:dev && yarn docs && http-server --cors",
+    "serve": "yarn build:clean && yarn build:dev && yarn docs && http-server --cors",
     "preversion": "./scripts/preversion.sh",
     "postversion": "git push origin HEAD --follow-tags",
-    "prepublishOnly": "./scripts/release.sh",
-    "cdn:branch:publish": "./scripts/publish-branch.sh",
+    "prepublishOnly": "yarn build && ./scripts/release.sh",
+    "cdn:branch:publish": "yarn build && ./scripts/publish-branch.sh",
     "ghpublish": "git checkout gh-pages && git pull origin gh-pages && git merge master && yarn build && yarn docs && git commit -a -m \"Auto generated gh-pages\" && git push origin gh-pages && git checkout master",
     "loc": "sloc src/ examples/"
   },
@@ -124,6 +127,10 @@
     "defaults",
     "not ie <12",
     "not edge <17"
+  ],
+  "previousMapboxGLVersions": [
+    "v0.50.0",
+    "v0.51.0"
   ]
 }
 

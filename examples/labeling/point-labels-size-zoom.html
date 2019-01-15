@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Point labels text size by zoom | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-104.994105, 39.745939],
+      zoom: 13
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Point layer
+    const source = new carto.source.Dataset('points_of_interest');
+    const viz = new carto.Viz(`
+      color: fuchsia
+      width: 6
+      strokeColor: white
+      strokeWidth: 2
+      filter: $major == "YES"
+      @v_features: viewportFeatures($poi_name)
+    `);
+    const layer = new carto.Layer('points', source, viz);
+
+    // Create labeling layer centroids
+    layer.on('loaded', () => {
+      map.addSource('labels', { type: 'geojson', data: null });
+      const labelSource = map.getSource('labels');
+
+      const layerUpdated = function () {
+        const features = viz.variables.v_features.value;
+        const geojsonFeatures = features.map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getRenderedCentroid()
+            },
+            "properties": {
+              "label_field": `${f.properties['poi_name']}`,
+            }
+          }
+        });
+
+        labelSource.setData({
+          type: 'FeatureCollection',
+          features: geojsonFeatures
+        });
+      };
+
+      layer.on('updated', layerUpdated);
+
+      // Style labels add stops for text size through zoom
+      map.addLayer({
+        "id": "my-labels",
+        "type": "symbol",
+        "source": "labels",
+        "layout": {
+          "text-size": {
+            "stops": [
+              [13, 8],
+              [14, 12],
+              [16, 16],
+              [18, 24]
+            ]
+          },
+          "text-field": "{label_field}",
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 0.65],
+          "text-anchor": "top",
+          "text-max-width": 8,
+          "text-justify": "center"
+        },
+        "paint": {
+          "text-color": "white",
+          "text-halo-color": "fuchsia",
+          "text-halo-width": 0.5,
+          "text-halo-blur": 0.5
+        }
+      });
+    });
+
+    layer.addTo(map);
+
+  </script>
+</body>
+
+</html>

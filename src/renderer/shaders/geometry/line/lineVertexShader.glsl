@@ -26,7 +26,7 @@ void main(void) {
     color = texture2D(colorTex, featureID);
     float filtering = texture2D(filterTex, featureID).a;
     color.a *= filtering;
-    color.rgb *= color.a;
+    color.rgb *= color.a; // premultiplied-alpha
     float size = decodeWidth(texture2D(widthTex, featureID).rg);
 
     // 64 is computed based on RTT_WIDTH and the depth buffer precision

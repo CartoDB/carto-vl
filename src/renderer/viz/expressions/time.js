@@ -49,4 +49,8 @@ export default class Time extends BaseExpression {
     isAnimated () {
         return false;
     }
+
+    isPlaying () {
+        return false;
+    }
 }

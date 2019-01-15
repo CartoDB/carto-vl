@@ -62,7 +62,5 @@ layer.addTo(map);
 layer.on('loaded', () => {
     viz.filter.pause();
     viz.filter.setProgressPct(0.3);
-    layer.on('updated', () => {
-        window.loaded = true;
-    });
+    layer.on('updated', debounceSetLoaded());
 });

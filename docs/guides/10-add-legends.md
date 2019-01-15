@@ -1,12 +1,12 @@
 ## Add legends
 
-Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with **legends** to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent.
+Maps that symbolize data without the necessary information to decode the symbols are not always effective in communicating their message. In this guide, you will explore how to enrich your visualizations with [legends](https://carto.com/help/glossary/#legend) to aid interpretation by providing a visual explanation of point, line, or polygon symbols used on a map with a description of what they represent.
 
 ### Overview
 
 CARTO VL itself doesn't provide the functionality to _draw_ legends. Instead, it provides the functionality necessary to _build_ them. What this means is that CARTO VL provides the data you need to create a legend, but drawing that data on the screen (in the form of a legend), is the responsibility of the application developer. The benefit of this is that you have more control over customizing legends for the needs of your specific application.
 
-If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map.
+If you completed the data-driven visualization guide, the map below will look familiar. In that guide, you learned how to symbolize feature properties with a `ramp`. In this guide, you will learn how to reference that `ramp` to access data for the legend, and then place the returned content on your map. At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
 
 <div class="example-map">
     <iframe
@@ -18,11 +18,9 @@ If you completed the data-driven visualization guide, the map below will look fa
     </iframe>
 </div>
 
-At the end of this guide, we also provide a series of examples, that are meant to serve as the legend "building blocks" that you can take and begin to customize on top of for a variety of map types.
-
 ### Getting started
 
-The map below is the same one as above, a category map that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right-hand corner, but is missing the legend information to help interpret what weather type each color on the map represents.
+The map below is the same one as above, a [category map](https://carto.com/help/glossary/#category) that symbolizes US rail accidents by reported weather conditions. Unlike the map above, you will notice that this map has a legend box with a title ("Rail Accidents by Weather") in the right-hand corner, but is missing the legend information to help interpret what weather type each color on the map represents.
 
 <div class="example-map">
     <iframe
@@ -49,8 +47,8 @@ To get started, copy and paste the code for this map and save it as `accidents.h
     <meta charset="UTF-8">
     <script src="../../../dist/carto-vl.js"></script>
 
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
@@ -103,7 +101,7 @@ To get started, copy and paste the code for this map and save it as `accidents.h
 
 ### Access data from `ramp`
 
-To get the necessary information to populate the legend, you use the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method needs to reference the `ramp` expression where the symbology for your map is defined.
+To get the necessary information to populate the legend, you use the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method. The `getLegendData()` method will reference the `ramp` expression where the symbology for your map is defined.
 
 Take a look at the point styling for the accidents map. This is the styling that we want to bring into our legend and associate each legend item to each category type that we are symbolizing from the `$weather` property.
 
@@ -118,10 +116,7 @@ const viz = new carto.Viz(`
 
 ### Get legend data
 
-Since the `ramp` expression is the root expression of a styling property (in this case, `color`) it can be accessed directly with `layer.viz.color.getLegendData()`.
-
-**Note:**
-If styling isn't tied directly to a styling property, you will need to use a variable. We will explore that method in detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
+In the map above, the `ramp` expression is the root expression of the styling property `color`. Therefore, it can be accessed directly with `layer.viz.color.getLegendData()`.
 
 Add the following code to your map right under `layer.addTo(map)` and before the closing `</script>` tag. Take a look through the inline comments describing the different steps to place the legend content when a map is loaded.
 
@@ -158,17 +153,6 @@ If you load your map after the previous step, you will see that there is still n
 
 That's because we have to define a place for the last step of the process (`document.getElementById('content').innerHTML = colorLegendList;`) to place the information on the map once it is received.
 
-<div class="example-map">
-    <iframe
-        id="guides-legend-step-2"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-
 To define where the content should be placed on the map, add a `<section>` in the title/legend box element of the page:
 
 ```html
@@ -198,7 +182,7 @@ Now, when you load the map, you will see the complete legend. You will also noti
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
 
 ### Overwrite defaults
 
@@ -217,14 +201,14 @@ For example, the map below symbolizes only the `top` three weather conditions in
     </iframe>
 </div>
 
-You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()`:
+You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()}`:
 
 ```js
 colorLegendList +=
     `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
 ```
 
-With that change, the final map will now label other categories as "Other weather" in the legend:
+With that change, the map labels other categories as "Other weather" in the legend:
 
 <div class="example-map">
     <iframe
@@ -236,7 +220,83 @@ With that change, the final map will now label other categories as "Other weathe
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
+
+### Assign opacity with variables
+
+If you want to assign opacity to mapped features, you will construct your `ramp` using [variables](/developers/carto-vl/guides/Glossary/#variables).
+
+**Note:**
+The use of [variables](/developers/carto-vl/guides/Glossary/#variables) is explored in greater detail in the [Add Widgets](/developers/carto-vl/guides/add-widgets/) guide.
+
+The styling below assigns a global `0.5` opacity to features, using two variables:
+* `@myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])` for the colors assigned to each category
+* `@myOpacity: 0.5` for the amount of opacity to assign to features
+
+The variables are then used in the `color` property inside of an `opacity` expression:
+
+```CARTO_VL_Viz
+const viz = new carto.Viz(`
+    @myRamp: ramp($weather, [darkorange, darkviolet, darkturquoise])
+    @myOpacity: 0.5
+
+    width: 7
+    color: opacity(@myRamp, @myOpacity)
+    strokeWidth: 0.2
+    strokeColor: black
+`);
+```
+
+Next, you need to modify where the legend gets the data to draw (`getLegendData()`). In the previous examples, you set the data to come from the `color` property but in this case, the symbology is assigned through variables so you need to modify it to read from the variable `@myRamp`:
+
+```js
+// Request data for legend from the layer variable myRamp
+    const colorLegend = layer.viz.variables.myRamp.getLegendData();
+    let colorLegendList = '';
+```
+At this point, if you refresh your map, you will see that the features on the map have the set opacity, but the features in the legend do not.
+
+To add opacity to the legend items, you need to remove the function `rgbToHex(color)` (that works only with the RGB color components of each entry) and instead, use another approach, that includes the alpha component. In the code below, the alpha component is defined previously as a variable (`@myOpacity`) which is read in when building the visual legend entries (thus using RGBA colors).
+
+```js
+// When layer loads, trigger legend event
+layer.on('loaded', () => {
+
+    // Request data for legend from the layer viz variables 'myRamp' and 'myOpacity'
+    const colorLegend = layer.viz.variables.myRamp.getLegendData();
+    const opacity = layer.viz.variables.myOpacity.value;
+
+    let colorLegendList = '';
+
+    // Create list elements for legend
+    colorLegend.data.forEach((legend, index) => {
+        const color = legend.value;
+
+        // Add the predefined opacity to the ramp color components
+        const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
+
+        // Style for legend items based on geometry type
+        colorLegendList +=
+            `<li><span class="point-mark" style="background-color:${rgba}; border: 0px solid black;"></span><span>${legend.key}</span></li>\n`;
+    });
+
+    // Place list items in the content section of the title/legend box
+    document.getElementById('content').innerHTML = colorLegendList;
+});
+```
+Now when you load the map, you will see that both the features on the map and the legend have the assigned opacity:
+
+<div class="example-map">
+    <iframe
+        id="accidents-all-transparent-legend"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
 
 ### More examples
 
@@ -247,7 +307,7 @@ View the source of the maps below to see how legends work for different map and 
 <div class="example-map">
     <iframe
         id="guides-legend-step-6"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -261,7 +321,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-7"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -275,7 +335,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-8"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"

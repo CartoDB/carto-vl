@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Viewport summary | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Railroad accidents</h1>
+            </header>
+            <p class="description open-sans">Viewport summaries</p>
+            <br />
+            <div id="widgets" class="open-sans">
+                <div>
+                    <label>Viewport accidents:</label>
+                    <div id="widget-viewport-accidents"></div>
+                    <label>Viewport damage:</label>
+                    <div id="widget-viewport-damage"></div>
+                    <label>Total damage:</label>
+                    <div id="widget-total-damage"></div>
+                </div>
+            </div>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 3.5,
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            @viewportAccidents: viewportCount()
+            @totalDamage: globalSum($total_damage)
+            @viewportDamage: viewportSum($total_damage)
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            hideLoader();
+            function hideLoader() {
+                document.getElementById('loader').style.opacity = '0';
+            }
+        });
+
+        layer.on('updated', () => {
+            // Update widgets
+            document.getElementById('widget-total-damage').innerText = `$ ${viz.variables.totalDamage.value / 1000000} M`;
+            document.getElementById('widget-viewport-damage').innerText = `$ ${viz.variables.viewportDamage.value / 1000000} M`;
+            document.getElementById('widget-viewport-accidents').innerText = viz.variables.viewportAccidents.value;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Add pop-ups | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../examples/style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -19,16 +21,16 @@
       <section>
         <p class="description open-sans">Create pop-up information windows and interact with your map</p>
         <div id="controls">
-            <ul class="actions">
-              <li>
-                <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
-                <label for="click">Pop-ups on click</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
-                <label for="hover">Pop-ups on hover</label>
-              </li>
-            </ul>
+          <ul class="actions">
+            <li>
+              <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
+              <label for="click">Pop-ups on click</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
+              <label for="hover">Pop-ups on hover</label>
+            </li>
+          </ul>
         </div>
       </section>
       <footer class="js-footer"></footer>
@@ -78,7 +80,7 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.on('updated', ()=>{
+    layer.on('updated', () => {
       console.log(viz.variables.v.value);
     })
 
@@ -89,18 +91,18 @@
     interactivity.on('featureEnter', event => {
       event.features.forEach(feature => {
         if (feature.id !== clickedFeatureId) {
-          feature.color.blendTo('opacity(DeepPink, 0.5)', delay)
-          feature.strokeWidth.blendTo('4', delay);
-          feature.strokeColor.blendTo('opacity(DeepPink, 0.8)', delay);
+          feature.blendTo({
+            color: 'opacity(DeepPink, 0.5)',
+            strokeWidth: '4',
+            strokeColor: 'opacity(DeepPink, 0.8)'
+          }, delay);
         }
       });
     });
     interactivity.on('featureLeave', event => {
       event.features.forEach(feature => {
         if (feature.id !== clickedFeatureId) {
-          feature.color.reset(delay);
-          feature.strokeWidth.reset(delay);
-          feature.strokeColor.reset(delay);
+          feature.reset(delay);
         }
       });
     });
@@ -108,18 +110,18 @@
       if (event.features.length) {
         const feature = event.features[0];
         clickedFeatureId = feature.id;
-        feature.color.blendTo('opacity(LimeGreen, 0.5)', delay)
-        feature.strokeWidth.blendTo('7', delay);
-        feature.strokeColor.blendTo('opacity(LimeGreen, 0.8)', delay);
+        feature.blendTo({
+          color: 'opacity(LimeGreen, 0.5)',
+          strokeWidth: '7',
+          strokeColor: 'opacity(LimeGreen, 0.8)'
+        }, delay);
       }
     });
     interactivity.on('featureClickOut', event => {
       if (event.features.length) {
         const feature = event.features[0];
         clickedFeatureId = '';
-        feature.color.reset(delay);
-        feature.strokeWidth.reset(delay);
-        feature.strokeColor.reset(delay);
+        feature.reset(delay);
       }
     });
 
@@ -157,5 +159,5 @@
     }
   </script>
 </body>
-</html>
 
+</html>

@@ -72,14 +72,16 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/car
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
  * @property {FeatureVizProperty} width
- * @property {FeatureVizProperty} colorStroke
- * @property {FeatureVizProperty} widthStroke
+ * @property {FeatureVizProperty} strokeColor
+ * @property {FeatureVizProperty} strokeWidth
  * @property {FeatureVizProperty} symbol
  * @property {FeatureVizProperty} symbolPlacement
  * @property {FeatureVizProperty} filter
  * @property {FeatureVizProperty} transform
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
+ * @property {function} blendTo - Blend custom feature vizs by fading in `duration` milliseconds
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
+ * @property {function} getRenderedCentroid - Get centroid from the displayed geometry as [longitude, latitude]. When using lines and polygons in a MVT source, it can be different from canonical feature's centroid (it can be the centroid from just some client-side pieces). Useful for labeling.
  * @api
  */
 
@@ -144,5 +146,9 @@ export default class Feature {
         for (let key in this.variables) {
             this.variables[key].reset(duration);
         }
+    }
+
+    getRenderedCentroid () {
+        return this._rawFeature._dataframe.getRenderedCentroid(this._rawFeature._index);
     }
 }

@@ -119,6 +119,23 @@ describe('viewportFeatures', () => {
         });
     });
 
+    it('should have a working getRenderedCentroid method', done => {
+        layer1.on('loaded', () => {
+            const featureList = viz1.variables.list.eval();
+            const [[x1, y1], [x2, y2]] = featureList.map(f => {
+                return f.getRenderedCentroid();
+            });
+
+            expect(x1).toBeCloseTo(0, 6);
+            expect(y1).toBeCloseTo(0, 6);
+
+            expect(x2).toBeCloseTo(10, 6);
+            expect(y2).toBeCloseTo(12, 6);
+
+            done();
+        });
+    });
+
     afterEach(() => {
         document.body.removeChild(setup.div);
     });
@@ -267,111 +284,194 @@ describe('viewportFeatures with invalid parameters', () => {
 });
 
 describe('viewportFeatures collision', () => {
-    const innerTriangle = {
-        type: 'Feature',
-        geometry: {
-            type: 'Polygon',
-            coordinates: [
-                [[0, 50], [0, 0], [50, 0], [0, 50]]
-            ]
-        },
-        properties: {
-            cartodb_id: 1,
-            value: 1,
-            category: 'a'
-        }
-    };
-
-    const intersectingTriangle = {
-        type: 'Feature',
-        geometry: {
-            type: 'Polygon',
-            coordinates: [
-                [[165, 50], [165, 0], [215, 0], [165, 50]]
-            ]
-        },
-        properties: {
-            cartodb_id: 2,
-            value: 2,
-            category: 'b'
-        }
-    };
-
-    const outerTriangle = {
-        type: 'Feature',
-        geometry: {
-            type: 'Polygon',
-            coordinates: [
-                [[200, 50], [200, 0], [250, 0], [200, 50]]
-            ]
-        },
-        properties: {
-            cartodb_id: 3,
-            value: 3,
-            category: 'c'
-        }
-    };
-
-    const outerBBOXTriangle = {
-        type: 'Feature',
-        geometry: {
-            type: 'Polygon',
-            coordinates: [
-                [[-226, -70], [-226, -85], [-176, -85], [-226, -70]]
-            ]
-        },
-        properties: {
-            cartodb_id: 4,
-            value: 4,
-            category: 'd'
-        }
-    };
-
-    function generateData (features) {
-        return { type: 'FeatureCollection', features };
-    }
-
     let map, viz1, layer1, source1, setup;
 
-    beforeEach(() => {
+    function setupMap (geojsonData, zoom = 0) {
         const VIEWPORT_SIZE = 500;
 
         setup = util.createMap('map', VIEWPORT_SIZE);
         map = setup.map;
+        map.setZoom(zoom);
 
-        source1 = new carto.source.GeoJSON(
-            generateData([
-                innerTriangle,
-                intersectingTriangle,
-                outerTriangle,
-                outerBBOXTriangle
-            ]),
-            {
-                id: 'cartodb_id',
-                value: ['value'],
-                category: ['category']
-            }
-        );
+        source1 = new carto.source.GeoJSON(geojsonData);
 
         viz1 = new carto.Viz(`
-              color: red,
+              color: ramp($category, prism),
               strokeWidth: 0,
               @list: viewportFeatures($value ,$category, $cartodb_id);
             `);
 
         layer1 = new carto.Layer('layer1', source1, viz1);
         layer1.addTo(map);
+    }
+
+    describe('polygons', () => {
+        function generatePolygonsDataset () {
+            const innerTriangle = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                        [[0, 50], [0, 0], [50, 0], [0, 50]]
+                    ]
+                },
+                properties: {
+                    cartodb_id: 1,
+                    value: 1,
+                    category: 'a'
+                }
+            };
+
+            const intersectingTriangle = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                        [[165, 50], [165, 0], [215, 0], [165, 50]]
+                    ]
+                },
+                properties: {
+                    cartodb_id: 2,
+                    value: 2,
+                    category: 'b'
+                }
+            };
+
+            const outerTriangle = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                        [[200, 50], [200, 0], [250, 0], [200, 50]]
+                    ]
+                },
+                properties: {
+                    cartodb_id: 3,
+                    value: 3,
+                    category: 'c'
+                }
+            };
+
+            const outerBBOXTriangle = {
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [
+                        [[-226, -70], [-226, -85], [-176, -85], [-226, -70]]
+                    ]
+                },
+                properties: {
+                    cartodb_id: 4,
+                    value: 4,
+                    category: 'd'
+                }
+            };
+
+            const features = [
+                innerTriangle,
+                intersectingTriangle,
+                outerTriangle,
+                outerBBOXTriangle
+            ];
+            return { type: 'FeatureCollection', features };
+        }
+
+        beforeEach(() => {
+            setupMap(generatePolygonsDataset());
+        });
+
+        it('should get correctly detected in the viewport', done => {
+            layer1.on('loaded', () => {
+                const expected = [
+                    { cartodb_id: 1, value: 1, category: 'a' },
+                    { cartodb_id: 2, value: 2, category: 'b' }
+                ];
+
+                checkFeatures(viz1.variables.list.eval(), expected);
+                done();
+            });
+        });
     });
 
-    it('should get the properties in the viewport', done => {
-        layer1.on('loaded', () => {
-            const expected = [
-                { cartodb_id: 1, value: 1, category: 'a' },
-                { cartodb_id: 2, value: 2, category: 'b' }
-            ];
+    describe('lines', () => {
+        function generateLinesDataset () {
+            const inner = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[0, 0], [0, 25]]
+                },
+                properties: {
+                    cartodb_id: 1,
+                    value: 1,
+                    category: 'a'
+                }
+            };
 
-            checkFeatures(viz1.variables.list.eval(), expected);
-            done();
+            const oneVertexOutsideIntersecting = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[15, 0], [15, 60]]
+                },
+                properties: {
+                    cartodb_id: 2,
+                    value: 2,
+                    category: 'b'
+                }
+            };
+
+            const twoVerticesOutsideIntersecting = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[30, -60], [30, 60]]
+                },
+                properties: {
+                    cartodb_id: 3,
+                    value: 3,
+                    category: 'c'
+                }
+            };
+
+            const outside = {
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: [[70, -60], [70, 60]]
+                },
+                properties: {
+                    cartodb_id: 4,
+                    value: 4,
+                    category: 'd'
+                }
+            };
+
+            const features = [
+                inner,
+                oneVertexOutsideIntersecting,
+                twoVerticesOutsideIntersecting,
+                outside
+
+            ];
+            return { type: 'FeatureCollection', features };
+        }
+
+        beforeEach(() => {
+            setupMap(generateLinesDataset(), 2);
+        });
+
+        it('should get correctly detected in the viewport', done => {
+            layer1.on('loaded', () => {
+                const expected = [
+                    { cartodb_id: 1, value: 1, category: 'a' }, // completely inside
+                    { cartodb_id: 2, value: 2, category: 'b' }, // one vertex outside
+                    { cartodb_id: 3, value: 3, category: 'c' } // two vertices outside
+                ];
+
+                checkFeatures(viz1.variables.list.eval(), expected);
+                done();
+            });
         });
     });
 

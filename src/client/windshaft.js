@@ -6,10 +6,13 @@ import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
+
+const TILE_EXTENT = 2048;
 
 export default class Windshaft {
     constructor (source) {
@@ -165,12 +168,12 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(urlTemplates);
+        metadata.extent = TILE_EXTENT;
+        this._mvtClient = new MVT(urlTemplates, metadata);
         this._mvtClient._workerName = 'windshaft';
         this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
-        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
@@ -292,6 +295,8 @@ export default class Windshaft {
                     options: {
                         sql: aggSQL,
                         aggregation: agg,
+                        vector_extent: TILE_EXTENT,
+                        vector_simplify_extent: TILE_EXTENT,
                         dates_as_numbers: true
                     }
                 }
@@ -390,15 +395,13 @@ export default class Windshaft {
             }
         });
 
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
         }
 
         const idProperty = 'cartodb_id';
 
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
-        metadata.setCodecs();
-        return metadata;
+        return new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
     }
 }
 
@@ -406,12 +409,12 @@ function adaptGeometryType (type) {
     switch (type) {
         case 'ST_MultiPolygon':
         case 'ST_Polygon':
-            return 'polygon';
+            return GEOMETRY_TYPE.POLYGON;
         case 'ST_Point':
-            return 'point';
+            return GEOMETRY_TYPE.POINT;
         case 'ST_MultiLineString':
         case 'ST_LineString':
-            return 'line';
+            return GEOMETRY_TYPE.LINE;
         default:
             throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
     }

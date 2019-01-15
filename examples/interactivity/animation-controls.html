@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="../style.css">
     <style type="text/css">
@@ -165,7 +165,6 @@
             border: 1px solid #ddd;
             width: 32px;
             height: 32px;
-            ;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -203,6 +202,10 @@
                 <input type="button" id="js-pause-button">
                 <input type="range" id="js-time-range" min="0" max="1" step="0.01">
             </section>
+            <br />
+            <section>
+                <span id="js-current-time" class="open-sans"></span>
+            </section>
             <hr>
             <section>
                 <span style="margin-right: 5px" class="open-sans">Duration (seconds)</span>
@@ -228,9 +231,7 @@
             scrollZoom: false
         });
 
-        const nav = new mapboxgl.NavigationControl({
-            showCompass: false
-        });
+        const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
         //** CARTO VL functionality begins here **//
@@ -263,6 +264,8 @@
         const $durationRange = document.getElementById('js-duration-range');
         const $timeRange = document.getElementById('js-time-range');
         const $spanDuration = document.getElementById('js-duration-span');
+        const $currentTime = document.getElementById('js-current-time');
+
         // Save initial time range value
         let last = $timeRange.value;
 
@@ -295,6 +298,7 @@
                 $timeRange.value = viz.variables.animation.getProgressPct();
                 last = $timeRange.value;
             }
+            $currentTime.innerText = viz.variables.animation.getProgressValue().toISOString();
         });
 
         layer.on('loaded', hideLoader);

@@ -45,6 +45,10 @@ export default class AnimationRange extends BaseExpression {
         return true;
     }
 
+    isPlaying () {
+        return this._startAnim.isPlaying();
+    }
+
     getProgressValue () {
         return this._startAnim.getProgressValue();
     }

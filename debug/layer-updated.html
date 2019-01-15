@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Layer:updated | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Update events</h1>
+      </header>
+      <section class="open-sans">
+        <h3>Viewport</h3>
+        <button id="btnZoom">Zoom</button>
+        <button id="btnCenter">Center</button>
+        <button id="btnBearing">Bearing</button>
+        <button id="btnPitch">Pitch</button>
+
+        <h3>Visibility</h3>
+        <button id="btnVisibleSimpleLayer">Simple - On/Off</button>
+        <button id="btnVisibleAnimationLayer">Animation - On/Off</button>
+
+        <h3>Viz</h3>
+        <button id="btnChangeViz">Simple - change color</button>
+
+        <h3>Source</h3>
+        <button id="btnChangeSource">Simple - change source</button>
+
+        <h3>Animation</h3>
+        <button id="btnPlayPause">Play / Pause</button><br />
+        <h4 id="js-animationDate"></h4>
+
+      </section>
+    </div>
+  </aside>
+
+  <script>
+
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-4.77, 37.88],
+      zoom: 12
+    });
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Shared source
+    const source = new carto.source.Dataset('cordoba_catastro');
+    const sqlSource = new carto.source.SQL('SELECT * FROM cordoba_catastro WHERE currentuse = \'3_industrial\'');
+
+    // 1. Animation Layer (1910 - 2018, all buildings)
+    const animationViz = new carto.Viz(`
+      @duration: 30
+      @animation: animation(linear($beginning, time('1910-01-01T00:00:07Z'), time('2018-01-01T00:00:07Z')), @duration, fade(0.1, ${Number.MAX_SAFE_INTEGER}))
+      strokeWidth: 0.8
+      width: 8
+      color: yellow
+      strokeColor: yellow
+      filter: @animation
+    `);
+    const animationLayer = new carto.Layer('animation', source, animationViz);
+    animationLayer.on('loaded', () => {
+      console.log('animation: loaded');
+      animationViz.variables.animation.pause(); // start with a paused animation
+    });
+    animationLayer.on('updated', (eventData) => {
+      const animation = animationViz.variables.animation;
+      console.log(`* animation: updated (${eventData})`);
+      console.log('* animation: progress', animation.getProgressPct());
+      document.getElementById('js-animationDate').innerText = animation.getProgressValue().toISOString();
+    });
+    animationLayer.addTo(map, 'watername_ocean');
+
+    // 2. Simple Layer
+    const simpleViz = new carto.Viz(`
+      @histogram: viewportHistogram($cartodb_id, 10)
+      @features: viewportFeatures($currentuse)
+      strokeWidth: 0
+      color: opacity(gray, 0.3)
+      width: 8
+      filter: 1
+    `)
+    const simpleLayer = new carto.Layer('simple', source, simpleViz);
+    simpleLayer.on('loaded', () => {
+      console.log('simple layer: loaded');
+    });
+    let firstTimeUpdate = true;
+    simpleLayer.on('updated', (eventData) => {
+      console.log(`* simple layer: updated (${eventData})`);
+
+      const features = simpleViz.variables.features.value;
+      if (firstTimeUpdate) {
+        firstTimeUpdate = false;
+        console.log('1 feature blendTo & reset change');
+
+        // several blendTo
+        features[0].blendTo({
+          color: 'red',
+          strokeColor: 'orange',
+          strokeWidth: 80
+        });
+        setTimeout(() => {
+          features[0].reset();
+        }, 2000);
+      }
+    });
+    simpleLayer.addTo(map, 'animation');
+    let simpleCurrentSource = source; // to enable toggling sources
+
+
+    // Helpers to raise events
+    function addTriggers() {
+      function randomBetween(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      // Viewport
+      document.getElementById('btnZoom').addEventListener('click', () => {
+        console.log('zoom');
+        map.zoomTo(randomBetween(10, 20));
+      });
+
+      document.getElementById('btnCenter').addEventListener('click', () => {
+        console.log('center');
+        map.panBy([randomBetween(-500, 500), randomBetween(-500, 500)]);
+      });
+
+      document.getElementById('btnBearing').addEventListener('click', () => {
+        console.log('bearing');
+        map.setBearing(randomBetween(0, 360));
+      });
+
+      document.getElementById('btnPitch').addEventListener('click', () => {
+        console.log('pitch');
+        map.setPitch(randomBetween(0, 60));
+      });
+
+      // map events
+      function updateMapInfo() {
+        const zoom = map.getZoom().toFixed(2);
+        document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+      }
+      // const mapEndEvents = ['load', 'moveend', 'dragend', 'zoomend', 'rotateend', 'pitchend', 'boxzoomend'];
+      // mapEndEvents.forEach((name) => {
+      //   map.on(name, () => console.log('...map:' + name));
+      // });
+
+      // Visibility
+      document.getElementById('btnVisibleSimpleLayer').addEventListener('click', () => {
+        console.log('layer on/off');
+        simpleLayer.visible ? simpleLayer.hide() : simpleLayer.show();
+        console.log(`simple layer visible? ${simpleLayer.visible}`);
+      });
+      document.getElementById('btnVisibleAnimationLayer').addEventListener('click', () => {
+        console.log('animationLayer on/off');
+        animationLayer.visible ? animationLayer.hide() : animationLayer.show();
+        console.log(`animationLayer visible? ${animationLayer.visible}`);
+      });
+
+      // Viz change (color)
+      document.getElementById('btnChangeViz').addEventListener('click', () => {
+        console.log('change viz (color)');
+        simpleViz.color.blendTo(`rgba(${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)}, 0.3)`);
+      });
+
+      // Source change
+      document.getElementById('btnChangeSource').addEventListener('click', () => {
+        console.log('change source (simple layer)');
+        let newSource = (simpleCurrentSource === source) ? sqlSource : source;
+        simpleLayer.update(newSource);
+        simpleCurrentSource = newSource;
+      });
+
+      // Animation
+      document.getElementById('btnPlayPause').addEventListener('click', () => {
+        console.log('play/pause');
+        const animation = animationViz.variables.animation;
+        const playing = animation.isPlaying();
+        playing ? animation.pause() : animation.play();
+        console.log(`now playing? ${!playing} (progress ${animation.getProgressPct()})`);
+      });
+
+    }
+
+    addTriggers();
+
+  </script>
+</body>
+
+</html>

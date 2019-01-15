@@ -19,5 +19,7 @@
       ]
     ]
   },
-  "properties": {}
+  "properties": {
+    "cat": "1"
+  }
 }

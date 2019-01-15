@@ -6,6 +6,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/ca
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -282,7 +283,7 @@ export default class GeoJSON extends Base {
                     f.properties.cartodb_id = -i;
                 }
                 // note that GeoJSON does not support multi-value properties
-                properties[name][i] = this._metadata.codec(name).sourceToInternal(f.properties[name]);
+                properties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
             });
         }
         return properties;
@@ -291,13 +292,13 @@ export default class GeoJSON extends Base {
     _getDataframeType (type) {
         switch (type) {
             case 'Point':
-                return 'point';
+                return GEOMETRY_TYPE.POINT;
             case 'LineString':
             case 'MultiLineString':
-                return 'line';
+                return GEOMETRY_TYPE.LINE;
             case 'Polygon':
             case 'MultiPolygon':
-                return 'polygon';
+                return GEOMETRY_TYPE.POLYGON;
             default:
                 return '';
         }

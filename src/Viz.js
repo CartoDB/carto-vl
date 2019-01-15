@@ -3,7 +3,7 @@ import shaders from './renderer/shaders/index';
 import { compileShader } from './renderer/shaders/shaderCompiler';
 import * as s from './renderer/viz/expressions';
 import BaseExpression from './renderer/viz/expressions/base';
-import { implicitCast } from './renderer/viz/expressions/utils';
+import { implicitCast, noOverrideColor } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
@@ -19,6 +19,7 @@ import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
 import VIZ_PROPERTIES from './renderer/viz/utils/properties';
+import { GEOMETRY_TYPE } from './utils/geometry';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -84,7 +85,7 @@ const SUPPORTED_PROPERTIES = [
 * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
 * @property {Transformation} transform - transformation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.
 * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
-* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256, and power of 2 values work better (no visual artifacts). A resolution of N means points are aggregated to grid cells NxN pixels. Unlike {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
 * @property {Object} variables - An object describing the variables used.
 * @api
 *
@@ -195,6 +196,10 @@ export default class Viz {
         return this._getRootStyleExpressions().some(expr => expr.isAnimated());
     }
 
+    isPlaying () {
+        return this._getRootStyleExpressions().some(expr => expr.isPlaying());
+    }
+
     onChange (callback) {
         this._changeCallback = callback;
     }
@@ -265,21 +270,21 @@ export default class Viz {
     }
 
     _getDefaultGeomStyle (geomType) {
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(7)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        } else if (geomType === 'line') {
+        } else if (geomType === GEOMETRY_TYPE.LINE) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1)) // Not used in lines
             };
-        } else if (geomType === 'polygon') {
+        } else if (geomType === GEOMETRY_TYPE.POLYGON) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
@@ -427,8 +432,7 @@ export default class Viz {
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
-            const NO_OVERRIDE_COLOR = s.rgba(0, 0, 0, 0); // TODO move to contant expressions
-            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : NO_OVERRIDE_COLOR;
+            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : noOverrideColor();
         }
         if (util.isUndefined(vizSpec.width)) {
             vizSpec.width = DEFAULT_WIDTH_EXPRESSION();
