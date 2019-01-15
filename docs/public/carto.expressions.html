@@ -15915,7 +15915,7 @@ layer.on('updated', () => {
     
 
     
-    <h4 class="name" id=".viewportHistogram"><span class="type-signature">(static) </span>viewportHistogram<span class="signature">(input, size, weight)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
+    <h4 class="name" id=".viewportHistogram"><span class="type-signature">(static) </span>viewportHistogram<span class="signature">(input, sizeOrBuckets, weight)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
     
 
     
@@ -15924,9 +15924,10 @@ layer.on('updated', () => {
 
 <div class="description">
     <p>Generates a histogram.</p>
-<p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
-The histogram can be based on a numeric expression, in which case the minimum and maximum will be computed automatically and bars will be generated
-at regular intervals between the minimum and maximum. The number of bars in this case is controllable through the <code>size</code> parameter.</p>
+<p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.</p>
+<p>The histogram can be based on a numeric expression, the buckets for the histogram is controllable through the <code>sizeOrBuckets</code> parameter.
+For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
+When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin &lt;= value &lt; bucketMax].</p>
 <p>Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.</p>
 </div>
 
@@ -15986,13 +15987,16 @@ at regular intervals between the minimum and maximum. The number of bars in this
 
         <tr>
             
-                <td class="name"><code>size</code></td>
+                <td class="name"><code>sizeOrBuckets</code></td>
             
 
             <td class="type">
             
                 
 <span class="param-type">Number</span>
+|
+
+<span class="param-type">Array</span>
 
 
             
@@ -16002,7 +16006,7 @@ at regular intervals between the minimum and maximum. The number of bars in this
 
             
 
-            <td class="description last"><p>Optional (defaults to 20). Number of bars to use if <code>x</code> is a numeric expression</p></td>
+            <td class="description last"><p>Optional (defaults to 20). Number of bars to use if <code>x</code> is a numeric expression; or user-defined buckets for numeric expressions.</p></td>
         </tr>
 
     
@@ -16116,8 +16120,9 @@ at regular intervals between the minimum and maximum. The number of bars in this
     
     <pre class="prettyprint"><code>const s = carto.expressions;
 const viz = new carto.Viz(`
-         @categoryHistogram: viewportHistogram($type)
-         @numericHistogram:  viewportHistogram($amount, 3, 1)
+         @categoryHistogram:    viewportHistogram($type)
+         @numericHistogram:     viewportHistogram($amount, 3, 1)
+         @userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
 `);
 ...
 console.log(viz.variables.categoryHistogram.eval());
@@ -16669,7 +16674,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportQuantiles"><span class="type-signature">(static) </span>viewportQuantiles<span class="signature">(input, n)</span><span class="type-signature"> &rarr; {Category}</span></h4>
+    <h4 class="name" id=".viewportQuantiles"><span class="type-signature">(static) </span>viewportQuantiles<span class="signature">(input, n, histogramSize<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {Category}</span></h4>
     
 
     
@@ -16702,6 +16707,8 @@ const viz = new carto.Viz({
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -16727,6 +16734,14 @@ const viz = new carto.Viz({
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
@@ -16743,17 +16758,58 @@ const viz = new carto.Viz({
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Number</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
             <td class="description last"><p>Number of buckets to be returned</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>histogramSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional (DEFAULT_HISTOGRAM_SIZE = 1000).  Histogram 'size' used for calculations (the bigger, the more precision)</p></td>
         </tr>
 
     
@@ -16857,7 +16913,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".viewportStandardDev"><span class="type-signature">(static) </span>viewportStandardDev<span class="signature">(input, n, classSize<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {Category}</span></h4>
+    <h4 class="name" id=".viewportStandardDev"><span class="type-signature">(static) </span>viewportStandardDev<span class="signature">(input, n, classSize<span class="signature-attributes">nullable</span>, histogramSize<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {Category}</span></h4>
     
 
     
@@ -16945,7 +17001,7 @@ appropiated for diverging datasets, which can be well displayed using a divergin
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Number</span>
 
 
             
@@ -16976,7 +17032,7 @@ appropiated for diverging datasets, which can be well displayed using a divergin
             <td class="type">
             
                 
-<span class="param-type">number</span>
+<span class="param-type">Number</span>
 
 
             
@@ -16997,6 +17053,39 @@ appropiated for diverging datasets, which can be well displayed using a divergin
             
 
             <td class="description last"><p>Optional. The class size, defaults to 1.0 standard deviation (usual values are also 0.5 or 0.25)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>histogramSize</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional (DEFAULT_HISTOGRAM_SIZE = 1000).  Histogram 'size' used for calculations (the bigger, the more precision)</p></td>
         </tr>
 
     
@@ -17698,7 +17787,7 @@ const viz = new carto.Viz({
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Nov 08 2018 12:13:06 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 15 2019 10:57:48 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
