@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Fix regression in `viewportFeatures` including hidden polygons
+- Fix Content-Type for files deployed to CDN
 
 ## [1.1.0] - 2019-01-15
 
