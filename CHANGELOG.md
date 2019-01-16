@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 
 ### Fixed
+- Fix performance regression while accessing features' properties from `viewportFeatures`.
 - Fix regression in `viewportFeatures` including hidden polygons
 - Fix Content-Type for files deployed to CDN
 
