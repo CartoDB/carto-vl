@@ -121,7 +121,8 @@ async function uploadFileToS3 (filePath, gzFileContent) {
         Bucket: secrets.AWS_S3_BUCKET,
         Key: filePath,
         Body: gzFileContent,
-        ContentEncoding: 'gzip'
+        ContentEncoding: 'gzip',
+        ContentType: getContentTypeFor(filePath)
     };
 
     await S3.upload(s3Params, function (err, data) {
@@ -131,6 +132,18 @@ async function uploadFileToS3 (filePath, gzFileContent) {
             console.log(`[${filePath}] uploaded!`);
         }
     });
+}
+
+function getContentTypeFor (filePath) {
+    const ext = path.extname(filePath);
+    switch (ext) {
+        case '.js':
+            return 'application/javascript';
+        case '.map':
+            return 'application/json';
+        default:
+            throw new Error(`Unexpected extension ${ext} for file being uploaded. Double check it!`);
+    }
 }
 
 async function gzippedFileContent (fileName) {
