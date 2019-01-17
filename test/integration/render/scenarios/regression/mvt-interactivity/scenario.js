@@ -26,7 +26,7 @@ const layer = new carto.Layer('my_mvt_layer', source, viz);
 
 const interactivity = new carto.Interactivity(layer);
 
-interactivity.on('featureClick', event => {
+interactivity.on('featureClick', async (event) => {
     const aFeature = event.features[0];
 
     console.log(aFeature.id);
@@ -41,9 +41,9 @@ interactivity.on('featureClick', event => {
         To force the regression, 'winner' category is considered here "the id",
         so that renders all the polygons with the same winner, as 'clicked' (imagine 'kind of a multi-polygon')
     */
-    aFeature.color.blendTo('DeepPink');
-    //
-    window.loaded = true;
+
+    await aFeature.color.blendTo('DeepPink', 0);
+    layer.on('updated', debounceSetLoaded());
 });
 
 layer.addTo(map);
@@ -63,4 +63,14 @@ function simulateClickAtClientXY (position) {
     el.dispatchEvent(mousedown);
     el.dispatchEvent(click);
     el.dispatchEvent(mouseup);
+}
+
+function debounceSetLoaded (delay = 250) {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            window.loaded = true;
+        }, delay);
+    };
 }
