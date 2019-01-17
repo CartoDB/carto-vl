@@ -9,11 +9,7 @@ webpackConfig.performance.hints = false;
 module.exports = function (config) {
     config.set({
         frameworks: ['jasmine'],
-        files: ['index.test.js', {
-            pattern: 'test/data/*.mvt',
-            included: false,
-            served: true
-        }],
+        files: ['index.test.js'],
         reporters: ['mocha'],
         mochaReporter: {
             ignoreSkipped: true
