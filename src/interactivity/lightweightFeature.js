@@ -15,6 +15,7 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     const cls = class LightweightFeature {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
+            this._featureProperties = null;
         }
     };
 
@@ -94,12 +95,14 @@ function _defineVizVariables (targetObject, renderLayer) {
 function _defineFeatureProperties (targetObject, propertyNames) {
     Object.defineProperty(targetObject, 'properties', {
         get: function () {
-            const properties = {};
-            // feature properties
-            propertyNames.forEach(propertyName => {
-                properties[propertyName] = this._rawFeature[propertyName];
-            });
-            return properties;
+            if (this._featureProperties === null) {
+                this._featureProperties = {};
+                // feature properties
+                propertyNames.forEach(propertyName => {
+                    this._featureProperties[propertyName] = this._rawFeature[propertyName];
+                });
+            }
+            return this._featureProperties;
         }
     });
 }

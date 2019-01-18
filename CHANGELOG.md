@@ -7,12 +7,24 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+
+## [1.1.1] - 2019-01-16
+
+### Fixed
+- Fix performance regression while accessing features' properties from `viewportFeatures`
+- Fix regression in `viewportFeatures` including hidden polygons
+- Fix Content-Type for files deployed to CDN
+
+## [1.1.0] - 2019-01-15
+
 ### Added
 - Add `getRenderedCentroid` method to features
 - Add `isPlaying` method to animations
 - Add `enable`/`disable` methods and `isEnabled` property to `Interactivity`
 - Enable user-defined buckets in `viewportHistogram`
 - Add and improve examples (legends, widgets, labeling and basemaps)
+- Add helpers to validate browser support (`isBrowserSupported` & `unsupportedBrowserReasons`)
+- Add tests to check for compatibility with several MGL versions
 
 ### Fixed
 - Fix `linear` error when evaluating a date property in a feature
@@ -26,6 +38,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix unwanted `Interactivity` events while using dragPan (and performance improvement)
 - Fix `linear` applied to cluster aggregations without explicit limits
 - Fix `MVT` category property returning a numeric value
+- Fix `Layer.addTo` for MGL v0.52
 
 ### Changed
 - Change examples to use Mapbox GL version 0.52

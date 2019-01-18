@@ -47,6 +47,7 @@ import GeoJSON from './sources/GeoJSON';
 import MVT from './sources/MVT';
 import SQL from './sources/SQL';
 import { on, off } from './utils/events';
+import { isBrowserSupported, unsupportedBrowserReasons } from './renderer/Renderer';
 
 /**
  *  @namespace carto.basemaps
@@ -68,5 +69,5 @@ import { version } from '../package.json';
 
 const source = { Dataset, SQL, GeoJSON, MVT };
 
-export { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
+export { version, on, off, isBrowserSupported, unsupportedBrowserReasons, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };
 export default { version, on, off, setDefaultAuth, setDefaultConfig, source, expressions, Layer, Viz, Interactivity, basemaps };

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Check for browser support | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Check for browser support</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Check if the browser supports CARTO VL and get the reasons if it doesn't.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    if (!carto.isBrowserSupported()) {
+      const reasons = carto.unsupportedBrowserReasons();
+      document.getElementById('loader').innerHTML = `
+        <div class="open-sans text-white">
+          <h3>Oops! Something went wrong.</h3>
+          <p>Your browser doesn't support CARTO VL:</p>
+          <ul>
+              ${reasons.map(r => `<li>${r.message}.</li>`).join('')}
+          </ul>
+        </div>
+      `;
+    } else {
+      const map = new mapboxgl.Map({
+        container: 'map',
+        style: carto.basemaps.voyager,
+        center: [0, 0],
+        zoom: 1,
+        scrollZoom: false,
+      });
+
+      carto.setDefaultAuth({
+        username: 'cartovl',
+        apiKey: 'default_public'
+      });
+
+      const source = new carto.source.Dataset('populated_places');
+      const viz = new carto.Viz();
+      const layer = new carto.Layer('layer', source, viz);
+
+      layer.addTo(map, 'watername_ocean');
+      layer.on('loaded', hideLoader);
+
+      function hideLoader() {
+        document.getElementById('loader').style.opacity = '0';
+      }
+    }
+  </script>
+</body>
+
+</html>
