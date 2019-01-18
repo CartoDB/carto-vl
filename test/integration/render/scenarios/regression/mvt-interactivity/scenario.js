@@ -29,10 +29,6 @@ const interactivity = new carto.Interactivity(layer);
 interactivity.on('featureClick', async (event) => {
     const aFeature = event.features[0];
 
-    console.log(aFeature.id);
-    console.log(aFeature.variables.f_cartodb_id);
-    console.log(aFeature.variables.f_winner);
-
     /*
         Highlight clicked feature on snapshot.
 
