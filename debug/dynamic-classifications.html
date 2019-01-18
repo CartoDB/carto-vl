@@ -187,9 +187,10 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.darkmatter,
-      center: [0, 30],
-      zoom: 1.5
+      center: [-88, 37],
+      zoom: 3
     });
+
 
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
@@ -210,6 +211,8 @@
         @opacity: ${settings.opacity}
 
         color: opacity(ramp(globalQuantiles(@input, @buckets), @palette), @opacity)
+        strokeColor: black
+        strokeWidth: 1
       `
       return new carto.Viz(stringViz);
     }
@@ -257,6 +260,8 @@
     }
 
     function updateViz() {
+      popup.remove();
+
       const columnName = selectedColumnName();
       viz.variables['input'] = s.property(columnName);
       viz.variables['opacity'].blendTo(parseFloat($opacitySelector.value));
@@ -268,7 +273,6 @@
 
     // Handle widget changes
     $valueSelector.addEventListener('change', () => {
-      popup.remove();
       updateViz();
     });
     $bucketsSelector.addEventListener('input', () => {
