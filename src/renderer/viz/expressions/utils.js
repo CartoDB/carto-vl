@@ -8,7 +8,13 @@ export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts just ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkMinArguments (constructorArguments, minArguments, expressionName) {
+    if (constructorArguments.length < minArguments) {
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts at least ${minArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
