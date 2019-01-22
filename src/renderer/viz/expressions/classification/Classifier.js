@@ -19,7 +19,7 @@ export default class Classifier extends BaseExpression {
     }
 
     _resolveAliases (aliases) {
-        this._getChildren().map(child => child._resolveAliases(aliases));
+        super._resolveAliases(aliases);
 
         this._bucketsInitialization();
     }
