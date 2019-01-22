@@ -55,11 +55,10 @@ export default class GlobalStandardDev extends Classifier {
         super({ input, buckets, _classSize: classSize });
     }
 
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
 
         this._validateClassSizeIsProperNumber();
-        this._updateBreakpointsWith(metadata);
     }
 
     _validateClassSizeIsProperNumber () {
@@ -68,6 +67,12 @@ export default class GlobalStandardDev extends Classifier {
         if (classSize <= 0) {
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
         }
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+
+        this._updateBreakpointsWith(metadata);
     }
 
     _updateBreakpointsWith (metadata) {
