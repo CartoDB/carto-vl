@@ -38,12 +38,12 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportQuantiles', ['number', 'color']);
             validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number', 'number']);
 
-            validateTypeErrors('viewportEqIntervals', []);
+            validateExactNumArgumentsError('viewportEqIntervals', []);
             validateTypeErrors('viewportEqIntervals', ['number', 'category']);
             validateTypeErrors('viewportEqIntervals', ['category', 2]);
             validateTypeErrors('viewportEqIntervals', ['color', 2]);
             validateTypeErrors('viewportEqIntervals', ['number', 'color']);
-            validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
             validateTypeErrors('viewportStandardDev', []);
             validateTypeErrors('viewportStandardDev', ['number', 'category']);
@@ -87,11 +87,11 @@ describe('src/renderer/viz/expressions/classifier', () => {
             ]
         });
 
-        function sampleValues() {
+        function sampleValues () {
             return METADATA.sample.map(s => s.price);
         }
 
-        function prepare(expr) {
+        function prepare (expr) {
             expr._resolveAliases();
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);

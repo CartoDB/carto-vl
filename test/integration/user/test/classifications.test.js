@@ -107,7 +107,28 @@ describe('classifications with variables', () => {
 
     describe('.viewport classifiers', () => {
         describe('.viewportEqIntervals', () => {
+            it('.control (static values)', (done) => {
+                const viz = `
+                  color: ramp(viewportEqIntervals($wind_speed, 5), sunset)
+                `;
+                createMapWith(viz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
 
+            it('should allow variables in a ramp', (done) => {
+                const classificationViz = `
+                      @input: $wind_speed
+                      @buckets: 5
+                      @palette: sunset
+                      color: ramp(viewportEqIntervals(@input, @buckets), @palette)
+                    `;
+                createMapWith(classificationViz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
         });
 
         describe('.viewportQuantiles', () => {
