@@ -53,7 +53,15 @@ export function validateMaxArgumentsError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             s[expressionName](...args.map(arg => arg[0]));
-        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*accepts.*arguments[\\s\\S]*passed[\\s\\S]*`, 'g'));
+        }).toThrowError(regExpThatContains('accepts just'));
+    });
+}
+
+export function validateMinArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(regExpThatContains('accepts at least'));
     });
 }
 
@@ -61,7 +69,7 @@ export function validateExactNumArgumentsError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             s[expressionName](...args.map(arg => arg[0]));
-        }).toThrowError(regExpThatContains(cvt.WRONG_NUMBER_ARGS));
+        }).toThrowError(regExpThatContains('accepts exactly'));
     });
 }
 
