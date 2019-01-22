@@ -1,5 +1,7 @@
 import Classifier from './Classifier';
-import { checkNumber, checkType, checkMaxArguments } from '../utils';
+import { checkNumber, checkMaxArguments, checkMinArguments } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+
 import { viewportHistogram } from '../../expressions';
 import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
@@ -31,35 +33,51 @@ import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
  */
 export default class ViewportQuantiles extends Classifier {
     constructor (input, buckets, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
+        checkMinArguments(arguments, 2, 'viewportQuantiles');
         checkMaxArguments(arguments, 3, 'viewportQuantiles');
-        checkNumber('viewportQuantiles', 'buckets', 1, buckets);
-        checkNumber('viewportQuantiles', 'histogramSize', 2, histogramSize);
 
-        const children = { input, _histogram: viewportHistogram(input, histogramSize) };
-        super(children, buckets);
+        const children = { input, buckets, _histogramSize: histogramSize };
+        super(children);
     }
 
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-        checkType('viewportQuantiles', 'input', 0, ['number'], this.input);
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._histogramInitialization();
+    }
+
+    _histogramInitialization () {
+        this._validateHistogramSizeIsProperNumber();
+
+        const input = this.input;
+        const histogramSize = this._histogramSize.value;
+        const children = { _histogram: viewportHistogram(input, histogramSize) };
+        this._initializeChildren(children);
+    }
+
+    _validateHistogramSizeIsProperNumber () {
+        const histogramSize = this._histogramSize.value;
+        checkNumber(this.expressionName, 'histogramSize', 2, histogramSize);
+        if (histogramSize <= 0) {
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'histogramSize' must be >0, but ${histogramSize} was used`);
+        }
     }
 
     _genBreakpoints () {
-        const hist = this._histogram.value;
+        const histogram = this._histogram.value;
+        if (histogram === undefined) { return; }
 
-        const histogramBuckets = hist.length;
-        const min = hist[0].x[0];
-        const max = hist[histogramBuckets - 1].x[1];
+        const accumHistogram = this._getAccumHistogram(histogram);
+        const [min, max] = this._getMinMaxFromHistogram(histogram);
 
-        let prev = 0;
-        const accumHistogram = hist.map(({ y }) => {
-            prev += y;
-            return prev;
-        });
+        this._updateBreakpointsWith({ accumHistogram, min, max });
+    }
+
+    _updateBreakpointsWith ({ accumHistogram, min, max }) {
+        const histogramBuckets = accumHistogram.length;
 
         let i = 0;
         const total = accumHistogram[histogramBuckets - 1];
-        let brs = [];
         // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
             for (i; i < histogramBuckets; i++) {
@@ -68,8 +86,23 @@ export default class ViewportQuantiles extends Classifier {
                 }
             }
             const percentileValue = i / histogramBuckets * (max - min) + min;
-            brs.push(percentileValue);
             breakpoint.expr = percentileValue;
         });
+    }
+
+    _getAccumHistogram (histogram) {
+        let prev = 0;
+        const accumHistogram = histogram.map(({ y }) => {
+            prev += y;
+            return prev;
+        });
+        return accumHistogram;
+    }
+
+    _getMinMaxFromHistogram (histogram) {
+        const min = histogram[0].x[0];
+        const max = histogram[histogram.length - 1].x[1];
+
+        return [min, max];
     }
 }

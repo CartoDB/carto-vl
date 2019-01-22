@@ -31,7 +31,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
         });
 
         describe('viewport', () => {
-            validateTypeErrors('viewportQuantiles', []);
+            validateMinArgumentsError('viewportQuantiles', []);
             validateTypeErrors('viewportQuantiles', ['number', 'category']);
             validateTypeErrors('viewportQuantiles', ['category', 2]);
             validateTypeErrors('viewportQuantiles', ['color', 2]);
@@ -87,11 +87,11 @@ describe('src/renderer/viz/expressions/classifier', () => {
             ]
         });
 
-        function sampleValues () {
+        function sampleValues() {
             return METADATA.sample.map(s => s.price);
         }
 
-        function prepare (expr) {
+        function prepare(expr) {
             expr._resolveAliases();
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);

@@ -41,10 +41,10 @@ describe('classifications with variables', () => {
 
             it('should allow variables in a ramp', (done) => {
                 const classificationViz = `
-                      @value: $wind_speed
-                      @breaks: 5
+                      @input: $wind_speed
+                      @buckets: 5
                       @palette: prism
-                      color: ramp(globalEqIntervals(@value, 5), @palette)
+                      color: ramp(globalEqIntervals(@input, @buckets), @palette)
                     `;
                 createMapWith(classificationViz, featureCollection);
                 layer.on('loaded', () => {
@@ -66,10 +66,10 @@ describe('classifications with variables', () => {
 
             it('should allow variables in a ramp', (done) => {
                 const classificationViz = `
-                      @value: $wind_speed
-                      @breaks: 5
+                      @input: $wind_speed
+                      @buckets: 5
                       @palette: reverse(sunset)
-                      color: ramp(globalQuantiles(@value, @breaks), @palette)
+                      color: ramp(globalQuantiles(@input, @buckets), @palette)
                     `;
                 createMapWith(classificationViz, featureCollection);
                 layer.on('loaded', () => {
@@ -91,11 +91,11 @@ describe('classifications with variables', () => {
 
             it('should allow variables in a ramp', (done) => {
                 const classificationViz = `
-                      @value: $wind_speed
-                      @breaks: 5
-                      @palette: tealrose
+                      @input: $wind_speed
+                      @buckets: 5
                       @classSize: 0.5
-                      color: ramp(globalStandardDev(@value, @breaks, @classSize), @palette)
+                      @palette: tealrose
+                      color: ramp(globalStandardDev(@input, @buckets, @classSize), @palette)
                     `;
                 createMapWith(classificationViz, featureCollection);
                 layer.on('loaded', () => {
@@ -105,19 +105,41 @@ describe('classifications with variables', () => {
         });
     });
 
-    // describe('.viewport classifiers', () => {
-    //     describe('.viewportEqIntervals', () => {
+    describe('.viewport classifiers', () => {
+        describe('.viewportEqIntervals', () => {
 
-    //     });
+        });
 
-    //     describe('.viewportQuantiles', () => {
+        describe('.viewportQuantiles', () => {
+            it('.control (static values)', (done) => {
+                const viz = `
+                  color: ramp(viewportQuantiles($wind_speed, 5, 1000), sunset)
+                `;
+                createMapWith(viz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
 
-    //     });
+            it('should allow variables in a ramp', (done) => {
+                const classificationViz = `
+                      @input: $wind_speed
+                      @buckets: 5
+                      @histogramSize: 1000
+                      @palette: sunset
+                      color: ramp(viewportQuantiles(@input, @buckets, @histogramSize), @palette)
+                    `;
+                createMapWith(classificationViz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
+        });
 
-    //     describe('.viewportStandardDev', () => {
+        describe('.viewportStandardDev', () => {
 
-    //     });
-    // });
+        });
+    });
 
     afterEach(() => {
         map.remove();
