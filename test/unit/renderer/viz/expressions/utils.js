@@ -3,8 +3,6 @@ import * as s from '../../../../../src/renderer/viz/expressions';
 import IdentityCodec from '../../../../../src/codecs/Identity';
 import { regExpThatContains } from '../../../../../src/utils/util';
 
-import { CartoValidationTypes as cvt } from '../../../../../src/errors/carto-validation-error';
-
 const metadata = new Metadata({
     properties: {
         number: {
