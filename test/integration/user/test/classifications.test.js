@@ -158,7 +158,30 @@ describe('classifications with variables', () => {
         });
 
         describe('.viewportStandardDev', () => {
+            it('.control (static values)', (done) => {
+                const viz = `
+                  color: ramp(viewportStandardDev($wind_speed, 5, 1.0, 1000), sunset)
+                `;
+                createMapWith(viz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
 
+            it('should allow variables in a ramp', (done) => {
+                const classificationViz = `
+                      @input: $wind_speed
+                      @buckets: 5
+                      @classSize: 1.0
+                      @histogramSize: 1000
+                      @palette: sunset
+                      color: ramp(viewportStandardDev(@input, @buckets, @classSize, @histogramSize), @palette)
+                    `;
+                createMapWith(classificationViz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
         });
     });
 
