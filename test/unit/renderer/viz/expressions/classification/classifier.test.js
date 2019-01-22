@@ -45,7 +45,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('viewportEqIntervals', ['number', 'color']);
             validateExactNumArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('viewportStandardDev', []);
+            validateMinArgumentsError('viewportStandardDev', []);
             validateTypeErrors('viewportStandardDev', ['number', 'category']);
             validateTypeErrors('viewportStandardDev', ['category', 2]);
             validateTypeErrors('viewportStandardDev', ['color', 2]);
@@ -299,13 +299,27 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => viewportStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => viewportStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => {
+                        const q = viewportStandardDev($price, 3, 0.0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = viewportStandardDev($price, 3, -1.0);
+                        prepare(q);
+                    }).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => viewportStandardDev($price, 0)).toThrow();
-                    expect(() => viewportStandardDev($price, 1)).toThrow();
+                    expect(() => {
+                        const q = viewportStandardDev($price, 0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = viewportStandardDev($price, 1);
+                        prepare(q);
+                    }).toThrow();
                 });
             });
         });

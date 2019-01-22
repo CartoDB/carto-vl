@@ -1,5 +1,7 @@
 import Classifier from './Classifier';
-import { checkNumber, checkType, checkMaxArguments } from '../utils';
+import { checkNumber, checkType, checkMaxArguments, checkMinArguments } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+
 import { viewportHistogram } from '../../expressions';
 import { calculateBreakpoints } from './GlobalStandardDev';
 import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
@@ -52,36 +54,71 @@ import { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
 
 export default class ViewportStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
+        checkMinArguments(arguments, 2, 'viewportStandardDev');
         checkMaxArguments(arguments, 4, 'viewportStandardDev');
-        checkNumber('viewportStandardDev', 'buckets', 1, buckets);
-        checkNumber('viewportStandardDev', 'classSize', 2, classSize);
-        checkNumber('viewportStandardDev', 'histogramSize', 3, histogramSize);
 
+        super({ input, buckets, _classSize: classSize, _histogramSize: histogramSize });
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._validateClassSizeIsProperNumber();
+        this._histogramInitialization();
+    }
+
+    _histogramInitialization () {
+        this._validateHistogramSizeIsProperNumber();
+
+        const input = this.input;
+        const histogramSize = this._histogramSize.value;
+        const children = { _histogram: viewportHistogram(input, histogramSize) };
+        this._initializeChildren(children);
+    }
+
+    _validateClassSizeIsProperNumber () {
+        const classSize = this._classSize.value;
+        checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
-            throw new RangeError(`The 'classSize' must be > 0.0, but '${classSize}' was used.`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
         }
+    }
 
-        const children = { input, _histogram: viewportHistogram(input, histogramSize) };
-        super(children, buckets);
-        this._classSize = classSize;
+    _validateHistogramSizeIsProperNumber () {
+        const histogramSize = this._histogramSize.value;
+        checkNumber(this.expressionName, 'histogramSize', 3, histogramSize);
+        if (histogramSize <= 0) {
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'histogramSize' must be > 0, but ${histogramSize} was used`);
+        }
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkType('viewportStandardDev', 'input', 0, ['number'], this.input);
+
+        checkType('viewportStandardDev', 'input', 0, 'number', this.input);
     }
 
+    _validateInputIsNumericProperty () { /* noop */ }
+
     _genBreakpoints () {
-        const avg = this._averageFrom(this._histogram.value);
-        const stdev = this._standardDevFrom(this._histogram.value, avg);
-        const breaks = calculateBreakpoints(avg, stdev, this.numCategories, this._classSize);
+        const histogram = this._histogram.value;
+        if (histogram === undefined) { return; }
+
+        const avg = this._getAverageFrom(histogram);
+        const stdev = this._getStandardDevFrom(histogram, avg);
+
+        this._updateBreakpointsWith({ avg, stdev });
+    }
+
+    _updateBreakpointsWith ({ avg, stdev }) {
+        const breaks = calculateBreakpoints(avg, stdev, this.numCategories, this._classSize.value);
 
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
     }
 
-    _averageFrom (histogram) {
+    _getAverageFrom (histogram) {
         let sumFrequencies = 0.0;
         let sumMidValueFrequencies = 0.0;
         histogram.forEach(({ x, y }) => {
@@ -95,7 +132,7 @@ export default class ViewportStandardDev extends Classifier {
         return avg;
     }
 
-    _standardDevFrom (histogram, average) {
+    _getStandardDevFrom (histogram, average) {
         let sumFrequencies = 0.0;
         let sumPowDifferences = 0.0;
         histogram.forEach(({ x, y }) => {
