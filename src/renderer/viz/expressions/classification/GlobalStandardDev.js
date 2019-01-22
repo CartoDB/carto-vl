@@ -52,7 +52,7 @@ export default class GlobalStandardDev extends Classifier {
         checkMinArguments(arguments, 2, 'globalStandardDev');
         checkMaxArguments(arguments, 3, 'globalStandardDev');
 
-        super({ input, buckets, classSize });
+        super({ input, buckets, _classSize: classSize });
     }
 
     _bindMetadata (metadata) {
@@ -63,7 +63,7 @@ export default class GlobalStandardDev extends Classifier {
     }
 
     _validateClassSizeIsProperNumber () {
-        const classSize = this.classSize.value;
+        const classSize = this._classSize.value;
         checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
             throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
@@ -74,7 +74,7 @@ export default class GlobalStandardDev extends Classifier {
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
-        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this.classSize.value);
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
 
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
