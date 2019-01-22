@@ -78,30 +78,31 @@ describe('classifications with variables', () => {
             });
         });
 
-        // describe('.globalStandardDev', () => {
-        //     it('.control (static values)', (done) => {
-        //         const viz = `
-        //           color: ramp(globalStandardDev($wind_speed, 5), tealrose)
-        //         `;
-        //         createMapWith(viz, featureCollection);
-        //         layer.on('loaded', () => {
-        //             done();
-        //         });
-        //     });
+        describe('.globalStandardDev', () => {
+            it('.control (static values)', (done) => {
+                const viz = `
+                  color: ramp(globalStandardDev($wind_speed, 5, 0.5), tealrose)
+                `;
+                createMapWith(viz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
 
-        //     it('should allow variables in a ramp', (done) => {
-        //         const classificationViz = `
-        //               @value: $wind_speed * 3
-        //               // @breaks: 5
-        //               @palette: tealrose
-        //               color: ramp(globalStandardDev(@value, 5), @palette)
-        //             `;
-        //         createMapWith(classificationViz, featureCollection);
-        //         layer.on('loaded', () => {
-        //             done();
-        //         });
-        //     });
-        // });
+            it('should allow variables in a ramp', (done) => {
+                const classificationViz = `
+                      @value: $wind_speed
+                      @breaks: 5
+                      @palette: tealrose
+                      @classSize: 0.5
+                      color: ramp(globalStandardDev(@value, @breaks, @classSize), @palette)
+                    `;
+                createMapWith(classificationViz, featureCollection);
+                layer.on('loaded', () => {
+                    done();
+                });
+            });
+        });
     });
 
     // describe('.viewport classifiers', () => {

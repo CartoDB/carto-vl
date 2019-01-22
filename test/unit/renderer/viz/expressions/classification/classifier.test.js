@@ -1,4 +1,4 @@
-import { validateStaticType, validateTypeErrors, validateMaxArgumentsError, validateExactNumArgumentsError } from '../utils';
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError, validateMinArgumentsError, validateExactNumArgumentsError } from '../utils';
 import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
 import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
@@ -13,16 +13,16 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateTypeErrors('globalQuantiles', ['category', 2]);
             validateTypeErrors('globalQuantiles', ['color', 2]);
             validateTypeErrors('globalQuantiles', ['number', 'color']);
-            validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
             validateExactNumArgumentsError('globalEqIntervals', []);
             validateTypeErrors('globalEqIntervals', ['number', 'category']);
             validateTypeErrors('globalEqIntervals', ['category', 2]);
             validateTypeErrors('globalEqIntervals', ['color', 2]);
             validateTypeErrors('globalEqIntervals', ['number', 'color']);
-            validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('globalStandardDev', []);
+            validateMinArgumentsError('globalStandardDev', []);
             validateTypeErrors('globalStandardDev', ['number', 'category']);
             validateTypeErrors('globalStandardDev', ['category', 2]);
             validateTypeErrors('globalStandardDev', ['color', 2]);
@@ -176,13 +176,27 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => globalStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => globalStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => {
+                        const q = globalStandardDev($price, 3, 0.0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = globalStandardDev($price, 3, -1.0);
+                        prepare(q);
+                    }).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => globalStandardDev($price, 0)).toThrow();
-                    expect(() => globalStandardDev($price, 1)).toThrow();
+                    expect(() => {
+                        const q = globalStandardDev($price, 0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = globalStandardDev($price, 1);
+                        prepare(q);
+                    }).toThrow();
                 });
             });
         });

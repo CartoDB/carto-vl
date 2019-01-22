@@ -1,6 +1,7 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
+import { checkMaxArguments, checkMinArguments, checkNumber } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+
 import { average, standardDeviation } from '../stats';
 
 /**
@@ -48,28 +49,32 @@ import { average, standardDeviation } from '../stats';
  */
 export default class GlobalStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
+        checkMinArguments(arguments, 2, 'globalStandardDev');
         checkMaxArguments(arguments, 3, 'globalStandardDev');
-        checkNumber('globalStandardDev', 'buckets', 1, buckets);
-        checkNumber('globalStandardDev', 'classSize', 2, classSize);
 
-        if (classSize <= 0) {
-            throw new RangeError(`The 'classSize must be > 0.0, but '${classSize}' was used.`);
-        }
-
-        super({ input }, buckets);
-        this._classSize = classSize;
-        this._sample = [];
+        super({ input, buckets, classSize });
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalStandardDev', 'input', 0, this.input);
-        checkType('globalStandardDev', 'input', 0, 'number', this.input);
 
+        this._validateClassSizeIsProperNumber();
+        this._updateBreakpointsWith(metadata);
+    }
+
+    _validateClassSizeIsProperNumber () {
+        const classSize = this.classSize.value;
+        checkNumber(this.expressionName, 'classSize', 2, classSize);
+        if (classSize <= 0) {
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
+        }
+    }
+
+    _updateBreakpointsWith (metadata) {
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
-        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize);
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this.classSize.value);
 
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
