@@ -1,5 +1,5 @@
 import Classifier from './Classifier';
-import { checkNumber, checkMaxArguments, checkMinArguments } from '../utils';
+import { checkNumber, checkType, checkMaxArguments, checkMinArguments } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 import { viewportHistogram } from '../../expressions';
@@ -62,12 +62,20 @@ export default class ViewportQuantiles extends Classifier {
         }
     }
 
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+
+        checkType('viewportQuantiles', 'input', 0, 'number', this.input);
+    }
+
+    _validateInputIsNumericProperty () { /* noop */ }
+
     _genBreakpoints () {
         const histogram = this._histogram.value;
         if (histogram === undefined) { return; }
 
-        const accumHistogram = this._getAccumHistogram(histogram);
-        const [min, max] = this._getMinMaxFromHistogram(histogram);
+        const accumHistogram = this._getAccumHistogramFrom(histogram);
+        const [min, max] = this._getMinMaxFrom(histogram);
 
         this._updateBreakpointsWith({ accumHistogram, min, max });
     }
@@ -89,7 +97,7 @@ export default class ViewportQuantiles extends Classifier {
         });
     }
 
-    _getAccumHistogram (histogram) {
+    _getAccumHistogramFrom (histogram) {
         let prev = 0;
         const accumHistogram = histogram.map(({ y }) => {
             prev += y;
@@ -98,7 +106,7 @@ export default class ViewportQuantiles extends Classifier {
         return accumHistogram;
     }
 
-    _getMinMaxFromHistogram (histogram) {
+    _getMinMaxFrom (histogram) {
         const min = histogram[0].x[0];
         const max = histogram[histogram.length - 1].x[1];
 
