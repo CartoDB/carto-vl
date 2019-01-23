@@ -1,6 +1,7 @@
 import Classifier from './Classifier';
 import { checkMaxArguments, checkMinArguments, checkNumber } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../../../errors/carto-runtime-error';
 
 import { average, standardDeviation } from '../stats';
 
@@ -79,8 +80,8 @@ export default class GlobalStandardDev extends Classifier {
         const sample = metadata.sample.map(s => s[this.input.name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
-        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
 
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
@@ -98,6 +99,12 @@ export default class GlobalStandardDev extends Classifier {
  * @returns {Number[]}
  */
 export function calculateBreakpoints (avg, stDev, buckets, classSize) {
+    if (stDev === 0 || isNaN(stDev)) {
+        throw new CartoRuntimeError(
+            `${crt.NOT_SUPPORTED} There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`
+        );
+    }
+
     let breaks;
     let over = [];
     let under = [];

@@ -68,8 +68,17 @@ describe('src/renderer/viz/expressions/classifier', () => {
     });
 
     describe('eval', () => {
+        // Price
         const $price = property('price');
-        const METADATA = new Metadata({
+        const PRICE_VALUES = [
+            { price: 0 },
+            { price: 1 },
+            { price: 2 },
+            { price: 3 },
+            { price: 4 },
+            { price: 5 }
+        ];
+        const PRICE_METADATA = new Metadata({
             properties: {
                 price: {
                     type: 'number',
@@ -77,43 +86,54 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     max: 5
                 }
             },
+            sample: PRICE_VALUES
+        });
+
+        function priceSampleValues () {
+            return PRICE_METADATA.sample.map(s => s.price);
+        }
+
+        // Rent
+        const $rent = property('rent');
+        const oneFeatureMetadata = new Metadata({
+            properties: {
+                rent: {
+                    type: 'number',
+                    min: 1000,
+                    max: 1000
+                }
+            },
             sample: [
-                { price: 0 },
-                { price: 1 },
-                { price: 2 },
-                { price: 3 },
-                { price: 4 },
-                { price: 5 }
+                { rent: 1000 }
             ]
         });
 
-        function sampleValues () {
-            return METADATA.sample.map(s => s.price);
-        }
+        const RENT_VALUES = [
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 }
+        ];
+        const severalEqualValueFeaturesMetadata = new Metadata({
+            properties: {
+                rent: {
+                    type: 'number',
+                    min: 1000,
+                    max: 1000
+                }
+            },
+            sample: RENT_VALUES
+        });
 
-        function prepare (expr) {
+        // Common for $price and $rent
+        function prepare (expr, metadata = PRICE_METADATA, viewportData = PRICE_VALUES) {
             expr._resolveAliases();
-            expr._bindMetadata(METADATA);
-            expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({
-                price: 0
-            });
-            expr.accumViewportAgg({
-                price: 1
-            });
+            expr._bindMetadata(metadata);
+            expr._resetViewportAgg(metadata);
 
-            expr.accumViewportAgg({
-                price: 2
-            });
-            expr.accumViewportAgg({
-                price: 3
-            });
-
-            expr.accumViewportAgg({
-                price: 4
-            });
-            expr.accumViewportAgg({
-                price: 5
+            viewportData.forEach((data) => {
+                expr.accumViewportAgg(data);
             });
         }
 
@@ -140,8 +160,8 @@ describe('src/renderer/viz/expressions/classifier', () => {
             });
 
             describe('.globalStandardDev', () => {
-                const avg = average(sampleValues());
-                const std = standardDeviation(sampleValues());
+                const avg = average(priceSampleValues());
+                const std = standardDeviation(priceSampleValues());
 
                 it('globalStandardDev($price, 2)', () => {
                     const q = globalStandardDev($price, 2);
@@ -198,6 +218,20 @@ describe('src/renderer/viz/expressions/classifier', () => {
                         prepare(q);
                     }).toThrow();
                 });
+
+                describe('works properly when there is no standardDev', () => {
+                    it('.raises an error if zero standardDev doesn\'t allow buckets', () => {
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, oneFeatureMetadata);
+                        }).toThrow();
+
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, severalEqualValueFeaturesMetadata);
+                        }).toThrow();
+                    });
+                });
             });
         });
 
@@ -237,8 +271,8 @@ describe('src/renderer/viz/expressions/classifier', () => {
             });
 
             describe('.viewportStandardDev', () => {
-                const avg = average(sampleValues());
-                const std = standardDeviation(sampleValues());
+                const avg = average(priceSampleValues());
+                const std = standardDeviation(priceSampleValues());
 
                 it('viewportStandardDev($price, 2)', () => {
                     const q = viewportStandardDev($price, 2);
@@ -320,6 +354,20 @@ describe('src/renderer/viz/expressions/classifier', () => {
                         const q = viewportStandardDev($price, 1);
                         prepare(q);
                     }).toThrow();
+                });
+
+                describe('works properly when there is no standardDev', () => {
+                    it('.raises an error if zero standardDev doesn\'t allow buckets', () => {
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, oneFeatureMetadata, RENT_VALUES);
+                        }).toThrow();
+
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, severalEqualValueFeaturesMetadata, RENT_VALUES);
+                        }).toThrow();
+                    });
                 });
             });
         });
