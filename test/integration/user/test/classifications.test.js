@@ -8,6 +8,11 @@ const featureCollection = {
             type: 'Feature',
             geometry: { type: 'Point', coordinates: [0, 0] },
             properties: { wind_speed: 20, wind_direction: 350, category: 'station' }
+        },
+        {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: [0, 0] },
+            properties: { wind_speed: 10, wind_direction: 340, category: 'station' }
         }
     ]
 };
