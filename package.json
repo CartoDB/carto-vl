@@ -90,7 +90,7 @@
     "build:clean": "rm -rf dist/",
     "build:dev": "webpack --config webpack/webpack.config.js",
     "build:min": "webpack --config webpack/webpack.min.config.js",
-    "build:min:report": "webpack-bundle-analyzer --port 4200 dist/stats.json",
+    "build:min:stats": "webpack --config webpack/webpack.min.config.js --profile --json > dist/stats.json && webpack-bundle-analyzer --port 4200 dist/stats.json",
     "build:watch": "webpack -w --config webpack/webpack.config.js",
     "docs": "rm -rf docs/public; jsdoc --configure config/jsdoc/public-conf.json",
     "docs:all": "rm -rf docs/all; jsdoc --configure config/jsdoc/all-conf.json",
