@@ -117,5 +117,49 @@
             "99.99": 124,
             "99.999": 234
         }
+    },
+    "eating_places": {
+        "min": 0,
+        "max": 20
+    },
+    "health_care_and_social_assistance": {
+        "min": 0,
+        "max": 20
+    },
+    "variety_general_merchandise_stores": {
+        "min": 0,
+        "max": 20
+    },
+    "financial_services": {
+        "min": 0,
+        "max": 20
+    },
+    "maintenance_and_repair_services": {
+        "min": 0,
+        "max": 20
+    },
+    "construction_services": {
+        "min": 0,
+        "max": 20
+    },
+    "cosmetic_and_beauty_services": {
+        "min": 0,
+        "max": 20
+    },
+    "wholesale_trade": {
+        "min": 0,
+        "max": 20
+    },
+    "grocery_stores": {
+        "min": 0,
+        "max": 20
+    },
+    "religious_civic_professional_organizations": {
+        "min": 0,
+        "max": 20
+    },
+    "others": {
+        "min": 0,
+        "max": 100
     }
 }
