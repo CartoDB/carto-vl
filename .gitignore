@@ -1,4 +1,6 @@
+.docker.run
 .DS_Store
+.mux.json
 .vscode/
 *_out.png
 *.log
@@ -9,8 +11,6 @@ examples/ignore/
 node_modules/
 secrets.json
 temp/
+test/acceptance/docker/Windshaft-cartodb/
 test/acceptance/e2e/**/*.html
 test/integration/render/**/*.html
-test/acceptance/docker/Windshaft-cartodb/
-.docker.run
-.mux.json

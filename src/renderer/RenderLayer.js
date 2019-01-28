@@ -112,7 +112,7 @@ export default class RenderLayer {
 
     /**
      * Get all the pieces from rawFeatures.
-     * Return is a nested Array; each entry includes an array with (potentially) several feature pieces
+     * Returns an Object, where each key includes an array with (potentially) several feature pieces
      */
     _getPartialFeaturesFromSingle (rawFeatures) {
         const featuresIds = new Set(rawFeatures.map(raw => raw[this.idProperty]));
@@ -139,10 +139,12 @@ export default class RenderLayer {
      */
     _addPartialFeaturesIfExistIn (dataframe, featureIds, result) {
         for (let i = 0; i < dataframe.numFeatures; i++) {
-            const currentId = dataframe.properties[this.idProperty][i];
-            if (featureIds.has(currentId)) {
-                const pieces = result[currentId];
-                pieces.push(dataframe.getFeature(i));
+            const feature = dataframe.getFeature(i);
+            const currentFeatureId = feature[this.idProperty];
+
+            if (featureIds.has(currentFeatureId)) {
+                const pieces = result[currentFeatureId];
+                pieces.push(feature);
             }
         }
     }

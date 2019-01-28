@@ -53,17 +53,26 @@
     };
 
     let vizSpec = `color: ramp(linear($attr_0, 0, 1000), temps)`;
-    let names=[];
+    let names = [];
     for (let i = 0; i < 600; i++) {
       metadata.properties['attr_' + i] = { type: 'number' };
       vizSpec += `@A${i}: $attr_${i}\n`;
       names.push(`$attr_${i}`);
     }
-    vizSpec+= `@f: viewportFeatures(${names.join()})`;
+    vizSpec += `@f: viewportFeatures(${names.join()})`;
 
     const source = new carto.source.MVT('./test.mvt', metadata);
     const viz = new carto.Viz(vizSpec);
     const layer = new carto.Layer('layer', source, viz);
+
+    const interactivity = new carto.Interactivity(layer, { autoChangePointer: false });
+    interactivity.on('featureClick', (event) => {
+      if (event && event.features.length > 0) {
+        for (var f of event.features) {
+          console.log(f);
+        }
+      }
+    });
 
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);

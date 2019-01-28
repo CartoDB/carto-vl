@@ -1,6 +1,6 @@
 import Classifier from './Classifier';
 import { viewportMax, viewportMin } from '../../expressions';
-import { checkNumber, checkType, checkMaxArguments } from '../utils';
+import { checkExactNumberOfArguments, checkType } from '../utils';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -29,17 +29,30 @@ import { checkNumber, checkType, checkMaxArguments } from '../utils';
  */
 export default class ViewportEqIntervals extends Classifier {
     constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'viewportEqIntervals');
-        checkNumber('viewportEqIntervals', 'buckets', 1, buckets);
+        checkExactNumberOfArguments(arguments, 2, 'viewportEqIntervals');
 
-        const children = { input, _min: viewportMin(input), _max: viewportMax(input) };
-        super(children, buckets);
+        super({ input, buckets });
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._minMaxInitialization();
+    }
+
+    _minMaxInitialization () {
+        const input = this.input;
+        const children = { _min: viewportMin(input), _max: viewportMax(input) };
+        this._initializeChildren(children);
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkType('viewportEqIntervals', 'input', 0, ['number'], this.input);
+
+        checkType('viewportEqIntervals', 'input', 0, 'number', this.input);
     }
+
+    _validateInputIsNumericProperty () { /* noop */ }
 
     _genBreakpoints () {
         const min = this._min.eval();

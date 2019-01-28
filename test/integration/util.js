@@ -4,6 +4,19 @@ import { projectToWebMercator, WM_2R } from '../../src/utils/util';
 const mapSize = 600;
 
 export function createMap (name, size) {
+    const div = createMapDivHolder(name, size);
+
+    const map = new mapboxgl.Map({
+        container: name,
+        style: { version: 8, sources: {}, layers: [] },
+        center: [0, 0],
+        zoom: 0
+    });
+
+    return { div, map };
+}
+
+export function createMapDivHolder (name, size) {
     size = size || mapSize;
 
     const div = document.createElement('div');
@@ -16,14 +29,7 @@ export function createMap (name, size) {
     document.body.style.padding = '0';
     document.body.appendChild(div);
 
-    const map = new mapboxgl.Map({
-        container: name,
-        style: { version: 8, sources: {}, layers: [] },
-        center: [0, 0],
-        zoom: 0
-    });
-
-    return { div, map };
+    return div;
 }
 
 function _mouseParamsFromCoords (coordinates) {
