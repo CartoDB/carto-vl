@@ -48,7 +48,8 @@ class CommonGridMetadata {
     }
 
     getMinMax (measurement) {
-        const meta = this.META[measurement] || { percentiles: {} };
+        const meta = this.META[measurement] || {};
+        meta.percentiles = meta.percentiles || {};
         const min = meta.min || 0;
         const max = meta.percentiles['99.9'] || meta.max || 100;
         return { min, max };
