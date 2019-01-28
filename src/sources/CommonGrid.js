@@ -207,7 +207,10 @@ export default class CommonGrid extends Base {
                 properties[propertyName][i] = codec.sourceToInternal(this._metadata, k);
             } else {
                 const idx = this._measurementsIndex[propertyName];
-                const propertyValue = cell[idx + 1];
+                let propertyValue = cell[idx + 1];
+                if (Array.isArray(propertyValue)) {
+                    propertyValue = JSON.stringify(propertyValue);
+                }
                 properties[propertyName][i] = codec.sourceToInternal(this._metadata, propertyValue);
             }
         }
