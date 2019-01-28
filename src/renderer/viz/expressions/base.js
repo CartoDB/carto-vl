@@ -187,7 +187,7 @@ export default class Base {
     _initializeChildrenArray (children) {
         if (this.maxParameters && this.maxParameters < children.length) {
             throw new CartoValidationError(
-                `${cvt.WRONG_NUMBER_ARGS} Extra parameters, got ${children.length} but maximum is ${this.maxParameters}`
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${children.length} but maximum is ${this.maxParameters}`
             );
         }
 
@@ -208,7 +208,7 @@ export default class Base {
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
             throw new CartoValidationError(
-                `${cvt.WRONG_NUMBER_ARGS} Extra parameters, got ${this.childrenNames.length} but maximum is ${this.maxParameters}`
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${this.childrenNames.length} but maximum is ${this.maxParameters}`
             );
         }
 
