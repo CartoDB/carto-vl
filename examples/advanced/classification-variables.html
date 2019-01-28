@@ -2,13 +2,13 @@
 <html>
 
 <head>
-  <title>Dynamic classification | CARTO</title>
+  <title>Classification using variables | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../dist/carto-vl.js"></script>
+  <script src="../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+  <link rel="stylesheet" type="text/css" href="../style.css">
 
   <style>
     #controls li {
@@ -47,10 +47,11 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Classifications using dynamic variables</h1>
+        <h1>Classification using variables</h1>
       </header>
       <section>
-        <p class="description open-sans">Illustrate the use of a classification method with dynamic variables
+        <p class="description open-sans">Illustrate the use of variables in a Classification to build
+          a little thematic mapping tool.
         </p>
       </section>
       <br />
@@ -191,7 +192,6 @@
       zoom: 3
     });
 
-
     const nav = new mapboxgl.NavigationControl();
     map.addControl(nav, 'top-left');
 
@@ -220,7 +220,7 @@
     // Define layer
     const source = new carto.source.Dataset('higher_edu_by_county');
     let initialSettings = {
-      input: "trump",
+      input: 'trump',
       buckets: 3,
       palette: 'Burg',
       opacity: 0.8
@@ -229,6 +229,7 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
 
+    // Basic popup to check the input field values
     const popup = new mapboxgl.Popup({
       closeButton: false,
       closeOnClick: false
@@ -239,7 +240,7 @@
       if (event.features.length > 0) {
         const firstFeature = event.features[0];
         const value = firstFeature.variables.input.value.toFixed(2);
-        popup.setHTML(`<p>${selectedColumnName()}: ${value}</p>`);
+        popup.setHTML(`<p><strong>${selectedColumnName()}</strong>: ${value}</p>`);
         popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
         if (!popup.isOpen()) {
           popup.addTo(map);
