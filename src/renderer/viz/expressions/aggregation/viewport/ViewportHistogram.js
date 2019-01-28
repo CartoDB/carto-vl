@@ -112,7 +112,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   @histogram: s.viewportHistogram(s.prop('vehicles))
+     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
      * });
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);

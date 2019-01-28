@@ -230,6 +230,10 @@
                     "file": "advanced/external-geojson.html"
                 },
                 {
+                    "title": "Classification with variables",
+                    "file": "advanced/classification-variables.html"
+                },
+                {
                     "title": "US population by county",
                     "file": "advanced/us-population-by-county.html"
                 },
