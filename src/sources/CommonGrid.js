@@ -67,7 +67,7 @@ export default class CommonGrid extends Base {
         }, {});
         const properties = measurements.reduce((props, m) => {
             props[m] = {
-                type: 'number',
+                type: m === 'movements' ? 'category' : 'number',
                 min: this.commonGridMetadata.getMinMax(m).min,
                 max: this.commonGridMetadata.getMinMax(m).max
             };
