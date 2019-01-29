@@ -2,7 +2,10 @@
 #
 # Check https://circleci.com/docs/2.0/language-javascript/ for more details
 #
-version: 2
+version: 2.1
+
+orbs:
+  sauce-connect: saucelabs/sauce-connect@1.0.1
 
 jobs:
   test-e2e:
@@ -83,6 +86,13 @@ workflows:
   build_and_test:
     jobs:
       - test-e2e
-      - test-unit-lint-docs
-      - test-render
-      - test-user
+      - saucelabs/with_proxy:
+          name: Chrome Tests
+          steps:
+            - run: mvn verify -B -Dsauce.browser=chrome  -Dsauce.tunnel="chrome"
+          tunnel_identifier: chrome
+      - saucelabs/with_proxy:
+          name: Safari Tests
+          steps:
+            - run: mvn verify -B -Dsauce.browser=safari  -Dsauce.tunnel="safari"
+          tunnel_identifier: safari
