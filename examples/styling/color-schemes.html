@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
@@ -73,7 +73,7 @@
       username: 'cartovl',
       apiKey: 'default_public'
     });
-    
+
     // Color with CARTOColor scheme
     const CartoColorViz = new carto.Viz(`
       color: ramp(globalQuantiles($pct_higher_ed,5),Emrld)
@@ -107,10 +107,10 @@
 
     const source = new carto.source.Dataset('higher_edu_by_county');
     const layer = new carto.Layer('layer', source, CartoColorViz);
-    
+
     layer.addTo(map, 'watername_ocean');
     layer.on('loaded', hideLoader);
-    
+
     function setCartoColor() {
       layer.blendToViz(CartoColorViz);
     }

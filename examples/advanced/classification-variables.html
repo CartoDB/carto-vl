@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Classification using variables | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+
+  <style>
+    #controls li {
+      display: grid;
+      padding-top: 5px;
+    }
+    #nBuckets, #nOpacity{
+      font-size: 10px;
+    }
+
+    .paletteSelector {
+      max-height: 200px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      list-style-image: none;
+    }
+    .paletteSelector li div {
+      height: 30px;
+    }
+
+    .paletteSelector li div.selected {
+      border: 2px black solid;
+    }
+
+    .paletteSelector li p {
+      position: relative;
+      top: 0px;
+      left: 5px;
+      font-size: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Classification using variables</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Illustrate the use of variables in a Classification to build
+          a little thematic mapping tool.
+        </p>
+      </section>
+      <br />
+      <section>
+        <div id="controls">
+          <ul>
+            <li>
+              <label>1. Select the input field</label>
+              <select id="valueSelector">
+                <option value="trump" selected>Trump</option>
+                <option value="clinton">Clinton</option>
+                <option value="pct_dem">Percent Democr.</option>
+                <option value="pct_higher_ed">Percent Higher Education</option>
+              </select>
+            </li>
+            <li>
+              <label>2. Select the number of buckets</label>
+              <input id="bucketsSelector" type="range" min="2" max="11" step="1" value="3">
+              <span id="nBuckets">3 buckets</span>
+            </li>
+            <li>
+              <label>3. Select the opacity</label>
+              <input id="opacitySelector" type="range" min="0" max="1" step="0.1" value="0.8">
+              <span id="nOpacity">80% opacity</span>
+            </li>
+            <li>
+              <label>4. Select a palette</label>
+              <ul class="paletteSelector">
+                <li>
+                  <div class="selected" style="background:linear-gradient(90deg,#ffc6c4 0,#ffc6c4 14.285714285714286%,#f4a3a8 14.285714285714286%,#f4a3a8 28.571428571428573%,#e38191 28.571428571428573%,#e38191 42.857142857142854%,#cc607d 42.857142857142854%,#cc607d 57.142857142857146%,#ad466c 57.142857142857146%,#ad466c 71.42857142857143%,#8b3058 71.42857142857143%,#8b3058 85.71428571428571%,#672044 85.71428571428571%,#672044 100%)">
+                    <p>Burg</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#fbe6c5 0,#fbe6c5 14.285714285714286%,#f5ba98 14.285714285714286%,#f5ba98 28.571428571428573%,#ee8a82 28.571428571428573%,#ee8a82 42.857142857142854%,#dc7176 42.857142857142854%,#dc7176 57.142857142857146%,#c8586c 57.142857142857146%,#c8586c 71.42857142857143%,#9c3f5d 71.42857142857143%,#9c3f5d 85.71428571428571%,#70284a 85.71428571428571%,#70284a 100%)">
+                    <p>BurgYl</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#f6d2a9 0,#f6d2a9 14.285714285714286%,#f5b78e 14.285714285714286%,#f5b78e 28.571428571428573%,#f19c7c 28.571428571428573%,#f19c7c 42.857142857142854%,#ea8171 42.857142857142854%,#ea8171 57.142857142857146%,#dd686c 57.142857142857146%,#dd686c 71.42857142857143%,#ca5268 71.42857142857143%,#ca5268 85.71428571428571%,#b13f64 85.71428571428571%,#b13f64 100%)">
+                    <p>RedOr</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#ecda9a 0,#ecda9a 14.285714285714286%,#efc47e 14.285714285714286%,#efc47e 28.571428571428573%,#f3ad6a 28.571428571428573%,#f3ad6a 42.857142857142854%,#f7945d 42.857142857142854%,#f7945d 57.142857142857146%,#f97b57 57.142857142857146%,#f97b57 71.42857142857143%,#f66356 71.42857142857143%,#f66356 85.71428571428571%,#ee4d5a 85.71428571428571%,#ee4d5a 100%)">
+                    <p>OrYel</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#fde0c5 0,#fde0c5 14.285714285714286%,#facba6 14.285714285714286%,#facba6 28.571428571428573%,#f8b58b 28.571428571428573%,#f8b58b 42.857142857142854%,#f59e72 42.857142857142854%,#f59e72 57.142857142857146%,#f2855d 57.142857142857146%,#f2855d 71.42857142857143%,#ef6a4c 71.42857142857143%,#ef6a4c 85.71428571428571%,#eb4a40 85.71428571428571%,#eb4a40 100%)">
+                    <p>Peach</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#fef6b5 0,#fef6b5 14.285714285714286%,#ffdd9a 14.285714285714286%,#ffdd9a 28.571428571428573%,#ffc285 28.571428571428573%,#ffc285 42.857142857142854%,#ffa679 42.857142857142854%,#ffa679 57.142857142857146%,#fa8a76 57.142857142857146%,#fa8a76 71.42857142857143%,#f16d7a 71.42857142857143%,#f16d7a 85.71428571428571%,#e15383 85.71428571428571%,#e15383 100%)">
+                    <p>PinkYl</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#e4f1e1 0,#e4f1e1 14.285714285714286%,#b4d9cc 14.285714285714286%,#b4d9cc 28.571428571428573%,#89c0b6 28.571428571428573%,#89c0b6 42.857142857142854%,#63a6a0 42.857142857142854%,#63a6a0 57.142857142857146%,#448c8a 57.142857142857146%,#448c8a 71.42857142857143%,#287274 71.42857142857143%,#287274 85.71428571428571%,#0d585f 85.71428571428571%,#0d585f 100%)">
+                    <p>Mint</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#c4e6c3 0,#c4e6c3 14.285714285714286%,#96d2a4 14.285714285714286%,#96d2a4 28.571428571428573%,#6dbc90 28.571428571428573%,#6dbc90 42.857142857142854%,#4da284 42.857142857142854%,#4da284 57.142857142857146%,#36877a 57.142857142857146%,#36877a 71.42857142857143%,#266b6e 71.42857142857143%,#266b6e 85.71428571428571%,#1d4f60 85.71428571428571%,#1d4f60 100%)">
+                    <p>BluGrn</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#d2fbd4 0,#d2fbd4 14.285714285714286%,#a5dbc2 14.285714285714286%,#a5dbc2 28.571428571428573%,#7bbcb0 28.571428571428573%,#7bbcb0 42.857142857142854%,#559c9e 42.857142857142854%,#559c9e 57.142857142857146%,#3a7c89 57.142857142857146%,#3a7c89 71.42857142857143%,#235d72 71.42857142857143%,#235d72 85.71428571428571%,#123f5a 85.71428571428571%,#123f5a 100%)">
+                    <p>DarkMint</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#d3f2a3 0,#d3f2a3 14.285714285714286%,#97e196 14.285714285714286%,#97e196 28.571428571428573%,#6cc08b 28.571428571428573%,#6cc08b 42.857142857142854%,#4c9b82 42.857142857142854%,#4c9b82 57.142857142857146%,#217a79 57.142857142857146%,#217a79 71.42857142857143%,#105965 71.42857142857143%,#105965 85.71428571428571%,#074050 85.71428571428571%,#074050 100%)">
+                    <p>Emrld</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#f7feae 0,#f7feae 14.285714285714286%,#b7e6a5 14.285714285714286%,#b7e6a5 28.571428571428573%,#7ccba2 28.571428571428573%,#7ccba2 42.857142857142854%,#46aea0 42.857142857142854%,#46aea0 57.142857142857146%,#089099 57.142857142857146%,#089099 71.42857142857143%,#00718b 71.42857142857143%,#00718b 85.71428571428571%,#045275 85.71428571428571%,#045275 100%)">
+                    <p>BluYl</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#d1eeea 0,#d1eeea 14.285714285714286%,#a8dbd9 14.285714285714286%,#a8dbd9 28.571428571428573%,#85c4c9 28.571428571428573%,#85c4c9 42.857142857142854%,#68abb8 42.857142857142854%,#68abb8 57.142857142857146%,#4f90a6 57.142857142857146%,#4f90a6 71.42857142857143%,#3b738f 71.42857142857143%,#3b738f 85.71428571428571%,#2a5674 85.71428571428571%,#2a5674 100%)">
+                    <p>Teal</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#b0f2bc 0,#b0f2bc 14.285714285714286%,#89e8ac 14.285714285714286%,#89e8ac 28.571428571428573%,#67dba5 28.571428571428573%,#67dba5 42.857142857142854%,#4cc8a3 42.857142857142854%,#4cc8a3 57.142857142857146%,#38b2a3 57.142857142857146%,#38b2a3 71.42857142857143%,#2c98a0 71.42857142857143%,#2c98a0 85.71428571428571%,#257d98 85.71428571428571%,#257d98 100%)">
+                    <p>TealGrn</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,hsl(290, 59%, 92%) 0,#f3e0f7 14.285714285714286%,#e4c7f1 14.285714285714286%,#e4c7f1 28.571428571428573%,#d1afe8 28.571428571428573%,#d1afe8 42.857142857142854%,#b998dd 42.857142857142854%,#b998dd 57.142857142857146%,#9f82ce 57.142857142857146%,#9f82ce 71.42857142857143%,#826dba 71.42857142857143%,#826dba 85.71428571428571%,#63589f 85.71428571428571%,#63589f 100%)">
+                    <p>Purp</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#f9ddda 0,#f9ddda 14.285714285714286%,#f2b9c4 14.285714285714286%,#f2b9c4 28.571428571428573%,#e597b9 28.571428571428573%,#e597b9 42.857142857142854%,#ce78b3 42.857142857142854%,#ce78b3 57.142857142857146%,#ad5fad 57.142857142857146%,#ad5fad 71.42857142857143%,#834ba0 71.42857142857143%,#834ba0 85.71428571428571%,#573b88 85.71428571428571%,#573b88 100%)">
+                    <p>PurpOr</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#f3e79b 0,#f3e79b 14.285714285714286%,#fac484 14.285714285714286%,#fac484 28.571428571428573%,#f8a07e 28.571428571428573%,#f8a07e 42.857142857142854%,#eb7f86 42.857142857142854%,#eb7f86 57.142857142857146%,#ce6693 57.142857142857146%,#ce6693 71.42857142857143%,#a059a0 71.42857142857143%,#a059a0 85.71428571428571%,#5c53a5 85.71428571428571%,#5c53a5 100%)">
+                    <p>Sunset</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#f3cbd3 0,#f3cbd3 14.285714285714286%,#eaa9bd 14.285714285714286%,#eaa9bd 28.571428571428573%,#dd88ac 28.571428571428573%,#dd88ac 42.857142857142854%,#ca699d 42.857142857142854%,#ca699d 57.142857142857146%,#b14d8e 57.142857142857146%,#b14d8e 71.42857142857143%,#91357d 71.42857142857143%,#91357d 85.71428571428571%,#6c2167 85.71428571428571%,#6c2167 100%)">
+                    <p>Magenta</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#fcde9c 0,#fcde9c 14.285714285714286%,#faa476 14.285714285714286%,#faa476 28.571428571428573%,#f0746e 28.571428571428573%,#f0746e 42.857142857142854%,#e34f6f 42.857142857142854%,#e34f6f 57.142857142857146%,#dc3977 57.142857142857146%,#dc3977 71.42857142857143%,#b9257a 71.42857142857143%,#b9257a 85.71428571428571%,#7c1d6f 85.71428571428571%,#7c1d6f 100%)">
+                    <p>SunsetDark</p>
+                  </div>
+                </li>
+                <li>
+                  <div style="background:linear-gradient(90deg,#ede5cf 0,#ede5cf 14.285714285714286%,#e0c2a2 14.285714285714286%,#e0c2a2 28.571428571428573%,#d39c83 28.571428571428573%,#d39c83 42.857142857142854%,#c1766f 42.857142857142854%,#c1766f 57.142857142857146%,#a65461 57.142857142857146%,#a65461 71.42857142857143%,#813753 71.42857142857143%,#813753 85.71428571428571%,#541f3f 85.71428571428571%,#541f3f 100%)">
+                    <p>BrwnYl</p>
+                  </div>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+    </div>
+  </aside>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-88, 37],
+      zoom: 3
+    });
+
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    // Define user
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const s = carto.expressions;
+
+    function vizFromSettings(settings) {
+      const stringViz = `
+        @input: $${settings.input}
+        @buckets: ${settings.buckets}
+        @palette: ${settings.palette}
+        @opacity: ${settings.opacity}
+
+        color: opacity(ramp(globalQuantiles(@input, @buckets), @palette), @opacity)
+        strokeColor: black
+        strokeWidth: 1
+      `
+      return new carto.Viz(stringViz);
+    }
+
+    // Define layer
+    const source = new carto.source.Dataset('higher_edu_by_county');
+    let initialSettings = {
+      input: 'trump',
+      buckets: 3,
+      palette: 'Burg',
+      opacity: 0.8
+    }
+    const viz = vizFromSettings(initialSettings);
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'watername_ocean');
+
+    // Basic popup to check the input field values
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event => {
+      if (event.features.length > 0) {
+        const firstFeature = event.features[0];
+        const value = firstFeature.variables.input.value.toFixed(2);
+        popup.setHTML(`<p><strong>${selectedColumnName()}</strong>: ${value}</p>`);
+        popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
+        if (!popup.isOpen()) {
+          popup.addTo(map);
+        }
+      } else {
+        popup.remove();
+      }
+    });
+
+    // Update variables with widgets
+    const $valueSelector = document.getElementById('valueSelector');
+    const $bucketsSelector = document.getElementById('bucketsSelector');
+    const $opacitySelector = document.getElementById('opacitySelector');
+    const $paletteSelectors = document.querySelectorAll('.paletteSelector div');
+
+    function selectedColumnName() {
+      return $valueSelector.options[$valueSelector.selectedIndex].value;
+    }
+
+    function updateViz() {
+      popup.remove();
+
+      const columnName = selectedColumnName();
+      viz.variables['input'] = s.property(columnName);
+      viz.variables['opacity'].blendTo(parseFloat($opacitySelector.value));
+      viz.variables['buckets'] = parseInt($bucketsSelector.value);
+
+      const paletteName = document.querySelector('.paletteSelector .selected p').innerText;
+      viz.variables['palette'] = s.palettes[paletteName.toUpperCase()];
+    }
+
+    // Handle widget changes
+    $valueSelector.addEventListener('change', () => {
+      updateViz();
+    });
+    $bucketsSelector.addEventListener('input', () => {
+      document.querySelector('#nBuckets').innerText = `${$bucketsSelector.value} buckets`;
+      updateViz();
+    });
+
+    $opacitySelector.addEventListener('input', () => {
+      document.querySelector('#nOpacity').innerText = `${$opacitySelector.value * 100}% opacity`;
+      updateViz();
+    });
+
+    $paletteSelectors.forEach((p) => p.addEventListener('click', () => {
+      // clear selected
+      $paletteSelectors.forEach((s) => s.classList.remove('selected'));
+      p.classList.add('selected');
+
+      updateViz();
+    }));
+  </script>
+</body>
+
+</html>

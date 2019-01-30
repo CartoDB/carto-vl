@@ -157,19 +157,27 @@ export default class Layer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        const STYLE_ERROR_REGEX = /Style is not done loading/;
-
-        const addTheLayer = () => { map.addLayer(this, beforeLayerID); };
+        // Manage errors, whether they are an Evented Error or a common Error
         try {
-            addTheLayer();
-            // Note: map.isStyleLoaded() has been tested here without success
+            map.once('error', (data) => {
+                console.warn(data.error.message);
+                this._waitForMapToLoad(map, beforeLayerID);
+            });
+            map.addLayer(this, beforeLayerID);
         } catch (error) {
-            if (!STYLE_ERROR_REGEX.test(error)) {
+            const STYLE_ERROR_REGEX = /Style is not done loading/;
+            const NO_STYLE_AT_ALL = /Cannot read property 'addLayer' of undefined/;
+            if (!(STYLE_ERROR_REGEX.test(error) || NO_STYLE_AT_ALL.test(error))) {
                 throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
-
-            map.on('load', addTheLayer);
+            this._waitForMapToLoad(map, beforeLayerID);
         }
+    }
+
+    _waitForMapToLoad (map, beforeLayerID) {
+        map.on('load', () => {
+            map.addLayer(this, beforeLayerID);
+        });
     }
 
     /**

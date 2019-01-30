@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Point labels conditional style | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-105.005366, 39.749277],
+      zoom: 14
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Point layer
+    const source = new carto.source.Dataset('points_of_interest');
+    const viz = new carto.Viz(`
+      color: ramp(buckets($poi_name, ['Union Station', 'Invesco Field at Mile High Stadium', 'Pepsi Center', 'Coors Field']), [#0B9F95, #D36DFB, #ff9674, #F75869],white)
+      width: 6
+      strokeWidth: 0
+      filter: $major == "YES"
+      @v_features: viewportFeatures($poi_name)
+    `);
+    const layer = new carto.Layer('points', source, viz);
+
+    // Create labeling layer centroids
+    layer.on('loaded', () => {
+      map.addSource('labels', { type: 'geojson', data: null });
+      const labelSource = map.getSource('labels');
+
+      const layerUpdated = function () {
+        const features = viz.variables.v_features.value;
+        const geojsonFeatures = features.map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getRenderedCentroid()
+            },
+            "properties": {
+              "label_field": `${f.properties['poi_name']}`,
+            }
+          }
+        });
+
+        labelSource.setData({
+          type: 'FeatureCollection',
+          features: geojsonFeatures
+        });
+      };
+
+      layer.on('updated', layerUpdated);
+
+      // Style labels add stops to paint properties for conditional label styles
+      map.addLayer({
+        "id": "my-labels",
+        "type": "symbol",
+        "source": "labels",
+        "layout": {
+          "text-field": "{label_field}",
+          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-size": 10,
+          "text-offset": [0, 0.65],
+          "text-anchor": "top",
+          "text-max-width": 8,
+          "text-justify": "center",
+          "text-letter-spacing": 0.1
+        },
+        "paint": {
+          "text-color": {
+            "property": "label_field",
+            "type": "categorical",
+            "stops": [
+              ["Union Station", "#0B9F95"],
+              ["Invesco Field at Mile High Stadium", "#D36DFB"],
+              ["Pepsi Center", "#ff9674"],
+              ["Coors Field", "#F75869"]
+            ]
+          },
+          "text-halo-color": "#888",
+          "text-halo-width": 1.2,
+          "text-halo-blur": 1
+        }
+      });
+    });
+
+    layer.addTo(map);
+
+  </script>
+</body>
+
+</html>

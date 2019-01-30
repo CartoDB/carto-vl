@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Labels & points | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+
+  <script src="../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link href="../examples/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [7, 25],
+      zoom: 2,
+      renderWorldCopies: false
+    });
+
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Points layer
+    const source = new carto.source.Dataset('world_population_2015');
+    const viz = new carto.Viz(`
+        color: opacity(navy, 0.75)
+        width: sqrt($pop_2015)/100
+        strokeColor: fuchsia
+        strokeWidth: 2
+        filter: $pop_2015 > 10000000
+        @v_features: viewportFeatures($country_code, $pop_2015)
+      `);
+    const layer = new carto.Layer('points', source, viz);
+
+
+    layer.on('loaded', () => {
+      map.addSource('labels', { type: 'geojson', data: null });
+      const labelSource = map.getSource('labels');
+
+      const layerUpdated = function () {
+        let features = viz.variables.v_features.value;
+        const currentZoom = map.getZoom();
+
+        features = features.filter(f => {
+          const pop = f.properties['pop_2015'];
+          if (currentZoom < 4) {
+            return pop > 50000000;
+          }
+          return true;
+        });
+
+        const geojsonFeatures = features.map(f => {
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getRenderedCentroid()
+            },
+            "properties": {
+              "label_field": `${f.properties['country_code']}`,
+              "population": `${f.properties['pop_2015']}`
+            }
+          }
+        });
+
+        labelSource.setData({
+          type: 'FeatureCollection',
+          features: geojsonFeatures
+        });
+        console.log('* labels updated');
+      };
+
+      layer.on('updated', layerUpdated);
+
+      // Labels layer
+      map.addLayer({
+        "id": "my-labels",
+        "type": "symbol",
+        "source": "labels",
+        "layout": {
+          "text-size": {
+            "stops": [
+              [0, 0],
+              [4, 20],
+              [9, 30],
+              [14, 50]
+            ]
+          },
+          //"icon-image": "marker-15",
+          "text-field": "{label_field}",
+          "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+          "text-offset": [0, 1],
+          "text-anchor": "top"
+        },
+        "paint": {
+          "text-color": "#fff",
+          'text-halo-color': '#2d99b7',
+          'text-halo-width': 2
+        }
+      });
+    });
+
+    layer.addTo(map);
+
+  </script>
+
+</body>
+
+</html>

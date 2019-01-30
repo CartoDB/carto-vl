@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Add layer | CARTO</title>
+  <title>Basemap labels under | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../../dist/carto-vl.js"></script>
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Add layer</h1>
+        <h1>Labels under</h1>
       </header>
       <section>
-        <p class="description open-sans">Show viewport aggregations</p>
+        <p class="description open-sans">Basemap labels under layer</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -34,7 +36,7 @@
       container: 'map',
       style: carto.basemaps.voyager,
       center: [0, 0],
-      zoom: 0,
+      zoom: 2,
       scrollZoom: false,
     });
 
@@ -43,28 +45,24 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
-    const source = new carto.source.Dataset('wwi');
+    const source = new carto.source.Dataset('countries_110m_admin_0');
     const viz = new carto.Viz(`
-        @avg: viewportAvg(($temp))
-        width:  zoom() * (animation($day, 140, fade(0.05, 0.2)) + 0.5)
-        color:  ramp(linear(($temp), 0,30), tealrose)
-        strokeWidth: 0
-        filter: animation($day, 140, fade(0.05, 0.2)) + 0.05
-        transform: translate(100, 50)
+      @country: ramp($mapcolor7,pastel)
+
+      color: opacity(@country,0.8)
+      strokeColor: @country
+      strokeWidth: 1
     `);
     const layer = new carto.Layer('layer', source, viz);
-    layer.on('updated', ()=>{
-        console.log(viz.variables.avg.value);
-    });
 
-    layer.addTo(map, 'watername_ocean');
+    // Add layer on top of basemap
+    layer.addTo(map);
+
     layer.on('loaded', hideLoader);
 
     function hideLoader() {
@@ -72,4 +70,5 @@
     }
   </script>
 </body>
+
 </html>

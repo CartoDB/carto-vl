@@ -1,6 +1,5 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
+import { checkExactNumberOfArguments } from '../utils';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -29,20 +28,21 @@ import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArgumen
  */
 export default class GlobalEqIntervals extends Classifier {
     constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'globalEqIntervals');
-        checkInstance('globalEqIntervals', 'input', 0, Property, input && (input.property || input));
-        checkNumber('globalEqIntervals', 'buckets', 1, buckets);
-
-        super({ input }, buckets);
+        checkExactNumberOfArguments(arguments, 2, 'globalEqIntervals');
+        super({ input, buckets });
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalEqIntervals', 'input', 0, this.input);
-        checkType('globalEqIntervals', 'input', 0, 'number', this.input);
+
+        this._updateBreakpointsWith(metadata);
+    }
+
+    _updateBreakpointsWith (metadata) {
         const { min, max } = metadata.stats(this.input.name);
         this.min = min;
         this.max = max;
+
         this.breakpoints.map((breakpoint, index) => {
             const p = (index + 1) / this.numCategories;
             breakpoint.expr = min + (max - min) * p;

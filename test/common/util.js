@@ -9,6 +9,11 @@ const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
 const PORT = 5000;
 
+const mapboxVersion = {
+    js: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+    css: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.css')
+};
+
 function loadFiles (directory) {
     testsDir = directory;
     let files = [];
@@ -59,8 +64,8 @@ function getDeviceScaleFactor (file) {
     return 1;
 }
 
-async function testSST (file, template, browser) {
-    writeTemplate(file, template);
+async function testSST (file, template, browser, mapbox = mapboxVersion) {
+    writeTemplate(file, template, mapbox);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
@@ -96,14 +101,14 @@ async function testSST (file, template, browser) {
     return result;
 }
 
-function writeTemplate (file, template) {
+function writeTemplate (file, template, mapbox = mapboxVersion) {
     const bundle = process.env.MIN ? 'carto-vl.min' : 'carto-vl';
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
         cartovl: `http://localhost:${PORT}/dist/${bundle}.js`,
-        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
-        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.css'),
+        mapboxgl: mapbox.js,
+        mapboxglcss: mapbox.css,
         glmatrix: `http://localhost:${PORT}/` + path.join('node_modules', 'gl-matrix', 'dist', 'gl-matrix-min.js')
     }));
 }

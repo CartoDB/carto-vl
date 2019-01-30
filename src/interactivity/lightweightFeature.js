@@ -15,6 +15,7 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     const cls = class LightweightFeature {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
+            this._featureProperties = null;
         }
     };
 
@@ -24,7 +25,7 @@ export function genLightweightFeatureClass (propertyNames, renderLayer) {
     _defineFeatureProperties(cls.prototype, propertyNames);
     _defineRootBlendToMethod(cls.prototype);
     _defineRootResetMethod(cls.prototype);
-    _defineGetCentroidMethod(cls.prototype);
+    _defineGetRenderedCentroidMethod(cls.prototype);
 
     return cls;
 }
@@ -94,12 +95,14 @@ function _defineVizVariables (targetObject, renderLayer) {
 function _defineFeatureProperties (targetObject, propertyNames) {
     Object.defineProperty(targetObject, 'properties', {
         get: function () {
-            const properties = {};
-            // feature properties
-            propertyNames.forEach(propertyName => {
-                properties[propertyName] = this._rawFeature[propertyName];
-            });
-            return properties;
+            if (this._featureProperties === null) {
+                this._featureProperties = {};
+                // feature properties
+                propertyNames.forEach(propertyName => {
+                    this._featureProperties[propertyName] = this._rawFeature[propertyName];
+                });
+            }
+            return this._featureProperties;
         }
     });
 }
@@ -138,13 +141,14 @@ function _defineRootResetMethod (targetObject) {
     });
 }
 
-function _defineGetCentroidMethod (targetObject) {
-    Object.defineProperty(targetObject, 'getCentroid', {
+function _defineGetRenderedCentroidMethod (targetObject) {
+    Object.defineProperty(targetObject, 'getRenderedCentroid', {
         get: function () {
-            const getCentroid = () => {
-                return this._rawFeature._dataframe.getCentroid(this._rawFeature._index);
+            const getRenderedCentroid = () => {
+                return this._rawFeature._dataframe.getRenderedCentroid(this._rawFeature._index);
             };
-            return getCentroid;
-        }
+            return getRenderedCentroid;
+        },
+        configurable: true
     });
 }

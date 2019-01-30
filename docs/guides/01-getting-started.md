@@ -24,12 +24,12 @@ The most straight-forward way to use CARTO VL is to include the required files f
   <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
 
   <!-- Include Mapbox GL from the Mapbox CDN-->
-  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
 </head>
 ```
 **Note:**
-**Mapbox GL**: CARTO VL is not compatible with every version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
+**Mapbox GL**: CARTO VL is not compatible with every version. We recommend using the same version that we use in the [examples](/developers/carto-vl/examples/). However, every version from **`v0.50.0`** should work. Historically, we provided patched MGL bundles, but this is no longer required.
 
 **Note:**
 **Developers**: if you have experience with `npm` and a build system in your project (*webpack*, *rollup*...), you can install CARTO VL library with `npm install @carto/carto-vl`. You can import it with `import carto from '@carto/carto-vl'` and then you will have access to an already babelified version of the library, ready to be used.
@@ -171,8 +171,8 @@ For more information about styling, check out the guide [Style with Expressions]
 <head>
     <meta charset="utf-8">
     <script src="https://libs.cartocdn.com/carto-vl/%VERSION%/carto-vl.min.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.50.0/mapbox-gl.css" rel="stylesheet" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 <body>

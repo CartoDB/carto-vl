@@ -157,7 +157,7 @@ export class MVTWorker {
                     `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
-            this._decodeProperties(scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
+            this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
             numFeatures++;
         }
 
@@ -221,19 +221,19 @@ export class MVTWorker {
             .filter(([_prop, _dprop, codec]) => codec.isRange());
     }
 
-    _decodeProperties (scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
+    _decodeProperties (metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, feature, i) {
         let length = scalarPropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, codec] = scalarPropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = codec.sourceToInternal(propertyValue);
+            properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue);
         }
 
         length = rangePropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, [loPropertyName, hiPropertyName], codec] = rangePropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            const [loValue, hiValue] = codec.sourceToInternal(propertyValue);
+            const [loValue, hiValue] = codec.sourceToInternal(metadata, propertyValue);
             properties[loPropertyName][i] = loValue;
             properties[hiPropertyName][i] = hiValue;
         }

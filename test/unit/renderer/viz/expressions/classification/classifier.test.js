@@ -1,5 +1,4 @@
-import { validateStaticType, validateTypeErrors, validateMaxArgumentsError } from '../utils';
-
+import { validateStaticType, validateTypeErrors, validateMaxArgumentsError, validateMinArgumentsError, validateExactNumArgumentsError } from '../utils';
 import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
 import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
@@ -9,21 +8,21 @@ import { DEFAULT_HISTOGRAM_SIZE } from '../../../../../../src/renderer/viz/expre
 describe('src/renderer/viz/expressions/classifier', () => {
     describe('error control', () => {
         describe('global', () => {
-            validateTypeErrors('globalQuantiles', []);
+            validateExactNumArgumentsError('globalQuantiles', []);
             validateTypeErrors('globalQuantiles', ['number', 'category']);
             validateTypeErrors('globalQuantiles', ['category', 2]);
             validateTypeErrors('globalQuantiles', ['color', 2]);
             validateTypeErrors('globalQuantiles', ['number', 'color']);
-            validateMaxArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('globalQuantiles', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('globalEqIntervals', []);
+            validateExactNumArgumentsError('globalEqIntervals', []);
             validateTypeErrors('globalEqIntervals', ['number', 'category']);
             validateTypeErrors('globalEqIntervals', ['category', 2]);
             validateTypeErrors('globalEqIntervals', ['color', 2]);
             validateTypeErrors('globalEqIntervals', ['number', 'color']);
-            validateMaxArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('globalEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('globalStandardDev', []);
+            validateMinArgumentsError('globalStandardDev', []);
             validateTypeErrors('globalStandardDev', ['number', 'category']);
             validateTypeErrors('globalStandardDev', ['category', 2]);
             validateTypeErrors('globalStandardDev', ['color', 2]);
@@ -32,21 +31,21 @@ describe('src/renderer/viz/expressions/classifier', () => {
         });
 
         describe('viewport', () => {
-            validateTypeErrors('viewportQuantiles', []);
+            validateMinArgumentsError('viewportQuantiles', []);
             validateTypeErrors('viewportQuantiles', ['number', 'category']);
             validateTypeErrors('viewportQuantiles', ['category', 2]);
             validateTypeErrors('viewportQuantiles', ['color', 2]);
             validateTypeErrors('viewportQuantiles', ['number', 'color']);
             validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number', 'number']);
 
-            validateTypeErrors('viewportEqIntervals', []);
+            validateExactNumArgumentsError('viewportEqIntervals', []);
             validateTypeErrors('viewportEqIntervals', ['number', 'category']);
             validateTypeErrors('viewportEqIntervals', ['category', 2]);
             validateTypeErrors('viewportEqIntervals', ['color', 2]);
             validateTypeErrors('viewportEqIntervals', ['number', 'color']);
-            validateMaxArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
+            validateExactNumArgumentsError('viewportEqIntervals', ['number', 'number-array', 'number']);
 
-            validateTypeErrors('viewportStandardDev', []);
+            validateMinArgumentsError('viewportStandardDev', []);
             validateTypeErrors('viewportStandardDev', ['number', 'category']);
             validateTypeErrors('viewportStandardDev', ['category', 2]);
             validateTypeErrors('viewportStandardDev', ['color', 2]);
@@ -69,8 +68,17 @@ describe('src/renderer/viz/expressions/classifier', () => {
     });
 
     describe('eval', () => {
+        // Price
         const $price = property('price');
-        const METADATA = new Metadata({
+        const PRICE_VALUES = [
+            { price: 0 },
+            { price: 1 },
+            { price: 2 },
+            { price: 3 },
+            { price: 4 },
+            { price: 5 }
+        ];
+        const PRICE_METADATA = new Metadata({
             properties: {
                 price: {
                     type: 'number',
@@ -78,69 +86,82 @@ describe('src/renderer/viz/expressions/classifier', () => {
                     max: 5
                 }
             },
+            sample: PRICE_VALUES
+        });
+
+        function priceSampleValues () {
+            return PRICE_METADATA.sample.map(s => s.price);
+        }
+
+        // Rent
+        const $rent = property('rent');
+        const oneFeatureMetadata = new Metadata({
+            properties: {
+                rent: {
+                    type: 'number',
+                    min: 1000,
+                    max: 1000
+                }
+            },
             sample: [
-                { price: 0 },
-                { price: 1 },
-                { price: 2 },
-                { price: 3 },
-                { price: 4 },
-                { price: 5 }
+                { rent: 1000 }
             ]
         });
 
-        function sampleValues () {
-            return METADATA.sample.map(s => s.price);
-        }
+        const RENT_VALUES = [
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 },
+            { rent: 1000 }
+        ];
+        const severalEqualValueFeaturesMetadata = new Metadata({
+            properties: {
+                rent: {
+                    type: 'number',
+                    min: 1000,
+                    max: 1000
+                }
+            },
+            sample: RENT_VALUES
+        });
 
-        function prepare (expr) {
-            expr._bindMetadata(METADATA);
-            expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({
-                price: 0
-            });
-            expr.accumViewportAgg({
-                price: 1
-            });
+        // Common for $price and $rent
+        function prepare (expr, metadata = PRICE_METADATA, viewportData = PRICE_VALUES) {
+            expr._resolveAliases();
+            expr._bindMetadata(metadata);
+            expr._resetViewportAgg(metadata);
 
-            expr.accumViewportAgg({
-                price: 2
-            });
-            expr.accumViewportAgg({
-                price: 3
-            });
-
-            expr.accumViewportAgg({
-                price: 4
-            });
-            expr.accumViewportAgg({
-                price: 5
+            viewportData.forEach((data) => {
+                expr.accumViewportAgg(data);
             });
         }
 
         describe('global', () => {
-            // globalQuantiles ---
-            it('globalQuantiles($price, 2)', () => {
-                const q = globalQuantiles($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([3]);
-            });
-            it('globalQuantiles($price, 3)', () => {
-                const q = globalQuantiles($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-            });
-
-            // globalEqIntervals ---
-            it('globalEqIntervals($price, 2)', () => {
-                const q = globalEqIntervals($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2.5]);
+            describe('.globalQuantiles', () => {
+                it('globalQuantiles($price, 2)', () => {
+                    const q = globalQuantiles($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([3]);
+                });
+                it('globalQuantiles($price, 3)', () => {
+                    const q = globalQuantiles($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                });
             });
 
-            // globalStandardDev ---
+            describe('.globalEqIntervals', () => {
+                it('globalEqIntervals($price, 2)', () => {
+                    const q = globalEqIntervals($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2.5]);
+                });
+            });
+
             describe('.globalStandardDev', () => {
-                const avg = average(sampleValues());
-                const std = standardDeviation(sampleValues());
+                const avg = average(priceSampleValues());
+                const std = standardDeviation(priceSampleValues());
 
                 it('globalStandardDev($price, 2)', () => {
                     const q = globalStandardDev($price, 2);
@@ -175,54 +196,83 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => globalStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => globalStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => {
+                        const q = globalStandardDev($price, 3, 0.0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = globalStandardDev($price, 3, -1.0);
+                        prepare(q);
+                    }).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => globalStandardDev($price, 0)).toThrow();
-                    expect(() => globalStandardDev($price, 1)).toThrow();
+                    expect(() => {
+                        const q = globalStandardDev($price, 0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = globalStandardDev($price, 1);
+                        prepare(q);
+                    }).toThrow();
+                });
+
+                describe('works properly when there is no standardDev', () => {
+                    it('.raises an error if zero standardDev doesn\'t allow buckets', () => {
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, oneFeatureMetadata);
+                        }).toThrow();
+
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, severalEqualValueFeaturesMetadata);
+                        }).toThrow();
+                    });
                 });
             });
         });
 
         describe('viewport', () => {
-            // viewportQuantiles ---
-            it('viewportQuantiles($price, 2)', () => {
-                const q = viewportQuantiles($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([3]);
-            });
-            it('viewportQuantiles($price, 3)', () => {
-                const q = viewportQuantiles($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
-            });
-            it('viewportQuantiles($price, 3, 30)', () => {
-                const q = viewportQuantiles($price, 3, 30);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2, 4]);
-                expect(q._histogram._sizeOrBuckets).toEqual(30);
-            });
-
-            // viewportEqIntervals ---
-            it('viewportEqIntervals($price, 2)', () => {
-                const q = viewportEqIntervals($price, 2);
-                prepare(q);
-                expect(q.getBreakpointList()).toEqual([2.5]);
-            });
-            it('viewportEqIntervals($price, 3)', () => {
-                const q = viewportEqIntervals($price, 3);
-                prepare(q);
-                expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
-                expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+            describe('.viewportQuantiles', () => {
+                it('viewportQuantiles($price, 2)', () => {
+                    const q = viewportQuantiles($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([3]);
+                });
+                it('viewportQuantiles($price, 3)', () => {
+                    const q = viewportQuantiles($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._histogram._sizeOrBuckets).toEqual(DEFAULT_HISTOGRAM_SIZE);
+                });
+                it('viewportQuantiles($price, 3, 30)', () => {
+                    const q = viewportQuantiles($price, 3, 30);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2, 4]);
+                    expect(q._histogram._sizeOrBuckets).toEqual(30);
+                });
             });
 
-            // viewportStandardDev ---
+            describe('.viewportEqIntervals', () => {
+                it('viewportEqIntervals($price, 2)', () => {
+                    const q = viewportEqIntervals($price, 2);
+                    prepare(q);
+                    expect(q.getBreakpointList()).toEqual([2.5]);
+                });
+                it('viewportEqIntervals($price, 3)', () => {
+                    const q = viewportEqIntervals($price, 3);
+                    prepare(q);
+                    expect(q.getBreakpointList()[0]).toBeCloseTo(5 / 3, 4);
+                    expect(q.getBreakpointList()[1]).toBeCloseTo(10 / 3, 4);
+                });
+            });
+
             describe('.viewportStandardDev', () => {
-                const avg = average(sampleValues());
-                const std = standardDeviation(sampleValues());
+                const avg = average(priceSampleValues());
+                const std = standardDeviation(priceSampleValues());
 
                 it('viewportStandardDev($price, 2)', () => {
                     const q = viewportStandardDev($price, 2);
@@ -283,13 +333,41 @@ describe('src/renderer/viz/expressions/classifier', () => {
                 });
 
                 it('doesn\'t allow an invalid classSize (<=0)', () => {
-                    expect(() => viewportStandardDev($price, 3, 0.0)).toThrow();
-                    expect(() => viewportStandardDev($price, 3, -1.0)).toThrow();
+                    expect(() => {
+                        const q = viewportStandardDev($price, 3, 0.0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = viewportStandardDev($price, 3, -1.0);
+                        prepare(q);
+                    }).toThrow();
                 });
 
                 it('doesn\'t allow an invalid number of buckets (<=2)', () => {
-                    expect(() => viewportStandardDev($price, 0)).toThrow();
-                    expect(() => viewportStandardDev($price, 1)).toThrow();
+                    expect(() => {
+                        const q = viewportStandardDev($price, 0);
+                        prepare(q);
+                    }).toThrow();
+
+                    expect(() => {
+                        const q = viewportStandardDev($price, 1);
+                        prepare(q);
+                    }).toThrow();
+                });
+
+                describe('works properly when there is no standardDev', () => {
+                    it('.raises an error if zero standardDev doesn\'t allow buckets', () => {
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, oneFeatureMetadata, RENT_VALUES);
+                        }).toThrow();
+
+                        expect(() => {
+                            const q = globalStandardDev($rent, 2);
+                            prepare(q, severalEqualValueFeaturesMetadata, RENT_VALUES);
+                        }).toThrow();
+                    });
                 });
             });
         });

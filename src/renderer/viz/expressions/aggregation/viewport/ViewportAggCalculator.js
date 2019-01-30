@@ -1,5 +1,7 @@
 
 import { FILTERING_THRESHOLD } from '../../../../Renderer';
+import ViewportFeatures from '../../viewportFeatures';
+import { GEOMETRY_TYPE } from '../../../../../utils/geometry';
 
 /**
  * Run all viewport aggregation functions over the visible features in the renderLayer
@@ -46,26 +48,61 @@ function _reset (viewportExpressions, renderLayer) {
  * Run all viewport aggregations in the active dataframes
  */
 function _runInActiveDataframes (viewportExpressions, renderLayer) {
-    const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
     const dataframes = renderLayer.getActiveDataframes();
+    const inViewportFeaturesIDs = _runInDataframes(viewportExpressions, renderLayer, dataframes);
+
+    _runImprovedForPartialFeatures(viewportExpressions, renderLayer, inViewportFeaturesIDs);
+}
+
+/**
+ * Run all viewport aggregations in the dataframes, and returns a list of featureIDs inside the
+ * viewport & not filtered out. That's a list of the features effectively included in the viewportExpressions run
+ */
+function _runInDataframes (viewportExpressions, renderLayer, dataframes) {
+    const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
+    const viz = renderLayer.viz;
+
+    const inViewportFeaturesIDs = new Set();
     dataframes.forEach(dataframe => {
-        _runInDataframe(renderLayer.viz, viewportExpressions, dataframe, processedFeaturesIDs);
+        _runInDataframe(viz, viewportExpressions, dataframe, processedFeaturesIDs, inViewportFeaturesIDs);
     });
+    return inViewportFeaturesIDs;
+}
+
+/**
+ * Run an improved viewportFeatures just for lines or polygons (considering the existence of partial Features)
+ */
+function _runImprovedForPartialFeatures (viewportExpressions, renderLayer, inViewportFeaturesIDs) {
+    const noFeatures = (inViewportFeaturesIDs.size === 0);
+    if (noFeatures) {
+        return;
+    }
+
+    const noPossiblePartialFeatures = (renderLayer.viz.geometryType === GEOMETRY_TYPE.POINT);
+    if (noPossiblePartialFeatures) {
+        return;
+    }
+
+    const viewportFeaturesExpressions = viewportExpressions.filter(exp => exp.isA(ViewportFeatures));
+    if (viewportFeaturesExpressions.length > 0) {
+        _runForPartialViewportFeatures(viewportFeaturesExpressions, renderLayer, inViewportFeaturesIDs);
+    }
 }
 
 /**
  * Run viewport aggregations in the dataframe. It excludes features:
- *    - already accumlated in other dataframes
+ *    - already accumulated in other dataframes
  *    - outside the viewport
  *    - filtered out
  */
-function _runInDataframe (viz, viewportExpressions, dataframe, processedFeaturesIDs) {
+function _runInDataframe (viz, viewportExpressions, dataframe, processedFeaturesIDs, inViewportFeaturesIDs) {
     for (let i = 0; i < dataframe.numFeatures; i++) {
-        const featureId = dataframe.properties[viz.metadata.idProperty][i];
+        const idProperty = viz.metadata.idProperty;
+        const featureId = dataframe.properties[idProperty][i];
 
         const featureAlreadyAccumulated = processedFeaturesIDs.has(featureId);
         if (featureAlreadyAccumulated) {
-            continue;
+            continue; // This is correct for viewportExpressions related to 'alphanumeric' properties (not geometry-related)
         }
 
         const featureOutsideViewport = !dataframe.inViewport(i);
@@ -82,7 +119,27 @@ function _runInDataframe (viz, viewportExpressions, dataframe, processedFeatures
             continue;
         }
 
-        // not a filtered feature, so pass the rawFeature to all viewport aggregations
+        inViewportFeaturesIDs.add(feature[idProperty]); // inViewport & in filter
+
+        // not a filtered feature, so pass the rawFeature to viewport expressions
         viewportExpressions.forEach(expr => expr.accumViewportAgg(feature));
     }
+}
+
+/**
+ * Rerun viewportFeatures to improve its results, including all feature pieces in dataframes
+ */
+function _runForPartialViewportFeatures (viewportFeaturesExpressions, renderLayer, featuresIDs) {
+    // Reset previous expressions with (possibly 1 partial) features
+    viewportFeaturesExpressions.forEach(expr => expr._resetViewportAgg(null, renderLayer));
+
+    // Gather all pieces per feature
+    const piecesPerFeature = renderLayer.getAllPiecesPerFeature(featuresIDs);
+
+    // Run viewportFeatures with the whole set of feature pieces
+    viewportFeaturesExpressions.forEach(expr => {
+        for (const featureId in piecesPerFeature) {
+            expr.accumViewportAgg(piecesPerFeature[featureId]);
+        }
+    });
 }
