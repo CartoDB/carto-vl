@@ -38,10 +38,10 @@ We have some basic cross browser testing, using **selenium** + [saucelabs](https
 1. Add the saucelabs credentials as variables to the project in:
   `Build Settings > Environment Variables`: **SAUCELABS_USER** and **SAUCELABS_KEY**
 
-2. saucelabs configuration requires v2.1 configuration from CircleCI. This allows the use of CircleCI Orbs (`sauce-connect: saucelabs/sauce-connect`). So enable `Build Settings > Advanced Settings > Enable build processing (preview)`.
+2. saucelabs configuration requires v2.1 from CircleCI. This allows the use of CircleCI Orbs (`sauce-connect: saucelabs/sauce-connect`). So enable it at `Build Settings > Advanced Settings > Enable build processing (preview)`.
 
 *b) Testing*
 
-3. Every commit will launch automatically the CircleCI workflows, which include a special job for cross browser testing.
+3. Every commit will launch automatically the CircleCI workflow, which include a special job for cross browser testing.
 
 4. You can check the output at CircleCI but there is also quite a lot of information for each one at [saucelabs dashboard](https://app.saucelabs.com/dashboard/tests), including a video and some logs.
