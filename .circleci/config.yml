@@ -117,3 +117,4 @@ workflows:
                 key: v1-dependencies-{{ checksum "package.json" }}
             - run: yarn test:browsers:compatibility
           tunnel_identifier: "cartovl-tunnel"
+          version: 4.5.3
