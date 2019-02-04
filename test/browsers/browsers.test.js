@@ -1,5 +1,6 @@
 const currentGitBranch = require('current-git-branch');
 const webdriver = require('selenium-webdriver');
+const chrome = require('selenium-webdriver/chrome');
 const assert = require('assert');
 
 const username = process.env.SAUCELABS_USER;
@@ -19,7 +20,10 @@ describe('CARTO VL browser tests in...', () => {
         const serverUrl = 'http://localhost:4445/wd/hub';
         // const serverUrl = `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`;
 
-        driver = new webdriver.Builder().withCapabilities({
+        let chromeOptions = new chrome.Options();
+        chromeOptions.addArguments(['--allow-insecure-localhost']);
+
+        let capabilities = {
             'browserName': browser.browserName,
             'platform': browser.platform,
             'version': browser.version,
@@ -27,12 +31,17 @@ describe('CARTO VL browser tests in...', () => {
             'accessKey': accessKey,
             'name': `CARTO VL - ${testName}`,
             'build': `CARTO VL [${branch}]`,
-            // 'maxDuration': 3600,
-            // 'idleTimeout': 1000,
             'tags': ['carto-vl', branch],
             'extendedDebugging': true,
             'tunnel-identifier': 'cartovl-tunnel'
-        }).usingServer(serverUrl).build();
+        };
+
+        driver = new webdriver.Builder()
+            .withCapabilities(capabilities)
+            .forBrowser('chrome')
+            .setChromeOptions(chromeOptions)
+            .usingServer(serverUrl)
+            .build();
 
         driver.getSession().then(function (sessionid) {
             driver.sessionID = sessionid.id_;
