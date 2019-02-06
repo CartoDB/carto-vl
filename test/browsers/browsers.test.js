@@ -1,6 +1,8 @@
 const currentGitBranch = require('current-git-branch');
 const webdriver = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
+// const safari = require('selenium-webdriver/safari');
+
 const assert = require('assert');
 
 const username = process.env.SAUCELABS_USER;
@@ -27,6 +29,8 @@ describe('CARTO VL browser tests in...', () => {
             'browserName': browser.browserName,
             'platform': browser.platform,
             'version': browser.version,
+            'maxDuration': 300,
+            'idleTimeout': 180,
             'username': username,
             'accessKey': accessKey,
             'name': `CARTO VL - ${testName}`,
@@ -36,12 +40,46 @@ describe('CARTO VL browser tests in...', () => {
             'tunnel-identifier': 'cartovl-tunnel'
         };
 
-        driver = new webdriver.Builder()
-            .withCapabilities(capabilities)
-            .forBrowser('chrome')
-            .setChromeOptions(chromeOptions)
-            .usingServer(serverUrl)
-            .build();
+        if (browser.browserName === 'firefox') {
+            capabilities['acceptInsecureCerts'] = true;
+        }
+
+        // if (browser.browserName === 'safari') {
+        //     capabilities['args'] = '--legacy';
+        // }
+
+        switch (browser.browserName) {
+            case 'chrome':
+                let chromeOptions = new chrome.Options();
+                chromeOptions.addArguments(['--allow-insecure-localhost']);
+
+                driver = new webdriver.Builder()
+                    .withCapabilities(capabilities)
+                    .forBrowser('chrome')
+                    .setChromeOptions(chromeOptions)
+                    .usingServer(serverUrl)
+                    .build();
+                break;
+
+            // case 'safari':
+            //     let safariOptions = new safari.Options();
+            //     // safariOptions.setAcceptInsecureCerts(true);
+            //     safariOptions.addArguments(['--legacy']);
+            //     driver = new webdriver.Builder()
+            //         .withCapabilities(capabilities)
+            //         .forBrowser('safari')
+            //         .setSafariOptions(safariOptions)
+            //         .usingServer(serverUrl)
+            //         .build();
+            //     break;
+
+            default:
+                driver = new webdriver.Builder()
+                    .withCapabilities(capabilities)
+                    .usingServer(serverUrl)
+                    .build();
+                break;
+        }
 
         driver.getSession().then(function (sessionid) {
             driver.sessionID = sessionid.id_;
@@ -71,11 +109,12 @@ describe('CARTO VL browser tests in...', () => {
             this.timeout(40000);
 
             beforeEach(function (done) {
+                succesfulTest = false;
                 getDriverFor(browser, testName);
                 done();
             });
 
-            it('should load a basic layer', function (done) {
+            it(`${testName} should load a basic VL Layer`, function (done) {
                 testBasicLayerLoads(done);
             });
         });
