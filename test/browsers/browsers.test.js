@@ -1,8 +1,5 @@
 const currentGitBranch = require('current-git-branch');
 const webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome');
-// const safari = require('selenium-webdriver/safari');
-
 const assert = require('assert');
 
 const username = process.env.SAUCELABS_USER;
@@ -22,15 +19,10 @@ describe('CARTO VL browser tests in...', () => {
         const serverUrl = 'http://localhost:4445/wd/hub';
         // const serverUrl = `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`;
 
-        let chromeOptions = new chrome.Options();
-        chromeOptions.addArguments(['--allow-insecure-localhost']);
-
         let capabilities = {
             'browserName': browser.browserName,
             'platform': browser.platform,
             'version': browser.version,
-            'maxDuration': 300,
-            'idleTimeout': 180,
             'username': username,
             'accessKey': accessKey,
             'name': `CARTO VL - ${testName}`,
@@ -40,46 +32,10 @@ describe('CARTO VL browser tests in...', () => {
             'tunnel-identifier': 'cartovl-tunnel'
         };
 
-        if (browser.browserName === 'firefox') {
-            capabilities['acceptInsecureCerts'] = true;
-        }
-
-        // if (browser.browserName === 'safari') {
-        //     capabilities['args'] = '--legacy';
-        // }
-
-        switch (browser.browserName) {
-            case 'chrome':
-                let chromeOptions = new chrome.Options();
-                chromeOptions.addArguments(['--allow-insecure-localhost']);
-
-                driver = new webdriver.Builder()
-                    .withCapabilities(capabilities)
-                    .forBrowser('chrome')
-                    .setChromeOptions(chromeOptions)
-                    .usingServer(serverUrl)
-                    .build();
-                break;
-
-            // case 'safari':
-            //     let safariOptions = new safari.Options();
-            //     // safariOptions.setAcceptInsecureCerts(true);
-            //     safariOptions.addArguments(['--legacy']);
-            //     driver = new webdriver.Builder()
-            //         .withCapabilities(capabilities)
-            //         .forBrowser('safari')
-            //         .setSafariOptions(safariOptions)
-            //         .usingServer(serverUrl)
-            //         .build();
-            //     break;
-
-            default:
-                driver = new webdriver.Builder()
-                    .withCapabilities(capabilities)
-                    .usingServer(serverUrl)
-                    .build();
-                break;
-        }
+        driver = new webdriver.Builder()
+            .withCapabilities(capabilities)
+            .usingServer(serverUrl)
+            .build();
 
         driver.getSession().then(function (sessionid) {
             driver.sessionID = sessionid.id_;
