@@ -136,5 +136,19 @@ describe('sources/MVT', () => {
             metadata.setCodecs();
             expect(metadata.codec('wadus').sourceToInternal(metadata, 0)).toEqual(0);
         });
+        it('should throw when idProperty is a category but it is not defined as category in properties', () => {
+            const metadata = new MVTMetadata({
+                properties: {
+                    wadus: {
+                        type: 'category'
+                    }
+                },
+                idProperty: 'id'
+            });
+            metadata.setCodecs();
+            expect(() => {
+                metadata.codec('id').sourceToInternal(metadata, 'id-0');
+            }).toThrowError(/MVT decoding error. Metadata property is of type 'number' but the MVT tile contained a feature property of type 'string': 'id-0'/);
+        });
     });
 });
