@@ -28,7 +28,6 @@ describe('CARTO VL browser tests in...', () => {
             'name': `CARTO VL - ${testName}`,
             'build': `CARTO VL [${branch}]`,
             'tags': ['carto-vl', branch],
-            'extendedDebugging': true,
             'tunnel-identifier': 'cartovl-tunnel'
         };
 
