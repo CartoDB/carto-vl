@@ -29,7 +29,7 @@ export default class Base {
         this.preface = '';
         this._shaderBindings = new Map();
         this.expressionName = _toCamelCase(this.constructor.name);
-        this.variableName = null;
+        this._variableName = null;
     }
 
     /**

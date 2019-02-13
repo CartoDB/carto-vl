@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Allow the use of variables for all classifiers: `globalQuantiles`, `globalEqIntervals`, `globalStandardDev`, `viewportQuantiles`, `viewportEqIntervals` and `viewportStandardDev`
-- Add the variable name to an expression if it is assigned to a variable through the property `variableName`
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons

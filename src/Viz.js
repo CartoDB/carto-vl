@@ -163,7 +163,7 @@ export default class Viz {
                     value = implicitCast(value);
 
                     if (value instanceof BaseExpression) {
-                        value.variableName = prop;
+                        value._variableName = prop;
                     }
 
                     obj[prop] = value;
