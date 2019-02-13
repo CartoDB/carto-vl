@@ -33,6 +33,16 @@ export default class ClusterCount extends BaseExpression {
         this._hasClusterFeatureCount = false;
     }
 
+    get propertyName () {
+        if (this._hasClusterFeatureCount) {
+            return CLUSTER_FEATURE_COUNT;
+        }
+    }
+
+    isFeatureDependent () {
+        return true;
+    }
+
     eval (feature) {
         return Number(feature[CLUSTER_FEATURE_COUNT]) || 1;
     }
@@ -40,6 +50,7 @@ export default class ClusterCount extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._hasClusterFeatureCount = metadata.properties[CLUSTER_FEATURE_COUNT] !== undefined;
+        this._metadata = metadata;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -47,5 +58,9 @@ export default class ClusterCount extends BaseExpression {
             preface: '',
             inline: this._hasClusterFeatureCount ? getGLSLforProperty(CLUSTER_FEATURE_COUNT) : '1.'
         };
+    }
+
+    _getMinimumNeededSchema () {
+        return {}
     }
 }

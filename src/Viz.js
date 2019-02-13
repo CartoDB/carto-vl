@@ -161,6 +161,11 @@ export default class Viz {
                 },
                 set: (obj, prop, value) => {
                     value = implicitCast(value);
+                    
+                    if (value instanceof BaseExpression) {
+                        value.variableName = prop;
+                    }
+
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
