@@ -99,11 +99,8 @@ function _defineFeatureProperties (targetObject, names) {
                 this._featureProperties = {};
 
                 names.forEach(({ property, variable }) => {
-                    if (variable) {
-                        this._featureProperties[variable] = this._rawFeature[property];
-                    } else {
-                        this._featureProperties[property] = this._rawFeature[property];
-                    }
+                    const propertyName = variable ? variable : property;
+                    this._featureProperties[propertyName] = this._rawFeature[property];
                 });
             }
             return this._featureProperties;
