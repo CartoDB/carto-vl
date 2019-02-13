@@ -23,7 +23,7 @@
 <script>
     const map = new mapboxgl.Map({
         container: 'map',
-        style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+        style: carto.basemaps.darkmatter,
         center: [2.1694138650888135, 41.37286330558891],
         zoom: 21.611075639862133
     });
@@ -44,7 +44,7 @@
         strokeWidth: 0
         resolution: 0.25
         width: @cc * 15
-        @v_features: viewportFeatures($speed, @cc);
+        @v_features: viewportFeatures(@cc);
     `);
     const layer = new carto.Layer('layer', source, viz);
 
