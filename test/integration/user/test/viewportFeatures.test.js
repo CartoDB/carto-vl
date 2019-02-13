@@ -155,8 +155,8 @@ describe('viewportFeatures', () => {
     it('should get the features properties of another layer', done => {
         layer2.on('loaded', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a' },
-                { id: 2, value: 1000, category: 'b' }
+                { id: 1, value: 10, cat: 'a' },
+                { id: 2, value: 1000, cat: 'b' }
             ];
             const expectedValue = [
                 { value: 10 },
