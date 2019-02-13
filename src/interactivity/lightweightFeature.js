@@ -99,7 +99,7 @@ function _defineFeatureProperties (targetObject, names) {
                 this._featureProperties = {};
 
                 names.forEach(({ property, variable }) => {
-                    const propertyName = variable ? variable : property;
+                    const propertyName = variable || property;
                     this._featureProperties[propertyName] = this._rawFeature[property];
                 });
             }
