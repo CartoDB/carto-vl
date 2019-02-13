@@ -1,7 +1,6 @@
-import BaseExpression from '../../base';
-import { implicitCast } from '../../utils';
-import { checkMaxArguments, checkArray } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import BaseExpression from '../base';
+import { checkArray } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 
 /**
  * Generates a histogram.
@@ -22,9 +21,9 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz(`
- *          \@categoryHistogram:    viewportHistogram($type)
- *          \@numericHistogram:     viewportHistogram($amount, 3, 1)
- *          \@userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *          \@categoryHistogram:    histogram($type)
+ *          \@numericHistogram:     histogram($amount, 3, 1)
+ *          \@userDefinedHistogram: histogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
@@ -36,47 +35,32 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name viewportHistogram
+ * @name histogram
  * @function
  * @api
  */
 
 /**
- * ViewportHistogram Class
+ * Histogram Class
  *
  * Generates a histogram.
- * This class is instanced automatically by using the `viewportHistogram` function. It is documented for its methods.
- * Read more about viewportHistogram expression at {@link carto.expressions.viewportHistogram}.
+ * This class is instanced automatically by using the `histogram` function. It is documented for its methods.
+ * Read more about histogram expression at {@link carto.expressions.histogram}.
  *
- * @name expressions.ViewportHistogram
+ * @name expressions.Histogram
  * @abstract
  * @hideconstructor
  * @class
  * @api
  */
-export default class ViewportHistogram extends BaseExpression {
-    constructor (property, sizeOrBuckets = 20, weight = 1) {
-        checkMaxArguments(arguments, 3, 'viewportHistogram');
-        super({ property: implicitCast(property), weight: implicitCast(weight) });
+export default class Histogram extends BaseExpression {
+    constructor (children) {
+        super(children);
 
         this.type = 'histogram';
-        this._sizeOrBuckets = sizeOrBuckets;
-        this._hasBuckets = Array.isArray(sizeOrBuckets);
-        this._isViewport = true;
         this._histogram = null;
 
         this.inlineMaker = () => null;
-    }
-
-    accumViewportAgg (feature) {
-        const property = this.property.eval(feature);
-
-        if (property !== undefined) {
-            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
-            const weight = clusterCount * this.weight.eval(feature);
-            const count = this._histogram.get(property) || 0;
-            this._histogram.set(property, count + weight);
-        }
     }
 
     eval () {
@@ -102,7 +86,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.ViewportHistogram
+     * @memberof expressions.Histogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
@@ -113,7 +97,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   @histogram: s.histogram(s.prop('vehicles'))
      * });
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -133,7 +117,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: viewportHistogram($vehicles)
+     *   @histogram: histogram($vehicles)
      * `);
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -147,7 +131,7 @@ export default class ViewportHistogram extends BaseExpression {
      * @example <caption>Get color values for the histogram when using a ramp.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   @histogram: s.histogram(s.prop('vehicles'))
      *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
      * `);
      *
@@ -164,7 +148,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: viewportHistogram($vehicles)
+     *   @histogram: histogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
@@ -179,7 +163,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
     */
     getJoinedValues (values) {
-        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
+        checkArray('histogram.getJoinedValues', 'values', 0, values);
 
         if (!values.length) {
             return [];
@@ -201,12 +185,15 @@ export default class ViewportHistogram extends BaseExpression {
         this._metadata = metadata;
     }
 
-    _resetViewportAgg (metadata) {
-        if (metadata) {
-            this._bindMetadata(metadata);
+    _addHistogramData (feature) {
+        const property = this.property.eval(feature);
+
+        if (property !== undefined) {
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
+            const weight = clusterCount * this.weight.eval(feature);
+            const count = this._histogram.get(property) || 0;
+            this._histogram.set(property, count + weight);
         }
-        this._cached = null;
-        this._histogram = new Map();
     }
 }
 
