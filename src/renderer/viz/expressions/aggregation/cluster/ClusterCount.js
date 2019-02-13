@@ -61,6 +61,6 @@ export default class ClusterCount extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
-        return {}
+        return {};
     }
 }
