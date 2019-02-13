@@ -8,4 +8,4 @@ Most modern browsers support CARTO VL, precisely:
  - Microsoft Edge latest, with the most recent Windows update.
  - Safari latest.
 
-Some browsers only have experimental WebGL support. We cannot guarantee that CARTO VL will work on those cases. For a complete list of supported browsers, check [caniuse.com](https://caniuse.com/#feat=webgl). To check if your browser is compatible, open [get.webgl.org](https://get.webgl.org).
+Some browsers only have experimental WebGL support. We cannot guarantee that CARTO VL will work on those cases. For a complete list of supported browsers, check [caniuse.com](https://caniuse.com/#feat=webgl). To check if your browser is compatible, open the [browser support example](https://carto.com/developers/carto-vl/examples/#example-check-for-browser-support).
