@@ -197,7 +197,7 @@ describe('Interactivity', () => {
                             const moveMouse = debounce(() => {
                                 util.simulateMove({ lng: 0, lat: 0 });
                             }, 500);
-                            
+
                             moveMouse();
 
                             // Click on the feature 1
