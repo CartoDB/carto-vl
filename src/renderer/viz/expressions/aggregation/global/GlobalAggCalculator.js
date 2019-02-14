@@ -64,7 +64,6 @@ function _runImprovedForPartialFeatures (globalExpressions, renderLayer, inGloba
  *    - filtered out
  */
 function _runInDataframe (viz, globalExpressions, dataframe, processedFeaturesIDs, inGlobalFeaturesIDs) {
-    console.log('!!! dataFrame', dataframe);
     for (let i = 0; i < dataframe.numFeatures; i++) {
         const idProperty = viz.metadata.idProperty;
         const featureId = dataframe.properties[idProperty][i];
