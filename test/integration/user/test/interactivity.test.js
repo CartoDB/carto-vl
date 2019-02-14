@@ -632,6 +632,7 @@ describe('regression with blendTo', () => {
         const moveAway = debounce(() => {
             util.simulateMove({ lng: -5, lat: -5 });
         });
+
         interactivity.on('featureEnter', async event => {
             layer.on('updated', moveAway);
 
@@ -644,7 +645,8 @@ describe('regression with blendTo', () => {
             const thereWasAnUpdateError = error && error.reason.message.startsWith('Another `viz change` finished before this one');
             expect(thereWasAnUpdateError).toBeFalsy();
             done();
-        });
+        }, 500);
+
         interactivity.on('featureLeave', async event => {
             layer.off('updated', moveAway);
 
