@@ -5,6 +5,7 @@ import { mat4 } from 'gl-matrix';
 import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
 import { parseVizExpression } from './viz/parser';
 import { runViewportAggregations } from './viz/expressions/aggregation/viewport/ViewportAggCalculator';
+import { runGlobalAggregations } from './viz/expressions/aggregation/global/GlobalAggCalculator';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const INITIAL_TIMESTAMP = Date.now();
@@ -125,6 +126,7 @@ export default class Renderer {
 
         renderLayer.parseVizExpression = parseVizExpression; // Important! to avoid a circular dependency problem (eg. viewportFeatures)
         runViewportAggregations(renderLayer);
+        runGlobalAggregations(renderLayer);
 
         if (!dataframes.length) {
             return;

@@ -720,6 +720,7 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
+export const globalHistogram = (...args) => new GlobalHistogram(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const scaled = (...args) => new Scaled(...args);

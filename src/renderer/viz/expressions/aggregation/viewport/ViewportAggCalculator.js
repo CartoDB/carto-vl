@@ -32,6 +32,7 @@ function _getViewportExpressions (rootExpressions) {
     }
 
     rootExpressions.map(dfs);
+
     return viewportExpressions;
 }
 
