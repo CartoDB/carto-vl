@@ -225,6 +225,7 @@ describe('viewportFeatures', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -280,6 +281,7 @@ describe('viewportFeatures on a map with filters', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -334,6 +336,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -493,9 +496,9 @@ describe('viewportFeatures collision', () => {
         });
     });
 
-    afterEach((done) => {
+    afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
-        done();
     });
 });
 
@@ -509,7 +512,7 @@ describe('viewportFeatures using aggregation expressions', () => {
             source = new carto.source.GeoJSON(aggregationFeatures);
         });
 
-        it('should get the clusterCount of a feature', (done) => {
+        it('should get the clusterCount of a feature', done => {
             viz = new carto.Viz(`
                 @list: viewportFeatures(clusterCount())
             `);
@@ -525,7 +528,7 @@ describe('viewportFeatures using aggregation expressions', () => {
             });
         });
 
-        it('should get the clusterCount of a feature when it is assigned to a variable', (done) => {
+        it('should get the clusterCount of a feature when it is assigned to a variable', done => {
             const variableName = 'cc';
 
             viz = new carto.Viz(`
@@ -543,6 +546,11 @@ describe('viewportFeatures using aggregation expressions', () => {
                 expect(actual).toEqual(expected);
                 done();
             });
+        });
+
+        afterEach(() => {
+            map.remove();
+            document.body.removeChild(setup.div);
         });
     });
 });

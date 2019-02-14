@@ -194,7 +194,12 @@ describe('Interactivity', () => {
                             // Click on the feature 1
                             util.simulateClick({ lng: 5, lat: 5 });
                             // Move the mouse
-                            util.simulateMove({ lng: 0, lat: 0 });
+                            const moveMouse = debounce(() => {
+                                util.simulateMove({ lng: 0, lat: 0 });
+                            }, 500);
+                            
+                            moveMouse();
+
                             // Click on the feature 1
                             util.simulateClick({ lng: -5, lat: -5 });
                         });
