@@ -11,7 +11,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/car
  * @param {*} renderLayer
  * @returns FeatureLike class
  */
-export function genLightweightFeatureClass (names, renderLayer) {
+export function genLightweightFeatureClass (propertyNames, renderLayer) {
     const cls = class LightweightFeature {
         constructor (rawFeature) {
             this._rawFeature = rawFeature;
@@ -22,7 +22,7 @@ export function genLightweightFeatureClass (names, renderLayer) {
     _defineIdProperty(cls.prototype, renderLayer);
     _defineVizProperties(cls.prototype, renderLayer);
     _defineVizVariables(cls.prototype, renderLayer);
-    _defineFeatureProperties(cls.prototype, names);
+    _defineFeatureProperties(cls.prototype, propertyNames);
     _defineRootBlendToMethod(cls.prototype);
     _defineRootResetMethod(cls.prototype);
     _defineGetRenderedCentroidMethod(cls.prototype);
@@ -92,13 +92,13 @@ function _defineVizVariables (targetObject, renderLayer) {
     });
 }
 
-function _defineFeatureProperties (targetObject, names) {
+function _defineFeatureProperties (targetObject, propertyNames) {
     Object.defineProperty(targetObject, 'properties', {
         get: function () {
             if (this._featureProperties === null) {
                 this._featureProperties = {};
 
-                names.forEach(({ property, variable }) => {
+                propertyNames.forEach(({ property, variable }) => {
                     const propertyName = variable || property;
                     this._featureProperties[propertyName] = this._rawFeature[property];
                 });

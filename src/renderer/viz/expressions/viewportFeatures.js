@@ -90,10 +90,10 @@ export default class ViewportFeatures extends BaseExpression {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
 
-            const names = this._requiredProperties.map((p) => {
+            const propertyNames = this._requiredProperties.map((p) => {
                 return { property: p.propertyName, variable: p._variableName };
             });
-            this._FeatureProxy = genLightweightFeatureClass(names, renderLayer);
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
     }
@@ -122,6 +122,5 @@ function _childrenFromProperties (properties) {
 
 function validProperty (property) {
     const validExpressions = [Property, ClusterAggregation, ClusterCount, ClusterTimeDimension];
-
     return validExpressions.some(expression => property.isA(expression));
 }

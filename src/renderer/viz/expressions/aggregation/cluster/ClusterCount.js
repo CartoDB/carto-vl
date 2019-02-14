@@ -48,7 +48,6 @@ export default class ClusterCount extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._hasClusterFeatureCount = metadata.properties[CLUSTER_FEATURE_COUNT] !== undefined;
-        this._metadata = metadata;
     }
 
     _applyToShaderSource (getGLSLforProperty) {
@@ -56,9 +55,5 @@ export default class ClusterCount extends BaseExpression {
             preface: '',
             inline: this._hasClusterFeatureCount ? getGLSLforProperty(CLUSTER_FEATURE_COUNT) : '1.'
         };
-    }
-
-    _getMinimumNeededSchema () {
-        return {};
     }
 }
