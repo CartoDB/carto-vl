@@ -1,7 +1,6 @@
-import { FILTERING_THRESHOLD } from '../../../../Renderer';
-
 export function runGlobalAggregations (renderLayer) {
     const globalExpressions = _getGlobalExpressions(renderLayer.viz._getRootExpressions());
+
     if (!globalExpressions.length) {
         return;
     }
@@ -12,15 +11,15 @@ export function runGlobalAggregations (renderLayer) {
 function _getGlobalExpressions (rootExpressions) {
     const globalExpressions = [];
 
-    function dfs (expr) {
+    function addGlobalExpressions (expr) {
         if (expr._isGlobal) {
             globalExpressions.push(expr);
         } else {
-            expr._getChildren().map(dfs);
+            expr._getChildren().map(addGlobalExpressions);
         }
     }
 
-    rootExpressions.map(dfs);
+    rootExpressions.forEach(addGlobalExpressions);
 
     return globalExpressions;
 }
@@ -40,13 +39,14 @@ function _runInActiveDataframes (globalExpressions, renderLayer) {
  * global & not filtered out. That's a list of the features effectively included in the globalExpressions run
  */
 function _runInDataframes (globalExpressions, renderLayer, dataframes) {
-    const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
     const viz = renderLayer.viz;
-
+    const processedFeaturesIDs = new Set(); // same feature can belong to multiple dataframes
     const inGlobalFeaturesIDs = new Set();
+
     dataframes.forEach(dataframe => {
         _runInDataframe(viz, globalExpressions, dataframe, processedFeaturesIDs, inGlobalFeaturesIDs);
     });
+
     return inGlobalFeaturesIDs;
 }
 
@@ -64,27 +64,15 @@ function _runImprovedForPartialFeatures (globalExpressions, renderLayer, inGloba
  *    - filtered out
  */
 function _runInDataframe (viz, globalExpressions, dataframe, processedFeaturesIDs, inGlobalFeaturesIDs) {
+    console.log('!!! dataFrame', dataframe);
     for (let i = 0; i < dataframe.numFeatures; i++) {
         const idProperty = viz.metadata.idProperty;
         const featureId = dataframe.properties[idProperty][i];
 
-        const featureAlreadyAccumulated = processedFeaturesIDs.has(featureId);
-        if (featureAlreadyAccumulated) {
-            continue; // This is correct for globalExpressions related to 'alphanumeric' properties (not geometry-related)
-        }
-
-        // a new feature, inside the global
         processedFeaturesIDs.add(featureId);
         const feature = dataframe.getFeature(i);
 
-        const featureIsFilteredOut = viz.filter.eval(feature) < FILTERING_THRESHOLD;
-        if (featureIsFilteredOut) {
-            continue;
-        }
-
-        inGlobalFeaturesIDs.add(feature[idProperty]); // inGlobal & in filter
-
-        // not a filtered feature, so pass the rawFeature to global expressions
+        inGlobalFeaturesIDs.add(feature[idProperty]);
         globalExpressions.forEach(expr => expr.accumGlobalAgg(feature));
     }
 }

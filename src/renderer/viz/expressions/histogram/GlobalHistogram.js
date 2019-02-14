@@ -13,13 +13,15 @@ export default class GlobalHistogram extends Histogram {
     }
 
     eval () {
-        if (!this._histogram) {
-            return null;
+        if (this._cached) {
+            return this._cached;
         }
 
-        return this.property.type === 'number'
+        this._cached = this.property.type === 'number'
             ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
             : this._getCategoryValue(this._histogram);
+
+        return this._cached;
     }
 
     accumGlobalAgg (feature) {
@@ -28,8 +30,7 @@ export default class GlobalHistogram extends Histogram {
         if (property !== undefined) {
             const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
             const weight = clusterCount * this.weight.eval(feature);
-            const count = this._histogram.get(property) || 0;
-            this._histogram.set(property, count + weight);
+            this._histogram.set(property, weight);
         }
     }
 
@@ -37,5 +38,7 @@ export default class GlobalHistogram extends Histogram {
         if (metadata) {
             this._bindMetadata(metadata);
         }
+
+        this._cached = null;
     }
 }

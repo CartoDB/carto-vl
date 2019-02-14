@@ -1,6 +1,5 @@
 import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
-
 export default class ViewportHistogram extends Histogram {
     constructor (property, sizeOrBuckets = 20, weight = 1) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
