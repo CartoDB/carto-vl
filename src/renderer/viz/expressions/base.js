@@ -167,6 +167,10 @@ export default class Base {
         this._getChildren().forEach(child => child.accumViewportAgg(feature));
     }
 
+    accumGlobalAgg (feature) {
+        this._getChildren().forEach(child => child.accumGlobalAgg(feature));
+    }
+
     loadImages () {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }

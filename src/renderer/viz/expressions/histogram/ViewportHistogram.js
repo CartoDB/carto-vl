@@ -1,5 +1,6 @@
 import Histogram from './Histogram';
-import { checkMaxArguments, implicitCast } from '../utils';
+import { checkMaxArguments, implicitCast, checkArray } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 export default class ViewportHistogram extends Histogram {
     constructor (property, sizeOrBuckets = 20, weight = 1) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
@@ -24,6 +25,35 @@ export default class ViewportHistogram extends Histogram {
         }
 
         return this._cached;
+    }
+
+    accumViewportAgg (feature) {
+        const property = this.property.eval(feature);
+
+        if (property !== undefined) {
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
+            const weight = clusterCount * this.weight.eval(feature);
+            const count = this._histogram.get(property) || 0;
+            this._histogram.set(property, count + weight);
+        }
+    }
+
+    getJoinedValues (values) {
+        checkArray('histogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        return this.value.map(elem => {
+            const data = values.find(value => value.key === elem.x);
+
+            const frequency = elem.y;
+            const key = elem.x;
+            const value = data !== -1 ? data.value : null;
+
+            return { frequency, key, value };
+        });
     }
 
     _resetViewportAgg (metadata) {

@@ -30,7 +30,6 @@ function _getGlobalExpressions (rootExpressions) {
 function _runInActiveDataframes (globalExpressions, renderLayer) {
     const dataframes = renderLayer.getActiveDataframes();
     const inGlobalFeaturesIDs = _runInDataframes(globalExpressions, renderLayer, dataframes);
-
     _runImprovedForPartialFeatures(globalExpressions, renderLayer, inGlobalFeaturesIDs);
 }
 
@@ -67,7 +66,6 @@ function _runInDataframe (viz, globalExpressions, dataframe, processedFeaturesID
     for (let i = 0; i < dataframe.numFeatures; i++) {
         const idProperty = viz.metadata.idProperty;
         const featureId = dataframe.properties[idProperty][i];
-
         processedFeaturesIDs.add(featureId);
         const feature = dataframe.getFeature(i);
 
@@ -84,8 +82,8 @@ function _runForPartialGlobalFeatures (globalFeaturesExpressions, renderLayer, f
     globalFeaturesExpressions.forEach(expr => expr._resetGlobalAgg(null, renderLayer));
 
     // Gather all pieces per feature
-    const piecesPerFeature = renderLayer.getAllPiecesPerFeature(featuresIDs);
-
+    // const piecesPerFeature = renderLayer.getAllPiecesPerFeature(featuresIDs);
+    const piecesPerFeature = renderLayer.getAllPieces(featuresIDs);
     // Run globalFeatures with the whole set of feature pieces
     globalFeaturesExpressions.forEach(expr => {
         for (const featureId in piecesPerFeature) {

@@ -1,6 +1,5 @@
 import BaseExpression from '../base';
-import { checkArray } from '../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../schema';
+// import { checkArray } from '../utils';
 
 /**
  * Generates a histogram.
@@ -143,34 +142,23 @@ export default class Histogram extends BaseExpression {
      * // ]
      *
     */
-    getJoinedValues (values) {
-        checkArray('histogram.getJoinedValues', 'values', 0, values);
+    // getJoinedValues (values) {
+    //     checkArray('histogram.getJoinedValues', 'values', 0, values);
 
-        if (!values.length) {
-            return [];
-        }
+    //     if (!values.length) {
+    //         return [];
+    //     }
 
-        return this.value.map(elem => {
-            const data = values.find(value => value.key === elem.x);
+    //     return this.value.map(elem => {
+    //         const data = values.find(value => value.key === elem.x);
 
-            const frequency = elem.y;
-            const key = elem.x;
-            const value = data !== -1 ? data.value : null;
+    //         const frequency = elem.y;
+    //         const key = elem.x;
+    //         const value = data !== -1 ? data.value : null;
 
-            return { frequency, key, value };
-        });
-    }
-
-    accumViewportAgg (feature) {
-        const property = this.property.eval(feature);
-
-        if (property !== undefined) {
-            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
-            const weight = clusterCount * this.weight.eval(feature);
-            const count = this._histogram.get(property) || 0;
-            this._histogram.set(property, count + weight);
-        }
-    }
+    //         return { frequency, key, value };
+    //     });
+    // }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
