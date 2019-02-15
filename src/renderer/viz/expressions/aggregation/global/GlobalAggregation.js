@@ -63,6 +63,7 @@ export default class GlobalAggregation extends BaseExpression {
     toString () {
         return `${this.expressionName}(${this.property.toString()})`;
     }
+
     isFeatureDependent () {
         return false;
     }

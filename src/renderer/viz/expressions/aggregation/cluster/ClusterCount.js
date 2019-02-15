@@ -33,6 +33,14 @@ export default class ClusterCount extends BaseExpression {
         this._hasClusterFeatureCount = false;
     }
 
+    get propertyName () {
+        return CLUSTER_FEATURE_COUNT;
+    }
+
+    isFeatureDependent () {
+        return true;
+    }
+
     eval (feature) {
         return Number(feature[CLUSTER_FEATURE_COUNT]) || 1;
     }

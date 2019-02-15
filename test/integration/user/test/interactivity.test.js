@@ -194,7 +194,12 @@ describe('Interactivity', () => {
                             // Click on the feature 1
                             util.simulateClick({ lng: 5, lat: 5 });
                             // Move the mouse
-                            util.simulateMove({ lng: 0, lat: 0 });
+                            const moveMouse = debounce(() => {
+                                util.simulateMove({ lng: 0, lat: 0 });
+                            }, 500);
+
+                            moveMouse();
+
                             // Click on the feature 1
                             util.simulateClick({ lng: -5, lat: -5 });
                         });
@@ -632,6 +637,7 @@ describe('regression with blendTo', () => {
         const moveAway = debounce(() => {
             util.simulateMove({ lng: -5, lat: -5 });
         });
+
         interactivity.on('featureEnter', async event => {
             layer.on('updated', moveAway);
 
@@ -644,7 +650,8 @@ describe('regression with blendTo', () => {
             const thereWasAnUpdateError = error && error.reason.message.startsWith('Another `viz change` finished before this one');
             expect(thereWasAnUpdateError).toBeFalsy();
             done();
-        });
+        }, 500);
+
         interactivity.on('featureLeave', async event => {
             layer.off('updated', moveAway);
 

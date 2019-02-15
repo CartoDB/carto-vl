@@ -2,6 +2,7 @@ import BaseExpression from './base';
 import Property from './basic/property';
 import ClusterTimeDimension from './aggregation/cluster/ClusterTimeDimension';
 import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
+import ClusterCount from './aggregation/cluster/ClusterCount';
 import { implicitCast } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import CartoRuntimeError from '../../../errors/carto-runtime-error';
@@ -60,7 +61,6 @@ export default class ViewportFeatures extends BaseExpression {
         // in order for variables to be resolved.
         // And as an additional bonus we don't need to define _getMinimumNeededSchema
         super(_childrenFromProperties(properties));
-
         this.expr = [];
         this.type = 'featureList';
         this._isViewport = true;
@@ -89,8 +89,11 @@ export default class ViewportFeatures extends BaseExpression {
             if (!this._requiredProperties.every(p => validProperty(p))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
-            const columns = this._requiredProperties.map(p => p.propertyName);
-            this._FeatureProxy = genLightweightFeatureClass(columns, renderLayer);
+
+            const propertyNames = this._requiredProperties.map((p) => {
+                return { property: p.propertyName, variable: p._variableName };
+            });
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
     }
@@ -118,5 +121,6 @@ function _childrenFromProperties (properties) {
 }
 
 function validProperty (property) {
-    return property.isA(Property) || property.isA(ClusterAggregation) || property.isA(ClusterTimeDimension);
+    const validExpressions = [Property, ClusterAggregation, ClusterCount, ClusterTimeDimension];
+    return validExpressions.some(expression => property.isA(expression));
 }
