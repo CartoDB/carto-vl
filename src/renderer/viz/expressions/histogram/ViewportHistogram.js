@@ -1,5 +1,5 @@
 import Histogram from './Histogram';
-import { checkMaxArguments, implicitCast, checkArray } from '../utils';
+import { checkMaxArguments, implicitCast } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 export default class ViewportHistogram extends Histogram {
     constructor (property, sizeOrBuckets = 20, weight = 1) {
@@ -36,24 +36,6 @@ export default class ViewportHistogram extends Histogram {
             const count = this._histogram.get(property) || 0;
             this._histogram.set(property, count + weight);
         }
-    }
-
-    getJoinedValues (values) {
-        checkArray('histogram.getJoinedValues', 'values', 0, values);
-
-        if (!values.length) {
-            return [];
-        }
-
-        return this.value.map(elem => {
-            const data = values.find(value => value.key === elem.x);
-
-            const frequency = elem.y;
-            const key = elem.x;
-            const value = data !== -1 ? data.value : null;
-
-            return { frequency, key, value };
-        });
     }
 
     _resetViewportAgg (metadata) {

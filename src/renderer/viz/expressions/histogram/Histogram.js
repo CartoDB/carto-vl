@@ -1,5 +1,5 @@
 import BaseExpression from '../base';
-// import { checkArray } from '../utils';
+import { checkArray } from '../utils';
 
 /**
  * Generates a histogram.
@@ -142,23 +142,24 @@ export default class Histogram extends BaseExpression {
      * // ]
      *
     */
-    // getJoinedValues (values) {
-    //     checkArray('histogram.getJoinedValues', 'values', 0, values);
 
-    //     if (!values.length) {
-    //         return [];
-    //     }
+    getJoinedValues (values) {
+        checkArray('histogram.getJoinedValues', 'values', 0, values);
 
-    //     return this.value.map(elem => {
-    //         const data = values.find(value => value.key === elem.x);
+        if (!values.length) {
+            return [];
+        }
 
-    //         const frequency = elem.y;
-    //         const key = elem.x;
-    //         const value = data !== -1 ? data.value : null;
+        return this.value.map(elem => {
+            const data = values.find(value => value.key === elem.x);
 
-    //         return { frequency, key, value };
-    //     });
-    // }
+            const frequency = elem.y;
+            const key = elem.x;
+            const value = data !== -1 ? data.value : null;
+
+            return { frequency, key, value };
+        });
+    }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
