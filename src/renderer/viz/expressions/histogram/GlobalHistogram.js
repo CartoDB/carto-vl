@@ -19,7 +19,7 @@ export default class GlobalHistogram extends Histogram {
 
         this._cached = this.property.type === 'number'
             ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
-            : this._getCategoryValue();
+            : this._getCategoryValue(this._histogram);
 
         return this._cached;
     }

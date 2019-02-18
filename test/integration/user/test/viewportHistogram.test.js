@@ -2,7 +2,7 @@ import carto from '../../../../src/index';
 import * as util from '../../util';
 import { OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
 
-fdescribe('viewportHistogram', () => {
+describe('viewportHistogram', () => {
     let div, map, source, viz, layer;
 
     // Some useful features
