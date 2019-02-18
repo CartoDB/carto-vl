@@ -143,6 +143,22 @@ export default class Histogram extends BaseExpression {
      *
     */
 
+    eval () {
+        if (this._cached === null) {
+            if (!this._histogram) {
+                return null;
+            }
+
+            this._cached = this.property.type === 'number'
+                ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
+                : this._getCategoryValue(this._histogram);
+
+            return this._cached;
+        }
+
+        return this._cached;
+    }
+
     getJoinedValues (values) {
         checkArray('histogram.getJoinedValues', 'values', 0, values);
 
@@ -222,6 +238,7 @@ export default class Histogram extends BaseExpression {
     }
 
     _getBucketsValue ([...histogram], buckets) {
+        console.log('!!! histogram', histogram);
         const nBuckets = buckets.length;
         const hist = Array(nBuckets).fill(0);
 
