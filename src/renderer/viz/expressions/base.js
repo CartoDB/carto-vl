@@ -171,6 +171,10 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
+    get _propertyName () {
+        return this._getChildren().map(child => child._propertyName).find(name => !!name);
+    }
+
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
     }

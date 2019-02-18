@@ -238,7 +238,6 @@ export default class Histogram extends BaseExpression {
     }
 
     _getBucketsValue ([...histogram], buckets) {
-        console.log('!!! histogram', histogram);
         const nBuckets = buckets.length;
         const hist = Array(nBuckets).fill(0);
 

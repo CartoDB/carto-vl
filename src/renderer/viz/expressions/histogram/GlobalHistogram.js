@@ -1,4 +1,5 @@
 import Histogram from './Histogram';
+import Property from '../basic/property';
 import { checkMaxArguments, implicitCast } from '../utils';
 
 export default class GlobalHistogram extends Histogram {
@@ -20,28 +21,61 @@ export default class GlobalHistogram extends Histogram {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        const categories = this._metadata.properties[this.property.name]
-            ? this._metadata.properties[this.property.name].categories
+        if (!this.property.isA(Property)) {
+            this._setHistogramForExpression();
+            return;
+        }
+
+        if (this.property.type === 'number') {
+            this._setHistogramForNumericValues();
+            return;
+        }
+
+        this._setHistogramForCategoryValues();
+    }
+
+    _setHistogramForExpression () {
+        const name = this.propertyName;
+        const categories = this._metadata.properties[name]
+            ? this._metadata.properties[name].categories
             : [];
 
-        if (categories && categories.length) {
-            categories.forEach(category => {
-                this._histogram.set(category.name, category.frequency);
-            });
-        } else {
-            const name = this.property.name;
-            const histogram = metadata.sample
-                .map((feature) => {
-                    return {
-                        key: feature.id,
-                        value: feature[name]
-                    };
-                })
-                .sort((x, y) => x - y);
+        const data = this.property._getLegendData().data;
 
-            histogram.forEach(feature => {
-                this._histogram.set(feature.value, feature.key);
+        categories.forEach(c => {
+            const category = data.find(category => c.name === category.key);
+            if (category) {
+                this._histogram.set(c.name, c.frequency);
+            } else {
+                const frequency = this._histogram.get('CARTO_VL_OTHERS') || 0;
+                this._histogram.set('CARTO_VL_OTHERS', c.frequency + parseInt(frequency));
+            }
+        });
+    }
+
+    _setHistogramForCategoryValues () {
+        const name = this.propertyName;
+        const categories = this._metadata.properties[name]
+            ? this._metadata.properties[name].categories
+            : [];
+
+        categories.forEach(category => {
+            this._histogram.set(category.name, category.frequency);
+        });
+    }
+
+    _setHistogramForNumericValues () {
+        const name = this.propertyName;
+        const histogram = this._metadata.sample
+            .map((feature) => {
+                return {
+                    key: feature.id,
+                    value: feature[name]
+                };
             });
-        }
+
+        histogram.forEach(feature => {
+            this._histogram.set(feature.value, feature.key);
+        });
     }
 }

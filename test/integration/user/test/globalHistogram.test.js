@@ -1,7 +1,5 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
-// import { OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
-// import Metadata from '../../../../src/renderer/Metadata';
 
 describe('globalHistogram', () => {
     let div, map, source, viz, layer;
@@ -52,18 +50,18 @@ describe('globalHistogram', () => {
     ];
 
     const numericFeatures = [
-        createFeature(1, 100),
-        createFeature(2, 20),
-        createFeature(3, 30),
+        createFeature(1, 0),
+        createFeature(2, 10),
+        createFeature(3, 15),
         createFeature(4, 20),
-        createFeature(5, 0),
-        createFeature(6, 80),
-        createFeature(7, 60),
-        createFeature(8, 90),
-        createFeature(9, 70),
-        createFeature(10, 100),
-        createFeature(11, 40),
-        createFeature(12, 20)
+        createFeature(5, 25),
+        createFeature(6, 30),
+        createFeature(7, 55),
+        createFeature(8, 74),
+        createFeature(9, 75),
+        createFeature(10, 80),
+        createFeature(11, 90),
+        createFeature(12, 100)
     ];
 
     it('should get correct data with categorical values', (done) => {
@@ -84,6 +82,21 @@ describe('globalHistogram', () => {
         });
     });
 
+    it('should get correct data with categorical values in buckets', (done) => {
+        const top = 1;
+        const histogramViz = `@histogram: globalHistogram(top($value, ${top}))`;
+        createMapWith(histogramViz, categoryFeatures);
+
+        layer.on('loaded', () => {
+            const histogram = viz.variables.histogram.value;
+            expect(histogram).toEqual([
+                { x: 'CARTO_VL_OTHERS', y: 7 },
+                { x: 'Murcia', y: 5 }
+            ]);
+            done();
+        });
+    });
+
     it('should get correct data with numeric values', (done) => {
         const size = 4;
         const min = 0;
@@ -92,29 +105,13 @@ describe('globalHistogram', () => {
         createMapWith(histogramViz, numericFeatures);
 
         layer.on('loaded', () => {
-            const histogram = viz.variables.histogram.value;
+            const histogram = viz.variables.histogram.eval();
 
             expect(histogram).toEqual([
-                { x: [min, 25], y: 4 },
-                { x: [25, 50], y: 2 },
-                { x: [50, 75], y: 2 },
-                { x: [75, max], y: 4 }
-            ]);
-            done();
-        });
-    });
-
-    it('should get correct data with numeric values in buckets', (done) => {
-        const top = 2;
-        const histogramViz = `@histogram: globalHistogram(top($value, ${top}))`;
-        createMapWith(histogramViz, numericFeatures);
-
-        layer.on('loaded', () => {
-            const histogram = viz.variables.histogram.value;
-
-            expect(histogram).toEqual([
-                { x: [0, 25], y: 4 },
-                { x: [25, 50], y: 2 }
+                { x: [min, 25], y: 10 },
+                { x: [25, 50], y: 11 },
+                { x: [50, 75], y: 15 },
+                { x: [75, max], y: 42 }
             ]);
             done();
         });
