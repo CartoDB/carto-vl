@@ -69,7 +69,7 @@ export default class GlobalHistogram extends Histogram {
         const histogram = this._metadata.sample
             .map((feature) => {
                 return {
-                    key: feature.id,
+                    key: feature.cartodb_id ? feature.cartodb_id : feature.id,
                     value: feature[name]
                 };
             });
