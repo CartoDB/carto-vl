@@ -134,18 +134,6 @@ export default class RenderLayer {
         return piecesPerFeature;
     }
 
-    getAllPieces (featureIds) {
-        const piecesPerFeature = {};
-        featureIds.forEach((featureId) => { piecesPerFeature[featureId] = []; });
-
-        const dataframes = this.getActiveDataframes();
-        dataframes.forEach(dataframe => {
-            this._addPartialFeatures(dataframe, piecesPerFeature);
-        });
-
-        return piecesPerFeature;
-    }
-
     /**
      * Add all the feature pieces, with selected featureIds, if present in the dataframe.
      */
@@ -158,15 +146,6 @@ export default class RenderLayer {
                 const pieces = result[currentFeatureId];
                 pieces.push(feature);
             }
-        }
-    }
-
-    _addPartialFeatures (dataframe, result) {
-        for (let i = 0; i < dataframe.numFeatures; i++) {
-            const feature = dataframe.getFeature(i);
-            const currentFeatureId = feature[this.idProperty];
-            const pieces = result[currentFeatureId];
-            pieces.push(feature);
         }
     }
 
