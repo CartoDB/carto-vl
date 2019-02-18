@@ -1,6 +1,6 @@
 import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../schema';
+
 export default class GlobalHistogram extends Histogram {
     constructor (property, sizeOrBuckets = 20, weight = 1) {
         checkMaxArguments(arguments, 3, 'globalHistogram');
@@ -24,30 +24,28 @@ export default class GlobalHistogram extends Histogram {
         return this._cached;
     }
 
-    _getCategoryValue () {
-        const categories = this._metadata.properties[this.property.name].categories;
-        categories.forEach(category => {
-            this._histogram.set(category.name, category.frequency);
-        });
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
 
-        return super._getCategoryValue(this._histogram);
-    }
+        if (this.property.type === 'number') {
+            const name = this.property.name;
+            const histogram = metadata.sample
+                .map((feature) => {
+                    return {
+                        key: feature.cartodb_id,
+                        value: feature[name]
+                    };
+                })
+                .sort((x, y) => x - y);
 
-    accumGlobalAgg (feature) {
-        const property = this.property.eval(feature);
-
-        if (property !== undefined && typeof property === 'number') {
-            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
-            const weight = clusterCount * this.weight.eval(feature);
-            this._histogram.set(property, weight);
+            histogram.forEach(feature => {
+                this._histogram.set(feature.value, feature.key);
+            });
+        } else {
+            const categories = this._metadata.properties[this.property.name].categories;
+            categories.forEach(category => {
+                this._histogram.set(category.name, category.frequency);
+            });
         }
-    }
-
-    _resetGlobalAgg (metadata) {
-        if (metadata) {
-            this._bindMetadata(metadata);
-        }
-
-        this._cached = null;
     }
 }
