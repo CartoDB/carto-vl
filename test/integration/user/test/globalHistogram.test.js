@@ -105,7 +105,7 @@ describe('globalHistogram', () => {
         createMapWith(histogramViz, numericFeatures);
 
         layer.on('loaded', () => {
-            const histogram = viz.variables.histogram.eval();
+            const histogram = viz.variables.histogram.value;
 
             expect(histogram).toEqual([
                 { x: [min, 25], y: 10 },
