@@ -35,7 +35,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForExpression () {
-        const name = this.propertyName;
+        const name = this._propertyName;
         const categories = this._metadata.properties[name]
             ? this._metadata.properties[name].categories
             : [];
@@ -54,7 +54,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForCategoryValues () {
-        const name = this.propertyName;
+        const name = this._propertyName;
         const categories = this._metadata.properties[name]
             ? this._metadata.properties[name].categories
             : [];
@@ -65,7 +65,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForNumericValues () {
-        const name = this.propertyName;
+        const name = this._propertyName;
         const histogram = this._metadata.sample
             .map((feature) => {
                 return {
