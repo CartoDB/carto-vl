@@ -165,41 +165,47 @@ export default class Histogram extends BaseExpression {
             return [];
         }
 
-        return values.map((val, index) => {
-            const frequency = this.value[index].y;
-            const key = val.key;
-            const value = val.value;
+        const joinedValues = [];
 
-            return { frequency, key, value };
+        values.forEach((val, index) => {
+            if (this.value[index]) {
+                const frequency = this.value[index].y;
+                const key = val.key;
+                const value = val.value;
+
+                joinedValues.push({ frequency, key, value });
+            }
         });
+
+        return joinedValues;
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._metadata = metadata;
+        const name = this._propertyName;
+        this._categories = this._metadata.properties[name]
+            ? this._metadata.properties[name].categories.sort(this._sortNumerically)
+            : [];
     }
 
     _getCategoryValue (histogram) {
-        const name = this._propertyName;
-        const categories = this._metadata.properties[name]
-            ? this._metadata.properties[name].categories
-            : [];
-
         return [...histogram]
             .map(([x, y]) => {
                 return { x, y };
             })
             .sort(this._sortNumerically)
             .map((category, index) => {
-                return {
-                    x: categories.length ? categories[index].name : category.x,
-                    y: category.y
-                };
+                const x = typeof category.x === 'number' ? this._categories[index].name : category.x;
+                const y = category.y;
+
+                return { x, y };
             });
     }
 
     _sortNumerically (a, b) {
         const frequencyDifference = (b.y - a.y);
+
         if (frequencyDifference === 0) {
             const categoryA = a.x;
             const categoryB = b.x;

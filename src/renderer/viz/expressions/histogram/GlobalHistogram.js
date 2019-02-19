@@ -35,14 +35,9 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForExpression () {
-        const name = this._propertyName;
-        const categories = this._metadata.properties[name]
-            ? this._metadata.properties[name].categories
-            : [];
+        const data = this.input._getLegendData().data;
 
-        const data = this.property._getLegendData().data;
-
-        categories.forEach(c => {
+        this._categories.forEach(c => {
             const category = data.find(category => c.name === category.key);
             if (category) {
                 this._histogram.set(c.name, c.frequency);
@@ -54,12 +49,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForCategoryValues () {
-        const name = this._propertyName;
-        const categories = this._metadata.properties[name]
-            ? this._metadata.properties[name].categories
-            : [];
-
-        categories.forEach(category => {
+        this._categories.forEach(category => {
             this._histogram.set(category.name, category.frequency);
         });
     }
