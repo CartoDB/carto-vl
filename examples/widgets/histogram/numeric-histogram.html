@@ -5,10 +5,10 @@
     <title>Viewport histogram widget | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <script src="../../../dist/carto-vl.js"></script>
+    <script src="../../../../dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../style.css">
+    <link rel="stylesheet" type="text/css" href="../../style.css">
 
     <!-- Include Airship -->
     <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.3/airship.css">
@@ -21,15 +21,13 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Damage distribution (logarithmic scale)</h1>
-                <h2>Viewport</h2>
+                <h1>Viewport Damage distribution (logarithmic scale)</h1>
             </header>
             <as-histogram-widget id="as-viewport-histogram" />
         </div>
         <div class="box">
           <header>
-              <h1>Damage distribution (logarithmic scale)</h1>
-              <h2>Global</h2>
+              <h1>Global Damage distribution (logarithmic scale)</h1>
           </header>
           <as-histogram-widget id="as-global-histogram" />
       </div>
@@ -75,7 +73,6 @@
         });
 
         layer.on('updated', drawHistograms);
-
 
         function drawViewportHistogram() {
             var histogramWidget = document.getElementById('as-viewport-histogram');

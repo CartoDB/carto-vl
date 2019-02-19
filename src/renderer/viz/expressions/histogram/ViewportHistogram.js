@@ -165,9 +165,6 @@ export default class ViewportHistogram extends Histogram {
      * // ]
      *
     */
-    getJoinedValues (values) {
-        super.getJoinedValues(values);
-    }
 
     accumViewportAgg (feature) {
         const property = this.input.eval(feature);

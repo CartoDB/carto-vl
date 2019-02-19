@@ -154,10 +154,6 @@ export default class GlobalHistogram extends Histogram {
      * // ]
      *
      */
-    getJoinedValues (values) {
-        super.getJoinedValues(values);
-    }
-
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
