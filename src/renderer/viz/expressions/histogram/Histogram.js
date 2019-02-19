@@ -167,9 +167,10 @@ export default class Histogram extends BaseExpression {
 
         const joinedValues = [];
 
-        values.forEach((val, index) => {
-            if (this.value[index]) {
-                const frequency = this.value[index].y;
+        this.value.forEach((elem) => {
+            const val = values.find(value => elem.x === value.key);
+            if (val) {
+                const frequency = elem.y;
                 const key = val.key;
                 const value = val.value;
 
