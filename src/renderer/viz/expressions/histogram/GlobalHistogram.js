@@ -3,9 +3,9 @@ import Property from '../basic/property';
 import { checkMaxArguments, implicitCast } from '../utils';
 
 export default class GlobalHistogram extends Histogram {
-    constructor (property, sizeOrBuckets = 20) {
+    constructor (input, sizeOrBuckets = 20) {
         checkMaxArguments(arguments, 3, 'globalHistogram');
-        super({ property: implicitCast(property) });
+        super({ input: implicitCast(input) });
 
         this._sizeOrBuckets = sizeOrBuckets;
         this._hasBuckets = Array.isArray(sizeOrBuckets);
@@ -13,7 +13,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     eval () {
-        return this.property.type === 'number'
+        return this.input.type === 'number'
             ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
             : this._getCategoryValue(this._histogram);
     }
@@ -21,12 +21,12 @@ export default class GlobalHistogram extends Histogram {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
-        if (!this.property.isA(Property)) {
+        if (!this.input.isA(Property)) {
             this._setHistogramForExpression();
             return;
         }
 
-        if (this.property.type === 'number') {
+        if (this.input.type === 'number') {
             this._setHistogramForNumericValues();
             return;
         }

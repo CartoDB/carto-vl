@@ -142,14 +142,13 @@ export default class Histogram extends BaseExpression {
      * // ]
      *
     */
-
     eval () {
         if (this._cached === null) {
             if (!this._histogram) {
                 return null;
             }
 
-            this._cached = this.property.type === 'number'
+            this._cached = this.input.type === 'number'
                 ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
                 : this._getCategoryValue(this._histogram);
 
@@ -166,12 +165,10 @@ export default class Histogram extends BaseExpression {
             return [];
         }
 
-        return this.value.map(elem => {
-            const data = values.find(value => value.key === elem.x);
-
-            const frequency = elem.y;
-            const key = elem.x;
-            const value = data !== -1 ? data.value : null;
+        return values.map((val, index) => {
+            const frequency = this.value[index].y;
+            const key = val.key;
+            const value = val.value;
 
             return { frequency, key, value };
         });
@@ -183,11 +180,22 @@ export default class Histogram extends BaseExpression {
     }
 
     _getCategoryValue (histogram) {
+        const name = this._propertyName;
+        const categories = this._metadata.properties[name]
+            ? this._metadata.properties[name].categories
+            : [];
+
         return [...histogram]
             .map(([x, y]) => {
                 return { x, y };
             })
-            .sort(this._sortNumerically);
+            .sort(this._sortNumerically)
+            .map((category, index) => {
+                return {
+                    x: categories.length ? categories[index].name : category.x,
+                    y: category.y
+                };
+            });
     }
 
     _sortNumerically (a, b) {
