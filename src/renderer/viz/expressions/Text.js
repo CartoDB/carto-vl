@@ -15,7 +15,7 @@ import Base from './base';
 */
 
 export default class Text extends Base {
-    constructor (input, x = 10, y = 10) {
+    constructor (input, x = 1, y = 1) {
         super({ input });
         this.type = 'text';
         this.canvas = _createCanvasForText(this.input, x, y);
@@ -34,7 +34,7 @@ export default class Text extends Base {
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
-            inline: `texture2D(texSprite${this._uid}, canvasUV).rgba` // FIXME
+            inline: `texture2D(texSprite${this._uid}, imageUV).rgba` // FIXME
         };
     }
 
@@ -69,6 +69,7 @@ export default class Text extends Base {
 
 function _createCanvasForText (input, x, y) {
     const CANVAS_SIZE = 256;
+    const fontSize = 20;
     const canvas = document.createElement('canvas');
     const p = document.createElement('p');
     const ctx = canvas.getContext('2d');
@@ -77,9 +78,9 @@ function _createCanvasForText (input, x, y) {
     canvas.height = CANVAS_SIZE;
     p.text = text;
     ctx.textAlign = 'center';
-    ctx.font = 'bold 20px Verdana'; // FIXME
+    ctx.font = `bold ${fontSize}px Verdana`; // FIXME
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillText(text, x, y);
+    ctx.fillText(text, x * fontSize + fontSize, y * fontSize * text.length); // FIXME
     ctx.restore();
 
     return canvas;

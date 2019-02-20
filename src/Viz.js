@@ -236,7 +236,6 @@ export default class Viz {
             this.symbolPlacement,
             this.label,
             this.labelPlacement,
-            this.offset,
             this.transform,
             ...Object.values(this.variables)
         ];
@@ -251,7 +250,6 @@ export default class Viz {
             this.symbolPlacement,
             this.label,
             this.labelPlacement,
-            this.offset,
             this.transform
         ];
     }
@@ -349,6 +347,7 @@ export default class Viz {
         this._strokeWidthShader = null;
         this._filterShader = null;
         this._symbolShader = null;
+        this._labelShader = null;
         this._pointShader = null;
         this._lineShader = null;
         this._polygonShader = null;
@@ -379,6 +378,15 @@ export default class Viz {
             transform: this.transform
         });
     }
+
+    get labelMetaShader () {
+        return this._compileShader('labelShader', shaders.labels.labelsShaderGLSL, {
+            label: this.label,
+            labelPlacement: this.labelPlacement,
+            transform: this.transform
+        });
+    }
+
     get pointMetaShader () {
         return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
             { transform: this.transform });
@@ -479,9 +487,6 @@ export default class Viz {
         }
         if (util.isUndefined(vizSpec.labelPlacement)) {
             vizSpec.labelPlacement = DEFAULT_LABELPLACEMENT_EXPRESSION();
-        }
-        if (util.isUndefined(vizSpec.offset)) {
-            vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
         }
         if (util.isUndefined(vizSpec.transform)) {
             vizSpec.transform = DEFAULT_TRANSFORM_EXPRESSION();

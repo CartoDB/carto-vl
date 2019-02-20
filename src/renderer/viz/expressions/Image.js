@@ -71,7 +71,7 @@ export default class Image extends Base {
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform sampler2D texSprite${this._uid};`),
-            inline: `texture2D(texSprite${this._uid}, canvasUV).rgba`
+            inline: `texture2D(texSprite${this._uid}, imageUV).rgba`
         };
     }
 

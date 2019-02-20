@@ -10,7 +10,6 @@ $propertyPreface
 
 void main(void) {
     vec2 featureID = abs(featureIDVar);
-    vec2 canvasUV = pointCoord*0.5+vec2(0.5);
     vec2 imageUV = pointCoord;
     imageUV.x = imageUV.x * 0.5 + 0.5;
 

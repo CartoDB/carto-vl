@@ -3,77 +3,81 @@ precision highp float;
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
 
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
 uniform float devicePixelRatio;
 uniform vec2 resolution;
-uniform vec2 normalScale;
+uniform mat4 matrix;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D filterTex;
-uniform sampler2D strokeColorTex;
-uniform sampler2D strokeWidthTex;
 
 varying highp vec2 featureIDVar;
 varying highp vec4 color;
-varying highp vec4 stroke;
 varying highp vec2 pointCoord;
-varying highp float fillScale;
-varying highp float strokeScale;
+varying highp float filtering;
 
 float decodeWidth(vec2 enc) {
-  return enc.x * (255. * 4.) + 4. * enc.y;
+  return enc.x*(255.*4.) + 4.*enc.y;
 }
 
 $labelPlacement_preface
 $propertyPreface
-$offset_preface
+$transform_preface
+
+vec2 transform(vec2 p){
+    return $transform_inline(2.*p)/resolution;
+}
+
+// We'll need a square inscribed in a triangle
+// The triangle will be equilateral
+// The square side length will be equal to 1
+// Each triangle edge length will be equal to 1+2*A (by definition of A)
+// The triangle height will be equal to H by definition
+// The square inscription will generate 3 smaller triangles
+// Each one of these will have an hypotenuse equal to Y
+//
+// Therefore:
+// Y*sin(60) = 1  =>  Y = 2 / sqrt(3)
+// A=Y*cos(60)    =>  A = 1 / sqrt(3)
+// tan(60) = H / (0.5 + A)   =>  H = sqrt(3)*(0.5 + 1 / sqrt(3))
+#define A (0.577350269189625)
+#define H (1.86603)
 
 void main(void) {
-  featureIDVar = abs(featureID);
-  color = texture2D(colorTex, abs(featureID));
-  stroke = texture2D(strokeColorTex, abs(featureID));
-  float filtering = texture2D(filterTex, abs(featureID)).a;
-  color.a *= filtering;
-  stroke.a *= filtering;
-  float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);
-  float fillSize = size;
-  float strokeSize = decodeWidth(texture2D(strokeWidthTex, abs(featureID)).rg);
-  size += strokeSize;
-  fillScale = min(size / fillSize, 1.);
-  strokeScale = size / max(0.001, (fillSize - strokeSize));
+    featureIDVar = abs(featureID);
+    color = texture2D(colorTex, abs(featureID));
+    filtering = texture2D(filterTex, abs(featureID)).a;
 
-  if (fillScale == strokeScale) {
-    stroke.a = 0.;
-  }
+    float size = decodeWidth(texture2D(widthTex, abs(featureID)).rg);
 
-  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
-  float sizeNormalizer = (size + 2.) / size;
-  vec2 size2 = (2. * size + 4.) * normalScale;
+    vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
+    p/=p.w;
 
-  if (featureID.y < 0.) {
-    pointCoord = vec2(0.866025, -0.5) * 2. * sizeNormalizer;
-    p.xy += size2 * vec2(0.866025, -0.5);
-  } else if (featureID.x < 0.) {
-    pointCoord = vec2(-0.866025, -0.5) * 2. * sizeNormalizer;
-    p.xy += size2 * vec2(-0.866025, -0.5);
-  } else {
-    pointCoord = vec2(0., 1.) * 2. * sizeNormalizer;
-    p.y += size2.y;
-  }
+    if (featureID.y<0.){
+        pointCoord = vec2((0.5+A)/(0.5), 0.);
+        p.xy += transform(size*vec2(0.5+A, -H/2. + (H/2. - 0.5) ));
+    }else if (featureID.x<0.){
+        pointCoord = vec2(-(0.5+A)/(0.5), 0.);
+        p.xy += transform(size*vec2(-(0.5+A), -H/2. + (H/2. - 0.5)));
+    }else{
+        pointCoord = vec2(0., H);
+        p.xy += transform(size*vec2(0., H/2. + (H/2. - 0.5)));
+    }
+    pointCoord.y = 1.-pointCoord.y;
 
-  pointCoord.y = -pointCoord.y;
 
-  p.xy += ($labelPlacement_inline) * size / resolution;
-  p.xy += normalScale * ($offset_inline);
+    p.xy += ($labelPlacement_inline)*size/resolution;
 
-  vec4 noOverrideColor = vec4(0.);
-  if (size == 0. || (stroke.a == 0. && color.a == 0.) || (color.a == 0. && color != noOverrideColor) || size < orderMinWidth || size >= orderMaxWidth) {
-    p.x = 10000.;
-  }
 
-  gl_Position = p;
+    vec4 noOverrideColor = vec4(1., 1., 1., 0.);
+    bool alphaButNotOverrideColor = (color.a==0. && color != noOverrideColor);
+
+    if (size==0. || alphaButNotOverrideColor || size<orderMinWidth || size>=orderMaxWidth){
+        p.x=10000.;
+    }
+
+    gl_Position  = p;
 }
+

@@ -1,15 +1,31 @@
 import shaders from './shaders';
-import { Asc, Desc } from './viz/expressions';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
-import { mat4 } from 'gl-matrix';
-import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
-import { parseVizExpression } from './viz/parser';
-import { runViewportAggregations } from './viz/expressions/aggregation/viewport/ViewportAggCalculator';
-import { GEOMETRY_TYPE } from '../utils/geometry';
+import {
+    Asc,
+    Desc
+} from './viz/expressions';
+import CartoRuntimeError, {
+    CartoRuntimeTypes as crt
+} from '../errors/carto-runtime-error';
+import {
+    mat4
+} from 'gl-matrix';
+import {
+    RESOLUTION_ZOOMLEVEL_ZERO
+} from '../constants/layer';
+import {
+    parseVizExpression
+} from './viz/parser';
+import {
+    runViewportAggregations
+} from './viz/expressions/aggregation/viewport/ViewportAggCalculator';
+import {
+    GEOMETRY_TYPE
+} from '../utils/geometry';
 
 const INITIAL_TIMESTAMP = Date.now();
 let timestamp = INITIAL_TIMESTAMP;
 requestAnimationFrame(refreshClock);
+
 function refreshClock () {
     timestamp = (Date.now() - INITIAL_TIMESTAMP) / 1000.0;
     requestAnimationFrame(refreshClock);
@@ -54,7 +70,10 @@ export default class Renderer {
             this.gl = getValidWebGLContextOrThrow(canvas);
             this._initGL(this.gl);
         }
-        this._center = { x: 0, y: 0 };
+        this._center = {
+            x: 0,
+            y: 0
+        };
         this._zoom = 1;
         this.RTT_WIDTH = RTT_WIDTH;
         this.dataframes = [];
@@ -170,6 +189,7 @@ export default class Renderer {
 
         // Draw dataframe style textures
         dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
+
         if (dataframes[0].type !== GEOMETRY_TYPE.POLYGON) {
             dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
         }
@@ -213,7 +233,10 @@ export default class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
+        const {
+            orderingMins,
+            orderingMaxs
+        } = getOrderingRenderBuckets(renderLayer);
 
         if (dataframes[0].type === GEOMETRY_TYPE.LINE || dataframes[0].type === GEOMETRY_TYPE.POLYGON) {
             gl.clearDepth(1);
@@ -226,7 +249,9 @@ export default class Renderer {
         const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
             let metaRenderer = null;
-            if (!viz.symbol.default) {
+            if (!viz.label.default) {
+                metaRenderer = viz.labelMetaShader;
+            } else if (!viz.symbol.default) {
                 metaRenderer = viz.symbolMetaShader;
             } else if (dataframe.type === GEOMETRY_TYPE.POINT) {
                 metaRenderer = viz.pointMetaShader;
@@ -235,6 +260,7 @@ export default class Renderer {
             } else {
                 metaRenderer = viz.polygonMetaShader;
             }
+
             const renderer = metaRenderer.shader;
             gl.useProgram(renderer.program);
 
@@ -275,7 +301,7 @@ export default class Renderer {
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
 
-            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            // gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             // Specific Style textures
             if (dataframe.type === 'point' || dataframe.type === 'line') {
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
@@ -285,24 +311,14 @@ export default class Renderer {
             }
 
             if (!viz.label.default) {
-                const textureId = viz.labelShader.textureIds.get(viz);
-
-                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeColor);
-                gl.uniform1i(renderer.strokeColorTexture, freeTexUnit);
-                freeTexUnit++;
-
-                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-                gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeWidth);
-                gl.uniform1i(renderer.strokeWidthTexture, freeTexUnit);
-                freeTexUnit++;
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.label._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.label._preDraw(viz.labelShader.program, drawMetadata, gl);
+                viz.label._setTimestamp(timestamp);
+                viz.label._preDraw(renderer.program, drawMetadata, gl);
 
-                viz.labelPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.labelPlacement._preDraw(viz.labelShader.program, drawMetadata, gl);
+                viz.labelPlacement._setTimestamp(timestamp);
+                viz.labelPlacement._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -375,11 +391,13 @@ export default class Renderer {
             // Some cleaning...
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
+
             if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
             }
         });
+
         orderingMins.map((_, orderingIndex) => {
             renderDrawPass(orderingIndex);
         });
@@ -438,11 +456,19 @@ function getOrderingRenderBuckets (renderLayer) {
     // We divide the ordering into 64 buckets of 2 pixels each, since the size limit is 127 pixels
     const NUM_BUCKETS = 64;
     if (orderer.isA(Asc)) {
-        orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === 0 ? MAX_SIZE : ((NUM_BUCKETS - 1) - i + 1) * 2);
+        orderingMins = Array.from({
+            length: NUM_BUCKETS
+        }, (_, i) => ((NUM_BUCKETS - 1) - i) * 2);
+        orderingMaxs = Array.from({
+            length: NUM_BUCKETS
+        }, (_, i) => i === 0 ? MAX_SIZE : ((NUM_BUCKETS - 1) - i + 1) * 2);
     } else if (orderer.isA(Desc)) {
-        orderingMins = Array.from({ length: NUM_BUCKETS }, (_, i) => i * 2);
-        orderingMaxs = Array.from({ length: NUM_BUCKETS }, (_, i) => i === (NUM_BUCKETS - 1) ? MAX_SIZE : (i + 1) * 2);
+        orderingMins = Array.from({
+            length: NUM_BUCKETS
+        }, (_, i) => i * 2);
+        orderingMaxs = Array.from({
+            length: NUM_BUCKETS
+        }, (_, i) => i === (NUM_BUCKETS - 1) ? MAX_SIZE : (i + 1) * 2);
     }
     return {
         orderingMins,
