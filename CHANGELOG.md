@@ -9,9 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 - Allow the use of variables for all classifiers: `globalQuantiles`, `globalEqIntervals`, `globalStandardDev`, `viewportQuantiles`, `viewportEqIntervals` and `viewportStandardDev`
+- Improve MVT decoding error messages
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons
+- Raise an error if when the idProperty is not specified in the metadata and is not a number
 
 ## [1.1.1] - 2019-01-16
 
