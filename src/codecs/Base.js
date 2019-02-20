@@ -44,8 +44,8 @@ export default class BaseCodec {
     // Convert source encoding to external encoding.
     // Used to present source stats values (global aggregations)
     // to match the format of constant expressions.
-    sourceToExternal (metadata, v) {
-        return this.internalToExternal(metadata, this.sourceToInternal(metadata, v));
+    sourceToExternal (metadata, v, propertyName) {
+        return this.internalToExternal(metadata, this.sourceToInternal(metadata, v, propertyName));
     }
 
     // Convert external to internal encoding.
@@ -53,8 +53,8 @@ export default class BaseCodec {
     // and [lo, hi] for range codecs.
     // used to to apply filters in GLSL inlined code;
     // evaluate binary operations property vs external (constant/global
-    externalToInternal (metadata, v) {
-        return this.sourceToInternal(metadata, this.externalToSource(metadata, v));
+    externalToInternal (metadata, v, propertyName) {
+        return this.sourceToInternal(metadata, this.externalToSource(metadata, v), propertyName);
     }
 
     // Generate GLSL inline expression to map a property value

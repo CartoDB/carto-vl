@@ -1,12 +1,12 @@
 import NumberCodec from '../Number';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes as errors } from '../../errors/carto-runtime-error';
 
 export default class MVTNumberCodec extends NumberCodec {
-    sourceToInternal (metadata, propertyValue) {
+    sourceToInternal (metadata, propertyValue, propertyName) {
         const propertyValueType = typeof propertyValue;
         if (propertyValue !== null && propertyValueType !== 'undefined' && propertyValueType !== 'number') {
-            throw new CartoRuntimeError(`${crt.MVT} MVT decoding error. Metadata property is of type 'number' but the MVT tile contained a feature property of type '${propertyValueType}': '${propertyValue}'`);
+            throw new CartoRuntimeError(`${errors.MVT} MVT decoding error. Metadata property '${propertyName}' is of type 'number' but the MVT tile contained a feature property of type '${propertyValueType}': '${propertyValue}'`);
         }
-        return super.sourceToInternal(metadata, propertyValue);
+        return super.sourceToInternal(metadata, propertyValue, propertyName);
     }
 }
