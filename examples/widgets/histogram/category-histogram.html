@@ -25,7 +25,7 @@
         <div id="controls">
           <ul>
             <li>
-              <input type="radio" name="style" onclick="setViewportHistogram()" id="viewport-histogram">
+              <input type="radio" name="style" onclick="setViewportHistogram()" id="viewport-histogram" checked>
               <label for="viewport-histogram">ViewportHistogram</label>
             </li>
             <li>
@@ -33,7 +33,7 @@
               <label for="classified-viewport-histogram">Classified ViewportHistogram</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setGlobalHistogram()" id="global-histogram" checked>
+              <input type="radio" name="style" onclick="setGlobalHistogram()" id="global-histogram">
               <label for="auto">GlobalHistogram</label>
             </li>
             <li>
@@ -79,38 +79,19 @@
     // Define the source
     const source = new carto.source.Dataset('populated_places');
 
-    // Define the visualizations
-    const vizViewportHistogram = new carto.Viz(`
+    // Define the visualization
+    const viz = new carto.Viz(`
       @color: ramp($featurecla, bold)
-      @histogram: viewportHistogram($featurecla)
+      @viewportHistogram: viewportHistogram($featurecla)
+      @viewportClassifiedHistogram: viewportHistogram(top($featurecla, 3))
+      @globalHistogram: globalHistogram($featurecla)
+      @globalClassifiedHistogram: globalHistogram(top($featurecla, 3))
       color: @color
       width: 5
       strokeWidth: 0
     `);
 
-    const vizClassifiedViewportHistogram = new carto.Viz(`
-      @color: ramp(top($featurecla, 3), bold)
-      @histogram: viewportHistogram(top($featurecla, 3))
-      color: @color
-      width: 5
-      strokeWidth: 0
-    `);
-
-    const vizGlobalHistogram = new carto.Viz(`
-      @color: ramp($featurecla, bold)
-      @histogram: globalHistogram($featurecla)
-      color: @color
-      width: 5
-      strokeWidth: 0
-    `);
-
-    const vizClassifiedGlobalHistogram = new carto.Viz(`
-      @color: ramp(top($featurecla, 3), bold)
-      @histogram: globalHistogram(top($featurecla, 3))
-      color: @color
-      width: 5
-      strokeWidth: 0
-    `);
+    let histogramVariable = 'viewportHistogram';
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
     const chartOptionsDefault = {
@@ -151,7 +132,7 @@
       options: chartOptionsDefault
     });
 
-    const layer = new carto.Layer('layer', source, vizGlobalHistogram);
+    const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'watername_ocean');
 
 
@@ -164,7 +145,7 @@
 
     function drawHistogramLegend() {
       // Get histogram variable
-      const histogram = layer.viz.variables.histogram;
+      const histogram = layer.viz.variables[histogramVariable];
       // Get color ramp
       const colorRamp = layer.viz.color;
 
@@ -198,16 +179,21 @@
     }
 
     function setViewportHistogram() {
-      layer.blendToViz(vizViewportHistogram);
+      histogramVariable = 'viewportHistogram';
+      drawHistogramLegend();
     }
+
     function setClassifiedViewportHistogram() {
-      layer.blendToViz(vizClassifiedViewportHistogram);
+      histogramVariable = 'viewportClassifiedHistogram';
+      drawHistogramLegend();
     }
     function setGlobalHistogram() {
-      layer.blendToViz(vizGlobalHistogram);
+      histogramVariable = 'globalHistogram';
+      drawHistogramLegend();
     }
     function setClassifiedGlobalHistogram() {
-      layer.blendToViz(vizClassifiedGlobalHistogram);
+      histogramVariable = 'globalClassifiedHistogram';
+      drawHistogramLegend();
     }
   </script>
 </body>
