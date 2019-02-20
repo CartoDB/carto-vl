@@ -42,7 +42,7 @@
     const source = new carto.source.Dataset('table_311_complaints');
     const viz = new carto.Viz(`
       color: blue
-      label: text('hello')
+      label: text($complaint)
       width: 500
     `);
     const layer = new carto.Layer('layer', source, viz);

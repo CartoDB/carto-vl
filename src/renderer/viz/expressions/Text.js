@@ -1,4 +1,6 @@
 import Base from './base';
+import Property from './basic/property';
+import { implicitCast, checkExpression, checkInstance, checkType } from './utils';
 /**
  * Text. Add a text Text to a feature
  *
@@ -16,9 +18,22 @@ import Base from './base';
 
 export default class Text extends Base {
     constructor (input, x = 1, y = 1) {
+        input = implicitCast(input);
+        checkExpression('text', 'input', 0, input);
         super({ input });
+
         this.type = 'text';
-        this.canvas = _createCanvasForText(this.input, x, y);
+        this.x = x;
+        this.y = y;
+        this.canvas = null;
+    }
+
+    eval (feature) {
+        if (this.input.isA(Property)) {
+            return this.input.eval(feature);
+        }
+
+        return this.input.expr;
     }
 
     _compile (meta) {
@@ -43,8 +58,18 @@ export default class Text extends Base {
     }
 
     _preDraw (program, drawMetadata, gl) {
-        if (!this.init && this.canvas) {
+        const categories = this._metadata.properties[this.input.name].categories;
+
+        if (!this.init) {
+            for (let i = 0; i < categories.length; i++) {
+                this[`_text${i}`] = categories[i];
+            }
+
             this.init = true;
+        }
+
+        if (this.init && !this.canvas) {
+            this.canvas = _createCanvasForText(this[`_text${this._uid}`].name, this.x, this.y);
             gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
             this.texture = gl.createTexture();
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
@@ -63,7 +88,19 @@ export default class Text extends Base {
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
             drawMetadata.freeTexUnit++;
+            this.texture = null;
         }
+
+        super._preDraw(program, drawMetadata, gl);
+    }
+
+    _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
+
+        checkInstance('text', 'input', 0, Property, this.input);
+        checkType('text', 'input', 0, ['number', 'category'], this.input);
+
+        this._metadata = metadata;
     }
 }
 
@@ -73,7 +110,7 @@ function _createCanvasForText (input, x, y) {
     const canvas = document.createElement('canvas');
     const p = document.createElement('p');
     const ctx = canvas.getContext('2d');
-    const text = input.expr;
+    const text = input;
     canvas.width = CANVAS_SIZE;
     canvas.height = CANVAS_SIZE;
     p.text = text;
