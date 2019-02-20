@@ -1,7 +1,7 @@
 import Classifier from './Classifier';
 import { checkMaxArguments, checkMinArguments, checkNumber } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../../../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../../../errors/carto-runtime-error';
 
 import { average, standardDeviation } from '../stats';
 
@@ -101,7 +101,7 @@ export default class GlobalStandardDev extends Classifier {
 export function calculateBreakpoints (avg, stDev, buckets, classSize) {
     if (stDev === 0 || isNaN(stDev)) {
         throw new CartoRuntimeError(
-            `${crt.NOT_SUPPORTED} There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`
+            `${runtimeErrors.NOT_SUPPORTED} There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`
         );
     }
 
