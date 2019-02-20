@@ -45,7 +45,7 @@ import { checkMaxArguments, implicitCast } from '../utils';
 /**
  * GlobalHistogram Class
  *
- * Generates a histogram based on the features in the viewport.
+ * Generates a histogram based on the samples from the metadata.
  * This class is instanced automatically by using the `globalHistogram` function. It is documented for its methods.
  * Read more about histogram expression at {@link carto.expressions.globalhistogram}.
  *
