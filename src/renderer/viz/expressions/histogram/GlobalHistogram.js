@@ -1,6 +1,7 @@
 import Histogram from './Histogram';
 import Property from '../basic/property';
 import { checkMaxArguments, implicitCast } from '../utils';
+import { OTHERS_LABEL } from '../constants';
 
 /**
  * Generates a histogram.
@@ -178,8 +179,8 @@ export default class GlobalHistogram extends Histogram {
             if (category) {
                 this._histogram.set(c.name, c.frequency);
             } else {
-                const frequency = this._histogram.get('CARTO_VL_OTHERS') || 0;
-                this._histogram.set('CARTO_VL_OTHERS', c.frequency + parseInt(frequency));
+                const frequency = this._histogram.get(OTHERS_LABEL) || 0;
+                this._histogram.set(OTHERS_LABEL, c.frequency + parseInt(frequency));
             }
         });
     }

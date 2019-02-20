@@ -1,5 +1,6 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
+import { OTHERS_LABEL } from '../../../../src/renderer/viz/expressions/constants';
 
 describe('globalHistogram', () => {
     let div, map, source, viz, layer;
@@ -90,7 +91,7 @@ describe('globalHistogram', () => {
         layer.on('loaded', () => {
             const histogram = viz.variables.histogram.value;
             expect(histogram).toEqual([
-                { x: 'CARTO_VL_OTHERS', y: 7 },
+                { x: OTHERS_LABEL, y: 7 },
                 { x: 'Murcia', y: 5 }
             ]);
             done();
