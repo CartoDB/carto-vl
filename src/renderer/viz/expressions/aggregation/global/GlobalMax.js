@@ -1,5 +1,13 @@
 import GlobalAggregation from './GlobalAggregation';
 import { checkMaxArguments } from '../../utils';
+
+import ClusterAggregation from '../cluster/ClusterAggregation';
+import ClusterAvg from '../cluster/ClusterAvg';
+import ClusterMax from '../cluster/ClusterMax';
+import ClusterMin from '../cluster/ClusterMin';
+
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+
 /**
  * Return the maximum of the feature property for the entire source data.
  *
@@ -30,6 +38,17 @@ export default class GlobalMax extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalMax');
 
-        super({ property, name: 'max', type: 'number' });
+        let baseStats = false;
+        if (property && property.isA(ClusterAggregation)) {
+            if (property.isA(ClusterAvg) || property.isA(ClusterMin) || property.isA(ClusterMax)) {
+                // This is not correct for ClusterAvg, and specially not for clusterMin...
+                // but we allow for it
+                baseStats = 'max';
+            } else {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid globlalAvg input`);
+            }
+        }
+
+        super({ property, name: 'max', type: 'number', baseStats });
     }
 }

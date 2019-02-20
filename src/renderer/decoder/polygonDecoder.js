@@ -1,7 +1,7 @@
 import * as earcut from 'earcut';
 import { addLineString, resizeBuffer } from './common';
 
-// If the geometry type is 'polygon' it will triangulate the polygon list (geom)
+// If the geometry type is GEOMETRY_TYPE.POLYGON it will triangulate the polygon list (geom)
 // geom will be a list of polygons in which each polygon will have a flat array of vertices and a list of holes indices
 // Example:
 /*   let geom = [{
@@ -36,7 +36,7 @@ export function decodePolygon (geometry) {
 
             // Increase buffers size if required
             resizeBuffers(VERTEX_COORDINATES_PER_TRIANGLE * triangles.length +
-                          MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);
+                MAX_VERTICES_COORDINATES_PER_SEGMENT * polygon.flat.length);
 
             // Add polygon
             for (let k = 0; k < triangles.length; k++) {

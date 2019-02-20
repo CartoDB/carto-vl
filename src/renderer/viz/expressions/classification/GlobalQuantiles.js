@@ -1,6 +1,5 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArguments } from '../utils';
+import { checkExactNumberOfArguments } from '../utils';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -29,23 +28,22 @@ import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArgumen
  */
 export default class GlobalQuantiles extends Classifier {
     constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'globalQuantiles');
-        checkInstance('globalQuantiles', 'input', 0, Property, input && (input.property || input));
-        checkNumber('globalQuantiles', 'buckets', 1, buckets);
-        super({ input }, buckets);
+        checkExactNumberOfArguments(arguments, 2, 'globalQuantiles');
+        super({ input, buckets });
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalQuantiles', 'input', 0, this.input);
-        checkType('globalQuantiles', 'input', 0, 'number', this.input);
 
+        this._updateBreakpointsWith(metadata);
+    }
+
+    _updateBreakpointsWith (metadata) {
         const copy = metadata.sample.map(s => s[this.input.name]);
-
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {
-            const p = (index + 1) / this.buckets;
+            const p = (index + 1) / this.numCategories;
             breakpoint.expr = copy[Math.floor(p * copy.length)];
         });
     }

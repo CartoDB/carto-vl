@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style>
+        #js-zoom {
+            position: absolute;
+            bottom: 0;
+            padding: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            color: rgba(0, 0, 0, 0.75);
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="js-zoom"></div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-123.098599, 49.240685],
+            zoom: 11
+        });
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+        }
+        map.on('load', updateZoom);
+        map.on('move', updateZoom);
+
+        //** CARTO VL functionality begins here **//
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset('vancouver_trees');
+
+        // Define Viz object and custom style
+        const viz = new carto.Viz(`
+            @category: ramp($common_name,prism)
+
+            width: ramp(zoomRange([10,15]),[1,scaled($diameter/2,15)])
+            color: ramp(zoomRange([12,13]),[green,opacity(@category,0.7)])
+            strokeColor: ramp(zoomRange([12,13]),[black,@category])
+            strokeWidth: ramp(zoomRange([13,14,16]),[0,0.5,1])
+            filter: ramp(zoomrange([12,13,14,15,16]),
+                        [$diameter>30,
+                        $diameter>15,
+                        $diameter>10,
+                        $diameter>5,
+                        true]
+                    )
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>

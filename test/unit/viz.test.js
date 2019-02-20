@@ -1,7 +1,8 @@
 import { Viz, expressions as s } from '../../src/index';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import { regExpThatContains as thatContains } from '../../src/utils/util';
 
 // Generic Style defaults
-
 const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_WIDTH_EXPRESSION = s.number(1);
 const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
@@ -79,7 +80,7 @@ describe('api/viz', () => {
             it('should throw an error when parameter is not an object neither a string', function () {
                 expect(function () {
                     new Viz(1234);
-                }).toThrowError('viz definition should be a vizSpec object or a valid viz string.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_VALUE + ' viz \'definition\' should be a vizSpec object or a valid viz string.'));
             });
 
             it('should throw an error when resolution is not a number', () => {
@@ -88,7 +89,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be a number.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_TYPE + ' \'resolution\' property must be a number.');
             });
 
             it('should throw an error when resolution is too small', () => {
@@ -97,7 +98,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be greater than 0.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -106,7 +107,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`resolution` must be less than 256.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be less than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -115,7 +116,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`color` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'color\''));
             });
 
             it('should throw an error when width is not a valid expression', () => {
@@ -124,7 +125,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`width` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'width\''));
             });
 
             it('should throw an error when strokeColor is not a valid expression', () => {
@@ -133,7 +134,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeColor` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeColor\''));
             });
 
             it('should throw an error when strokeWidth is not a valid expression', () => {
@@ -142,7 +143,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`strokeWidth` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'strokeWidth\''));
             });
 
             it('should throw an error when order is not a valid expression', () => {
@@ -151,7 +152,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError('`order` parameter is not a valid viz Expresion.');
+                }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'order\''));
             });
 
             it('should add a console.warn when non supported properties are included', () => {
@@ -194,17 +195,6 @@ describe('api/viz', () => {
         afterEach(function () {
             Date.now = dateNow;
         });
-        it('should return the new/final expression', () => {
-            const numberA = s.number(1);
-            const numberB = s.number(2);
-            const expected = s.gt(s.property('fake_property'), numberA);
-            new Viz({
-                filter: expected
-            });
-
-            const final = numberA.blendTo(numberB, 10);
-            expect(final).toBe(numberB);
-        });
         it('should notify the viz on change', done => {
             const numberA = s.number(1);
             const numberB = s.number(2);
@@ -223,7 +213,10 @@ describe('api/viz', () => {
                 filter: expected
             });
             numberA.blendTo(numberB, 999);
-            viz.onChange(done);
+            viz.onChange(() => {
+                done();
+                return Promise.resolve(null);
+            });
             const t = Date.now() + 1000;
             Date.now = () => t;
             viz.filter._preDraw(null, {}, { uniform1f: () => { } });
@@ -233,7 +226,10 @@ describe('api/viz', () => {
     describe('resolution changes', () => {
         it('should be effective and notify observers', done => {
             const viz = new Viz();
-            viz.onChange(done);
+            viz.onChange(() => {
+                done();
+                return Promise.resolve(null);
+            });
             viz.resolution = 8;
             expect(viz.resolution).toEqual(8);
         });
@@ -251,10 +247,15 @@ describe('api/viz', () => {
 
         it('should work with arrays of numbers', () => {
             let viz = new Viz('@a: [1,2,3]');
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
-            viz = new Viz({ variables: { a: s.array([1, 2, 3]) } });
+
+            viz = new Viz({ variables: { a: s.list([1, 2, 3]) } });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
+
             viz = new Viz({ variables: { a: [1, 2, 3] } }); // Implicit cast
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
         });
 
@@ -267,12 +268,17 @@ describe('api/viz', () => {
 
         it('should work with other variables', () => {
             let viz = new Viz('@a: [@v, 2, 3] @v: 1');
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.v.value).toEqual(1);
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
-            viz = new Viz({ variables: { a: s.array([s.var('v'), 2, 3]), v: s.number(1) } });
+
+            viz = new Viz({ variables: { a: s.list([s.var('v'), 2, 3]), v: s.number(1) } });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.v.value).toEqual(1);
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
-            viz = new Viz({ variables: { a: [1, 2, 3], v: 1 } }); // Implicit cast
+
+            viz = new Viz({ variables: { a: [1, 2, 3], v: 1 } });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.v.value).toEqual(1);
             expect(viz.variables.a.value).toEqual([1, 2, 3]);
         });
@@ -288,10 +294,15 @@ describe('api/viz', () => {
 
         it('should work with arrays of strings', () => {
             let viz = new Viz('@a: ["a","b","c"]');
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
-            viz = new Viz({ variables: { a: s.array(['a', 'b', 'c']) } });
+
+            viz = new Viz({ variables: { a: s.list(['a', 'b', 'c']) } });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
+
             viz = new Viz({ variables: { a: ['a', 'b', 'c'] } }); // Implicit cast
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual(['a', 'b', 'c']);
         });
 
@@ -304,22 +315,26 @@ describe('api/viz', () => {
 
         it('should work with arrays of colors', () => {
             let viz = new Viz('@a: [red, lime, blue]');
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([
                 { r: 255, g: 0, b: 0, a: 1 },
                 { r: 0, g: 255, b: 0, a: 1 },
                 { r: 0, g: 0, b: 255, a: 1 }]);
+
             viz = new Viz({
                 variables: {
-                    a: s.array([
+                    a: s.list([
                         s.namedColor('red'),
                         s.namedColor('lime'),
                         s.namedColor('blue')])
                 }
             });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([
                 { r: 255, g: 0, b: 0, a: 1 },
                 { r: 0, g: 255, b: 0, a: 1 },
                 { r: 0, g: 0, b: 255, a: 1 }]);
+
             viz = new Viz({
                 variables: {
                     a: [
@@ -328,6 +343,7 @@ describe('api/viz', () => {
                         s.namedColor('blue')]
                 }
             }); // Implicit cast
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([
                 { r: 255, g: 0, b: 0, a: 1 },
                 { r: 0, g: 255, b: 0, a: 1 },
@@ -343,8 +359,11 @@ describe('api/viz', () => {
 
         it('should work with arrays of dates', () => {
             let viz = new Viz('@a: [date("2022-03-09T00:00:00Z")]');
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
-            viz = new Viz({ variables: { a: s.array(s.date('2022-03-09T00:00:00Z')) } });
+
+            viz = new Viz({ variables: { a: s.list(s.date('2022-03-09T00:00:00Z')) } });
+            viz._getRootExpressions().forEach(expr => expr._bindMetadata({}));
             expect(viz.variables.a.value).toEqual([new Date('2022-03-09T00:00:00Z')]);
         });
 

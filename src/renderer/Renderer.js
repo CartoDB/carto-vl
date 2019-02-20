@@ -1,15 +1,27 @@
 import shaders from './shaders';
 import { Asc, Desc } from './viz/expressions';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import { mat4 } from 'gl-matrix';
+import { RESOLUTION_ZOOMLEVEL_ZERO } from '../constants/layer';
+import { parseVizExpression } from './viz/parser';
+import { runViewportAggregations } from './viz/expressions/aggregation/viewport/ViewportAggCalculator';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const INITIAL_TIMESTAMP = Date.now();
+let timestamp = INITIAL_TIMESTAMP;
+requestAnimationFrame(refreshClock);
+function refreshClock () {
+    timestamp = (Date.now() - INITIAL_TIMESTAMP) / 1000.0;
+    requestAnimationFrame(refreshClock);
+}
 
 /**
  * The renderer use fuzzy logic where < 0.5 means false and >= 0.5 means true
  */
-const FILTERING_THRESHOLD = 0.5;
+export const FILTERING_THRESHOLD = 0.5;
 
 /**
- * @typedef {object} RPoint - Point in renderer coordinates space
+ * @typedef {Object} RPoint - Point in renderer coordinates space
  * @property {number} x
  * @property {number} y
  */
@@ -39,10 +51,7 @@ export const RTT_WIDTH = 1024;
 export default class Renderer {
     constructor (canvas) {
         if (canvas) {
-            this.gl = canvas.getContext('webgl');
-            if (!this.gl) {
-                throw new Error('WebGL 1 is unsupported');
-            }
+            this.gl = getValidWebGLContextOrThrow(canvas);
             this._initGL(this.gl);
         }
         this._center = { x: 0, y: 0 };
@@ -56,47 +65,12 @@ export default class Renderer {
      * @param {WebGLRenderingContext} gl - WebGL context
      */
     initialize (gl) {
+        gl = getValidWebGLContextOrThrow(null, gl);
         this._initGL(gl);
-    }
-
-    /**
-     * Set Renderer visualization center
-     * @param {number} x
-     * @param {number} y
-     */
-    setCenter (center) {
-        this._center.x = center.x;
-        this._center.y = center.y;
-    }
-
-    /**
-     * Set Renderer visualization zoom
-     * @param {number} zoom
-     */
-    setZoom (zoom) {
-        this._zoom = zoom;
-    }
-
-    /**
-     * Get Renderer visualization bounds
-     * @return {*}
-     */
-    getBounds () {
-        const sx = this._zoom * this._getAspect();
-        const sy = this._zoom;
-        return [this._center.x - sx, this._center.y - sy, this._center.x + sx, this._center.y + sy];
     }
 
     _initGL (gl) {
         this.gl = gl;
-        const OESTextureFloat = gl.getExtension('OES_texture_float');
-        if (!OESTextureFloat) {
-            throw new Error('WebGL extension OES_texture_float is unsupported');
-        }
-        const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-        if (supportedRTT < RTT_WIDTH) {
-            throw new Error(`WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`);
-        }
         this._initShaders();
 
         this.auxFB = gl.createFramebuffer();
@@ -124,7 +98,7 @@ export default class Renderer {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
-        this._AATex = gl.createTexture();
+        this._AATex = gl.createTexture(); // Antialiasing
         this._AAFB = gl.createFramebuffer();
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -138,109 +112,37 @@ export default class Renderer {
         return 1;
     }
 
-    /**
-     * Run aggregation functions over the visible features.
-     */
-    _runViewportAggregations (renderLayer) {
+    renderLayer (renderLayer, drawMetadata) {
+        this.drawMetadata = drawMetadata;
         const dataframes = renderLayer.getActiveDataframes();
         const viz = renderLayer.viz;
-
-        // Performance optimization to avoid doing DFS at each feature iteration
-        const viewportExpressions = this._getViewportExpressions(viz._getRootExpressions());
-
-        if (!viewportExpressions.length) {
+        if (!viz) {
             return;
         }
-
-        // Assume that all dataframes of a renderLayer share the same metadata
-        const metadata = dataframes.length ? dataframes[0].metadata : null;
-
-        viewportExpressions.forEach(expr => expr._resetViewportAgg(metadata));
-
-        const viewportExpressionsLength = viewportExpressions.length;
-
-        // Avoid acumulating the same feature multiple times keeping a set of processed features (same feature can belong to multiple dataframes).
-        const processedFeaturesIDs = new Set();
-
-        const aspect = this.gl.canvas.width / this.gl.canvas.height;
-        const scale = 1 / this._zoom;
-        dataframes.forEach(dataframe => {
-            const aabb = dataframe.getViewportAABB(scale, this._center, aspect);
-            for (let i = 0; i < dataframe.numFeatures; i++) {
-                const featureId = dataframe.properties[metadata.idProperty][i];
-
-                // If feature has been acumulated ignore it
-                if (processedFeaturesIDs.has(featureId)) {
-                    continue;
-                }
-                // Ignore features outside viewport
-                if (!dataframe.inViewport(i, viz, aabb)) {
-                    continue;
-                }
-
-                processedFeaturesIDs.add(featureId);
-
-                const feature = this._featureFromDataFrame(dataframe, i, metadata);
-
-                // Ignore filtered features
-                if (viz.filter.eval(feature) < FILTERING_THRESHOLD) {
-                    continue;
-                }
-
-                for (let j = 0; j < viewportExpressionsLength; j++) {
-                    viewportExpressions[j].accumViewportAgg(feature);
-                }
-            }
-        });
-    }
-
-    /**
-     * Perform a depth first search through the expression tree collecting all viewport expressions.
-     */
-    _getViewportExpressions (rootExpressions) {
-        const viewportExpressions = [];
-
-        function dfs (expr) {
-            if (expr._isViewport) {
-                viewportExpressions.push(expr);
-            } else {
-                expr._getChildren().map(dfs);
-            }
-        }
-
-        rootExpressions.map(dfs);
-        return viewportExpressions;
-    }
-
-    /**
-     * Build a feature object from a dataframe and an index copying all the properties.
-     */
-    _featureFromDataFrame (dataframe, index, metadata) {
-        return dataframe.getFeature(index);
-    }
-
-    renderLayer (renderLayer, drawMetadata) {
-        const dataframes = renderLayer.getActiveDataframes();
-        const viz = renderLayer.viz;
         const gl = this.gl;
-        const aspect = this._getAspect();
 
-        this._runViewportAggregations(renderLayer);
+        this._updateDataframeMatrices(dataframes);
+
+        renderLayer.parseVizExpression = parseVizExpression; // Important! to avoid a circular dependency problem (eg. viewportFeatures)
+        runViewportAggregations(renderLayer);
 
         if (!dataframes.length) {
             return;
         }
         viz._getRootExpressions().map(expr => expr._dataReady());
 
-        gl.enable(gl.CULL_FACE);
+        gl.enable(gl.CULL_FACE); // this enables an optimization but it forces a particular vertices orientation
         gl.disable(gl.BLEND);
         gl.disable(gl.DEPTH_TEST);
         gl.disable(gl.STENCIL_TEST);
         gl.depthMask(false);
         gl.bindFramebuffer(gl.FRAMEBUFFER, this.auxFB);
 
-        const styleDataframe = (dataframe, dataframeTexture, shader, vizExpr) => {
-            const textureId = shader.textureIds.get(viz);
+        // To execute once per daframe and style property
+        // (geometries, properties and ids have been already loaded to GPU)
+        const styleDataframe = (dataframe, dataframeTexture, metashader, vizExpr) => {
+            const shader = metashader.shader;
+            const textureId = metashader.textureIds;
 
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, dataframeTexture, 0);
             gl.viewport(0, 0, RTT_WIDTH, dataframe.height);
@@ -249,7 +151,7 @@ export default class Renderer {
             gl.useProgram(shader.program);
             // Enforce that property texture TextureUnit don't clash with auxiliar ones
             drawMetadata.freeTexUnit = Object.keys(textureId).length;
-            vizExpr._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
+            vizExpr._setTimestamp(timestamp);
             vizExpr._preDraw(shader.program, drawMetadata, gl);
 
             Object.keys(textureId).forEach((name, i) => {
@@ -266,19 +168,26 @@ export default class Renderer {
             gl.disableVertexAttribArray(shader.vertexAttribute);
         };
 
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorShader, viz.color));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthShader, viz.width));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorShader, viz.strokeColor));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthShader, viz.strokeWidth));
-        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterShader, viz.filter));
+        // Draw dataframe style textures
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texColor, viz.colorMetaShader, viz.color));
+        if (dataframes[0].type !== GEOMETRY_TYPE.POLYGON) {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texWidth, viz.widthMetaShader, viz.width));
+        }
+        if (dataframes[0].type !== GEOMETRY_TYPE.LINE) {
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeColor, viz.strokeColorMetaShader, viz.strokeColor));
+            dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texStrokeWidth, viz.strokeWidthMetaShader, viz.strokeWidth));
+        }
+        dataframes.map(dataframe => styleDataframe(dataframe, dataframe.texFilter, viz.filterMetaShader, viz.filter));
 
+        // Final drawing (to screen). In the case of lines / polygons, there is an extra step (for antialiasing)
         gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.BLEND);
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-
-        if (renderLayer.type !== 'point') {
+        if (renderLayer.type === GEOMETRY_TYPE.POINT) {
+            gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+            gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+        } else {
+            // lines & polygon (antialiasing)
             const antialiasingScale = (window.devicePixelRatio || 1) >= 2 ? 1 : 2;
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._AAFB);
             const [w, h] = [gl.drawingBufferWidth, gl.drawingBufferHeight];
@@ -304,11 +213,9 @@ export default class Renderer {
             gl.clear(gl.COLOR_BUFFER_BIT);
         }
 
-        const scale = 1.0 / this._zoom;
-
         const { orderingMins, orderingMaxs } = getOrderingRenderBuckets(renderLayer);
 
-        if (dataframes[0].type === 'line' || dataframes[0].type === 'polygon') {
+        if (dataframes[0].type === GEOMETRY_TYPE.LINE || dataframes[0].type === GEOMETRY_TYPE.POLYGON) {
             gl.clearDepth(1);
             gl.depthRange(0, 1);
             gl.depthFunc(gl.NOTEQUAL);
@@ -318,16 +225,17 @@ export default class Renderer {
 
         const renderDrawPass = orderingIndex => dataframes.forEach(dataframe => {
             let freeTexUnit = 0;
-            let renderer = null;
-            if (!viz.label.default) {
-                renderer = viz.labelShader;
-            } else if (dataframe.type === 'point') {
-                renderer = viz.pointShader;
-            } else if (dataframe.type === 'line') {
-                renderer = viz.lineShader;
+            let metaRenderer = null;
+            if (!viz.symbol.default) {
+                metaRenderer = viz.symbolMetaShader;
+            } else if (dataframe.type === GEOMETRY_TYPE.POINT) {
+                metaRenderer = viz.pointMetaShader;
+            } else if (dataframe.type === GEOMETRY_TYPE.LINE) {
+                metaRenderer = viz.lineMetaShader;
             } else {
-                renderer = viz.polygonShader;
+                metaRenderer = viz.polygonMetaShader;
             }
+            const renderer = metaRenderer.shader;
             gl.useProgram(renderer.program);
 
             // if (!viz.label.default) {
@@ -338,17 +246,9 @@ export default class Renderer {
             gl.uniform1f(renderer.orderMinWidth, orderingMins[orderingIndex]);
             gl.uniform1f(renderer.orderMaxWidth, orderingMaxs[orderingIndex]);
 
-            gl.uniform2f(renderer.vertexScaleUniformLocation,
-                (scale / aspect) * dataframe.scale,
-                scale * dataframe.scale);
-            gl.uniform2f(renderer.vertexOffsetUniformLocation,
-                (scale / aspect) * (this._center.x - dataframe.center.x),
-                scale * (this._center.y - dataframe.center.y));
-            gl.uniform2f(renderer.normalScale, 1 / gl.canvas.clientWidth, 1 / gl.canvas.clientHeight);
-
-            dataframe.vertexScale = [(scale / aspect) * dataframe.scale, scale * dataframe.scale];
-
-            dataframe.vertexOffset = [(scale / aspect) * (this._center.x - dataframe.center.x), scale * (this._center.y - dataframe.center.y)];
+            // Define some scalar uniforms
+            gl.uniform1f(renderer.normalScale, 1 / (Math.pow(2, drawMetadata.zoomLevel) * RESOLUTION_ZOOMLEVEL_ZERO * dataframe.scale));
+            gl.uniform2f(renderer.resolution, gl.canvas.width / window.devicePixelRatio, gl.canvas.height / window.devicePixelRatio);
 
             gl.enableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.vertexBuffer);
@@ -358,26 +258,31 @@ export default class Renderer {
             gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.featureIDBuffer);
             gl.vertexAttribPointer(renderer.featureIdAttr, 2, gl.FLOAT, false, 0, 0);
 
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.enableVertexAttribArray(renderer.normalAttr);
                 gl.bindBuffer(gl.ARRAY_BUFFER, dataframe.normalBuffer);
                 gl.vertexAttribPointer(renderer.normalAttr, 2, gl.FLOAT, false, 0, 0);
             }
 
+            // Common Style textures
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texColor);
             gl.uniform1i(renderer.colorTexture, freeTexUnit);
             freeTexUnit++;
 
             gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
-            gl.uniform1i(renderer.widthTexture, freeTexUnit);
-            freeTexUnit++;
-
-            gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
             gl.bindTexture(gl.TEXTURE_2D, dataframe.texFilter);
             gl.uniform1i(renderer.filterTexture, freeTexUnit);
             freeTexUnit++;
+
+            gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+            // Specific Style textures
+            if (dataframe.type === 'point' || dataframe.type === 'line') {
+                gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
+                gl.bindTexture(gl.TEXTURE_2D, dataframe.texWidth);
+                gl.uniform1i(renderer.widthTexture, freeTexUnit);
+                freeTexUnit++;
+            }
 
             if (!viz.label.default) {
                 const textureId = viz.labelShader.textureIds.get(viz);
@@ -407,19 +312,17 @@ export default class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
             }
 
             if (!viz.symbol.default) {
-                const textureId = viz.symbolShader.textureIds.get(viz);
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.symbol._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbol._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbol._setTimestamp(timestamp);
+                viz.symbol._preDraw(renderer.program, drawMetadata, gl);
 
-                viz.symbolPlacement._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.symbolPlacement._preDraw(viz.symbolShader.program, drawMetadata, gl);
+                viz.symbolPlacement._setTimestamp(timestamp);
+                viz.symbolPlacement._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -429,9 +332,7 @@ export default class Renderer {
                     gl.uniform1i(textureId[name], freeTexUnit);
                     freeTexUnit++;
                 });
-
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
-            } else if (dataframe.type !== 'line') {
+            } else if (dataframe.type !== GEOMETRY_TYPE.LINE) {
                 // Lines don't support stroke
                 gl.activeTexture(gl.TEXTURE0 + freeTexUnit);
                 gl.bindTexture(gl.TEXTURE_2D, dataframe.texStrokeColor);
@@ -444,16 +345,16 @@ export default class Renderer {
                 freeTexUnit++;
             }
 
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
-                gl.clear(gl.DEPTH_BUFFER_BIT);
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
+                gl.clear(gl.DEPTH_BUFFER_BIT); // antialising-related
             }
 
-            if (!viz.offset.default) {
-                const textureId = renderer.textureIds.get(viz);
+            if (!viz.transform.default) {
+                const textureId = metaRenderer.textureIds;
                 // Enforce that property texture and style texture TextureUnits don't clash with auxiliar ones
                 drawMetadata.freeTexUnit = freeTexUnit + Object.keys(textureId).length;
-                viz.offset._setTimestamp((Date.now() - INITIAL_TIMESTAMP) / 1000.0);
-                viz.offset._preDraw(renderer.program, drawMetadata, gl);
+                viz.transform._setTimestamp(timestamp);
+                viz.transform._preDraw(renderer.program, drawMetadata, gl);
 
                 freeTexUnit = drawMetadata.freeTexUnit;
 
@@ -464,14 +365,17 @@ export default class Renderer {
                     freeTexUnit++;
                 });
 
-                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height);
+                gl.uniform2f(renderer.resolution, gl.canvas.width, gl.canvas.height); // remove it ? (duplicated)
             }
+
+            gl.uniformMatrix4fv(renderer.matrix, false, dataframe.matrix);
 
             gl.drawArrays(gl.TRIANGLES, 0, dataframe.numVertex);
 
+            // Some cleaning...
             gl.disableVertexAttribArray(renderer.vertexPositionAttribute);
             gl.disableVertexAttribArray(renderer.featureIdAttr);
-            if (dataframe.type === 'line' || dataframe.type === 'polygon') {
+            if (dataframe.type === GEOMETRY_TYPE.LINE || dataframe.type === GEOMETRY_TYPE.POLYGON) {
                 gl.disableVertexAttribArray(renderer.normalAttr);
                 gl.disable(gl.DEPTH_TEST);
             }
@@ -480,7 +384,7 @@ export default class Renderer {
             renderDrawPass(orderingIndex);
         });
 
-        if (renderLayer.type !== 'point') {
+        if (renderLayer.type !== GEOMETRY_TYPE.POINT) {
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
@@ -498,7 +402,24 @@ export default class Renderer {
             gl.disableVertexAttribArray(this._aaBlendShader.vertexAttribute);
         }
 
-        gl.disable(gl.CULL_FACE);
+        gl.disable(gl.CULL_FACE); // ? not needed from v0.50?
+    }
+
+    _updateDataframeMatrices (dataframes) {
+        dataframes.forEach(dataframe => {
+            let m2 = [];
+            let m3 = [];
+            mat4.copy(m2, this.matrix);
+            mat4.identity(m3);
+            mat4.translate(m3, m3, [0.5, 0.5, 0]);
+            mat4.scale(m3, m3, [0.5, -0.5, 1]);
+
+            mat4.translate(m3, m3, [dataframe.center.x, dataframe.center.y, 0]);
+            mat4.scale(m3, m3, [dataframe.scale, dataframe.scale, 1]);
+
+            mat4.multiply(m2, m2, m3);
+            dataframe.matrix = m2;
+        });
     }
 
     /**
@@ -527,4 +448,46 @@ function getOrderingRenderBuckets (renderLayer) {
         orderingMins,
         orderingMaxs
     };
+}
+
+function getValidWebGLContextOrThrow (canvas, gl) {
+    const reasons = unsupportedBrowserReasons(canvas, gl, true);
+    if (reasons.length > 0) {
+        throw reasons[0];
+    }
+    return gl;
+}
+
+export function isBrowserSupported (canvas, gl) {
+    const reasons = unsupportedBrowserReasons(canvas, gl);
+    return reasons.length === 0;
+}
+
+export function unsupportedBrowserReasons (canvas, gl, early = false) {
+    const reasons = [];
+    if (!gl) {
+        if (!canvas) {
+            canvas = document.createElement('canvas');
+        }
+        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    }
+    if (!gl) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL 1 is unsupported`));
+        return reasons;
+    }
+
+    const OESTextureFloat = gl.getExtension('OES_texture_float');
+    if (!OESTextureFloat) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL extension 'OES_texture_float' is unsupported`));
+        if (early) {
+            return reasons;
+        }
+    }
+
+    const supportedRTT = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+    if (supportedRTT < RTT_WIDTH) {
+        reasons.push(new CartoRuntimeError(`${crt.WEB_GL} WebGL parameter 'gl.MAX_RENDERBUFFER_SIZE' is below the requirement: ${supportedRTT} < ${RTT_WIDTH}`));
+    }
+
+    return reasons;
 }

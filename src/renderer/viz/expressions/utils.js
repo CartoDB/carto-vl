@@ -1,11 +1,26 @@
-import { number, category, array, imageList } from '../expressions';
+import { number, category, list, rgba } from '../expressions';
 import BaseExpression from './base';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoParsingError from '../../../errors/carto-parsing-error';
+import { interpolateRGBAinCieLAB } from '../colorspaces';
 
 export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new Error(`Expression ${expressionName} accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new CartoValidationError(`${cvt.TOO_MANY_ARGS} Expression '${expressionName}' accepts just ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkMinArguments (constructorArguments, minArguments, expressionName) {
+    if (constructorArguments.length < minArguments) {
+        throw new CartoValidationError(`${cvt.NOT_ENOUGH_ARGS} Expression '${expressionName}' accepts at least ${minArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkExactNumberOfArguments (constructorArguments, numArguments, expressionName) {
+    if (constructorArguments.length !== numArguments) {
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts exactly ${numArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
@@ -14,16 +29,15 @@ export function implicitCast (value) {
     if (_isNumber(value)) {
         return number(value);
     }
+
     if (typeof value === 'string') {
         return category(value);
     }
+
     if (Array.isArray(value)) {
-        const _array = array(value);
-        if (_array && _array.type === 'image-array') {
-            return imageList(_array.elems);
-        }
-        return _array;
+        return list(value);
     }
+
     return value;
 }
 
@@ -72,7 +86,11 @@ export function hexToRgb (hex) {
         };
     }
 
-    throw new Error('Invalid hexadecimal color');
+    throw new CartoParsingError('Invalid hexadecimal color');
+}
+
+export function noOverrideColor () {
+    return rgba(255, 255, 255, 0);
 }
 
 export function getOrdinalFromIndex (index) {
@@ -88,39 +106,45 @@ export function getOrdinalFromIndex (index) {
 export function getStringErrorPreface (expressionName, parameterName, parameterIndex) {
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
+
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-expected type was '${expectedType}', actual type was '${actualType}'`);
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    expected type was '${expectedType}', actual type was '${actualType}'`);
 }
 
-export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass, actualInstance) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was instance of '${expectedClass.name}'`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     type of '${number}' is ${typeof number}, 'number' was expected`);
 }
 
 export function throwInvalidArray (expressionName, parameterName, parameterIndex, array) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     '${array}' is not an array`);
 }
 
 export function throwInvalidString (expressionName, parameterName, parameterIndex, str) {
-    throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was 'string', but ${str}' is not a string`);
+}
+
+export function throwInvalidStringValue (expressionName, parameterName, parameterIndex, str, validValues) {
+    throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+    value '${str}' is not valid. It should be one of ${validValues.map(v => `'${v}'`).join(', ')}`);
 }
 
 // Returns true if the argument is of a type that cannot be strictly checked at constructor time
 export function isArgConstructorTimeTyped (arg) {
     switch (arg) {
         case 'number':
-        case 'number-array':
+        case 'number-list':
         case 'number-property':
         case 'category':
-        case 'category-array':
+        case 'category-list':
         case 'category-property':
             return false;
         default:
@@ -130,8 +154,8 @@ export function isArgConstructorTimeTyped (arg) {
 
 export function checkExpression (expressionName, parameterName, parameterIndex, parameter) {
     if (!(parameter instanceof BaseExpression)) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-        '${parameter}' is not of type carto.expressions.Base`);
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        '${parameter}' is not of type "carto.expressions.Base"`);
     }
 }
 
@@ -142,7 +166,7 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
             parameter.type === type
         );
         if (!ok) {
-            throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
             expected type was one of ${expectedType.join()}, actual type was '${parameter.type}'`);
         }
     } else if (parameter.type !== expectedType) {
@@ -153,7 +177,7 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
 export function checkInstance (expressionName, parameterName, parameterIndex, expectedClass, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
     if (!(parameter.isA(expectedClass))) {
-        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass, parameter.type);
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass);
     }
 }
 
@@ -169,6 +193,14 @@ export function checkString (expressionName, parameterName, parameterIndex, str)
     }
 }
 
+export function checkStringValue (expressionName, parameterName, parameterIndex, str, validValues) {
+    if (typeof str !== 'string') {
+        throwInvalidString(expressionName, parameterName, parameterIndex, str);
+    } else if (!validValues.includes(str)) {
+        throwInvalidStringValue(expressionName, parameterName, parameterIndex, str, validValues);
+    }
+}
+
 export function checkArray (expressionName, parameterName, parameterIndex, array) {
     if (!Array.isArray(array)) {
         throwInvalidArray(expressionName, parameterName, parameterIndex, array);
@@ -177,8 +209,15 @@ export function checkArray (expressionName, parameterName, parameterIndex, array
 
 export function checkFeatureIndependent (expressionName, parameterName, parameterIndex, parameter) {
     if (parameter.isFeatureDependent()) {
-        throw new Error(`${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
         parameter cannot be feature dependent`);
+    }
+}
+
+export function checkFeatureDependent (expressionName, parameterName, parameterIndex, parameter) {
+    if (!parameter.isFeatureDependent()) {
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        parameter must be feature dependent`);
     }
 }
 
@@ -187,7 +226,13 @@ export function clamp (x, min, max) {
 }
 
 export function mix (x, y, a) {
-    return x * (1 - a) + y * a;
+    return typeof x === 'number'
+        ? x * (1 - a) + y * a
+        : interpolateRGBAinCieLAB(x, y, a);
+}
+
+export function fract (x) {
+    return x - Math.floor(x);
 }
 
 function _isNumber (value) {

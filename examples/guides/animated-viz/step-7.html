@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Animation | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,200,400,500" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+
+    <!-- Include custom embed styles -->
+    <style type="text/css">
+        aside.toolbox {
+            right: 96px;
+        }
+
+        .box {
+            width: 320px;
+            background: #f2f2f2;
+        }
+
+        section {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        hr {
+            margin: 15px auto;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            border: 1px solid white;
+            background: transparent;
+            border: none;
+
+            cursor: pointer;
+            flex: 1;
+            padding: auto 10px;
+
+            margin: auto 5px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+            margin-top: -4px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        input[type=range]::-moz-range-track {
+            height: 3px;
+            background: #1785FB;
+            border: none;
+            border-radius: 3px;
+        }
+
+        input[type=range]::-moz-range-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+
+        input[type=range].white-thumb::-moz-range-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range].white-thumb::-webkit-slider-thumb {
+            border-radius: 50%;
+            border: 3px solid #1785FB;
+            background: white;
+            height: 15px;
+            width: 15px;
+            margin-top: -6px;
+        }
+
+        input[type=range].white-thumb::-ms-thumb {
+            border-radius: 50%;
+            border: 2px solid #1785FB;
+            background: white;
+            height: 12px;
+            width: 12px;
+        }
+
+        input[type=range]:-moz-focusring {
+            outline: 1px solid white;
+            outline-offset: -1px;
+        }
+
+        input[type=range]::-ms-track {
+            height: 3px;
+            background: transparent;
+            border-color: transparent;
+            border-width: 6px 0;
+            color: transparent;
+        }
+
+        input[type=range]::-ms-fill-lower {
+            background: #1785FB;
+        }
+
+        input[type="range"]::-moz-range-progress {
+            background: #1785FB;
+        }
+
+        input[type=range]::-ms-fill-upper {
+            background: #ccc;
+        }
+
+        input[type="range"]::-moz-range-track {
+            background: #ccc;
+        }
+
+        input[type=range]::-ms-thumb {
+            border: none;
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background: #1785FB;
+        }
+
+        input[type="button"] {
+            width: 36px;
+            height: 36px;
+            border-radius: 4px;
+            border: 0;
+            box-shadow: none;
+            color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            font: 500 12px/20px 'Roboto';
+            margin: 0;
+            margin-right: 10px;
+        }
+
+        #map {
+            flex: 1;
+        }
+
+        #js-duration-span {
+            background: white;
+            border: 1px solid #ddd;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #js-play-button {
+            background: url('./play.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
+
+        #js-pause-button {
+            background: url('./pause.svg') no-repeat;
+            background-color: #1785FB;
+            background-position: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Map goes here -->
+    <div id="map"></div>
+
+    <!-- Animation control elements -->
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Animation controls</h1>
+            </header>
+            <section style="margin-top: 15px;">
+                <input type="button" id="js-play-button" disabled>
+                <input type="button" id="js-pause-button">
+                <input type="range" id="js-time-range" min="0" max="1" step="0.01">
+            </section>
+            <br />
+            <section>
+                <span id="js-current-time" class="open-sans"></span>
+            </section>
+            <hr>
+            <section>
+                <span style="margin-right: 5px" class="open-sans">Duration (seconds)</span>
+                <input class="white-thumb" type="range" id="js-duration-range" min="1" max="60" step="1">
+                <span style="margin-left: 5px" class="open-sans" id="js-duration-span">10</span>
+            </section>
+        </div>
+    </aside>
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-0.12796893854942937, 35.1654623242204],
+            zoom: 2.8,
+            scrollZoom: false
+        });
+
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        //** CARTO VL functionality begins here **//
+
+        // Autenticate the client
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const source = new carto.source.Dataset('bird_journey');
+
+        // Define and style Viz object
+        const viz = new carto.Viz(`
+            @duration: 10
+            @animation: animation(@timeSteps, @duration, fade(0, 0.5))
+            @timeSteps: linear($date_time, time('2014-03-30T20:24:25Z'), time('2014-04-24T23:52:14Z'))
+            color: ramp(@timeSteps, SunsetDark)
+            filter: @animation
+            width: 10
+            strokeWidth: 0
+        `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add map layer
+        layer.addTo(map, 'watername_ocean');
+
+        // Get HTML elements
+        const $playbutton = document.getElementById('js-play-button');
+        const $pausebutton = document.getElementById('js-pause-button');
+        const $durationRange = document.getElementById('js-duration-range');
+        const $timeRange = document.getElementById('js-time-range');
+        const $spanDuration = document.getElementById('js-duration-span');
+        const $currentTime = document.getElementById('js-current-time');
+
+        // Listen to layer events
+        let last = $timeRange.value;
+
+        layer.on('updated', () => {
+            if ($timeRange.value == last) {
+                $timeRange.value = viz.variables.animation.getProgressPct();
+                last = $timeRange.value;
+            }
+            $currentTime.innerText = viz.variables.animation.getProgressValue().toISOString();
+        });
+
+        $timeRange.addEventListener('change', () => {
+            // Update animation progress
+            viz.variables.animation.setProgressPct($timeRange.value);
+            last = $timeRange.value;
+        });
+
+        // Listen to interaction events
+        $durationRange.addEventListener('change', () => {
+            const duration = parseInt($durationRange.value, 10);
+            // Update animation duration
+            viz.variables.duration = $spanDuration.innerHTML = duration;
+        });
+
+        $playbutton.addEventListener('click', () => {
+            // Play the animation
+            viz.variables.animation.play()
+            $playbutton.disabled = true;
+            $pausebutton.disabled = false;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
+        });
+
+        $pausebutton.addEventListener('click', () => {
+            // Pause the animation
+            viz.variables.animation.pause();
+            $playbutton.disabled = false;
+            $pausebutton.disabled = true;
+            console.log('Playing: ', viz.variables.animation.isPlaying());
+        });
+    </script>
+</body>
+
+</html>

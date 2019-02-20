@@ -6,7 +6,7 @@
  *  - **strokeColor**: stroke/border color of points and polygons, not applicable to lines
  *  - **width**: fill diameter of points, thickness of lines, not applicable to polygons
  *  - **strokeWidth**: stroke width of points and polygons, not applicable to lines
- *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test
+ *  - **filter**: filter features by removing from rendering and interactivity all the features that don't pass the test.
  *  - **symbol** - show an image instead in the place of points
  *  - **symbolPlacement** - when using `symbol`, offset to apply to the image
  *  - **order**: - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
@@ -66,6 +66,13 @@
  */
 
 /**
+ * Depending on the output, each expression has a different type
+ *
+ * @namespace Types
+ * @api
+ */
+
+/**
  * Type of Numeric Expressions.
  *
  * Associated to expressions that return is an integer or float. When these expressions are evaluated it should return a JavaScript number.
@@ -73,6 +80,8 @@
  * JavaScript numbers are automatically converted to Numeric Expressions.
  *
  * @typedef {} Number
+ * @name Number
+ * @memberof Types
  * @api
  */
 
@@ -84,6 +93,8 @@
  * JavaScript strings are automatically converted to Category Expressions.
  *
  * @typedef {} Category
+ * @name Category
+ * @memberof Types
  * @api
  */
 
@@ -97,6 +108,8 @@
  * ```
  *
  * @typedef {} Color
+ * @name Color
+ * @memberof Types
  * @api
  */
 
@@ -104,6 +117,8 @@
  * Type of Date Expressions.
  *
  * @typedef {} Date
+ * @name Date
+ * @memberof Types
  * @api
  */
 
@@ -111,6 +126,8 @@
  * Type of Fade Expressions.
  *
  * @typedef {} Fade
+ * @name Fade
+ * @memberof Types
  * @api
  */
 
@@ -120,12 +137,314 @@
  * More information in {@link carto.expressions.palettes|carto.expressions.palettes}.
  *
  * @typedef {} Palette
+ * @name Palette
+ * @memberof Types
  * @api
  */
 
-import Transition from './expressions/transition';
+/**
+ * Type of Image Expressions.
+ *
+ * More information in {@link carto.expressions.image|carto.expressions.image}.
+ *
+ * @typedef {} Image
+ * @name Image
+ * @memberof Types
+ * @api
+ */
 
-import BaseArray from './expressions/basic/array';
+/**
+ * Type of Transformation expressions.
+ *
+ * More information in {@link carto.expressions.rotate|carto.expressions.rotate} and {@link carto.expressions.translate|carto.expressions.translate} expressions.
+ *
+ * @typedef {} Transformation
+ * @name Transformation
+ * @memberof Types
+ * @api
+ */
+
+/**
+ * Type of Placement expressions.
+ *
+ * More information in {@link carto.expressions.placement|carto.expressions.placement} expression.
+ *
+ * @typedef {} Placement
+ * @name Placement
+ * @memberof Types
+ * @api
+ */
+
+/**
+ * Type of Ordered Expressions.
+ *
+ * Order expressions are {@link carto.expressions.asc|carto.expressions.asc}, {@link carto.expressions.desc|carto.expressions.desc} and {@link carto.expressions.noOrder|carto.expressions.noOrder}.
+ *
+ * @typedef {} Order
+ * @name Order
+ * @memberof Types
+ * @api
+ */
+
+/**
+ * @namespace Constants
+ * @api
+ *
+*/
+
+/**
+ * Constant FALSE value. Equivalent to `carto.expressions.constant(0)`
+ *
+ * @name expressions.FALSE
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant TRUE value. Equivalent to `carto.expressions.constant(1)`
+ *
+ * @name expressions.TRUE
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant ALIGN_CENTER translation. Equivalent to `carto.expressions.translate(0, 0)`.
+ * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
+ *
+ * @name expressions.ALIGN_CENTER
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant ALIGN_BOTTOM translation. Equivalent to `carto.expressions.translate(0, 1)`.
+ * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
+ *
+ * @name expressions.ALIGN_BOTTOM
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant PI number.
+ *
+ * @name expressions.PI
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant E number.
+ *
+ * @name expressions.E
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * Constant HOLD number. Max Safe Integer number to be used to "hold" the Fade expression.
+ * Read more about fading in {@link carto.expressions.fade|carto.expressions.fade}
+ *
+ * @name expressions.HOLD
+ * @memberof Constants
+ * @api
+*/
+
+/**
+ * @namespace Icons
+ * @api
+ *
+*/
+
+/**
+ * Constant BICYCLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.BICYCLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant BUILDING icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.BUILDING
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant BUS icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.BUS
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CAR icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.CAR
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CIRCLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.CIRCLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CIRCLE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.CIRCLE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant CROSS icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.CROSS
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant FLAG icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.FLAG
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant HOUSE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.HOUSE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant MARKER icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.MARKER
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant MARKER_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.MARKER_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant SQUARE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.SQUARE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant SQUARE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.SQUARE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant STAR icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.STAR
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant STAR_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.STAR_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant TRIANGLE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.TRIANGLE
+ * @memberof Icons
+ * @api
+*/
+
+/**
+ * Constant TRIANGLE_OUTLINE icon.
+ * Read more about how to use constant icons in {@link carto.expressions.image|carto.expressions.image}.
+ * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
+ * There is a list with all the default {@link icons.showcase|icons} available.
+ *
+ * @name expressions.TRIANGLE_OUTLINE
+ * @memberof Icons
+ * @api
+*/
+
+import Transition from './expressions/transition';
 
 import { In } from './expressions/belongs';
 import { Nin } from './expressions/belongs';
@@ -162,6 +481,8 @@ import ClusterMode from './expressions/aggregation/cluster/ClusterMode';
 import ClusterSum from './expressions/aggregation/cluster/ClusterSum';
 import ClusterCount from './expressions/aggregation/cluster/ClusterCount';
 
+import ClusterTime from './expressions/aggregation/cluster/ClusterTime';
+
 import Constant from './expressions/basic/constant';
 
 import Hex from './expressions/color/hex';
@@ -191,7 +512,7 @@ import { NoOrder } from './expressions/ordering';
 import { Width } from './expressions/ordering';
 
 import palettes from './expressions/color/palettes';
-import reverseFn from './expressions/reverse/reverse';
+import Reverse from './expressions/reverse/Reverse';
 
 import Property from './expressions/basic/property';
 
@@ -203,12 +524,14 @@ import ViewportEqIntervals from './expressions/classification/ViewportEqInterval
 import ViewportQuantiles from './expressions/classification/ViewportQuantiles';
 import ViewportStandardDev from './expressions/classification/ViewportStandardDev';
 
-import Ramp from './expressions/ramp';
+import Ramp from './expressions/Ramp';
+import List from './expressions/basic/List';
 
 import { RGB } from './expressions/color/rgb';
 import { RGBA } from './expressions/color/rgb';
 
 import Time from './expressions/time';
+import TimeRangeExpr from './expressions/timeRange';
 
 import Top from './expressions/top';
 
@@ -221,7 +544,7 @@ import { Sin } from './expressions/unary';
 import { Cos } from './expressions/unary';
 import { Tan } from './expressions/unary';
 import { Sign } from './expressions/unary';
-import { Abs, IsNaN } from './expressions/unary';
+import { Abs, IsNull } from './expressions/unary';
 import { Not } from './expressions/unary';
 import { Floor } from './expressions/unary';
 import { Ceil } from './expressions/unary';
@@ -247,21 +570,20 @@ import ViewportFeatures from './expressions/viewportFeatures';
 
 import Zoom from './expressions/zoom';
 
-import Placement from './expressions/placement';
+import Placement from './expressions/Placement';
 import Image from './expressions/Image';
-import ImageList from './expressions/ImageList';
 import SVG from './expressions/SVG';
 import svgs from './defaultSVGs';
 import Text from './expressions/Text';
 import Zoomrange from './expressions/Zoomrange';
 import Scaled from './expressions/Scaled';
 import AlphaNormalize from './expressions/AlphaNormalize';
+import Translate from './expressions/transformation/Translate';
+import Rotate from './expressions/transformation/Rotate';
 
 /* Expose classes as constructor functions */
 
 export const transition = (...args) => new Transition(...args);
-
-export const array = (...args) => new BaseArray(...args);
 
 const in_ = (...args) => new In(...args);
 export const nin = (...args) => new Nin(...args);
@@ -303,10 +625,11 @@ export const clusterMode = (...args) => new ClusterMode(...args);
 export const clusterSum = (...args) => new ClusterSum(...args);
 export const clusterCount = (...args) => new ClusterCount(...args);
 
+export const clusterTime = (...args) => new ClusterTime(...args);
+
 export const constant = (...args) => new Constant(...args);
 
 export const image = (...args) => new Image(...args);
-export const imageList = (...args) => new ImageList(...args);
 export const text = (...args) => new Text(...args);
 
 export const svg = (...args) => new SVG(...args);
@@ -323,6 +646,7 @@ export const cubic = (...args) => new Cubic(...args);
 export const ilinear = (...args) => new ILinear(...args);
 
 export const linear = (...args) => new Linear(...args);
+export const list = (...args) => new List(...args);
 
 export const namedColor = (...args) => new NamedColor(...args);
 
@@ -337,7 +661,7 @@ export const desc = (...args) => new Desc(...args);
 export const noOrder = (...args) => new NoOrder(...args);
 export const width = (...args) => new Width(...args);
 
-export const reverse = reverseFn;
+export const reverse = (...args) => new Reverse(...args);
 
 export const property = (...args) => new Property(...args);
 export { property as prop };
@@ -361,6 +685,8 @@ export const category = (...args) => new BaseCategory(...args);
 export const time = (...args) => new Time(...args);
 export { time as date };
 
+export const timeRange = (...args) => new TimeRangeExpr(...args);
+
 export const top = (...args) => new Top(...args);
 
 export const fade = (...args) => new Fade(...args);
@@ -373,7 +699,7 @@ export const cos = (...args) => new Cos(...args);
 export const tan = (...args) => new Tan(...args);
 export const sign = (...args) => new Sign(...args);
 export const abs = (...args) => new Abs(...args);
-export const isNaN = (...args) => new IsNaN(...args);
+export const isNull = (...args) => new IsNull(...args);
 export const not = (...args) => new Not(...args);
 export const floor = (...args) => new Floor(...args);
 export const ceil = (...args) => new Ceil(...args);
@@ -401,6 +727,8 @@ export const scaled = (...args) => new Scaled(...args);
 export const zoomrange = (...args) => new Zoomrange(...args);
 
 export const placement = (...args) => new Placement(...args);
+export const translate = (...args) => new Translate(...args);
+export const rotate = (...args) => new Rotate(...args);
 export const alphaNormalize = (...args) => new AlphaNormalize(...args);
 
 export const HOLD = new Constant(Number.MAX_SAFE_INTEGER);

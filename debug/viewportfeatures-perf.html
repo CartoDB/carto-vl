@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Taxi pickups | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- Include CARTO VL JS -->
+  <script src="../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Taxi pickups</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Multi-scale animation with color interpolation through time of day and sized
+          by trip distance</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-74.0032059, 40.7482066],
+      zoom: 12,
+      scrollZoom: false,
+
+
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    // Define user
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define layer
+    const source = new carto.source.Dataset('taxi_50k');
+    const viz = new carto.Viz(`
+     width: ($fare_amount/15000)*scaled(1)
+     filter: animation($tpep_pickup_datetime,10,fade(0.2,0.2)) + 0.6
+     // filter: $trip_distance>10
+     color: rgba(255,255,255,0.2)
+     strokeColor: ramp(linear($tpep_pickup_datetime,time('2016-05-01T00:08:39Z'),time('2016-05-06T10:29:11Z')),[#CF1C90,#F8CA00,#9BBD4D,#07A5AB,#B100EB])
+     strokeWidth: ($trip_distance/30000)*scaled(1)
+     @wadus: viewportAvg($trip_distance)
+     @wadus2: viewportFeatures($fare_amount)
+   `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+    layer.on('updated', () => {
+      if (!window.feature) {
+        window.feature = viz.variables.wadus2.value[0];
+        window.feature && window.feature.width.blendTo(200);
+        window.feature && window.feature.color.blendTo('red');
+      }
+      // console.log(viz.variables.wadus2.value.length);
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

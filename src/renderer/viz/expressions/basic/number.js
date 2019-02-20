@@ -38,9 +38,19 @@ export default class BaseNumber extends BaseExpression {
     eval () {
         return this.expr;
     }
+
+    toString () {
+        return `${this.expr}`;
+    }
+
     isAnimated () {
         return false;
     }
+
+    isPlaying () {
+        return false;
+    }
+
     _applyToShaderSource () {
         return {
             preface: this._prefaceCode(`uniform float number${this._uid};`),

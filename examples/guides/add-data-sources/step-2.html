@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2
+        });
+
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+
+        //** CARTO VL functionality begins here **//
+
+
+        // DATASET
+        // Define Dataset source with custom credentials
+        const citiesSource = new carto.source.Dataset('populated_places', {
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const citiesViz = new carto.Viz(`
+            color: grey
+            width: 4
+        `);
+        const citiesLayer = new carto.Layer('cities', citiesSource, citiesViz);
+        citiesLayer.addTo(map);
+
+
+        // GEOJSON
+        // Create GeoJSON content
+        const offices = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-73.944158, 40.678178]
+                    },
+                    "properties": {
+                        "address": "Brooklyn, New York"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-3.70379, 40.416775]
+                    },
+                    "properties": {
+                        "address": "Madrid, Spain"
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-77.036871, 38.907192]
+                    },
+                    "properties": {
+                        "address": "Washington, DC"
+                    }
+                }
+            ]
+        };
+
+        // Define GeoJSON source
+        const officesSource = new carto.source.GeoJSON(offices);
+
+        const officesViz = new carto.Viz(`
+            color: red
+            width: 20
+        `);
+        const officesLayer = new carto.Layer('offices', officesSource, officesViz);
+        officesLayer.addTo(map);
+    </script>
+</body>
+
+</html>

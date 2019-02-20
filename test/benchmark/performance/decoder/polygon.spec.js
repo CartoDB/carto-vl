@@ -1,5 +1,6 @@
 import { decodeGeom } from '../../../../src/renderer/decoder';
 import GeoJSON from '../../../../src/sources/GeoJSON';
+import { GEOMETRY_TYPE } from '../../../../src/utils/geometry';
 
 const geojson = new GeoJSON({
     'type': 'Feature',
@@ -18,5 +19,5 @@ const geojson = new GeoJSON({
 const polygonGeometry = geojson._decodeGeometry();
 
 falcon.benchmark('decodePolygon', () => {
-    decodeGeom('polygon', polygonGeometry);
-}, {runs: 10000});
+    decodeGeom(GEOMETRY_TYPE.POLYGON, polygonGeometry);
+}, { runs: 10000 });

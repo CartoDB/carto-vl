@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <style>
+        #js-zoom {
+            position: absolute;
+            bottom: 0;
+            padding: 0 5px;
+            background-color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+            color: rgba(0, 0, 0, 0.75);
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <div id="js-zoom"></div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-123.098599, 49.240685],
+            zoom: 11
+        });
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        function updateZoom() {
+            const zoom = map.getZoom().toFixed(2);
+            document.getElementById('js-zoom').innerText = `Zoom: ${zoom}`;
+        }
+        map.on('load', updateZoom);
+        map.on('move', updateZoom);
+
+        //** CARTO VL functionality begins here **//
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset('vancouver_trees');
+        const viz = new carto.Viz(`
+            color: white
+            strokeColor: green
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>

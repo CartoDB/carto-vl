@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.voyager,
+            center: [0, 30],
+            zoom: 2
+        });
+
+        // Add zoom controls
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+
+        // MAP EVENTS
+        // Wait for the map to render for the first time
+        map.on('load', () => {
+            console.log('Map has loaded!');
+        });
+
+        // Listen to every move event caused by the user
+        const displayCenter = () => {
+            const center = map.getCenter();
+            const longitude = center.lng.toFixed(6);
+            const latitude = center.lat.toFixed(6);
+            const bearing = map.getBearing().toFixed(0);
+            const zoom = map.getZoom().toFixed(2);
+            console.log(`Center: [${longitude}, ${latitude}] - Zoom: ${zoom} - Bearing: ${bearing} degrees`);
+        };
+        map.on('move', displayCenter);
+
+
+        //** CARTO VL functionality begins here **//
+
+
+        // LAYER EVENTS & VARIABLES
+        carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
+        const source = new carto.source.Dataset('populated_places');
+
+        // Viz using a dynamic variable
+        const viz = new carto.Viz(`
+            @currentFeatures: viewportCount()
+        `);
+        const layer = new carto.Layer('Cities', source, viz);
+        layer.addTo(map);
+
+        // Add on 'loaded' event handler to layer
+        layer.on('loaded', () => {
+            console.log('Cities layer has been loaded!');
+        });
+
+        // Disable map move listener
+        map.off('move', displayCenter);
+
+        // Add on 'updated' event handler to layer
+        const displayNumberOfCities = () => {
+            const numberOfFeatures = viz.variables.currentFeatures.value;
+            console.log(`Now you can see ${numberOfFeatures} cities`);
+        };
+        layer.on('updated', displayNumberOfCities);
+
+    </script>
+</body>
+
+</html>

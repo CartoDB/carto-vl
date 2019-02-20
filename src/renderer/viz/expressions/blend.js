@@ -1,6 +1,7 @@
 import { implicitCast, clamp, mix, checkType, checkExpression, checkMaxArguments } from './utils';
 import Transition from './transition';
 import BaseExpression from './base';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 
 /**
  * Linearly interpolate from `a` to `b` based on `mix`.
@@ -43,10 +44,6 @@ export default class Blend extends BaseExpression {
         checkExpression('blend', 'b', 1, b);
         checkExpression('blend', 'mix', 2, mix);
 
-        if (a.type && b.type) {
-            abTypeCheck(a, b);
-        }
-
         // TODO check interpolator type
         const originalMix = mix;
         if (interpolator) {
@@ -84,7 +81,6 @@ export default class Blend extends BaseExpression {
         super._preDraw(...args);
         if (this.originalMix.isA(Transition) && !this.originalMix.isAnimated()) {
             this.parent.replaceChild(this, this.b);
-            this.notify();
         }
     }
 }
@@ -93,6 +89,6 @@ function abTypeCheck (a, b) {
     const validTypes = ['number', 'color', 'image', 'placement'];
 
     if (a.type !== b.type || !(validTypes.includes(a.type))) {
-        throw new Error(`blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was ${b.type}'`);
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} blend(): invalid parameter types\n\t'a' type was '${a.type}'\n\t'b' type was '${b.type}'`);
     }
 }

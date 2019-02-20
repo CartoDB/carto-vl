@@ -1,14 +1,18 @@
 import { version } from '../../package';
 import MVT from '../sources/MVT';
-import Metadata from '../renderer/Metadata';
+import Metadata from './WindshaftMetadata';
 import schema from '../renderer/schema';
-import Time from '../renderer/viz/expressions/time';
 import * as windshaftFiltering from './windshaft-filtering';
 import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
+
+const TILE_EXTENT = 2048;
 
 export default class Windshaft {
     constructor (source) {
@@ -20,10 +24,9 @@ export default class Windshaft {
         this.inProgressInstantiations = {};
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
-        this._mvtClient.bindLayer(addDataframe, dataLoadedCallback);
+        this._mvtClient.bindLayer(addDataframe);
     }
 
     _getInstantiationID (MNS, resolution, filtering, choices) {
@@ -74,11 +77,11 @@ export default class Windshaft {
     _checkAcceptableMNS (MNS) {
         Object.keys(MNS).forEach(propertyName => {
             const usages = MNS[propertyName];
-            const aggregatedUsage = usages.some(x => x.type === 'aggregated');
+            const aggregatedUsage = usages.some(x => x.type !== 'unaggregated');
             const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
             if (aggregatedUsage && unAggregatedUsage) {
-                throw new Error(`Incompatible combination of cluster aggregation usages (${
-                    JSON.stringify(usages.filter(x => x.type === 'aggregated'))
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
+                    JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
                 }) with unaggregated usage for property '${propertyName}'`);
             }
         });
@@ -155,7 +158,7 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata);
+        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
         return { MNS, resolution, filters, metadata, urlTemplates };
@@ -165,12 +168,12 @@ export default class Windshaft {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
-        this._mvtClient = new MVT(urlTemplates);
+        metadata.extent = TILE_EXTENT;
+        this._mvtClient = new MVT(urlTemplates, metadata);
         this._mvtClient._workerName = 'windshaft';
-        this._mvtClient.bindLayer(this._addDataframe, this._dataLoadedCallback);
+        this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
-        this._mvtClient._metadata = metadata;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
@@ -203,7 +206,7 @@ export default class Windshaft {
     _checkLayerMeta (MNS) {
         if (!this._isAggregated()) {
             if (this._requiresAggregation(MNS)) {
-                throw new Error('Aggregation not supported for this dataset');
+                throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Aggregation not supported for this dataset`);
             }
         }
     }
@@ -213,7 +216,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === 'aggregated'));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== 'unaggregated'));
     }
 
     _generateAggregation (MNS, resolution) {
@@ -235,8 +238,19 @@ export default class Windshaft {
                                 aggregate_function: usage.op,
                                 aggregated_column: propertyName
                             };
+                        } else if (usage.type === 'dimension') {
+                            const dimension = usage.dimension;
+                            const { group, format } = dimension;
+                            const parameters = { column: propertyName, group, format };
+                            aggregation.dimensions[dimension.propertyName] = parameters;
                         } else {
-                            aggregation.dimensions[propertyName] = propertyName;
+                            // automatic ungrouped dimension
+                            // TODO:
+                            // we should consider eliminating this and requiring
+                            // all dimensions to be used through clusterXXX functions
+                            aggregation.dimensions[propertyName] = {
+                                column: propertyName
+                            };
                         }
                     });
                 }
@@ -252,9 +266,8 @@ export default class Windshaft {
 
     _buildQuery (select, filters) {
         const columns = select.map(column => `"${column}"`).join();
-        const relation = this._source._query ? `(${this._source._query}) as _cdb_query_wrapper` : this._source._tableName;
         const condition = filters ? windshaftFiltering.getSQLWhere(filters) : '';
-        return `SELECT ${columns} FROM ${relation} ${condition}`;
+        return `SELECT ${columns} FROM ${this._source._getFromClause()} ${condition}`;
     }
 
     _getConfig () {
@@ -271,7 +284,7 @@ export default class Windshaft {
         }
     }
 
-    async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata = null) {
+    async _getInstantiationPromise (query, conf, agg, aggSQL, columns, overrideMetadata, MNS) {
         const mapConfigAgg = {
             buffersize: {
                 mvt: 1
@@ -282,6 +295,8 @@ export default class Windshaft {
                     options: {
                         sql: aggSQL,
                         aggregation: agg,
+                        vector_extent: TILE_EXTENT,
+                        vector_simplify_extent: TILE_EXTENT,
                         dates_as_numbers: true
                     }
                 }
@@ -293,6 +308,7 @@ export default class Windshaft {
             mapConfigAgg.layers[0].options.metadata = {
                 geometryType: true,
                 columnStats: { topCategories: 32768, includeNulls: true },
+                dimensions: true,
                 sample: {
                     num_rows: SAMPLE_ROWS,
                     include_columns: includedColumns // TODO: when supported by Maps API: exclude_columns: excludedColumns
@@ -303,37 +319,65 @@ export default class Windshaft {
         try {
             response = await fetch(getMapRequest(conf, mapConfigAgg));
         } catch (error) {
-            throw new Error(`Failed to connect to Maps API with your user('${this._source._username}')`);
+            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._source._username}')`);
         }
         const layergroup = await response.json();
         if (!response.ok) {
             if (response.status === 401) {
-                throw new Error(`Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`);
+                throw new CartoMapsAPIError(
+                    `${cmt.SECURITY} Unauthorized access to Maps API: invalid combination of user('${this._source._username}') and apiKey('${this._source._apiKey}')`
+                );
             } else if (response.status === 403) {
-                throw new Error(`Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`);
+                throw new CartoMapsAPIError(
+                    `${cmt.SECURITY} Unauthorized access to dataset: the provided apiKey('${this._source._apiKey}') doesn't provide access to the requested data`
+                );
             }
-            throw new Error(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
+            throw new CartoMapsAPIError(`SQL errors: ${JSON.stringify(layergroup.errors)}`);
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
-            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg)
+            metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg, MNS)
         };
     }
 
-    _adaptMetadata (meta, agg) {
+    _adaptMetadata (meta, agg, MNS) {
         meta.datesAsNumbers = meta.dates_as_numbers;
         const { stats, aggregation, datesAsNumbers } = meta;
         const featureCount = stats.hasOwnProperty('featureCount') ? stats.featureCount : stats.estimatedFeatureCount;
-        const geomType = adaptGeometryType(stats.geometryType);
+        const geomType = stats.geometryType && adaptGeometryType(stats.geometryType);
 
         const properties = stats.columns;
         Object.keys(agg.columns).forEach(aggName => {
-            const basename = schema.column.getBase(aggName);
-            const fnName = schema.column.getAggFN(aggName);
+            const basename = agg.columns[aggName].aggregated_column;
+            const fnName = agg.columns[aggName].aggregate_function;
             if (!properties[basename].aggregations) {
                 properties[basename].aggregations = {};
             }
             properties[basename].aggregations[fnName] = aggName;
+        });
+        Object.keys(agg.dimensions).forEach(dimName => {
+            const dimension = agg.dimensions[dimName];
+            if (stats.dimensions && stats.dimensions[dimName].type) {
+                // otherwise, the dimension is a (legacy) ungrouped dimension
+                const dimensionStats = stats.dimensions[dimName];
+                const dimType = adaptColumnType(dimensionStats.type);
+                const { column, ...params } = dimension;
+                if (properties[column].dimension) {
+                    throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Multiple dimensions based on same column '${column}'.`);
+                }
+                properties[column].dimension = {
+                    propertyName: dimName,
+                    grouping: Object.keys(params).length === 0 ? undefined : dimensionStats.params,
+                    type: dimType,
+                    // TODO: merge all properties of dimensionStats except params, type
+                    min: dimensionStats.min,
+                    max: dimensionStats.max
+                };
+                const range = MNS[column].some(c => c.range);
+                if (range > 0) {
+                    properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
+                }
+            }
         });
         Object.values(properties).map(property => {
             property.type = adaptColumnType(property.type);
@@ -348,22 +392,16 @@ export default class Windshaft {
                 });
             } else if (datesAsNumbers && datesAsNumbers.includes(propertyName)) {
                 property.type = 'date';
-                ['min', 'max', 'avg'].map(fn => {
-                    if (property[fn]) {
-                        property[fn] = new Time(property[fn] * 1000).value;
-                    }
-                });
             }
         });
 
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             properties[CLUSTER_FEATURE_COUNT] = { type: 'number' };
         }
 
         const idProperty = 'cartodb_id';
 
-        const metadata = new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
-        return metadata;
+        return new Metadata({ properties, featureCount, sample: stats.sample, geomType, isAggregated: aggregation.mvt, idProperty });
     }
 }
 
@@ -371,14 +409,14 @@ function adaptGeometryType (type) {
     switch (type) {
         case 'ST_MultiPolygon':
         case 'ST_Polygon':
-            return 'polygon';
+            return GEOMETRY_TYPE.POLYGON;
         case 'ST_Point':
-            return 'point';
+            return GEOMETRY_TYPE.POINT;
         case 'ST_MultiLineString':
         case 'ST_LineString':
-            return 'line';
+            return GEOMETRY_TYPE.LINE;
         default:
-            throw new Error(`Unimplemented geometry type ''${type}'`);
+            throw new CartoMapsAPIError(`${cmt.NOT_SUPPORTED} Unimplemented geometry type '${type}'.`);
     }
 }
 

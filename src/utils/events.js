@@ -1,3 +1,4 @@
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 let registeredHandlers = [];
 
@@ -9,7 +10,7 @@ let registeredHandlers = [];
  * The 'updated' event will be fired whenever one of the layers fired an 'updated' event,
  * but throttled by requestAnimationFrame to return a maximum of one event per frame.
  *
- * @param {string} eventName - Supported event names are 'loaded' and 'updated'
+ * @param {String} eventName - Supported event names are 'loaded' and 'updated'
  * @param {carto.Layer[]} layerList - List of layers
  *
  * @memberof carto
@@ -44,7 +45,7 @@ export function on (eventName, layerList, callback) {
             internalCallbacks.push(internalCallback);
         });
     } else {
-        throw new Error(`Event name '${eventName}' is not supported by 'carto.on'. Supported event names are: 'loaded', 'updated'.`);
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Event name '${eventName}' is not supported by "carto.on". Supported event names are: 'loaded' and 'updated'.`);
     }
     registeredHandlers.push({
         eventName,
@@ -57,7 +58,7 @@ export function on (eventName, layerList, callback) {
 /**
 * Remove an event handler for the given event name, layer list and callback.
 *
-* @param {string} eventName - event
+* @param {String} eventName - event
 * @param {carto.Layer} layerList - List of layers
 * @param {function} callback - Handler function to unregister
 *

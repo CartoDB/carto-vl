@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Geometry types | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+
+  <script src="../../../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Visualization properties by geometry</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Styling properties adapt to each geometry type. Some geometry types will
+          ignore some styling properties.</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="source" onclick="usePoints()" id="points" checked>
+              <label for="points">Points</label>
+            </li>
+            <li>
+              <input type="radio" name="source" onclick="useLines()" id="lines">
+              <label for="lines">Lines</label>
+            </li>
+            <li>
+              <input type="radio" name="source" onclick="usePolygons()" id="polygons">
+              <label for="polygons">Polygons</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [7, 25],
+      zoom: 2
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('populated_places_small');
+
+    // Define Viz object and custom style
+    const viz = new carto.Viz(`
+        color: navy           // 'color' is never ignored
+        width: 8             // 'width' is ignored for polygons
+        strokeColor: fuchsia // 'strokeColor' is ignored for lines
+        strokeWidth: 2     // 'strokeWidth' is ignored for lines
+    `);
+
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map);
+
+    // Define selection behavior
+    function usePoints() {
+      layer.update(new carto.source.Dataset('populated_places_small'), viz)
+    }
+    function useLines() {
+      layer.update(new carto.source.Dataset('world_rivers_small'), viz)
+    }
+    function usePolygons() {
+      layer.update(new carto.source.Dataset('world_borders'), viz)
+    }
+
+  </script>
+
+</body>
+
+</html>

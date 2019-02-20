@@ -1,10 +1,11 @@
 import BaseExpression from '../base';
 import { checkString, hexToRgb, getStringErrorPreface, checkMaxArguments } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Create a color from its hexadecimal description.
  *
- * @param {string} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
+ * @param {String} hexadecimalColor - Color in the #RGB, #RGBA, #RRGGBB or #RRGGBBAA format
  * @return {Color}
  *
  * @example <caption>Display blue points.</caption>
@@ -33,9 +34,14 @@ export default class Hex extends BaseExpression {
         try {
             this.color = hexToRgb(hexadecimalColor);
         } catch (error) {
-            throw new Error(getStringErrorPreface('hex', 'hexadecimalColor', 0) + '\nInvalid hexadecimal color string');
+            const preface = getStringErrorPreface('hex', 'hexadecimalColor', 0);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${preface} \nInvalid hexadecimal color string`);
         }
+        this.hexadecimalColor = hexadecimalColor;
         this.inlineMaker = () => `vec4(${(this.color.r / 255).toFixed(4)}, ${(this.color.g / 255).toFixed(4)}, ${(this.color.b / 255).toFixed(4)}, ${(this.color.a).toFixed(4)})`;
+    }
+    toString () {
+        return this.hexadecimalColor;
     }
     get value () {
         return this.eval();

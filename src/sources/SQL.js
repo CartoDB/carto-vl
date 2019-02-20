@@ -1,4 +1,4 @@
-import CartoValidationError from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import util from '../utils/util';
 import BaseWindshaft from './BaseWindshaft';
 
@@ -11,7 +11,7 @@ export default class SQL extends BaseWindshaft {
      * ```javascript
      * const source = new carto.source.SQL(`SELECT * FROM european_cities WHERE country like 'europe' AND population > 10000`, {
      *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     *   username: 'YOUR_USERNAME_HERE'
      * });
      * ````
      *
@@ -28,24 +28,23 @@ export default class SQL extends BaseWindshaft {
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `points`, `lines` and `polygons`.
      *
-     * @param {string} query - A SQL query containing a SELECT statement
-     * @param {object} auth
-     * @param {string} auth.apiKey - API key used to authenticate against CARTO
-     * @param {string} auth.user - Name of the user
-     * @param {object} config
-     * @param {string} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
+     * @param {String} query - A SQL query containing a SELECT statement
+     * @param {Object} auth
+     * @param {String} auth.apiKey - API key used to authenticate against CARTO
+     * @param {String} auth.user - Name of the user
+     * @param {Object} config
+     * @param {String} [config.serverURL='https://{user}.carto.com'] - URL of the CARTO Maps API server
      *
      * @example
      * const source = new carto.source.SQL('SELECT * FROM european_cities', {
      *   apiKey: 'YOUR_API_KEY_HERE',
-     *   user: 'YOUR_USERNAME_HERE'
+     *   username: 'YOUR_USERNAME_HERE'
      * });
      *
-     * @fires CartoError
+     * @throws CartoError
      *
-     * @constructor SQL
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name SQL
      * @api
      */
     constructor (query, auth, config) {
@@ -55,23 +54,27 @@ export default class SQL extends BaseWindshaft {
         this.initialize(auth, config);
     }
 
+    _getFromClause () {
+        return `(${this._query}) as _cdb_query_wrapper`;
+    }
+
     _clone () {
         return new SQL(this._query, this._auth, this._config);
     }
 
     _checkQuery (query) {
         if (util.isUndefined(query)) {
-            throw new CartoValidationError('source', 'queryRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'query'`);
         }
         if (!util.isString(query)) {
-            throw new CartoValidationError('source', 'queryStringRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'query' property must be a string.`);
         }
         if (query === '') {
-            throw new CartoValidationError('source', 'nonValidQuery');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'query' property must be not empty.`);
         }
         let sqlRegex = /\bSELECT\b/i;
         if (!query.match(sqlRegex)) {
-            throw new CartoValidationError('source', 'nonValidSQLQuery');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'query' property must be a SQL query.`);
         }
     }
 }

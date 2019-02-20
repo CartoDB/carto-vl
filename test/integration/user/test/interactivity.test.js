@@ -1,5 +1,6 @@
 import carto from '../../../../src';
 import * as util from '../../util';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../src/errors/carto-validation-error';
 
 // More info: https://github.com/CartoDB/carto-vl/wiki/Interactivity-tests
 
@@ -134,10 +135,14 @@ describe('Interactivity', () => {
 
             it('should fire a featureClick event with the proper feature attributes', done => {
                 interactivity.on('featureClick', event => {
-                    expect(event.features[0].reset).toBeDefined();
-                    expect(event.features[0].color.blendTo).toBeDefined();
-                    expect(event.features[0].color.reset).toBeDefined();
-                    expect(event.features[0].variables.wadus.value).toEqual(123);
+                    const feature = event.features[0];
+                    expect(feature.reset).toBeDefined();
+                    expect(feature.blendTo).toBeDefined();
+                    expect(feature.getRenderedCentroid).toBeDefined();
+                    expect(feature.color.blendTo).toBeDefined();
+                    expect(feature.color.reset).toBeDefined();
+                    expect(feature.variables.wadus.value).toEqual(123);
+                    expect();
                     done();
                 });
 
@@ -189,11 +194,34 @@ describe('Interactivity', () => {
                             // Click on the feature 1
                             util.simulateClick({ lng: 5, lat: 5 });
                             // Move the mouse
-                            util.simulateMove({ lng: 0, lat: 0 });
+                            const moveMouse = debounce(() => {
+                                util.simulateMove({ lng: 0, lat: 0 });
+                            }, 500);
+
+                            moveMouse();
+
                             // Click on the feature 1
                             util.simulateClick({ lng: -5, lat: -5 });
                         });
                     });
+                });
+            });
+
+            it('should not fire a click-derived event if it is disabled', done => {
+                interactivity.disable();
+
+                const onClickSpy = spyOn(interactivity, '_onClick');
+                const createFeatureEventSpy = spyOn(interactivity, '_createFeatureEvent');
+
+                onLoaded(() => {
+                    // Click on the feature 1
+                    util.simulateClick({ lng: 5, lat: 5 });
+
+                    setTimeout(() => {
+                        expect(onClickSpy).toHaveBeenCalled();
+                        expect(createFeatureEventSpy).not.toHaveBeenCalled();
+                        done();
+                    }, 0);
                 });
             });
         });
@@ -274,6 +302,59 @@ describe('Interactivity', () => {
                 });
             });
         });
+
+        it('should not fire a featureHover / featureEnter or featureLeave event if it is disabled', done => {
+            interactivity.disable();
+
+            const onMouseMoveSpy = spyOn(interactivity, '_onMouseMove');
+            const createFeatureEventSpy = spyOn(interactivity, '_createFeatureEvent');
+
+            onLoaded(() => {
+                // Move mouse inside a feature 1
+                util.simulateMove({ lng: 5, lat: 5 });
+                // Move mouse outside any feature
+                util.simulateMove({ lng: -5, lat: -5 });
+
+                setTimeout(() => {
+                    expect(onMouseMoveSpy).toHaveBeenCalled();
+                    expect(createFeatureEventSpy).not.toHaveBeenCalled();
+                    done();
+                }, 0);
+            });
+        });
+    });
+
+    describe('while the map is being moved (eg. dragPan)', () => {
+        it('should be automatically tracked (to later on control enabled / disabled state)', done => {
+            const setMapStateSpy = spyOn(interactivity, '_setMapState');
+
+            onLoaded(() => {
+                // Emulate a dragPan on the map (over features)
+                const a = {
+                    lng: 31.20,
+                    lat: 35.81
+                };
+                const b = {
+                    lng: 30.00,
+                    lat: 35.81
+                };
+                const c = {
+                    lng: 31.20,
+                    lat: 33.84
+                };
+
+                map.on('moveend', () => {
+                    setTimeout(() => {
+                        expect(setMapStateSpy).toHaveBeenCalledTimes(2);
+                        expect(setMapStateSpy).toHaveBeenCalledWith('moving');
+                        expect(setMapStateSpy).toHaveBeenCalledWith('idle');
+                        done();
+                    }, 0);
+                });
+
+                util.simulateDrag([a, b, c]);
+            });
+        });
     });
 
     describe('when the layer changes', () => {
@@ -312,6 +393,24 @@ describe('Interactivity', () => {
         });
     });
 
+    describe('.enable / .disable', () => {
+        it('should allow turn on & off the whole interactivity', () => {
+            expect(interactivity.isEnabled).toBeTruthy(); // enabled by default
+            interactivity.disable();
+            expect(interactivity.isEnabled).toBeFalsy();
+            interactivity.enable();
+            expect(interactivity.isEnabled).toBeTruthy();
+        });
+
+        it('should be disabled while map is moving', () => {
+            expect(interactivity.isEnabled).toBeTruthy(); // enabled by default
+            interactivity._mapState = 'moving';
+            expect(interactivity.isEnabled).toBeFalsy();
+            interactivity._mapState = 'idle';
+            expect(interactivity.isEnabled).toBeTruthy();
+        });
+    });
+
     xdescribe('when the user creates a new Interactivity object', () => {
         it('should throw an error when layers belong to different maps', done => {
             const setupA = util.createMap('mapA');
@@ -335,7 +434,7 @@ describe('Interactivity', () => {
 
             const int = new carto.Interactivity([layerA, layerB]);
             int._init([layerA, layerB]).catch((err) => {
-                expect(err).toEqual(new Error('Invalid argument, all layers must belong to the same map'));
+                expect(err).toEqual(new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, all layers must belong to the same map.`));
                 document.body.removeChild(setupA.div);
                 document.body.removeChild(setupB.div);
                 done();
@@ -509,3 +608,80 @@ describe('regression with a category filter', () => {
         document.body.removeChild(setup.div);
     });
 });
+
+describe('regression with blendTo', () => {
+    let div, map, source, viz, layer, interactivity;
+
+    beforeEach(() => {
+        const setup = util.createMap('map');
+        div = setup.div;
+        map = setup.map;
+
+        source = new carto.source.GeoJSON(feature1);
+        viz = new carto.Viz(`
+            color: red
+            @wadus: 123
+        `);
+        layer = new carto.Layer('layer1', source, viz);
+        interactivity = new carto.Interactivity(layer);
+        layer.addTo(map);
+    });
+
+    it('should ignore rejected updates when coming from `reset`', done => {
+        let error = null;
+        // chrome-only event
+        window.addEventListener('unhandledrejection', function (promiseRejectionEvent) {
+            error = promiseRejectionEvent;
+        });
+
+        const moveAway = debounce(() => {
+            util.simulateMove({ lng: -5, lat: -5 });
+        });
+
+        interactivity.on('featureEnter', async event => {
+            layer.on('updated', moveAway);
+
+            const feature = event.features[0];
+            await feature.color.blendTo('green', 50);
+            await feature.strokeWidth.blendTo(40, 50);
+        });
+
+        const resetEnd = debounce(() => {
+            const thereWasAnUpdateError = error && error.reason.message.startsWith('Another `viz change` finished before this one');
+            expect(thereWasAnUpdateError).toBeFalsy();
+            done();
+        }, 500);
+
+        interactivity.on('featureLeave', async event => {
+            layer.off('updated', moveAway);
+
+            const feature = event.features[0];
+            await feature.color.reset();
+            await feature.strokeWidth.reset();
+
+            layer.on('updated', resetEnd);
+        });
+
+        onLoaded(() => {
+            // Hover on the feature 1
+            util.simulateMove({ lng: 5, lat: 5 });
+        });
+    });
+
+    function onLoaded (callback) {
+        layer.on('loaded', callback);
+    }
+
+    afterEach(() => {
+        map.remove();
+        document.body.removeChild(div);
+    });
+});
+
+const debounce = (func, delay = 250) => {
+    let timeoutId;
+    return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+    };
+};

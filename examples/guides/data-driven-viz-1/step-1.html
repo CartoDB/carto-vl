@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Unclassed map| CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Unclassed Map</h1>
+            </header>
+        </div>
+    </aside>
+
+    <script>
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [60, 19],
+            zoom: 2,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("pop_density_points");
+        const viz = new carto.Viz(`
+            width: 2.5
+            color: ramp($dn, [midnightblue,gold])
+            strokeWidth: 0
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>

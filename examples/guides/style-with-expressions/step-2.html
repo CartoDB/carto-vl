@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Color spaces | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+
+  <script src="../../../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Color spaces</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Supported color spaces</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="viz" onclick="setHEXGreen()" id="green" checked>
+              <label for="green">HEX - Green</label>
+            </li>
+            <li>
+              <input type="radio" name="viz" onclick="setRGBARed()" id="red">
+              <label for="red">RGBA - Red</label>
+            </li>
+            <li>
+              <input type="radio" name="viz" onclick="setNamedColorOrange()" id="orange">
+              <label for="orange">Named Color - Orange</label>
+            </li>
+            <li>
+              <input type="radio" name="viz" onclick="setHSVBlue()" id="blue">
+              <label for="blue">HSV - Blue</label>
+            </li>
+            <li>
+              <input type="radio" name="viz" onclick="setHSLPurple()" id="purple">
+              <label for="purple">HSL - Purple</label>
+            </li>
+            <li>
+              <input type="radio" name="viz" onclick="setCIELABYellow()" id="yellow">
+              <label for="yellow">CIELAB - Yellow</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [0, 30],
+      zoom: 2
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define styles
+    const vizGreen = new carto.Viz(`
+      color: #00874D
+    `);
+    const vizRed = new carto.Viz(`
+      color: rgba(255, 0, 0, 1)
+    `);
+    const vizOrange = new carto.Viz(`
+      color: orange
+    `);
+    const vizBlue = new carto.Viz(`
+      color: hsva(0.59, 0.89, 1.0, 1.0)
+    `);
+    const vizPurple = new carto.Viz(`
+      color: hsla(0.7, 0.7, 0.5, 1.0)
+    `);
+    const vizYellow = new carto.Viz(`
+      color: cielab(90, 10, 60)
+    `);
+
+    const source = new carto.source.Dataset('populated_places');
+    const layer = new carto.Layer('layer', source, vizGreen);
+    layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', hideLoader);
+
+    // Change styles
+    function setHEXGreen() {
+      layer.blendToViz(vizGreen);
+    }
+    function setRGBARed() {
+      layer.blendToViz(vizRed);
+    }
+    function setNamedColorOrange() {
+      layer.blendToViz(vizOrange);
+    }
+    function setHSVBlue() {
+      layer.blendToViz(vizBlue);
+    }
+    function setHSLPurple() {
+      layer.blendToViz(vizPurple);
+    }
+    function setCIELABYellow() {
+      layer.blendToViz(vizYellow);
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

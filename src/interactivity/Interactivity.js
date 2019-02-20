@@ -1,62 +1,6 @@
 import mitt from 'mitt';
 import Layer from '../Layer';
-import { WM_R, projectToWebMercator } from '../utils/util';
-import { wToR } from '../client/rsys';
-
-/**
- *
- * FeatureEvent objects are fired by {@link carto.Interactivity|Interactivity} objects.
- *
- * @typedef {object} FeatureEvent
- * @property {object} coordinates - LongLat coordinates in { lng, lat } form
- * @property {object} position - Pixel coordinates in { x, y } form
- * @property {Feature[]} features - Array of {@link Feature}
- * @api
- */
-
-/**
- * featureClick events are fired when the user clicks on features. The list of features behind the cursor is provided.
- *
- * @event featureClick
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureClickOut events are fired when the user clicks outside a feature that was clicked in the last featureClick event.
- * The list of features that were clicked before and that are no longer behind this new click is provided.
- *
- * @event featureClickOut
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureEnter events are fired when the user moves the cursor and the movement implies that a non-previously hovered feature (as reported by featureHover or featureLeave) is now under the cursor.
- * The list of features that are now behind the cursor and that weren't before is provided.
- *
- * @event featureEnter
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureHover events are fired when the user moves the cursor.
- * The list of features behind the cursor is provided.
- *
- * @event featureHover
- * @type {FeatureEvent}
- * @api
- */
-
-/**
- * featureLeave events are fired when the user moves the cursor and the movement implies that a previously hovered feature (as reported by featureHover or featureEnter) is no longer behind the cursor.
- * The list of features that are no longer behind the cursor and that were before is provided.
- *
- * @event featureLeave
- * @type {FeatureEvent}
- * @api
- */
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 const EVENTS = [
     'featureClick',
@@ -66,17 +10,22 @@ const EVENTS = [
     'featureLeave'
 ];
 
+const MAP_STATE = {
+    IDLE: 'idle',
+    MOVING: 'moving'
+};
+
 export default class Interactivity {
     /**
     *
     * Interactivity purpose is to allow the reception and management of user-generated events, like clicking, over layer features.
     *
-    * To create a Interactivity object an array of {@link carto.Layer} is required.
-    * Events fired from interactivity objects will refer to the features of these layers and only these layers.
-    * Moreover, the order of the features in the events will be determined by the order of the layers in this list.
+    * To create a Interactivity object a {@link carto.Layer} or an array with several {@link carto.Layer} is required.
+    * Events fired from interactivity objects will refer to the features of these layer/s and only these layer/s.
+    * Moreover, when using an array of layers, the order of the features in the events will be determined by the order of these layers in the layerList.
     *
     * @param {carto.Layer|carto.Layer[]} layerList - {@link carto.Layer} or array of {@link carto.Layer}, events will be fired based on the features of these layers. The array cannot be empty, and all the layers must be attached to the same map.
-    * @param {object} [options={}] - Object containing interactivity options
+    * @param {Object} [options={}] - Object containing interactivity options
     * @param {boolean} [options.autoChangePointer=true] - A boolean flag indicating if the cursor should change when the mouse is over a feature.
     *
     * @example
@@ -91,16 +40,15 @@ export default class Interactivity {
     * @fires featureHover
     * @fires featureEnter
     * @fires featureLeave
-    * @fires CartoError
+    * @throws CartoError
     *
     * @constructor Interactivity
-    * @memberof carto
+    * @name carto.Interactivity
     * @api
     */
     constructor (layerList, options = { autoChangePointer: true }) {
         if (layerList instanceof Layer) {
-            // Allow one layer as input
-            layerList = [layerList];
+            layerList = [layerList]; // Allow one layer as input
         }
         preCheckLayerList(layerList);
         this._init(layerList, options);
@@ -109,7 +57,7 @@ export default class Interactivity {
     /**
      * Register an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to listen for
+     * @param {String} eventName - Type of event to listen for
      * @param {function} callback - Function to call in response to given event, function will be called with a {@link carto.FeatureEvent}
      * @memberof carto.Interactivity
      * @instance
@@ -117,14 +65,15 @@ export default class Interactivity {
      */
     on (eventName, callback) {
         checkEvent(eventName);
-        this._numListeners[eventName] = (this._numListeners[eventName] || 0) + 1;
+        const currentCount = this._numListeners[eventName] || 0;
+        this._numListeners[eventName] = currentCount + 1;
         return this._emitter.on(eventName, callback);
     }
 
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Interactivity
      * @instance
@@ -132,45 +81,100 @@ export default class Interactivity {
      */
     off (eventName, callback) {
         checkEvent(eventName);
-        this._numListeners[eventName] = this._numListeners[eventName] - 1;
+        const currentCount = this._numListeners[eventName];
+        this._numListeners[eventName] = currentCount - 1;
         return this._emitter.off(eventName, callback);
     }
 
+    /**
+    * Interactivity enabled property. When enabled, it can emit events
+    *
+    * @type {boolean}
+    * @memberof carto.Interactivity
+    * @instance
+    * @api
+    */
+    get isEnabled () {
+        return this._enabled && this._mapState !== MAP_STATE.MOVING;
+    }
+
+    /**
+     * Change interactivity state to disabled, so no event will be emitted
+     *
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    disable () {
+        this._enabled = false;
+    }
+
+    /**
+     * Change interactivity state to enabled, so events can be emitted
+     *
+     * @memberof carto.Interactivity
+     * @instance
+     * @api
+     */
+    enable () {
+        this._enabled = true;
+    }
+
     _init (layerList, options) {
+        this._enabled = true;
+        this._mapState = MAP_STATE.IDLE;
         this._emitter = mitt();
         this._layerList = layerList;
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
-        return Promise.all(layerList.map(layer => layer._context)).then(() => {
-            postCheckLayerList(layerList);
-            this._subscribeToLayerEvents(layerList);
-            this._subscribeToMapEvents(layerList[0].map);
-        }).then(() => {
-            if (options.autoChangePointer) {
-                this._setInteractiveCursor();
-            }
-        });
+
+        const allLayersReadyPromises = layerList.map(layer => layer._context);
+        return Promise.all(allLayersReadyPromises)
+            .then(() => {
+                postCheckLayerList(layerList);
+                this._subscribeToLayerEvents(layerList);
+                this._subscribeToMapEvents(layerList[0].map);
+            }).then(() => {
+                if (options.autoChangePointer) {
+                    this._setInteractiveCursor();
+                }
+            });
     }
 
     _setInteractiveCursor () {
         const map = this._layerList[0].map; // All layers belong to the same map
-        if (!map.__carto_interacivities) {
-            map.__carto_interacivities = new Set();
+        if (!map.__carto_interactivities) {
+            map.__carto_interactivities = new Set();
         }
         this.on('featureHover', event => {
             if (event.features.length) {
-                map.__carto_interacivities.add(this);
+                map.__carto_interactivities.add(this);
             } else {
-                map.__carto_interacivities.delete(this);
+                map.__carto_interactivities.delete(this);
             }
-            map.getCanvas().style.cursor = (map.__carto_interacivities.size > 0) ? 'pointer' : '';
+            map.getCanvas().style.cursor = (map.__carto_interactivities.size > 0) ? 'pointer' : '';
         });
     }
 
     _subscribeToMapEvents (map) {
         map.on('mousemove', this._onMouseMove.bind(this));
         map.on('click', this._onClick.bind(this));
+        this._disableWhileMovingMap(map);
+    }
+
+    _disableWhileMovingMap (map) {
+        map.on('movestart', () => {
+            this._setMapState(MAP_STATE.MOVING);
+        });
+
+        map.on('moveend', () => {
+            this._setMapState(MAP_STATE.IDLE);
+        });
+    }
+
+    _setMapState (state) {
+        this._mapState = state;
     }
 
     _subscribeToLayerEvents (layers) {
@@ -187,38 +191,39 @@ export default class Interactivity {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (!event ||
             (!this._numListeners['featureEnter'] &&
-             !this._numListeners['featureHover'] &&
-             !this._numListeners['featureLeave'])) {
+                !this._numListeners['featureHover'] &&
+                !this._numListeners['featureLeave'])) {
             return;
         }
 
         const featureEvent = this._createFeatureEvent(event);
-        const currentFeatures = featureEvent.features;
 
-        // Manage enter/leave events
-        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, currentFeatures);
-        const featuresEntered = this._getDiffFeatures(currentFeatures, this._prevHoverFeatures);
+        const featuresLeft = this._manageFeatureLeaveEvent(featureEvent);
+        const featuresEntered = this._manageFeatureEnterEvent(featureEvent);
 
-        if (featuresLeft.length > 0) {
-            this._fireEvent('featureLeave', {
-                coordinates: featureEvent.coordinates,
-                position: featureEvent.position,
-                features: featuresLeft
-            });
-        }
+        this._prevHoverFeatures = featureEvent.features;
+        this._manageFeatureHoverEvent(featureEvent, { featuresLeft, featuresEntered }, emulated);
+    }
 
-        if (featuresEntered.length > 0) {
-            this._fireEvent('featureEnter', {
-                coordinates: featureEvent.coordinates,
-                position: featureEvent.position,
-                features: featuresEntered
-            });
-        }
+    _manageFeatureLeaveEvent (featureEvent) {
+        const featuresLeft = this._getDiffFeatures(this._prevHoverFeatures, featureEvent.features);
+        this._fireEventIfFeatures('featureLeave', { featureEvent, eventFeatures: featuresLeft });
+        return featuresLeft;
+    }
 
-        this._prevHoverFeatures = currentFeatures;
+    _manageFeatureEnterEvent (featureEvent) {
+        const featuresEntered = this._getDiffFeatures(featureEvent.features, this._prevHoverFeatures);
+        this._fireEventIfFeatures('featureEnter', { featureEvent, eventFeatures: featuresEntered });
+        return featuresEntered;
+    }
 
+    _manageFeatureHoverEvent (featureEvent, { featuresLeft, featuresEntered }, emulated) {
         // If the event comes from a real mouse move, trigger always (because coordinates and position have changed)
         // If the event comes from an animated event, trigger only when features have changed (because position is the same)
         if (!emulated || (emulated && (featuresLeft.length || featuresEntered.length))) {
@@ -227,25 +232,28 @@ export default class Interactivity {
         }
     }
 
+    _fireEventIfFeatures (eventName, { featureEvent, eventFeatures }) {
+        if (eventFeatures.length > 0) {
+            this._fireEvent(eventName, {
+                coordinates: featureEvent.coordinates,
+                position: featureEvent.position,
+                features: eventFeatures
+            });
+        }
+    }
+
     _onClick (event) {
+        if (!this.isEnabled) {
+            return;
+        }
+
         if (!this._numListeners['featureClick'] &&
             !this._numListeners['featureClickOut']) {
             return;
         }
 
         const featureEvent = this._createFeatureEvent(event);
-        const currentFeatures = featureEvent.features;
-
-        // Manage clickOut event
-        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, currentFeatures);
-
-        if (featuresClickedOut.length > 0) {
-            this._fireEvent('featureClickOut', {
-                coordinates: featureEvent.coordinates,
-                position: featureEvent.position,
-                features: featuresClickedOut
-            });
-        }
+        this._manageClickOutEvent(featureEvent);
 
         this._prevClickFeatures = featureEvent.features;
 
@@ -253,8 +261,15 @@ export default class Interactivity {
         this._fireEvent('featureClick', featureEvent);
     }
 
+    _manageClickOutEvent (featureEvent) {
+        const featuresClickedOut = this._getDiffFeatures(this._prevClickFeatures, featureEvent.features);
+        this._fireEventIfFeatures('featureClickOut', { featureEvent, eventFeatures: featuresClickedOut });
+        return featuresClickedOut;
+    }
+
     _createFeatureEvent (eventData) {
-        const features = this._getFeaturesAtPosition(eventData.lngLat);
+        // a potentially very intensive task
+        const features = this._getFeaturesAtPosition(eventData.point);
         return {
             coordinates: eventData.lngLat,
             position: eventData.point,
@@ -266,10 +281,8 @@ export default class Interactivity {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition (lngLat) {
-        const wm = projectToWebMercator(lngLat);
-        const nwmc = wToR(wm.x, wm.y, { scale: WM_R, center: { x: 0, y: 0 } });
-        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(nwmc)));
+    _getFeaturesAtPosition (point) {
+        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(point)));
     }
 
     /**
@@ -288,23 +301,24 @@ export default class Interactivity {
 
 function preCheckLayerList (layerList) {
     if (!Array.isArray(layerList)) {
-        throw new Error('Invalid layer list, parameter must be an array of carto.Layer objects');
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid layer list, parameter must be an array of "carto.Layer" objects.`);
     }
     if (!layerList.length) {
-        throw new Error('Invalid argument, layer list must not be empty');
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, layer list must not be empty.`);
     }
     if (!layerList.every(layer => layer instanceof Layer)) {
-        throw new Error('Invalid layer, layer must be an instance of carto.Layer');
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid layer, layer must be an instance of "carto.Layer".`);
     }
 }
+
 function postCheckLayerList (layerList) {
     if (!layerList.every(layer => layer.map === layerList[0].map)) {
-        throw new Error('Invalid argument, all layers must belong to the same map');
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Invalid argument, all layers must belong to the same map.`);
     }
 }
 
 function checkEvent (eventName) {
     if (!EVENTS.includes(eventName)) {
-        throw new Error(`Unrecognized event: ${eventName}. Available events: ${EVENTS.join(', ')}`);
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Unrecognized event: '${eventName}'. Available events: ${EVENTS.join(', ')}.`);
     }
 }

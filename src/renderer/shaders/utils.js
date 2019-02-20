@@ -1,4 +1,5 @@
 import Cache from './Cache';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../errors/carto-runtime-error';
 
 let programID = 1;
 const shaderCache = new Cache();
@@ -9,8 +10,8 @@ const programCache = new Cache();
  * Use a cache to improve speed.
  *
  * @param {WebGLRenderingContext} gl - The context where the program will be executed
- * @param {string} glslvertexShader - vertex shader code
- * @param {string} glslfragmentShader - fragment shader code
+ * @param {String} glslvertexShader - vertex shader code
+ * @param {String} glslfragmentShader - fragment shader code
  */
 export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     const code = glslvertexShader + glslfragmentShader;
@@ -32,7 +33,7 @@ export function compileProgram (gl, glslvertexShader, glslfragmentShader) {
     gl.deleteShader(fragmentShader);
 
     if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
-        throw new Error('Unable to link the shader program: ' + gl.getProgramInfoLog(shader.program));
+        throw new CartoRuntimeError(`${crt.WEB_GL} Unable to link the shader program: ${gl.getProgramInfoLog(shader.program)}.`);
     }
 
     shader.programID = programID++;
@@ -53,7 +54,7 @@ function _compileShader (gl, sourceCode, type) {
     if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
         const log = gl.getShaderInfoLog(shader);
         gl.deleteShader(shader);
-        throw new Error('An error occurred compiling the shaders: ' + log + '\nSource:\n' + sourceCode);
+        throw new CartoRuntimeError(`${crt.WEB_GL} An error occurred compiling the shaders: ${log}\nSource:\n${sourceCode}`);
     }
 
     shaderCache.set(gl, sourceCode, shader);
@@ -76,8 +77,6 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.featureIdAttr = gl.getAttribLocation(shader.program, 'featureID');
     shader.normalAttr = gl.getAttribLocation(shader.program, 'normal');
 
-    shader.vertexScaleUniformLocation = gl.getUniformLocation(shader.program, 'vertexScale');
-    shader.vertexOffsetUniformLocation = gl.getUniformLocation(shader.program, 'vertexOffset');
     shader.colorTexture = gl.getUniformLocation(shader.program, 'colorTex');
     shader.strokeColorTexture = gl.getUniformLocation(shader.program, 'strokeColorTex');
     shader.strokeWidthTexture = gl.getUniformLocation(shader.program, 'strokeWidthTex');
@@ -87,6 +86,7 @@ export function createShaderFromTemplate (gl, glslTemplate, codes) {
     shader.filterTexture = gl.getUniformLocation(shader.program, 'filterTex');
     shader.normalScale = gl.getUniformLocation(shader.program, 'normalScale');
     shader.resolution = gl.getUniformLocation(shader.program, 'resolution');
+    shader.matrix = gl.getUniformLocation(shader.program, 'matrix');
 
     return shader;
 }

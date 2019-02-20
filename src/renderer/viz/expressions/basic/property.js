@@ -1,13 +1,14 @@
 import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
-
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
 /**
  * Evaluates the value of a column for every row in the dataset.
  *
  * For example think about a dataset containing 3 cities: Barcelona, Paris and London.
  * The `prop('name')` will return the name of the current city for every point in the dataset.
  *
- * @param {string} name - The property in the dataset that is going to be evaluated
+ * @param {String} name - The property in the dataset that is going to be evaluated
  * @return {Number|Category|Date}
  *
  * @example <caption>Display only cities with name different from "London".</caption>
@@ -36,10 +37,11 @@ export default class Property extends BaseExpression {
         checkString('property', 'name', 0, name);
 
         if (name === '') {
-            throw new Error('property(): invalid parameter, zero-length string');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} property(): invalid parameter, zero-length string`);
         }
         super({});
         this.name = name;
+        this.expressionName = name;
         super._setGenericGLSL((childInlines, getGLSLforProperty) => getGLSLforProperty(this.name));
     }
 
@@ -51,22 +53,46 @@ export default class Property extends BaseExpression {
         return this.eval();
     }
 
-    eval (feature) {
-        if (!feature) {
-            throw new Error('A property needs to be evaluated in a feature');
-        }
-        return feature[this.name];
+    get propertyName () {
+        return this.name;
     }
 
-    _bindMetadata (meta) {
-        const metaColumn = meta.properties[this.name];
-        if (!metaColumn) {
-            throw new Error(`Property '${this.name}' does not exist`);
+    eval (feature) {
+        if (!feature) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
         }
+
+        return feature[this.name] && feature[this.name] === FP32_DESIGNATED_NULL_VALUE
+            ? null
+            : feature[this.name];
+    }
+
+    toString () {
+        return `$${this.expressionName}`;
+    }
+
+    get categories () {
+        return this.type === 'category'
+            ? this._metadata.properties[this.name].categories
+            : undefined;
+    }
+
+    _bindMetadata (metadata) {
+        const metaColumn = metadata.properties[this.name];
+
+        if (!metaColumn) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} Property '${this.name}' does not exist`);
+        }
+
+        this._metadata = metadata;
         this.type = metaColumn.type;
 
         if (this.type === 'category' && this.numCategories === undefined) {
-            Object.defineProperty(this, 'numCategories', { get: function () { return metaColumn.categories.length; } });
+            Object.defineProperty(this, 'numCategories', {
+                get: function () {
+                    return metaColumn.categories.length;
+                }
+            });
         }
     }
 

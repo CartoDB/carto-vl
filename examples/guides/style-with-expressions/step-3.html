@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Access viz properties | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+
+  <script src="../../../dist/carto-vl.js"></script>
+
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+
+  <div id="map"></div>
+
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Access visualization properties</h1>
+      </header>
+      <section class="open-sans">
+        <p class="description">Modify and access visualization properties</p>
+        <br />
+        <div>
+          <label>The current color is:</label>
+          <label id="colorDisplay"></label>
+          <br />
+          <br />
+          <button onclick="randomizeColor()">Randomize color</button>
+        </div>
+      </section>
+    </div>
+  </aside>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [7, 25],
+      zoom: 2
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    //** CARTO VL functionality begins here **//
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('populated_places');
+
+    // Define Viz object and custom style
+    const viz = new carto.Viz(`
+        color: slateblue
+    `);
+
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map);
+
+    // Define randomize color behavior
+    layer.on('updated', () => {
+      const currentColor = viz.color.value;
+      document.getElementById('colorDisplay').innerText = JSON.stringify(currentColor, null, 4);
+    });
+
+    function randomizeColor() {
+      viz.color.blendTo(`rgb(${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)}, ${(Math.random() * 255).toFixed(0)})`);
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+  </script>
+
+</body>
+
+</html>

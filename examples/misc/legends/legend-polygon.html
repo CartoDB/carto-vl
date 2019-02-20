@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Number of floors</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <p id="content-title"></p>
+          <ul id="content"></ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-73.98076101209858, 40.751681063],
+      zoom: 13
+    });
+
+    // Autenticate the client
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define the source
+    const source = new carto.source.Dataset('mnmappluto');
+
+    // Define the visualization
+    const viz = new carto.Viz(`
+      color: ramp(linear(log($numfloors), 1, 4), Earth)
+      strokeWidth: 0
+    `);
+
+    // Create the layer
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', () => {
+      hideLoader();
+
+      const colorLegend = layer.viz.color.getLegendData({
+        othersLabel: 'Default',
+        samples: 20
+      });
+
+      let colorLegendList = '';
+
+      colorLegend.data.forEach((legend) => {
+        const color = legend.value
+          ? rgbToHex(legend.value)
+          : 'white'
+
+        if (color) {
+          colorLegendList +=
+            `<li><span class="${viz.geometryType}-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.toFixed(2)}</span></li>\n`;
+        }
+      });
+
+      // Update the legend with the legend information
+      document.getElementById('content').innerHTML = colorLegendList;
+      document.getElementById('content-title').innerHTML = colorLegend.name;
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function rgbToHex(color) {
+      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+    }
+
+  </script>
+</body>
+
+</html>

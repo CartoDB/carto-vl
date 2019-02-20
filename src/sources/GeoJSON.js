@@ -1,10 +1,12 @@
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
-import Metadata from '../renderer/Metadata';
-import CartoValidationError from '../errors/carto-validation-error';
+import Metadata from './GeoJSONMetadata';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
+import { GEOMETRY_TYPE } from '../utils/geometry';
 
 const SAMPLE_TARGET_SIZE = 1000;
 
@@ -12,8 +14,8 @@ export default class GeoJSON extends Base {
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
-     * @param {object} data - A GeoJSON data object
-     * @param {object} options - Options
+     * @param {Object} data - A GeoJSON data object
+     * @param {Object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
      * The combination of different type of geometries on the same source is not supported. Valid geometry types are `Point`, `LineString`, `MultiLineString`, `Polygon` and `MultiPolygon`.
@@ -30,11 +32,10 @@ export default class GeoJSON extends Base {
      *   }
      * });
      *
-     * @fires CartoError
+     * @throws CartoError
      *
-     * @constructor GeoJSON
-     * @extends carto.source.Base
      * @memberof carto.source
+     * @name GeoJSON
      * @api
      */
     constructor (data, options = {}) {
@@ -57,7 +58,7 @@ export default class GeoJSON extends Base {
         } else if (data.type === 'Feature') {
             this._features = [data];
         } else {
-            throw new CartoValidationError('source', 'nonValidGeoJSONData');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
         }
 
         this._features = this._initializeFeatureProperties(this._features);
@@ -65,9 +66,8 @@ export default class GeoJSON extends Base {
         this._setCoordinatesCenter();
     }
 
-    bindLayer (addDataframe, dataLoadedCallback) {
+    bindLayer (addDataframe) {
         this._addDataframe = addDataframe;
-        this._dataLoadedCallback = dataLoadedCallback;
     }
 
     requestMetadata (viz) {
@@ -81,7 +81,7 @@ export default class GeoJSON extends Base {
             Object.keys(newProperties).forEach(propertyName => {
                 this._boundColumns.add(propertyName);
             });
-            return;
+            return Promise.resolve(Object.keys(newProperties).length > 0);
         }
         const dataframe = new Dataframe({
             active: true,
@@ -96,7 +96,7 @@ export default class GeoJSON extends Base {
         this._boundColumns = new Set(Object.keys(dataframe.properties));
         this._dataframe = dataframe;
         this._addDataframe(dataframe);
-        this._dataLoadedCallback();
+        return Promise.resolve(true);
     }
 
     requiresNewMetadata () {
@@ -109,10 +109,10 @@ export default class GeoJSON extends Base {
 
     _checkData (data) {
         if (util.isUndefined(data)) {
-            throw new CartoValidationError('source', 'dataRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'data'`);
         }
         if (!util.isObject(data)) {
-            throw new CartoValidationError('source', 'dataObjectRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'data' property must be an object.`);
         }
     }
 
@@ -120,6 +120,7 @@ export default class GeoJSON extends Base {
         for (let i = 0; i < features.length; i++) {
             features[i].properties = features[i].properties || {};
         }
+
         return features;
     }
 
@@ -156,7 +157,7 @@ export default class GeoJSON extends Base {
         const idProperty = 'cartodb_id';
 
         this._metadata = new Metadata({ properties: this._properties, featureCount, sample, geomType, idProperty });
-
+        this._metadata.setCodecs();
         return this._metadata;
     }
 
@@ -172,7 +173,7 @@ export default class GeoJSON extends Base {
 
     _addNumericPropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
         }
         this._addNumericColumnField(propertyName);
         const property = this._properties[propertyName];
@@ -197,7 +198,9 @@ export default class GeoJSON extends Base {
 
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoRuntimeError(
+                `${crt.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+            );
         }
         this._addDateColumnField(propertyName);
         const column = this._properties[propertyName];
@@ -229,12 +232,17 @@ export default class GeoJSON extends Base {
         if (Number.isFinite(value)) {
             return this._addNumericPropertyToMetadata(propertyName, value);
         }
+        if (value === null) {
+            return;
+        }
         this._addCategoryPropertyToMetadata(propertyName, value);
     }
 
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
-            throw new Error(`Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`);
+            throw new CartoRuntimeError(
+                `${crt.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+            );
         }
         if (!this._catFields.has(propertyName)) {
             this._catFields.add(propertyName);
@@ -265,28 +273,17 @@ export default class GeoJSON extends Base {
         const catFields = [...this._catFields].filter(name => !this._boundColumns.has(name));
         const numFields = [...this._numFields].filter(name => !this._boundColumns.has(name));
         const dateFields = [...this._dateFields].filter(name => !this._boundColumns.has(name));
+        const fields = [...catFields, ...numFields, ...dateFields];
 
         for (let i = 0; i < this._features.length; i++) {
             const f = this._features[i];
-
-            catFields.forEach(name => {
-                properties[name][i] = this._metadata.categorizeString(name, f.properties[name], true);
-            });
-            numFields.forEach(name => {
+            fields.forEach(name => {
                 if (name === 'cartodb_id' && !Number.isFinite(f.properties.cartodb_id)) {
                     // Using negative ids for GeoJSON features
                     f.properties.cartodb_id = -i;
                 }
-                properties[name][i] = Number(f.properties[name]);
-            });
-            dateFields.forEach(name => {
-                const property = this._properties[name];
-                // dates in Dataframes are mapped to [0,1] to maximize precision
-                const d = util.castDate(f.properties[name]).getTime();
-                const min = property.min;
-                const max = property.max;
-                const n = (d - min.getTime()) / (max.getTime() - min.getTime());
-                properties[name][i] = n;
+                // note that GeoJSON does not support multi-value properties
+                properties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
             });
         }
         return properties;
@@ -295,13 +292,13 @@ export default class GeoJSON extends Base {
     _getDataframeType (type) {
         switch (type) {
             case 'Point':
-                return 'point';
+                return GEOMETRY_TYPE.POINT;
             case 'LineString':
             case 'MultiLineString':
-                return 'line';
+                return GEOMETRY_TYPE.LINE;
             case 'Polygon':
             case 'MultiPolygon':
-                return 'polygon';
+                return GEOMETRY_TYPE.POLYGON;
             default:
                 return '';
         }
@@ -325,7 +322,7 @@ export default class GeoJSON extends Base {
         if (this._type === 'Point') {
             return new Float32Array(this._features.length * 6);
         }
-        return [];
+        return ([]);
     }
 
     _decodeGeometry () {
@@ -335,7 +332,7 @@ export default class GeoJSON extends Base {
             const type = geometry.type;
             const coordinates = geometry.coordinates;
             if (this._type !== type) {
-                throw new CartoValidationError('source', `multipleFeatureTypes[${this._type}, ${type}]`);
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} multiple geometry types not supported: found '${type}' instead of '${this._type}'.`);
             }
             if (type === 'Point') {
                 const point = this._computePointGeometry(coordinates);

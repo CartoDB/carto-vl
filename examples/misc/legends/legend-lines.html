@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>San Francisco</h1>
+      </header>
+      <section>
+        <div id="controls">
+          <ul id="content"></ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-122.40432, 37.804421878656186],
+      zoom: 11.2
+    });
+
+    // Autenticate the client
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define the source
+    const source = new carto.source.Dataset('sf_stclines');
+
+    // Define the visualization
+    const viz = new carto.Viz(`
+      color: ramp(top($st_type, 5), bold)
+      width: 2
+    `);
+
+    // Create the layer
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', () => {
+      hideLoader();
+
+      // Get the information for legend
+      const colorLegend = layer.viz.color.getLegendData({
+        othersLabel: 'Default'
+      });
+
+      let colorLegendList = '';
+      colorLegend.data.forEach((legend) => {
+        const colorHex = rgbToHex(legend.value);
+        colorLegendList +=
+          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
+      });
+
+      // Update the legend with the legend information
+      document.getElementById('content').innerHTML = colorLegendList;
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+
+    function rgbToHex(color) {
+      return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+    }
+
+  </script>
+</body>
+
+</html>

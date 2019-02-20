@@ -1,44 +1,45 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Populated places | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
-  <!-- Include Mapbox GL JS -->
-  <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
-  <!-- Include Mapbox GL CSS -->
-  <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
-  <div id="controls">
-    <ul>
-      <li>
-        <input type="radio" name="pop" onclick="setAll()" id="all" checked>
-        <label for="all">All places<label>
-      </li>
-      <li>
-        <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
-        <label for="most">Very populated places</label>
-      </li>
-      <li>
-        <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
-        <label for="less">Less populated places</label>
-      </li>
-    </ul>
-  </div>
+  <aside class="toolbox">
+    <div class="box">
+      <div id="controls">
+        <ul>
+          <li>
+            <input type="radio" name="pop" onclick="setAll()" id="all" checked>
+            <label for="all">All places<label>
+          </li>
+          <li>
+            <input type="radio" name="pop" onclick="setVeryPopulated()" id="most">
+            <label for="most">Very populated places</label>
+          </li>
+          <li>
+            <input type="radio" name="pop" onclick="setLessPopulated()" id="less">
+            <label for="less">Less populated places</label>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
-      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      style: carto.basemaps.voyager,
       center: [0, 30],
       zoom: 2,
       scrollZoom: false,
-      dragRotate: false,
-      touchZoomRotate: false,
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -47,12 +48,12 @@
     map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
     const populatedPlacesSource = new carto.source.Dataset(`
-      ne_10m_populated_places_simple
+      populated_places
     `);
     const allPlacesViz = new carto.Viz(`
       width: 6
@@ -93,4 +94,5 @@
     }
   </script>
 </body>
+
 </html>

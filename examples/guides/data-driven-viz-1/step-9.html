@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Railroad accidents | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Weather Conditions</h1>
+            </header>
+            <section>
+                <div id="controls">
+                    <ul id="content"></ul>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 2.75,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            width: 5
+            color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            strokeWidth: 0.2
+            strokeColor: black
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            hideLoader();
+
+            const colorLegend = layer.viz.color.getLegendData();
+            let colorLegendList = '';
+
+            function rgbToHex(color) {
+                return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+            }
+            function hideLoader() {
+                document.getElementById('loader').style.opacity = '0';
+            }
+            colorLegend.data.forEach((legend, index) => {
+                const color = rgbToHex(legend.value);
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other causes')}</span></li>\n`;
+            });
+
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+    </script>
+</body>
+
+</html>

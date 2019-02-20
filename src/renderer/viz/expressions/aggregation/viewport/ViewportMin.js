@@ -44,7 +44,7 @@ export default class ViewportMin extends ViewportAggregation {
     accumViewportAgg (feature) {
         const propertyValue = this.property.eval(feature);
 
-        if (!Number.isNaN(propertyValue)) {
+        if (propertyValue !== null) {
             this._value = Math.min(this._value, propertyValue);
         }
     }

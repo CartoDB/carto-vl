@@ -4,14 +4,14 @@ attribute vec2 vertexPosition;
 attribute vec2 featureID;
 attribute vec2 normal;
 
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
-uniform vec2 normalScale;
+uniform float normalScale;
+uniform vec2 resolution;
 
 uniform sampler2D colorTex;
 uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
+uniform mat4 matrix;
 
 varying lowp vec4 color;
 
@@ -20,7 +20,7 @@ float decodeWidth(vec2 enc) {
 }
 
 $propertyPreface
-$offset_preface
+$transform_preface
 
 void main(void) {
     // 64 is computed based on RTT_WIDTH and the depth buffer precision
@@ -39,12 +39,16 @@ void main(void) {
     c.a *= filtering;
     float size = decodeWidth(texture2D(strokeWidthTex, featureID).rg);
 
-    vec4 p = vec4(vertexScale*(vertexPosition)+normalScale*normal*size-vertexOffset, z, 1.);
-    p.xy += normalScale*($offset_inline);
+    vec2 n = normal*size*normalScale;
+    vec4 p =  matrix*vec4(vertexPosition+n, 0., 1.);
+    p/=p.w;
+
+    p.xy = $transform_inline(p.xy*resolution*0.5)/resolution*2.;
 
     if (c.a==0.){
         p.x=10000.;
     }
+    p.z=z;
     color = vec4(c.rgb*c.a, c.a);
     gl_Position  = p;
 }

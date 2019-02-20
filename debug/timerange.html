@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Animation demo | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+          id: 'background', type: 'background',
+          paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      apiKey: 'default_public',
+      user: 'cartovl'
+    });
+
+    const animStart = '2018-04-11T12:00:00Z';
+    // const animEnd = '2018-04-18T12:00:00Z';
+    const animEnd = '2019-12-18T12:00:00Z';
+    const animDuration = 10;
+    const lineLength = 600000;
+
+    const s = carto.expressions;
+    const source = new carto.source.SQL(`
+      WITH params AS (
+        SELECT
+        -- simulation time limits:
+        '${animStart}'::timestamp with time zone AS min_st,
+        '${animEnd}'::timestamp with time zone AS max_st,
+        0.0 AS x0, 0.1 AS y0,
+        200 AS length,
+        50 AS n
+      ),
+      positions AS (
+        SELECT
+          step::float8/n AS s,
+          x0 + (step::float8/n - 0.5)*length AS x, y0 AS y
+        FROM params, generate_series(1, n) AS step
+      )
+      SELECT
+        row_number() over () AS cartodb_id,
+        min_st + (max_st - min_st)*s AS date,
+        ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
+        ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
+        FROM params, positions
+    `);
+    const viz = new carto.Viz(`
+      @month: clusterTime($date, 'month', 'Europe/Madrid')
+
+      // linear uses start date value
+      // width: linear(@month)*60
+      width: linear(@month, '2018-01', '2018-09')*60
+      color: ramp(linear(@month), SUNSET)
+
+      // filter: animation(@month, 10, fade(0.01, 0.01))
+      filter: animation(@month)
+
+      // TODO: buckets should use category?
+      // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
+      // width: ramp(@selMonths, [60, 50, 40, 30], 20)
+
+      @list: viewportFeatures(@month)
+      @maxMonth: globalMax(@month)
+      @minMonth: globalMin(@month)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    let info = true;
+    const animation = ['animation'].includes(viz.filter.expressionName) ? viz.filter : null;
+    layer.on('updated', () => {
+      if (info) {
+        info = !animation;
+        console.log(viz);
+        console.log("Min Month", viz.variables.minMonth.value);
+        console.log("Max Month", viz.variables.maxMonth.value);
+        console.log('Months:', viz.variables.list.value.map(f => viz.variables.month.eval(f.properties).text));
+        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
+      }
+      if (animation) {
+        const time = animation.getProgressValue();
+        if (time) {
+          const msg = `${time.text} (${time.timeZone})`;
+          document.getElementById("timer").textContent = msg;
+        }
+      }
+    });
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event => {
+      if (animation) {
+        const playing = animation.isPlaying();
+        if (playing) {
+          console.log('PAUSE');
+          animation.pause();
+        } else {
+          console.log('PLAY');
+          animation.play();
+        }
+      };
+
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        console.log('Start:', feature.variables.month.value.startValue);
+        console.log('End:', feature.variables.month.value.endValue);
+        console.log('ISO:', feature.variables.month.value.text);
+        console.log('Start D:', feature.variables.month.value.startDate);
+        console.log('End D:', feature.variables.month.value.endDate);
+      }
+    });
+  </script>
+</body>
+
+</html>

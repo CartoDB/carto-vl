@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Proportional symbols | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Proportional symbols</h1>
+            </header>
+            <p class="description open-sans">Select a style</p>
+            <div id="controls">
+                <ul class="actions">
+                    <li>
+                        <label>
+                            <input type="radio" name="source" onclick="viz.width.blendTo('ramp($total_damage, [0, 50])')"
+                                id="viz0" checked>Style 1
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="radio" name="source" onclick="viz.width.blendTo('sqrt(ramp($total_damage, [0, 50^2]))')"
+                                id="viz1">Style 2
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="radio" name="source" onclick="viz.width.blendTo('sqrt($total_damage/globalMax($total_damage))*50')"
+                                id="viz4">Style 3
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="radio" name="source" onclick="viz.width.blendTo('ramp(globalEqIntervals($total_damage, 3), [0.5, 50])')"
+                                id="viz2">Style 4
+                        </label>
+                    </li>
+                </ul>
+                <div id="info"></div>
+                <header>
+                    <h1>US Rail Accidents</h1>
+                </header>
+                <p class="description open-sans">Type of accident</p>
+                <section>
+                    <div id="controls">
+                        <ul id="content"></ul>
+                    </div>
+                </section>
+            </div>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 3.5,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            width: ramp($total_damage, [0, 50])
+            strokeColor: black
+            strokeWidth: 0.2
+            color: ramp(top($accident_type, 3), [#3969AC, #F2B701, #E73F74], #A5AA99)
+`);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            hideLoader();
+
+            const colorLegend = layer.viz.color.getLegendData();
+            let colorLegendList = '';
+
+            function rgbToHex(color) {
+                return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+            }
+            function hideLoader() {
+                document.getElementById('loader').style.opacity = '0';
+            }
+            colorLegend.data.forEach((legend, index) => {
+                const color = legend.value
+                    ? rgbToHex(legend.value)
+                    : 'white'
+
+                if (color) {
+                    colorLegendList +=
+                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'All other causes')}</span></li>\n`;
+                }
+            });
+
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+    </script>
+</body>
+
+</html>

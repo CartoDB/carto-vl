@@ -8,7 +8,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         validateMaxArgumentsError('viewportMin', ['number', 'number']);
         validateMaxArgumentsError('viewportSum', ['number', 'number']);
         validateMaxArgumentsError('viewportAvg', ['number', 'number']);
-        validateMaxArgumentsError('viewportCount', ['number', 'number']);
+        validateMaxArgumentsError('viewportCount', ['number']);
         validateMaxArgumentsError('viewportPercentile', ['number', 'number', 'number']);
         validateMaxArgumentsError('viewportHistogram', ['number', 'number', 'number', 'number']);
     });
@@ -18,25 +18,25 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
     const $cat = s.property('cat');
 
     describe('viewport filtering', () => {
-        function fakeDrawMetadata (expr) {
-            const METADATA = new Metadata({
-                properties: {
-                    numeric_with_nulls: { type: 'number' },
-                    price: { type: 'number' },
-                    cat: {
-                        type: 'category',
-                        categories: [
-                            { name: 'a' },
-                            { name: 'b' },
-                            { name: 'c' }
-                        ]
-                    }
+        const METADATA = new Metadata({
+            properties: {
+                numeric_with_nulls: { type: 'number' },
+                price: { type: 'number' },
+                cat: {
+                    type: 'category',
+                    categories: [
+                        { name: 'a' },
+                        { name: 'b' },
+                        { name: 'c' }
+                    ]
                 }
-            });
+            }
+        });
 
+        function fakeDrawMetadata (expr) {
             expr._bindMetadata(METADATA);
             expr._resetViewportAgg(METADATA);
-            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: NaN });
+            expr.accumViewportAgg({ price: 1.5, cat: 'b', numeric_with_nulls: null });
             expr.accumViewportAgg({ price: 2, cat: 'c', numeric_with_nulls: 2 });
             expr.accumViewportAgg({ price: 0.5, cat: 'b', numeric_with_nulls: 1 });
             expr.accumViewportAgg({ price: 0, cat: 'a', numeric_with_nulls: 0 });
@@ -99,14 +99,8 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
         });
 
         describe('viewportCount', () => {
-            it('($price) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($price);
-                fakeDrawMetadata(viewportCount);
-                expect(viewportCount.eval()).toEqual(4);
-            });
-
-            it('($nulls) should return the metadata count', () => {
-                const viewportCount = s.viewportCount($nulls);
+            it('() should return the metadata count', () => {
+                const viewportCount = s.viewportCount();
                 fakeDrawMetadata(viewportCount);
                 expect(viewportCount.eval()).toEqual(4);
             });
@@ -119,13 +113,16 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
 
+            viewportPercentile = s.viewportPercentile($price, 1);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(0);
+
             viewportPercentile = s.viewportPercentile($price, 24);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0);
             viewportPercentile = s.viewportPercentile($price, 26);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
-
             viewportPercentile = s.viewportPercentile($price, 49);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(0.5);
@@ -136,6 +133,7 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 74);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(1.5);
+
             viewportPercentile = s.viewportPercentile($price, 76);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
@@ -143,10 +141,14 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
             viewportPercentile = s.viewportPercentile($price, 100);
             fakeDrawMetadata(viewportPercentile);
             expect(viewportPercentile.value).toEqual(2);
+
+            viewportPercentile = s.viewportPercentile($price, 999);
+            fakeDrawMetadata(viewportPercentile);
+            expect(viewportPercentile.value).toEqual(2);
         });
 
-        it('viewportHistogram($price, 1, 3) should eval to the correct histogram', () => {
-            const viewportHistogram = s.viewportHistogram($price, 1, 3);
+        it('viewportHistogram($price, 3, 1) should eval to the correct histogram', () => {
+            const viewportHistogram = s.viewportHistogram($price, 3, 1);
             fakeDrawMetadata(viewportHistogram);
             expect(viewportHistogram.value).toEqual([
                 {
@@ -159,6 +161,21 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                 },
                 {
                     x: [4 / 3, 2],
+                    y: 2
+                }
+            ]);
+        });
+
+        it('viewportHistogram($price, [[0, 1], [1, 2]], 1) should eval to the correct histogram', () => {
+            const viewportHistogram = s.viewportHistogram($price, [[0, 1.5], [1.5, 3]], 1);
+            fakeDrawMetadata(viewportHistogram);
+            expect(viewportHistogram.value).toEqual([
+                {
+                    x: [0, 1.5],
+                    y: 2
+                },
+                {
+                    x: [1.5, 3],
                     y: 2
                 }
             ]);
@@ -181,6 +198,76 @@ describe('src/renderer/viz/expressions/viewportAggregation', () => {
                     y: 1
                 }
             ]);
+        });
+
+        it('viewportHistogram.getJoinedValues should be able to join data sorted by frequency', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            fakeDrawMetadata(viewportHistogram);
+            const fakeValues = [
+                {
+                    key: 'b',
+                    value: 10
+                },
+                {
+                    key: 'c',
+                    value: 20
+                },
+                {
+                    key: 'a',
+                    value: 30
+                }
+            ];
+
+            const joinedValues = viewportHistogram.getJoinedValues(fakeValues);
+            expect(joinedValues).toEqual(
+                [
+                    {
+                        frequency: 2,
+                        key: 'b',
+                        value: 10
+                    },
+                    {
+                        frequency: 1,
+                        key: 'a',
+                        value: 30
+                    },
+                    {
+                        frequency: 1,
+                        key: 'c',
+                        value: 20
+                    }
+                ]
+            );
+        });
+
+        it('viewportHistogram.getJoinedValues should be combined with ramp.getLegendData', () => {
+            const viewportHistogram = s.viewportHistogram($cat);
+            const ramp = s.ramp($cat, s.palettes.PRISM);
+            ramp._bindMetadata(METADATA);
+            fakeDrawMetadata(viewportHistogram);
+
+            const values = ramp.getLegendData().data;
+            const joinedValues = viewportHistogram.getJoinedValues(values);
+
+            expect(joinedValues).toEqual(
+                [
+                    {
+                        frequency: 2,
+                        key: 'b',
+                        value: { r: 29, g: 105, b: 150, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'a',
+                        value: { r: 95, g: 70, b: 144, a: 1 }
+                    },
+                    {
+                        frequency: 1,
+                        key: 'c',
+                        value: { r: 56, g: 166, b: 165, a: 1 }
+                    }
+                ]
+            );
         });
     });
 });

@@ -1,9 +1,11 @@
 import Dataset from '../../../src/sources/Dataset';
+import { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import { regExpThatContains as thatContains } from '../../../src/utils/util';
 
 describe('sources/dataset', () => {
     const tableName = 'table0';
     const auth = {
-        user: 'test',
+        username: 'test',
         apiKey: '1234567890'
     };
     const options = {
@@ -32,13 +34,15 @@ describe('sources/dataset', () => {
         it('should throw an error if tableName is not valid', function () {
             expect(function () {
                 new Dataset();
-            }).toThrowError('`tableName` property is required.');
+            }).toThrowError(thatContains(cvt.MISSING_REQUIRED + ' \'tableName\''));
+
             expect(function () {
                 new Dataset(1234);
-            }).toThrowError('`tableName` property must be a string.');
+            }).toThrowError(thatContains(cvt.INCORRECT_TYPE + ' \'tableName\''));
+
             expect(function () {
                 new Dataset('');
-            }).toThrowError('`tableName` property must be not empty.');
+            }).toThrowError(thatContains(cvt.INCORRECT_VALUE + ' \'tableName\''));
         });
     });
 });

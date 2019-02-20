@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        // Add basemap and set properties
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-0.12796893854942937, 35.1654623242204],
+            zoom: 2.8,
+            scrollZoom: false
+        });
+
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-left');
+
+        //** CARTO VL functionality begins here **//
+
+        // Autenticate the client
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        // Define source
+        const source = new carto.source.Dataset('bird_journey');
+
+        // Define and style Viz object
+        const viz = new carto.Viz(`
+            filter: animation($date_time, 10, fade(1, 1))
+        `);
+
+        // Define map layer
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Add the layer to the map
+        layer.addTo(map);
+    </script>
+</body>
+
+</html>

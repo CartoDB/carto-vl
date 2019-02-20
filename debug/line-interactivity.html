@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Add pop-ups | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Add pop-ups</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Create pop-up information windows and interact with your map</p>
+        <div id="controls">
+          <ul class="actions">
+            <li>
+              <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
+              <label for="click">Pop-ups on click</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
+              <label for="hover">Pop-ups on hover</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [0, 30],
+      zoom: 1.5,
+      scrollZoom: false,
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    // Define pop-up
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
+
+    // Define user
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    // Define layer
+    const source = new carto.source.Dataset('sf_stclines');
+    const viz = new carto.Viz(`
+      width: 10
+      color: ramp($st_type, prism)
+      strokeColor: opacity(BlueViolet, 0.8)
+      @v: viewportHistogram($st_type)
+      @t: $st_type
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.on('updated', () => {
+      console.log(viz.variables.v.value);
+    })
+
+    // Define interactivity
+    const interactivity = new carto.Interactivity(layer);
+    const delay = 50;
+    let clickedFeatureId = null;
+    interactivity.on('featureEnter', event => {
+      event.features.forEach(feature => {
+        if (feature.id !== clickedFeatureId) {
+          feature.blendTo({
+            color: 'opacity(DeepPink, 0.5)',
+            strokeWidth: '4',
+            strokeColor: 'opacity(DeepPink, 0.8)'
+          }, delay);
+        }
+      });
+    });
+    interactivity.on('featureLeave', event => {
+      event.features.forEach(feature => {
+        if (feature.id !== clickedFeatureId) {
+          feature.reset(delay);
+        }
+      });
+    });
+    interactivity.on('featureClick', event => {
+      if (event.features.length) {
+        const feature = event.features[0];
+        clickedFeatureId = feature.id;
+        feature.blendTo({
+          color: 'opacity(LimeGreen, 0.5)',
+          strokeWidth: '7',
+          strokeColor: 'opacity(LimeGreen, 0.8)'
+        }, delay);
+      }
+    });
+    interactivity.on('featureClickOut', event => {
+      if (event.features.length) {
+        const feature = event.features[0];
+        clickedFeatureId = '';
+        feature.reset(delay);
+      }
+    });
+
+    layer.addTo(map, 'watername_ocean');
+    layer.on('loaded', hideLoader);
+
+    setPopupsClick();
+
+    function setPopupsClick() {
+      interactivity.off('featureHover', updatePopup);
+      interactivity.on('featureClick', updatePopup);
+    }
+    function setPopupsHover() {
+      interactivity.off('featureClick', updatePopup);
+      interactivity.on('featureHover', updatePopup);
+    }
+    function updatePopup(event) {
+      if (event.features.length > 0) {
+        const vars = event.features[0].variables;
+        popup.setHTML(`
+        <div>
+          <p class="description open-sans">Population: ${vars.t.value}</h3>
+        </div>
+        `);
+        popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
+        if (!popup.isOpen()) {
+          popup.addTo(map);
+        }
+      } else {
+        popup.remove();
+      }
+    }
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

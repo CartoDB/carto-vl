@@ -9,6 +9,11 @@ const testFile = 'scenario.js';
 const sources = loadGeoJSONSources();
 const PORT = 5000;
 
+const mapboxVersion = {
+    js: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
+    css: `http://localhost:${PORT}/` + path.join('node_modules', 'mapbox-gl', 'dist', 'mapbox-gl.css')
+};
+
 function loadFiles (directory) {
     testsDir = directory;
     let files = [];
@@ -51,13 +56,22 @@ function takeReference (file, template) {
     }
 }
 
-async function testSST (file, template, browser) {
-    writeTemplate(file, template);
+function getDeviceScaleFactor (file) {
+    const matches = file.match(/@([0-9]*)x/);
+    if (matches && matches[1]) {
+        return parseInt(matches[1], 10);
+    }
+    return 1;
+}
+
+async function testSST (file, template, browser, mapbox = mapboxVersion) {
+    writeTemplate(file, template, mapbox);
     let options = loadOptions();
     options.url = `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.html`;
     options.input = `${getPNG(file)}`;
     options.output = `${getOutPNG(file)}`;
     options.consoleFn = handleBrowserConsole;
+    options.deviceScaleFactor = getDeviceScaleFactor(file);
     options.browser = browser;
     const capturedErrors = [];
     options.pageEvents = {
@@ -87,14 +101,15 @@ async function testSST (file, template, browser) {
     return result;
 }
 
-function writeTemplate (file, template) {
+function writeTemplate (file, template, mapbox = mapboxVersion) {
     const bundle = process.env.MIN ? 'carto-vl.min' : 'carto-vl';
     fs.writeFileSync(getHTML(file), template({
         file: `http://localhost:${PORT}/test/${getLocalhostURL(file)}/scenario.js`,
         sources: sources,
         cartovl: `http://localhost:${PORT}/dist/${bundle}.js`,
-        mapboxgl: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.js'),
-        mapboxglcss: `http://localhost:${PORT}/` + path.join('node_modules', '@carto', 'mapbox-gl', 'dist', 'mapbox-gl.css')
+        mapboxgl: mapbox.js,
+        mapboxglcss: mapbox.css,
+        glmatrix: `http://localhost:${PORT}/` + path.join('node_modules', 'gl-matrix', 'dist', 'gl-matrix-min.js')
     }));
 }
 
@@ -134,7 +149,7 @@ function loadOptions () {
 }
 
 function headless () {
-    return process.platform === 'linux';
+    return process.platform === 'darwin' || process.platform === 'linux';
 }
 
 /**

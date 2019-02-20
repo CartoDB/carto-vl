@@ -1,7 +1,13 @@
 import BaseExpression from './base';
 import Property from './basic/property';
+import ClusterTimeDimension from './aggregation/cluster/ClusterTimeDimension';
+import ClusterAggregation from './aggregation/cluster/ClusterAggregation';
+import ClusterCount from './aggregation/cluster/ClusterCount';
 import { implicitCast } from './utils';
-import schema from '../../schema';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoRuntimeError from '../../../errors/carto-runtime-error';
+import { genLightweightFeatureClass } from '../../../interactivity/lightweightFeature';
+import { getCompoundFeature } from '../../../interactivity/commonFeature';
 
 /**
  * Generates a list of features in the viewport
@@ -23,7 +29,6 @@ import schema from '../../schema';
  * });
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
@@ -37,7 +42,6 @@ import schema from '../../schema';
  * `);
  * const layer = carto.Layer('layer', source, viz);
  * ...
-
  * layer.on('updated', () => {
  *   viz.variables.list.value.forEach(feature => {
  *     console.log('value:', feature.value, 'category:', feature.category);
@@ -57,7 +61,6 @@ export default class ViewportFeatures extends BaseExpression {
         // in order for variables to be resolved.
         // And as an additional bonus we don't need to define _getMinimumNeededSchema
         super(_childrenFromProperties(properties));
-
         this.expr = [];
         this.type = 'featureList';
         this._isViewport = true;
@@ -66,7 +69,7 @@ export default class ViewportFeatures extends BaseExpression {
     }
 
     _applyToShaderSource () {
-        throw new Error('viewportFeatures cannot be used in visualizations');
+        throw new CartoRuntimeError('\'viewportFeatures\' cannot be used in visualizations.');
     }
 
     isFeatureDependent () {
@@ -81,35 +84,30 @@ export default class ViewportFeatures extends BaseExpression {
         return this.expr;
     }
 
-    _resetViewportAgg () {
+    _resetViewportAgg (metadata, renderLayer) {
         if (!this._FeatureProxy) {
-            if (!this._requiredProperties.every(p => (p.isA(Property)))) {
-                throw new Error('viewportFeatures arguments can only be properties');
+            if (!this._requiredProperties.every(p => validProperty(p))) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} viewportFeatures arguments can only be properties`);
             }
-            const columns = Object.keys(schema.simplify(this._getMinimumNeededSchema()));
-            this._FeatureProxy = this.genViewportFeatureClass(columns);
+
+            const propertyNames = this._requiredProperties.map((p) => {
+                return { property: p.propertyName, variable: p._variableName };
+            });
+            this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];
     }
 
-    accumViewportAgg (feature) {
-        this.expr.push(new this._FeatureProxy(feature));
-    }
+    accumViewportAgg (featurePieces) {
+        featurePieces = Array.isArray(featurePieces) ? featurePieces : [featurePieces];
 
-    genViewportFeatureClass (properties) {
-        const cls = class ViewportFeature {
-            constructor (feature) {
-                this._feature = feature;
-            }
-        };
-        properties.forEach(prop => {
-            Object.defineProperty(cls.prototype, prop, {
-                get: function () {
-                    return this._feature[prop];
-                }
-            });
-        });
-        return cls;
+        if (featurePieces.length === 1) {
+            this.expr.push(new this._FeatureProxy(featurePieces[0]));
+        } else {
+            const pieces = featurePieces.map((piece) => { return new this._FeatureProxy(piece); });
+            const compoundFeature = getCompoundFeature(pieces);
+            this.expr.push(compoundFeature);
+        }
     }
 }
 
@@ -120,4 +118,9 @@ function _childrenFromProperties (properties) {
         childContainer['p' + ++i] = property;
     });
     return childContainer;
+}
+
+function validProperty (property) {
+    const validExpressions = [Property, ClusterAggregation, ClusterCount, ClusterTimeDimension];
+    return validExpressions.some(expression => property.isA(expression));
 }

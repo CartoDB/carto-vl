@@ -4,91 +4,127 @@ import Viz from './Viz';
 import SourceBase from './sources/Base';
 import Renderer from './renderer/Renderer';
 import RenderLayer from './renderer/RenderLayer';
-import CartoValidationError from './errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoRuntimeError from '../src/errors/carto-runtime-error';
+
 import { cubic } from './renderer/viz/expressions';
-import { layerVisibility } from './constants/layer';
+import { mat4 } from 'gl-matrix';
+import { computeViewportFromCameraMatrix } from './utils/util';
+import LayerConcurrencyHelper from './LayerConcurrencyHelper';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
 const renderers = new WeakMap();
 
+const states = Object.freeze({
+    INIT: 'init', // Initial state until the Source is rendered for the first time
+    IDLE: 'idle', // The Source has been rendered for the first time already, but there are no scheduled updates
+    UPDATING: 'updating' // The Source has been rendered for the first time already and there is a scheduled update
+});
+
 /**
 *
 * A Layer is the primary way to visualize geospatial data.
 *
-* To create a layer a {@link carto.source.Base|source} and {@link carto.Viz|viz} are required:
+* To create a layer a {@link carto.source|source} and {@link carto.Viz|viz} are required:
 *
-* - The {@link carto.source.Base|source} is used to know **what** data will be displayed in the Layer.
+* - The {@link carto.source|source} is used to know **what** data will be displayed in the Layer.
 * - The {@link carto.Viz|viz} is used to know **how** to draw the data in the Layer, Viz instances can only be bound to one single layer.
 *
-* @param {string} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
-* @param {carto.source.Base} source - The source of the data
+* Note: This Layer implements {@link https://www.mapbox.com/mapbox-gl-js/api/#customlayerinterface|Mapbox GL JS - Custom Layer Interface}
+*
+* @param {String} id - The ID of the layer. Can be used in the {@link addTo|addTo} function
+* @param {carto.source} source - The source of the data
 * @param {carto.Viz} viz - The description of the visualization of the data
+* @throws CartoError
 *
 * @example
 * const layer = new carto.Layer('layer0', source, viz);
 *
-* @fires CartoError
-*
 * @constructor Layer
-* @memberof carto
+* @name carto.Layer
 * @api
 */
+
 export default class Layer {
     constructor (id, source, viz) {
         this._checkId(id);
         this._checkSource(source);
         this._checkViz(viz);
-        this._init(id, source, viz);
-    }
 
-    _init (id, source, viz) {
-        viz._boundLayer = this;
-        this._context = new Promise((resolve) => {
-            this._contextInitialize = resolve;
-        });
-
-        /* Custom Layer API attributes:
+        /* Mapbox GL Custom Layer API attributes:
           - id: string
           - type: "custom"
         */
         this.id = id;
         this.type = 'custom';
 
-        this.metadata = null;
-        this._state = 'init';
+        viz._boundLayer = this;
+
+        this._context = new Promise(resolve => {
+            this._contextInitialize = resolve;
+        });
+
+        this._state = states.INIT;
         this._visible = true;
-        this._isLoaded = false;
-        this._matrix = null;
-        this._fireUpdateOnNextRender = false;
         this._emitter = mitt();
-        this._oldDataframes = new Set();
         this._renderLayer = new RenderLayer();
-        this._atomicChangeUID = 0;
 
-        this.update(source, viz);
+        this.concurrencyHelper = new LayerConcurrencyHelper();
+        this._sourcePromise = this.update(source, viz);
+        this._renderWaiters = [];
+        this._cameraMatrix = mat4.identity([]);
     }
 
     /**
-     * Get layer visibility. Can be 'visible' or 'none'.
-     * @readonly
-     */
-    get visibility () {
-        return this._visible ? layerVisibility.VISIBLE : layerVisibility.HIDDEN;
-    }
-
-    /**
-     * Get layer visibility. Can be true or false.
-     * @readonly
+     * Layer visibility property.
+     *
+     * @type {boolean}
+     * @memberof carto.Layer
+     * @instance
+     * @api
      */
     get visible () {
         return this._visible;
     }
 
+    set visible (visible) {
+        const initial = this._visible;
+        this.map.setLayoutProperty(this.id, 'visibility', visible ? 'visible' : 'none');
+        this._visible = visible;
+        if (visible !== initial) {
+            this._fire('updated', 'visibility change');
+        }
+    }
+
     /**
-     * Register an event handler for the given event name. Valid names are: `loaded`, `updated`.
+     * Change layer visibility to visible
      *
-     * @param {string} eventName - Type of event to listen for
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     * @fires updated
+     */
+    show () {
+        this.visible = true;
+    }
+
+    /**
+     * Change layer visibility to hidden
+     *
+     * @memberof carto.Layer
+     * @instance
+     * @api
+     * @fires updated
+     */
+    hide () {
+        this.visible = false;
+    }
+
+    /**
+     * Register an event handler for the given event name.
+     *
+     * @param {String} eventName - Type of event to listen for. Valid names are: `loaded`, `updated`.
      * @param {function} callback - Function to call in response to given event
      * @memberof carto.Layer
      * @instance
@@ -101,7 +137,7 @@ export default class Layer {
     /**
      * Remove an event handler for the given type.
      *
-     * @param {string} eventName - Type of event to unregister
+     * @param {String} eventName - Type of event to unregister. Valid names are: `loaded`, `updated`.
      * @param {function} callback - Handler function to unregister
      * @memberof carto.Layer
      * @instance
@@ -121,19 +157,27 @@ export default class Layer {
      * @api
      */
     addTo (map, beforeLayerID) {
-        const STYLE_ERROR_REGEX = /Style is not done loading/;
-
+        // Manage errors, whether they are an Evented Error or a common Error
         try {
+            map.once('error', (data) => {
+                console.warn(data.error.message);
+                this._waitForMapToLoad(map, beforeLayerID);
+            });
             map.addLayer(this, beforeLayerID);
         } catch (error) {
-            if (!STYLE_ERROR_REGEX.test(error)) {
-                throw new Error(error);
+            const STYLE_ERROR_REGEX = /Style is not done loading/;
+            const NO_STYLE_AT_ALL = /Cannot read property 'addLayer' of undefined/;
+            if (!(STYLE_ERROR_REGEX.test(error) || NO_STYLE_AT_ALL.test(error))) {
+                throw new CartoRuntimeError(`Error adding layer to map: ${error}`);
             }
-
-            map.on('load', () => {
-                map.addLayer(this, beforeLayerID);
-            });
+            this._waitForMapToLoad(map, beforeLayerID);
         }
+    }
+
+    _waitForMapToLoad (map, beforeLayerID) {
+        map.on('load', () => {
+            map.addLayer(this, beforeLayerID);
+        });
     }
 
     /**
@@ -150,70 +194,149 @@ export default class Layer {
     }
 
     /**
-     * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.: the viz will be changed with the source, not before it.
+     * Update the layer with a new Source and a new Viz object, replacing the current ones. The update is done atomically, i.e.:
+     * the viz will be changed with the source, not before it.
+     *
      * This method will return a promise that will be resolved once the source and the visualization are validated.
-     * The promise will be rejected if the validation fails, for example because the visualization expects a property name that is not present in the source.
+     *
+     * The promise will be rejected if the validation fails, for example
+     * because the visualization expects a property name that is not present in the source.
+     *
      * The promise will be rejected also if this method is invoked again before the first promise is resolved.
-     * If the promise is rejected the layer's source and viz won't be changed.
-     * @param {carto.source.Base} source - The new Source object
-     * @param {carto.Viz?} viz - Optional. The new Viz object
+     * If the promise is rejected the layer's source and viz won't be changed by this call.
+     *
+     * Concurrent calls to `blendToViz` or `blendTo` won't override calls to update (like calls to `update` do).
+     *
+     * @param {carto.source} source - The new Source object.
+     * @param {carto.Viz?} viz - Optional. The new Viz object. Defaults to the current viz.
      * @memberof carto.Layer
      * @instance
      * @async
      * @api
      */
-    async update (source, viz) {
-        if (viz === undefined) {
-            // Use current viz
-            viz = this._viz;
-        }
+    async update (source, viz = this._viz) {
+        return this._update(source, viz, true);
+    }
+
+    async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
 
-        source = source._clone();
-        this._atomicChangeUID++;
-        const uid = this._atomicChangeUID;
-        const loadImagesPromise = viz.loadImages();
-        const metadata = await source.requestMetadata(viz);
-        await loadImagesPromise;
+        const safeSource = this._cloneSourceIfDifferent(source);
 
+        let change = this._initChange(majorChange);
+        const [, metadata] = await Promise.all([
+            viz.loadImages(), // start requesting images ASAP
+            safeSource.requestMetadata(viz)
+        ]);
         await this._context;
-        if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
-        }
 
-        // Everything was ok => commit changes
+        this._endChange(majorChange, change);
+
+        this._commitSuccesfulUpdate(metadata, viz, safeSource);
+    }
+
+    _initChange (majorChange) {
+        if (majorChange) {
+            return this.concurrencyHelper.initMajorChange();
+        }
+        return this.concurrencyHelper.initMinorChange();
+    }
+
+    _endChange (majorChange, change) {
+        if (majorChange) {
+            this.concurrencyHelper.endMajorChange(change);
+        } else {
+            this.concurrencyHelper.endMinorChange(change);
+        }
+    }
+
+    /**
+     * Updating viz and source, after having checked them and having required new metadata
+     *
+     * @param {Metadata} metadata
+     * @param {carto.Viz} newViz
+     * @param {carto.source} newSource
+     */
+    _commitSuccesfulUpdate (metadata, newViz, newSource) {
         this.metadata = metadata;
 
-        source.bindLayer(this._onDataframeAdded.bind(this), this._onDataLoaded.bind(this));
+        this._commitVizChange(newViz);
+        this._commitSourceChange(newSource);
 
-        if (this._source !== source) {
-            this._freeSource();
-        }
+        // to force pre-render (which gives us the matrix to request data from the source...)
+        this._needRefresh();
+    }
 
-        this._source = source;
-        this.requestData();
-
-        viz.setDefaultsIfRequired(this.metadata.geomType);
-        await this._context;
-        if (this._atomicChangeUID > uid) {
-            throw new Error('Another atomic change was done before this one committed');
-        }
-
+    /**
+     * Updates the viz with the newViz
+     *
+     * @param {carto.Viz} newViz
+     */
+    _commitVizChange (newViz) {
         if (this._viz) {
             this._viz.onChange(null);
         }
-        viz.setDefaultsIfRequired(this._renderLayer.type);
-        this._viz = viz;
-        viz.onChange(this._vizChanged.bind(this));
-        this._compileShaders(viz, metadata);
-        this._needRefresh();
+        newViz.setDefaultsIfRequired(this.metadata.geomType);
+        newViz.setDefaultsIfRequired(this._renderLayer.type);
+        newViz.onChange(this._vizChanged.bind(this));
+        newViz._bindMetadata(this.metadata);
+        newViz.gl = this.gl;
+        this._viz = newViz;
+    }
+
+    /**
+     * Updates the source with the newSource
+     *
+     * @param {carto.source} newSource
+     */
+    _commitSourceChange (newSource) {
+        newSource.bindLayer(this._onDataframeAdded.bind(this));
+        if (newSource !== this._source) {
+            this._freeSource();
+        }
+        this._source = newSource;
+    }
+
+    /**
+     * Returns a safe source from the new required source.
+     *
+     * @param {carto.source} source
+     * @returns {carto.source} safeSource
+     */
+    _cloneSourceIfDifferent (source) {
+        // The cloning allows the source to be safely used in other layers.
+        // That's because using `source.requestMetadata()` can update later on its internal state (depending on what's required by the viz)
+
+        let safeSource;
+        if (source !== this._source) {
+            safeSource = source._clone();
+        } else {
+            safeSource = source;
+        }
+        return safeSource;
     }
 
     /**
      * Blend the current viz with another viz.
      *
-     * This allows smooth transforms between two different vizs.
+     * This allows smooth transitions between two different Vizs.
+     *
+     * Blending won't be performed when convenient for the attached Source. This
+     * happens with Maps API sources when the new Viz uses a different set of properties or
+     * aggregations. In these cases a hard transition will be used instead.
+     *
+     * This method returns a promise that will be resolved if validations passed.
+     *
+     * The promise will be rejected if the validation fails, for example
+     * because the visualization expects a property name that is not present in the source.
+     *
+     * The promise will be rejected also if this method is invoked again before the first promise is resolved.
+     * If the promise is rejected the layer's viz won't be changed by this call.
+     *
+     * Concurrent calls to `update` will override the effects of `blendToViz`:
+     * if a call to `blendToViz` is performed after a call to `update`, but the `update` hasn't been resolved yet,
+     * the call to `update` will override the call to `blendToViz` is it resolves.
      *
      * @example <caption> Smooth transition variating point size </caption>
      * // We create two different vizs varying the width
@@ -236,20 +359,12 @@ export default class Layer {
      */
     async blendToViz (viz, ms = 400, interpolator = cubic) {
         this._checkViz(viz);
-        viz.setDefaultsIfRequired(this.metadata.geomType);
+        await this._sourcePromise;
+
+        // It doesn't make sense to blendTo if a new request is required
         if (this._viz && !this._source.requiresNewMetadata(viz)) {
             Object.keys(this._viz.variables).map(varName => {
-                // If an existing variable is not re-declared we add it to the new viz
-                if (!viz.variables[varName]) {
-                    viz.variables[varName] = this._viz.variables[varName];
-                }
-            });
-
-            Object.keys(viz.variables).map(varName => {
-                // If the variable existed, we need to blend it, nothing to do if not
-                if (this._viz.variables[varName]) {
-                    viz.variables[varName]._blendFrom(this._viz.variables[varName], ms, interpolator);
-                }
+                viz.variables[varName] = this._viz.variables[varName];
             });
 
             viz.color._blendFrom(this._viz.color, ms, interpolator);
@@ -260,79 +375,22 @@ export default class Layer {
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
         }
-
-        return this._vizChanged(viz).then(() => {
-            if (this._viz) {
-                this._viz.onChange(null);
-            }
-            viz.setDefaultsIfRequired(this._renderLayer.type);
-            this._viz = viz;
-            this._viz.onChange(this._vizChanged.bind(this));
-        });
+        return this._update(this._source, viz, false);
     }
 
     /**
      * Viz attached to this layer.
      *
-     * Calls to `blendToViz` and `update` wont' update the viz until those calls "commit",
+     * Calls to `blendToViz` and `update` won't update the viz until those calls "commit",
      * having performed and completed all asynchronous necessary sanity checks.
      *
-     * @returns {carto.Viz} - Viz object currently bound to the layer
+     * @type {carto.Viz}
      * @memberof carto.Layer
+     * @readonly
      * @api
      */
     get viz () {
         return this._viz;
-    }
-
-    /**
-     * Change layer visibility to visible
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    show () {
-        this.map.setLayoutProperty(this.id, 'visibility', 'visible');
-        this._visible = true;
-        this.requestData();
-    }
-
-    /**
-     * Change layer visibility to hidden
-     *
-     * @memberof carto.Layer
-     * @instance
-     * @api
-     *
-     * @fires updated
-     */
-    hide () {
-        this.map.setLayoutProperty(this.id, 'visibility', 'none');
-        this._visible = false;
-        this._fire('updated');
-    }
-
-    async requestMetadata (viz) {
-        viz = viz || this._viz;
-        if (!viz) {
-            return;
-        }
-        return this._source.requestMetadata(viz);
-    }
-
-    async requestData (matrix) {
-        // Set renderer zoom and center
-        this._setZoomCenter(matrix);
-
-        if (!this.metadata || !this._visible) {
-            return;
-        }
-
-        this._source.requestData(this._getZoom(), this._getViewport());
-        this._fireUpdateOnNextRender = true;
     }
 
     hasDataframes () {
@@ -344,7 +402,7 @@ export default class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this._visible
+        return this.visible
             ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
             : [];
     }
@@ -353,12 +411,16 @@ export default class Layer {
         return this._viz && this._viz.isAnimated();
     }
 
+    isPlaying () {
+        return this._viz && this._viz.isPlaying();
+    }
+
     /**
      * Custom Layer API: `onAdd` function
      */
     onAdd (map, gl) {
-        this.gl = gl;
         this.map = map;
+        this.gl = gl;
         this.renderer = _getRenderer(map, gl);
 
         // Initialize render layer
@@ -376,11 +438,43 @@ export default class Layer {
      * Custom Layer API: `prerender` function
      */
     prerender (gl, matrix) {
-        // Call request data if the matrix has changed
-        if (!util.equalArrays(this._matrix, matrix)) {
-            this._matrix = matrix;
-            this.requestData(matrix);
+        const isNewCameraMatrix = this._detectAndSetNewMatrix(matrix);
+        if (this._source && this.visible) {
+            this._checkSourceRequestsAndFireEvents(isNewCameraMatrix);
         }
+    }
+
+    _detectAndSetNewMatrix (newMatrix) {
+        const isNewMatrix = !mat4.exactEquals(newMatrix, this._cameraMatrix);
+        if (isNewMatrix) {
+            this._cameraMatrix = newMatrix;
+            this.renderer.matrix = newMatrix; // in case it is not set yet (first layer)
+        }
+        return isNewMatrix;
+    }
+
+    _checkSourceRequestsAndFireEvents (isNewMatrix) {
+        const checkForDataframesUpdate = this._source.requestData(this._getZoom(), this._getViewport());
+
+        checkForDataframesUpdate.then(dataframesHaveChanged => {
+            if (dataframesHaveChanged) {
+                this._needRefresh().then(() => {
+                    if (this._state === states.INIT) {
+                        this._state = states.IDLE;
+                        this._fire('loaded');
+                    }
+                    this._fire('updated', 'different dataframes required from source');
+                });
+            } else {
+                if (isNewMatrix) {
+                    this._fire('updated', 'new camara view');
+                }
+            }
+        });
+    }
+
+    _getViewport () {
+        return computeViewportFromCameraMatrix(this._cameraMatrix);
     }
 
     /**
@@ -389,37 +483,47 @@ export default class Layer {
     render (gl, matrix) {
         this._paintLayer();
 
+        this._renderWaiters.forEach(resolve => resolve());
+
         if (this.isAnimated()) {
-            this._needRefresh();
+            if (this.isPlaying()) {
+                this._needRefresh().then(() => {
+                    this._fire('updated', 'animation is playing');
+                });
+            } else {
+                this._keepTimestampIfPaused();
+            }
+        } else {
+            if (this._state === states.UPDATING) {
+                this._state = states.IDLE;
+                this._fire('updated', 'updated viz');
+            }
         }
+    }
+
+    _keepTimestampIfPaused () {
+        let timestamp = this.renderer.timestamp;
+        // to avoid 'jumps' after resume playing.
+        this._viz._getRootStyleExpressions().forEach(vizExpr => {
+            vizExpr._setTimestamp(timestamp);
+        });
     }
 
     _paintLayer () {
-        if (this._viz && this._viz.colorShader) {
-            this._renderLayer.setViz(this._viz);
-            this.renderer.renderLayer(this._renderLayer, {
-                zoomLevel: this.map.getZoom()
-            });
-            const dataframesHaveChanged = !util.isSetsEqual(this._oldDataframes, new Set(this._renderLayer.getActiveDataframes()));
-            if (this.isAnimated() || this._fireUpdateOnNextRender || dataframesHaveChanged) {
-                this._oldDataframes = new Set(this._renderLayer.getActiveDataframes());
-                this._fireUpdateOnNextRender = false;
-                this._fire('updated');
-            }
-
-            if (!this._isLoaded && this._state === 'dataLoaded') {
-                this._isLoaded = true;
-                this._fire('loaded');
-            }
-        }
+        this._renderLayer.setViz(this._viz);
+        this.renderer.renderLayer(this._renderLayer, {
+            zoomLevel: this.map.getZoom() // for zoom expressions
+        });
     }
 
     _fire (eventType, eventData) {
-        try {
-            return this._emitter.emit(eventType, eventData);
-        } catch (err) {
-            console.error(err);
-        }
+        // We don't want to fire an event within MGL custom layer callback since an error there
+        // would crash MGL renderer
+        // We fire the event asynchronously to be safe
+        new Promise(resolve => {
+            this._emitter.emit(eventType, eventData);
+            resolve();
+        });
     }
 
     /**
@@ -427,26 +531,20 @@ export default class Layer {
      * @param {Dataframe} dataframe
      */
     _onDataframeAdded (dataframe) {
-        dataframe.setFreeObserver(() => {
-            this._needRefresh();
-        });
         this._renderLayer.addDataframe(dataframe);
         if (this._viz) {
             this._viz.setDefaultsIfRequired(dataframe.type);
         }
-        this._needRefresh();
     }
 
     _needRefresh () {
-        this.map.triggerRepaint();
-    }
-
-    /**
-     * Callback executed when the client finishes loading data
-     */
-    _onDataLoaded () {
-        this._state = 'dataLoaded';
-        this._needRefresh();
+        if (this._state === states.IDLE) {
+            this._state = states.UPDATING;
+        }
+        return new Promise(resolve => {
+            this._renderWaiters.push(resolve);
+            this.map.triggerRepaint();
+        });
     }
 
     _addLayerIdToFeature (feature) {
@@ -454,86 +552,42 @@ export default class Layer {
         return feature;
     }
 
-    _compileShaders (viz, metadata) {
-        viz.compileShaders(this.gl, metadata);
-    }
-
     async _vizChanged (viz) {
-        await this._context;
-        if (!this._source) {
-            throw new Error('A source is required before changing the viz');
-        }
-
-        const source = this._source;
-        const loadImagesPromise = viz.loadImages();
-        const metadata = await source.requestMetadata(viz);
-        await loadImagesPromise;
-
-        if (this._source !== source) {
-            throw new Error('A source change was made before the metadata was retrieved, therefore, metadata is stale and it cannot be longer consumed');
-        }
-        this.metadata = metadata;
-        this._compileShaders(viz, this.metadata);
-        this._needRefresh();
-        return this.requestData();
+        return this._update(this._source, viz, false);
     }
 
     _checkId (id) {
-        if (util.isUndefined(id)) {
-            throw new CartoValidationError('layer', 'idRequired');
+        if (id === undefined) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'id'`);
         }
         if (!util.isString(id)) {
-            throw new CartoValidationError('layer', 'idStringRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'id' property must be a string.`);
         }
         if (id === '') {
-            throw new CartoValidationError('layer', 'nonValidId');
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'id' property must be not empty.`);
         }
     }
 
     _checkSource (source) {
-        if (util.isUndefined(source)) {
-            throw new CartoValidationError('layer', 'sourceRequired');
+        if (source === undefined) {
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'source'`);
         }
         if (!(source instanceof SourceBase)) {
-            throw new CartoValidationError('layer', 'nonValidSource');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'source'. See "carto.source".`);
         }
     }
 
     _checkViz (viz) {
         if (util.isUndefined(viz)) {
-            throw new CartoValidationError('layer', 'vizRequired');
+            throw new CartoValidationError(`${cvt.MISSING_REQUIRED} 'viz'`);
         }
         if (!(viz instanceof Viz)) {
-            throw new CartoValidationError('layer', 'nonValidViz');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} The given object is not a valid 'viz'. See "carto.Viz".`);
         }
         if (viz._boundLayer && viz._boundLayer !== this) {
-            throw new CartoValidationError('layer', 'sharedViz');
+            // Not the required 1 on 1 relationship between layer & viz
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The given Viz object is already bound to another layer. Vizs cannot be shared between different layers.`);
         }
-    }
-
-    _setZoomCenter (matrix) {
-        let zoom;
-        let center;
-
-        if (matrix) {
-            // Compute the zoom and center from the matrix.
-            // This is a solution to avoid subscribing to map events and
-            // make a better and efficient use of the Custom Layers interface.
-            // TODO: the best solution is to use the matrix at the shader
-            // level and remove the aspect and scale logic from the renderer
-            zoom = util.computeMatrixZoom(matrix);
-            center = util.computeMatrixCenter(matrix);
-        } else {
-            zoom = util.computeMapZoom(this.map);
-            center = util.computeMapCenter(this.map);
-        }
-
-        this.renderer.setZoom(zoom);
-        this.renderer.setCenter(center);
-    }
-
-    _getViewport () {
-        return this.renderer.getBounds();
     }
 
     _getZoom () {
@@ -556,28 +610,3 @@ function _getRenderer (map, gl) {
     }
     return renderers.get(map);
 }
-
-/**
- *
- * LayerEvent objects are fired by {@link carto.Layer|Layer} objects.
- *
- * @typedef {object} LayerEvent
- * @api
- */
-
-/**
- * A loaded event is fired once the layer is firstly loaded. Loaded events won't be fired after the initial load.
- *
- * @event loaded
- * @type {LayerEvent}
- * @api
- */
-
-/**
- * Updated events are fired every time that viz variables could have changed, like: map panning, map zooming, source data loading or viz changes.
- * This is useful to create external widgets that are refreshed reactively to changes in the CARTO VL map.
- *
- * @event updated
- * @type {LayerEvent}
- * @api
-*/

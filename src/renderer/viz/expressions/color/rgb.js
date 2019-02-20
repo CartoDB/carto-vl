@@ -75,9 +75,11 @@ function genRGB (name, alpha) {
             this.type = 'color';
             this.inlineMaker = inline => `vec4(${inline.r}/255., ${inline.g}/255., ${inline.b}/255., ${alpha ? inline.a : '1.'})`;
         }
+
         get value () {
             return this.eval();
         }
+
         eval (f) {
             return {
                 r: this.r.eval(f),
@@ -86,6 +88,7 @@ function genRGB (name, alpha) {
                 a: alpha ? this.a.eval(f) : 1
             };
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             checkType(name, 'r', 0, 'number', this.r);

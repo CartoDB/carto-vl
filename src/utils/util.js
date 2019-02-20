@@ -1,6 +1,11 @@
+import TimeRange from './time/TimeRange';
+import { mat4 } from 'gl-matrix';
+import { unproject } from './geometry';
+
 /**
  * Export util functions
  */
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 
 const DEG2RAD = Math.PI / 180;
 const EARTH_RADIUS = 6378137;
@@ -24,9 +29,15 @@ export function isObject (value) {
     return value !== null && (type === 'object' || type === 'function');
 }
 
+export function regExpThatContains (text) {
+    const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // in case it has special symbols
+    return new RegExp(escaped);
+}
+
 /**
  * Transform the given parameter into a Date object.
- * When a number is given as a parameter is asummed to be a milliseconds epoch.
+ * When a number is given as a parameter is assumed to be a milliseconds epoch (UTC).
+ * The result is a local Date.
  * @param {Date|number|string} date
  */
 export function castDate (date) {
@@ -34,12 +45,17 @@ export function castDate (date) {
         return date;
     }
     if (typeof (date) === 'number') {
-        const msEpoch = date;
-        date = new Date(0);
-        date.setUTCMilliseconds(msEpoch);
-        return date;
+        return msToDate(date);
     }
-    return new Date(date);
+    if (isString(date)) {
+        return new Date(date);
+    } else {
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Invalid Date type`);
+    }
+}
+
+export function msToDate (msEpoch) {
+    return new Date(msEpoch);
 }
 
 export function isSetsEqual (a, b) {
@@ -66,22 +82,6 @@ export function projectToWebMercator (latLng) {
     };
 }
 
-export function computeMapZoom (map) {
-    const bounds = map.getBounds();
-    const nw = bounds.getNorthWest();
-    const sw = bounds.getSouthWest();
-    return (projectToWebMercator(nw).y - projectToWebMercator(sw).y) / WM_2R;
-}
-
-export function computeMapCenter (map) {
-    const center = map.getCenter();
-    const coords = projectToWebMercator(center);
-    return {
-        x: coords.x / WM_R,
-        y: coords.y / WM_R
-    };
-}
-
 export function computeMatrixZoom (matrix) {
     // The matrix projects spherical mercator coordinates to gl coordinates
     return -(2 * matrix[15] / matrix[5]);
@@ -95,6 +95,42 @@ export function computeMatrixCenter (matrix) {
     };
 }
 
+export function computeViewportFromCameraMatrix (matrix) {
+    const inv = mat4.invert([], matrix);
+
+    const corners = [
+        [-1, -1],
+        [-1, 1],
+        [1, -1],
+        [1, 1]
+    ].map(NDC =>
+        unproject(inv, ...NDC)
+    ).map(c =>
+        // Our API works on the [-1,1] range, convert from [0,1] range to  [-1, 1] range
+        c.map(x => x * 2 - 1)
+    );
+
+    // Rotation no longer guarantees that corners[0] will be the minimum point of the AABB and corners[3] the maximum,
+    // we need to compute the AABB min/max by iterating
+    const min = [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+    const max = [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY];
+    corners.forEach(corner => {
+        min[0] = Math.min(min[0], corner[0]);
+        min[1] = Math.min(min[1], corner[1]);
+        max[0] = Math.max(max[0], corner[0]);
+        max[1] = Math.max(max[1], corner[1]);
+    });
+
+    // Our API flips the `y` coordinate, we need to convert the values accordingly
+    min[1] = -min[1];
+    max[1] = -max[1];
+    const temp = min[1];
+    min[1] = max[1];
+    max[1] = temp;
+
+    return [...min, ...max];
+}
+
 export default {
     WM_R,
     WM_2R,
@@ -106,8 +142,32 @@ export default {
     isSetsEqual,
     equalArrays,
     projectToWebMercator,
-    computeMapZoom,
-    computeMapCenter,
     computeMatrixZoom,
-    computeMatrixCenter
+    computeMatrixCenter,
+    computeViewportFromCameraMatrix
 };
+
+export function castTimeRange (v, tz = null) {
+    if (v === undefined || isTimeRange(v)) {
+        if (v && tz) {
+            return timeRange({ iso: v.text, timeZone: tz });
+        }
+        return v;
+    }
+    if (typeof v === 'string') {
+        return timeRange({ iso: v, timeZone: tz });
+    }
+}
+
+export function timeRange (parameters) {
+    const { start, end, iso, timeZone } = parameters;
+    if (iso) {
+        return TimeRange.fromText(iso, timeZone);
+    } else {
+        return TimeRange.fromStartEndValues(start, end, timeZone);
+    }
+}
+
+export function isTimeRange (t) {
+    return t instanceof TimeRange;
+}

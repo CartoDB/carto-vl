@@ -1,0 +1,12 @@
+
+{
+  "type": "FeatureCollection",
+    "features": [
+      { "type": "Feature", "properties": { "cat": "(a) one triangle" }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[0, 0], [5, 10], [10, 0], [0, 0]]]] } },
+      { "type": "Feature", "properties": { "cat": "(b) trapezoid" }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[0, 0], [10, 0], [15, -10], [5, -10], [0, 0]]]] } },
+      { "type": "Feature", "properties": { "cat": "(c) square" }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[20, 0], [20, 20], [40, 20], [40, 0], [20, 0]]]] } },
+      { "type": "Feature", "properties": { "cat": "(d) with 1 hole" }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[-65, 40], [-65, 60], [-20, 60], [-20, 40], [-65, 40]], [[-55, 55], [-55, 45], [-30, 45], [-30, 55], [-30, 55], [-55, 55]]]] } },
+      { "type": "Feature", "properties": { "cat": "(e) multi-2" }, "geometry": { "type": "MultiPolygon", "coordinates": [[[[75, 50], [75, 60], [90, 60], [90, 50], [75, 50]]], [[[45, 30], [45, 45], [65, 45], [65, 30], [45, 30]]]] } },
+      { "type": "Feature", "properties": { "cat": "(f) multi-3" }, "geometry": { "type": "MultiPolygon", "coordinates": [ [ [ [ 45.0, 75.0 ], [ 45.0, 76.0 ], [ 46.0, 76.0 ], [ 46.0, 75.0 ], [ 45.0, 75.0 ] ] ], [ [ [ 7.0, 50.0 ], [ 7.0, 60.0 ], [ 25.0, 60.0 ], [ 25.0, 50.0 ], [ 7.0, 50.0 ] ] ], [ [ [ -7.0, 70.0 ], [ -7.0, 72.0 ], [ -5.0, 72.0 ], [ -5.0, 70.0 ], [ -7.0, 70.0 ] ] ] ] } }
+    ]
+}

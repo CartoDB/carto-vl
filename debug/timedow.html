@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Day of the week | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: {
+        version: 8,
+        sources: {},
+        layers: [{
+            id: 'background', type: 'background',
+            paint: { 'background-color': 'black' }
+        }]
+      },
+      center: [0, 0],
+      zoom: 0,
+      dragRotate: false
+    });
+
+    carto.setDefaultAuth({
+      apiKey: 'default_public',
+      user: 'cartovl'
+    });
+
+    const animStart = '2018-04-11T00:00:00Z';
+    const animEnd = '2018-05-11T00:00:00Z';
+    const animDuration = 10;
+    const lineLength = 600000;
+
+    const s = carto.expressions;
+    const source = new carto.source.SQL(`
+      WITH params AS (
+        SELECT
+        -- simulation time limits:
+        '${animStart}'::timestamp with time zone AS min_st,
+        '${animEnd}'::timestamp with time zone AS max_st,
+        0.0 AS x0, 0.1 AS y0,
+        200 AS length,
+        50 AS n
+      ),
+      positions AS (
+        SELECT
+          step::float8/n AS s,
+          x0 + (step::float8/n - 0.5)*length AS x, y0 AS y
+        FROM params, generate_series(1, n) AS step
+      )
+      SELECT
+        row_number() over () AS cartodb_id,
+        min_st + (max_st - min_st)*s AS date,
+        ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
+        ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
+        FROM params, positions
+    `);
+    const viz = new carto.Viz(`
+      width: 15 + @dow*8
+      @dow: clusterTime($date, 'dayOfWeek', 'Europe/Madrid')
+      color: ramp(linear(@dow), ag_Sunset)
+      // filter: animation(linear(@dow), 5, fade(0.4,0.4))
+      filter: animation(linear(@dow, 1, 8), 5, fade(0.5,0.5))
+      @list: viewportFeatures(@dow)
+      @maxDow: globalMax(@dow)
+      @minDow: globalMin(@dow)
+    `);
+    const DAYS = {
+      1: 'Monday',
+      2: 'Tuesday',
+      3: 'Wednesday',
+      4: 'Thurdsday',
+      5: 'Friday',
+      6: 'Saturday',
+      7: 'Sunday'
+    }
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'background');
+    let info = true;
+    layer.on('updated', () => {
+      if (viz.filter.expressionName === 'animation') {
+          const dayValue = viz.filter.getProgressValue();
+          const dayName = DAYS[Math.round(dayValue)];
+          document.getElementById("timer").textContent = dayName;
+      } else {
+          console.log("Min", viz.variables.minDow.value);
+          console.log("Max", viz.variables.maxDow.value);
+          console.log('dow var:',viz.variables.list.value.map(f => viz.variables.dow.eval(f)));
+          console.log('dow prop:',viz.variables.list.value.map(f => f[viz.variables.dow.propertyName]));
+      }
+
+      // console.log('dow var:',viz.variables.list.value.map(f => f.variables.dow.value));  // <- f is not a viz feature!
+    });
+    const interactivity = new carto.Interactivity(layer);
+    interactivity.on('featureClick', event => {
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        const value = feature.variables.dow.value
+        console.log('day:',DAYS[value],`(${value}) [${feature.id}]`);
+      }
+    });
+  </script>
+</body>
+</html>
+
+

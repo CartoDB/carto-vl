@@ -1,11 +1,11 @@
 import BaseExpression from './base';
 import * as util from '../../../utils/util';
-import { checkMaxArguments } from './utils';
+import { checkMaxArguments, throwInvalidType } from './utils';
 
 /**
- * Time contant expression
+ * Time constant expression
  *
- * @param {Date|string} date - The date from a JavaScript Date() object or encoded as a string
+ * @param {Date|string|number} date - The date from a JavaScript Date() object or a date encoded as a string or the number of milliseconds since Epoch.
  * @return {Date}
  *
  * @example <caption>Filter by a date between dates.</caption>
@@ -29,9 +29,12 @@ export default class Time extends BaseExpression {
         checkMaxArguments(arguments, 1, 'time');
 
         super({});
-        // TODO improve type check
-        this.type = 'time';
-        this.date = util.castDate(date);
+        this.type = 'date';
+        try {
+            this.date = util.castDate(date);
+        } catch (error) {
+            throwInvalidType('time', 'date', 0, 'Date or string or number', 'other type');
+        }
         this.inlineMaker = () => undefined;
     }
 
@@ -44,6 +47,10 @@ export default class Time extends BaseExpression {
     }
 
     isAnimated () {
+        return false;
+    }
+
+    isPlaying () {
         return false;
     }
 }

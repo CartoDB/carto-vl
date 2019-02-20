@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Centroids | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json',
+      center: [0, 0],
+      zoom: 0,
+      renderWorldCopies: false
+    });
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      user: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const debounce = (func, delay = 250) => {
+      let timeoutId;
+      return function () {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(func, delay);
+      };
+    };
+
+    // GeoJSON
+    const buildSourceFromGeoJSON = () => {
+      // const URL = '/test/common/sources/point-collection.geojson'; // points
+      // const URL = '/test/common/sources/line-string.geojson'; // lines
+      const URL = '/test/common/sources/polygon-collection-with-multipolygon.geojson'; // polygons
+      // const URL = 'https://cartovl.carto.com/api/v2/sql?format=GeoJSON&q=SELECT *, name as cat FROM world_borders'; // complex polygons
+
+      return fetch(URL)
+        .then(response => response.json())
+        .then(function (geojson) {
+          const source = new carto.source.GeoJSON(geojson);
+          return source;
+        });
+    };
+
+    // Windshaft examples
+    const buildSourceFromWindshaft = () => {
+      // const sqlQuery = `SELECT * FROM sf_neighborhoods WHERE name='Outer Richmond'`;
+      // const source = new carto.source.SQL(sqlQuery);
+      const source = new carto.source.Dataset('sf_neighborhoods');
+      return Promise.resolve(source);
+    }
+
+    const currentBuildSource = buildSourceFromWindshaft; // buildSourceFromGeoJSON; // vs buildSourceFromWindshaft
+    const FIELD = 'name'; // 'cat' for geojson | 'name' for windshaft data sources
+
+    map.on('load', async () => {
+      let mainLayer;
+      let centroidsLayer;
+      let currentMarkers = [];
+
+      const source = await currentBuildSource();
+      const viz = new carto.Viz(`
+        @field: $${FIELD}
+        @v_features: viewportFeatures(@field)
+        color: opacity(ramp(@field, prism), 0.6)
+        width: 15
+      `);
+
+      mainLayer = new carto.Layer('original', source, viz);
+      mainLayer.addTo(map, 'watername_ocean');
+
+      function sourceFrom(features) {
+        const centroidFeatures = features.map(f => {
+          // f.properties[FIELD] is not exposed in Interactivity (it requires declaring the field as a variable in the viz, and accesing it from .variables)
+          const field = f.properties ? f.properties[FIELD] : f._rawFeature[FIELD];
+
+          return {
+            "type": "Feature",
+            "geometry": {
+              "type": "Point",
+              "coordinates": f.getRenderedCentroid()
+            },
+            "properties": {
+              "field": field
+            }
+          }
+        });
+
+        const sourceCentroids = new carto.source.GeoJSON({
+          type: 'FeatureCollection',
+          features: centroidFeatures
+        });
+        return sourceCentroids;
+      }
+
+      function updateCentroidsWith(features) {
+        const updatedSource = sourceFrom(features);
+
+        if (centroidsLayer) {
+          setTimeout(() => {
+            centroidsLayer.update(updatedSource);
+            console.log('updated centroids'); // updates
+          }, 0);
+          return;
+        }
+
+        // created just once
+        centroidsLayer = new carto.Layer('centroids', updatedSource,
+          new carto.Viz(`
+          symbol: cross
+          color: red
+          width: 20
+          symbolPlacement: ALIGN_CENTER
+        `)
+        );
+        centroidsLayer.addTo(map);
+        console.log('centroid layer created');
+      }
+
+      function updateCentroidsFromViewportFeatures() {
+        const viewportFeatures = viz.variables.v_features.value;
+        if (viewportFeatures.length === 0) return;
+
+        updateCentroidsWith(viewportFeatures);
+      };
+
+      // Display all centroids, from viewporFeatures
+      mainLayer.on('updated', debounce(updateCentroidsFromViewportFeatures));
+
+      // or display centroid on click from Interactivity
+      const interactivity = new carto.Interactivity(mainLayer);
+      interactivity.on('featureClick', event => {
+        const interactivityFeatures = event.features;
+        if (interactivityFeatures.length === 0) return;
+
+        interactivityFeatures.forEach((f) => {
+          console.log(`>> ${f._rawFeature[FIELD]}`);
+        });
+        updateCentroidsWith(event.features);
+      });
+    });
+
+
+  </script>
+</body>
+
+</html>

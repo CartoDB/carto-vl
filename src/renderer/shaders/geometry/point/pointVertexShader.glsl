@@ -3,18 +3,16 @@ precision highp float;
 attribute vec2 vertexPosition;
 attribute vec2 featureID;
 
-uniform vec2 vertexScale;
-uniform vec2 vertexOffset;
 uniform float orderMinWidth;
 uniform float orderMaxWidth;
-uniform vec2 normalScale;
+uniform vec2 resolution;
+uniform mat4 matrix;
 
 uniform sampler2D colorTex;
 uniform sampler2D widthTex;
 uniform sampler2D strokeColorTex;
 uniform sampler2D strokeWidthTex;
 uniform sampler2D filterTex;
-//TODO order bucket texture
 
 varying highp vec4 color;
 varying highp vec4 stroke;
@@ -28,7 +26,11 @@ float decodeWidth(vec2 enc) {
 }
 
 $propertyPreface
-$offset_preface
+$transform_preface
+
+vec2 transform(vec2 p){
+    return $transform_inline(p*resolution*0.5)/resolution*2.;
+}
 
 void main(void) {
   color = texture2D(colorTex, abs(featureID));
@@ -48,25 +50,23 @@ void main(void) {
   dp = 1.0 / (size + 1.);
   float sizeNormalizer = (size +1.)/size;
 
+  vec4 p =  matrix*vec4(vertexPosition, 0., 1.);
+  p/=p.w;
+  vec2 size2 = (2.*size+4.)/resolution;
 
-  vec4 p = vec4(vertexScale * vertexPosition - vertexOffset, 0.5, 1.);
+    if (featureID.y<0.){
+        pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
+        p.xy += transform(size2*vec2(0.866025, -0.5));
+    }else if (featureID.x<0.){
+        pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;
+        p.xy += transform(size2*vec2(-0.866025, -0.5));
+    }else{
+        pointCoord = vec2(0., 1.)*2.*sizeNormalizer;
+        p.xy += transform(vec2(0.,size2.y));
+    }
 
-  vec2 size2 = (2.*size+4.)*normalScale;
-
-  if (featureID.y<0.){
-      pointCoord = vec2(0.866025, -0.5)*2.*sizeNormalizer;
-      p.xy += size2*vec2(0.866025, -0.5);
-  }else if (featureID.x<0.){
-      pointCoord = vec2(-0.866025, -0.5)*2.*sizeNormalizer;
-      p.xy += size2*vec2(-0.866025, -0.5);
-  }else{
-      pointCoord = vec2(0., 1.)*2.*sizeNormalizer;
-      p.y += size2.y;
-  }
-
-  p.xy += normalScale*($offset_inline);
   if (size == 0. || (stroke.a == 0. && color.a == 0.) || size < orderMinWidth || size >= orderMaxWidth) {
-    p.x = 10000.;
+    p.z = p.w*2.;
   }
 
   gl_Position = p;

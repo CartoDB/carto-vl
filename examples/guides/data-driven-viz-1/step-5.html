@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Add layer | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Manual Classification</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Use buckets to set custom breaks</p>
+                <div id="controls">
+                    <ul class="actions">
+                        <li>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])')"
+                                    id="viz1" checked>
+                                Style 1: Manual Breaks</label>
+                        </li>
+                    </ul>
+                    <div id="info"></div>
+                    <h1 id="content-title"></h1>
+                    <ul id="content" class="description open-sans"></ul>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [60, 19],
+            zoom: 2,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("pop_density_points");
+        const viz = new carto.Viz(`
+            width: 2
+            color: ramp(buckets($dn, [80, 160]), [midnightblue, deeppink, gold])
+            strokeWidth: 0
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('updated', () => {
+            if (!layer.viz.color.getLegendData) {
+                return;
+            }
+
+            const colorLegend = layer.viz.color.getLegendData();
+
+            let colorLegendList = '';
+
+            colorLegend.data.forEach((legend) => {
+                const colorHex = rgbToHex(legend.value);
+                const keyMin = legend.key[0].toFixed(2).replace('Infinity', '∞');
+                const keyMax = legend.key[1].toFixed(2).replace('Infinity', '+∞');
+
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${colorHex};"></span> <span>[${keyMin}, ${keyMax}]</span></li>\n`;
+            });
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+
+        function rgbToHex(color) {
+            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+        }
+    </script>
+</body>
+
+</html>

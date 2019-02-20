@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Implicit casts | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Implicit casts</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Select a style</p>
+                <div id="controls">
+                    <ul class="actions">
+                        <li>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp($dn, [midnightblue, deeppink, gold])')"
+                                    id="viz1" checked>
+                                Style 1</label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn), [midnightblue, deeppink, gold])')"
+                                    id="viz2">
+                                Style 2</label>
+                        </li>
+                        <li>
+                            <label>
+                                <input type="radio" name="source" onclick="viz.color.blendTo('ramp(linear($dn, globalMin($dn), globalMax($dn)), [midnightblue, deeppink, gold])')"
+                                    id="viz3">
+                                Style 3</label>
+                        </li>
+                    </ul>
+                    <div id="info"></div>
+                </div>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [60, 19],
+            zoom: 2,
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("pop_density_points");
+        const viz = new carto.Viz(`
+            width: 2
+            color: ramp($dn, [midnightblue, deeppink, gold])
+            strokeWidth: 0
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>

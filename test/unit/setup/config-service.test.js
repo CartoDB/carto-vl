@@ -1,4 +1,6 @@
 import { setDefaultConfig, getDefaultConfig, checkConfig, cleanDefaultConfig } from '../../../src/setup/config-service';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../src/errors/carto-validation-error';
+import { regExpThatContains as thatContains } from '../../../src/utils/util';
 
 describe('api/setup/config-service', () => {
     const config = {
@@ -10,9 +12,16 @@ describe('api/setup/config-service', () => {
             expect(getDefaultConfig()).toBeUndefined();
         });
 
+        let defaultConfig;
+        beforeEach(() => {
+            defaultConfig = getDefaultConfig();
+        });
         it('should return the last config set', () => {
             setDefaultConfig(config);
             expect(getDefaultConfig()).toEqual(config);
+        });
+        afterEach(() => {
+            setDefaultConfig(defaultConfig);
         });
     });
 
@@ -20,13 +29,13 @@ describe('api/setup/config-service', () => {
         it('should throw an error if config is not valid', function () {
             expect(function () {
                 checkConfig(1234);
-            }).toThrowError('`config` property must be an object.');
+            }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'config\''));
         });
 
         it('should throw an error if config.serverURL is not valid', function () {
             expect(function () {
                 checkConfig({ serverURL: 1234 });
-            }).toThrowError('`serverURL` property must be a string.');
+            }).toThrowError(CartoValidationError, thatContains(cvt.INCORRECT_TYPE + ' \'serverURL\''));
         });
     });
 

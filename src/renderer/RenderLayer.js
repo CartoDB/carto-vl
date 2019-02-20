@@ -1,4 +1,7 @@
 import Feature from '../interactivity/feature';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import { GEOMETRY_TYPE } from '../utils/geometry';
+import { getCompoundFeature } from '../interactivity/commonFeature';
 
 export default class RenderLayer {
     constructor () {
@@ -9,6 +12,7 @@ export default class RenderLayer {
         this.customizedFeatures = {};
         this.idProperty = null;
     }
+
     // Performance-intensive. The required allocation and copy of resources will happen synchronously.
     // To achieve good performance, avoid multiple calls within the same event, particularly with large dataframes.
     addDataframe (dataframe) {
@@ -51,7 +55,7 @@ export default class RenderLayer {
 
     _checkDataframeType (dataframe) {
         if (this.type !== dataframe.type) {
-            throw new Error('Layer dataframes must always be of the same type');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} Layer dataframes must always be of the same type`);
         }
     }
 
@@ -59,11 +63,90 @@ export default class RenderLayer {
         if (!this.viz) {
             return [];
         }
-        return [].concat(...this.getActiveDataframes().map(df =>
+
+        const noPossiblePartialFeatures = (this.viz.geometryType === GEOMETRY_TYPE.POINT);
+        if (noPossiblePartialFeatures) {
+            return this._getPointFeaturesAtPosition(pos);
+        } else {
+            return this._getPartialFeaturesAtPosition(pos);
+        }
+    }
+
+    _getPointFeaturesAtPosition (pos) {
+        const rawFeatures = this._getRawFeaturesAtPosition(pos);
+        return rawFeatures.map((raw) => { return this._buildFeatureFromRaw(raw); });
+    }
+
+    _buildFeatureFromRaw (rawFeature) {
+        const { viz, customizedFeatures, trackFeatureViz, idProperty } = this;
+        const featureVizParams = { viz, customizedFeatures, trackFeatureViz, idProperty };
+        return new Feature(rawFeature, featureVizParams);
+    }
+
+    _getRawFeaturesAtPosition (pos) {
+        const rawFeatures = [].concat(...this.getActiveDataframes().map(df =>
             df.getFeaturesAtPosition(pos, this.viz)
-        )).map(rawFeature =>
-            new Feature(rawFeature, this.viz, this.customizedFeatures, this.trackFeatureViz, this.idProperty)
-        );
+        ));
+        return rawFeatures;
+    }
+
+    _getPartialFeaturesAtPosition (pos) {
+        const rawFeatures = this._getRawFeaturesAtPosition(pos);
+        if (rawFeatures.length === 0) return [];
+
+        const rawPartialFeatures = this._getPartialFeaturesFromSingle(rawFeatures);
+
+        const compoundFeatures = this._getCompoundFeaturesFrom(rawPartialFeatures);
+        return compoundFeatures;
+    }
+
+    _getCompoundFeaturesFrom (rawPartialFeatures) {
+        const features = [];
+        for (let featureId in rawPartialFeatures) {
+            const viewporFeaturePieces = rawPartialFeatures[featureId];
+            const featurePieces = viewporFeaturePieces.map((raw) => { return this._buildFeatureFromRaw(raw); });
+            features.push(getCompoundFeature(featurePieces));
+        }
+        return features;
+    }
+
+    /**
+     * Get all the pieces from rawFeatures.
+     * Returns an Object, where each key includes an array with (potentially) several feature pieces
+     */
+    _getPartialFeaturesFromSingle (rawFeatures) {
+        const featuresIds = new Set(rawFeatures.map(raw => raw[this.idProperty]));
+        return this.getAllPiecesPerFeature(featuresIds);
+    }
+
+    /**
+     * Gather all feature pieces in the dataframes
+     */
+    getAllPiecesPerFeature (featureIds) {
+        const piecesPerFeature = {};
+        featureIds.forEach((featureId) => { piecesPerFeature[featureId] = []; });
+
+        const dataframes = this.getActiveDataframes();
+        dataframes.forEach(dataframe => {
+            this._addPartialFeaturesIfExistIn(dataframe, featureIds, piecesPerFeature);
+        });
+
+        return piecesPerFeature;
+    }
+
+    /**
+     * Add all the feature pieces, with selected featureIds, if present in the dataframe.
+     */
+    _addPartialFeaturesIfExistIn (dataframe, featureIds, result) {
+        for (let i = 0; i < dataframe.numFeatures; i++) {
+            const feature = dataframe.getFeature(i);
+            const currentFeatureId = feature[this.idProperty];
+
+            if (featureIds.has(currentFeatureId)) {
+                const pieces = result[currentFeatureId];
+                pieces.push(feature);
+            }
+        }
     }
 
     trackFeatureViz (featureID, vizProperty, newViz, customizedFeatures) {

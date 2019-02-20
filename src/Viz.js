@@ -3,10 +3,11 @@ import shaders from './renderer/shaders/index';
 import { compileShader } from './renderer/shaders/shaderCompiler';
 import * as s from './renderer/viz/expressions';
 import BaseExpression from './renderer/viz/expressions/base';
-import { implicitCast } from './renderer/viz/expressions/utils';
+import { implicitCast, noOverrideColor } from './renderer/viz/expressions/utils';
 import { parseVizDefinition } from './renderer/viz/parser';
 import util from './utils/util';
-import CartoValidationError from './errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../src/errors/carto-validation-error';
+import CartoRuntimeError from '../src/errors/carto-runtime-error';
 import pointVertexShaderGLSL from './renderer/shaders/geometry/point/pointVertexShader.glsl';
 import pointFragmentShaderGLSL from './renderer/shaders/geometry/point/pointFragmentShader.glsl';
 import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexShader.glsl';
@@ -17,6 +18,9 @@ import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/placement';
 import Text from './renderer/viz/expressions/Text';
+import Translate from './renderer/viz/expressions/transformation/Translate';
+import VIZ_PROPERTIES from './renderer/viz/utils/properties';
+import { GEOMETRY_TYPE } from './utils/geometry';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -28,7 +32,7 @@ const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_LABEL_EXPRESSION = () => _markDefault(new Text(''));
 const DEFAULT_LABELPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
-const DEFAULT_OFFSET_EXPRESSION = () => _markDefault(s.placement(0, 0));
+const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
 const DEFAULT_RESOLUTION = () => 1;
 
 const MIN_RESOLUTION = 0;
@@ -45,67 +49,53 @@ const SUPPORTED_PROPERTIES = [
     'symbolPlacement',
     'label',
     'labelPlacement',
-    'offset',
+    'transform',
     'resolution',
     'variables'
 ];
 
 /**
- * A vizSpec object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
- * For a better understanding we recommend reading the {@link https://carto.com/developers/carto-vl/guides/introduction-to-expressions/|Introduction to Expressions guide}
- * @typedef {object} VizSpec
- * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
- * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
- * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
- * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
- * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
- * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
- * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
- * @property {Placement} offset - offset to apply to the features in pixels
- * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
- * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
- * @property {object} variables - An object describing the variables used.
+ * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
+ *
+ * @typedef {Object} vizSpec
+ * @name vizSpec
  * @api
  */
 
+/**
+* A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
+* displayed and processed. A Viz instance can only be bound to one layer.
+*
+*
+* @param {string|vizSpec} definition - The definition of a viz. This parameter could be a `string` or a {@link vizSpec|vizSpec}  object
+*
+* @example <caption> Create a viz with black dots using the string constructor </caption>
+* const viz = new carto.Viz(`
+*   color: rgb(0,0,0)
+* `);
+*
+* @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
+* const viz = new carto.Viz({
+*   color: carto.expressions.rgb(0,0,0)
+* });
+*
+* @constructor Viz
+* @name carto.Viz
+* @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
+* @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
+* @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
+* @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
+* @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
+* @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
+* @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
+* @property {Transformation} transform - transformation to apply to the features in pixels. We can assign a {@link carto.expressions.translate|translation}, a {@link carto.expressions.rotate|rotation}, or a chain of those two.
+* @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
+* @property {Number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256, and power of 2 values work better (no visual artifacts). A resolution of N means points are aggregated to grid cells NxN pixels. Unlike {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
+* @property {Object} variables - An object describing the variables used.
+* @api
+*
+*/
 export default class Viz {
-    /**
-    * A Viz is one of the core elements of CARTO VL and defines how the data will be styled,
-    * displayed and processed. A Viz instance can only be bound to one layer.
-    *
-    *
-    * @param {string|VizSpec} definition - The definition of a viz. This parameter could be a `string` or a `VizSpec` object
-    *
-    * @example <caption> Create a viz with black dots using the string constructor </caption>
-    * const viz = new carto.Viz(`
-    *   color: rgb(0,0,0)
-    * `);
-    *
-    * @example <caption> Create a viz with black dots using the vizSpec constructor </caption>
-    * const viz = new carto.Viz({
-    *   color: carto.expressions.rgb(0,0,0)
-    * });
-    *
-    * @fires CartoError
-    *
-    * @constructor Viz
-    * @memberof carto
-    * @api
-    *
-    * @property {Color} color - fill color of points and polygons and color of lines, if used with `symbol` the color will override the original image RGB channels
-    * @property {Number} width - fill diameter of points, thickness of lines, not applicable to polygons
-    * @property {Color} strokeColor - stroke/border color of points and polygons, not applicable to lines
-    * @property {Number} strokeWidth - stroke width of points and polygons, not applicable to lines
-    * @property {Number} filter - filter features by removing from rendering and interactivity all the features that don't pass the test. In combination with {@link carto.expressions.animation} temporal maps can be created.
-    * @property {Image} symbol - show an image instead in the place of points. There is a list of built-in icons you can use by default in the {@link https://carto.com/developers/carto-vl/reference/#icons|Icons section}
-    * @property {Placement} symbolPlacement - when using `symbol`, offset to apply to the image
-    * @property {Placement} offset - offset to apply to points, lines, polygons or images in pixels, defaults to `placement(0,0)`
-    * @IGNOREproperty {Order} order - rendering order of the features, only applicable to points
-    * @property {Order} order - rendering order of the features, only applicable to points. See {@link carto.expressions.asc}, {@link carto.expressions.desc} and {@link carto.expressions.noOrder}
-    * @property {number} resolution - resolution of the property-aggregation functions, only applicable to points. Default resolution is 1. Custom values must be greater than 0 and lower than 256. A resolution of N means points are aggregated to grid cells NxN pixels. Unlinke {@link https://carto.com/developers/torque-js/guides/how-spatial-aggregation-works/|Torque resolution}, the aggregated points are placed in the centroid of the cluster, not in the center of the grid cell.
-    * @property {object} variables - An object describing the variables used.
-    *
-    */
     constructor (definition) {
         const vizSpec = this._getVizDefinition(definition);
         this._checkVizSpec(vizSpec);
@@ -113,6 +103,7 @@ export default class Viz {
         Object.keys(vizSpec).forEach(property => {
             this._defineProperty(property, vizSpec[property]);
         });
+
         if (!Object.keys(vizSpec).includes('variables')) {
             this._defineProperty('variables', {});
         }
@@ -127,8 +118,26 @@ export default class Viz {
         this._validateAliasDAG();
     }
 
+    /**
+     * Get the geometry type of the visualization.
+     * @readonly
+     * @memberof carto.Viz
+     * @api
+     */
+    get geometryType () {
+        return this._geomType;
+    }
+
     loadImages () {
         return Promise.all(this._getRootExpressions().map(expr => expr.loadImages()));
+    }
+
+    /*
+     * There are cases when promise rejections are fine, such as when using
+     * `blendTo` to change the viz synchronously.
+    */
+    _ignoreChangeRejections () {
+        return {};
     }
 
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
@@ -144,7 +153,7 @@ export default class Viz {
                     expr = implicitCast(expr);
                 }
                 this['_' + propertyName] = expr;
-                this._changed();
+                this._changed().catch(this._ignoreChangeRejections);
             }
         });
 
@@ -157,10 +166,15 @@ export default class Viz {
                 },
                 set: (obj, prop, value) => {
                     value = implicitCast(value);
+
+                    if (value instanceof BaseExpression) {
+                        value._variableName = prop;
+                    }
+
                     obj[prop] = value;
                     this['__cartovl_variable_' + prop] = value;
                     if (init) {
-                        this._changed();
+                        this._changed().catch(this._ignoreChangeRejections);
                     }
                     return true;
                 }
@@ -192,6 +206,10 @@ export default class Viz {
         return this._getRootStyleExpressions().some(expr => expr.isAnimated());
     }
 
+    isPlaying () {
+        return this._getRootStyleExpressions().some(expr => expr.isPlaying());
+    }
+
     onChange (callback) {
         this._changeCallback = callback;
     }
@@ -201,8 +219,9 @@ export default class Viz {
         this._resolveAliases();
         this._validateAliasDAG();
         if (this._changeCallback) {
-            this._changeCallback(this);
+            return this._changeCallback(this);
         }
+        return Promise.resolve(null);
     }
 
     _updateRootExpressionList () {
@@ -218,6 +237,7 @@ export default class Viz {
             this.label,
             this.labelPlacement,
             this.offset,
+            this.transform,
             ...Object.values(this.variables)
         ];
         this._rootStyleExpressions = [
@@ -231,7 +251,8 @@ export default class Viz {
             this.symbolPlacement,
             this.label,
             this.labelPlacement,
-            this.offset
+            this.offset,
+            this.transform
         ];
     }
 
@@ -265,21 +286,21 @@ export default class Viz {
     }
 
     _getDefaultGeomStyle (geomType) {
-        if (geomType === 'point') {
+        if (geomType === GEOMETRY_TYPE.POINT) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#EE4D5A')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(7)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')),
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1))
             };
-        } else if (geomType === 'line') {
+        } else if (geomType === GEOMETRY_TYPE.LINE) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#4CC8A3')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1.5)),
                 STROKE_COLOR_EXPRESSION: () => _markDefault(s.hex('#FFF')), // Not used in lines
                 STROKE_WIDTH_EXPRESSION: () => _markDefault(s.number(1)) // Not used in lines
             };
-        } else if (geomType === 'polygon') {
+        } else if (geomType === GEOMETRY_TYPE.POLYGON) {
             return {
                 COLOR_EXPRESSION: () => _markDefault(s.hex('#826DBA')),
                 WIDTH_EXPRESSION: () => _markDefault(s.number(1)), // Not used in polygons
@@ -304,7 +325,7 @@ export default class Viz {
                 return;
             }
             if (temporarilyMarkedSet.has(node)) {
-                throw new Error('Viz contains a circular dependency');
+                throw new CartoRuntimeError('Viz contains a circular dependency');
             }
             temporarilyMarkedSet.add(node);
             node._getDependencies().forEach(visit);
@@ -312,55 +333,70 @@ export default class Viz {
         };
         const unmarked = this._getRootExpressions().map(
             expr => expr._getDependencies()
-        ).reduce((a, b) =>
-            [...a, ...b]
-            , []);
+        ).reduce(
+            (a, b) => [...a, ...b],
+            []
+        );
         while (unmarked.length) {
             visit(unmarked.pop());
         }
     }
 
-    compileShaders (gl, metadata) {
-        this._getRootExpressions().forEach(expr => expr._bindMetadata(metadata));
+    _bindMetadata (metadata) {
+        this._colorShader = null;
+        this._widthShader = null;
+        this._strokeColorShader = null;
+        this._strokeWidthShader = null;
+        this._filterShader = null;
+        this._symbolShader = null;
+        this._pointShader = null;
+        this._lineShader = null;
+        this._polygonShader = null;
+        this.metadata = metadata;
+        this._getRootExpressions().forEach(expr => expr._bindMetadata(this.metadata));
         checkVizPropertyTypes(this);
+    }
 
-        this.colorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.color }, this);
-        this.widthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.width }, this);
-        this.strokeColorShader = compileShader(gl, shaders.styler.colorShaderGLSL, { color: this.strokeColor }, this);
-        this.strokeWidthShader = compileShader(gl, shaders.styler.widthShaderGLSL, { width: this.strokeWidth }, this);
-        this.filterShader = compileShader(gl, shaders.styler.filterShaderGLSL, { filter: this.filter }, this);
+    get colorMetaShader () {
+        return this._compileShader('colorShader', shaders.styler.colorShaderGLSL, { color: this.color });
+    }
+    get widthMetaShader () {
+        return this._compileShader('widthShader', shaders.styler.widthShaderGLSL, { width: this.width });
+    }
+    get strokeColorMetaShader () {
+        return this._compileShader('strokeColorShader', shaders.styler.colorShaderGLSL, { color: this.strokeColor });
+    }
+    get strokeWidthMetaShader () {
+        return this._compileShader('strokeWidthShader', shaders.styler.widthShaderGLSL, { width: this.strokeWidth });
+    }
+    get filterMetaShader () {
+        return this._compileShader('filterShader', shaders.styler.filterShaderGLSL, { filter: this.filter });
+    }
+    get symbolMetaShader () {
+        return this._compileShader('symbolShader', shaders.symbolizer.symbolShaderGLSL, {
+            symbol: this.symbol,
+            symbolPlacement: this.symbolPlacement,
+            transform: this.transform
+        });
+    }
+    get pointMetaShader () {
+        return this._compileShader('pointShader', { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get lineMetaShader () {
+        return this._compileShader('lineShader', { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
+            { transform: this.transform });
+    }
+    get polygonMetaShader () {
+        return this._compileShader('polygonShader', { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
+            { transform: this.transform });
+    }
 
-        if (!this.symbol.default) {
-            this.symbolShader = compileShader(gl, shaders.symbolizer.symbolShaderGLSL, {
-                symbol: this.symbol,
-                symbolPlacement: this.symbolPlacement,
-                offset: this.offset
-            }, this);
+    _compileShader (shaderName, GLSL, expr) {
+        if (!this['_' + shaderName]) {
+            this['_' + shaderName] = compileShader(this.gl, GLSL, expr, this);
         }
-
-        if (!this.label.default) {
-            this.labelShader = compileShader(gl, shaders.labels.labelsShaderGLSL, {
-                label: this.label,
-                labelPlacement: this.labelPlacement,
-                offset: this.offset
-            }, this);
-        }
-
-        if (!this._geomType || this._geomType === 'point') {
-            this.pointShader = compileShader(gl,
-                { vertexShader: pointVertexShaderGLSL, fragmentShader: pointFragmentShaderGLSL },
-                { offset: this.offset }, this);
-        }
-        if (!this._geomType || this._geomType === 'line') {
-            this.lineShader = compileShader(gl,
-                { vertexShader: lineVertexShaderGLSL, fragmentShader: lineFragmentShaderGLSL },
-                { offset: this.offset }, this);
-        }
-        if (!this._geomType || this._geomType === 'polygon') {
-            this.polygonShader = compileShader(gl,
-                { vertexShader: polygonVertexShaderGLSL, fragmentShader: polygonFragmentShaderGLSL },
-                { offset: this.offset }, this);
-        }
+        return this['_' + shaderName];
     }
 
     replaceChild (toReplace, replacer) {
@@ -369,48 +405,16 @@ export default class Viz {
             this.variables[varName] = replacer;
             replacer.parent = this;
             replacer.notify = toReplace.notify;
-        } else if (toReplace === this.color) {
-            this.color = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.width) {
-            this.width = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeColor) {
-            this.strokeColor = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.strokeWidth) {
-            this.strokeWidth = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.filter) {
-            this.filter = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbol) {
-            this.symbol = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.symbolPlacement) {
-            this.symbolPlacement = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.label) {
-            this.label = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.labelPlacement) {
-            this.labelPlacement = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
-        } else if (toReplace === this.offset) {
-            this.offset = replacer;
-            replacer.parent = this;
-            replacer.notify = toReplace.notify;
         } else {
-            throw new Error('No child found');
+            const properties = VIZ_PROPERTIES;
+            const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
+            if (propertyName) {
+                this[propertyName] = replacer;
+                replacer.parent = this;
+                replacer.notify = toReplace.notify;
+            } else {
+                throw new CartoRuntimeError('No child found');
+            }
         }
     }
 
@@ -421,7 +425,7 @@ export default class Viz {
      * Otherwise it throws an error.
      *
      * @param  {string|object} definition
-     * @return {VizSpec}
+     * @return {vizSpec}
      */
     _getVizDefinition (definition) {
         if (util.isUndefined(definition)) {
@@ -433,19 +437,18 @@ export default class Viz {
         if (util.isString(definition)) {
             return this._setDefaults(parseVizDefinition(definition));
         }
-        throw new CartoValidationError('viz', 'nonValidDefinition');
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} viz 'definition' should be a vizSpec object or a valid viz string.`);
     }
 
     /**
      * Add default values to a vizSpec object.
      *
-     * @param {VizSpec} vizSpec
-     * @return {VizSpec}
+     * @param {vizSpec} vizSpec
+     * @return {vizSpec}
      */
     _setDefaults (vizSpec) {
         if (util.isUndefined(vizSpec.color)) {
-            const NO_OVERRIDE_COLOR = s.rgba(0, 0, 0, 0); // TODO move to contant expressions
-            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : NO_OVERRIDE_COLOR;
+            vizSpec.color = util.isUndefined(vizSpec.symbol) ? DEFAULT_COLOR_EXPRESSION() : noOverrideColor();
         }
         if (util.isUndefined(vizSpec.width)) {
             vizSpec.width = DEFAULT_WIDTH_EXPRESSION();
@@ -480,6 +483,9 @@ export default class Viz {
         if (util.isUndefined(vizSpec.offset)) {
             vizSpec.offset = DEFAULT_OFFSET_EXPRESSION();
         }
+        if (util.isUndefined(vizSpec.transform)) {
+            vizSpec.transform = DEFAULT_TRANSFORM_EXPRESSION();
+        }
         vizSpec.variables = vizSpec.variables || {};
         return vizSpec;
     }
@@ -489,54 +495,29 @@ export default class Viz {
         vizSpec.width = implicitCast(vizSpec.width);
         vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
         vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
-        vizSpec.offset = implicitCast(vizSpec.offset);
+        vizSpec.transform = implicitCast(vizSpec.transform);
         vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.label = implicitCast(vizSpec.label);
         vizSpec.labelPlacement = implicitCast(vizSpec.labelPlacement);
         vizSpec.filter = implicitCast(vizSpec.filter);
 
         if (!util.isNumber(vizSpec.resolution)) {
-            throw new CartoValidationError('viz', 'resolutionNumberRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
         if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooSmall[${MIN_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
         }
         if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError('viz', `resolutionTooBig[${MAX_RESOLUTION}]`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
         }
-        if (!(vizSpec.color instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[color]');
-        }
-        if (!(vizSpec.strokeColor instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeColor]');
-        }
-        if (!(vizSpec.width instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[width]');
-        }
-        if (!(vizSpec.strokeWidth instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[strokeWidth]');
-        }
-        if (!(vizSpec.order instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[order]');
-        }
-        if (!(vizSpec.filter instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[filter]');
-        }
-        if (!(vizSpec.symbol instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbol]');
-        }
-        if (!(vizSpec.symbolPlacement instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[symbolPlacement]');
-        }
-        if (!(vizSpec.label instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[label]');
-        }
-        if (!(vizSpec.labelPlacement instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[labelPlacement]');
-        }
-        if (!(vizSpec.offset instanceof BaseExpression)) {
-            throw new CartoValidationError('viz', 'nonValidExpression[offset]');
-        }
+
+        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
+            'symbol', 'symbolPlacement', 'label', 'labelPlacement', 'transform'];
+        toCheck.forEach((parameter) => {
+            if (!(vizSpec[parameter] instanceof BaseExpression)) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
+            }
+        });
 
         for (let key in vizSpec) {
             if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
@@ -544,42 +525,55 @@ export default class Viz {
             }
         }
     }
+
+    /**
+     * Stringify the visualization
+     *
+     * @returns {String}
+     * @memberof carto.Viz
+     * @api
+     */
+    toString () {
+        const variables = Object.keys(this.variables).map(varName =>
+            `@${varName}: ${this.variables[varName].toString()}\n`
+        );
+        return `color: ${this.color.toString()}
+            strokeColor: ${this.strokeColor.toString()}
+            width: ${this.width.toString()}
+            strokeWidth: ${this.strokeWidth.toString()}
+            filter: ${this.filter.toString()}
+            order: ${this.order.toString()}
+            symbol: ${this.symbol.toString()}
+            symbolPlacement: ${this.symbolPlacement.toString()}
+            offset: ${this.offset.toString()}
+            ${variables}`.replace(/ {4}/g, '');
+    }
 }
 
 function checkVizPropertyTypes (viz) {
-    if (viz.color.type !== 'color') {
-        throw new Error(`Viz property 'color:' must be of type 'color' but it was of type ${viz.color.type}`);
-    }
-    if (viz.strokeColor.type !== 'color') {
-        throw new Error(`Viz property 'strokeColor:' must be of type 'color' but it was of type ${viz.strokeColor.type}`);
-    }
-    if (viz.width.type !== 'number') {
-        throw new Error(`Viz property 'width:' must be of type 'number' but it was of type ${viz.width.type}`);
-    }
-    if (viz.strokeWidth.type !== 'number') {
-        throw new Error(`Viz property 'strokeWidth:' must be of type 'number' but it was of type ${viz.strokeWidth.type}`);
-    }
-    if (viz.order.type !== 'orderer') {
-        throw new Error(`Viz property 'order:' must be of type 'orderer' but it was of type ${viz.order.type}`);
-    }
-    if (viz.filter.type !== 'number') {
-        throw new Error(`Viz property 'filter:' must be of type 'number' but it was of type ${viz.filter.type}`);
-    }
-    if (viz.symbol.type !== 'image') {
-        throw new Error(`Viz property 'symbol:' must be of type 'image' but it was of type ${viz.symbol.type}`);
-    }
-    if (viz.symbolPlacement.type !== 'placement') {
-        throw new Error(`Viz property 'symbolPlacement:' must be of type 'placement' but it was of type ${viz.symbolPlacement.type}`);
-    }
-    if (viz.label.type !== 'text') {
-        throw new Error(`Viz property 'label:' must be of type 'text' but it was of type ${viz.label.type}`);
-    }
-    if (viz.labelPlacement.type !== 'placement') {
-        throw new Error(`Viz property 'labelPlacement:' must be of type 'placement' but it was of type ${viz.labelPlacement.type}`);
-    }
-    if (viz.offset.type !== 'placement') {
-        throw new Error(`Viz property 'offset:' must be of type 'placement' but it was of type ${viz.offset.type}`);
-    }
+    const expectedTypePerProperty = {
+        color: 'color',
+        strokeColor: 'color',
+        width: 'number',
+        strokeWidth: 'number',
+        order: 'orderer',
+        filter: 'number',
+        symbol: 'image',
+        symbolPlacement: 'placement',
+        label: 'text',
+        labelPlacement: 'placement',
+        transform: 'transformation'
+    };
+
+    Object.keys(expectedTypePerProperty).forEach((property) => {
+        const currentType = viz[property].type;
+        const expected = expectedTypePerProperty[property];
+        if (currentType !== expected) {
+            throw new CartoValidationError(
+                `${cvt.INCORRECT_TYPE} Viz property '${property}': must be of type '${expected}' but it was of type '${currentType}'`
+            );
+        }
+    });
 }
 
 /**

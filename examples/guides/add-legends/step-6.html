@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Transparent Legend | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script src="../../../dist/carto-vl.js"></script>
+
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box" id="dark">
+            <header>
+                <h1 id="light">Rail Accidents by Weather</h1>
+            </header>
+            <!-- Add legend data -->
+            <section id="light">
+                <div id="controls">
+                    <ul id="content"></ul>
+                </div>
+            </section>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 3
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            @myRamp: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            @myOpacity: 0.5
+
+            width: 5
+            color: opacity(@myRamp,@myOpacity)
+            strokeWidth: 1
+            strokeColor: black
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+        layer.addTo(map);
+
+        //** ADD LEGEND **//
+
+        // When layer loads, trigger legend event
+        layer.on('loaded', () => {
+
+            // Request data for legend from the layer viz variables 'myRamp' and 'myOpacity'
+            const colorLegend = layer.viz.variables.myRamp.getLegendData();
+            const opacity = layer.viz.variables.myOpacity.value;
+
+            let colorLegendList = '';
+
+            // Create list elements for legend
+            colorLegend.data.forEach((legend, index) => {
+                const color = legend.value;
+
+                // Add the predefined opacity to the ramp color components
+                const rgba = `rgba(${color.r}, ${color.g}, ${color.b}, ${opacity})`;
+
+                // Style for legend items based on geometry type
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${rgba}; border: 1px solid black;"></span><span>${legend.key}</span></li>\n`;
+            });
+
+            // Place list items in the content section of the title/legend box
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+
+    </script>
+
+</body>
+
+</html>

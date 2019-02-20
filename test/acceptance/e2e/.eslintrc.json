@@ -1,6 +1,9 @@
 {
     "globals": {
+        "assert": true,
+        "debounceSetLoaded": true,
         "carto": true,
-        "mapboxgl": true
+        "mapboxgl": true,
+        "CartoMap": true
     }
 }

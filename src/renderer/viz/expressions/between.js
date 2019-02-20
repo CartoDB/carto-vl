@@ -6,7 +6,7 @@ import { implicitCast, checkType, checkMaxArguments } from './utils';
  *
  * This returns a numeric expression where 0 means `false` and 1 means `true`.
  *
- * @param {Number} value - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
+ * @param {Number} input - Numeric expression that is going to be tested against the [lowerLimit, upperLimit] range
  * @param {Number} lowerLimit - Numeric expression with the lower limit of the range
  * @param {Number} upperLimit -  Numeric expression with the upper limit of the range
  * @return {Number} Numeric expression with the result of the check
@@ -28,27 +28,27 @@ import { implicitCast, checkType, checkMaxArguments } from './utils';
  * @api
  */
 export default class Between extends BaseExpression {
-    constructor (value, lowerLimit, upperLimit) {
+    constructor (input, lowerLimit, upperLimit) {
         checkMaxArguments(arguments, 3, 'between');
 
-        value = implicitCast(value);
+        input = implicitCast(input);
         lowerLimit = implicitCast(lowerLimit);
         upperLimit = implicitCast(upperLimit);
 
-        super({ value, lowerLimit, upperLimit });
+        super({ input, lowerLimit, upperLimit });
         this.type = 'number';
-        this.inlineMaker = inline => `((${inline.value} >= ${inline.lowerLimit} &&  ${inline.value} <= ${inline.upperLimit}) ? 1. : 0.)`;
+        this.inlineMaker = inline => `((${inline.input} >= ${inline.lowerLimit} &&  ${inline.input} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
     eval (feature) {
-        const value = this.value.eval(feature);
+        const input = this.input.eval(feature);
         const lower = this.lowerLimit.eval(feature);
         const upper = this.upperLimit.eval(feature);
-        return (value >= lower && value <= upper) ? 1 : 0;
+        return (input >= lower && input <= upper) ? 1 : 0;
     }
     _bindMetadata (meta) {
         super._bindMetadata(meta);
 
-        checkType('between', 'value', 0, 'number', this.value);
+        checkType('between', 'input', 0, 'number', this.input);
         checkType('between', 'lowerLimit', 1, 'number', this.lowerLimit);
         checkType('between', 'upperLimit', 2, 'number', this.upperLimit);
     }

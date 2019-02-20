@@ -132,6 +132,7 @@ body {
     padding: 30px;
     font-size: 14px;
     display: none;
+    max-height: 400px;
 }
 
 .cvl-ButtonList {

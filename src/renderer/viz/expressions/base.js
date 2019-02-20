@@ -1,17 +1,17 @@
 import { implicitCast } from './utils';
 import { blend, transition } from '../expressions';
 import * as schema from '../../schema';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
+import CartoRuntimeError from '../../../errors/carto-runtime-error';
 
 /**
- * Abstract expression class
+ * CARTO VL Expression
  *
- * All expressions listed in  {@link carto.expressions} inherit from this class so any of them
- * can be used where an Expression is required as long as the types match.
+ * An expression is a function that is used to modify the visualization. All expressions are listed in  {@link carto.expressions}.
  *
- * This means that you can't use a numeric expression where a color expression is expected.
+ * Any expression can be used where an expression is required as long as the types match. This means that you can't use a numeric expression where a color expression is expected.
  *
- * @memberof carto.expressions
- * @name Base
+ * @name Expression
  * @abstract
  * @hideconstructor
  * @class
@@ -26,21 +26,21 @@ export default class Base {
      */
     constructor (children) {
         this._initializeChildren(children);
-        this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
+        this.expressionName = _toCamelCase(this.constructor.name);
+        this._variableName = null;
     }
 
-    // eslint-disable-next-line no-unused-vars
     /**
      * Evaluate the expression providing a feature.
      * This is particularly useful for making legends.
      *
+     * @memberof Expression
+     * @param {Object} feature
+     * @returns {} result - result of evaluating the expression for the input feature
+     * @name eval
      * @api
-     * @memberof carto.expressions.Base
-     * @param {object} feature
-     * @returns {*} result - result of evaluating the expression for the input feature
-     *
      * @example
      * const viz = new carto.Viz(`
      *      color: red
@@ -66,36 +66,94 @@ export default class Base {
      *
      */
     eval (feature) {
-        throw new Error('Unimplemented');
+        throw new CartoRuntimeError('Unimplemented');
     }
 
     /**
+     * Get the expression value
+     *
      * @api
-     * @memberof carto.expressions.Base
-     * @returns true if the evaluation of the expression may change without external action.
+     * @memberof Expression
+     * @name value
+     */
+    get value () {
+        return this.eval();
+    }
+
+    /**
+     * Get the expression stringified
+     *
+     * @api
+     * @returns {String} Stringified expression
+     * @memberof Expression
+     * @instance
+     * @name toString
+     *
+     * @example <caption>Get the stringified expression of the viz color property.</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz({
+     *   color: s.ramp(s.linear('amount'), s.palettes.PRISM)
+     * });
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     * @example <caption>Get the stringified expression of the viz color property. (String)</caption>
+     * const viz = new carto.Viz(`
+     *   color: ramp(linear($amount), Prism)
+     * `);
+     *
+     * console.log(viz.color.toString());
+     * // logs: "ramp(linear($amount), Prism)"
+     *
+     */
+    toString () {
+        return `${this.expressionName}(${this._getChildren().map(child => child.toString()).join(', ')})`;
+    }
+
+    /**
+     *
+     * @api
+     * @returns `true` if the evaluation of the expression may change without external action, `false` otherwise.
+     * @memberof Expression
+     * @instance
+     * @name isAnimated
      */
     isAnimated () {
         return this._getChildren().some(child => child.isAnimated());
     }
 
     /**
-     * Linear interpolation between this and finalValue with the specified duration
+     *
+     * @api
+     * @returns `true` if the expression it is currently changing
+     * @memberof Expression
+     * @instance
+     * @name isPlaying
+     */
+    isPlaying () {
+        return this._getChildren().some(child => child.isPlaying());
+    }
+
+    /**
+     * Linear interpolate between `this` and `final` with the specified duration
+     *
      * @api
      * @param {Expression|string} final - Viz Expression or string to parse for a Viz expression
      * @param {Expression} duration - duration of the transition in milliseconds
      * @param {Expression} blendFunc
-     * @memberof carto.expressions.Base
+     * @memberof Expression
      * @instance
+     * @async
      * @name blendTo
      */
-    blendTo (final, duration = 500) {
-        // The parsing of the string (if any) is monkey patched at parser.js to avoid a circular dependency
+    async blendTo (final, duration = 500) {
+        // The previous parsing of 'final' (if it is a string) is monkey-patched at parser.js to avoid a circular dependency
         final = implicitCast(final);
+        this.keepDefaultsOnBlend && this.keepDefaultsOnBlend();
         const parent = this.parent;
         const blender = blend(this, final, transition(duration));
         parent.replaceChild(this, blender);
         blender.notify();
-        return final;
     }
 
     isA (expressionClass) {
@@ -103,7 +161,7 @@ export default class Base {
     }
 
     notify () {
-        this.parent.notify();
+        return this.parent.notify();
     }
 
     accumViewportAgg (feature) {
@@ -124,11 +182,14 @@ export default class Base {
         } else {
             this._initializeChildrenObject(children);
         }
+        this._addParentToChildren();
     }
 
     _initializeChildrenArray (children) {
         if (this.maxParameters && this.maxParameters < children.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError(
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${children.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         this.childrenNames = [];
@@ -141,10 +202,15 @@ export default class Base {
     }
 
     _initializeChildrenObject (children) {
-        this.childrenNames = Object.keys(children);
+        if (this.childrenNames === undefined) {
+            this.childrenNames = [];
+        }
+        this.childrenNames.push(...Object.keys(children));
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
-            throw new Error('Extra parameters');
+            throw new CartoValidationError(
+                `${cvt.TOO_MANY_ARGS} Extra parameters, got ${this.childrenNames.length} but maximum is ${this.maxParameters}`
+            );
         }
 
         Object.keys(children).map(name => {
@@ -245,6 +311,7 @@ export default class Base {
         this[name] = replacer;
         replacer.parent = this;
         replacer.notify = toReplace.notify;
+        replacer.notify().catch(() => { }); // ignore change rejections when using blend
     }
 
     _blendFrom (final, duration = 500, interpolator = null) {
@@ -266,4 +333,11 @@ export default class Base {
         // Depth First Search => reduce using union
         return this._getChildren().map(child => child._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
     }
+}
+
+function _toCamelCase (str) {
+    if (str.toUpperCase() === str) {
+        return str.toLowerCase();
+    }
+    return str.charAt(0).toLowerCase() + str.slice(1);
 }

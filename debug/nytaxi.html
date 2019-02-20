@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Animation demo | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+<style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    #map {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+    }
+    #timer {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: white;
+      font-family: monospace;
+      font-size: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="timer"></div>
+  <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-74.0032059, 40.7482066],
+            zoom: 12,
+        });
+
+
+    carto.setDefaultAuth({
+      apiKey: 'default_public',
+      username: 'cartovl'
+    });
+
+    const s = carto.expressions;
+    const source = new carto.source.Dataset('taxi_50k');
+
+    const viz = new carto.Viz(`
+      @hour: clusterTime($tpep_pickup_datetime, 'hour', 'America/New_York')
+
+      width: 10
+      strokeWidth: 0
+      color: opacity(rgb(255,255,0),0.5)
+
+      filter: animation(@hour, 130, fade(0.0,0.0))
+
+      @list: viewportFeatures(@hour)
+      @maxhour: globalMax(@hour)
+      @minhour: globalMin(@hour)
+    `);
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map);
+    let info = true;
+    console.log('FIL',viz.filter.expressionName)
+    const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    layer.on('updated', () => {
+      if (info) {
+        info = !animation;
+        console.log(viz);
+        console.log("Min hour", viz.variables.minhour.value.text);
+        console.log("Max hour", viz.variables.maxhour.value.text);
+        console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f.properties).text));
+        // console.log('Hours:',viz.variables.list.value.map(f => f[viz.variables.hour.propertyName]));
+      }
+      if (animation) {
+        const time = animation.getProgressValue();
+        const msg = `${time.text} (${time.timeZone})`;
+        document.getElementById("timer").textContent = msg;
+      }
+    });
+    const interactivity = new carto.Interactivity(layer);
+    let playing = true;
+    interactivity.on('featureClick', event => {
+      if (animation) {
+        if (playing) {
+          console.log('PAUSE');
+          animation.pause();
+        } else {
+          console.log('PLAY');
+          animation.play();
+        }
+        playing = !playing;
+      };
+
+      if (event.features.length > 0) {
+        const feature = event.features[0];
+        console.log('hour:', feature.variables.hour.value.text);
+      }
+    });
+  </script>
+</body>
+</html>
+
+

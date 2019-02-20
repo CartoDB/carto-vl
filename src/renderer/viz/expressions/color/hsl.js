@@ -1,5 +1,7 @@
+
 import BaseExpression from '../base';
 import { implicitCast, checkExpression, checkType, checkMaxArguments, clamp } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Evaluates to a hsl color.
@@ -127,32 +129,33 @@ function genHSL (name, alpha) {
                 }
                 return '';
             };
-            super._setGenericGLSL(inline =>
-                `vec4(HSLtoRGB(vec3(
+            super._setGenericGLSL(
+                inline => `vec4(HSLtoRGB(vec3(
                     ${inline.h}${normalize(this.h, true)},
                     clamp(${inline.s}${normalize(this.s)}, 0., 1.),
                     clamp(${inline.l}${normalize(this.l)}, 0., 1.)
-                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`
-                , `
-    #ifndef HSL2RGB
-    #define HSL2RGB
-    vec3 HSLtoRGB(vec3 HSL) {
-      float R = abs(HSL.x * 6. - 3.) - 1.;
-      float G = 2. - abs(HSL.x * 6. - 2.);
-      float B = 2. - abs(HSL.x * 6. - 4.);
-      float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
-      vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
-      return (RGB - 0.5) * C + HSL.z;
-    }
-    #endif
-    `);
+                )), ${alpha ? `clamp(${inline.a}, 0., 1.)` : '1.'})`,
+                `
+                    #ifndef HSL2RGB
+                    #define HSL2RGB
+                    vec3 HSLtoRGB(vec3 HSL) {
+                        float R = abs(HSL.x * 6. - 3.) - 1.;
+                        float G = 2. - abs(HSL.x * 6. - 2.);
+                        float B = 2. - abs(HSL.x * 6. - 4.);
+                        float C = (1. - abs(2. * HSL.z - 1.)) * HSL.y;
+                        vec3 RGB = clamp(vec3(R,G,B), 0., 1.);
+                        return (RGB - 0.5) * C + HSL.z;
+                    }
+                    #endif
+                `
+            );
         }
     };
 
     function hslCheckType (parameterName, parameterIndex, parameter) {
         checkExpression(name, parameterName, parameterIndex, parameter);
         if (parameter.type !== 'number' && parameter.type !== 'category' && parameter.type !== undefined) {
-            throw new Error(`${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${name}(): invalid parameter\n\t${parameterName} type was: '${parameter.type}'`);
         }
     }
 }

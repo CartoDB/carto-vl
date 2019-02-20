@@ -24,14 +24,14 @@ describe('src/renderer/viz/expressions/belongs', () => {
         validateTypeErrors('in', ['category']);
         validateTypeErrors('in', ['number']);
         validateTypeErrors('in', ['color']);
-        validateTypeErrors('in', ['number', 'category-array']);
-        validateTypeErrors('in', ['category', 'number-array']);
-        validateMaxArgumentsError('in', ['category', 'category-array', 'number']);
-        validateMaxArgumentsError('nin', ['category', 'category-array', 'number']);
+        validateTypeErrors('in', ['number', 'category-list']);
+        validateTypeErrors('in', ['category', 'number-list']);
+        validateMaxArgumentsError('in', ['category', 'category-list', 'number']);
+        validateMaxArgumentsError('nin', ['category', 'category-list', 'number']);
     });
 
     describe('type', () => {
-        validateStaticType('in', ['category', 'category-array'], 'number');
+        validateStaticType('in', ['category', 'category-list'], 'number');
     });
 
     describe('eval', () => {

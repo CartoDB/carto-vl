@@ -1,12 +1,12 @@
 import Base from './base';
-import { checkString, checkMaxArguments } from './utils';
+import { checkString, checkMaxArguments, noOverrideColor } from './utils';
 
 /**
  * Image. Load an image and use it as a symbol.
  *
  * Note: image RGB color will be overridden if the viz `color` property is set.
  *
- * @param {string} url - Image path
+ * @param {String} url - Image path
  *
  * @example <caption>Load a svg image.</caption>
  * const s = carto.expressions;
@@ -32,7 +32,7 @@ export default class Image extends Base {
         super({});
         this.type = 'image';
         this.canvas = null;
-        this._url = url;
+        this.url = url;
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
@@ -42,7 +42,7 @@ export default class Image extends Base {
             };
             this.image.onerror = reject;
             this.image.crossOrigin = 'anonymous';
-            this.image.src = this._url;
+            this.image.src = this.url;
         });
     }
 
@@ -51,7 +51,16 @@ export default class Image extends Base {
         return this._promise;
     }
 
-    eval () {}
+    keepDefaultsOnBlend () {
+        // Keep default image color if setting a symbol after viz initialization with defaults
+        if (this.default && this.parent.color.default) {
+            this.parent.color = noOverrideColor();
+        }
+    }
+
+    eval () {
+        return this.url;
+    }
 
     _free (gl) {
         if (this.texture) {
@@ -107,7 +116,7 @@ function _getCanvasFromImage (img) {
     const width = img.width / max * CANVAS_SIZE;
     const height = img.height / max * CANVAS_SIZE;
 
-    ctx.drawImage(img, 1 + (CANVAS_SIZE - width) / 2, 1 + (CANVAS_SIZE - height) / 2, width - 2, height - 2);
+    ctx.drawImage(img, (CANVAS_SIZE - width) / 2, (CANVAS_SIZE - height) / 2, width, height);
 
     return canvas;
 }

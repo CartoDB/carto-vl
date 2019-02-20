@@ -7,7 +7,7 @@ describe('src/renderer/viz/expressions/image', () => {
         validateTypeErrors('image', ['number']);
         validateTypeErrors('image', ['color']);
         validateTypeErrors('image', ['category-property']);
-        validateTypeErrors('image', ['color-array']);
+        validateTypeErrors('image', ['color-list']);
         validateMaxArgumentsError('image', ['number', 'number']);
     });
 

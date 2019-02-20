@@ -1,13 +1,13 @@
 import * as util from '../utils/util';
-import CartoValidationError from '../errors/carto-validation-error';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 
 let defaultConfig;
 
 /**
  * Set default configuration parameters
  *
- * @param {object} config
- * @param {string} config.serverURL='https://{user}.carto.com' - Template URL of the CARTO Maps API server
+ * @param {Object} config
+ * @param {String} config.serverURL - Template URL of the CARTO Maps API server: `https://{user}.carto.com`
  *
  * @memberof carto
  * @api
@@ -19,7 +19,7 @@ function setDefaultConfig (config) {
 
 /**
  * Get default config
- * @return {object}
+ * @return {Object}
  */
 function getDefaultConfig () {
     return defaultConfig;
@@ -35,12 +35,12 @@ function cleanDefaultConfig () {
 /**
  * Check a valid config parameter.
  *
- * @param  {object} config
+ * @param  {Object} config
  */
 function checkConfig (config) {
     if (config) {
         if (!util.isObject(config)) {
-            throw new CartoValidationError('setup', 'configObjectRequired');
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'config' property must be an object.`);
         }
         _checkServerURL(config.serverURL);
     }
@@ -48,7 +48,7 @@ function checkConfig (config) {
 
 function _checkServerURL (serverURL) {
     if (!util.isString(serverURL)) {
-        throw new CartoValidationError('setup', 'serverURLStringRequired');
+        throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'serverURL' property must be a string.`);
     }
 }
 

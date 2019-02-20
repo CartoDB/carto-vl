@@ -22,7 +22,7 @@ import { implicitCast, checkType } from './utils';
  * `);
  *
  * @memberof carto.expressions
- * @name scale
+ * @name scaled
  * @function
  * @api
  */
@@ -40,9 +40,9 @@ export default class Scaled extends BaseExpression {
         return this.scale.eval();
     }
     _bindMetadata (metadata) {
+        super._bindMetadata(metadata);
         checkType('scaled', 'width', 0, 'number', this.scale.a.a);
         checkType('scaled', 'zoomlevel', 1, 'number', this.scale.b);
-        super._bindMetadata(metadata);
     }
     _preDraw (program, drawMetadata, gl) {
         this.scale.a.b.expr = Math.pow(2, drawMetadata.zoomLevel);

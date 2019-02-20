@@ -1,4 +1,4 @@
-const map = new carto.Map({
+const map = new CartoMap({
     container: 'map',
     background: 'white'
 });
@@ -8,7 +8,7 @@ const viz = new carto.Viz(`
 width: 5
 symbol: cross
 symbolPlacement: align_bottom
-offset: placement(15, 37)
+transform: translate(15, 37)
 `);
 const layer = new carto.Layer('layer', source, viz);
 
