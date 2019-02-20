@@ -17,6 +17,9 @@ export default class Metadata {
         this.geomType = geomType;
         this.isAggregated = isAggregated;
         this.idProperty = idProperty || 'cartodb_id';
+        if (!this.properties.hasOwnProperty(this.idProperty)) {
+            this.properties[this.idProperty] = { type: 'number' };
+        }
 
         this.categoryToID = new Map();
         this.IDToCategory = new Map();

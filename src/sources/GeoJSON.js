@@ -2,7 +2,7 @@ import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from './GeoJSONMetadata';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../../src/errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../src/errors/carto-runtime-error';
 import util from '../utils/util';
 import Base from './Base';
 import schema from '../renderer/schema';
@@ -199,7 +199,7 @@ export default class GeoJSON extends Base {
     _addDatePropertyToMetadata (propertyName, value) {
         if (this._catFields.has(propertyName) || this._numFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${crt.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
             );
         }
         this._addDateColumnField(propertyName);
@@ -241,7 +241,7 @@ export default class GeoJSON extends Base {
     _addCategoryPropertyToMetadata (propertyName, value) {
         if (this._numFields.has(propertyName) || this._dateFields.has(propertyName)) {
             throw new CartoRuntimeError(
-                `${crt.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
+                `${runtimeErrors.NOT_SUPPORTED} Unsupported GeoJSON: the property '${propertyName}' has different types in different features.`
             );
         }
         if (!this._catFields.has(propertyName)) {
@@ -283,7 +283,7 @@ export default class GeoJSON extends Base {
                     f.properties.cartodb_id = -i;
                 }
                 // note that GeoJSON does not support multi-value properties
-                properties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name]);
+                properties[name][i] = this._metadata.codec(name).sourceToInternal(this._metadata, f.properties[name], name);
             });
         }
         return properties;
