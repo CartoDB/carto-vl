@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Exported map | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../style.css">
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+
+        #map {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="map"></div>
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-93.374509, 35.786814],
+            zoom: 3
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+
+        carto.setDefaultConfig({
+            serverURL: 'https://{user}.carto.com'
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+
+        const source = new carto.source.SQL(`select * from monarch_migration_1`);
+        const viz = new carto.Viz(`
+
+        @cc: clusterCount()
+        @v_features: viewportFeatures(@cc);
+
+        width: sqrt(@cc)*10
+        color: opacity(ramp(linear(@cc,5,50),redor),0.7)
+        strokeColor: ramp(linear(@cc,5,50),redor)
+        strokeWidth: 1
+        order: asc(width())
+        resolution: 16
+        //filter:ramp(zoomrange([3,4,5,6]),[@cc>20,@cc>10,@cc>5,true])
+
+    `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Create labeling layer centroids
+        layer.on('loaded', () => {
+            map.addSource('labels', { type: 'geojson', data: null });
+            const labelSource = map.getSource('labels');
+
+            const layerUpdated = function () {
+                const features = viz.variables.v_features.value;
+                const geojsonFeatures = features.map(f => {
+                    return {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": f.getRenderedCentroid()
+                        },
+                        "properties": {
+                            "label_field": `${f.properties['cc']}`,
+                        }
+                    }
+                });
+
+                labelSource.setData({
+                    type: 'FeatureCollection',
+                    features: geojsonFeatures
+                });
+            };
+
+            layer.on('updated', layerUpdated);
+
+            // Style labels
+            map.addLayer({
+                "id": "my-labels",
+                "type": "symbol",
+                "source": "labels",
+                "layout": {
+                    "text-field": "{label_field}",
+                    "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+                    "text-size": 12,
+                    "text-offset": [-0.05, -0.65],
+                    "text-anchor": "top",
+                    "text-max-width": 8,
+                    "text-justify": "center"
+                },
+                "paint": {
+                    "text-color": "white",
+                    "text-halo-width": 0,
+                    "text-halo-blur": 0
+                }
+            });
+        });
+
+        layer.addTo(map, 'watername_ocean');
+    </script>
+</body>
+
+</html>

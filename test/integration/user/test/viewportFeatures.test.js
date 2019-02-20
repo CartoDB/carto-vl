@@ -1,6 +1,7 @@
 import carto from '../../../../src';
 import * as util from '../../util';
 import VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/properties';
+import { CLUSTER_FEATURE_COUNT } from '../../../../src/renderer/schema';
 
 const feature1 = {
     type: 'Feature',
@@ -31,6 +32,22 @@ const feature2 = {
 const features = {
     type: 'FeatureCollection',
     features: [feature1, feature2]
+};
+
+const aggregationFeatures = {
+    type: 'FeatureCollection',
+    features: [{
+        type: 'Feature',
+        geometry: {
+            type: 'Point',
+            coordinates: [10, 12]
+        },
+        properties: {
+            id: 1,
+            value: 1000,
+            _cdb_feature_count: 2
+        }
+    }]
 };
 
 function checkFeatures (featureList, expectedList) {
@@ -113,6 +130,7 @@ function generatePolygonsDataset () {
         outerTriangle,
         outerBBOXTriangle
     ];
+
     return { type: 'FeatureCollection', features };
 }
 
@@ -155,8 +173,8 @@ describe('viewportFeatures', () => {
     it('should get the features properties of another layer', done => {
         layer2.on('loaded', () => {
             const expectedAll = [
-                { id: 1, value: 10, category: 'a' },
-                { id: 2, value: 1000, category: 'b' }
+                { id: 1, value: 10, cat: 'a' },
+                { id: 2, value: 1000, cat: 'b' }
             ];
             const expectedValue = [
                 { value: 10 },
@@ -207,6 +225,7 @@ describe('viewportFeatures', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -262,6 +281,7 @@ describe('viewportFeatures on a map with filters', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -316,6 +336,7 @@ describe('viewportFeatures on a zoomed-in map', () => {
     });
 
     afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
     });
 });
@@ -475,9 +496,62 @@ describe('viewportFeatures collision', () => {
         });
     });
 
-    afterEach((done) => {
+    afterEach(() => {
+        map.remove();
         document.body.removeChild(setup.div);
-        done();
+    });
+});
+
+describe('viewportFeatures using aggregation expressions', () => {
+    describe('clusterCount', () => {
+        let map, source, viz, layer, setup;
+
+        beforeEach(() => {
+            setup = util.createMap('map');
+            map = setup.map;
+            source = new carto.source.GeoJSON(aggregationFeatures);
+        });
+
+        it('should get the clusterCount of a feature', done => {
+            viz = new carto.Viz(`
+                @list: viewportFeatures(clusterCount())
+            `);
+
+            layer = new carto.Layer('layer', source, viz);
+            layer.addTo(map);
+
+            layer.on('updated', () => {
+                const actual = Object.keys(viz.variables.list.value[0].properties);
+                const expected = [CLUSTER_FEATURE_COUNT];
+                expect(actual).toEqual(expected);
+                done();
+            });
+        });
+
+        it('should get the clusterCount of a feature when it is assigned to a variable', done => {
+            const variableName = 'cc';
+
+            viz = new carto.Viz(`
+                @${variableName}: clusterCount()
+                @list: viewportFeatures(@${variableName})
+            `);
+
+            layer = new carto.Layer('layer', source, viz);
+
+            layer.addTo(map);
+
+            layer.on('updated', () => {
+                const actual = Object.keys(viz.variables.list.value[0].properties);
+                const expected = [variableName];
+                expect(actual).toEqual(expected);
+                done();
+            });
+        });
+
+        afterEach(() => {
+            map.remove();
+            document.body.removeChild(setup.div);
+        });
     });
 });
 
