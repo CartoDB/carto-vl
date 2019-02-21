@@ -178,21 +178,28 @@
       return `rgba(${color.r},${color.g},${color.b},${color.a})`;
     }
 
+    const s = carto.expressions;
+
     function setViewportHistogram() {
       histogramVariable = 'viewportHistogram';
+      layer.viz.color.blendTo(s.ramp(s.prop('featurecla'), s.palettes.BOLD));
       drawHistogramLegend();
     }
 
     function setClassifiedViewportHistogram() {
       histogramVariable = 'viewportClassifiedHistogram';
+      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 3), s.palettes.BOLD));
       drawHistogramLegend();
     }
+
     function setGlobalHistogram() {
       histogramVariable = 'globalHistogram';
+      layer.viz.color.blendTo(s.ramp(s.prop('featurecla'), s.palettes.BOLD));
       drawHistogramLegend();
     }
     function setClassifiedGlobalHistogram() {
       histogramVariable = 'globalClassifiedHistogram';
+      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 3), s.palettes.BOLD));
       drawHistogramLegend();
     }
   </script>
