@@ -3,7 +3,8 @@ import * as util from '../../utils/util';
 
 export default class TimeRangeCodec extends BaseCodec {
     constructor (metadata, propertyName) {
-        super();
+        super(metadata, propertyName);
+
         const stats = metadata.stats(propertyName);
         const { min } = stats;
         const tr = util.timeRange({ iso: min });

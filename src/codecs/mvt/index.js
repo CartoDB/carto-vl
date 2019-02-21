@@ -5,7 +5,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../err
 export default function MVTCodecFactory (metadata, type, propertyName) {
     switch (type) {
         case 'number':
-            return new NumberCodec();
+            return new NumberCodec(metadata, propertyName);
         case 'category':
             return new CategoryCodec(metadata, propertyName);
         default:
