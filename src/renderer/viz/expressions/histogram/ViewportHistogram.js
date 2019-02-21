@@ -64,6 +64,7 @@ export default class ViewportHistogram extends Histogram {
         this._sizeOrBuckets = sizeOrBuckets;
         this._isViewport = true;
         this._hasBuckets = Array.isArray(sizeOrBuckets);
+        this._cached = null;
     }
 
     eval () {
