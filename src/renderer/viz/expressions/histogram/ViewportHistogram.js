@@ -72,12 +72,7 @@ export default class ViewportHistogram extends Histogram {
             if (!this._histogram) {
                 return null;
             }
-
-            this._cached = this.input.type === 'number'
-                ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
-                : this._getCategoryValue(this._histogram);
-
-            return this._cached;
+            this._cached = super.eval();
         }
 
         return this._cached;

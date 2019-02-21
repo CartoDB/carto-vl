@@ -66,12 +66,6 @@ export default class GlobalHistogram extends Histogram {
         this._histogram = new Map();
     }
 
-    eval () {
-        return this.input.type === 'number'
-            ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
-            : this._getCategoryValue(this._histogram);
-    }
-
     /**
      * Get an array of joined data by key and sorted by frequency.
      *
