@@ -130,4 +130,4 @@ This project is licensed under the BSD 3-clause "New" or "Revised" License - see
 
 BrowserStack supports this OpenSource project, providing us with valuable tools to test CARTO VL over different systems and browsers configurations.
 
-![BrowserStack](./test/browserstack-logo.png | width=300)(https://www.browserstack.com/)
+![](https://raw.githubusercontent.com/CartoDB/carto-vl/master/test/browserstack-logo.png | width=300)(https://www.browserstack.com/)
