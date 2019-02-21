@@ -1,7 +1,6 @@
-import BaseExpression from '../../base';
-import { implicitCast } from '../../utils';
-import { checkMaxArguments, checkArray } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import Histogram from './Histogram';
+import { checkMaxArguments, implicitCast } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 
 /**
  * Generates a histogram.
@@ -12,12 +11,14 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
  * When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin <= value < bucketMax].
  *
+ * The histogram can also be based on the result of a classifier expression such as `top()` or `buckets()`.
+ *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
  * @param {Number} input - expression to base the histogram
  * @param {Number|Array} sizeOrBuckets - Optional (defaults to 20). Number of bars to use if `x` is a numeric expression; or user-defined buckets for numeric expressions.
  * @param {Number} weight - Optional. Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
- * @return {Histogram} Histogram
+ * @return {ViewportHistogram} ViewportHistogram
  *
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
@@ -25,6 +26,7 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  *          \@categoryHistogram:    viewportHistogram($type)
  *          \@numericHistogram:     viewportHistogram($amount, 3, 1)
  *          \@userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *          \@topCategoryHistogram: viewportHistogram(top($type, 3))
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
@@ -36,7 +38,7 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name viewportHistogram
+ * @name ViewportHistogram
  * @function
  * @api
  */
@@ -44,9 +46,9 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
 /**
  * ViewportHistogram Class
  *
- * Generates a histogram.
+ * Generates a histogram based on the features in the viewport.
  * This class is instanced automatically by using the `viewportHistogram` function. It is documented for its methods.
- * Read more about viewportHistogram expression at {@link carto.expressions.viewportHistogram}.
+ * Read more about histogram expression at {@link carto.expressions.viewporthistogram}.
  *
  * @name expressions.ViewportHistogram
  * @abstract
@@ -54,28 +56,15 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
  * @class
  * @api
  */
-export default class ViewportHistogram extends BaseExpression {
-    constructor (x, sizeOrBuckets = 20, weight = 1) {
+export default class ViewportHistogram extends Histogram {
+    constructor (input, sizeOrBuckets = 20, weight = 1) {
         checkMaxArguments(arguments, 3, 'viewportHistogram');
-        super({ x: implicitCast(x), weight: implicitCast(weight) });
+        super({ input: implicitCast(input), weight: implicitCast(weight) });
 
-        this.type = 'histogram';
         this._sizeOrBuckets = sizeOrBuckets;
-        this._hasBuckets = Array.isArray(sizeOrBuckets);
         this._isViewport = true;
-
-        this.inlineMaker = () => null;
-    }
-
-    accumViewportAgg (feature) {
-        const x = this.x.eval(feature);
-
-        if (x !== undefined) {
-            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
-            const weight = clusterCount * this.weight.eval(feature);
-            const count = this._histogram.get(x) || 0;
-            this._histogram.set(x, count + weight);
-        }
+        this._hasBuckets = Array.isArray(sizeOrBuckets);
+        this._cached = null;
     }
 
     eval () {
@@ -83,12 +72,7 @@ export default class ViewportHistogram extends BaseExpression {
             if (!this._histogram) {
                 return null;
             }
-
-            this._cached = this.x.type === 'number'
-                ? (this._hasBuckets ? _getBucketsValue(this._histogram, this._sizeOrBuckets) : _getNumericValue(this._histogram, this._sizeOrBuckets))
-                : _getCategoryValue(this._histogram);
-
-            return this._cached;
+            this._cached = super.eval();
         }
 
         return this._cached;
@@ -101,7 +85,7 @@ export default class ViewportHistogram extends BaseExpression {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.ViewportHistogram
+     * @memberof expressions.Histogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
@@ -177,27 +161,16 @@ export default class ViewportHistogram extends BaseExpression {
      * // ]
      *
     */
-    getJoinedValues (values) {
-        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
 
-        if (!values.length) {
-            return [];
+    accumViewportAgg (feature) {
+        const property = this.input.eval(feature);
+
+        if (property !== undefined) {
+            const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
+            const weight = clusterCount * this.weight.eval(feature);
+            const count = this._histogram.get(property) || 0;
+            this._histogram.set(property, count + weight);
         }
-
-        return this.value.map(elem => {
-            const data = values.find(value => value.key === elem.x);
-
-            const frequency = elem.y;
-            const key = elem.x;
-            const value = data !== -1 ? data.value : null;
-
-            return { frequency, key, value };
-        });
-    }
-
-    _bindMetadata (metadata) {
-        super._bindMetadata(metadata);
-        this._metadata = metadata;
     }
 
     _resetViewportAgg (metadata) {
@@ -207,82 +180,4 @@ export default class ViewportHistogram extends BaseExpression {
         this._cached = null;
         this._histogram = new Map();
     }
-}
-
-function _getNumericValue (histogram, size) {
-    const array = [...histogram];
-    const arrayLength = array.length;
-    let min = Number.POSITIVE_INFINITY;
-    let max = Number.NEGATIVE_INFINITY;
-
-    for (let i = 0; i < arrayLength; i++) {
-        const x = array[i][0];
-        min = Math.min(min, x);
-        max = Math.max(max, x);
-    }
-
-    const hist = Array(size).fill(0);
-    const range = max - min;
-    const sizeMinusOne = size - 1;
-
-    for (let i = 0; i < arrayLength; i++) {
-        const x = array[i][0];
-        const y = array[i][1];
-        const index = Math.min(Math.floor(size * (x - min) / range), sizeMinusOne);
-        hist[index] += y;
-    }
-
-    return hist.map((count, index) => {
-        return {
-            x: [min + index / size * range, min + (index + 1) / size * range],
-            y: count
-        };
-    });
-}
-
-function _getBucketsValue ([...histogram], buckets) {
-    const nBuckets = buckets.length;
-    const hist = Array(nBuckets).fill(0);
-
-    for (let i = 0, len = histogram.length; i < len; i++) {
-        const x = histogram[i][0];
-        for (let j = 0; j < nBuckets; j++) {
-            const bucket = buckets[j];
-            if (x >= bucket[0] && x < bucket[1]) {
-                hist[j] += histogram[i][1];
-                break;
-            }
-        }
-    }
-
-    return hist.map((count, index) => {
-        return {
-            x: buckets[index],
-            y: count
-        };
-    });
-}
-
-function _getCategoryValue (histogram) {
-    return [...histogram]
-        .map(([x, y]) => {
-            return { x, y };
-        })
-        .sort(_sortNumerically);
-}
-
-function _sortNumerically (a, b) {
-    const frequencyDifference = (b.y - a.y);
-    if (frequencyDifference === 0) {
-        const categoryA = a.x;
-        const categoryB = b.x;
-
-        if (!categoryA && !categoryB) { return 0; } // both null or undefined
-        if (!categoryA) { return 1; } // categoryB first
-        if (!categoryB) { return -1; } // categoryA first
-
-        return categoryA.localeCompare(categoryB);
-    }
-
-    return frequencyDifference;
 }

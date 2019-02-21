@@ -1,6 +1,5 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
-import { OTHERS_INDEX } from '../../../../src/renderer/viz/expressions/constants';
 
 describe('viewportHistogram', () => {
     let div, map, source, viz, layer;
@@ -135,13 +134,11 @@ describe('viewportHistogram', () => {
         const histogramViz = '@histogram: viewportHistogram(top($category, 1))';
         createMapWith(histogramViz, commonFeatures);
 
-        const TOP_ONE_CATEGORY = 0; // category: 'a'
-
         layer.on('loaded', () => {
             const histogram = viz.variables.histogram.value;
             expect(histogram).toEqual([
-                { x: TOP_ONE_CATEGORY, y: 2 },
-                { x: OTHERS_INDEX, y: 1 }
+                { x: 'a', y: 2 },
+                { x: 'b', y: 1 }
             ]);
             done();
         });

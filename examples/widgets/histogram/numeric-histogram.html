@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Viewport histogram widget | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+
+    <!-- Include Airship -->
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-style/v1.0.3/airship.css">
+    <link rel="stylesheet" href="https://libs.cartocdn.com/airship-icons/v1.0.3/icons.css">
+    <script src="https://libs.cartocdn.com/airship-components/v1.0.3/airship.js"></script>
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Viewport Damage distribution (logarithmic scale)</h1>
+            </header>
+            <as-histogram-widget id="as-viewport-histogram" />
+        </div>
+        <div class="box">
+          <header>
+              <h1>Global Damage distribution (logarithmic scale)</h1>
+          </header>
+          <as-histogram-widget id="as-global-histogram" />
+      </div>
+    </aside>
+
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: carto.basemaps.darkmatter,
+            center: [-96, 41],
+            zoom: 1.5952286749544728,
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset("railroad_accidents");
+        const viz = new carto.Viz(`
+            @gHistogram: globalHistogram($total_damage, 6)
+            @vHistogram: viewportHistogram($total_damage, 6)
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        layer.addTo(map, 'watername_ocean');
+
+        layer.on('loaded', () => {
+            document.getElementById('loader').style.opacity = '0';
+        });
+
+        layer.on('updated', drawHistograms);
+
+        function drawViewportHistogram() {
+            var histogramWidget = document.getElementById('as-viewport-histogram');
+            const viewportHistogram = layer.viz.variables.vHistogram.value;
+            histogramWidget.disableInteractivity = true;
+            histogramWidget.data = viewportHistogram.map(entry => {
+                return {
+                    start: entry.x[0] / 1e6,
+                    end: entry.x[1] / 1e6,
+                    value: Math.log(entry.y + 1)
+                }
+            });
+        }
+
+        function drawGlobalHistogram() {
+            var histogramWidget = document.getElementById('as-global-histogram');
+            const globalHistogram = layer.viz.variables.gHistogram.value;
+            histogramWidget.disableInteractivity = true;
+            histogramWidget.data = globalHistogram.map(entry => {
+                return {
+                    start: entry.x[0] / 1e6,
+                    end: entry.x[1] / 1e6,
+                    value: Math.log(entry.y + 1)
+                }
+            });
+        }
+
+        function drawHistograms () {
+          drawViewportHistogram();
+          drawGlobalHistogram();
+        }
+    </script>
+</body>
+
+</html>

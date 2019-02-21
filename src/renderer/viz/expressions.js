@@ -557,7 +557,9 @@ import ViewportMin from './expressions/aggregation/viewport/ViewportMin';
 import ViewportSum from './expressions/aggregation/viewport/ViewportSum';
 import ViewportCount from './expressions/aggregation/viewport/ViewportCount';
 import ViewportPercentile from './expressions/aggregation/viewport/ViewportPercentile';
-import ViewportHistogram from './expressions/aggregation/viewport/ViewportHistogram';
+import ViewportHistogram from './expressions/histogram/ViewportHistogram';
+import GlobalHistogram from './expressions/histogram/GlobalHistogram';
+import ViewportFeatures from './expressions/viewportFeatures';
 
 import GlobalAvg from './expressions/aggregation/global/GlobalAvg';
 import GlobalCount from './expressions/aggregation/global/GlobalCount';
@@ -565,8 +567,6 @@ import GlobalMax from './expressions/aggregation/global/GlobalMax';
 import GlobalMin from './expressions/aggregation/global/GlobalMin';
 import GlobalSum from './expressions/aggregation/global/GlobalSum';
 import GlobalPercentile from './expressions/aggregation/global/GlobalPercentile';
-
-import ViewportFeatures from './expressions/viewportFeatures';
 
 import Zoom from './expressions/zoom';
 
@@ -719,6 +719,7 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
+export const globalHistogram = (...args) => new GlobalHistogram(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const scaled = (...args) => new Scaled(...args);
