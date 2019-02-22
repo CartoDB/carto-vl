@@ -43,17 +43,19 @@ describe('CARTO VL browser tests in...', () => {
 
     function testBasicLayerLoads (done) {
         const BASIC_TEST = `${BASE_URL}basic-test.html`;
-        // const BASIC_TEST = 'https://carto.com/developers/carto-vl/examples/maps/basics/add-layer.html';
 
         driver.get(BASIC_TEST);
-        const WAIT_MILISECONDS = 10000;
+        const WAIT_MILISECONDS = 15000;
         driver.sleep(WAIT_MILISECONDS);
-        driver.findElement({ id: 'loader' }).getCssValue('opacity').then(function (opacity) {
-            const loadingIsHidden = (opacity === '0');
-            succesfulTest = loadingIsHidden;
-            assert(loadingIsHidden, `The <loading> indicator is still visible after ${WAIT_MILISECONDS / 1000} seconds, so the Layer has NOT loaded!`);
-            done();
-        });
+        driver
+            .findElement({ id: 'loader' })
+            .getCssValue('opacity')
+            .then(function (opacity) {
+                const loadingIsHidden = (opacity === '0');
+                succesfulTest = loadingIsHidden;
+                assert(loadingIsHidden, `The <loading> indicator is still visible after ${WAIT_MILISECONDS / 1000} seconds, so the Layer has NOT loaded!`);
+                done();
+            });
     }
 
     BROWSERS.forEach((browser) => {
