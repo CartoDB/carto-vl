@@ -152,6 +152,8 @@ export default class GlobalHistogram extends Histogram {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
+        this._histogram = new Map();
+
         if (!this.input.isA(Property)) {
             this._setHistogramForExpression();
             return;
