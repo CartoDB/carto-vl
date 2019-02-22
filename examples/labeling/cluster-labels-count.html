@@ -15,7 +15,7 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Parking signs in Montreal</h1>
+                <h1>Label clusters</h1>
             </header>
             <section>
                 <p class="description open-sans">Symbolize and label by cluster count</p>
@@ -50,16 +50,18 @@
 
         const source = new carto.source.Dataset('montreal_parking_signs');
         const viz = new carto.Viz(`
-
         @cc: clusterCount()
         @v_features: viewportFeatures(@cc)
-       
-        width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[8,20,50])
+        //width: sqrt(clusterCount())*10
+        //width: ramp(linear(clusterCount(),1,80),[5,50])
+        width: ramp(viewportQuantiles(@cc,5), [8,50])
+        //width: ramp(globalQuantiles(@cc,5),[5,50])
+        //width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[8,20,50])
         color: opacity(#C91329,0.7)
         strokeColor: black
         resolution: 32
         strokeWidth: 1
-    `);
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         // Create labeling layer centroids
