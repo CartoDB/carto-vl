@@ -27,7 +27,7 @@ We have some basic cross browser testing, using **selenium** + [saucelabs](https
 4. Once the tunnel is ready (see its messages in the shell), run the tests with:
 
   ```
-  test:browsers:compatibility
+  yarn test:browsers:compatibility
   ```
 
 

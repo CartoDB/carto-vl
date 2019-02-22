@@ -91,11 +91,6 @@ workflows:
       - test-user
       - sauce-connect/with_proxy:
           name: test-browsers-saucelabs
-          requires:
-            - test-e2e
-            - test-unit-lint-docs
-            - test-render
-            - test-user
           steps:
             - run: echo Install node and yarn
             - run: curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
