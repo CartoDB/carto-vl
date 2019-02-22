@@ -107,7 +107,7 @@
     "test:user:watch": "karma start --no-single-run --auto-watch --browsers ChromeHeadlessNoSandbox test/integration/user/karma.conf.js",
     "test:user:watchc": "karma start --no-single-run --browsers Chrome test/integration/user/karma.conf.js",
     "test:browser": "karma start --no-single-run --browsers Chrome test/unit/karma.conf.js",
-    "test:browsers:connect": "sc -u $SAUCELABS_USER -k $SAUCELABS_KEY -i cartovl-tunnel",
+    "test:browsers:connect": "sc -u $SAUCELABS_USER -k $SAUCELABS_KEY -i cartovl-tunnel --no-autodetect",
     "test:browsers:compatibility": "./scripts/run-cross-browser-tests.sh",
     "test:render": "yarn build:clean && yarn build:dev && mocha test/integration/render/render.test.js --timeout 15000",
     "test:render:min": "yarn build:clean && yarn build:min && MIN=1 mocha test/integration/render/render.test.js --timeout 15000",
