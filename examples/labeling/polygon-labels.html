@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & useLines | CARTO</title>
+  <title>Label polygons | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -13,6 +13,17 @@
 
 <body>
   <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Label Polygons</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Style and label polygons</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
 
   <script>
     const map = new mapboxgl.Map({
@@ -32,7 +43,7 @@
       apiKey: 'default_public'
     });
 
-    // Polygon layer
+
     const source = new carto.source.Dataset('sf_neighborhoods');
     const viz = new carto.Viz(`
       color: ramp($name,vivid)
