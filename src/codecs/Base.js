@@ -13,6 +13,12 @@
 // * Scalar (simple) encoder: source value is encoded as a single internal value
 // * Range encoder: a source value encodes as a pair [lo, hi] of values.
 export default class BaseCodec {
+    constructor (metadata, propertyName) {
+        if (metadata && propertyName) {
+            this._baseName = metadata.baseName(propertyName);
+        }
+    }
+
     isRange () {
         return false;
     }
@@ -44,8 +50,8 @@ export default class BaseCodec {
     // Convert source encoding to external encoding.
     // Used to present source stats values (global aggregations)
     // to match the format of constant expressions.
-    sourceToExternal (metadata, v, propertyName) {
-        return this.internalToExternal(metadata, this.sourceToInternal(metadata, v, propertyName));
+    sourceToExternal (metadata, v) {
+        return this.internalToExternal(metadata, this.sourceToInternal(metadata, v));
     }
 
     // Convert external to internal encoding.
@@ -53,8 +59,8 @@ export default class BaseCodec {
     // and [lo, hi] for range codecs.
     // used to to apply filters in GLSL inlined code;
     // evaluate binary operations property vs external (constant/global
-    externalToInternal (metadata, v, propertyName) {
-        return this.sourceToInternal(metadata, this.externalToSource(metadata, v), propertyName);
+    externalToInternal (metadata, v) {
+        return this.sourceToInternal(metadata, this.externalToSource(metadata, v));
     }
 
     // Generate GLSL inline expression to map a property value

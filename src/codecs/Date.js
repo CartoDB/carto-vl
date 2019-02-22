@@ -3,7 +3,8 @@ import * as util from '../utils/util';
 
 export default class DateCodec extends BaseCodec {
     constructor (metadata, propertyName) {
-        super();
+        super(metadata, propertyName);
+
         const { min } = metadata.stats(propertyName);
         this._min_date = util.castDate(min);
         this._min_ms = this._min_date.getTime();
