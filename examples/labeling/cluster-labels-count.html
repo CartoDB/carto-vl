@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Exported map | CARTO VL</title>
+    <title>Label clusters by count | CARTO VL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../../dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
@@ -12,6 +12,24 @@
 
 <body>
     <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Parking signs in Montreal</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Symbolize and label by cluster count</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+    <div id="loader">
+        <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+            <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+                <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+            </svg>
+        </div>
+    </div>
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
@@ -47,7 +65,6 @@
         strokeColor: black
         resolution: 32
         strokeWidth: 1
-
     `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -99,7 +116,12 @@
             });
         });
 
-        layer.addTo(map, 'watername_ocean');
+        layer.addTo(map);
+        layer.on('loaded', hideLoader);
+
+        function hideLoader() {
+            document.getElementById('loader').style.opacity = '0';
+        }
     </script>
 </body>
 
