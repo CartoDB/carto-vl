@@ -81,8 +81,9 @@ export default class GlobalAggregation extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this.property._bindMetadata(metadata);
+        const valueName = this.property.name;
         const propertyName = this.property.propertyName || this.property.name;
-        const value = this._getValueFromStats(metadata, propertyName);
+        const value = this._getValueFromStats(metadata, valueName);
         this._value.expr = metadata.codec(propertyName).sourceToExternal(metadata, value);
     }
 
