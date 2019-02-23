@@ -57,10 +57,11 @@
         width: ramp(viewportQuantiles(@cc,5), [8,50])
         //width: ramp(globalQuantiles(@cc,5),[5,50])
         //width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[8,20,50])
-        color: opacity(#C91329,0.7)
-        strokeColor: black
+        
+        color: opacity(#C91329,0.9)
+        strokeColor: opacity(white,0.1)
         resolution: 32
-        strokeWidth: 1
+        strokeWidth: ramp(viewportQuantiles(@cc,5), [2,10])
         `);
         const layer = new carto.Layer('layer', source, viz);
 
