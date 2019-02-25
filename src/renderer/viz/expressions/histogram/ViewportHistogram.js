@@ -96,7 +96,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   @histogram: s.globalHistogram(s.prop('vehicles'))
      * });
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -116,7 +116,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: viewportHistogram($vehicles)
+     *   @histogram: globalHistogram($vehicles)
      * `);
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -130,12 +130,12 @@ export default class ViewportHistogram extends Histogram {
      * @example <caption>Get color values for the histogram when using a ramp.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: s.viewportHistogram(s.prop('vehicles'))
+     *   @histogram: s.globalHistogram(s.prop('vehicles'))
      *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
@@ -144,24 +144,57 @@ export default class ViewportHistogram extends Histogram {
      * // ]
      *
      * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
-     *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: viewportHistogram($vehicles)
+     *   @histogram: globalHistogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
      * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
      * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
      * // ]
+     * @example <caption>Get color values for the histogram using a ramp with classified data.</caption>
+     * // Note: Both the ramp and the histogram expressions must use the same classification.
      *
-    */
-
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: s.globalHistogram(s.top(s.prop('vehicles'), 2))
+     *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
+     * `);
+     *
+     * const opions = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(opions);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, opions);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram using a ramp with classified data (String).</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: globalHistogram(top($vehicles, 2))
+     *   color: ramp((top($vehicles, 2)), Prism, green)
+     * `);
+     *
+     * const opions = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(opions);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, opions);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
+     *
+     */
     accumViewportAgg (feature) {
         const property = this.input.eval(feature);
 
