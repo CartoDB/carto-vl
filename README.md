@@ -125,3 +125,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## License
 
 This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE](LICENSE) file for details.
+
+## BrowserStack
+
+[BrowserStack](https://www.browserstack.com/) supports this OpenSource project, providing us with valuable tools to test CARTO VL over different systems and browsers configurations.
+
+<img src="https://raw.githubusercontent.com/CartoDB/carto-vl/master/test/browserstack-logo.png" width="200" alt="BrowserStack Logo">

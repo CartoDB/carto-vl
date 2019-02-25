@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix regression in `Interactivity` using MVT and polygons
 - Raise an error when the idProperty is not specified in the metadata and is not a number
 - Fix getting aggregation expression values passed to `viewportFeatures` expression
+- Fix WebGL incompatibility in Edge
 
 ## [1.1.1] - 2019-01-16
 

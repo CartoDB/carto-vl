@@ -6,7 +6,7 @@ import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../errors
 export default function codecFactory (metadata, type, propertyName) {
     switch (type) {
         case 'number':
-            return new NumberCodec();
+            return new NumberCodec(metadata, propertyName);
         case 'category':
             return new CategoryCodec(metadata, propertyName);
         case 'date':

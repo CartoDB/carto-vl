@@ -194,6 +194,9 @@ class MockMetadata {
         });
         this._codec = new IdentityCodec();
     }
+    baseName (propertyName) {
+        return propertyName;
+    }
     stats (propertyName) {
         return this.properties[propertyName];
     }

@@ -7,7 +7,7 @@ import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../../errors/carto-
 export default function windshaftCodecFactory (metadata, type, propertyName) {
     switch (type) {
         case 'number':
-            return new NumberCodec();
+            return new NumberCodec(metadata, propertyName);
         case 'category':
             return new CategoryCodec(metadata, propertyName);
         case 'date':
