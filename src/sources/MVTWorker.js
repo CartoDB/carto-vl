@@ -226,14 +226,14 @@ export class MVTWorker {
         for (let j = 0; j < length; j++) {
             const [propertyName, codec] = scalarPropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue, propertyName);
+            properties[propertyName][i] = codec.sourceToInternal(metadata, propertyValue);
         }
 
         length = rangePropertyCodecs.length;
         for (let j = 0; j < length; j++) {
             const [propertyName, [loPropertyName, hiPropertyName], codec] = rangePropertyCodecs[j];
             const propertyValue = feature.properties[propertyName];
-            const [loValue, hiValue] = codec.sourceToInternal(metadata, propertyValue, propertyName);
+            const [loValue, hiValue] = codec.sourceToInternal(metadata, propertyValue);
             properties[loPropertyName][i] = loValue;
             properties[hiPropertyName][i] = hiValue;
         }

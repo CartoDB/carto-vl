@@ -3,7 +3,8 @@ import * as util from '../../utils/util';
 
 export default class WindshaftDateCodec extends BaseCodec {
     constructor (metadata, propertyName) {
-        super();
+        super(metadata, propertyName);
+
         const { min } = metadata.stats(propertyName);
         this._min_ms = min * 1000;
         this._min_date = util.msToDate(this._min_ms);

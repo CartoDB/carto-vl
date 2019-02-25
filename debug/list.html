@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Feature Lists</title> | CARTO VL</title>
+  <title>Feature Lists | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../dist/carto-vl.js"></script>
@@ -12,11 +13,13 @@
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
     #timer {
       position: absolute;
       top: '20px', left: '20px';
@@ -26,6 +29,7 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="timer"></div>
@@ -36,9 +40,9 @@
         version: 8,
         sources: {},
         layers: [{
-            id: 'background',
-            type: 'background',
-            paint: { 'background-color': 'black' }
+          id: 'background',
+          type: 'background',
+          paint: { 'background-color': 'black' }
         }]
       },
       center: [-100, 40],
@@ -67,9 +71,10 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
     layer.on('updated', () => {
-      console.log('Features:',viz.variables.list.value);
-      console.log('Other Features:',viz.variables.anotheList.value);
+      console.log('Features:', viz.variables.list.value);
+      console.log('Other Features:', viz.variables.anotheList.value);
     });
   </script>
 </body>
+
 </html>
