@@ -28,6 +28,9 @@
     </aside>
 
     <script>
+        const weatherCategories = ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet'];
+        let filteredWeatherCategories = JSON.parse(JSON.stringify(weatherCategories));
+
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
@@ -47,13 +50,14 @@
 
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
-            width: 5
-            @buckets: list(['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet'])
+            @buckets: ${JSON.stringify(weatherCategories)}
             filter: $weather in @buckets
-            color: ramp($weather, [darkorange,darkviolet,darkturquoise])
+            color: ramp($weather, [ darkorange, darkviolet, darkturquoise] )
             strokeWidth: 0.2
             strokeColor: black
-        `);
+            width: 5
+        `
+        );
         const layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
 
@@ -68,39 +72,45 @@
         layer.on('updated', () => {
 
             // Request data for legend from the layer viz
-            const colorLegend = layer.viz.color.getLegendData({
+            const legend = layer.viz.color.getLegendData({
                 othersLabel: 'Other Weather'
             });
 
-            let colorLegendList = '';
+            let legendList = '';
 
             // Create list elements for legend
-            colorLegend.data.forEach((legend, index) => {
+            legend.data.forEach((legend, index) => {
                 const color = rgbToHex(legend.value);
                 const key = legend.key.toLowerCase().replace(' ', '-');
 
-                colorLegendList +=
-                    `<li>
-                        <button class="js-legend-button" id="js-legend-button-${key}">
+                legendList +=`
+                    <li>
+                        <button class="js-legend-button" id="js-legend-button-${key}" data-weather-category="${legend.key}">
                             <span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}</span>
                         </button>
                     </li>\n`;
             });
 
-            // Place list items in the content section of the title/legend box
-            document.getElementById('content').innerHTML = colorLegendList;
+            document.getElementById('content').innerHTML = legendList;
             getSelectionButtons();
         });
 
         function getSelectionButtons() {
             const buttons = document.getElementsByClassName('js-legend-button');
             for (let i in buttons) {
-                const button = buttons.item(i);
-                button.addEventListener('click', (event) => {
-
-                });
+                buttons
+                    .item(i)
+                    .addEventListener('click', toggleCategory);
             };
         }
+
+        function toggleCategory(event) {
+            const category = event.currentTarget.getAttribute('data-weather-category');
+            filteredWeatherCategories = _toggle(filteredWeatherCategories, category);
+            viz.filter.blendTo(`$weather in ${JSON.stringify(filteredWeatherCategories)}`);
+        }
+
+        const _toggle = (arr, item) => arr.includes(item) ? arr.filter(i => i !== item) : [ ...arr, item ];
     </script>
 </body>
 
