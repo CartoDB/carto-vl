@@ -118,6 +118,32 @@ describe('globalHistogram', () => {
         });
     });
 
+    it('should get correct data labeled when there are "others" values', (done) => {
+        const top = 1;
+        const histogramViz = `
+            @histogram: globalHistogram(top($value, ${top}))
+            @color: ramp(top($value, ${top}), [ red, blue ], green )
+        `;
+
+        const options = {
+            othersLabel: 'Others Test'
+        };
+
+        createMapWith(histogramViz, categoryFeatures);
+
+        layer.on('loaded', () => {
+            const colors = viz.variables.color.getLegendData(options).data;
+            const histogram = viz.variables.histogram.getJoinedValues(colors, options);
+            const GREEN_RGBA = { r: 0, g: 128, b: 0, a: 1 };
+            const RED_RGBA = { r: 255, g: 0, b: 0, a: 1 };
+            expect(histogram).toEqual([
+                { key: 'Others Test', frequency: 7, value: GREEN_RGBA },
+                { key: 'Murcia', frequency: 5, value: RED_RGBA }
+            ]);
+            done();
+        });
+    });
+
     afterEach(() => {
         map.remove();
         document.body.removeChild(div);

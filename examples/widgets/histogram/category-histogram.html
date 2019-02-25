@@ -148,11 +148,14 @@
       const histogram = layer.viz.variables[histogramVariable];
       // Get color ramp
       const colorRamp = layer.viz.color;
-
+      // Define custom options
+      const options = {
+        othersLabel: 'Others'
+      };
       // Use getLegendData to get color values from the ramp
-      const legendData = colorRamp.getLegendData().data;
+      const legendData = colorRamp.getLegendData(options).data;
       // Use getJoinedValues to get sorted colors by frequency
-      const histogramData = histogram.getJoinedValues(legendData);
+      const histogramData = histogram.getJoinedValues(legendData, options);
 
       // Chart.js set up
       const data = histogramData.map(elem => elem.frequency);

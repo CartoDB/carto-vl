@@ -1,5 +1,6 @@
 import BaseExpression from '../base';
 import { checkArray } from '../utils';
+import { DEFAULT_OPTIONS, OTHERS_LABEL } from '../constants';
 
 export default class Histogram extends BaseExpression {
     constructor (children) {
@@ -14,20 +15,24 @@ export default class Histogram extends BaseExpression {
             : this._getCategoryValue(this._histogram);
     }
 
-    getJoinedValues (values) {
+    getJoinedValues (values, options) {
         checkArray('histogram.getJoinedValues', 'values', 0, values);
 
         if (!values.length) {
             return [];
         }
 
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const joinedValues = [];
 
         this.value.forEach((elem) => {
             const val = values.find(value => elem.x === value.key);
+
             if (val) {
                 const frequency = elem.y;
-                const key = val.key;
+                const key = elem.x === OTHERS_LABEL
+                    ? config.othersLabel
+                    : val.key;
                 const value = val.value;
 
                 joinedValues.push({ frequency, key, value });
