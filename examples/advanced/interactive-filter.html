@@ -9,6 +9,14 @@
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
     <link rel="stylesheet" type="text/css" href="../style.css">
+
+    <style>
+        li {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -18,6 +26,7 @@
             <header>
                 <h1>Rail Accidents by Weather</h1>
             </header>
+            
             <!-- Add legend data -->
             <section>
                 <div id="controls">
@@ -28,8 +37,7 @@
     </aside>
 
     <script>
-        const weatherCategories = ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet'];
-        let filteredWeatherCategories = JSON.parse(JSON.stringify(weatherCategories));
+        const s = carto.expressions;
 
         const map = new mapboxgl.Map({
             container: 'map',
@@ -41,6 +49,7 @@
         const nav = new mapboxgl.NavigationControl({
             showCompass: false
         });
+
         map.addControl(nav, 'top-left');
 
         carto.setDefaultAuth({
@@ -49,50 +58,54 @@
         });
 
         const source = new carto.source.Dataset("railroad_accidents");
+
+        let weatherCategories = ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet'];
+
         const viz = new carto.Viz(`
-            @buckets: ${JSON.stringify(weatherCategories)}
-            filter: $weather in @buckets
             color: ramp($weather, [ darkorange, darkviolet, darkturquoise] )
             strokeWidth: 0.2
             strokeColor: black
             width: 5
-        `
-        );
+        `);
+
+        applyFilter();
+
         const layer = new carto.Layer('layer', source, viz);
+
         layer.addTo(map);
 
         //** ADD LEGEND **//
 
-        // A function to convert map colors to HEX values for legend
-        function rgbToHex(color) {
-            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
-        }
+        let initialized = false;
 
         // When layer loads, trigger legend event
         layer.on('updated', () => {
+            if (!initialized) {
+                // Request data for legend from the layer viz
+                const legend = layer.viz.color.getLegendData({
+                    othersLabel: 'Other Weather'
+                });
 
-            // Request data for legend from the layer viz
-            const legend = layer.viz.color.getLegendData({
-                othersLabel: 'Other Weather'
-            });
+                let legendList = '';
 
-            let legendList = '';
+                // Create list elements for legend
+                legend.data.forEach((legend, index) => {
+                    const color = rgbToHex(legend.value);
+                    const key = legend.key.toLowerCase().replace(' ', '-');
+                    const checked = weatherCategories.includes(legend.key);
+                    
+                    legendList +=`
+                        <li style="border-bottom: 4px solid ${color};">
+                            <input type="checkbox" name="categories" id="js-legend-button-${key}" class="js-legend-button" data-weather-category="${legend.key}" checked>
+                            <label for="js-legend-button-${key}">${legend.key}</label>
+                        </li>\n`;
+                });
 
-            // Create list elements for legend
-            legend.data.forEach((legend, index) => {
-                const color = rgbToHex(legend.value);
-                const key = legend.key.toLowerCase().replace(' ', '-');
+                document.getElementById('content').innerHTML = legendList;
 
-                legendList +=`
-                    <li>
-                        <button class="js-legend-button" id="js-legend-button-${key}" data-weather-category="${legend.key}">
-                            <span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}</span>
-                        </button>
-                    </li>\n`;
-            });
-
-            document.getElementById('content').innerHTML = legendList;
-            getSelectionButtons();
+                getSelectionButtons();
+                initialized = true;
+            }
         });
 
         function getSelectionButtons() {
@@ -100,17 +113,33 @@
             for (let i in buttons) {
                 buttons
                     .item(i)
-                    .addEventListener('click', toggleCategory);
+                    .addEventListener('change', toggleCategory);
             };
         }
 
         function toggleCategory(event) {
             const category = event.currentTarget.getAttribute('data-weather-category');
-            filteredWeatherCategories = _toggle(filteredWeatherCategories, category);
-            viz.filter.blendTo(`$weather in ${JSON.stringify(filteredWeatherCategories)}`);
+            weatherCategories = _toggle(weatherCategories, category);
+            event.currentTarget.checked = weatherCategories.includes(category);
+            
+            applyFilter();
         }
 
-        const _toggle = (arr, item) => arr.includes(item) ? arr.filter(i => i !== item) : [ ...arr, item ];
+        function applyFilter() {
+            viz.filter.blendTo(s.in(s.prop('weather'), weatherCategories));
+        }
+
+        //** Helper Methods **//
+        
+        // A function to convert map colors to HEX values for legend    
+        function rgbToHex(color) {
+            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+        }
+
+        // A function to toggle an element in an array  
+        function _toggle(arr, item) {
+            return arr.includes(item) ? arr.filter(i => i !== item) : [ ...arr, item ];
+        }
     </script>
 </body>
 
