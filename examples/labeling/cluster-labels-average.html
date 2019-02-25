@@ -18,7 +18,7 @@
                 <h1>Label clusters</h1>
             </header>
             <section>
-                <p class="description open-sans">Symbolize and label by viewport cluster count</p>
+                <p class="description open-sans">Symbolize and label by viewport cluster average</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -27,9 +27,9 @@
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-            center: [-73.605089, 45.536127],
-            zoom: 10,
+            style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            center: [-95.491724, 38.685047],
+            zoom: 3,
             scrollZoom: false
         });
 
@@ -49,15 +49,15 @@
         });
 
 
-        const source = new carto.source.Dataset('montreal_parking_signs');
+        const source = new carto.source.Dataset('july_temps');
         const viz = new carto.Viz(`
-            @cc: clusterCount()
-            @v_features: viewportFeatures(@cc)
+            @ca: clusterAVG($value)
+            @v_features: viewportFeatures(@ca)
             
-            width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[5,50])
-            color: opacity(#C91329,0.9)
+            width: 30
+            color: ramp(linear(@ca,viewportMIN(@ca),viewportMAX(@ca)),[blue,turquoise,yellow,red])
             strokeWidth: 0
-            resolution: 32
+            resolution: 16
         `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -76,7 +76,7 @@
                             "coordinates": f.getRenderedCentroid()
                         },
                         "properties": {
-                            "label_field": `${f.properties['cc']}`,
+                            "label_field": `${f.properties['ca']}`,
                         }
                     }
                 });
@@ -104,8 +104,7 @@
                     "text-color": "#FFFFFF",
                     "text-halo-width": 0,
                     "text-halo-blur": 0
-                },
-                filter: ['!=', ['string', ['get', 'label_field']], '1']
+                }
             });
         });
 
