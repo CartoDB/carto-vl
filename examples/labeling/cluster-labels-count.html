@@ -53,8 +53,8 @@
         @cc: clusterCount()
         @v_features: viewportFeatures(@cc)
         //width: sqrt(clusterCount())*10
-        //width: ramp(linear(clusterCount(),1,80),[5,50])
-        width: ramp(viewportQuantiles(@cc,5), [8,50])
+        width: ramp(linear(clusterCount(),1,80),[5,50])
+        //width: ramp(viewportQuantiles(@cc,5), [8,50])
         //width: ramp(globalQuantiles(@cc,5),[5,50])
         //width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[8,20,50])
         

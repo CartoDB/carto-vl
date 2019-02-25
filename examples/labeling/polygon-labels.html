@@ -43,13 +43,13 @@
       apiKey: 'default_public'
     });
 
-
     const source = new carto.source.Dataset('sf_neighborhoods');
     const viz = new carto.Viz(`
+      @v_features: viewportFeatures($name)
+
       color: ramp($name,vivid)
       strokeWidth: 1
       strokeColor: black
-      @v_features: viewportFeatures($name)
     `);
     const layer = new carto.Layer('polygons', source, viz);
 
