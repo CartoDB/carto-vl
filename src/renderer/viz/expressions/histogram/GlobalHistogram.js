@@ -230,7 +230,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForExpression () {
-        const data = this.input._getLegendData(DEFAULT_OPTIONS).data;
+        const data = this.input.getLegendData(DEFAULT_OPTIONS).data;
 
         this._categories.forEach(c => {
             const category = data.find(category => c.name === category.key);
