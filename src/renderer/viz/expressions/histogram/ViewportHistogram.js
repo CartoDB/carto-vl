@@ -167,9 +167,9 @@ export default class ViewportHistogram extends Histogram {
      *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
      * `);
      *
-     * const opions = { othersLabel: 'Others '};
-     * const legend = viz.color.getLegendData(opions);
-     * const data = viz.variables.histogram.getJoinedValues(legend.data, opions);
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
@@ -184,9 +184,9 @@ export default class ViewportHistogram extends Histogram {
      *   color: ramp((top($vehicles, 2)), Prism, green)
      * `);
      *
-     * const opions = { othersLabel: 'Others '};
-     * const legend = viz.color.getLegendData(opions);
-     * const data = viz.variables.histogram.getJoinedValues(legend.data, opions);
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
