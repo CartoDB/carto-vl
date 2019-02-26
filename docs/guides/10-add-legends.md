@@ -205,7 +205,7 @@ You can overwrite this default label in the style for the `colorLegendList` with
 
 ```js
 colorLegendList +=
-    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
+    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}<span></li>\n`;
 ```
 
 With that change, the map labels other categories as "Other weather" in the legend:
