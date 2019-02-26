@@ -1,7 +1,7 @@
 import Histogram from './Histogram';
 import Property from '../basic/property';
-import { checkMaxArguments, implicitCast } from '../utils';
-import { OTHERS_LABEL } from '../constants';
+import { checkMaxArguments, implicitCast, checkArray } from '../utils';
+import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
 
 /**
  * Generates a histogram.
@@ -183,6 +183,34 @@ export default class GlobalHistogram extends Histogram {
      * // ]
      *
      */
+    getJoinedValues (values, options) {
+        checkArray('globalHistogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
+        const joinedValues = [];
+
+        this.value.forEach((elem) => {
+            elem.x = elem.x === OTHERS_LABEL
+                ? config.othersLabel
+                : elem.x;
+            const val = values.find(value => elem.x === value.key);
+
+            if (val) {
+                const frequency = elem.y;
+                const key = val.key;
+                const value = val.value;
+
+                joinedValues.push({ frequency, key, value });
+            }
+        });
+
+        return joinedValues;
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
@@ -202,7 +230,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForExpression () {
-        const data = this.input._getLegendData().data;
+        const data = this.input._getLegendData(DEFAULT_OPTIONS).data;
 
         this._categories.forEach(c => {
             const category = data.find(category => c.name === category.key);

@@ -83,9 +83,9 @@
     const viz = new carto.Viz(`
       @color: ramp($featurecla, bold)
       @viewportHistogram: viewportHistogram($featurecla)
-      @viewportClassifiedHistogram: viewportHistogram(top($featurecla, 3))
+      @viewportClassifiedHistogram: viewportHistogram(top($featurecla, 2))
       @globalHistogram: globalHistogram($featurecla)
-      @globalClassifiedHistogram: globalHistogram(top($featurecla, 3))
+      @globalClassifiedHistogram: globalHistogram(top($featurecla, 2))
       color: @color
       width: 5
       strokeWidth: 0
@@ -191,7 +191,7 @@
 
     function setClassifiedViewportHistogram() {
       histogramVariable = 'viewportClassifiedHistogram';
-      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 3), s.palettes.BOLD));
+      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 2), s.palettes.BOLD));
       drawHistogramLegend();
     }
 
@@ -202,7 +202,7 @@
     }
     function setClassifiedGlobalHistogram() {
       histogramVariable = 'globalClassifiedHistogram';
-      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 3), s.palettes.BOLD));
+      layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 2), s.palettes.BOLD));
       drawHistogramLegend();
     }
   </script>

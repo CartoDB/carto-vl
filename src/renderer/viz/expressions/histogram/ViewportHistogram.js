@@ -1,6 +1,8 @@
 import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../schema';
+import { checkArray } from '../utils';
+import { DEFAULT_OPTIONS } from '../constants';
 
 /**
  * Generates a histogram.
@@ -195,6 +197,43 @@ export default class ViewportHistogram extends Histogram {
      * // ]
      *
      */
+    getJoinedValues (values, options) {
+        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
+        const joinedValues = [];
+        const otherValues = [];
+
+        this.value.forEach((elem) => {
+            const val = values.find(value => elem.x === value.key);
+
+            if (val) {
+                const frequency = elem.y;
+                const key = val.key;
+                const value = val.value;
+
+                joinedValues.push({ frequency, key, value });
+            } else {
+                otherValues.push(elem.y);
+            }
+        });
+
+        if (otherValues.length) {
+            const others = values.find(value => config.othersLabel === value.key);
+            const frequency = otherValues.reduce((prev, freq) => prev + freq);
+            const key = others.key;
+            const value = others.value;
+
+            joinedValues.push({ frequency, key, value });
+        }
+
+        return joinedValues;
+    }
+
     accumViewportAgg (feature) {
         const property = this.input.eval(feature);
 
