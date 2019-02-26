@@ -175,7 +175,7 @@ export default class Top extends BaseExpression {
         super._preDraw(program, drawMetadata, gl);
     }
 
-    _getLegendData (options) {
+    getLegendData (options) {
         const metaColumn = this._metadata.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
