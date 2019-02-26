@@ -62,70 +62,76 @@
         let weatherCategories = ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet'];
 
         const viz = new carto.Viz(`
+            filter: $weather in ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet']
             color: ramp($weather, [ darkorange, darkviolet, darkturquoise] )
             strokeWidth: 0.2
             strokeColor: black
             width: 5
         `);
 
-        applyFilter();
-
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map);
-
-        //** ADD LEGEND **//
 
         let initialized = false;
 
         // When layer loads, trigger legend event
         layer.on('updated', () => {
             if (!initialized) {
-                // Request data for legend from the layer viz
-                const legend = layer.viz.color.getLegendData({
-                    othersLabel: 'Other Weather'
-                });
-
-                let legendList = '';
-
-                // Create list elements for legend
-                legend.data.forEach((legend, index) => {
-                    const color = rgbToHex(legend.value);
-                    const key = legend.key.toLowerCase().replace(' ', '-');
-                    const checked = weatherCategories.includes(legend.key);
-                    
-                    legendList +=`
-                        <li style="border-bottom: 4px solid ${color};">
-                            <input type="checkbox" name="categories" id="js-legend-button-${key}" class="js-legend-button" data-weather-category="${legend.key}" checked>
-                            <label for="js-legend-button-${key}">${legend.key}</label>
-                        </li>\n`;
-                });
-
-                document.getElementById('content').innerHTML = legendList;
-
-                getSelectionButtons();
+                generateLegend();
+                setupWidget();
                 initialized = true;
             }
         });
 
-        function getSelectionButtons() {
-            const buttons = document.getElementsByClassName('js-legend-button');
-            for (let i in buttons) {
-                buttons
-                    .item(i)
-                    .addEventListener('change', toggleCategory);
+        function generateLegend() {
+            // Request data for legend from the layer viz
+            const legend = layer.viz.color.getLegendData();
+
+            // Create list elements for legend
+            const legendList = legend.data.map((legend, index) => {
+                const color = rgbToHex(legend.value);
+                const key = legend.key.toLowerCase().replace(' ', '-');
+                const checked = weatherCategories.includes(legend.key);
+                
+                // Use "js-checkbox" class to get all the checkbox elements from the widget
+                // Use "data-weather-category" attribute to set the category for each checkbox
+                return `
+                    <li style="border-bottom: 4px solid ${color};">
+                        <input 
+                            id="js-checkbox-${key}"
+                            class="js-checkbox"
+                            type="checkbox"
+                            name="categories"
+                            data-weather-category="${legend.key}"
+                        checked>
+                        <label for="js-checkbox-${key}">${legend.key}</label>
+                    </li>\n`;
+            }).join('');
+
+            document.getElementById('content').innerHTML = legendList;
+        }
+
+        function setupWidget() {
+            // 1. Get all the category checkboxes
+            const checkboxes = document.getElementsByClassName('js-checkbox');
+            // 2. Add an event listener to each category checkbox
+            for (let i in checkboxes) {
+                const checkbox = checkboxes.item(i);
+                checkbox.addEventListener('change', toggleCategory);
             };
         }
 
         function toggleCategory(event) {
-            const category = event.currentTarget.getAttribute('data-weather-category');
+            // 1. Get the clicked checkbox element from the event
+            const checkboxElement = event.currentTarget;
+            // 2. Get the category through the "data-weather-category" attribute
+            const category = checkboxElement.getAttribute('data-weather-category');
+            // 3. Toggle the chosen category from the global weatherCategories array
             weatherCategories = _toggle(weatherCategories, category);
-            event.currentTarget.checked = weatherCategories.includes(category);
-            
-            applyFilter();
-        }
-
-        function applyFilter() {
+            // 4. Check / uncheck the checkbox element
+            checkboxElement.checked = weatherCategories.includes(category);
+            // 5. Update the filter
             viz.filter.blendTo(s.in(s.prop('weather'), weatherCategories));
         }
 
