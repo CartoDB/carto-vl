@@ -176,6 +176,13 @@ export default class Base {
         return this._getChildren().map(child => child._propertyName).find(name => !!name);
     }
 
+    getLegendData () {
+        return {
+            name: this._propertyName,
+            data: []
+        };
+    }
+
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
     }
