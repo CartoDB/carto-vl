@@ -15,10 +15,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Label clusters</h1>
+                <h1>Label cluster average</h1>
             </header>
             <section>
-                <p class="description open-sans">Symbolize and label by viewport cluster average</p>
+                <p class="description open-sans">Symbolize and label viewport-based cluster averages</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -49,17 +49,15 @@
         });
 
 
-        const source = new carto.source.Dataset('michael_wind_1009_1010');
+        const source = new carto.source.Dataset('july_temps');
         const viz = new carto.Viz(`
-            @ca: clusterAVG($wind_speed)
+            @ca: clusterAVG($value)
             @v_features: viewportFeatures(@ca)
             
-            width: 20
+            width: 40
             color: opacity(ramp(linear(@ca,viewportMIN(@ca),viewportMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
             strokeWidth: 0
-            resolution: 8
-            //symbol: square
-            //symbolPlacement: align_center
+            resolution: 32  
         `);
         const layer = new carto.Layer('layer', source, viz);
 
