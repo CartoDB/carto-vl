@@ -1,7 +1,7 @@
 import Histogram from './Histogram';
 import Property from '../basic/property';
-import { checkMaxArguments, implicitCast } from '../utils';
-import { OTHERS_LABEL } from '../constants';
+import { checkMaxArguments, implicitCast, checkArray } from '../utils';
+import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
 
 /**
  * Generates a histogram.
@@ -122,8 +122,8 @@ export default class GlobalHistogram extends Histogram {
      *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
@@ -132,25 +132,89 @@ export default class GlobalHistogram extends Histogram {
      * // ]
      *
      * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
-     *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
      *   @histogram: globalHistogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
      * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
      * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
      * // ]
+     * @example <caption>Get color values for the histogram using a ramp with classified data.</caption>
+     * // Note: Both the ramp and the histogram expressions must use the same classification.
+     *
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: s.globalHistogram(s.top(s.prop('vehicles'), 2))
+     *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
+     * `);
+     *
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram using a ramp with classified data (String).</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: globalHistogram(top($vehicles, 2))
+     *   color: ramp((top($vehicles, 2)), Prism, green)
+     * `);
+     *
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
      *
      */
+    getJoinedValues (values, options) {
+        checkArray('globalHistogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
+        const joinedValues = [];
+
+        this.value.forEach((elem) => {
+            elem.x = elem.x === OTHERS_LABEL
+                ? config.othersLabel
+                : elem.x;
+            const val = values.find(value => elem.x === value.key);
+
+            if (val) {
+                const frequency = elem.y;
+                const key = val.key;
+                const value = val.value;
+
+                joinedValues.push({ frequency, key, value });
+            }
+        });
+
+        return joinedValues;
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
+
+        this._histogram = new Map();
 
         if (!this.input.isA(Property)) {
             this._setHistogramForExpression();
@@ -166,7 +230,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForExpression () {
-        const data = this.input._getLegendData().data;
+        const data = this.input.getLegendData(DEFAULT_OPTIONS).data;
 
         this._categories.forEach(c => {
             const category = data.find(category => c.name === category.key);
@@ -187,16 +251,13 @@ export default class GlobalHistogram extends Histogram {
 
     _setHistogramForNumericValues () {
         const name = this._propertyName;
-        const histogram = this._metadata.sample
-            .map((feature) => {
-                return {
-                    key: feature.cartodb_id ? feature.cartodb_id : feature.id,
-                    value: feature[name]
-                };
-            });
+        const ratio = this._metadata.featureCount / this._metadata.sample.length;
 
-        histogram.forEach(feature => {
-            this._histogram.set(feature.value, feature.key);
+        this._metadata.sample.forEach((feature) => {
+            const key = feature[name];
+            const value = this._histogram.get(key) || 0;
+
+            this._histogram.set(key, value + ratio);
         });
     }
 }

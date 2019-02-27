@@ -206,7 +206,7 @@ export default class Linear extends BaseExpression {
         }
     }
 
-    _getLegendData (config) {
+    getLegendData (config) {
         // TODO: timerange support
         const min = this.min.eval();
         const max = this.max.eval();
