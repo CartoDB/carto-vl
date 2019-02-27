@@ -118,7 +118,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: globalHistogram($vehicles)
+     *   @histogram: viewportHistogram($vehicles)
      * `);
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
