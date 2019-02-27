@@ -148,7 +148,7 @@ export default class ViewportHistogram extends Histogram {
      * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: globalHistogram($vehicles)
+     *   @histogram: viewportHistogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
