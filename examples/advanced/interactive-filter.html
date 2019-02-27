@@ -16,6 +16,10 @@
             align-items: center;
             padding: 8px 0;
         }
+
+        .point-mark {
+            margin-right: 4px;
+        }
     </style>
 </head>
 
@@ -97,7 +101,7 @@
                 // Use "js-checkbox" class to get all the checkbox elements from the widget
                 // Use "data-weather-category" attribute to set the category for each checkbox
                 return `
-                    <li style="border-bottom: 4px solid ${color};">
+                    <li>
                         <input 
                             id="js-checkbox-${key}"
                             class="js-checkbox"
@@ -105,7 +109,10 @@
                             name="categories"
                             data-weather-category="${legend.key}"
                         checked>
-                        <label for="js-checkbox-${key}">${legend.key}</label>
+                        <span class="point-mark" style="background-color:${color};"></span>
+                        <label for="js-checkbox-${key}">
+                            ${legend.key}
+                        </label>
                     </li>\n`;
             }).join('');
 
