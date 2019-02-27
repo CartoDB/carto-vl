@@ -1,6 +1,5 @@
-import Classifier, { DEFAULT_HISTOGRAM_SIZE } from './Classifier';
-import { checkMinArguments, checkMaxArguments } from '../utils';
-import { globalHistogram } from '../../expressions';
+import Classifier from './Classifier';
+import { checkExactNumberOfArguments, checkType } from '../utils';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -28,61 +27,27 @@ import { globalHistogram } from '../../expressions';
  * @api
  */
 export default class GlobalQuantiles extends Classifier {
-    constructor (input, buckets, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
-        checkMinArguments(arguments, 2, 'globalQuantiles');
-        checkMaxArguments(arguments, 3, 'globalQuantiles');
-
-        super({ input, buckets, _histogramSize: histogramSize });
-    }
-
-    _histogramInitialization () {
-        const input = this.input;
-        const histogramSize = this._histogramSize.value;
-
-        this._histogram = globalHistogram(input, histogramSize);
-    }
-
-    _resolveAliases (aliases) {
-        super._resolveAliases(aliases);
-
-        this._histogramInitialization();
+    constructor (input, buckets) {
+        checkExactNumberOfArguments(arguments, 2, 'globalQuantiles');
+        super({ input, buckets });
     }
 
     _bindMetadata (metadata) {
-        this._metadata = metadata;
-        this._genBreakpoints();
+        super._bindMetadata(metadata);
+
+        checkType('globalQuantiles', 'input', 0, 'number', this.input);
+        this._updateBreakpointsWith(metadata);
     }
 
-    _genBreakpoints () {
-        const histogram = this._histogram.value;
-        if (histogram === undefined || !histogram.length) { return; }
+    _validateInputIsNumericProperty () { /* noop */ }
 
-        const [min, max] = this._getMinMaxFrom(histogram);
+    _updateBreakpointsWith (metadata) {
+        const copy = metadata.sample.map(s => s[this.input.name]);
+        copy.sort((x, y) => x - y);
 
-        this._updateBreakpointsWith({ histogram, min, max });
-    }
-
-    _updateBreakpointsWith ({ histogram, min, max }) {
-        const histogramBuckets = histogram.length;
-
-        let i = 0;
-        const total = histogram[histogramBuckets - 1];
-        // TODO OPT: this could be faster with binary search
         this.breakpoints.map((breakpoint, index) => {
-            for (i; i < histogramBuckets; i++) {
-                if (histogram[i] > (index + 1) / this.numCategories * total) {
-                    break;
-                }
-            }
-            const percentileValue = i / histogramBuckets * (max - min) + min;
-            breakpoint.expr = percentileValue;
+            const p = (index + 1) / this.numCategories;
+            breakpoint.expr = copy[Math.floor(p * copy.length)];
         });
-    }
-
-    _getMinMaxFrom (histogram) {
-        const min = histogram[0].x[0];
-        const max = histogram[histogram.length - 1].x[1];
-
-        return [min, max];
     }
 }
