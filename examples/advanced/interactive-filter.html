@@ -30,7 +30,11 @@
             <header>
                 <h1>Rail Accidents by Weather</h1>
             </header>
-            
+            <section>
+                <p class="description open-sans">Turn weather categories on and off using the checkboxes to filter each
+                    type.</p>
+            </section>
+            <footer class="js-footer"></footer>
             <!-- Add legend data -->
             <section>
                 <div id="controls">
@@ -67,10 +71,10 @@
 
         const viz = new carto.Viz(`
             filter: $weather in ['Clear', 'Cloudly', 'Rain', 'Snow', 'Fog', 'Sleet']
-            color: ramp($weather, [ darkorange, darkviolet, darkturquoise] )
+            color: ramp($weather, [ darkorange, darkviolet, darkturquoise])
+            width: 5
             strokeWidth: 0.2
             strokeColor: black
-            width: 5
         `);
 
         const layer = new carto.Layer('layer', source, viz);
@@ -97,7 +101,7 @@
                 const color = rgbToHex(legend.value);
                 const key = legend.key.toLowerCase().replace(' ', '-');
                 const checked = weatherCategories.includes(legend.key);
-                
+
                 // Use "js-checkbox" class to get all the checkbox elements from the widget
                 // Use "data-weather-category" attribute to set the category for each checkbox
                 return `
@@ -143,7 +147,7 @@
         }
 
         //** Helper Methods **//
-        
+
         // A function to convert map colors to HEX values for legend    
         function rgbToHex(color) {
             return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
@@ -151,7 +155,7 @@
 
         // A function to toggle an element in an array  
         function _toggle(arr, item) {
-            return arr.includes(item) ? arr.filter(i => i !== item) : [ ...arr, item ];
+            return arr.includes(item) ? arr.filter(i => i !== item) : [...arr, item];
         }
     </script>
 </body>
