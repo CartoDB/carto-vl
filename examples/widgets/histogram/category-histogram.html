@@ -200,6 +200,7 @@
       layer.viz.color.blendTo(s.ramp(s.prop('featurecla'), s.palettes.BOLD));
       drawHistogramLegend();
     }
+
     function setClassifiedGlobalHistogram() {
       histogramVariable = 'globalClassifiedHistogram';
       layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 2), s.palettes.BOLD));

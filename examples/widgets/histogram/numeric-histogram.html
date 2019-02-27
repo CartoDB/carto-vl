@@ -21,16 +21,21 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Viewport Damage distribution (logarithmic scale)</h1>
+                <h1>Taxi Pickups</h1>
+            </header>
+        </div>
+        <div class="box">
+            <header>
+                <h2>Viewport Trip Distance</h2>
             </header>
             <as-histogram-widget id="as-viewport-histogram" />
         </div>
         <div class="box">
-          <header>
-              <h1>Global Damage distribution (logarithmic scale)</h1>
-          </header>
-          <as-histogram-widget id="as-global-histogram" />
-      </div>
+            <header>
+                <h2>Global Trip Distance</h2>
+            </header>
+            <as-histogram-widget id="as-global-histogram" />
+        </div>
     </aside>
 
     <div id="loader">
@@ -45,8 +50,8 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-96, 41],
-            zoom: 1.5952286749544728,
+            center: [-73.9, 40.7],
+            zoom: 12
         });
 
         const nav = new mapboxgl.NavigationControl({
@@ -59,11 +64,13 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset("railroad_accidents");
+        const source = new carto.source.Dataset('taxi_50k');
+
         const viz = new carto.Viz(`
-            @gHistogram: globalHistogram($total_damage, 6)
-            @vHistogram: viewportHistogram($total_damage, 6)
+            @gHistogram: globalHistogram($trip_distance, 5)
+            @vHistogram: viewportHistogram($trip_distance, 5)
         `);
+
         const layer = new carto.Layer('layer', source, viz);
 
         layer.addTo(map, 'watername_ocean');
@@ -80,9 +87,9 @@
             histogramWidget.disableInteractivity = true;
             histogramWidget.data = viewportHistogram.map(entry => {
                 return {
-                    start: entry.x[0] / 1e6,
-                    end: entry.x[1] / 1e6,
-                    value: Math.log(entry.y + 1)
+                    start: entry.x[0],
+                    end: entry.x[1],
+                    value: entry.y
                 }
             });
         }
@@ -93,9 +100,9 @@
             histogramWidget.disableInteractivity = true;
             histogramWidget.data = globalHistogram.map(entry => {
                 return {
-                    start: entry.x[0] / 1e6,
-                    end: entry.x[1] / 1e6,
-                    value: Math.log(entry.y + 1)
+                    start: entry.x[0],
+                    end: entry.x[1],
+                    value: entry.y
                 }
             });
         }
