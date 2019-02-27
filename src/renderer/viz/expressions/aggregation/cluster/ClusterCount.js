@@ -45,7 +45,7 @@ export default class ClusterCount extends BaseExpression {
         return Number(feature[CLUSTER_FEATURE_COUNT]) || 1;
     }
 
-    _getLegendData () {
+    getLegendData () {
         return {
             data: this._hasClusterFeatureCount
                 ? this._metadata.properties[CLUSTER_FEATURE_COUNT]
