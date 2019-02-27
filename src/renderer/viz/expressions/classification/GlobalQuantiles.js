@@ -55,7 +55,7 @@ export default class GlobalQuantiles extends Classifier {
 
     _genBreakpoints () {
         const histogram = this._histogram.value;
-        if (histogram === undefined) { return; }
+        if (histogram === undefined || !histogram.length) { return; }
 
         const [min, max] = this._getMinMaxFrom(histogram);
 
