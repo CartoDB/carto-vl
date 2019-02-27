@@ -109,10 +109,10 @@ describe('globalHistogram', () => {
             const histogram = viz.variables.histogram.value;
 
             expect(histogram).toEqual([
-                { x: [min, 25], y: 10 },
-                { x: [25, 50], y: 11 },
-                { x: [50, 75], y: 15 },
-                { x: [75, max], y: 42 }
+                { x: [min, 25], y: 4 },
+                { x: [25, 50], y: 2 },
+                { x: [50, 75], y: 2 },
+                { x: [75, max], y: 4 }
             ]);
             done();
         });
