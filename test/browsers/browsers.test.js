@@ -8,7 +8,7 @@ const accessKey = process.env.SAUCELABS_KEY;
 const BROWSERS = require('./browsers-target');
 
 describe('CARTO VL browser tests in...', () => {
-    const BASE_URL = 'http://localhost:8080/test/browsers/';
+    const BASE_URL = 'http://192.168.20.1:8080/test/browsers/';
     const branch = currentGitBranch();
 
     // for each test...
@@ -20,15 +20,16 @@ describe('CARTO VL browser tests in...', () => {
         // const serverUrl = `http://${username}:${accessKey}@ondemand.saucelabs.com:80/wd/hub`;
 
         let capabilities = {
-            'browserName': browser.browserName,
             'platform': browser.platform,
+            'browserName': browser.browserName,
             'version': browser.version,
             'username': username,
             'accessKey': accessKey,
+            'tunnel-identifier': 'cartovl-tunnel',
             'name': `CARTO VL - ${testName}`,
             'build': `CARTO VL [${branch}]`,
             'tags': ['carto-vl', branch],
-            'tunnel-identifier': 'cartovl-tunnel'
+            'extendedDebugging': true
         };
 
         driver = new webdriver.Builder()
@@ -45,7 +46,7 @@ describe('CARTO VL browser tests in...', () => {
         const BASIC_TEST = `${BASE_URL}basic-test.html`;
 
         driver.get(BASIC_TEST);
-        const WAIT_MILISECONDS = 15000;
+        const WAIT_MILISECONDS = 20000;
         driver.sleep(WAIT_MILISECONDS);
         driver
             .findElement({ id: 'loader' })
@@ -63,7 +64,7 @@ describe('CARTO VL browser tests in...', () => {
         const testName = `${platform} / ${browserName} ${version}`;
 
         describe(testName, function () {
-            this.timeout(40000);
+            this.timeout(80000);
 
             beforeEach(function (done) {
                 succesfulTest = false;
