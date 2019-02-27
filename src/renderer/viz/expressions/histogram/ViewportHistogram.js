@@ -165,7 +165,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: s.globalHistogram(s.top(s.prop('vehicles'), 2))
+     *   @histogram: s.viewportHistogram(s.top(s.prop('vehicles'), 2))
      *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
      * `);
      *
