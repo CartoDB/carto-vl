@@ -251,16 +251,12 @@ export default class GlobalHistogram extends Histogram {
 
     _setHistogramForNumericValues () {
         const name = this._propertyName;
-        const histogram = this._metadata.sample
-            .map((feature) => {
-                return {
-                    key: feature.cartodb_id ? feature.cartodb_id : feature.id,
-                    value: feature[name]
-                };
-            });
 
-        histogram.forEach(feature => {
-            this._histogram.set(feature.value, feature.key);
+        this._metadata.sample.forEach((feature) => {
+            const key = feature[name];
+            const value = this._histogram.get(key) || 0;
+
+            this._histogram.set(key, value + 1);
         });
     }
 }
