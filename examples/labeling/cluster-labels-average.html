@@ -29,7 +29,7 @@
             container: 'map',
             style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
             center: [-95.491724, 38.685047],
-            zoom: 3,
+            zoom: 4,
             scrollZoom: false
         });
 
@@ -49,15 +49,17 @@
         });
 
 
-        const source = new carto.source.Dataset('july_temps');
+        const source = new carto.source.Dataset('michael_wind_1009_1010');
         const viz = new carto.Viz(`
-            @ca: clusterAVG($value)
+            @ca: clusterAVG($wind_speed)
             @v_features: viewportFeatures(@ca)
             
-            width: 30
-            color: ramp(linear(@ca,viewportMIN(@ca),viewportMAX(@ca)),[blue,turquoise,yellow,red])
+            width: 20
+            color: opacity(ramp(linear(@ca,viewportMIN(@ca),viewportMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
             strokeWidth: 0
-            resolution: 16
+            resolution: 8
+            //symbol: square
+            //symbolPlacement: align_center
         `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -75,8 +77,9 @@
                             "type": "Point",
                             "coordinates": f.getRenderedCentroid()
                         },
+                        //Round cluster average values for labeling purposes
                         "properties": {
-                            "label_field": `${f.properties['ca']}`,
+                            "label_field": Math.round(f.properties['ca']),
                         }
                     }
                 });
@@ -98,10 +101,10 @@
                     "text-field": "{label_field}",
                     "text-font": ["Open Sans Semibold", "Arial Unicode MS Regular"],
                     "text-size": 10,
-                    "text-justify": "center"
+                    //"text-justify": "center"
                 },
                 "paint": {
-                    "text-color": "#FFFFFF",
+                    "text-color": "#000000",
                     "text-halo-width": 0,
                     "text-halo-blur": 0
                 }
