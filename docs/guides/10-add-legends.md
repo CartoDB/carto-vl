@@ -201,11 +201,12 @@ For example, the map below symbolizes only the `top` three weather conditions in
     </iframe>
 </div>
 
-You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()}`:
+You can overwrite the default `CARTO_VL_OTHERS` value by setting the `othersLabel` option when using `getLegendData`:
 
 ```js
-colorLegendList +=
-    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}<span></li>\n`;
+const colorLegend = layer.viz.color.getLegendData({
+    othersLabel: 'Other Weather'
+});
 ```
 
 With that change, the map labels other categories as "Other weather" in the legend:
