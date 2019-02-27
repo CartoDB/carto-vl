@@ -251,12 +251,13 @@ export default class GlobalHistogram extends Histogram {
 
     _setHistogramForNumericValues () {
         const name = this._propertyName;
+        const ratio = this._metadata.featureCount / this._metadata.sample.length;
 
         this._metadata.sample.forEach((feature) => {
             const key = feature[name];
             const value = this._histogram.get(key) || 0;
 
-            this._histogram.set(key, value + 1);
+            this._histogram.set(key, value + ratio);
         });
     }
 }
