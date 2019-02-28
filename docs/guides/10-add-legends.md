@@ -315,7 +315,7 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
 
 #### Categorical lines
 
@@ -329,7 +329,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
 
 #### Image markers
 
@@ -343,18 +343,18 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
 
-#### Unclassed latitudes
+#### Unclassed points
 
 <div class="example-map">
     <iframe
         id="guides-legend-step-9"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-10.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-10.html)
