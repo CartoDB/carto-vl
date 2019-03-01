@@ -61,8 +61,8 @@
     const viz = new carto.Viz(`
       @v_color: ramp($species_name, Prism)
       @v_histogram: viewportHistogram($species_name)
-      width: 5
       color: @v_color
+      width: 5
       strokeWidth: 0
     `);
 
@@ -124,13 +124,13 @@
       // Chart.js set up
       const labels = histogramData.map(elem => elem.key);
       const data = histogramData.map(elem => elem.frequency);
-      const backgroundColor = histogramData.map(elem => computeColor(elem.value));
+      const colors = histogramData.map(elem => computeColor(elem.value));
 
       chart.data = {
         labels,
         datasets: [{
           data,
-          backgroundColor
+          backgroundColor: colors
         }]
       };
 
