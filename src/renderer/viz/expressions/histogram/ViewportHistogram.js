@@ -13,7 +13,7 @@ import { DEFAULT_OPTIONS } from '../constants';
  * For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
  * When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin <= value < bucketMax].
  *
- * The histogram can also be based on the result of a classifier expression such as `top()` or `buckets()`.
+ * The viewportHistogram can also be combined with the `top()` expression.
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
@@ -209,7 +209,12 @@ export default class ViewportHistogram extends Histogram {
         const otherValues = [];
 
         this.value.forEach((elem) => {
-            const val = values.find(value => elem.x === value.key);
+            const val = values.find(value => {
+                if (Array.isArray(value.key)) {
+                    return value.key[0] === elem.x[0] && value.key[1] === elem.x[1];
+                }
+                return elem.x === value.key;
+            });
 
             if (val) {
                 const frequency = elem.y;
@@ -222,8 +227,9 @@ export default class ViewportHistogram extends Histogram {
             }
         });
 
-        if (otherValues.length) {
-            const others = values.find(value => config.othersLabel === value.key);
+        const others = values.find(value => config.othersLabel === value.key);
+
+        if (others) {
             const frequency = otherValues.reduce((prev, freq) => prev + freq);
             const key = others.key;
             const value = others.value;

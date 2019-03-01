@@ -12,7 +12,7 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  * For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
  * When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin <= value < bucketMax].
  *
- * The histogram can also be based on the result of a classifier expression such as `top()` or `buckets()`.
+ * The globalHistogram can also be combined with the `top()` expression.
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
