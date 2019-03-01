@@ -18,7 +18,7 @@
   <aside class="toolbox chart-toolbox">
     <div class="box">
       <header>
-        <h1>Tree Diameter</h1>
+        <h1>Species</h1>
       </header>
       <section>
         <canvas id="histogram" width="500" height="600"></canvas>
@@ -59,8 +59,10 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+      @v_color: ramp($species_name, Prism)
+      @v_histogram: viewportHistogram($species_name)
       width: 5
+      color: @v_color
       strokeWidth: 0
     `);
 
@@ -112,12 +114,17 @@
     layer.on('updated', () => {
       // Save histogram variable
       const histogram = layer.viz.variables.v_histogram;
+      // Save color variable
+      const color = layer.viz.variables.v_color;
+      // Get color ramp legend
+      const colorValues = color.getLegendData().data;
       // Get histogram data
-      const histogramData = histogram.value;
+      const histogramData = histogram.getJoinedValues(colorValues);
+
       // Chart.js set up
-      const labels = histogramData.map(elem => elem.x);
-      const data = histogramData.map(elem => elem.y);
-      const backgroundColor = '#00718b';
+      const labels = histogramData.map(elem => elem.key);
+      const data = histogramData.map(elem => elem.frequency);
+      const backgroundColor = histogramData.map(elem => computeColor(elem.value));
 
       chart.data = {
         labels,
@@ -132,6 +139,10 @@
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
+    }
+
+    function computeColor(color) {
+      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
     }
   </script>
 </body>
