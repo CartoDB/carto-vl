@@ -108,8 +108,78 @@ layer.on('updated', () => {
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
 
-Now, let's build a histogram showing the information of the trees diameter.
+Now, let's build a histogram showing the information of the trees diameter. The diameter is a numeric value, and since we are going to classify the diameters in buckets.
 
-#### Using classifiers
+```js
+const viz = new carto.Viz(`
+  @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+  width: 5
+  strokeWidth: 0
+`);
+```
+
+In this case, we will create a histogram with six bars based on the viewport features.
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-2"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html"
+    width="100%"
+    height="500"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
+
+We can combine both the `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features.
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-3"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
+    width="100%"
+    height="500"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+
+#### Using `top()`
+
+It is posible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms.
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-4"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html"
+    width="100%"
+    height="500"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
 
 ### `getJoinedValues`
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-5"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html"
+    width="100%"
+    height="500"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-6"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html"
+    width="100%"
+    height="500"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>

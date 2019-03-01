@@ -59,10 +59,11 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
+      @v_color: ramp(top($species_name, 5), Prism)
       @v_histogram: viewportHistogram(top($species_name, 5))
       width: 5
+      color: @v_color
       strokeWidth: 0
-      color: #00718b
     `);
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
@@ -114,13 +115,20 @@
     layer.on('updated', () => {
       // Save histogram variable
       const histogram = layer.viz.variables.v_histogram;
+      // Save color variable
+      const color = layer.viz.variables.v_color;
+      // Get color ramp legend
+      const legendOptions = {
+        othersLabel: 'Other species'
+      };
+      const colorValues = color.getLegendData(legendOptions).data;
       // Get histogram data
-      const histogramData = histogram.value;
+      const histogramData = histogram.getJoinedValues(colorValues, legendOptions);
 
       // Chart.js set up
-      const labels = histogramData.map(elem => elem.x);
-      const data = histogramData.map(elem => elem.y);
-      const backgroundColor = '#00718b';
+      const labels = histogramData.map(elem => elem.key);
+      const data = histogramData.map(elem => elem.frequency);
+      const backgroundColor = histogramData.map(elem => computeColor(elem.value));
 
       chart.data = {
         labels,
@@ -135,6 +143,10 @@
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
+    }
+
+    function computeColor(color) {
+      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
     }
   </script>
 </body>

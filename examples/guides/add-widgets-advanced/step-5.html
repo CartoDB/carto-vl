@@ -18,7 +18,7 @@
   <aside class="toolbox chart-toolbox">
     <div class="box">
       <header>
-        <h1>Top 5 Tree Species</h1>
+        <h1>Species</h1>
       </header>
       <section>
         <canvas id="histogram" width="500" height="600"></canvas>
@@ -59,8 +59,8 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_color: ramp(top($species_name, 5), Prism)
-      @v_histogram: viewportHistogram(top($species_name, 5))
+      @v_color: ramp($species_name, Prism)
+      @v_histogram: viewportHistogram($species_name)
       width: 5
       color: @v_color
       strokeWidth: 0
@@ -92,8 +92,7 @@
             display: false
           },
           ticks: {
-            display: true,
-            fontSize: 8
+            display: false
           },
           barPercentage: 1.0,
           categoryPercentage: 1.0
@@ -118,12 +117,9 @@
       // Save color variable
       const color = layer.viz.variables.v_color;
       // Get color ramp legend
-      const legendOptions = {
-        othersLabel: 'Other species'
-      };
-      const colorValues = color.getLegendData(legendOptions).data;
+      const colorValues = color.getLegendData().data;
       // Get histogram data
-      const histogramData = histogram.getJoinedValues(colorValues, legendOptions);
+      const histogramData = histogram.getJoinedValues(colorValues);
 
       // Chart.js set up
       const labels = histogramData.map(elem => elem.key);
