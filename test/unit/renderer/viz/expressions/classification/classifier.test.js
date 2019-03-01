@@ -1,4 +1,4 @@
-import { validateStaticType, validateTypeErrors, validateMaxArgumentsError, validateMinArgumentsError, validateExactNumArgumentsError } from '../utils';
+import { validateStaticType, validateInputTypeErrors, validateTypeErrors, validateMaxArgumentsError, validateMinArgumentsError, validateExactNumArgumentsError } from '../utils';
 import { average, standardDeviation } from '../../../../../../src/renderer/viz/expressions/stats';
 import { property, globalQuantiles, globalEqIntervals, globalStandardDev, viewportQuantiles, viewportEqIntervals, viewportStandardDev } from '../../../../../../src/renderer/viz/expressions';
 
@@ -34,7 +34,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateMinArgumentsError('viewportQuantiles', []);
             validateTypeErrors('viewportQuantiles', ['number', 'category']);
             validateTypeErrors('viewportQuantiles', ['category', 2]);
-            validateTypeErrors('viewportQuantiles', ['color', 2]);
+            validateInputTypeErrors('viewportQuantiles', ['color', 2]);
             validateTypeErrors('viewportQuantiles', ['number', 'color']);
             validateMaxArgumentsError('viewportQuantiles', ['number', 'number-array', 'number', 'number']);
 
@@ -48,7 +48,7 @@ describe('src/renderer/viz/expressions/classifier', () => {
             validateMinArgumentsError('viewportStandardDev', []);
             validateTypeErrors('viewportStandardDev', ['number', 'category']);
             validateTypeErrors('viewportStandardDev', ['category', 2]);
-            validateTypeErrors('viewportStandardDev', ['color', 2]);
+            validateInputTypeErrors('viewportStandardDev', ['color', 2]);
             validateTypeErrors('viewportStandardDev', ['number', 'color']);
             validateMaxArgumentsError('viewportStandardDev', ['number', 'number-array', 'number', 'number', 'number']);
 
