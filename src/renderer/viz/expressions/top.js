@@ -44,6 +44,15 @@ export default class Top extends BaseExpression {
         this.type = 'category';
     }
 
+    get value () {
+        const buckets = [];
+        for (let i = 0; i < this.buckets - 1; i++) {
+            buckets.push(this[`_top${i}`].value);
+        }
+
+        return buckets;
+    }
+
     eval (feature) {
         const metaColumn = this._metadata.properties[this.property.name];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
