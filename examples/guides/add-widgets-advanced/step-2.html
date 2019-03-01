@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Advanced Widgets | CARTO</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <script src="../../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../../style.css">
+    <!-- Include Chart JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox chart-toolbox">
+    <div class="box">
+      <header>
+        <h1>Stree Side Name</h1>
+      </header>
+      <section>
+        <canvas id="histogram" width="500" height="600"></canvas>
+      </section>
+    </div>
+  </aside>
+
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.voyager,
+      center: [-123.1205, 49.2617],
+      zoom: 12.41
+    });
+
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const ctx = document.getElementById('histogram').getContext('2d');
+    
+    // Define the source
+    const source = new carto.source.Dataset('vancouver_trees');
+
+    // Define the visualization
+    const viz = new carto.Viz(`
+      @v_histogram: viewportHistogram($year_planted, [[1992, 1993], [1993, 1994], [1994, 1995], [1995, 1996], [1996, 1997], [1997, 1998]])
+      width: 5
+      strokeWidth: 0
+    `);
+
+    // Draw chart using Chart.js library (https://www.chartjs.org/)
+    const chartOptionsDefault = {
+      animation: {
+        duration: 0
+      },
+      legend: {
+        display: false
+      },
+      scales: {
+        yAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            suggestedMin: 1,
+            beginAtZero: true,
+            display: false
+          }
+        }],
+        xAxes: [{
+          gridLines: {
+            drawBorder: false,
+            display: false
+          },
+          ticks: {
+            display: false
+          },
+          barPercentage: 1.0,
+          categoryPercentage: 1.0
+        }]
+      }
+    };
+
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      options: chartOptionsDefault
+    });
+
+    const layer = new carto.Layer('layer', source, viz);
+
+    layer.addTo(map, 'watername_ocean');
+
+    layer.on('loaded', hideLoader);
+    
+    layer.on('updated', () => {
+      // Save histogram variable
+      const histogram = layer.viz.variables.v_histogram;
+      // Get histogram data
+      const histogramData = histogram.value;
+      // Chart.js set up
+      const labels = histogramData.map(elem => elem.x);
+      const data = histogramData.map(elem => elem.y);
+      const backgroundColor = '#00718b';
+
+      chart.data = {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor
+        }]
+      };
+
+      chart.update();
+    });
+
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

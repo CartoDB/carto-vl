@@ -52,7 +52,7 @@ const chart = new Chart(ctx, {
 
 There are two histogram expressions in CARTO VL: `viewportHistogram` and `globalHistogram`. These expressions return a list of values grouped by column. The `viewportHistogram` return this list based on the features visible in the viewport, while `globalHistogram` takes into account the whole dataset.
 
-In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression and check how the bars changed when we interact with the map.
+In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression and check how the bars change when we interact with the map.
 
 ```js
   // Define the source
@@ -76,10 +76,9 @@ The `histogram.value` returns an array of `{ x, y }` objects where `x` is the na
 
 ```js
 layer.on('updated', () => {
-  // Save histogram variable
-  const histogram = layer.viz.variables.v_histogram;
   // Get histogram data
-  const histogramData = histogram.value;
+  const histogramData = layer.viz.variables.v_histogram.value;
+
   // Chart.js set up
   const labels = histogramData.map(elem => elem.x);
   const data = histogramData.map(elem => elem.y);
@@ -107,10 +106,9 @@ layer.on('updated', () => {
         frameBorder="0">
     </iframe>
 </div>
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
 
-#### Numeric Values
-
-#### Category Values
+Now, let's build a histogram showing the information of the trees diameter.
 
 #### Using classifiers
 
