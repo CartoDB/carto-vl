@@ -2,7 +2,6 @@ import BaseExpression from '../../base';
 import PropertyExpression from '../../basic/property';
 import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
-
 export default class ClusterAggregation extends BaseExpression {
     constructor ({ property, expressionName, aggName, aggType }) {
         checkExpression(expressionName, 'property', 0, property);
@@ -42,7 +41,9 @@ export default class ClusterAggregation extends BaseExpression {
         checkType(this._expressionName, 'property', 0, this.type, this.property);
     }
 
-    _resolveAliases () {}
+    _resolveAliases (aliases) {
+        return this._getChildren().map(child => child._resolveAliases(aliases));
+    }
 
     _applyToShaderSource (getGLSLforProperty) {
         return {

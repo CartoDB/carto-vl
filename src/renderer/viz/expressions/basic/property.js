@@ -108,6 +108,10 @@ export default class Property extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
+        if (this._variableName) {
+            return {};
+        }
+
         return {
             [this.name]: [{
                 type: 'unaggregated'

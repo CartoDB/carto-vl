@@ -75,6 +75,8 @@ export default function variable (name) {
             switch (prop) {
                 case 'parent':
                 case 'notify':
+                case 'propertyName':
+                    return name;
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':
