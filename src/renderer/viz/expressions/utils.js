@@ -113,8 +113,11 @@ export function throwInvalidType (expressionName, parameterName, parameterIndex,
 }
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
+    const expectedClassNames = Array.isArray(expectedClass)
+        ? expectedClass.join(', ')
+        : expectedClass.name;
     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    expected type was instance of '${expectedClass.name}'`);
+    expected type was instance of '${expectedClassNames}'`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
@@ -174,10 +177,19 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
     }
 }
 
-export function checkInstance (expressionName, parameterName, parameterIndex, expectedClass, parameter) {
+export function checkInstance (expressionName, parameterName, parameterIndex, expectedExpression, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
-    if (!(parameter.isA(expectedClass))) {
-        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass);
+
+    if (Array.isArray(expectedExpression)) {
+        const ok = expectedExpression.some(expression => {
+            return parameter.isA(expression);
+        });
+
+        if (!ok) {
+            throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedExpression);
+        }
+    } else if (!(parameter.isA(expectedExpression))) {
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedExpression);
     }
 }
 

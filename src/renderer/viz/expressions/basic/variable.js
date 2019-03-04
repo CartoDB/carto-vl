@@ -52,6 +52,10 @@ export default function variable (name) {
         }
     };
 
+    const isA = function (expression) {
+        return expression === Variable;
+    };
+
     const _getDependencies = () => {
         return [alias];
     };
@@ -77,6 +81,8 @@ export default function variable (name) {
                 case 'notify':
                 case 'propertyName':
                     return name;
+                case 'isA':
+                    return isA;
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':
@@ -98,6 +104,5 @@ export default function variable (name) {
         }
     };
 
-    const proxy = new Proxy(new Variable(), aliaser);
-    return proxy;
+    return new Proxy(new Variable(), aliaser);
 }
