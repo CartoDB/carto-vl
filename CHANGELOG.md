@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Raise an error when the idProperty is not specified in the metadata and is not a number
 - Fix getting aggregation expression values passed to `viewportFeatures` expression
 - Fix WebGL incompatibility in Edge
+- Fix regression in `toString` Viz method
 
 ## [1.1.1] - 2019-01-16
 
