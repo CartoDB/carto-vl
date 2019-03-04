@@ -117,9 +117,9 @@
       // Save color variable
       const color = layer.viz.variables.v_color;
       // Get color ramp legend
-      const colorValues = color.getLegendData().data;
+      const colorValues = color.getLegendData();
       // Get histogram data
-      const histogramData = histogram.getJoinedValues(colorValues);
+      const histogramData = histogram.getJoinedValues(colorValues.data);
 
       // Chart.js set up
       const labels = histogramData.map(elem => elem.key);

@@ -121,9 +121,9 @@
       const legendOptions = {
         othersLabel: 'Other species'
       };
-      const colorValues = color.getLegendData(legendOptions).data;
+      const colorValues = color.getLegendData(legendOptions);
       // Get histogram data
-      const histogramData = histogram.getJoinedValues(colorValues, legendOptions);
+      const histogramData = histogram.getJoinedValues(colorValues.data, legendOptions);
 
       // Chart.js set up
       const labels = histogramData.map(elem => elem.key);

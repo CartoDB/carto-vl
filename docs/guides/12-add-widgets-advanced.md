@@ -1,18 +1,18 @@
 ## Add widgets advanced
 
-We have seen how to add legends to our map by using `getLegendsData` method, and we have also learned to display widgets using histogram expressions. This is an advanced guide to learn how to enrich the information in the widgets by using `viewportHistogram` and `globalHistogram` expressions.
+We have seen how to add legends to our map by using `getLegendsData` method, and we have also learned how to display widgets using histogram expressions in the [previous guide](/developers/carto-vl/guides/add-widgets/). This is an advanced guide to learn how to obtain and display the information in widgets by using `viewportHistogram` and `globalHistogram` expressions.
 
 ### Overview
 
-For this case, we are going to use the same source, the **Vancouver Trees** dataset. We will learn how to create bar charts for categorical data and histograms for numeric data.
+We will learn how to create bar charts for categorical data and histograms for numeric data. For this purpose, all the following examples we use the same source, the [**Vancouver Trees**](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset.
 
-All the charts in this guide have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram. Here, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore we've to explain how the histogram expressions work a bit deeply. In this case, we will use this configuration:
+All the charts in this guide have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. Here, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
 
 ### Histogram expressions
 
-There are two histogram expressions in CARTO VL: `viewportHistogram` and `globalHistogram`. These expressions return a list of values grouped by column. The `viewportHistogram` return this list based on the features visible in the viewport, while `globalHistogram` takes into account the whole dataset.
+There are two histogram expressions in CARTO VL: `viewportHistogram` and `globalHistogram`. These expressions return a list of values grouped by column. The `viewportHistogram` returns the list based on the features that are visible in the viewport, while `globalHistogram` takes into account the whole dataset.
 
-In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression and check how the bars change when we interact with the map.
+In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression.
 
 ```js
   // Define the source
@@ -30,7 +30,7 @@ Char.js library needs three arrays to draw the bar chart:
 * `data`: array of numeric values that indicates the height of each bar.
 * `backgroundColor`: array of colors: to color the bars from left to right. All the bars will have the same color if there is only one element.
 
-And we're going to use by default this configuration:
+And we are going to use this configuration by default:
 
 ```js
 const chartOptionsDefault = {
@@ -96,6 +96,8 @@ layer.on('updated', () => {
 });
 ```
 
+Here you can see the result. Check how the bars change when you interact with the map.
+
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-1"
@@ -108,7 +110,7 @@ layer.on('updated', () => {
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
 
-Now, let's build a histogram showing the information of the trees diameter. The diameter is a numeric value, and since we are going to classify the diameters in buckets.
+Now, let's build a histogram showing the information of the **trees diameter**. The diameter is a **numeric** value, and we are going to classify the diameters in six buckets as follows:
 
 ```js
 const viz = new carto.Viz(`
@@ -130,7 +132,7 @@ In this case, we will create a histogram with six bars based on the viewport fea
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
-We can combine both the `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features.
+We can combine both `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features.
 
 <div class="example-map">
   <iframe
@@ -146,7 +148,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### Using `top()`
 
-It is posible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the top 5 tree species, so we have to create the following viz:
+It is posible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
 
 ```js
 const viz = new carto.Viz(`
@@ -168,9 +170,9 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 ### `getJoinedValues`
 
-What if we want create a bar chart, where the chart in the bars correspond with the ones in the map? First of all, we will need a `ramp` expression to color the map. This expression comes with the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method we explained in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
+What if we want create a bar chart, where each color corresponds with its features in the map? First of all, we will need a `ramp` expression to color the map. This expression comes with the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method we explained in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
-Both the `viewportHistogram` and `globalHistogram` expressions have the [`getLegendData()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. Let's first define the Viz:
+Both `viewportHistogram` and `globalHistogram` expressions have the [`getLegendData()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. Let's first define the Viz:
 
 ```js
 const viz = new carto.Viz(`
@@ -180,7 +182,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-And then, use the variables to access to the `getLegendData` and `getJoinedValues` methods:
+And then, use the `@v_color` and `@v_histogram` variables to access to the `getLegendData` and `getJoinedValues` methods respectively:
 
 ```js
 // Save histogram variable
@@ -188,16 +190,16 @@ const histogram = layer.viz.variables.v_histogram;
 // Save color variable
 const color = layer.viz.variables.v_color;
 // Get color ramp legend
-const colorValues = color.getLegendData().data;
+const colorValues = color.getLegendData();
 // Get histogram data
-const histogramData = histogram.getJoinedValues(colorValues);
+const histogramData = histogram.getJoinedValues(colorValues.data);
 
 const labels = histogramData.map(elem => elem.key);
 const data = histogramData.map(elem => elem.frequency);
 const colors = histogramData.map(elem => elem.value);
 ```
 
-It's important to take into account that `getJoinedValues` returns an array of `{ key, value, frequency }` elements sorted by frequency. In this case, the value contains a color because it's a color ramp. This is the result:
+It is important to take into account that `getJoinedValues` returns an array of `{ key, value, frequency }` elements sorted by frequency. In this case, the value contains a **color** because it is a **color ramp**. Take a look at the result:
 
 <div class="example-map">
   <iframe
@@ -211,7 +213,7 @@ It's important to take into account that `getJoinedValues` returns an array of `
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html)
 
-But, what if we're using a `top` expression? How should we color it then? The answer is that we should use the same structure in the ramp and in the histogram. If we use the `top` in the histogram, then we've to use the `top` in the ramp as well.
+But, what if we are using a `top` expression? How should we tell the bar chart which color do we need and to display only the five top categories? The answer is that we should use the **same operation** in the ramp and in the histogram. If we use the `top` in the histogram, then we have to use the `top` in the ramp as well.
 
 ```js
 const viz = new carto.Viz(`
@@ -221,7 +223,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-However, there's something else these methods have in common. By default, the `top` classifies the ones that aren't the _top_ ones as 'others'. In CARTO VL, this value is labeled with `CARTO_VL_OTHERS`. We can override it by passing an `options` object with `othersLabel`. But if we do so, we've to use the options in **both** methods:
+However, there is something else these methods have in common. By default, the `top` classifies the ones that are not the _top_ ones as **'others'**. In CARTO VL, this value is labeled with `CARTO_VL_OTHERS` by default. We can override it by passing an `options` object with `othersLabel`. But if we do so, we have to use the **same options** in both methods:
 
 ```js
 // Save histogram variable
@@ -232,9 +234,9 @@ const color = layer.viz.variables.v_color;
 const options = {
   othersLabel: 'Other species'
 };
-const colorValues = color.getLegendData(options).data;
+const colorValues = color.getLegendData(options);
 // Get histogram data
-const histogramData = histogram.getJoinedValues(colorValues, options);
+const histogramData = histogram.getJoinedValues(colorValues.data, options);
 
 const labels = histogramData.map(elem => elem.key);
 const data = histogramData.map(elem => elem.frequency);
