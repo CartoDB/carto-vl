@@ -523,7 +523,6 @@ export default class Viz {
             order: ${this.order.toString()}
             symbol: ${this.symbol.toString()}
             symbolPlacement: ${this.symbolPlacement.toString()}
-            offset: ${this.offset.toString()}
             ${variables}`.replace(/ {4}/g, '');
     }
 }

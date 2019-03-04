@@ -374,4 +374,34 @@ describe('api/viz', () => {
             `)).toThrowError('Viz contains a circular dependency');
         });
     });
+
+    describe('toString', () => {
+        it('should be able to get the stringified viz', () => {
+            const vizString = `
+                @input: $wind_speed
+                @buckets: 5
+                @palette: reverse(sunset)
+                color: ramp(globalQuantiles(@input, @buckets), @palette)
+                width: 10
+                strokeColor: ramp($wind_speed, Prism)
+            `;
+
+            const viz = new Viz(vizString);
+            const actual = viz.toString().replace(/\s/g, '');
+            const expected = `
+                color: ramp(globalQuantiles($wind_speed,5), reverse(Sunset))
+                strokeColor: ramp($wind_speed,Prism)
+                width:10 
+                strokeWidth: 0
+                filter:1
+                order:noOrder()
+                symbol:svg()
+                symbolPlacement:placement(0,1)
+                @input:$wind_speed,
+                @buckets:5,
+                @palette:reverse(Sunset)
+            `.replace(/\s/g, '');
+            expect(expected).toEqual(actual);
+        });
+    });
 });
