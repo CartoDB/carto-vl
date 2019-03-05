@@ -126,10 +126,7 @@ export default class Viz {
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (propertyName !== 'resolution') {
-                    expr = implicitCast(expr);
-                }
-                this['_' + propertyName] = expr;
+                this['_' + propertyName] = implicitCast(expr);
                 this._changed().catch(this._ignoreChangeRejections);
             }
         });
@@ -458,10 +455,10 @@ export default class Viz {
 
         if (util.isNumber(resolutionValue)) {
             if (resolution <= MIN_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`);
             }
             if (resolution >= MAX_RESOLUTION) {
-                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
             }
         } else {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
