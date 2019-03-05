@@ -76,7 +76,7 @@ export default function variable (name) {
                 case 'parent':
                 case 'notify':
                 case 'propertyName':
-                    return alias.property.name;
+                    return alias.property ? alias.property.name : alias.propertyName;
                 case 'name':
                     return name;
                 case 'value':
