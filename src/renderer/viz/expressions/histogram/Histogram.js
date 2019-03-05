@@ -1,10 +1,4 @@
 import BaseExpression from '../base';
-import Top from '../top';
-import Property from '../basic/property';
-import BaseCategory from '../basic/category';
-
-const VALID_INPUTS = [ Top, Property, BaseCategory ];
-
 export default class Histogram extends BaseExpression {
     constructor (children) {
         super(children);
