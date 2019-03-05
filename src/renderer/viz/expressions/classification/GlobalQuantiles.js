@@ -1,5 +1,6 @@
 import Classifier from './Classifier';
 import { checkExactNumberOfArguments, checkType } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -42,7 +43,9 @@ export default class GlobalQuantiles extends Classifier {
     _validateInputIsNumericProperty () { /* noop */ }
 
     _updateBreakpointsWith (metadata) {
-        const name = this.input.name || this.input.propertyName;
+        const name = this.input.propertyName === CLUSTER_FEATURE_COUNT
+            ? 'cartodb_id'
+            : this.input.propertyName || this.input.name;
         const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 

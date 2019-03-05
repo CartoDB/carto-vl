@@ -1,5 +1,6 @@
 import Classifier from './Classifier';
 import { checkExactNumberOfArguments } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Classify `input` by using the equal intervals method with `n` buckets.
@@ -39,7 +40,9 @@ export default class GlobalEqIntervals extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        const name = this.input.propertyName || this.input.name;
+        const name = this.input.propertyName === CLUSTER_FEATURE_COUNT
+            ? 'cartodb_id'
+            : this.input.propertyName || this.input.name;
         const { min, max } = metadata.stats(name);
         this.min = min;
         this.max = max;
