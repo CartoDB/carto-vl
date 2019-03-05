@@ -2,16 +2,11 @@ import BaseExpression from '../base';
 import Top from '../top';
 import Property from '../basic/property';
 import BaseCategory from '../basic/category';
-import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 const VALID_INPUTS = [ Top, Property, BaseCategory ];
 
 export default class Histogram extends BaseExpression {
     constructor (children) {
-        if (!_validInput(children.input)) {
-            const validInputNames = VALID_INPUTS.map(input => input.name).join(', ');
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Input '${children.input.expressionName}' is not valid for a histogram expression. Accepted inputs are: ${validInputNames}.`);
-        }
         super(children);
         this.type = 'histogram';
         this.inlineMaker = () => null;
@@ -116,8 +111,4 @@ export default class Histogram extends BaseExpression {
             };
         });
     }
-}
-
-function _validInput (input) {
-    return VALID_INPUTS.some(expression => input.isA(expression));
 }

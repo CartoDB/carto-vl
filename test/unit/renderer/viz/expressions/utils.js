@@ -47,11 +47,6 @@ export function validateTypeErrors (expressionName, argTypes, regexGenerator = n
     _validateCompileTimeTypeError(expressionName, simpleArgs, regexGenerator);
 }
 
-export function validateInputTypeErrors (expressionName, argTypes, regexGenerator = null) {
-    const simpleArgs = argTypes.map(getSimpleArg);
-    _validateInputTypeError(expressionName, simpleArgs, regexGenerator);
-}
-
 export function validateMaxArgumentsError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
@@ -184,20 +179,6 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
     const regex = regexGenerator
         ? regexGenerator(expressionName, args)
         : new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g');
-
-    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
-        expect(() => {
-            const expression = s[expressionName](...args.map(arg => arg[0]));
-            expression._resolveAliases();
-            expression._bindMetadata(metadata);
-        }).toThrowError(regex);
-    });
-}
-
-function _validateInputTypeError (expressionName, args, regexGenerator = null) {
-    const regex = regexGenerator
-        ? regexGenerator(expressionName, args)
-        : new RegExp('[\\s\\S]*[Incorrect value]:[\\s\\S]*', 'g');
 
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
