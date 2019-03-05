@@ -79,8 +79,6 @@ export default function variable (name) {
                     return alias.property ? alias.property.name : alias.propertyName;
                 case 'name':
                     return name;
-                case 'value':
-                    return obj[prop];
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':

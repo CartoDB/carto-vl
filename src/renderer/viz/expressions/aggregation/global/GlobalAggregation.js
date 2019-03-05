@@ -53,13 +53,12 @@ export default class GlobalAggregation extends BaseExpression {
      * @param {*} name
      */
     constructor ({ property, name, type, baseStats = false }) {
-        property = implicitCast(property);
-        super({ property, _impostor: number(0) });
-
+        super({ _value: number(0) });
+        this.property = implicitCast(property);
         this._name = name;
         this.type = type;
         this.baseStats = baseStats;
-        super.inlineMaker = inline => inline._impostor;
+        super.inlineMaker = inline => inline._value;
     }
 
     toString () {
@@ -71,7 +70,7 @@ export default class GlobalAggregation extends BaseExpression {
     }
 
     eval () {
-        return this._impostor.expr;
+        return this._value.expr;
     }
 
     _resolveAliases (aliases) {
@@ -85,7 +84,7 @@ export default class GlobalAggregation extends BaseExpression {
         this.property._bindMetadata(metadata);
         const propertyName = this.property.propertyName || this.property.name;
         const value = this._getValueFromStats(metadata, propertyName);
-        this._impostor.expr = metadata.codec(propertyName).sourceToExternal(metadata, value);
+        this._value.expr = metadata.codec(propertyName).sourceToExternal(metadata, value);
     }
 
     _getValueFromStats (metadata, propertyName) {
@@ -117,10 +116,5 @@ export default class GlobalAggregation extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return this.property._getMinimumNeededSchema();
-    }
-
-    _preDraw (...args) {
-        this._impostor.expr = this.eval();
-        super._preDraw(...args);
     }
 }
