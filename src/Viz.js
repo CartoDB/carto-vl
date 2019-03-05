@@ -468,16 +468,18 @@ export default class Viz {
         }
     }
 
-    _checkVizSpec (vizSpec) {
-        // Apply implicit cast to numeric style properties
-        vizSpec.width = implicitCast(vizSpec.width);
-        vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
-        vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
-        vizSpec.transform = implicitCast(vizSpec.transform);
-        vizSpec.symbol = implicitCast(vizSpec.symbol);
+    _applyImplitCastToNumericProperties (vizSpec) {
         vizSpec.filter = implicitCast(vizSpec.filter);
         vizSpec.resolution = implicitCast(vizSpec.resolution);
+        vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
+        vizSpec.symbol = implicitCast(vizSpec.symbol);
+        vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.transform = implicitCast(vizSpec.transform);
+        vizSpec.width = implicitCast(vizSpec.width);
+    }
 
+    _checkVizSpec (vizSpec) {
+        this._applyImplitCastToNumericProperties(vizSpec);
         this._checkResolution(vizSpec.resolution);
 
         SUPPORTED_VIZ_PROPERTIES.forEach((parameter) => {
@@ -515,14 +517,15 @@ export default class Viz {
 function checkVizPropertyTypes (viz) {
     const expectedTypePerProperty = {
         color: 'color',
-        strokeColor: 'color',
-        width: 'number',
-        strokeWidth: 'number',
-        order: 'orderer',
         filter: 'number',
+        order: 'orderer',
+        resolution: 'number',
+        strokeColor: 'color',
+        strokeWidth: 'number',
         symbol: 'image',
         symbolPlacement: 'placement',
-        transform: 'transformation'
+        transform: 'transformation',
+        width: 'number'
     };
 
     Object.keys(expectedTypePerProperty).forEach((property) => {

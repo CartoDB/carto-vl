@@ -37,6 +37,11 @@ export class Asc extends BaseExpression {
         super({ by });
         this.type = 'orderer';
     }
+
+    eval () {
+        return 'asc';
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkInstance('asc', 'by', 0, Width, this.by);
@@ -79,6 +84,11 @@ export class Desc extends BaseExpression {
         super({ by });
         this.type = 'orderer';
     }
+
+    eval () {
+        return 'desc';
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         checkInstance('desc', 'by', 0, Width, this.by);
@@ -112,6 +122,10 @@ export class NoOrder extends BaseExpression {
 
         super({});
         this.type = 'orderer';
+    }
+
+    eval () {
+        return 'noOrder';
     }
 }
 

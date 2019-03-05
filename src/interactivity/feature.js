@@ -71,13 +71,15 @@ import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
  * @typedef {Object} Feature
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
- * @property {FeatureVizProperty} width
+ * @property {FeatureVizProperty} filter
+ * @property {FeatureVizProperty} order
+ * @property {FeatureVizProperty} resolution
  * @property {FeatureVizProperty} strokeColor
  * @property {FeatureVizProperty} strokeWidth
  * @property {FeatureVizProperty} symbol
  * @property {FeatureVizProperty} symbolPlacement
- * @property {FeatureVizProperty} filter
  * @property {FeatureVizProperty} transform
+ * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
  * @property {function} blendTo - Blend custom feature vizs by fading in `duration` milliseconds
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset

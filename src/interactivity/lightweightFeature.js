@@ -41,8 +41,8 @@ function _defineIdProperty (targetObject, renderLayer) {
 }
 
 function _defineVizProperties (targetObject, renderLayer) {
-    SUPPORTED_VIZ_PROPERTIES.forEach(prop => {
-        _createLightweightFeatureVizProperty(targetObject, renderLayer, prop);
+    SUPPORTED_VIZ_PROPERTIES.forEach(property => {
+        _createLightweightFeatureVizProperty(targetObject, renderLayer, property);
     });
 }
 
@@ -132,7 +132,6 @@ function _defineRootResetMethod (targetObject) {
                 SUPPORTED_VIZ_PROPERTIES.forEach((property) => {
                     this[property].reset(duration);
                 });
-
                 for (let key in this.variables) {
                     this.variables[key].reset(duration);
                 }
