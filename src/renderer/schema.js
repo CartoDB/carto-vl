@@ -1,4 +1,4 @@
-import { AGG_PREFIX, DIM_PREFIX } from "../constants/metadata";
+import { AGG_PREFIX, DIM_PREFIX } from '../constants/metadata';
 
 export const IDENTITY = {};
 

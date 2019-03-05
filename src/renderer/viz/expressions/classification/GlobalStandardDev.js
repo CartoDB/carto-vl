@@ -4,6 +4,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
 import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../../../errors/carto-runtime-error';
 
 import { average, standardDeviation } from '../stats';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -77,7 +78,9 @@ export default class GlobalStandardDev extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        const name = this.input.propertyName || this.input.name;
+        const name = this.input.propertyName === CLUSTER_FEATURE_COUNT
+            ? 'cartodb_id'
+            : this.input.propertyName || this.input.name;
         const sample = metadata.sample.map(s => s[name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);

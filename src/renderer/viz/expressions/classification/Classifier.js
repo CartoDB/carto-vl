@@ -1,12 +1,9 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
 
-import { checkType, checkNumber, checkInstance } from '../utils';
+import { checkType, checkNumber } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
-import Property from '../basic/property';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
-import { Variable } from '../basic/variable';
-import ClusterCount from '../aggregation/cluster/ClusterCount';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
 
