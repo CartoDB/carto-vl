@@ -1,6 +1,6 @@
 import BaseExpression from '../../base';
 import { checkMaxArguments } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
 
 /**
  * Count of features per cluster.

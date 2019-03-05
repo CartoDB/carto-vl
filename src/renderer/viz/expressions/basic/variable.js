@@ -52,10 +52,6 @@ export default function variable (name) {
         }
     };
 
-    const isA = function (expression) {
-        return expression === Variable;
-    };
-
     const _getDependencies = () => {
         return [alias];
     };
@@ -80,9 +76,11 @@ export default function variable (name) {
                 case 'parent':
                 case 'notify':
                 case 'propertyName':
+                    return alias.property.name;
+                case 'name':
                     return name;
-                case 'isA':
-                    return isA;
+                case 'value':
+                    return obj[prop];
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':

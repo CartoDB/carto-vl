@@ -6,6 +6,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../e
 import Property from '../basic/property';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
 import { Variable } from '../basic/variable';
+import ClusterCount from '../aggregation/cluster/ClusterCount';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
 
@@ -68,7 +69,6 @@ export default class Classifier extends BaseExpression {
     }
 
     _validateInputIsNumericProperty () {
-        checkInstance(this.expressionName, 'input', 0, [ Property, Variable ], this.input);
         checkType(this.expressionName, 'input', 0, 'number', this.input);
     }
 

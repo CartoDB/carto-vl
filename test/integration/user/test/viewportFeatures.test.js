@@ -1,7 +1,7 @@
 import carto from '../../../../src';
 import * as util from '../../util';
 import VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/properties';
-import { CLUSTER_FEATURE_COUNT } from '../../../../src/renderer/schema';
+import { CLUSTER_FEATURE_COUNT } from '../../../../src/constants/metadata';
 
 const feature1 = {
     type: 'Feature',

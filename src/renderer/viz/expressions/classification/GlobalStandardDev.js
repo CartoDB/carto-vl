@@ -77,7 +77,8 @@ export default class GlobalStandardDev extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        const sample = metadata.sample.map(s => s[this.input.name]);
+        const name = this.input.propertyName || this.input.name;
+        const sample = metadata.sample.map(s => s[name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
 

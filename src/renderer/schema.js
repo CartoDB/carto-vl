@@ -1,3 +1,4 @@
+import { AGG_PREFIX, DIM_PREFIX } from "../constants/metadata";
 
 export const IDENTITY = {};
 
@@ -41,13 +42,6 @@ function simplify (MNS) {
     });
     return result;
 }
-
-// TODO: this is Windsshaft-specific, so move to WindshaftMetadata
-
-const AGG_PREFIX = '_cdb_agg_';
-const DIM_PREFIX = '_cdb_dim_';
-
-export const CLUSTER_FEATURE_COUNT = '_cdb_feature_count';
 
 // column information functions
 export const column = {

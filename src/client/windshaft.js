@@ -3,15 +3,14 @@ import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
 import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
-import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
+import { CLUSTER_FEATURE_COUNT } from '../constants/metadata';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-
 const TILE_EXTENT = 2048;
 
 export default class Windshaft {

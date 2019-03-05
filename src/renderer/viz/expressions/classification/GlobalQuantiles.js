@@ -42,7 +42,8 @@ export default class GlobalQuantiles extends Classifier {
     _validateInputIsNumericProperty () { /* noop */ }
 
     _updateBreakpointsWith (metadata) {
-        const copy = metadata.sample.map(s => s[this.input.name]);
+        const name = this.input.name || this.input.propertyName;
+        const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {

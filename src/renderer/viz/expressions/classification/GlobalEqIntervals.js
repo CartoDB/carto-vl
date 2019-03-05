@@ -39,7 +39,8 @@ export default class GlobalEqIntervals extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        const { min, max } = metadata.stats(this.input.name);
+        const name = this.input.propertyName || this.input.name;
+        const { min, max } = metadata.stats(name);
         this.min = min;
         this.max = max;
 
