@@ -18,8 +18,8 @@ import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
-import VIZ_PROPERTIES from './renderer/viz/utils/properties';
 import { GEOMETRY_TYPE } from './utils/geometry';
+import { MAX_RESOLUTION, MIN_RESOLUTION, SUPPORTED_VIZ_PROPERTIES } from './constants/viz';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -30,25 +30,7 @@ const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
-const DEFAULT_RESOLUTION = () => 1;
-
-const MIN_RESOLUTION = 0;
-const MAX_RESOLUTION = 256;
-
-const SUPPORTED_PROPERTIES = [
-    'color',
-    'width',
-    'strokeColor',
-    'strokeWidth',
-    'order',
-    'filter',
-    'symbol',
-    'symbolPlacement',
-    'transform',
-    'resolution',
-    'variables'
-];
-
+const DEFAULT_RESOLUTION = () => _markDefault(s.number(1));
 /**
  * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
  *
@@ -138,7 +120,7 @@ export default class Viz {
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
     _defineProperty (propertyName, propertyValue) {
-        if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
+        if (propertyName !== 'variables' && !SUPPORTED_VIZ_PROPERTIES.includes(propertyName)) {
             return;
         }
         Object.defineProperty(this, propertyName, {
@@ -222,26 +204,26 @@ export default class Viz {
     _updateRootExpressionList () {
         this._rootExpressions = [
             this.color,
-            this.width,
+            this.filter,
+            this.order,
             this.strokeColor,
             this.strokeWidth,
-            this.order,
-            this.filter,
             this.symbol,
             this.symbolPlacement,
             this.transform,
+            this.width,
             ...Object.values(this.variables)
         ];
         this._rootStyleExpressions = [
             this.color,
-            this.width,
+            this.filter,
+            this.order,
             this.strokeColor,
             this.strokeWidth,
-            this.order,
-            this.filter,
             this.symbol,
             this.symbolPlacement,
-            this.transform
+            this.transform,
+            this.width
         ];
     }
 
@@ -395,8 +377,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            const properties = VIZ_PROPERTIES;
-            const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
+            const propertyName = SUPPORTED_VIZ_PROPERTIES.find(propertyName => this[propertyName] === toReplace);
             if (propertyName) {
                 this[propertyName] = replacer;
                 replacer.parent = this;
@@ -470,6 +451,23 @@ export default class Viz {
         return vizSpec;
     }
 
+    _checkResolution (resolution) {
+        const resolutionValue = resolution instanceof BaseExpression
+            ? resolution.eval()
+            : resolution;
+
+        if (util.isNumber(resolutionValue)) {
+            if (resolution <= MIN_RESOLUTION) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
+            }
+            if (resolution >= MAX_RESOLUTION) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
+            }
+        } else {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
+        }
+    }
+
     _checkVizSpec (vizSpec) {
         // Apply implicit cast to numeric style properties
         vizSpec.width = implicitCast(vizSpec.width);
@@ -478,27 +476,18 @@ export default class Viz {
         vizSpec.transform = implicitCast(vizSpec.transform);
         vizSpec.symbol = implicitCast(vizSpec.symbol);
         vizSpec.filter = implicitCast(vizSpec.filter);
+        vizSpec.resolution = implicitCast(vizSpec.resolution);
 
-        if (!util.isNumber(vizSpec.resolution)) {
-            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
-        }
-        if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
-        }
-        if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
-        }
+        this._checkResolution(vizSpec.resolution);
 
-        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
-            'symbol', 'symbolPlacement', 'transform'];
-        toCheck.forEach((parameter) => {
+        SUPPORTED_VIZ_PROPERTIES.forEach((parameter) => {
             if (!(vizSpec[parameter] instanceof BaseExpression)) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
             }
         });
 
         for (let key in vizSpec) {
-            if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
+            if (key !== 'variables' && SUPPORTED_VIZ_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
         }
@@ -512,18 +501,14 @@ export default class Viz {
      * @api
      */
     toString () {
-        const variables = Object.keys(this.variables).map(varName =>
-            `@${varName}: ${this.variables[varName].toString()}\n`
-        );
-        return `color: ${this.color.toString()}
-            strokeColor: ${this.strokeColor.toString()}
-            width: ${this.width.toString()}
-            strokeWidth: ${this.strokeWidth.toString()}
-            filter: ${this.filter.toString()}
-            order: ${this.order.toString()}
-            symbol: ${this.symbol.toString()}
-            symbolPlacement: ${this.symbolPlacement.toString()}
-            ${variables}`.replace(/ {4}/g, '');
+        const variables = Object
+            .keys(this.variables)
+            .map(varName => `@${varName}: ${this.variables[varName].toString()}`);
+
+        const properties = SUPPORTED_VIZ_PROPERTIES
+            .map(property => `${property}: ${this[property].toString()}`);
+
+        return [...variables, ...properties].join('\n');
     }
 }
 
