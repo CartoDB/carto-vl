@@ -99,7 +99,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be greater than 0.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 0, must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -108,7 +108,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be less than 256.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 10000, must be lower than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -231,8 +231,8 @@ describe('api/viz', () => {
                 done();
                 return Promise.resolve(null);
             });
-            viz.resolution = 8;
-            expect(viz.resolution).toEqual(8);
+            viz.resolution = s.number(8);
+            expect(viz.resolution.eval()).toEqual(8);
         });
     });
 
