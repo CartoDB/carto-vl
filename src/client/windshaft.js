@@ -6,7 +6,7 @@ import * as windshaftFiltering from './windshaft-filtering';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
-import { CLUSTER_FEATURE_COUNT } from '../constants/metadata';
+import { CLUSTER_FEATURE_COUNT, aggregationTypes } from '../constants/metadata';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
@@ -60,7 +60,7 @@ export default class Windshaft {
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{ type: 'unaggregated' }];
+            MNS['cartodb_id'] = [{ type: aggregationTypes.UNAGGREGATED }];
         }
     }
 
@@ -76,8 +76,8 @@ export default class Windshaft {
     _checkAcceptableMNS (MNS) {
         Object.keys(MNS).forEach(propertyName => {
             const usages = MNS[propertyName];
-            const aggregatedUsage = usages.some(x => x.type !== 'unaggregated');
-            const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
+            const aggregatedUsage = usages.some(x => x.type !== aggregationTypes.UNAGGREGATED);
+            const unAggregatedUsage = usages.some(x => x.type === aggregationTypes.UNAGGREGATED);
             if (aggregatedUsage && unAggregatedUsage) {
                 throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
                     JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
@@ -215,7 +215,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== 'unaggregated'));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== aggregationTypes.UNAGGREGATED));
     }
 
     _generateAggregation (MNS, resolution) {
