@@ -58,19 +58,17 @@ export default function variable (name) {
 
     let aliaser = {
         set: (obj, prop, value) => {
-            if (alias && alias[prop]) {
+            if (prop === 'parent') {
+                obj[prop] = value;
+            } else if (prop === 'notify') {
+                obj[prop] = value;
+            } else if (alias && alias[prop]) {
                 alias[prop] = value;
-                return true;
+            } else {
+                return false;
             }
 
-            switch (prop) {
-                case 'parent':
-                case 'notify':
-                    obj[prop] = value;
-                    return true;
-                default:
-                    return false;
-            }
+            return true;
         },
 
         get: (obj, prop) => {
@@ -78,12 +76,10 @@ export default function variable (name) {
                 case 'parent':
                 case 'notify':
                 case 'propertyName':
-                    return alias.property ? alias.property.name : alias.propertyName;
+                    return alias.propertyName;
                 case 'name':
-                    return alias.property ? alias.property.name : alias.propertyName;
+                    return alias.property ? alias.property.name : name;
                 case 'blendTo':
-                    return obj[prop];
-                case 'aggType':
                     return obj[prop];
                 case '_resolveAliases':
                     return resolve;
