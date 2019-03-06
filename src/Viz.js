@@ -18,8 +18,8 @@ import SVG from './renderer/viz/expressions/SVG';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
-import VIZ_PROPERTIES from './renderer/viz/utils/properties';
 import { GEOMETRY_TYPE } from './utils/geometry';
+import { MAX_RESOLUTION, MIN_RESOLUTION, SUPPORTED_VIZ_PROPERTIES, STYLE_VIZ_PROPERTIES } from './constants/viz';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -30,25 +30,7 @@ const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
 const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
-const DEFAULT_RESOLUTION = () => 1;
-
-const MIN_RESOLUTION = 0;
-const MAX_RESOLUTION = 256;
-
-const SUPPORTED_PROPERTIES = [
-    'color',
-    'width',
-    'strokeColor',
-    'strokeWidth',
-    'order',
-    'filter',
-    'symbol',
-    'symbolPlacement',
-    'transform',
-    'resolution',
-    'variables'
-];
-
+const DEFAULT_RESOLUTION = () => _markDefault(s.number(1));
 /**
  * A `vizSpec` object is used to create a {@link carto.Viz|Viz} and controlling multiple aspects.
  *
@@ -138,16 +120,13 @@ export default class Viz {
     // Define a viz property, setting all the required getters, setters and creating a proxy for the variables object
     // These setters and the proxy allow us to re-render without requiring further action from the user
     _defineProperty (propertyName, propertyValue) {
-        if (!SUPPORTED_PROPERTIES.includes(propertyName)) {
+        if (propertyName !== 'variables' && !SUPPORTED_VIZ_PROPERTIES.includes(propertyName)) {
             return;
         }
         Object.defineProperty(this, propertyName, {
             get: () => this['_' + propertyName],
             set: expr => {
-                if (propertyName !== 'resolution') {
-                    expr = implicitCast(expr);
-                }
-                this['_' + propertyName] = expr;
+                this['_' + propertyName] = implicitCast(expr);
                 this._changed().catch(this._ignoreChangeRejections);
             }
         });
@@ -186,6 +165,7 @@ export default class Viz {
     _getRootExpressions () {
         return this._rootExpressions;
     }
+
     _getRootStyleExpressions () {
         return this._rootStyleExpressions;
     }
@@ -220,29 +200,12 @@ export default class Viz {
     }
 
     _updateRootExpressionList () {
-        this._rootExpressions = [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.order,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement,
-            this.transform,
-            ...Object.values(this.variables)
-        ];
-        this._rootStyleExpressions = [
-            this.color,
-            this.width,
-            this.strokeColor,
-            this.strokeWidth,
-            this.order,
-            this.filter,
-            this.symbol,
-            this.symbolPlacement,
-            this.transform
-        ];
+        const expressions = [...SUPPORTED_VIZ_PROPERTIES].map(expression => this[expression]);
+        const styleExpressions = [...STYLE_VIZ_PROPERTIES].map(expression => this[expression]);
+        const variables = [...Object.values(this.variables)];
+
+        this._rootExpressions = [...expressions, ...variables];
+        this._rootStyleExpressions = styleExpressions;
     }
 
     getMinimumNeededSchema () {
@@ -395,8 +358,7 @@ export default class Viz {
             replacer.parent = this;
             replacer.notify = toReplace.notify;
         } else {
-            const properties = VIZ_PROPERTIES;
-            const propertyName = properties.find(propertyName => this[propertyName] === toReplace);
+            const propertyName = SUPPORTED_VIZ_PROPERTIES.find(propertyName => this[propertyName] === toReplace);
             if (propertyName) {
                 this[propertyName] = replacer;
                 replacer.parent = this;
@@ -470,35 +432,45 @@ export default class Viz {
         return vizSpec;
     }
 
-    _checkVizSpec (vizSpec) {
-        // Apply implicit cast to numeric style properties
-        vizSpec.width = implicitCast(vizSpec.width);
-        vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
-        vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
-        vizSpec.transform = implicitCast(vizSpec.transform);
-        vizSpec.symbol = implicitCast(vizSpec.symbol);
-        vizSpec.filter = implicitCast(vizSpec.filter);
+    _checkResolution (resolution) {
+        const resolutionValue = resolution instanceof BaseExpression
+            ? resolution.eval()
+            : resolution;
 
-        if (!util.isNumber(vizSpec.resolution)) {
+        if (util.isNumber(resolutionValue)) {
+            if (resolution <= MIN_RESOLUTION) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be greater than ${MIN_RESOLUTION}.`);
+            }
+            if (resolution >= MAX_RESOLUTION) {
+                throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' is ${resolution}, must be lower than ${MAX_RESOLUTION}.`);
+            }
+        } else {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'resolution' property must be a number.`);
         }
-        if (vizSpec.resolution <= MIN_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be greater than ${MIN_RESOLUTION}.`);
-        }
-        if (vizSpec.resolution >= MAX_RESOLUTION) {
-            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'resolution' must be less than ${MAX_RESOLUTION}.`);
-        }
+    }
 
-        const toCheck = ['color', 'strokeColor', 'width', 'strokeWidth', 'order', 'filter',
-            'symbol', 'symbolPlacement', 'transform'];
-        toCheck.forEach((parameter) => {
+    _applyImplitCastToNumericProperties (vizSpec) {
+        vizSpec.filter = implicitCast(vizSpec.filter);
+        vizSpec.resolution = implicitCast(vizSpec.resolution);
+        vizSpec.strokeWidth = implicitCast(vizSpec.strokeWidth);
+        vizSpec.symbol = implicitCast(vizSpec.symbol);
+        vizSpec.symbolPlacement = implicitCast(vizSpec.symbolPlacement);
+        vizSpec.transform = implicitCast(vizSpec.transform);
+        vizSpec.width = implicitCast(vizSpec.width);
+    }
+
+    _checkVizSpec (vizSpec) {
+        this._applyImplitCastToNumericProperties(vizSpec);
+        this._checkResolution(vizSpec.resolution);
+
+        SUPPORTED_VIZ_PROPERTIES.forEach((parameter) => {
             if (!(vizSpec[parameter] instanceof BaseExpression)) {
                 throw new CartoValidationError(`${cvt.INCORRECT_TYPE} '${parameter}' parameter is not a valid viz Expresion.`);
             }
         });
 
         for (let key in vizSpec) {
-            if (SUPPORTED_PROPERTIES.indexOf(key) === -1) {
+            if (key !== 'variables' && SUPPORTED_VIZ_PROPERTIES.indexOf(key) === -1) {
                 console.warn(`Property '${key}' is not supported`);
             }
         }
@@ -512,33 +484,29 @@ export default class Viz {
      * @api
      */
     toString () {
-        const variables = Object.keys(this.variables).map(varName =>
-            `@${varName}: ${this.variables[varName].toString()}\n`
-        );
-        return `color: ${this.color.toString()}
-            strokeColor: ${this.strokeColor.toString()}
-            width: ${this.width.toString()}
-            strokeWidth: ${this.strokeWidth.toString()}
-            filter: ${this.filter.toString()}
-            order: ${this.order.toString()}
-            symbol: ${this.symbol.toString()}
-            symbolPlacement: ${this.symbolPlacement.toString()}
-            offset: ${this.offset.toString()}
-            ${variables}`.replace(/ {4}/g, '');
+        const variables = Object
+            .keys(this.variables)
+            .map(varName => `@${varName}: ${this.variables[varName].toString()}`);
+
+        const properties = SUPPORTED_VIZ_PROPERTIES
+            .map(property => `${property}: ${this[property].toString()}`);
+
+        return [...variables, ...properties].join('\n');
     }
 }
 
 function checkVizPropertyTypes (viz) {
     const expectedTypePerProperty = {
         color: 'color',
-        strokeColor: 'color',
-        width: 'number',
-        strokeWidth: 'number',
-        order: 'orderer',
         filter: 'number',
+        order: 'orderer',
+        resolution: 'number',
+        strokeColor: 'color',
+        strokeWidth: 'number',
         symbol: 'image',
         symbolPlacement: 'placement',
-        transform: 'transformation'
+        transform: 'transformation',
+        width: 'number'
     };
 
     Object.keys(expectedTypePerProperty).forEach((property) => {
