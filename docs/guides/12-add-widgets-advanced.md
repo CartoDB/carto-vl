@@ -12,6 +12,8 @@ Bar charts and histograms have been built with [Chart.js](https://www.chartjs.or
 
 There are two histogram expressions in CARTO VL: `viewportHistogram` and `globalHistogram`. These expressions return a list of values grouped by column. The `viewportHistogram` returns the list based on the features that are visible in the viewport, while `globalHistogram` takes into account the whole dataset.
 
+#### Drawing a bar chart
+
 In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression.
 
 ```js
@@ -110,6 +112,8 @@ Here you can see the result. Check how the bars change when you interact with th
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
 
+#### Drawing a histogram
+
 Now, let's build a histogram showing the information of the **trees diameter**. The diameter is a **numeric** value, and we are going to classify the diameters in six buckets as follows:
 
 ```js
@@ -132,7 +136,9 @@ In this case, we will create a histogram with six bars based on the viewport fea
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
-We can combine both `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features.
+#### viewportHistogram vs globalHistogram
+
+We can combine both `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features. If you interact with the map, you'll see how the bars from the globalHistogram remain static, while the ones from the viewportHistogram change depending on the features present in the viewport.
 
 <div class="example-map">
   <iframe
@@ -168,7 +174,7 @@ const viz = new carto.Viz(`
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
 
-### `getJoinedValues`
+#### `getJoinedValues`
 
 What if we want create a bar chart, where each color corresponds with its features in the map? First of all, we will need a `ramp` expression to color the map. This expression comes with the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method we explained in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
