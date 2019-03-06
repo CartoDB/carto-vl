@@ -76,7 +76,7 @@ export default class Windshaft {
     _checkAcceptableMNS (MNS) {
         Object.keys(MNS).forEach(propertyName => {
             const usages = MNS[propertyName];
-            const aggregatedUsage = usages.some(x => x.type !== aggregationTypes.UNAGGREGATED);
+            const aggregatedUsage = usages.some(x => x.type === aggregationTypes.AGGREGATED);
             const unAggregatedUsage = usages.some(x => x.type === aggregationTypes.UNAGGREGATED);
             if (aggregatedUsage && unAggregatedUsage) {
                 throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
@@ -215,7 +215,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== aggregationTypes.UNAGGREGATED));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === aggregationTypes.AGGREGATED));
     }
 
     _generateAggregation (MNS, resolution) {
