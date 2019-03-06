@@ -21,7 +21,7 @@
         <h1>Top 5 Tree Species</h1>
       </header>
       <section>
-        <canvas id="histogram" width="500" height="600"></canvas>
+        <canvas id="histogram" width="300" height="300"></canvas>
       </section>
     </div>
   </aside>
@@ -59,7 +59,7 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_color: ramp(top($species_name, 5), Prism)
+      @v_color: ramp(top($species_name, 5), Vivid)
       @v_histogram: viewportHistogram(top($species_name, 5))
       color: @v_color
       width: 5

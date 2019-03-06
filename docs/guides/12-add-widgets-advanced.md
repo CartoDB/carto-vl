@@ -4,9 +4,9 @@ We have seen how to add legends to our map by using `getLegendsData` method, and
 
 ### Overview
 
-We will learn how to create bar charts for categorical data and histograms for numeric data. For this purpose, all the following examples we use the same source, the [**Vancouver Trees**](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset.
+We will learn how to create bar charts for **categorical** data and histograms for **numeric** data. For this purpose, the following examples make use of the same source, the [**Vancouver Trees**](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset.
 
-All the charts in this guide have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. Here, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
+Bar charts and histograms have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. In this case, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
 
 ### Histogram expressions
 
@@ -26,11 +26,11 @@ In this first step, we are going to draw a bar chart showing the number of trees
 
 Char.js library needs three arrays to draw the bar chart:
 
-* `labels`: array of string values: that indicates the label of each bar.
-* `data`: array of numeric values that indicates the height of each bar.
-* `backgroundColor`: array of colors: to color the bars from left to right. All the bars will have the same color if there is only one element.
+* `labels`: array of string values that indicate the label of each bar.
+* `data`: array of numeric values that indicate the height of each bar.
+* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assing a single color, all the chart bars will be colored the same.
 
-And we are going to use this configuration by default:
+We are going to use this configuration by default:
 
 ```js
 const chartOptionsDefault = {
@@ -103,7 +103,7 @@ Here you can see the result. Check how the bars change when you interact with th
     id="guides-widgets-advanced-step-1"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
@@ -125,7 +125,7 @@ In this case, we will create a histogram with six bars based on the viewport fea
     id="guides-widgets-advanced-step-2"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
@@ -139,7 +139,7 @@ We can combine both `viewportHistogram` and the `globalHistogram` expressions to
     id="guides-widgets-advanced-step-3"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
@@ -161,7 +161,7 @@ const viz = new carto.Viz(`
     id="guides-widgets-advanced-step-4"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
@@ -176,7 +176,7 @@ Both `viewportHistogram` and `globalHistogram` expressions have the [`getLegendD
 
 ```js
 const viz = new carto.Viz(`
-  @v_color: ramp($species_name, Prism)
+  @v_color: ramp($species_name, Vivid)
   @v_histogram: viewportHistogram($species_name)
   color: @v_color
 `);
@@ -206,7 +206,7 @@ It is important to take into account that `getJoinedValues` returns an array of 
     id="guides-widgets-advanced-step-5"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
@@ -217,7 +217,7 @@ But, what if we are using a `top` expression? How should we tell the bar chart w
 
 ```js
 const viz = new carto.Viz(`
-  @v_color: ramp(top($species_name, 5), Prism)
+  @v_color: ramp(top($species_name, 5), Vivid)
   @v_histogram: viewportHistogram(top($species_name, 5))
   color: @v_color
 `);
@@ -248,7 +248,7 @@ const colors = histogramData.map(elem => elem.value);
     id="guides-widgets-advanced-step-6"
     src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html"
     width="100%"
-    height="500"
+    height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>

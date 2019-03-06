@@ -21,7 +21,7 @@
         <h1>Species</h1>
       </header>
       <section>
-        <canvas id="histogram" width="500" height="600"></canvas>
+        <canvas id="histogram" width="300" height="300"></canvas>
       </section>
     </div>
   </aside>
@@ -59,7 +59,7 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_color: ramp($species_name, Prism)
+      @v_color: ramp($species_name, Vivid)
       @v_histogram: viewportHistogram($species_name)
       color: @v_color
       width: 5

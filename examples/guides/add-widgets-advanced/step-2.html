@@ -21,7 +21,7 @@
         <h1>Tree Diameter</h1>
       </header>
       <section>
-        <canvas id="histogram" width="500" height="600"></canvas>
+        <canvas id="histogram" width="300" height="300"></canvas>
       </section>
     </div>
   </aside>
@@ -60,9 +60,9 @@
     // Define the visualization
     const viz = new carto.Viz(`
       @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+      color: ramp($street_side_name, Vivid)
       width: 5
       strokeWidth: 0
-      color: #00718b
     `);
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
