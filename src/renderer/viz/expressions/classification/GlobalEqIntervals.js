@@ -41,11 +41,11 @@ export default class GlobalEqIntervals extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+        if (this.input.name === CLUSTER_FEATURE_COUNT) {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalEqIntervals. Use ViewportEqIntervals instead`);
         }
 
-        const name = this.input.propertyName || this.input.name;
+        const name = this.input.name;
         const { min, max } = metadata.stats(name);
         this.min = min;
         this.max = max;

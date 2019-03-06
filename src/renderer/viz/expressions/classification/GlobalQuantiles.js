@@ -44,11 +44,11 @@ export default class GlobalQuantiles extends Classifier {
     _validateInputIsNumericProperty () { /* noop */ }
 
     _updateBreakpointsWith (metadata) {
-        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+        if (this.input.name === CLUSTER_FEATURE_COUNT) {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalQuantiles. Use ViewportQuantiles instead`);
         }
 
-        const name = this.input.propertyName || this.input.name;
+        const name = this.input.name;
         const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 
