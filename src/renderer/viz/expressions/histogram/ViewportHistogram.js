@@ -3,6 +3,7 @@ import { checkMaxArguments, implicitCast } from '../utils';
 import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 import { checkArray } from '../utils';
 import { DEFAULT_OPTIONS } from '../constants';
+import Top from '../top';
 
 /**
  * Generates a histogram.
@@ -237,11 +238,14 @@ export default class ViewportHistogram extends Histogram {
             joinedValues.push({ frequency, key, value });
         }
 
-        return joinedValues;
+        return joinedValues.sort((a, b) => b.frequency - a.frequency);
     }
 
     accumViewportAgg (feature) {
-        const property = this.input.eval(feature);
+        const evalFeature = this.input.eval(feature);
+        const property = this.input.isA(Top)
+            ? evalFeature.label
+            : evalFeature;
 
         if (property !== undefined) {
             const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
