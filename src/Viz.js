@@ -19,7 +19,7 @@ import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
 import { GEOMETRY_TYPE } from './utils/geometry';
-import { MAX_RESOLUTION, MIN_RESOLUTION, SUPPORTED_VIZ_PROPERTIES } from './constants/viz';
+import { MAX_RESOLUTION, MIN_RESOLUTION, SUPPORTED_VIZ_PROPERTIES, STYLE_VIZ_PROPERTIES } from './constants/viz';
 
 const DEFAULT_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_WIDTH_EXPRESSION = () => _markDefault(s.number(1));
@@ -165,6 +165,7 @@ export default class Viz {
     _getRootExpressions () {
         return this._rootExpressions;
     }
+
     _getRootStyleExpressions () {
         return this._rootStyleExpressions;
     }
@@ -199,29 +200,12 @@ export default class Viz {
     }
 
     _updateRootExpressionList () {
-        this._rootExpressions = [
-            this.color,
-            this.filter,
-            this.order,
-            this.strokeColor,
-            this.strokeWidth,
-            this.symbol,
-            this.symbolPlacement,
-            this.transform,
-            this.width,
-            ...Object.values(this.variables)
-        ];
-        this._rootStyleExpressions = [
-            this.color,
-            this.filter,
-            this.order,
-            this.strokeColor,
-            this.strokeWidth,
-            this.symbol,
-            this.symbolPlacement,
-            this.transform,
-            this.width
-        ];
+        const expressions = [...SUPPORTED_VIZ_PROPERTIES].map(expression => this[expression]);
+        const styleExpressions = [...STYLE_VIZ_PROPERTIES].map(expression => this[expression]);
+        const variables = [...Object.values(this.variables)];
+
+        this._rootExpressions = [...expressions, ...variables];
+        this._rootStyleExpressions = styleExpressions;
     }
 
     getMinimumNeededSchema () {
