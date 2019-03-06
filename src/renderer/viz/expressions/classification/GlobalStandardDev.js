@@ -78,9 +78,11 @@ export default class GlobalStandardDev extends Classifier {
     }
 
     _updateBreakpointsWith (metadata) {
-        const name = this.input.propertyName === CLUSTER_FEATURE_COUNT
-            ? 'cartodb_id'
-            : this.input.propertyName || this.input.name;
+        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalStandardDev. Use ViewportStandardDev instead`);
+        }
+
+        const name = this.input.propertyName || this.input.name;
         const sample = metadata.sample.map(s => s[name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);

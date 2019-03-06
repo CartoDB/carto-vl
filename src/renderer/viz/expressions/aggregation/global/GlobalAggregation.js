@@ -89,6 +89,10 @@ export default class GlobalAggregation extends BaseExpression {
 
     _getValueFromStats (metadata, propertyName) {
         let value;
+        if (propertyName === CLUSTER_FEATURE_COUNT) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in ${this.expressionName}.`);
+        }
+
         if (this.baseStats) {
             // Use base stats (pre-aggregation)
             if (this.baseStats === '_count') {
@@ -101,9 +105,7 @@ export default class GlobalAggregation extends BaseExpression {
             }
         } else {
             // Use stats from actual column corresponding to this aggregate function
-            const stats = propertyName === CLUSTER_FEATURE_COUNT
-                ? metadata.stats('cartodb_id') // FIXME
-                : metadata.stats(propertyName);
+            const stats = metadata.stats(propertyName);
             value = stats && stats[this._name];
         }
 
