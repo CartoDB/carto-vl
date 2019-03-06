@@ -46,7 +46,7 @@ export default class Windshaft {
     async getMetadata (viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
-        const resolution = viz.resolution;
+        const resolution = viz.resolution.eval();
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         this._forceIncludeCartodbId(MNS);
         if (this._needToInstantiate(MNS, resolution, filtering)) {

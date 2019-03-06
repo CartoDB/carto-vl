@@ -1,6 +1,7 @@
 import { Viz, expressions as s } from '../../src/index';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../src/errors/carto-validation-error';
 import { regExpThatContains as thatContains } from '../../src/utils/util';
+import { SUPPORTED_VIZ_PROPERTIES } from '../../src/constants/viz';
 
 // Generic Style defaults
 const DEFAULT_COLOR_EXPRESSION = s.rgb(0, 0, 0);
@@ -9,7 +10,7 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = s.rgb(0, 0, 0);
 const DEFAULT_STROKE_WIDTH_EXPRESSION = s.number(0);
 const DEFAULT_FILTER_EXPRESSION = s.constant(1);
 const DEFAULT_ORDER_EXPRESSION = s.noOrder();
-const DEFAULT_RESOLUTION = 1;
+const DEFAULT_RESOLUTION = s.number(1);
 
 describe('api/viz', () => {
     describe('constructor', () => {
@@ -26,7 +27,7 @@ describe('api/viz', () => {
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
             });
 
             it('should set default viz values when an empty object is given', () => {
@@ -39,7 +40,7 @@ describe('api/viz', () => {
                 expect(actual.strokeWidth.eval()).toEqual(DEFAULT_STROKE_WIDTH_EXPRESSION.eval());
                 expect(actual.filter.eval()).toEqual(DEFAULT_FILTER_EXPRESSION.eval());
                 expect(actual.order.expr).toEqual(DEFAULT_ORDER_EXPRESSION.expr);
-                expect(actual.resolution).toEqual(DEFAULT_RESOLUTION);
+                expect(actual.resolution.eval()).toEqual(DEFAULT_RESOLUTION.eval());
             });
 
             it('should set the viz properties defined in the vizSpec object', () => {
@@ -50,7 +51,7 @@ describe('api/viz', () => {
                     strokeWidth: s.number(15),
                     filter: s.number(0.5),
                     order: s.asc(s.width()),
-                    resolution: 2
+                    resolution: s.number(2)
                 };
                 const actual = new Viz(vizSpec);
 
@@ -61,7 +62,7 @@ describe('api/viz', () => {
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
-                expect(actual.resolution).toEqual(2);
+                expect(actual.resolution.eval()).toEqual(s.number(2).eval());
             });
 
             it('should allow the viz properties `width` and `strokeWidth` to be numbers', () => {
@@ -85,7 +86,7 @@ describe('api/viz', () => {
 
             it('should throw an error when resolution is not a number', () => {
                 const vizSpec = {
-                    resolution: false // wrong type!
+                    resolution: false
                 };
                 expect(function () {
                     new Viz(vizSpec);
@@ -98,7 +99,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be greater than 0.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 0, must be greater than 0.');
             });
 
             it('should throw an error when resolution is too big', () => {
@@ -107,7 +108,7 @@ describe('api/viz', () => {
                 };
                 expect(function () {
                     new Viz(vizSpec);
-                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' must be less than 256.');
+                }).toThrowError(CartoValidationError, cvt.INCORRECT_VALUE + ' \'resolution\' is 10000, must be lower than 256.');
             });
 
             it('should throw an error when color is not a valid expression', () => {
@@ -174,7 +175,7 @@ describe('api/viz', () => {
                     strokeWidth: number(15)
                     filter: 0.5
                     order: asc(width())
-                    resolution: 1
+                    resolution: number(1)
                 `;
                 const actual = new Viz(vizSpec);
 
@@ -185,7 +186,7 @@ describe('api/viz', () => {
                 expect(actual.strokeWidth.eval()).toEqual(s.number(15).eval());
                 expect(actual.filter.eval()).toEqual(s.number(0.5).eval());
                 expect(actual.order.expr).toEqual(s.asc(s.width()).expr);
-                expect(actual.resolution).toEqual(1);
+                expect(actual.resolution.eval()).toEqual(s.number(1).eval());
             });
         });
     });
@@ -230,8 +231,8 @@ describe('api/viz', () => {
                 done();
                 return Promise.resolve(null);
             });
-            viz.resolution = 8;
-            expect(viz.resolution).toEqual(8);
+            viz.resolution = s.number(8);
+            expect(viz.resolution.eval()).toEqual(8);
         });
     });
 
@@ -372,6 +373,72 @@ describe('api/viz', () => {
                 __cartovl_variable_oneHundred: __cartovl_variable_ten * __cartovl_variable_ten
                 __cartovl_variable_ten: __cartovl_variable_oneHundred / 10
             `)).toThrowError('Viz contains a circular dependency');
+        });
+    });
+
+    describe('.toString()', () => {
+        function _expectVizString (property) {
+            const viz = new Viz();
+            const vizString = viz.toString();
+
+            it(`should stringify the "${property}" property`, () => {
+                const containsProperty = vizString.includes(property);
+                expect(containsProperty).toBeTruthy();
+            });
+        }
+
+        describe('with properties', () => {
+            SUPPORTED_VIZ_PROPERTIES.forEach(_expectVizString);
+
+            it('should return the default properties', () => {
+                const viz = new Viz();
+                const actual = viz.toString().replace(/\s/g, '');
+                const expected = `
+                    color: rgba(0,0,0)
+                    filter: 1
+                    order: noOrder()
+                    resolution: 1
+                    strokeColor: rgba(0,0,0)
+                    strokeWidth:0 symbol: svg()
+                    symbolPlacement: placement(0,1)
+                    transform: translate(0,0)
+                    width:1
+                `.replace(/\s/g, '');
+
+                expect(expected).toEqual(actual);
+            });
+        });
+
+        describe('with variables', () => {
+            it('should be able to replace the variables', () => {
+                const vizString = `
+                    @input: $category
+                    @numBuckets: 5
+                    @palette: reverse(sunset)
+                    color: ramp(globalQuantiles(@input, @numBuckets), @palette)
+                    strokeColor: ramp(@input, Prism)
+                `;
+
+                const viz = new Viz(vizString);
+                const actual = viz.toString().replace(/\s/g, '');
+                const expected = `
+                    @input: $category
+                    @numBuckets: 5
+                    @palette: reverse(Sunset)
+                    color: ramp(globalQuantiles($category,5),reverse(Sunset))
+                    filter: 1
+                    order: noOrder()
+                    resolution: 1
+                    strokeColor: ramp($category,Prism)
+                    strokeWidth: 0
+                    symbol: svg()
+                    symbolPlacement: placement(0,1)
+                    transform: translate(0,0)
+                    width: 1
+                `.replace(/\s/g, '');
+
+                expect(expected).toEqual(actual);
+            });
         });
     });
 });
