@@ -30,7 +30,7 @@ Char.js library needs three arrays to draw the bar chart:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
-* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assing a single color, all the chart bars will be colored the same.
+* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
 
 We are going to use this configuration by default:
 
@@ -154,7 +154,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### Using `top()`
 
-It is posible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
+It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
 
 ```js
 const viz = new carto.Viz(`
