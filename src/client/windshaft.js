@@ -380,13 +380,10 @@ export default class Windshaft {
                     max: dimensionStats.max
                 };
                 const range = MNS[column].some(c => c.range);
+
                 if (range > 0) {
                     properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
                 }
-
-                // if (dimName !== column) {
-                //     properties[dimName] = properties[column];
-                // }
             }
         });
         Object.values(properties).map(property => {
