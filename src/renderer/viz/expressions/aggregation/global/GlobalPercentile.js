@@ -56,7 +56,7 @@ export default class GlobalPercentile extends BaseExpression {
         checkInstance('globalPercentile', 'property', 0, Property, this.property);
         checkFeatureIndependent('globalPercentile', 'percentile', 1, this.percentile);
 
-        this._copySample = metadata.sample.map(s => s[this.property.name]);
+        this._copySample = metadata.sample.map(s => s[this.property.propertyName]);
         this._copySample.sort((x, y) => x - y);
     }
 

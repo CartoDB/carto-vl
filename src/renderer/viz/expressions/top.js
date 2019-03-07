@@ -45,7 +45,7 @@ export default class Top extends BaseExpression {
     }
 
     eval (feature) {
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -155,7 +155,7 @@ export default class Top extends BaseExpression {
 
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
@@ -176,7 +176,7 @@ export default class Top extends BaseExpression {
     }
 
     getLegendData (options) {
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );

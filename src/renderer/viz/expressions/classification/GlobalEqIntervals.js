@@ -45,7 +45,7 @@ export default class GlobalEqIntervals extends Classifier {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalEqIntervals. Use ViewportEqIntervals instead`);
         }
 
-        const name = this.input.propertyName;
+        const name = this.input.name;
         const { min, max } = metadata.stats(name);
         this.min = min;
         this.max = max;

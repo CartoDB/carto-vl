@@ -109,7 +109,7 @@ export default class Property extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
-        const type = aggregationTypes.UNAGGREGATED;
+        const type = aggregationTypes.UNKNOWN;
 
         return {
             [this.name]: [{ type }]

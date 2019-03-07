@@ -48,7 +48,7 @@ export default class GlobalQuantiles extends Classifier {
             throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalQuantiles. Use ViewportQuantiles instead`);
         }
 
-        const name = this.input.propertyName;
+        const name = this.input.name;
         const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 

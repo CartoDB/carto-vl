@@ -349,11 +349,18 @@ export default class Windshaft {
         Object.keys(agg.columns).forEach(aggName => {
             const basename = agg.columns[aggName].aggregated_column;
             const fnName = agg.columns[aggName].aggregate_function;
+
             if (!properties[basename].aggregations) {
                 properties[basename].aggregations = {};
             }
+
             properties[basename].aggregations[fnName] = aggName;
+
+            if (basename !== aggName) {
+                properties[aggName] = JSON.parse(JSON.stringify(properties[basename]));
+            }
         });
+
         Object.keys(agg.dimensions).forEach(dimName => {
             const dimension = agg.dimensions[dimName];
             if (stats.dimensions && stats.dimensions[dimName].type) {
@@ -376,6 +383,10 @@ export default class Windshaft {
                 if (range > 0) {
                     properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
                 }
+
+                // if (dimName !== column) {
+                //     properties[dimName] = properties[column];
+                // }
             }
         });
         Object.values(properties).map(property => {

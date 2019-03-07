@@ -22,7 +22,7 @@ export default class clusterTimeDimension extends BaseExpression {
         checkExpression(expressionName, 'property', 0, property);
         super({ property });
         this._dimension = dimension;
-        this._dimension.propertyName = schema.column.dimColumn(this.property.name, this._dimension.group.units);
+        this._dimension.propertyName = schema.column.dimColumn(this.property.propertyName, this._dimension.group.units);
         this._expressionName = expressionName;
         this.type = type;
         this._range = range;
@@ -37,7 +37,7 @@ export default class clusterTimeDimension extends BaseExpression {
     }
 
     get name () {
-        return this.property.name;
+        return this.property.propertyName;
     }
 
     get propertyName () {

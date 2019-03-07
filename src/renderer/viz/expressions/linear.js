@@ -134,15 +134,15 @@ export default class Linear extends BaseExpression {
                     inputIndex = 1; // end
                     break;
             }
-            const input = feature._dataframe.properties[this._metadata.decodedProperties(this.input.name)[inputIndex]][feature._index];
+            const input = feature._dataframe.properties[this._metadata.decodedProperties(this.input.propertyName)[inputIndex]][feature._index];
 
             return (input - this._internalMin) / (this._internalMax - this._internalMin);
         }
 
         const input = this.input.eval(feature);
         const metadata = this._metadata;
-        const codec = (metadata && this.input.name)
-            ? metadata.codec(this.input.name)
+        const codec = (metadata && this.input.propertyName)
+            ? metadata.codec(this.input.propertyName)
             : new IdentityCodec();
         const min = codec.externalToInternal(metadata, this.min.eval(feature));
         const max = codec.externalToInternal(metadata, this.max.eval(feature));
@@ -160,22 +160,22 @@ export default class Linear extends BaseExpression {
                 case 'unit':
                     // choose same side for all three:
                     inputIndex = 0; // start
-                    min = metadata.codec(this.input.name).externalToInternal(metadata, this.min.eval())[inputIndex];
-                    max = metadata.codec(this.input.name).externalToInternal(metadata, this.max.eval())[inputIndex];
+                    min = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.min.eval())[inputIndex];
+                    max = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.max.eval())[inputIndex];
                     // min in ms is castTimeRange(this.min.eval()).startValue;
                     // max in ms is castTimeRange(this.max.eval()).startValue;
                     break;
                 case 'start':
                     inputIndex = 0; // start
-                    min = metadata.codec(this.input.name).externalToInternal(metadata, this.min.eval())[0]; // start
-                    max = metadata.codec(this.input.name).externalToInternal(metadata, this.max.eval())[1]; // end
+                    min = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.max.eval())[1]; // end
                     // min in ms is castTimeRange(this.min.eval()).startValue;
                     // max in ms is castTimeRange(this.max.eval()).endValue;
                     break;
                 case 'end':
                     inputIndex = 1; // end
-                    min = metadata.codec(this.input.name).externalToInternal(metadata, this.min.eval())[0]; // start
-                    max = metadata.codec(this.input.name).externalToInternal(metadata, this.max.eval())[1]; // end
+                    min = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.min.eval())[0]; // start
+                    max = metadata.codec(this.input.propertyName).externalToInternal(metadata, this.max.eval())[1]; // end
                     // min in ms is castTimeRange(this.min.eval()).startValue;
                     // max in ms is castTimeRange(this.max.eval()).endValue;
                     break;
@@ -194,7 +194,7 @@ export default class Linear extends BaseExpression {
             // checkType('linear', 'max', 2, this.input.type, this.max);
             // but global aggregations are currently of type number even for dates
 
-            const codec = this.input.name && metadata.codec(this.input.name);
+            const codec = this.input.propertyName && metadata.codec(this.input.propertyName);
             if (!codec || codec.isIdentity()) {
                 // this permits using properties for the min/man expressions
                 this.inlineMaker = (inline) => `((${inline.input}-${inline.min})/(${inline.max}-${inline.min}))`;
