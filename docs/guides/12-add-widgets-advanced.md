@@ -84,7 +84,7 @@ layer.on('updated', () => {
   // Chart.js set up
   const labels = histogramData.map(elem => elem.x);
   const data = histogramData.map(elem => elem.y);
-  const backgroundColor = ['#00718b', '#089099', '#46aea0', '#7ccba2', '#f7feae'];
+  const backgroundColor = '#00718b';
 
   chart.data = {
     labels,
