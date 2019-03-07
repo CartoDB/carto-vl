@@ -2,15 +2,15 @@
 <html>
 
 <head>
-    <title>Advanced Widgets | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../../style.css">
-    <!-- Include Chart JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <title>Advanced Widgets | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+  <!-- Include Chart JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
 
 <body>
@@ -53,14 +53,15 @@
     });
 
     const ctx = document.getElementById('histogram').getContext('2d');
-    
+
     // Define the source
     const source = new carto.source.Dataset('vancouver_trees');
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_color: ramp(top($species_name, 5), Vivid)
-      @v_histogram: viewportHistogram(top($species_name, 5))
+      @top_five: top($species_name, 5)
+      @v_color: ramp(@top_five, Vivid)
+      @v_histogram: viewportHistogram(@top_five)
       color: @v_color
       width: 5
       strokeWidth: 0
@@ -111,7 +112,7 @@
     layer.addTo(map, 'watername_ocean');
 
     layer.on('loaded', hideLoader);
-    
+
     layer.on('updated', () => {
       // Save histogram variable
       const histogram = layer.viz.variables.v_histogram;

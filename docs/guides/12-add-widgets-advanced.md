@@ -229,6 +229,17 @@ const viz = new carto.Viz(`
 `);
 ```
 
+And, refactoring a bit the visualization to share that expression in a variable, we have the equivalent:
+
+```js
+const viz = new carto.Viz(`
+  @top_five: top($species_name, 5)
+  @v_color: ramp(@top_five, Vivid)
+  @v_histogram: viewportHistogram(@top_five)
+  color: @v_color
+`);
+```
+
 However, there is something else these methods have in common. By default, the `top` classifies the ones that are not the _top_ ones as **'others'**. In CARTO VL, this value is labeled with `CARTO_VL_OTHERS` by default. We can override it by passing an `options` object with `othersLabel`. But if we do so, we have to use the **same options** in both methods:
 
 ```js
