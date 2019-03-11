@@ -61,15 +61,15 @@
 
       const layerUpdated = function () {
         const features = viz.variables.v_features.value;
-        const geojsonFeatures = features.map(f => {
+        const geojsonFeatures = features.map(feature => {
           return {
             "type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": f.getRenderedCentroid()
+              "coordinates": feature.getRenderedCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['name']}`,
+              "label_field": `${feature.properties['name']}`,
             }
           }
         });

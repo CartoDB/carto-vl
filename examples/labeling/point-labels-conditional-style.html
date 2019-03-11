@@ -48,8 +48,17 @@
     const source = new carto.source.Dataset('points_of_interest');
     const viz = new carto.Viz(`
       @v_features: viewportFeatures($poi_name)
-      
-      color: ramp(buckets($poi_name, ['Union Station', 'Invesco Field at Mile High Stadium', 'Pepsi Center', 'Coors Field']), [#0B9F95, #D36DFB, #ff9674, #F75869],white)
+      @pois: buckets(
+        $poi_name, [
+          'Union Station',
+          'Invesco Field at Mile High Stadium',
+          'Pepsi Center',
+          'Coors Field'
+        ]
+      )
+      @colors: [#0B9F95, #D36DFB, #ff9674, #F75869]
+
+      color: ramp(@pois, @colors, white)
       width: 6
       strokeWidth: 0
       filter: $major == "YES"
@@ -63,15 +72,15 @@
 
       const layerUpdated = function () {
         const features = viz.variables.v_features.value;
-        const geojsonFeatures = features.map(f => {
+        const geojsonFeatures = features.map(feature => {
           return {
             "type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": f.getRenderedCentroid()
+              "coordinates": feature.getRenderedCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['poi_name']}`,
+              "label_field": `${feature.properties['poi_name']}`,
             }
           }
         });

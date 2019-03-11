@@ -51,10 +51,10 @@
 
         const source = new carto.source.Dataset('montreal_parking_signs');
         const viz = new carto.Viz(`
-            @cc: clusterCount()
-            @v_features: viewportFeatures(@cc)
+            @count: clusterCount()
+            @v_features: viewportFeatures(@count)
             
-            width: ramp(linear(clusterCount(),viewportMIN(@cc),viewportMAX(@cc)),[5,50])
+            width: ramp(linear(@count, viewportMIN(@count), viewportMAX(@count)), [5,50])
             color: opacity(#C91329,0.9)
             strokeWidth: 0
             resolution: 32
@@ -68,15 +68,15 @@
 
             const layerUpdated = function () {
                 const features = viz.variables.v_features.value;
-                const geojsonFeatures = features.map(f => {
+                const geojsonFeatures = features.map(feature => {
                     return {
                         "type": "Feature",
                         "geometry": {
                             "type": "Point",
-                            "coordinates": f.getRenderedCentroid()
+                            "coordinates": feature.getRenderedCentroid()
                         },
                         "properties": {
-                            "label_field": `${f.properties['cc']}`,
+                            "label_field": `${feature.properties['count']}`,
                         }
                     }
                 });

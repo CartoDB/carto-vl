@@ -38,7 +38,6 @@
         });
         map.addControl(nav, 'top-left');
 
-
         carto.setDefaultConfig({
             serverURL: 'https://{user}.carto.com'
         });
@@ -48,16 +47,18 @@
             apiKey: 'default_public'
         });
 
-
         const source = new carto.source.Dataset('july_temps');
         const viz = new carto.Viz(`
-            @ca: clusterAVG($value)
-            @v_features: viewportFeatures(@ca)
+            @clusterAverage: clusterAVG($value)
+            @v_features: viewportFeatures(@clusterAverage)
+            @g_min: globalMIN(@clusterAverage)
+            @g_max: globalMAX(@clusterAverage)
+            @color: ramp(linear(@clusterAverage, @g_min, @g_max), [blue, turquoise, yellow, red])
             
             width: 40
-            color: opacity(ramp(linear(@ca,globalMIN(@ca),globalMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
+            color: opacity(@color, 0.8)
             strokeWidth: 0
-            resolution: 32  
+            resolution: 32
         `);
         const layer = new carto.Layer('layer', source, viz);
 
@@ -68,16 +69,15 @@
 
             const layerUpdated = function () {
                 const features = viz.variables.v_features.value;
-                const geojsonFeatures = features.map(f => {
+                const geojsonFeatures = features.map(feature => {
                     return {
                         "type": "Feature",
                         "geometry": {
                             "type": "Point",
-                            "coordinates": f.getRenderedCentroid()
+                            "coordinates": feature.getRenderedCentroid()
                         },
-                        //Round cluster average values for labeling purposes
                         "properties": {
-                            "label_field": Math.round(f.properties['ca']),
+                            "label_field": Math.round(feature.properties['clusterAverage']) //Round cluster average values for labeling purposes
                         }
                     }
                 });
@@ -98,8 +98,7 @@
                 "layout": {
                     "text-field": "{label_field}",
                     "text-font": ["Open Sans Semibold", "Arial Unicode MS Regular"],
-                    "text-size": 10,
-                    //"text-justify": "center"
+                    "text-size": 10
                 },
                 "paint": {
                     "text-color": "#000000",
@@ -110,7 +109,6 @@
         });
 
         layer.addTo(map);
-
     </script>
 </body>
 
