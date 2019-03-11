@@ -71,9 +71,9 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         this.concurrencyHelper = new LayerConcurrencyHelper();
-        this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
+        this._init(source, viz);
     }
 
     /**
@@ -218,6 +218,13 @@ export default class Layer {
         return this._update(source, viz, true);
     }
 
+    async _init (source, viz) {
+        this._sourcePromise = this.update(source, viz);
+        await this._sourcePromise;
+        
+        this._clusterCache = null;
+    }
+
     async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
@@ -225,15 +232,13 @@ export default class Layer {
         const safeSource = this._cloneSourceIfDifferent(source);
 
         let change = this._initChange(majorChange);
-        const [, metadata] = await Promise.all([
+        const [, data] = await Promise.all([
             viz.loadImages(), // start requesting images ASAP
             safeSource.requestMetadata(viz)
         ]);
         await this._context;
-
         this._endChange(majorChange, change);
-
-        this._commitSuccesfulUpdate(metadata, viz, safeSource);
+        this._commitSuccesfulUpdate(data.metadata, data.layergroupid, viz, safeSource);
     }
 
     _initChange (majorChange) {
@@ -258,9 +263,9 @@ export default class Layer {
      * @param {carto.Viz} newViz
      * @param {carto.source} newSource
      */
-    _commitSuccesfulUpdate (metadata, newViz, newSource) {
+    _commitSuccesfulUpdate (metadata, layergroupid, newViz, newSource) {
         this.metadata = metadata;
-
+        this.layergroupid = layergroupid;
         this._commitVizChange(newViz);
         this._commitSourceChange(newSource);
 
@@ -375,7 +380,9 @@ export default class Layer {
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
         }
-        return this._update(this._source, viz, false);
+
+        this._sourcePromise = await this._update(this._source, viz, false);
+        return this._sourcePromise;
     }
 
     /**

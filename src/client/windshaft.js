@@ -53,7 +53,10 @@ export default class Windshaft {
             const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
-        return this.metadata;
+        return {
+            metadata: this.metadata,
+            layergroupid: this.layergroupid
+        };
     }
 
     _forceIncludeCartodbId (MNS) {
@@ -157,22 +160,25 @@ export default class Windshaft {
             aggSQL = filteredSQL;
         }
 
-        let { urlTemplates, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
+        let { urlTemplates, layergroupid, metadata } = await this._getInstantiationPromise(query, conf, agg, aggSQL, select, overrideMetadata, MNS);
         metadata.backendFiltersApplied = backendFiltersApplied;
 
-        return { MNS, resolution, filters, metadata, urlTemplates };
+        return { MNS, resolution, filters, metadata, urlTemplates, layergroupid };
     }
 
-    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplates }) {
+    _updateStateAfterInstantiating ({ MNS, resolution, filters, metadata, urlTemplates, layergroupid }) {
         if (this._mvtClient) {
             this._mvtClient.free();
         }
+
         metadata.extent = TILE_EXTENT;
+
         this._mvtClient = new MVT(urlTemplates, metadata);
         this._mvtClient._workerName = 'windshaft';
         this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
+        this.layergroupid = layergroupid;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;
@@ -335,6 +341,7 @@ export default class Windshaft {
         }
         return {
             urlTemplates: layergroup.metadata.tilejson.vector.tiles,
+            layergroupid: layergroup.layergroupid,
             metadata: overrideMetadata || this._adaptMetadata(layergroup.metadata.layers[0].meta, agg, MNS)
         };
     }
