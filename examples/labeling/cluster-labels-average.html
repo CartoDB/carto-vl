@@ -55,10 +55,10 @@
             @g_max: globalMAX(@clusterAverage)
             @color: ramp(linear(@clusterAverage, @g_min, @g_max), [blue, turquoise, yellow, red])
             
-            width: 40
+            width: 30
             color: opacity(@color, 0.8)
             strokeWidth: 0
-            resolution: 32
+            resolution: 16
         `);
         const layer = new carto.Layer('layer', source, viz);
 
