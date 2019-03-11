@@ -3,7 +3,7 @@ import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkM
 import Property from './basic/property';
 import { number } from '../expressions';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
-import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
 
 // Careful! This constant must match with the shader code of the Top expression
 const MAX_TOP_BUCKETS = 16;
@@ -45,7 +45,7 @@ export default class Top extends BaseExpression {
     }
 
     eval (feature) {
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -155,7 +155,7 @@ export default class Top extends BaseExpression {
 
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
@@ -175,8 +175,8 @@ export default class Top extends BaseExpression {
         super._preDraw(program, drawMetadata, gl);
     }
 
-    _getLegendData () {
-        const metaColumn = this._metadata.properties[this.property.name];
+    getLegendData (options) {
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -193,7 +193,7 @@ export default class Top extends BaseExpression {
         });
 
         data.push({
-            key: OTHERS_LABEL,
+            key: options.othersLabel,
             value: OTHERS_INDEX
         });
 

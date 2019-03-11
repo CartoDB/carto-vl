@@ -1,6 +1,4 @@
 import BaseExpression from '../base';
-import { checkArray } from '../utils';
-
 export default class Histogram extends BaseExpression {
     constructor (children) {
         super(children);
@@ -12,29 +10,6 @@ export default class Histogram extends BaseExpression {
         return this.input.type === 'number'
             ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
             : this._getCategoryValue(this._histogram);
-    }
-
-    getJoinedValues (values) {
-        checkArray('histogram.getJoinedValues', 'values', 0, values);
-
-        if (!values.length) {
-            return [];
-        }
-
-        const joinedValues = [];
-
-        this.value.forEach((elem) => {
-            const val = values.find(value => elem.x === value.key);
-            if (val) {
-                const frequency = elem.y;
-                const key = val.key;
-                const value = val.value;
-
-                joinedValues.push({ frequency, key, value });
-            }
-        });
-
-        return joinedValues;
     }
 
     _bindMetadata (metadata) {

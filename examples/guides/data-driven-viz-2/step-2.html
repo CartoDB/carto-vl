@@ -95,7 +95,9 @@
         layer.on('loaded', () => {
             hideLoader();
 
-            const colorLegend = layer.viz.color.getLegendData();
+            const colorLegend = layer.viz.color.getLegendData({
+                othersLabel: 'All other causes'
+            });
             let colorLegendList = '';
 
             function rgbToHex(color) {
@@ -111,7 +113,7 @@
 
                 if (color) {
                     colorLegendList +=
-                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'All other causes')}</span></li>\n`;
+                        `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key}</span></li>\n`;
                 }
             });
 

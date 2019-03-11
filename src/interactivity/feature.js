@@ -1,6 +1,6 @@
 import FeatureVizProperty from './featureVizProperty';
-import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
 
 /**
  * @namespace Features
@@ -71,13 +71,15 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/car
  * @typedef {Object} Feature
  * @property {number} id - Unique identification code
  * @property {FeatureVizProperty} color
- * @property {FeatureVizProperty} width
+ * @property {FeatureVizProperty} filter
+ * @property {FeatureVizProperty} order
+ * @property {FeatureVizProperty} resolution
  * @property {FeatureVizProperty} strokeColor
  * @property {FeatureVizProperty} strokeWidth
  * @property {FeatureVizProperty} symbol
  * @property {FeatureVizProperty} symbolPlacement
- * @property {FeatureVizProperty} filter
  * @property {FeatureVizProperty} transform
+ * @property {FeatureVizProperty} width
  * @property {FeatureVizProperty[]} variables - Declared variables in the viz object
  * @property {function} blendTo - Blend custom feature vizs by fading in `duration` milliseconds
  * @property {function} reset - Reset custom feature vizs by fading out `duration` milliseconds, where `duration` is the first parameter to reset
@@ -98,7 +100,7 @@ export default class Feature {
     }
 
     _defineVizProperties () {
-        VIZ_PROPERTIES.forEach((property) => {
+        SUPPORTED_VIZ_PROPERTIES.forEach((property) => {
             this[property] = this._buildFeatureVizProperty(property);
         });
     }
@@ -130,7 +132,7 @@ export default class Feature {
 
     blendTo (newVizProperties, duration = 500) {
         Object.keys(newVizProperties).forEach((property) => {
-            if (!(VIZ_PROPERTIES.includes(property))) {
+            if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
                 throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
             }
             const newValue = newVizProperties[property];
@@ -139,7 +141,7 @@ export default class Feature {
     }
 
     reset (duration = 500) {
-        VIZ_PROPERTIES.forEach((property) => {
+        SUPPORTED_VIZ_PROPERTIES.forEach((property) => {
             this[property].reset(duration);
         });
 

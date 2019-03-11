@@ -67,7 +67,7 @@ export default function variable (name) {
             } else {
                 return false;
             }
-            // Indicate success
+
             return true;
         },
 
@@ -75,6 +75,10 @@ export default function variable (name) {
             switch (prop) {
                 case 'parent':
                 case 'notify':
+                case 'propertyName':
+                    return alias.propertyName;
+                case 'name':
+                    return alias._dimension ? alias.propertyName : alias.name;
                 case 'blendTo':
                     return obj[prop];
                 case '_resolveAliases':
@@ -96,6 +100,5 @@ export default function variable (name) {
         }
     };
 
-    const proxy = new Proxy(new Variable(), aliaser);
-    return proxy;
+    return new Proxy(new Variable(), aliaser);
 }

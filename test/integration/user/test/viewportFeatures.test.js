@@ -1,7 +1,7 @@
 import carto from '../../../../src';
 import * as util from '../../util';
-import VIZ_PROPERTIES from '../../../../src/renderer/viz/utils/properties';
-import { CLUSTER_FEATURE_COUNT } from '../../../../src/renderer/schema';
+import { CLUSTER_FEATURE_COUNT } from '../../../../src/constants/metadata';
+import { SUPPORTED_VIZ_PROPERTIES } from '../../../../src/constants/viz';
 
 const feature1 = {
     type: 'Feature',
@@ -198,7 +198,7 @@ describe('viewportFeatures', () => {
 
             // 2. and featureVizProperties / variables are available
             featureList.forEach(feature => {
-                VIZ_PROPERTIES.forEach(propertyName => {
+                SUPPORTED_VIZ_PROPERTIES.forEach(propertyName => {
                     expect(feature[propertyName]).toBeTruthy();
                 });
                 expect(feature['variables']).toBeTruthy();

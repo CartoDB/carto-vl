@@ -1,6 +1,8 @@
 import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../schema';
+import { checkArray } from '../utils';
+import { DEFAULT_OPTIONS } from '../constants';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Generates a histogram.
@@ -134,8 +136,8 @@ export default class ViewportHistogram extends Histogram {
      *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
@@ -144,23 +146,93 @@ export default class ViewportHistogram extends Histogram {
      * // ]
      *
      * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
-     *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
      *   @histogram: viewportHistogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
-     * const legendData = viz.color.getLegendData();
-     * const data = viz.variables.histogram.getJoinedValues(legendData);
+     * const legend = viz.color.getLegendData();
+     * const data = viz.variables.histogram.getJoinedValues(legend.data);
      * // returns the following array
      * // [
      * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
      * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
      * //   { frequency: 30, key: 'car', value: { r: 56, g: 166, b: 165, a: 1 } }
      * // ]
+     * @example <caption>Get color values for the histogram using a ramp with classified data.</caption>
+     * // Note: Both the ramp and the histogram expressions must use the same classification.
      *
-    */
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: s.viewportHistogram(s.top(s.prop('vehicles'), 2))
+     *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
+     * `);
+     *
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
+     *
+     * @example <caption>Get color values for the histogram using a ramp with classified data (String).</caption>
+     * const s = carto.expressions;
+     * const viz = new carto.Viz(`
+     *   @histogram: viewportHistogram(top($vehicles, 2))
+     *   color: ramp((top($vehicles, 2)), Prism, green)
+     * `);
+     *
+     * const options = { othersLabel: 'Others '};
+     * const legend = viz.color.getLegendData(options);
+     * const data = viz.variables.histogram.getJoinedValues(legend.data, options);
+     * // returns the following array
+     * // [
+     * //   { frequency: 10, key: 'truck', value: { r: 95, g: 70, b: 144, a: 1 } }
+     * //   { frequency: 20, key: 'bike', value: { r: 29, g: 105, b: 150, a: 1 } }
+     * //   { frequency: 30, key: 'Others', value: { r: 0, g: 128, b: 0, a: 1 } }
+     * // ]
+     *
+     */
+    getJoinedValues (values, options) {
+        checkArray('viewportHistogram.getJoinedValues', 'values', 0, values);
+
+        if (!values.length) {
+            return [];
+        }
+
+        const config = Object.assign({}, DEFAULT_OPTIONS, options);
+        const joinedValues = [];
+        const otherValues = [];
+
+        this.value.forEach((elem) => {
+            const val = values.find(value => elem.x === value.key);
+
+            if (val) {
+                const frequency = elem.y;
+                const key = val.key;
+                const value = val.value;
+
+                joinedValues.push({ frequency, key, value });
+            } else {
+                otherValues.push(elem.y);
+            }
+        });
+
+        if (otherValues.length) {
+            const others = values.find(value => config.othersLabel === value.key);
+            const frequency = otherValues.reduce((prev, freq) => prev + freq);
+            const key = others.key;
+            const value = others.value;
+
+            joinedValues.push({ frequency, key, value });
+        }
+
+        return joinedValues;
+    }
 
     accumViewportAgg (feature) {
         const property = this.input.eval(feature);

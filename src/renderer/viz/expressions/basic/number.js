@@ -32,9 +32,11 @@ export default class BaseNumber extends BaseExpression {
         this.expr = x;
         this.type = 'number';
     }
+
     get value () {
         return this.eval();
     }
+
     eval () {
         return this.expr;
     }
