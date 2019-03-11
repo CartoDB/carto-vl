@@ -201,11 +201,12 @@ For example, the map below symbolizes only the `top` three weather conditions in
     </iframe>
 </div>
 
-You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()}`:
+You can overwrite the default `CARTO_VL_OTHERS` value by setting the `othersLabel` option when using `getLegendData`:
 
 ```js
-colorLegendList +=
-    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
+const colorLegend = layer.viz.color.getLegendData({
+    othersLabel: 'Other Weather'
+});
 ```
 
 With that change, the map labels other categories as "Other weather" in the legend:
@@ -314,7 +315,7 @@ View the source of the maps below to see how legends work for different map and 
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
 
 #### Categorical lines
 
@@ -328,7 +329,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
 
 #### Image markers
 
@@ -342,18 +343,18 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
 
-#### Unclassed latitudes
+#### Unclassed points
 
 <div class="example-map">
     <iframe
         id="guides-legend-step-9"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-10.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-10.html)

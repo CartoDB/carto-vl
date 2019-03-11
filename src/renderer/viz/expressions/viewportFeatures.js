@@ -93,6 +93,7 @@ export default class ViewportFeatures extends BaseExpression {
             const propertyNames = this._requiredProperties.map((p) => {
                 return { property: p.propertyName, variable: p._variableName };
             });
+
             this._FeatureProxy = genLightweightFeatureClass(propertyNames, renderLayer);
         }
         this.expr = [];

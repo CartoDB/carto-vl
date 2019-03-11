@@ -1,9 +1,8 @@
 import BaseExpression from '../base';
 import { number } from '../../expressions';
 
-import { checkType, checkNumber, checkInstance } from '../utils';
+import { checkType, checkNumber } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
-import Property from '../basic/property';
 import ClassifierGLSLHelper from './ClassifierGLSLHelper';
 
 export const DEFAULT_HISTOGRAM_SIZE = 1000;
@@ -67,12 +66,15 @@ export default class Classifier extends BaseExpression {
     }
 
     _validateInputIsNumericProperty () {
-        checkInstance(this.expressionName, 'input', 0, Property, this.input);
         checkType(this.expressionName, 'input', 0, 'number', this.input);
     }
 
     toString () {
         return `${this.expressionName}(${this.input.toString()}, ${this.numCategories})`;
+    }
+
+    get value () {
+        return this.breakpoints.map(br => br.expr);
     }
 
     eval (feature) {

@@ -1,7 +1,7 @@
 import ViewportAggregation from './ViewportAggregation';
 import { number } from '../../../expressions';
 import { checkMaxArguments } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
 
 /**
  * Return the feature count of the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
