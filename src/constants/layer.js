@@ -1,2 +1,1 @@
-
 export const RESOLUTION_ZOOMLEVEL_ZERO = 512;
