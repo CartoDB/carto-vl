@@ -1,20 +1,20 @@
 ## Add widgets advanced
 
-We have seen how to add legends to our map by using `getLegendsData` method, and we have also learned how to display widgets using histogram expressions in the [previous guide](/developers/carto-vl/guides/add-widgets/). This is an advanced guide to learn how to obtain and display the information in widgets by using `viewportHistogram` and `globalHistogram` expressions.
+In the [previous guide](/developers/carto-vl/guides/add-widgets/), you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions with CARTO's frontend framework [Airship](https://carto.com/airship/). This guide takes a deeper dive into histogram expressions and explores the flexibility of using CARTO VL to connect with other, external libraries to draw the returned information.
 
 ### Overview
 
-We will learn how to create bar charts for **categorical** data and histograms for **numeric** data. For this purpose, the following examples make use of the same source, the [**Vancouver Trees**](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset.
-
-Bar charts and histograms have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. Airship comes with a built-in histogram widgets you can use directly with CARTO VL, which are connected to the map automatically and are also very easy to configure. However, in this case, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
+Using a [Vancouver Trees](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset, this guide explores using `viewportHistogram` and `globalHistogram` to create bar charts for **categorical** data and histograms for **numeric** data   with the external charting library, [Chart.js](https://www.chartjs.org).
 
 ### Histogram expressions
 
-There are two histogram expressions in CARTO VL: `viewportHistogram` and `globalHistogram`. These expressions return a list of values grouped by column. The `viewportHistogram` returns the list based on the features that are visible in the viewport, while `globalHistogram` takes into account the whole dataset.
+CARTO VL has two expressions to create histograms: `viewportHistogram` and `globalHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of  features that are in the viewport, while the `globalHistogram` expression returns a list based off of the entire dataset.
 
-#### Drawing a bar chart
+#### Draw a bar chart for categories
 
-In this first step, we are going to draw a bar chart showing the number of trees classified by **street side**. We are going to use the `viewportHistogram` expression.
+In this step, you will create a basic bar chart that displays the count of trees planted on each **street side** category (odd, even, middle) using the `viewportHistogram` expression.
+
+To start, define the source dataset and create a variable (`@v_histogram`) that will return the count and category information for the chart:
 
 ```js
   // Define the source
@@ -26,13 +26,13 @@ In this first step, we are going to draw a bar chart showing the number of trees
   `);
 ```
 
-Char.js library needs three arrays to draw the bar chart:
+In order for Chart.js to draw the returned information as a bar chart, it needs three arrays of information:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
 * `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
 
-We are going to use this configuration by default:
+Start with a default configuration for the chart:
 
 ```js
 const chartOptionsDefault = {
@@ -74,7 +74,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-The `histogram.value` returns an array of `{ x, y }` objects where `x` is the name of the category and `y` is the amount of trees for this category. We are going to build `data` and `labels` arrays from the histogram expression  **once the layer is updated**:
+The `histogram.value` returns an array of `{ x, y }` objects where `x` is the name of the street side category and `y` is the amount of trees in that category. This is the information used to build the `data` and `labels` arrays for the bar chart. Since the values will be dynamically updated based on the viewport, the information should be returned **once the layer is updated**:
 
 ```js
 layer.on('updated', () => {
@@ -98,7 +98,7 @@ layer.on('updated', () => {
 });
 ```
 
-Here you can see the result. Check how the bars change when you interact with the map.
+On the resulting map, you will notice as you interact with it (zoom and pan) that the bars in the chart dynamically change based on your current viewport. You can also hover over each bar in the chart to see the category name and count.
 
 <div class="example-map">
   <iframe
@@ -112,9 +112,11 @@ Here you can see the result. Check how the bars change when you interact with th
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
 
-#### Drawing a histogram
+#### Draw a histogram for numbers
 
-Now, let's build a histogram showing the information of the **trees diameter**. The diameter is a **numeric** value, and we are going to classify the diameters in six buckets as follows:
+Next, let's take a look at building a histogram to show the distribution of a numeric value, **tree diameter**.  
+
+For this case, the chart will have six histogram bars with the count of trees within each diameter range. To get this information, classify the diameter values into six buckets based on the viewport:
 
 ```js
 const viz = new carto.Viz(`
@@ -122,7 +124,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-In this case, we will create a histogram with six bars based on the viewport features.
+Similar to the map above, when interacting with resulting map, the histogram bars dynamically update and can be hovered for more detailed information:
 
 <div class="example-map">
   <iframe
@@ -136,9 +138,9 @@ In this case, we will create a histogram with six bars based on the viewport fea
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
-#### viewportHistogram vs globalHistogram
+#### `viewportHistogram` vs `globalHistogram`
 
-We can combine both `viewportHistogram` and the `globalHistogram` expressions to compare viewport vs global features. If you interact with the map, you'll see how the bars from the globalHistogram remain static, while the ones from the viewportHistogram change depending on the features present in the viewport.
+The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for globalHistogram remain static, while the ones for viewportHistogram change depending on the features present in the viewport. If you zoom out, you'll see the viewportHistogram chart doesn't match the globalHistogram chart. This is because the data returned for the globalHistogram is a random sample (as is the case for other global expressions in VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
 
 <div class="example-map">
   <iframe
@@ -151,8 +153,6 @@ We can combine both `viewportHistogram` and the `globalHistogram` expressions to
   </iframe>
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
-
-If you zoom out, you'll see the viewport histogram chart doesn't match the global histogram chart. This is due to the data we're using for the global histogram uses a random sample, as other global expressions. Therefore, in this case we're comparing the viewport data with a representative sample of the whole dataset.
 
 #### Using `top()`
 
