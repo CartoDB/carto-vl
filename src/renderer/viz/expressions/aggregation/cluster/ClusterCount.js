@@ -6,7 +6,7 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
  * Count of features per cluster.
  *
  * The `clusterCount` expression has no input parameters and if data is not aggregated, it always returns 1.
- * Currently, it is not possible to use it as an input in global aggregations such as `globalMin` or `globalQuantiles`.
+ * It is not possible to use it as an input in global aggregations such as `globalMin` or `globalQuantiles`.
  *
  * @return {Number} Cluster feature count
  *
