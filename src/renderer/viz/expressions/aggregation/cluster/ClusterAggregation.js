@@ -41,10 +41,6 @@ export default class ClusterAggregation extends BaseExpression {
         checkType(this._expressionName, 'property', 0, this.type, this.property);
     }
 
-    _resolveAliases (aliases) {
-        return this._getChildren().map(child => child._resolveAliases(aliases));
-    }
-
     _applyToShaderSource (getGLSLforProperty) {
         return {
             preface: '',
