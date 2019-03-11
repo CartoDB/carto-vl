@@ -30,7 +30,7 @@ Char.js library needs three arrays to draw the bar chart:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
-* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assing a single color, all the chart bars will be colored the same.
+* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
 
 We are going to use this configuration by default:
 
@@ -84,7 +84,7 @@ layer.on('updated', () => {
   // Chart.js set up
   const labels = histogramData.map(elem => elem.x);
   const data = histogramData.map(elem => elem.y);
-  const backgroundColor = ['#00718b', '#089099', '#46aea0', '#7ccba2', '#f7feae'];
+  const backgroundColor = '#00718b';
 
   chart.data = {
     labels,
@@ -154,7 +154,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### Using `top()`
 
-It is posible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
+It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
 
 ```js
 const viz = new carto.Viz(`
@@ -225,6 +225,17 @@ But, what if we are using a `top` expression? How should we tell the bar chart w
 const viz = new carto.Viz(`
   @v_color: ramp(top($species_name, 5), Vivid)
   @v_histogram: viewportHistogram(top($species_name, 5))
+  color: @v_color
+`);
+```
+
+And, refactoring a bit the visualization to share that expression in a variable, we have the equivalent:
+
+```js
+const viz = new carto.Viz(`
+  @top_five: top($species_name, 5)
+  @v_color: ramp(@top_five, Vivid)
+  @v_histogram: viewportHistogram(@top_five)
   color: @v_color
 `);
 ```

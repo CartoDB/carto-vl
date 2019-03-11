@@ -2,15 +2,15 @@
 <html>
 
 <head>
-    <title>Advanced Widgets | CARTO</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <script src="../../../dist/carto-vl.js"></script>
-    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../../style.css">
-    <!-- Include Chart JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <title>Advanced Widgets | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../style.css">
+  <!-- Include Chart JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
 
 <body>
@@ -53,7 +53,7 @@
     });
 
     const ctx = document.getElementById('histogram').getContext('2d');
-    
+
     // Define the source
     const source = new carto.source.Dataset('vancouver_trees');
 
@@ -84,7 +84,8 @@
             suggestedMin: 1,
             beginAtZero: true,
             display: false
-          }
+          },
+          stacked: false
         }],
         xAxes: [{
           gridLines: {
@@ -93,12 +94,13 @@
           },
           ticks: {
             display: true,
-            callback: function(value, index, values) {
+            callback: function (value, index, values) {
               return `[${value.join(', ')}]`;
             }
           },
           barPercentage: 1.0,
-          categoryPercentage: 1.0
+          categoryPercentage: 1.0,
+          stacked: true
         }]
       }
     };
@@ -113,7 +115,7 @@
     layer.addTo(map, 'watername_ocean');
 
     layer.on('loaded', hideLoader);
-    
+
     layer.on('updated', () => {
       // Save histograms variable
       const viewportHistogram = layer.viz.variables.v_viewportHistogram;
@@ -122,7 +124,7 @@
       // Get histograms data
       const viewportHistogramData = viewportHistogram.value;
       const globalHistogramData = globalHistogram.value;
-      
+
       // Chart.js set up
       const labels = viewportHistogramData.map(elem => elem.x);
       const viewportData = viewportHistogramData.map(elem => elem.y);
@@ -132,15 +134,17 @@
 
       chart.data = {
         labels,
-        datasets: [{
-          label: 'Global',
-          data: globalData,
-          backgroundColor: globalColor
-        }, {
-          label: 'Viewport',
-          data: viewportData,
-          backgroundColor: viewportColor
-        }]
+        datasets: [
+          {
+            label: 'Viewport',
+            data: viewportData,
+            backgroundColor: viewportColor
+          },
+          {
+            label: 'Global',
+            data: globalData,
+            backgroundColor: globalColor
+          }]
       };
 
       chart.update();
