@@ -6,7 +6,7 @@ We have seen how to add legends to our map by using `getLegendsData` method, and
 
 We will learn how to create bar charts for **categorical** data and histograms for **numeric** data. For this purpose, the following examples make use of the same source, the [**Vancouver Trees**](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset.
 
-Bar charts and histograms have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. In this case, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
+Bar charts and histograms have been built with [Chart.js](https://www.chartjs.org), a very simple external library. In the previous guide we used [Airship](https://carto.com/airship/) to build a histogram widget. Airship comes with a built-in histogram widgets you can use directly with CARTO VL, which are connected to the map automatically and are also very easy to configure. However, in this case, we want to demonstrate you can use the visualization library of your choice with CARTO VL, and therefore, we have to explain how the histogram expressions work a bit deeply.
 
 ### Histogram expressions
 
