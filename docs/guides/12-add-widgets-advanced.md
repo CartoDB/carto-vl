@@ -152,6 +152,8 @@ We can combine both `viewportHistogram` and the `globalHistogram` expressions to
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
 
+If you zoom out, you'll see the viewport histogram chart doesn't match the global histogram chart. This is due to the data we're using for the global histogram uses a random sample, as other global expressions. Therefore, in this case we're comparing the viewport data with a representative sample of the whole dataset.
+
 #### Using `top()`
 
 It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
