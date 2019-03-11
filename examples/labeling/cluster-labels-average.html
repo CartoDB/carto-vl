@@ -18,7 +18,7 @@
                 <h1>Average temperatures</h1>
             </header>
             <section>
-                <p class="description open-sans">Symbolize and label viewport-based cluster averages</p>
+                <p class="description open-sans">Symbolize and label global cluster averages</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -55,7 +55,7 @@
             @v_features: viewportFeatures(@ca)
             
             width: 40
-            color: opacity(ramp(linear(@ca,viewportMIN(@ca),viewportMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
+            color: opacity(ramp(linear(@ca,globalMIN(@ca),globalMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
             strokeWidth: 0
             resolution: 32  
         `);
