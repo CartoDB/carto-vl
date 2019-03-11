@@ -16,10 +16,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Size labels by zoom</h1>
+        <h1>Points of interest</h1>
       </header>
       <section>
-        <p class="description open-sans">Add one CARTO layer to your map</p>
+        <p class="description open-sans">Size symbols and labels through zoom</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -50,9 +50,9 @@
       @v_features: viewportFeatures($poi_name)
 
       color: fuchsia
-      width: 6
+      width: ramp(zoomrange([13,18]),[5,10])
       strokeColor: white
-      strokeWidth: 2
+      strokeWidth: ramp(zoomrange([13,18]),[1,2])
       filter: $major == "YES"
     `);
     const layer = new carto.Layer('points', source, viz);
