@@ -6,10 +6,9 @@ In the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide, you saw ho
 
 In the previous guide histogram widgets were built with CARTO's frontend framework [Airship](https://carto.com/airship/). As explained there, Airship widgets interact with CARTO VL directly, which means widgets are automatically connected to the map and can be configured accordingly. This guide takes a deeper dive into histogram expressions and the flexibility in CARTO VL to connect with external libraries. You will learn how to use histogram expressions to create bar charts for **categorical** data and histograms for **numeric** data using a [Vancouver Trees](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset with the external charting library, [Chart.js](https://www.chartjs.org).
 
-
 ### Histogram expressions
 
-CARTO VL has two expressions to create histograms: `viewportHistogram` and `globalHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of  features that are in the viewport, while the `globalHistogram` expression returns a list based off of the entire dataset.
+CARTO VL has two expressions to create histograms: `viewportHistogram` and `globalHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `globalHistogram` expression returns a list based off of the entire dataset.
 
 #### Draw a bar chart for categories
 
@@ -141,7 +140,9 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### `viewportHistogram` vs `globalHistogram`
 
-The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for globalHistogram remain static, while the ones for viewportHistogram change depending on the features present in the viewport. If you zoom out, you'll see the viewportHistogram chart doesn't match the globalHistogram chart. This is because the data returned for the globalHistogram is a random sample (as is the case for other global expressions in VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
+The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for globalHistogram remain static, while the ones for viewportHistogram change depending on the features present in the viewport. 
+
+What you may notice is that if you zoom out, the viewportHistogram chart doesn't match the globalHistogram chart. This is because the data returned for the globalHistogram is a random sample (as is the case for other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
 
 <div class="example-map">
   <iframe
@@ -155,7 +156,7 @@ The map below combines both `viewportHistogram` and `globalHistogram` expression
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
 
-#### Using `top()`
+#### Show `top()` categories
 
 It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
 
