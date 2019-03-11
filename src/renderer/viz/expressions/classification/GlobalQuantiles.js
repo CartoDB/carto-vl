@@ -1,5 +1,7 @@
 import Classifier from './Classifier';
-import { checkExactNumberOfArguments } from '../utils';
+import { checkExactNumberOfArguments, checkType } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -35,11 +37,19 @@ export default class GlobalQuantiles extends Classifier {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
 
+        checkType('globalQuantiles', 'input', 0, 'number', this.input);
         this._updateBreakpointsWith(metadata);
     }
 
+    _validateInputIsNumericProperty () { /* noop */ }
+
     _updateBreakpointsWith (metadata) {
-        const copy = metadata.sample.map(s => s[this.input.name]);
+        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalQuantiles. Consider using ViewportQuantiles instead`);
+        }
+
+        const name = this.input.name;
+        const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {

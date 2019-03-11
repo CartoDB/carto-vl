@@ -1,8 +1,8 @@
 import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../schema';
 import { checkArray } from '../utils';
 import { DEFAULT_OPTIONS } from '../constants';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Generates a histogram.
