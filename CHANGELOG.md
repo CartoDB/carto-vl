@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Allow the use of variables for all classifiers: `globalQuantiles`, `globalEqIntervals`, `globalStandardDev`, `viewportQuantiles`, `viewportEqIntervals` and `viewportStandardDev`
 - Improve MVT decoding error messages
 - Add interactive filter example
+- Throw error when using `clusterCount()` in a global classifier
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons
@@ -18,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix getting aggregation expression values passed to `viewportFeatures` expression
 - Fix WebGL incompatibility in Edge
 - Fix regression in `toString` Viz method
+- Fix variables for aggregated values
 
 ## [1.1.1] - 2019-01-16
 
