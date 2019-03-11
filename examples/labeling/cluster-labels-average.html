@@ -54,10 +54,10 @@
             @ca: clusterAVG($value)
             @v_features: viewportFeatures(@ca)
             
-            width: 40
+            width: 30
             color: opacity(ramp(linear(@ca,globalMIN(@ca),globalMAX(@ca)),[blue,turquoise,yellow,red]),0.8)
             strokeWidth: 0
-            resolution: 32  
+            resolution: 16  
         `);
         const layer = new carto.Layer('layer', source, viz);
 
