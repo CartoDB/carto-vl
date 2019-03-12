@@ -65,6 +65,7 @@ export default class Interactivity {
      */
     on (eventName, callback) {
         checkEvent(eventName);
+
         const currentCount = this._numListeners[eventName] || 0;
         this._numListeners[eventName] = currentCount + 1;
         return this._emitter.on(eventName, callback);
@@ -158,7 +159,7 @@ export default class Interactivity {
     }
 
     _subscribeToMapEvents (map) {
-        map.on('mousemove', this._onMouseMove.bind(this));
+        // map.on('mousemove', this._onMouseMove.bind(this));
         map.on('click', this._onClick.bind(this));
         this._disableWhileMovingMap(map);
     }

@@ -65,6 +65,7 @@ export default class RenderLayer {
         }
 
         const noPossiblePartialFeatures = (this.viz.geometryType === GEOMETRY_TYPE.POINT);
+
         if (noPossiblePartialFeatures) {
             return this._getPointFeaturesAtPosition(pos);
         } else {

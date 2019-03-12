@@ -11,6 +11,7 @@ import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
 import { computeViewportFromCameraMatrix } from './utils/util';
 import LayerConcurrencyHelper from './LayerConcurrencyHelper';
+import ClusterCache from './sources/ClusterCache';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -95,6 +96,10 @@ export default class Layer {
         if (visible !== initial) {
             this._fire('updated', 'visibility change');
         }
+    }
+
+    get isAggregated () {
+        return this.viz && this.viz.metadata.isAggregated;
     }
 
     /**
@@ -221,8 +226,8 @@ export default class Layer {
     async _init (source, viz) {
         this._sourcePromise = this.update(source, viz);
         await this._sourcePromise;
-        
-        this._clusterCache = null;
+
+        this._clusterCache = new ClusterCache(source);
     }
 
     async _update (source, viz, majorChange) {
@@ -254,6 +259,13 @@ export default class Layer {
         } else {
             this.concurrencyHelper.endMinorChange(change);
         }
+    }
+
+    // TODO document
+    _getClusterFeatures (layerIndex, clusterId) {
+        const zoom = this.map.getZoom();
+        const layergroupid = this.layergroupid;
+        return this._clusterCache.get(layerIndex, zoom, clusterId, layergroupid);
     }
 
     /**
@@ -409,9 +421,25 @@ export default class Layer {
     }
 
     getFeaturesAtPosition (pos) {
-        return this.visible
+        const isAggregated = this.isAggregated;
+        const features = this.visible
             ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
             : [];
+
+        if (isAggregated) {
+            const clusterId = this._getClusterId(features);
+            return this._getClusterFeatures(0 /*fixme*/, clusterId);
+        }
+
+        return features;
+    }
+
+    _getClusterId (features) {
+        const minFeature = features.reduce(function (previousFeature, feature) {
+            return previousFeature.id < feature.id ? previousFeature.id : feature.id;
+        });
+
+        return minFeature !== -1 ? minFeature.id : minFeature;
     }
 
     isAnimated () {
