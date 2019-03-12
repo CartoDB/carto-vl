@@ -1,17 +1,19 @@
 import * as LRU from 'lru-cache';
+import CartoMapsAPIError from '../errors/carto-maps-api-error';
 
 export default class ClusterCache {
     constructor (source) {
         const lruOptions = {
-            max: 256,
+            max: 256, // TODO check
             length: () => 1,
-            maxAge: 1000 * 60 * 60,
+            maxAge: 1000 * 60 * 60, // TODO check
             dispose: (uid, n) => {
                 n.close();
             }
         };
 
-        this._source = source;
+        this._username = source._username;
+        this._serverURL = source._serverURL;
         this._cache = LRU(lruOptions);
     }
 
@@ -23,20 +25,22 @@ export default class ClusterCache {
             return cachedFeatures;
         }
 
-        const response = await this._getFeatures(layerIndex, zoom, clusterId, layergroupid);
-        const features = await response.json();
+        try {
+            const response = await this._getFeatures(layerIndex, zoom, clusterId, layergroupid);
+            const features = await response.json();
 
-        this._cache.set(uid, features);
-        return features;
+            this._cache.set(uid, features);
+
+            return features;
+        } catch (error) {
+            throw new CartoMapsAPIError(`Failed to connect to Maps API with your user('${this._username}'), ${error}`);
+        }
     }
 
     async _getFeatures (layerIndex, zoom, clusterId, layergroupid) {
-        const URL = this._buildClusterURL(layerIndex, zoom, clusterId, layergroupid);
+        const URI = `${layergroupid}/${layerIndex}/${Math.round(zoom)}/cluster/${clusterId}`;
+        const URL = `${this._serverURL}/api/v1/map/${URI}`;
 
         return fetch(URL);
-    }
-
-    _buildClusterURL (layerIndex, zoom, clusterId, layergroupid) {
-        return `${this._source._serverURL}/api/v1/map/${layergroupid}/${layerIndex}/${zoom}/cluster/${clusterId}`;
     }
 }

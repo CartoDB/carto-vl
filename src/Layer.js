@@ -265,6 +265,7 @@ export default class Layer {
     _getClusterFeatures (layerIndex, clusterId) {
         const zoom = this.map.getZoom();
         const layergroupid = this.layergroupid;
+
         return this._clusterCache.get(layerIndex, zoom, clusterId, layergroupid);
     }
 
@@ -435,11 +436,9 @@ export default class Layer {
     }
 
     _getClusterId (features) {
-        const minFeature = features.reduce(function (previousFeature, feature) {
-            return previousFeature.id < feature.id ? previousFeature.id : feature.id;
-        });
-
-        return minFeature !== -1 ? minFeature.id : minFeature;
+        return features.reduce((previousFeature, feature) => {
+            return previousFeature.id < feature.id ? previousFeature : feature;
+        }).id;
     }
 
     isAnimated () {
