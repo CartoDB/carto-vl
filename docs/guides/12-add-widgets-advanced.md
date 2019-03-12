@@ -154,9 +154,25 @@ What you may notice is that if you zoom out, the viewportHistogram chart doesn't
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
+```js
+const viz = new carto.Viz(`
+  @v_histogram: viewportHistogram(top($species_name, 5))
+`);
+```
 
-#### Show `top()` categories
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-4"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html"
+    width="100%"
+    height="550"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
+
+#### Using `top()`
 
 It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
 
