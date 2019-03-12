@@ -140,9 +140,9 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### `viewportHistogram` vs `globalHistogram`
 
-The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for globalHistogram remain static, while the ones for viewportHistogram change depending on the features present in the viewport. 
+The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `globalHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
 
-What you may notice is that if you zoom out, the viewportHistogram chart doesn't match the globalHistogram chart. This is because the data returned for the globalHistogram is a random sample (as is the case for other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `globalHistogram` chart. This is because the data returned for the `globalHistogram` is a random sample (as is the case for other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
 
 <div class="example-map">
   <iframe
@@ -174,7 +174,9 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 #### Using `top()`
 
-It is possible to use the `top` expression in the histograms expressions. Right now, this is the **only expression** we allow in the histograms. In this case, we want to get the **top five** tree species, so we have to create the following viz:
+In the map below, the chart displays counts of the number of features in each **species name** category using the `top` expression inside of the histogram expression. In this case, we only want to display the **top five** tree species in the data.
+
+To do so, create the following viz:
 
 ```js
 const viz = new carto.Viz(`
@@ -194,11 +196,16 @@ const viz = new carto.Viz(`
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
 
+**Note:**
+Right now, `top` is the **only expression** available for use with histograms. 
+
 #### `getJoinedValues`
 
-What if we want create a bar chart, where each color corresponds with its features in the map? First of all, we will need a `ramp` expression to color the map. This expression comes with the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method we explained in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
+In all of the examples above, you will notice that the bar colors are a solid, default color that was defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map? To do this, first, you need a `ramp` expression to color map features which is part of the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method covered in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
-Both `viewportHistogram` and `globalHistogram` expressions have the [`getLegendData()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. Let's first define the Viz:
+Both `viewportHistogram` and `globalHistogram` expressions have the [`getLegendData()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
+
+Let's first define the viz:
 
 ```js
 const viz = new carto.Viz(`
@@ -239,7 +246,7 @@ It is important to take into account that `getJoinedValues` returns an array of 
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html)
 
-But, what if we are using a `top` expression? How should we tell the bar chart which color do we need and to display only the five top categories? The answer is that we should use the **same operation** in the ramp and in the histogram. If we use the `top` in the histogram, then we have to use the `top` in the ramp as well.
+But, what if we are using a `top` expression? How can we tell the bar chart which colors we need to display only the five top categories? The answer is that we should use the **same operation** in the ramp and in the histogram. If we use `top` in the histogram, then we have to use `top` in the ramp as well:
 
 ```js
 const viz = new carto.Viz(`
@@ -249,7 +256,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-And, refactoring a bit the visualization to share that expression in a variable, we have the equivalent:
+By refactoring the visualization a bit, to share that expression in a variable, we have the equivalent:
 
 ```js
 const viz = new carto.Viz(`
