@@ -1,10 +1,10 @@
 ## Add widgets advanced
 
-In the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `globalHistogram` expressions and an external charting library.
+In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `globalHistogram` expressions and an external charting library.
 
 ### Overview
 
-In the previous guide histogram widgets were built with CARTO's frontend framework [Airship](https://carto.com/airship/). As explained there, Airship widgets interact with CARTO VL directly, which means widgets are automatically connected to the map and can be configured accordingly. This guide takes a deeper dive into histogram expressions and the flexibility in CARTO VL to connect with external libraries. You will learn how to use histogram expressions to create bar charts for **categorical** data and histograms for **numeric** data using a [Vancouver Trees](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset with the external charting library, [Chart.js](https://www.chartjs.org).
+In the [previous guide](/developers/carto-vl/guides/add-widgets/) histogram widgets were built with CARTO's frontend framework [Airship](https://carto.com/airship/). As explained there, Airship widgets interact with CARTO VL directly, which means widgets are automatically connected to the map and can be configured accordingly. This guide takes a deeper dive into histogram expressions and the flexibility in CARTO VL to connect with external libraries. You will learn how to use histogram expressions to create bar charts for **categorical** data and histograms for **numeric** data using a [Vancouver Trees](https://team.carto.com/u/cartovl/tables/cartovl.vancouver_trees/public/map) dataset with the external charting library, [Chart.js](https://www.chartjs.org).
 
 ### Histogram expressions
 
@@ -14,7 +14,7 @@ CARTO VL has two expressions to create histograms: `viewportHistogram` and `glob
 
 In this step, you will create a basic bar chart that displays the count of trees planted on each **street side** category (odd, even, middle) using the `viewportHistogram` expression.
 
-To start, define the source dataset and create a variable (`@v_histogram`) that will return the count and category information for the chart:
+To start, define the source dataset and create a variable (`@v_histogram`) in the viz that will return the count and category information for the chart:
 
 ```js
   // Define the source
@@ -98,7 +98,7 @@ layer.on('updated', () => {
 });
 ```
 
-On the resulting map, you will notice as you interact with it (zoom and pan) that the bars in the chart dynamically change based on your current viewport. You can also hover over each bar in the chart to see the category name and count.
+On the resulting map, you will notice as you interact with it (zoom and pan) that the bars in the chart dynamically update based on the data in your current viewport. You can also hover over each bar in the chart to see the category name and count.
 
 <div class="example-map">
   <iframe
