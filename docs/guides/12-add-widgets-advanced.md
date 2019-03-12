@@ -56,7 +56,7 @@ const chartOptionsDefault = {
       ticks: {
         display: false
       },
-      barPercentage: 1.0,
+      barPercentage: 0.9,
       categoryPercentage: 1.0
     }]
   }
