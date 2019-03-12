@@ -11,7 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Allow the use of variables for all classifiers: `globalQuantiles`, `globalEqIntervals`, `globalStandardDev`, `viewportQuantiles`, `viewportEqIntervals` and `viewportStandardDev`
 - Improve MVT decoding error messages
 - Add interactive filter example
-- Throw error when using `clusterCount()` in a global classifier
+- Throw error when using `clusterCount` in a global classifier
+- Label example with `clusterAVG` expression
+- Label example with `clusterCount` expression
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons

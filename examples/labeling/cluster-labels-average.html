@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Label clusters by count | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Average temperatures</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Symbolize and label global cluster averages</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            center: [-95.491724, 38.685047],
+            zoom: 4,
+            scrollZoom: false
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+        carto.setDefaultConfig({
+            serverURL: 'https://{user}.carto.com'
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+        const source = new carto.source.Dataset('july_temps');
+        const viz = new carto.Viz(`
+            @clusterAverage: clusterAVG($value)
+            @v_features: viewportFeatures(@clusterAverage)
+            @g_min: globalMIN(@clusterAverage)
+            @g_max: globalMAX(@clusterAverage)
+            @color: ramp(linear(@clusterAverage, @g_min, @g_max), [blue, turquoise, yellow, red])
+            
+            width: 30
+            color: opacity(@color, 0.8)
+            strokeWidth: 0
+            resolution: 16
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Create labeling layer centroids
+        layer.on('loaded', () => {
+            map.addSource('labels', { type: 'geojson', data: null });
+            const labelSource = map.getSource('labels');
+
+            const layerUpdated = function () {
+                const features = viz.variables.v_features.value;
+                const geojsonFeatures = features.map(feature => {
+                    return {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": feature.getRenderedCentroid()
+                        },
+                        "properties": {
+                            "label_field": Math.round(feature.properties['clusterAverage']) //Round cluster average values for labeling purposes
+                        }
+                    }
+                });
+
+                labelSource.setData({
+                    type: 'FeatureCollection',
+                    features: geojsonFeatures
+                });
+            };
+
+            layer.on('updated', layerUpdated);
+
+            // Style labels
+            map.addLayer({
+                "id": "my-labels",
+                "type": "symbol",
+                "source": "labels",
+                "layout": {
+                    "text-field": "{label_field}",
+                    "text-font": ["Open Sans Semibold", "Arial Unicode MS Regular"],
+                    "text-size": 10
+                },
+                "paint": {
+                    "text-color": "#000000",
+                    "text-halo-width": 0,
+                    "text-halo-blur": 0
+                }
+            });
+        });
+
+        layer.addTo(map);
+    </script>
+</body>
+
+</html>

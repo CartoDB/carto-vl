@@ -192,6 +192,14 @@
                     "file": "labeling/point-labels-size-zoom.html"
                 },
                 {
+                    "title": "Label cluster counts",
+                    "file": "labeling/cluster-labels-count.html"
+                },
+                {
+                    "title": "Label cluster average",
+                    "file": "labeling/cluster-labels-average.html"
+                },
+                {
                     "title": "Polygon labels",
                     "file": "labeling/polygon-labels.html"
                 }
