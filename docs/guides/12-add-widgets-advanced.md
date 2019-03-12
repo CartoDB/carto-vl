@@ -1,4 +1,4 @@
-## Add widgets advanced
+## Build (or draw) custom charts
 
 In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `globalHistogram` expressions and an external charting library.
 
@@ -26,13 +26,7 @@ To start, define the source dataset and create a variable (`@v_histogram`) in th
   `);
 ```
 
-In order for Chart.js to draw the returned information as a bar chart, it needs three arrays of information:
-
-* `labels`: array of string values that indicate the label of each bar.
-* `data`: array of numeric values that indicate the height of each bar.
-* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
-
-Start with a default configuration for the chart:
+To draw a basic chart, start with a default configuration:
 
 ```js
 const chartOptionsDefault = {
@@ -74,7 +68,15 @@ const chart = new Chart(ctx, {
 });
 ```
 
-The `histogram.value` returns an array of `{ x, y }` objects where `x` is the name of the street side category and `y` is the amount of trees in that category. This is the information used to build the `data` and `labels` arrays for the bar chart. Since the values will be dynamically updated based on the viewport, the information should be returned **once the layer is updated**:
+In order for Chart.js to draw the returned information as a bar chart, it needs three arrays of information:
+
+* `labels`: array of string values that indicate the label of each bar.
+* `data`: array of numeric values that indicate the height of each bar.
+* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
+
+The `v_histogram.value` returns an array of `{ x, y }` objects where `x` is the name of the street side category and `y` is the amount of trees in that category. This is the information used to build the `data` and `labels` arrays for the bar chart. For `backgroundColor` let's assign a solid color (we will explore how to modify this later in the guide).  
+
+Since the values will be dynamically updated based on the viewport, the information should be returned **once the layer is updated**:
 
 ```js
 layer.on('updated', () => {
@@ -142,7 +144,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-w
 
 The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `globalHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
 
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `globalHistogram` chart. This is because the data returned for the `globalHistogram` is a random sample (as is the case for other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `globalHistogram` chart. This is because the data returned for the `globalHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
 
 <div class="example-map">
   <iframe
@@ -154,27 +156,11 @@ What you may notice is that if you zoom out, the `viewportHistogram` chart doesn
     frameBorder="0">
   </iframe>
 </div>
-```js
-const viz = new carto.Viz(`
-  @v_histogram: viewportHistogram(top($species_name, 5))
-`);
-```
-
-<div class="example-map">
-  <iframe
-    id="guides-widgets-advanced-step-4"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html"
-    width="100%"
-    height="550"
-    style="margin: 20px auto !important"
-    frameBorder="0">
-  </iframe>
-</div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
 
 #### Using `top()`
 
-In the map below, the chart displays counts of the number of features in each **species name** category using the `top` expression inside of the histogram expression. In this case, we only want to display the **top five** tree species in the data.
+In the map below, the chart displays counts of the number of features in each **species name** category using `top` inside of the histogram expression. In this case, we only want to display the **top five** tree species in the data in the histogram.
 
 To do so, create the following viz:
 
@@ -203,7 +189,7 @@ Right now, `top` is the **only expression** available for use with histograms.
 
 In all of the examples above, you will notice that the bar colors are a solid, default color that was defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map? To do this, first, you need a `ramp` expression to color map features which is part of the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method covered in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
-Both `viewportHistogram` and `globalHistogram` expressions have the [`getLegendData()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
+Both `viewportHistogram` and `globalHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
 
 Let's first define the viz:
 

@@ -61,9 +61,9 @@
     const viz = new carto.Viz(`
       @v_viewportHistogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
       @v_globalHistogram: globalHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
-      color: ramp($street_side_name, Vivid)
+      color: #00718b
       width: 5
-      strokeWidth: 0
+      strokeWidth: 0.5
     `);
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
