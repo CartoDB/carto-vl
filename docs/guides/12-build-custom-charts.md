@@ -1,4 +1,4 @@
-## Build (or draw) custom charts
+## Build custom charts
 
 In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
 
@@ -19,14 +19,14 @@ What you may notice is that if you zoom out, the `viewportHistogram` chart doesn
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-3"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-1.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-1.html)
 
 Once we've introduced the main difference between viewport and sample histogram, it's time to learn how to use these expressions to draw charts.
 
@@ -125,14 +125,14 @@ On the resulting map, you will notice as you interact with it (zoom and pan) tha
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-1"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-2.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-2.html)
 
 #### Draw a histogram for numbers
 
@@ -151,14 +151,14 @@ Similar to the map above, when interacting with resulting map, the histogram bar
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-2"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-3.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-3.html)
 
 #### Using `top()`
 
@@ -175,14 +175,14 @@ const viz = new carto.Viz(`
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-4"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-4.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-4.html)
 
 **Note:**
 Right now, `top` is the **only expression** available for use with histograms.
@@ -237,14 +237,14 @@ const colors = histogramData.map(elem => elem.value);
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-5"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-5.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-5.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-5.html)
 
 But, what if we are using a `top` expression? How can we tell the bar chart which colors we need to display only the five top categories? The answer is that we should use the **same operation** in the ramp and in the histogram. If we use `top` in the histogram, then we have to use `top` in the ramp as well:
 
@@ -291,11 +291,11 @@ const colors = histogramData.map(elem => elem.value);
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-6"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html"
+    src="/developers/carto-vl/examples/maps/guides/build-custom-charts/step-6.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-6.html)
