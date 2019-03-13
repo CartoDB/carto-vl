@@ -140,24 +140,6 @@ Similar to the map above, when interacting with resulting map, the histogram bar
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
-#### `viewportHistogram` vs `sampleHistogram`
-
-The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
-
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
-
-<div class="example-map">
-  <iframe
-    id="guides-widgets-advanced-step-3"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
-    width="100%"
-    height="550"
-    style="margin: 20px auto !important"
-    frameBorder="0">
-  </iframe>
-</div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
-
 #### Using `top()`
 
 In the map below, the chart displays counts of the number of features in each **species name** category using `top` inside of the histogram expression. In this case, we only want to display the **top five** tree species in the data in the histogram.
@@ -189,7 +171,7 @@ Right now, `top` is the **only expression** available for use with histograms.
 
 In all of the examples above, you will notice that the bar colors are a solid, default color that was defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map? To do this, first, you need a `ramp` expression to color map features which is part of the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method covered in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
-Both `viewportHistogram` and `sampleHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
+Both `viewportHistogram` and `sampleHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method.
 
 Let's first define the viz:
 
@@ -209,16 +191,28 @@ const histogram = layer.viz.variables.v_histogram;
 // Save color variable
 const color = layer.viz.variables.v_color;
 // Get color ramp legend
+const options = {
+  othersLabel: 'Other species'
+};
 const colorValues = color.getLegendData();
 // Get histogram data
 const histogramData = histogram.getJoinedValues(colorValues.data);
+```
 
+It is important to take into account that `getJoinedValues` returns an array of `{ key, value, frequency }` elements sorted by frequency. In this case, the value contains a **color** because it is a **color ramp**.
+
+* key: The name or id that identifies the value
+* frequency: The total count of this value
+* value: The value asigned to the data from the ramp
+
+We can use these properties to build the Chart bars. We get the labels from the `key` property, the data from the `frequency`, and the colors from the `value`:
+
+```js
+// Chart.js set up
 const labels = histogramData.map(elem => elem.key);
 const data = histogramData.map(elem => elem.frequency);
 const colors = histogramData.map(elem => elem.value);
 ```
-
-It is important to take into account that `getJoinedValues` returns an array of `{ key, value, frequency }` elements sorted by frequency. In this case, the value contains a **color** because it is a **color ramp**. Take a look at the result:
 
 <div class="example-map">
   <iframe
@@ -268,6 +262,7 @@ const colorValues = color.getLegendData(options);
 // Get histogram data
 const histogramData = histogram.getJoinedValues(colorValues.data, options);
 
+// Chart.js set up
 const labels = histogramData.map(elem => elem.key);
 const data = histogramData.map(elem => elem.frequency);
 const colors = histogramData.map(elem => elem.value);
@@ -284,3 +279,21 @@ const colors = histogramData.map(elem => elem.value);
   </iframe>
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html)
+
+#### `viewportHistogram` vs `sampleHistogram`
+
+The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
+
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-3"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
+    width="100%"
+    height="550"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
