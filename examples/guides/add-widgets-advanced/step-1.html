@@ -18,7 +18,7 @@
   <aside class="toolbox chart-toolbox">
     <div class="box">
       <header>
-        <h1>Stree Side Name</h1>
+        <h1>Tree Diameter</h1>
       </header>
       <section>
         <canvas id="histogram" width="300" height="300"></canvas>
@@ -55,11 +55,12 @@
     const ctx = document.getElementById('histogram').getContext('2d');
 
     // Define the source
-    const source = new carto.source.Dataset('vancouver_trees');
+    const source = new carto.source.SQL('SELECT * FROM vancouver_trees WHERE diameter <= 7 AND diameter >= 1');
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_histogram: viewportHistogram($street_side_name)
+      @v_viewportHistogram: viewportHistogram($diameter, [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
+      @v_sampleHistogram: sampleHistogram($diameter, [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
       color: #00718b
       width: 5
       strokeWidth: 0.5
@@ -71,7 +72,7 @@
         duration: 0
       },
       legend: {
-        display: false
+        display: true
       },
       scales: {
         yAxes: [{
@@ -83,7 +84,8 @@
             suggestedMin: 1,
             beginAtZero: true,
             display: false
-          }
+          },
+          stacked: false
         }],
         xAxes: [{
           gridLines: {
@@ -91,10 +93,14 @@
             display: false
           },
           ticks: {
-            display: false
+            display: true,
+            callback: function (value, index, values) {
+              return `[${value.join(', ')}]`;
+            }
           },
           barPercentage: 0.9,
-          categoryPercentage: 1.0
+          categoryPercentage: 1.0,
+          stacked: true
         }]
       }
     };
@@ -111,21 +117,34 @@
     layer.on('loaded', hideLoader);
 
     layer.on('updated', () => {
-      // Save histogram variable
-      const histogram = layer.viz.variables.v_histogram;
-      // Get histogram data
-      const histogramData = histogram.value;
+      // Save histograms variable
+      const viewportHistogram = layer.viz.variables.v_viewportHistogram;
+      const sampleHistogram = layer.viz.variables.v_sampleHistogram;
+
+      // Get histograms data
+      const viewportHistogramData = viewportHistogram.value;
+      const sampleHistogramData = sampleHistogram.value;
+
       // Chart.js set up
-      const labels = histogramData.map(elem => elem.x);
-      const data = histogramData.map(elem => elem.y);
-      const backgroundColor = '#00718b';
+      const labels = viewportHistogramData.map(elem => elem.x);
+      const viewportData = viewportHistogramData.map(elem => elem.y);
+      const globalData = sampleHistogramData.map(elem => elem.y);
+      const viewportColor = 'rgba(1, 155, 155, 0.5)';
+      const globalColor = 'rgba(155, 1, 155, 0.5)';
 
       chart.data = {
         labels,
-        datasets: [{
-          data,
-          backgroundColor
-        }]
+        datasets: [
+          {
+            label: 'Viewport',
+            data: viewportData,
+            backgroundColor: viewportColor
+          },
+          {
+            label: 'Global',
+            data: globalData,
+            backgroundColor: globalColor
+          }]
       };
 
       chart.update();

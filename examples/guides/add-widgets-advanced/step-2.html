@@ -18,7 +18,7 @@
   <aside class="toolbox chart-toolbox">
     <div class="box">
       <header>
-        <h1>Tree Diameter</h1>
+        <h1>Stree Side Name</h1>
       </header>
       <section>
         <canvas id="histogram" width="300" height="300"></canvas>
@@ -59,7 +59,7 @@
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+      @v_histogram: viewportHistogram($street_side_name)
       color: #00718b
       width: 5
       strokeWidth: 0.5

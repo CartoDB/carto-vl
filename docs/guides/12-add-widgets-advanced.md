@@ -8,7 +8,27 @@ In the [previous guide](/developers/carto-vl/guides/add-widgets/) histogram widg
 
 ### Histogram expressions
 
-CARTO VL has two expressions to create histograms: `viewportHistogram` and `sampleHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based off of the entire dataset.
+CARTO VL has two expressions to create histograms: `viewportHistogram` and `sampleHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based on a data sample.
+
+#### `viewportHistogram` vs `sampleHistogram`
+
+The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs sample feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport.
+
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram`, as indicated by its name, is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset. If you need higher accuracy, we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) and use the [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql).
+
+<div class="example-map">
+  <iframe
+    id="guides-widgets-advanced-step-3"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html"
+    width="100%"
+    height="550"
+    style="margin: 20px auto !important"
+    frameBorder="0">
+  </iframe>
+</div>
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
+
+Once we've introduced the main difference between viewport and sample histogram, it's time to learn how to use these expressions to draw charts.
 
 #### Draw a bar chart for categories
 
@@ -105,14 +125,14 @@ On the resulting map, you will notice as you interact with it (zoom and pan) tha
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-1"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-1.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
 #### Draw a histogram for numbers
 
@@ -131,14 +151,14 @@ Similar to the map above, when interacting with resulting map, the histogram bar
 <div class="example-map">
   <iframe
     id="guides-widgets-advanced-step-2"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html"
+    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
     width="100%"
     height="550"
     style="margin: 20px auto !important"
     frameBorder="0">
   </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
 
 #### Using `top()`
 
@@ -165,7 +185,7 @@ const viz = new carto.Viz(`
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-4.html)
 
 **Note:**
-Right now, `top` is the **only expression** available for use with histograms. 
+Right now, `top` is the **only expression** available for use with histograms.
 
 #### `getJoinedValues`
 
@@ -279,21 +299,3 @@ const colors = histogramData.map(elem => elem.value);
   </iframe>
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-6.html)
-
-#### `viewportHistogram` vs `sampleHistogram`
-
-The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
-
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
-
-<div class="example-map">
-  <iframe
-    id="guides-widgets-advanced-step-3"
-    src="/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html"
-    width="100%"
-    height="550"
-    style="margin: 20px auto !important"
-    frameBorder="0">
-  </iframe>
-</div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-3.html)
