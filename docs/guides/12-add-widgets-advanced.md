@@ -1,6 +1,6 @@
 ## Build (or draw) custom charts
 
-In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `globalHistogram` expressions and an external charting library.
+In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
 
 ### Overview
 
@@ -8,7 +8,7 @@ In the [previous guide](/developers/carto-vl/guides/add-widgets/) histogram widg
 
 ### Histogram expressions
 
-CARTO VL has two expressions to create histograms: `viewportHistogram` and `globalHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `globalHistogram` expression returns a list based off of the entire dataset.
+CARTO VL has two expressions to create histograms: `viewportHistogram` and `sampleHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based off of the entire dataset.
 
 #### Draw a bar chart for categories
 
@@ -140,11 +140,11 @@ Similar to the map above, when interacting with resulting map, the histogram bar
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-widgets-advanced/step-2.html)
 
-#### `viewportHistogram` vs `globalHistogram`
+#### `viewportHistogram` vs `sampleHistogram`
 
-The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `globalHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
+The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport. 
 
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `globalHistogram` chart. This is because the data returned for the `globalHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram` is a random sample (as is the case for all other global expressions in CARTO VL). Therefore, in this case, we're comparing the viewport data with a representative sample of the whole dataset.
 
 <div class="example-map">
   <iframe
@@ -189,7 +189,7 @@ Right now, `top` is the **only expression** available for use with histograms.
 
 In all of the examples above, you will notice that the bar colors are a solid, default color that was defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map? To do this, first, you need a `ramp` expression to color map features which is part of the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method covered in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
 
-Both `viewportHistogram` and `globalHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
+Both `viewportHistogram` and `sampleHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method. 
 
 Let's first define the viz:
 

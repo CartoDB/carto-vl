@@ -33,12 +33,12 @@
               <label for="classified-viewport-histogram">Classified ViewportHistogram</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setGlobalHistogram()" id="global-histogram">
-              <label for="auto">GlobalHistogram</label>
+              <input type="radio" name="style" onclick="setSampleHistogram()" id="global-histogram">
+              <label for="auto">SampleHistogram</label>
             </li>
             <li>
-              <input type="radio" name="style" onclick="setClassifiedGlobalHistogram()" id="classified-global-histogram">
-              <label for="auto">Classified GlobalHistogram</label>
+              <input type="radio" name="style" onclick="setClassifiedSampleHistogram()" id="classified-global-histogram">
+              <label for="auto">Classified SampleHistogram</label>
             </li>
           </ul>
         </div>
@@ -84,8 +84,8 @@
       @color: ramp($featurecla, bold)
       @viewportHistogram: viewportHistogram($featurecla)
       @viewportClassifiedHistogram: viewportHistogram(top($featurecla, 2))
-      @globalHistogram: globalHistogram($featurecla)
-      @globalClassifiedHistogram: globalHistogram(top($featurecla, 2))
+      @sampleHistogram: sampleHistogram($featurecla)
+      @globalClassifiedHistogram: sampleHistogram(top($featurecla, 2))
       color: @color
       width: 5
       strokeWidth: 0
@@ -195,13 +195,13 @@
       drawHistogramLegend();
     }
 
-    function setGlobalHistogram() {
-      histogramVariable = 'globalHistogram';
+    function setSampleHistogram() {
+      histogramVariable = 'sampleHistogram';
       layer.viz.color.blendTo(s.ramp(s.prop('featurecla'), s.palettes.BOLD));
       drawHistogramLegend();
     }
 
-    function setClassifiedGlobalHistogram() {
+    function setClassifiedSampleHistogram() {
       histogramVariable = 'globalClassifiedHistogram';
       layer.viz.color.blendTo(s.ramp(s.top(s.prop('featurecla'), 2), s.palettes.BOLD));
       drawHistogramLegend();
