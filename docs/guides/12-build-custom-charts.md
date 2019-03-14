@@ -14,7 +14,9 @@ CARTO VL has two expressions to create histograms: `viewportHistogram` and `samp
 
 The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs sample feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport.
 
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram`, as indicated by its name, is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset. If you need higher accuracy, we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) and use the [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql).
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram`, as indicated by its name, is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset.
+
+> If you need higher accuracy in your `sampleHistogram`,  we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) and use the [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql).
 
 <div class="example-map">
   <iframe
