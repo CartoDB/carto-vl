@@ -91,7 +91,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-In order for Chart.js to populate the bar chart with the information from the Vancouver Trees dataset, it needs three arrays:
+In order for Chart.js to populate the bar chart with information from the Vancouver Trees dataset, it needs three arrays:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
