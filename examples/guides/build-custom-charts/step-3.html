@@ -91,7 +91,10 @@
             display: false
           },
           ticks: {
-            display: false
+            display: false,
+            callback: function (value, index, values) {
+              return `[${value.join(', ')}]`;
+            }
           },
           barPercentage: 0.9,
           categoryPercentage: 1.0
