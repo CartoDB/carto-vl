@@ -1,6 +1,6 @@
 ## Build custom charts
 
-In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in widgets using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
+In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in custom charts using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
 
 ### Overview
 
@@ -16,7 +16,7 @@ The map below combines both `viewportHistogram` and `sampleHistogram` expression
 
 What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram`, as indicated by its name, is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset.
 
-> If you need higher accuracy in your `sampleHistogram`,  we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) and use the [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql).
+> If you need higher accuracy in your `sampleHistogram`,  we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) with a [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql).
 
 <div class="example-map">
   <iframe
@@ -30,13 +30,13 @@ What you may notice is that if you zoom out, the `viewportHistogram` chart doesn
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-1.html)
 
-Once we've introduced the main difference between viewport and sample histogram, it's time to learn how to use these expressions to draw charts.
+Now that you've seen the main differences between viewport and sample histograms, next, you will see how to use these expressions to draw charts.
 
 #### Draw a bar chart for categories
 
-In this step, you will create a basic bar chart that displays the count of trees planted on each **street side** category (odd, even, middle) using the `viewportHistogram` expression.
+First, let's start with a basic bar chart that displays the count of trees planted on each **street side** category (describing whether a tree is planted on the odd, even, or middle side of a street) using the `viewportHistogram` expression.
 
-To start, define the source dataset and create a variable (`@v_histogram`) in the viz that will return the count and category information for the chart:
+To start, define the source dataset and create a variable (`@v_histogram`) in the `viz` that will return the count and category information for the chart:
 
 ```js
   // Define the source
@@ -48,7 +48,7 @@ To start, define the source dataset and create a variable (`@v_histogram`) in th
   `);
 ```
 
-To draw a basic chart, start with a default configuration:
+In order to draw a basic chart, start with a default configuration:
 
 ```js
 const chartOptionsDefault = {
@@ -90,7 +90,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-In order for Chart.js to draw the returned information as a bar chart, it needs three arrays of information:
+In order for Chart.js to populate the bar chart with the returned information, it needs three arrays:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
@@ -140,15 +140,14 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 
 Next, let's take a look at building a histogram to show the distribution of a numeric value, **tree diameter**.  
 
-For this case, the chart will have six histogram bars with the count of trees within each diameter range. To get this information, classify the diameter values into six buckets based on the viewport:
+For this case, let's create a chart with six histogram bars that count the number of trees within each diameter range. To get this information, classify the diameter values into six buckets based on the viewport:
 
 ```js
 const viz = new carto.Viz(`
   @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
 `);
 ```
-
-Similar to the map above, when interacting with resulting map, the histogram bars dynamically update and can be hovered for more detailed information:
+When interacting with resulting map, similar to the map above, the histogram bars dynamically update and can be hovered for more detailed information:
 
 <div class="example-map">
   <iframe
@@ -164,15 +163,16 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 
 #### Using `top()`
 
-In the map below, the chart displays counts of the number of features in each **species name** category using `top` inside of the histogram expression. In this case, we only want to display the **top five** tree species in the data in the histogram.
+In the first example you saw how to create a chart for all category values in the street side attribute. While that attribute has four unique values, there will be other times where you may want to summarize category values in your chart based on the data. For example, if we take an attribute like tree **species name** there are many categories, but in the chart, you only want to display the **top five** tree species and their count. 
 
-To do so, create the following viz:
+You can do this using the `top` expression inside of the histogram expression: 
 
 ```js
 const viz = new carto.Viz(`
   @v_histogram: viewportHistogram(top($species_name, 5))
 `);
 ```
+As you can see in the map below, the result is a chart with the top 5 tree species in the data with all other values in a others bucket:
 
 <div class="example-map">
   <iframe
@@ -189,13 +189,13 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 **Note:**
 Right now, `top` is the **only expression** available for use with histograms.
 
-#### `getJoinedValues`
+#### Assign bar colors with `getJoinedValues`
 
-In all of the examples above, you will notice that the bar colors are a solid, default color that was defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map? To do this, first, you need a `ramp` expression to color map features which is part of the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method covered in the [Add legends](/developers/carto-vl/guides/add-legends/) guide.
+In all of the examples above, you will notice that the bar colors are a solid default color defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map?
 
-Both `viewportHistogram` and `sampleHistogram` expressions have the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method.
+You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of both the `viewportHistogram` and `sampleHistogram` expressions.
 
-Let's first define the viz:
+The `ramp` expression (`@v_color`) is used to color map features and by the `getLegendData()` method to color chart bars:
 
 ```js
 const viz = new carto.Viz(`
@@ -205,7 +205,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-And then, use the `@v_color` and `@v_histogram` variables to access to the `getLegendData` and `getJoinedValues` methods respectively:
+The ramp (`@v_color`) and histogram (`@v_histogram`) variables are then used to access to the `getLegendData` and `getJoinedValues` methods respectively:
 
 ```js
 // Save histogram variable
@@ -222,9 +222,9 @@ It is important to take into account that `getJoinedValues` returns an array of 
 
 * key: The name or id that identifies the value
 * frequency: The total count of this value
-* value: The value asigned to the data from the ramp
+* value: The value assigned to the data from the ramp
 
-We can use these properties to build the Chart bars. We get the labels from the `key` property, the data from the `frequency`, and the colors from the `value`:
+These are the properties needed to build the chart bars where the labels come from the `key` property, the data from `frequency`, and the colors from `value`:
 
 ```js
 // Chart.js set up
@@ -245,7 +245,9 @@ const colors = histogramData.map(elem => elem.value);
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-5.html)
 
-But, what if we are using a `top` expression? How can we tell the bar chart which colors we need to display only the five top categories? The answer is that we should use the **same operation** in the ramp and in the histogram. If we use `top` in the histogram, then we have to use `top` in the ramp as well:
+But, what if you want to create a chart for a map that uses the `top` expression? How can you tell the bar chart which colors are needed to display only the top five categories? The answer is to use the **same operation** in both the ramp and histogram expressions. 
+
+In this case, that means using `top` for both the histogram (`@v_histogram`), and the ramp (`@v_color`):
 
 ```js
 const viz = new carto.Viz(`
@@ -255,7 +257,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-By refactoring the visualization a bit, to share that expression in a variable, we have the equivalent:
+Since both share the same `top` expression, it can be written to a variable (`@top_five`). With some refactoring of the visualization, we have the equivalent as above:
 
 ```js
 const viz = new carto.Viz(`
@@ -266,7 +268,9 @@ const viz = new carto.Viz(`
 `);
 ```
 
-However, there is something else these methods have in common. By default, the `top` classifies the ones that are not the _top_ ones as **'others'**. In CARTO VL, this value is labeled with `CARTO_VL_OTHERS` by default. We can override it by passing an `options` object with `othersLabel`. But if we do so, we have to use the **same options** in both methods:
+The `top` expression places all other values (that are not the _top_ ones) into an **'others'** bucket. In CARTO VL, by default, this bucket is labeled `CARTO_VL_OTHERS`. 
+
+This can be overwritten by passing an `options` object with the desired text set in `othersLabel`and setting that **same options** object to both the `getLegendData` and `getJoinedValues` methods:
 
 ```js
 // Save histogram variable
@@ -286,6 +290,8 @@ const labels = histogramData.map(elem => elem.key);
 const data = histogramData.map(elem => elem.frequency);
 const colors = histogramData.map(elem => elem.value);
 ```
+
+In the resulting map, both the map features and chart bars are colored by the top five tree species in the data. In addition, the bar for "others" is appropriately labeled. As in previous examples, the chart bars update with the appropriate information as you interact with the map and features in the viewport change.
 
 <div class="example-map">
   <iframe
