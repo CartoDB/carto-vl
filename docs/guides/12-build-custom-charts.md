@@ -31,9 +31,9 @@ If you need higher accuracy in your `sampleHistogram`,  we recommend creating a 
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-1.html)
 
-Now that you've seen the main differences between viewport and sample histograms, next, you will see how to use these expressions to draw charts.
+Now that you know the differences between viewport and sample histograms, next, let's look at using these expressions to draw charts.
 
-#### Draw a bar chart for categories
+#### Bar chart for categories
 
 First, let's start with a basic bar chart that displays the count of trees planted on each **street side** category (describing whether a tree is planted on the odd, even, or middle side of a street) using the `viewportHistogram` expression.
 
@@ -91,7 +91,7 @@ const chart = new Chart(ctx, {
 });
 ```
 
-In order for Chart.js to populate the bar chart with the returned information, it needs three arrays:
+In order for Chart.js to populate the bar chart with the information from the Vancouver Trees dataset, it needs three arrays:
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
@@ -137,7 +137,7 @@ On the resulting map, you will notice as you interact with it (zoom and pan) tha
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-2.html)
 
-#### Draw a histogram for numbers
+#### Histogram for numbers
 
 Next, let's take a look at building a histogram to show the distribution of a numeric value, **tree diameter**.  
 
@@ -148,7 +148,7 @@ const viz = new carto.Viz(`
   @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
 `);
 ```
-When interacting with resulting map, similar to the map above, the histogram bars dynamically update and can be hovered for more detailed information:
+On the resulting map, you will see a histogram with six bars for each diameter bucket and the count of trees in each one. Similar to the map above, the histogram bars dynamically update and can be hovered for more detailed information.
 
 <div class="example-map">
   <iframe
@@ -166,14 +166,14 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 
 In the first example you saw how to create a chart for all category values in the street side attribute. While that attribute has four unique values, there will be other times where you may want to summarize category values in your chart based on the data. For example, if we take an attribute like tree **species name** there are many categories, but in the chart, you only want to display the **top five** tree species and their count. 
 
-You can do this using the `top` expression inside of the histogram expression: 
+You can do this using the [`top`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstop) expression inside of the histogram expression: 
 
 ```js
 const viz = new carto.Viz(`
   @v_histogram: viewportHistogram(top($species_name, 5))
 `);
 ```
-As you can see in the map below, the result is a chart with the top 5 tree species in the data with all other values in a others bucket:
+As you can see in the map below, the result is a chart with the top 5 tree species in the data and all other values in an others bucket:
 
 <div class="example-map">
   <iframe
@@ -188,15 +188,17 @@ As you can see in the map below, the result is a chart with the top 5 tree speci
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-4.html)
 
 **Note:**
-Right now, `top` is the **only expression** available for use with histograms.
+At this time, `top` is the **only expression** available for use with histograms.
 
 #### Assign bar colors with `getJoinedValues`
 
-In all of the examples above, you will notice that the bar colors are a solid default color defined in the default chart properties. But what if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map?
+In all of the examples above, you will notice that the bar colors are a solid default color defined in the default chart properties. 
 
-You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of both the `viewportHistogram` and `sampleHistogram` expressions.
+What if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map?
 
-The `ramp` expression (`@v_color`) is used to color map features and by the `getLegendData()` method to color chart bars:
+You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of `viewportHistogram` and `sampleHistogram`.
+
+The `ramp` expression (`@v_color`) is used to in two ways: to color the features on the map and to color the chart bars with the same colors using the `getLegendData()` method:
 
 ```js
 const viz = new carto.Viz(`
