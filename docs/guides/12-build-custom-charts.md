@@ -95,7 +95,7 @@ In order for Chart.js to populate the bar chart with the information from the Va
 
 * `labels`: array of string values that indicate the label of each bar.
 * `data`: array of numeric values that indicate the height of each bar.
-* `backgroundColor`: array of colors that will be applied to the chart bars from left to right. If you assign a single color, all the chart bars will be colored the same.
+* `backgroundColor`: array of colors that will be applied to each bar in the chart from left to right. If you assign a single color, all bars will be colored the same.
 
 The `v_histogram.value` returns an array of `{ x, y }` objects where `x` is the name of the street side category and `y` is the amount of trees in that category. This is the information used to build the `data` and `labels` arrays for the bar chart. For `backgroundColor` let's assign a solid color (we will explore how to modify this later in the guide).  
 
@@ -198,7 +198,7 @@ What if you want to create a bar chart, and assign colors to each bar that corre
 
 You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of `viewportHistogram` and `sampleHistogram`.
 
-The `ramp` expression (`@v_color`) is used to in two ways: to color the features on the map and to color the chart bars with the same colors using the `getLegendData()` method:
+The `ramp` expression (`@v_color`) is used to in two ways: to color the features on the map and to color the chart's bars with the same colors using the `getLegendData()` method:
 
 ```js
 const viz = new carto.Viz(`
@@ -227,7 +227,7 @@ It is important to take into account that `getJoinedValues` returns an array of 
 * frequency: The total count of this value
 * value: The value assigned to the data from the ramp
 
-These are the properties needed to build the chart bars where the labels come from the `key` property, the data from `frequency`, and the colors from `value`:
+These are the properties needed to build the chart's bars where the labels come from the `key` property, the data from `frequency`, and the colors from `value`:
 
 ```js
 // Chart.js set up
@@ -294,7 +294,7 @@ const data = histogramData.map(elem => elem.frequency);
 const colors = histogramData.map(elem => elem.value);
 ```
 
-In the resulting map, both the map features and chart bars are colored by the top five tree species in the data. In addition, the bar for "others" is appropriately labeled. As in previous examples, the chart bars update with the appropriate information as you interact with the map and features in the viewport change.
+In the resulting map, both the map features and bars in the chart are colored by the top five tree species in the data. In addition, the bar for "others" is appropriately labeled. As in previous examples, the bars update with the appropriate information as you interact with the map and features in the viewport change.
 
 <div class="example-map">
   <iframe
