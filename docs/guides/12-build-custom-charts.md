@@ -211,9 +211,6 @@ const histogram = layer.viz.variables.v_histogram;
 // Save color variable
 const color = layer.viz.variables.v_color;
 // Get color ramp legend
-const options = {
-  othersLabel: 'Other species'
-};
 const colorValues = color.getLegendData();
 // Get histogram data
 const histogramData = histogram.getJoinedValues(colorValues.data);
@@ -276,7 +273,7 @@ const histogram = layer.viz.variables.v_histogram;
 const color = layer.viz.variables.v_color;
 // Get color ramp legend
 const options = {
-  othersLabel: 'Other species'
+  othersLabel: 'OTHER SPECIES'
 };
 const colorValues = color.getLegendData(options);
 // Get histogram data
