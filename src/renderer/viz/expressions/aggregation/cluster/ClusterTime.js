@@ -66,7 +66,7 @@ import { checkExpression, checkMaxArguments, checkStringValue } from '../../util
  * `);
  *
  * @memberof carto.expressions
- * @name ClusterTime
+ * @name clusterTime
  * @function
  * @api
  */

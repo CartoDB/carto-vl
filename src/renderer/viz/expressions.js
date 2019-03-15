@@ -558,7 +558,7 @@ import ViewportSum from './expressions/aggregation/viewport/ViewportSum';
 import ViewportCount from './expressions/aggregation/viewport/ViewportCount';
 import ViewportPercentile from './expressions/aggregation/viewport/ViewportPercentile';
 import ViewportHistogram from './expressions/histogram/ViewportHistogram';
-import GlobalHistogram from './expressions/histogram/GlobalHistogram';
+import SampleHistogram from './expressions/histogram/SampleHistogram';
 import ViewportFeatures from './expressions/viewportFeatures';
 
 import GlobalAvg from './expressions/aggregation/global/GlobalAvg';
@@ -719,7 +719,7 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
-export const globalHistogram = (...args) => new GlobalHistogram(...args);
+export const sampleHistogram = (...args) => new SampleHistogram(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const scaled = (...args) => new Scaled(...args);

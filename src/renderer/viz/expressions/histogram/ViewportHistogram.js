@@ -2,10 +2,11 @@ import Histogram from './Histogram';
 import { checkMaxArguments, implicitCast } from '../utils';
 import { checkArray } from '../utils';
 import { DEFAULT_OPTIONS } from '../constants';
+import Top from '../top';
 import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
- * Generates a histogram.
+ * Generates a histogram based on the data from the features present in the viewport.
  *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  *
@@ -13,7 +14,7 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
  * For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
  * When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin <= value < bucketMax].
  *
- * The histogram can also be based on the result of a classifier expression such as `top()` or `buckets()`.
+ * The viewportHistogram can also be combined with the `top()` expression.
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
@@ -22,25 +23,44 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
  * @param {Number} weight - Optional. Weight each occurrence differently based on this weight, defaults to `1`, which will generate a simple, non-weighted count.
  * @return {ViewportHistogram} ViewportHistogram
  *
- * @example <caption>Create and use an histogram. (String)</caption>
+ * @example <caption>Create and use an histogram.</caption>
  * const s = carto.expressions;
- * const viz = new carto.Viz(`
- *          \@categoryHistogram:    viewportHistogram($type)
- *          \@numericHistogram:     viewportHistogram($amount, 3, 1)
- *          \@userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
- *          \@topCategoryHistogram: viewportHistogram(top($type, 3))
- * `);
- * ...
- * console.log(viz.variables.categoryHistogram.eval());
+ * const viz = new carto.Viz(
+ *     variables: {
+ *       categoryHistogram: s.viewportHistogram(s.prop('type')),
+ *       numericHistogram: s.viewportHistogram(s.prop('amount'), 3, 1),
+ *       userDefinedHistogram: s.viewportHistogram(s.prop('amount', [[0, 10], [10, 20], [20, 30]], 1),
+ *       topCategoryHistogram: s.viewportHistogram(s.top(s.prop('type'), 3))
+ *     }
+ * );
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
  * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
  * // There are 10 features of type A and 20 of type B
  *
- * console.log(viz.variables.numericHistogram.eval());
+ * console.log(viz.variables.numericHistogram.value);
+ * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+ * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
+ *
+ *
+ * @example <caption>Create and use an histogram. (String)</caption>
+ * const viz = new carto.Viz(`
+ *    \@categoryHistogram:    viewportHistogram($type)
+ *    \@numericHistogram:     viewportHistogram($amount, 3, 1)
+ *    \@userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *    \@topCategoryHistogram: viewportHistogram(top($type, 3))
+ * `);
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+ * // There are 10 features of type A and 20 of type B
+ *
+ * console.log(viz.variables.numericHistogram.value);
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name ViewportHistogram
+ * @name viewportHistogram
  * @function
  * @api
  */
@@ -87,7 +107,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.Histogram
+     * @memberof expressions.ViewportHistogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
@@ -209,7 +229,12 @@ export default class ViewportHistogram extends Histogram {
         const otherValues = [];
 
         this.value.forEach((elem) => {
-            const val = values.find(value => elem.x === value.key);
+            const val = values.find(value => {
+                if (Array.isArray(value.key)) {
+                    return value.key[0] === elem.x[0] && value.key[1] === elem.x[1];
+                }
+                return elem.x === value.key;
+            });
 
             if (val) {
                 const frequency = elem.y;
@@ -222,8 +247,9 @@ export default class ViewportHistogram extends Histogram {
             }
         });
 
-        if (otherValues.length) {
-            const others = values.find(value => config.othersLabel === value.key);
+        const others = values.find(value => config.othersLabel === value.key);
+
+        if (others) {
             const frequency = otherValues.reduce((prev, freq) => prev + freq);
             const key = others.key;
             const value = others.value;
@@ -231,11 +257,14 @@ export default class ViewportHistogram extends Histogram {
             joinedValues.push({ frequency, key, value });
         }
 
-        return joinedValues;
+        return joinedValues.sort((a, b) => b.frequency - a.frequency);
     }
 
     accumViewportAgg (feature) {
-        const property = this.input.eval(feature);
+        const evalFeature = this.input.eval(feature);
+        const property = this.input.isA(Top)
+            ? evalFeature.label
+            : evalFeature;
 
         if (property !== undefined) {
             const clusterCount = feature[CLUSTER_FEATURE_COUNT] || 1;
