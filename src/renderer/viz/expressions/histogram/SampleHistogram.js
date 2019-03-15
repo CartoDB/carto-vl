@@ -269,7 +269,7 @@ export default class SampleHistogram extends Histogram {
     }
 
     _setHistogramForNumericValues () {
-        const name = this._propertyName;
+        const name = this.propertyName;
         const ratio = this._metadata.featureCount / this._metadata.sample.length;
 
         this._metadata.sample.forEach((feature) => {
