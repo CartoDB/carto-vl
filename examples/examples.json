@@ -97,6 +97,10 @@
                     "file": "animation/animate-by-date-range.html"
                 },
                 {
+                    "title": "Animate feature width",
+                    "file": "animation/animate-width.html"
+                },
+                {
                     "title": "Add animation controls",
                     "file": "animation/animation-controls.html"
                 }
