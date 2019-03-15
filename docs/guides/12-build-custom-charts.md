@@ -33,7 +33,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 
 Now that you know the differences between viewport and sample histograms, next, let's look at using these expressions to draw charts.
 
-#### Bar chart for categories
+### Bar chart for categories
 
 First, let's start with a basic bar chart that displays the count of trees planted on each **street side** category (describing whether a tree is planted on the odd, even, or middle side of a street) using the `viewportHistogram` expression.
 
@@ -137,7 +137,7 @@ On the resulting map, you will notice as you interact with it (zoom and pan) tha
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-2.html)
 
-#### Histogram for numbers
+### Histogram for numbers
 
 Next, let's take a look at building a histogram to show the distribution of a numeric value, **tree diameter**.  
 
@@ -162,7 +162,7 @@ On the resulting map, you will see a histogram with six bars for each diameter b
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-3.html)
 
-#### Using `top()`
+### Using `top()`
 
 In the first example you saw how to create a chart for all category values in the street side attribute. While that attribute has four unique values, there will be other times where you may want to summarize category values in your chart based on the data. For example, if we take an attribute like tree **species name** there are many categories, but in the chart, you only want to display the **top five** tree species and their count. 
 
@@ -190,7 +190,7 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 **Note:**
 At this time, `top` is the **only expression** available for use with histograms.
 
-#### Assign bar colors with `getJoinedValues`
+### Assign bar colors with `getJoinedValues`
 
 In all of the examples above, you will notice that the bar colors are a solid default color defined in the default chart properties. 
 
