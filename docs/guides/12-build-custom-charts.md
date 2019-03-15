@@ -1,6 +1,6 @@
 ## Build custom charts
 
-In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the `getLegendsData` method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in custom charts using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
+In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the [`getLegendsData`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in custom charts using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
 
 ### Overview
 
@@ -8,7 +8,7 @@ In the [previous guide](/developers/carto-vl/guides/add-widgets/) histogram widg
 
 ### Histogram expressions
 
-CARTO VL has two expressions to create histograms: `viewportHistogram` and `sampleHistogram`. Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based on a data sample.
+CARTO VL has two expressions to create histograms: [`viewportHistogram`](/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) and [`sampleHistogram`](/developers/carto-vl/reference/#cartoexpressionssamplehistogram). Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based on a data sample.
 
 #### `viewportHistogram` vs `sampleHistogram`
 
