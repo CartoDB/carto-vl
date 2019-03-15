@@ -4,7 +4,7 @@ import { checkMaxArguments, implicitCast, checkArray } from '../utils';
 import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
 
 /**
- * Generates a histogram.
+ * Generates a histogram based on a representative sample of the data.
  *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  *
@@ -20,20 +20,39 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  * @param {Number|Array} sizeOrBuckets - Optional (defaults to 20). Number of bars to use if `x` is a numeric expression; or user-defined buckets for numeric expressions.
  * @return {SampleHistogram} SampleHistogram
  *
- * @example <caption>Create and use an histogram. (String)</caption>
+ * @example <caption>Create and use an histogram.</caption>
  * const s = carto.expressions;
+ * const viz = new carto.Viz(
+ *     variables: {
+ *       categoryHistogram: s.sampleHistogram(s.prop('type')),
+ *       numericHistogram: s.sampleHistogram(s.prop('amount'), 3, 1),
+ *       userDefinedHistogram: s.sampleHistogram(s.prop('amount', [[0, 10], [10, 20], [20, 30]], 1),
+ *       topCategoryHistogram: s.sampleHistogram(s.top(s.prop('type'), 3))
+ *     }
+ * );
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+ * // There are 10 features of type A and 20 of type B
+ *
+ * console.log(viz.variables.numericHistogram.value);
+ * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+ * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
+ *
+ *
+ * @example <caption>Create and use an histogram. (String)</caption>
  * const viz = new carto.Viz(`
  *    \@categoryHistogram:    sampleHistogram($type)
  *    \@numericHistogram:     sampleHistogram($amount, 3, 1)
  *    \@userDefinedHistogram: sampleHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
  *    \@topCategoryHistogram: sampleHistogram(top($type, 3))
  * `);
- * ...
- * console.log(viz.variables.categoryHistogram.eval());
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
  * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
  * // There are 10 features of type A and 20 of type B
  *
- * console.log(viz.variables.numericHistogram.eval());
+ * console.log(viz.variables.numericHistogram.value);
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
