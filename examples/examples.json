@@ -56,10 +56,6 @@
                     "file": "styling/style-with-variables.html"
                 },
                 {
-                    "title": "Animate by date/time",
-                    "file": "styling/animation.html"
-                },
-                {
                     "title": "Filter based styling",
                     "file": "styling/filter.html"
                 },
@@ -86,6 +82,19 @@
                 {
                     "title": "Scaled width",
                     "file": "styling/scaled.html"
+                }
+            ]
+        },
+        {
+            "title": "Animation",
+            "samples": [
+                {
+                    "title": "Animate by date/time",
+                    "file": "animation/animate-by-date.html"
+                },
+                {
+                    "title": "Add animation controls",
+                    "file": "animation/animation-controls.html"
                 }
             ]
         },
