@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Animate by date/time | CARTO</title>
+    <title>Animate feature width | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
@@ -36,7 +36,7 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-122.33, 47.61],
-            zoom: 10,
+            zoom: 11,
             scrollZoom: false,
         });
 
@@ -55,8 +55,9 @@
         // Define animation viz
         const viz = new carto.Viz(`
             @animation: animation(linear($incdate),20,fade(1,1))
-            width: ramp($personcount,[5,20])* @animation
+            width: ramp(linear($personcount,2,5),[5,20])* @animation
             strokeWidth: 0
+            color: ramp(linear($personcount,1,5),[indigo,deeppink,gold])
         `);
 
         const layer = new carto.Layer('layer', source, viz);
