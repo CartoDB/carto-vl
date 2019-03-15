@@ -59,7 +59,7 @@
 
     const layer = new carto.Layer('layer', source, viz);
 
-    layer.addTo(map, 'watername_ocean');
+    layer.addTo(map);
     layer.on('loaded', hideLoader);
 
     function hideLoader() {
