@@ -164,9 +164,9 @@ You can explore this step [here](/developers/carto-vl/examples/maps/guides/build
 
 ### Using `top()`
 
-In the first example you saw how to create a chart for all category values in the street side attribute. While that attribute has four unique values, there will be other times where you may want to summarize category values in your chart based on the data. For example, if we take an attribute like tree **species name** there are many categories, but in the chart, you only want to display the **top five** tree species and their count. 
+In the first example you saw how to create a chart for all category values in the street side attribute. While that attribute has four unique values, there will be other times where you may want to summarize category values in your chart based on the data. For example, if we take an attribute like tree **species name** there are many categories, but in the chart, you only want to display the **top five** tree species and their count.
 
-You can do this using the [`top`](https://carto.com/developers/carto-vl/reference/#cartoexpressionstop) expression inside of the histogram expression: 
+You can do this using the [`top`](/developers/carto-vl/reference/#cartoexpressionstop) expression inside of the histogram expression: 
 
 ```js
 const viz = new carto.Viz(`
