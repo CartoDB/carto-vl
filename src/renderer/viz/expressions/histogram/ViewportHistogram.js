@@ -26,10 +26,10 @@ import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz(`
- *          \@categoryHistogram:    viewportHistogram($type)
- *          \@numericHistogram:     viewportHistogram($amount, 3, 1)
- *          \@userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
- *          \@topCategoryHistogram: viewportHistogram(top($type, 3))
+ *    @categoryHistogram:    viewportHistogram($type)
+ *    @numericHistogram:     viewportHistogram($amount, 3, 1)
+ *    @userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *    @topCategoryHistogram: viewportHistogram(top($type, 3))
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());

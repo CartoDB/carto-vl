@@ -23,10 +23,10 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  * @example <caption>Create and use an histogram. (String)</caption>
  * const s = carto.expressions;
  * const viz = new carto.Viz(`
- *          \@categoryHistogram:    sampleHistogram($type)
- *          \@numericHistogram:     sampleHistogram($amount, 3, 1)
- *          \@userDefinedHistogram: sampleHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
- *          \@topCategoryHistogram: sampleHistogram(top($type, 3))
+ *    @categoryHistogram:    sampleHistogram($type)
+ *    @numericHistogram:     sampleHistogram($amount, 3, 1)
+ *    @userDefinedHistogram: sampleHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *    @topCategoryHistogram: sampleHistogram(top($type, 3))
  * `);
  * ...
  * console.log(viz.variables.categoryHistogram.eval());
