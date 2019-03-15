@@ -38,7 +38,7 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name SampleHistogram
+ * @name sampleHistogram
  * @function
  * @api
  */

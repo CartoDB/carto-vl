@@ -15,7 +15,7 @@ import * as util from '../../../utils/util';
  * @return {TimeRange} It retuns a TimeRange object.
  *
  * @memberof carto.expressions
- * @name TimeRangeExpr
+ * @name timeRange
  * @function
  * @api
  */
