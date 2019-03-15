@@ -54,7 +54,7 @@
 
     // Define animation viz
     const viz = new carto.Viz(`
-      filter: animation(linear($incdate),30,fade(1,1))
+      filter: animation($incdate,30,fade(1,1))
     `);
 
     const layer = new carto.Layer('layer', source, viz);

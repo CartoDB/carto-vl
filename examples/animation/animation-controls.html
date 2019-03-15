@@ -243,7 +243,7 @@
         // Define animation viz with variables
         const viz = new carto.Viz(`
             @duration: 30
-            @animation: animation(linear($incdate),@duration,fade(1,1))
+            @animation: animation($incdate,@duration,fade(1,1))
             filter: @animation
         `);
 
