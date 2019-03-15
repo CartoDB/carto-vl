@@ -73,7 +73,7 @@ export default class SampleHistogram extends Histogram {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.Histogram
+     * @memberof expressions.SampleHistogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [

@@ -88,7 +88,7 @@ export default class ViewportHistogram extends Histogram {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.Histogram
+     * @memberof expressions.ViewportHistogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
