@@ -28,7 +28,9 @@ export default class Histogram extends BaseExpression {
             })
             .sort(this._sortNumerically)
             .map((category, index) => {
-                const x = typeof category.x === 'number' ? this._categories[index].name : category.x;
+                const x = typeof category.x === 'number' && this._categories[index]
+                    ? this._categories[index].name
+                    : category.x;
                 const y = category.y;
 
                 return { x, y };

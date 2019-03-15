@@ -3,7 +3,7 @@ import { checkType, implicitCast, checkFeatureIndependent, checkInstance, checkM
 import Property from './basic/property';
 import { number } from '../expressions';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
-import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
+import { OTHERS_INDEX, OTHERS_GLSL_VALUE, OTHERS_LABEL } from './constants';
 
 // Careful! This constant must match with the shader code of the Top expression
 const MAX_TOP_BUCKETS = 16;
@@ -44,6 +44,15 @@ export default class Top extends BaseExpression {
         this.type = 'category';
     }
 
+    get value () {
+        const buckets = [];
+        for (let i = 0; i < this.buckets - 1; i++) {
+            buckets.push(this[`_top${i}`].value);
+        }
+
+        return buckets;
+    }
+
     eval (feature) {
         const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
@@ -53,7 +62,9 @@ export default class Top extends BaseExpression {
         const index = orderedCategoryNames.findIndex(category => category.name === categoryName);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
-        return index >= this.numBuckets || index === -1 ? OTHERS_INDEX : index / divisor;
+        return index >= this.numBuckets || index === -1
+            ? { label: OTHERS_LABEL, index: OTHERS_INDEX }
+            : { label: categoryName, index: index / divisor };
     }
 
     _bindMetadata (metadata) {
