@@ -19,7 +19,7 @@
         <h1>Seattle Collisions</h1>
       </header>
       <section>
-        <p class="description open-sans">Animate features over a date/time field</p>
+        <p class="description open-sans">Animate and color features over a date/time field</p>
       </section>
       <footer class="js-footer"></footer>
     </div>
@@ -55,6 +55,8 @@
     // Define animation viz
     const viz = new carto.Viz(`
       filter: animation($incdate,30,fade(1,1))
+      color: ramp(linear($incdate),sunset)
+      strokeWidth: 0
     `);
 
     const layer = new carto.Layer('layer', source, viz);

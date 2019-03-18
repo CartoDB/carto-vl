@@ -89,8 +89,8 @@
             "title": "Animation",
             "samples": [
                 {
-                    "title": "Animate by date",
-                    "file": "animation/animate-by-date.html"
+                    "title": "Animate and color by date",
+                    "file": "animation/animate-color-by-date.html"
                 },
                 {
                     "title": "Animate by date range",

@@ -55,6 +55,7 @@
         // Define time range for animation viz
         const viz = new carto.Viz(`
             filter: animation(linear($incdate,time('2019-01-01T00:00:00Z'),time('2019-01-30T00:00:00Z')),30,fade(1,1))
+            strokeWidth: 0
         `);
 
         const layer = new carto.Layer('layer', source, viz);

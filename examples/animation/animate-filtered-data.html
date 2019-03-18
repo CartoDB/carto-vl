@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Animate feature width | CARTO</title>
+    <title>Animate filtered features | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
@@ -16,10 +16,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Number of People Invlovled in Collisions</h1>
+                <h1>Manhattan Buildings Year Built</h1>
             </header>
             <section>
-                <p class="description open-sans">Animate the width of features over time</p>
+                <p class="description open-sans">Animate features with a filter</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -31,15 +31,15 @@
             </svg>
         </div>
     </div>
+
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-122.33, 47.61],
-            zoom: 11,
+            center: [-73.954400, 40.763723],
+            zoom: 12,
             scrollZoom: false,
         });
-
         const nav = new mapboxgl.NavigationControl({
             showCompass: false
         });
@@ -50,15 +50,14 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset('seattle_collisions');
+        const source = new carto.source.Dataset('mnmappluto');
 
         // Define animation viz
         const viz = new carto.Viz(`
-            @animation: animation(linear($incdate),20,fade(1,1))
-            width: ramp(linear($personcount,2,5),[5,20])* @animation
-            strokeWidth: 0
-            color: opacity(turquoise,0.8)
-        `);
+        color: ramp(linear($yearbuilt,1900,2018),prism)
+        filter: $numfloors > 2 and animation(linear($yearbuilt,1900,2018), 20, fade(0.1, hold))
+        strokeWidth: 0
+    `);
 
         const layer = new carto.Layer('layer', source, viz);
 
