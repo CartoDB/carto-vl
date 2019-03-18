@@ -421,15 +421,17 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    getFeaturesAtPosition (pos) {
+    async getFeaturesAtPosition (position, index = 0, showClusterAggregation = false) {
         const isAggregated = this.isAggregated;
         const features = this.visible
-            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+            ? this._renderLayer.getFeaturesAtPosition(position).map(this._addLayerIdToFeature.bind(this))
             : [];
 
-        if (isAggregated) {
+        if (isAggregated && showClusterAggregation) {
             const clusterId = this._getClusterId(features);
-            return this._getClusterFeatures(0 /*fixme*/, clusterId);
+            const clusterFeatures = await this._getClusterFeatures(index, clusterId);
+
+            return clusterFeatures;
         }
 
         return features;

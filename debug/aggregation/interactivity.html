@@ -49,11 +49,10 @@
 
 
     const source = new carto.source.SQL(`select * from monarch_migration_1`);
-    const viz = new carto.Viz(
-      `
-
+    const viz = new carto.Viz(`
+        @ca: clusterAVG($number)
         @cc: clusterCount()
-        @v_features: viewportFeatures(@cc);
+        @v_features: viewportFeatures(@cc, @ca);
 
         width: sqrt(@cc)*10
         color: opacity(ramp(linear(@cc,5,50),redor),0.7)
@@ -61,10 +60,7 @@
         strokeWidth: 1
         order: asc(width())
         resolution: 16
-        //filter:ramp(zoomrange([3,4,5,6]),[@cc>20,@cc>10,@cc>5,true])
-
-    `
-    );
+    `);
     const layer = new carto.Layer('layer', source, viz);
 
     // Create labeling layer centroids
@@ -121,20 +117,12 @@
     });
 
     // Define interactivity
-    const interactivity = new carto.Interactivity(layer);
+    const interactivity = new carto.Interactivity(layer, { showClusterAggregation: true });
     let clickedFeatureId = null;
 
     interactivity.on('featureClick', event => {
-      if (event.features.length) {
-        console.log('event', event);
-      }
+        console.log('event', event.features[0]);
     });
-
-    // interactivity.on('featureClickOut', event => {
-    //   if (event.features.length) {
-    //     console.log('event', event);
-    //   }
-    // });
 
     layer.addTo(map, 'watername_ocean');
   </script>

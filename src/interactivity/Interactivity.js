@@ -15,6 +15,11 @@ const MAP_STATE = {
     MOVING: 'moving'
 };
 
+const DEFAULT_OPTIONS = {
+    autoChangePointer: true,
+    showClusterAggregation: false
+};
+
 export default class Interactivity {
     /**
     *
@@ -46,7 +51,7 @@ export default class Interactivity {
     * @name carto.Interactivity
     * @api
     */
-    constructor (layerList, options = { autoChangePointer: true }) {
+    constructor (layerList, options = DEFAULT_OPTIONS) {
         if (layerList instanceof Layer) {
             layerList = [layerList]; // Allow one layer as input
         }
@@ -129,6 +134,7 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
+        this._showClusterAggregation = options.showClusterAggregation;
 
         const allLayersReadyPromises = layerList.map(layer => layer._context);
         return Promise.all(allLayersReadyPromises)
@@ -243,7 +249,7 @@ export default class Interactivity {
         }
     }
 
-    _onClick (event) {
+    async _onClick (event) {
         if (!this.isEnabled) {
             return;
         }
@@ -253,7 +259,7 @@ export default class Interactivity {
             return;
         }
 
-        const featureEvent = this._createFeatureEvent(event);
+        const featureEvent = await this._createFeatureEvent(event);
         this._manageClickOutEvent(featureEvent);
 
         this._prevClickFeatures = featureEvent.features;
@@ -268,9 +274,10 @@ export default class Interactivity {
         return featuresClickedOut;
     }
 
-    _createFeatureEvent (eventData) {
-        // a potentially very intensive task
-        const features = this._getFeaturesAtPosition(eventData.point);
+    async _createFeatureEvent (eventData) {
+        const layerFeatures = await this._getFeaturesAtPosition(eventData.point);
+        const features = [].concat(...layerFeatures);
+
         return {
             coordinates: eventData.lngLat,
             position: eventData.point,
@@ -282,8 +289,16 @@ export default class Interactivity {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition (point) {
-        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(point)));
+    async _getFeaturesAtPosition (point) {
+        const showClusterAgg = this._showClusterAggregation;
+        const features = await this._layerList
+            .map(this._getLayerFeaturesAtPosition.bind(this, point, showClusterAgg));
+
+        return Promise.all(features);
+    }
+
+    async _getLayerFeaturesAtPosition (point, showClusterAgg, layer, index) {
+        return layer.getFeaturesAtPosition(point, index, showClusterAgg);
     }
 
     /**
