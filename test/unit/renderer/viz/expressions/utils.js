@@ -176,8 +176,10 @@ function equalArgs (argsA, argsB) {
 }
 
 function _validateCompileTimeTypeError (expressionName, args, regexGenerator = null) {
-    const regex = regexGenerator ? regexGenerator(expressionName, args)
+    const regex = regexGenerator
+        ? regexGenerator(expressionName, args)
         : new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g');
+
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
@@ -186,7 +188,6 @@ function _validateCompileTimeTypeError (expressionName, args, regexGenerator = n
         }).toThrowError(regex);
     });
 }
-
 class MockMetadata {
     constructor (data) {
         Object.keys(data).forEach(key => {

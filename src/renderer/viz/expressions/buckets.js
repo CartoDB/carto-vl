@@ -75,6 +75,10 @@ export default class Buckets extends BaseExpression {
         this.type = 'category';
     }
 
+    get value () {
+        return this.list.elems.map(elem => elem.value);
+    }
+
     eval (feature) {
         const v = this.input.eval(feature);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;

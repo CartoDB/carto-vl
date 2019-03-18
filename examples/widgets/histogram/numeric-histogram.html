@@ -67,7 +67,7 @@
         const source = new carto.source.Dataset('taxi_50k');
 
         const viz = new carto.Viz(`
-            @gHistogram: globalHistogram($trip_distance, 5)
+            @gHistogram: sampleHistogram($trip_distance, 5)
             @vHistogram: viewportHistogram($trip_distance, 5)
         `);
 
@@ -94,11 +94,11 @@
             });
         }
 
-        function drawGlobalHistogram() {
+        function drawSampleHistogram() {
             var histogramWidget = document.getElementById('as-global-histogram');
-            const globalHistogram = layer.viz.variables.gHistogram.value;
+            const sampleHistogram = layer.viz.variables.gHistogram.value;
             histogramWidget.disableInteractivity = true;
-            histogramWidget.data = globalHistogram.map(entry => {
+            histogramWidget.data = sampleHistogram.map(entry => {
                 return {
                     start: entry.x[0],
                     end: entry.x[1],
@@ -109,7 +109,7 @@
 
         function drawHistograms () {
           drawViewportHistogram();
-          drawGlobalHistogram();
+          drawSampleHistogram();
         }
     </script>
 </body>

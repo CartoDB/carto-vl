@@ -13,13 +13,25 @@
 
 <body>
   <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Points of interest</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Size symbols and labels through zoom</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
 
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [-104.994105, 39.745939],
-      zoom: 13
+      zoom: 13,
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -35,12 +47,13 @@
     // Point layer
     const source = new carto.source.Dataset('points_of_interest');
     const viz = new carto.Viz(`
-      color: fuchsia
-      width: 6
-      strokeColor: white
-      strokeWidth: 2
-      filter: $major == "YES"
       @v_features: viewportFeatures($poi_name)
+
+      color: fuchsia
+      width: ramp(zoomrange([13,18]),[5,10])
+      strokeColor: white
+      strokeWidth: ramp(zoomrange([13,18]),[1,2])
+      filter: $major == "YES"
     `);
     const layer = new carto.Layer('points', source, viz);
 
@@ -51,15 +64,15 @@
 
       const layerUpdated = function () {
         const features = viz.variables.v_features.value;
-        const geojsonFeatures = features.map(f => {
+        const geojsonFeatures = features.map(feature => {
           return {
             "type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": f.getRenderedCentroid()
+              "coordinates": feature.getRenderedCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['poi_name']}`,
+              "label_field": `${feature.properties['poi_name']}`,
             }
           }
         });

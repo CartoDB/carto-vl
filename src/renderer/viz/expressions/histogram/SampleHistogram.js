@@ -4,7 +4,7 @@ import { checkMaxArguments, implicitCast, checkArray } from '../utils';
 import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
 
 /**
- * Generates a histogram.
+ * Generates a histogram based on a representative sample of the data.
  *
  * The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.
  *
@@ -12,53 +12,72 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  * For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
  * When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin <= value < bucketMax].
  *
- * The histogram can also be based on the result of a classifier expression such as `top()` or `buckets()`.
+ * The sampleHistogram can also be combined with the `top()` expression.
  *
  * Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.
  *
  * @param {Number} input - expression to base the histogram
  * @param {Number|Array} sizeOrBuckets - Optional (defaults to 20). Number of bars to use if `x` is a numeric expression; or user-defined buckets for numeric expressions.
- * @return {GlobalHistogram} GlobalHistogram
+ * @return {SampleHistogram} SampleHistogram
  *
- * @example <caption>Create and use an histogram. (String)</caption>
+ * @example <caption>Create and use an histogram.</caption>
  * const s = carto.expressions;
- * const viz = new carto.Viz(`
- *          \@categoryHistogram:    globalHistogram($type)
- *          \@numericHistogram:     globalHistogram($amount, 3, 1)
- *          \@userDefinedHistogram: globalHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
- *          \@topCategoryHistogram: globalHistogram(top($type, 3))
- * `);
- * ...
- * console.log(viz.variables.categoryHistogram.eval());
+ * const viz = new carto.Viz(
+ *     variables: {
+ *       categoryHistogram: s.sampleHistogram(s.prop('type')),
+ *       numericHistogram: s.sampleHistogram(s.prop('amount'), 3, 1),
+ *       userDefinedHistogram: s.sampleHistogram(s.prop('amount', [[0, 10], [10, 20], [20, 30]], 1),
+ *       topCategoryHistogram: s.sampleHistogram(s.top(s.prop('type'), 3))
+ *     }
+ * );
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
  * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
  * // There are 10 features of type A and 20 of type B
  *
- * console.log(viz.variables.numericHistogram.eval());
+ * console.log(viz.variables.numericHistogram.value);
+ * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+ * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
+ *
+ *
+ * @example <caption>Create and use an histogram. (String)</caption>
+ * const viz = new carto.Viz(`
+ *    \@categoryHistogram:    sampleHistogram($type)
+ *    \@numericHistogram:     sampleHistogram($amount, 3, 1)
+ *    \@userDefinedHistogram: sampleHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+ *    \@topCategoryHistogram: sampleHistogram(top($type, 3))
+ * `);
+ * // ...
+ * console.log(viz.variables.categoryHistogram.value);
+ * // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+ * // There are 10 features of type A and 20 of type B
+ *
+ * console.log(viz.variables.numericHistogram.value);
  * // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
  * // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30
  *
  * @memberof carto.expressions
- * @name GlobalHistogram
+ * @name sampleHistogram
  * @function
  * @api
  */
 
 /**
- * GlobalHistogram Class
+ * SampleHistogram Class
  *
  * Generates a histogram based on the samples from the metadata.
- * This class is instanced automatically by using the `globalHistogram` function. It is documented for its methods.
- * Read more about histogram expression at {@link carto.expressions.globalhistogram}.
+ * This class is instanced automatically by using the `sampleHistogram` function. It is documented for its methods.
+ * Read more about histogram expression at {@link carto.expressions.sampleHistogram}.
  *
- * @name expressions.GlobalHistogram
+ * @name expressions.SampleHistogram
  * @abstract
  * @hideconstructor
  * @class
  * @api
  */
-export default class GlobalHistogram extends Histogram {
+export default class SampleHistogram extends Histogram {
     constructor (input, sizeOrBuckets = 20) {
-        checkMaxArguments(arguments, 3, 'globalHistogram');
+        checkMaxArguments(arguments, 3, 'sampleHistogram');
         super({ input: implicitCast(input) });
 
         this._sizeOrBuckets = sizeOrBuckets;
@@ -73,7 +92,7 @@ export default class GlobalHistogram extends Histogram {
      *
      * @param {Array} values - Array of { key, value } pairs
      * @return {Array} - { frequency, key, value }
-     * @memberof expressions.Histogram
+     * @memberof expressions.SampleHistogram
      * @api
      * @example <caption>Get joined data for a categorical property sorted by frequency.</caption>
      * const numberOfWheels = [
@@ -84,7 +103,7 @@ export default class GlobalHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz({
-     *   @histogram: s.globalHistogram(s.prop('vehicles'))
+     *   @histogram: s.sampleHistogram(s.prop('vehicles'))
      * });
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -104,7 +123,7 @@ export default class GlobalHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: globalHistogram($vehicles)
+     *   @histogram: sampleHistogram($vehicles)
      * `);
      *
      * const data = viz.variables.histogram.getJoinedValues(numberOfWheels);
@@ -118,7 +137,7 @@ export default class GlobalHistogram extends Histogram {
      * @example <caption>Get color values for the histogram when using a ramp.</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: s.globalHistogram(s.prop('vehicles'))
+     *   @histogram: s.sampleHistogram(s.prop('vehicles'))
      *   color: ramp(s.prop('vehicles'), s.palettes.PRISM)
      * `);
      *
@@ -134,7 +153,7 @@ export default class GlobalHistogram extends Histogram {
      * @example <caption>Get color values for the histogram when using a ramp. (String)</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: globalHistogram($vehicles)
+     *   @histogram: sampleHistogram($vehicles)
      *   color: ramp($vehicles, Prism)
      * `);
      *
@@ -151,7 +170,7 @@ export default class GlobalHistogram extends Histogram {
      *
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: s.globalHistogram(s.top(s.prop('vehicles'), 2))
+     *   @histogram: s.sampleHistogram(s.top(s.prop('vehicles'), 2))
      *   color: ramp(s.top(s.prop('vehicles'), 2)), s.palettes.PRISM, s.rgba(0, 128, 0, 1))
      * `);
      *
@@ -168,7 +187,7 @@ export default class GlobalHistogram extends Histogram {
      * @example <caption>Get color values for the histogram using a ramp with classified data (String).</caption>
      * const s = carto.expressions;
      * const viz = new carto.Viz(`
-     *   @histogram: globalHistogram(top($vehicles, 2))
+     *   @histogram: sampleHistogram(top($vehicles, 2))
      *   color: ramp((top($vehicles, 2)), Prism, green)
      * `);
      *
@@ -184,7 +203,7 @@ export default class GlobalHistogram extends Histogram {
      *
      */
     getJoinedValues (values, options) {
-        checkArray('globalHistogram.getJoinedValues', 'values', 0, values);
+        checkArray('sampleHistogram.getJoinedValues', 'values', 0, values);
 
         if (!values.length) {
             return [];
@@ -250,7 +269,7 @@ export default class GlobalHistogram extends Histogram {
     }
 
     _setHistogramForNumericValues () {
-        const name = this._propertyName;
+        const name = this.propertyName;
         const ratio = this._metadata.featureCount / this._metadata.sample.length;
 
         this._metadata.sample.forEach((feature) => {

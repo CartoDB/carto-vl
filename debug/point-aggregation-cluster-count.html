@@ -2,52 +2,62 @@
 <html>
 
 <head>
-  <title>Point labels | CARTO</title>
+  <title>Exported map | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-  <link rel="stylesheet" type="text/css" href="../style.css">
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+  <style>
+    html,
+    body {
+      margin: 0;
+    }
+
+    #map {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
 </head>
 
 <body>
   <div id="map"></div>
-
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.darkmatter,
-      center: [-104.994105, 39.745939],
-      zoom: 14
+      center: [2.1694138650888135, 41.37286330558891],
+      zoom: 21.611075639862133
     });
 
-    const nav = new mapboxgl.NavigationControl({
-      showCompass: false
+    carto.setDefaultConfig({
+      serverURL: 'https://{user}.carto.com'
     });
-    map.addControl(nav, 'top-left');
 
     carto.setDefaultAuth({
-      user: 'cartovl',
+      username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Point layer
-    const source = new carto.source.Dataset('points_of_interest');
+
+    const source = new carto.source.SQL(`select *, 1 as co from gecat_geodata_copy`);
     const viz = new carto.Viz(`
-      color: fuchsia
-      strokeColor: white
-      strokeWidth: 2
-      filter: $major == "YES"
-      @cc: clusterCount()
-      width: @cc * 30
-      @v_features: viewportFeatures($poi_name, @cc)
+        @cc: clusterCount()
+        strokeWidth: 0
+        resolution: 0.25
+        width: @cc * 15
+        @v_features: viewportFeatures(@cc);
     `);
-    const layer = new carto.Layer('points', source, viz);
+    const layer = new carto.Layer('layer', source, viz);
 
     // Create labeling layer centroids
     layer.on('loaded', () => {
-      map.addSource('labels', { type: 'geojson', data: null });
+      map.addSource('labels', {
+        type: 'geojson',
+        data: null
+      });
       const labelSource = map.getSource('labels');
 
       const layerUpdated = function () {
@@ -81,7 +91,7 @@
         "layout": {
           "text-field": "{label_field}",
           "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-          "text-size": 10,
+          "text-size": 12,
           "text-offset": [-0.05, -0.65],
           "text-anchor": "top",
           "text-max-width": 8,
@@ -89,15 +99,13 @@
         },
         "paint": {
           "text-color": "white",
-          "text-halo-color": "white",
-          "text-halo-width": 0.5,
-          "text-halo-blur": 0.5
+          "text-halo-width": 0,
+          "text-halo-blur": 0
         }
       });
     });
 
-    layer.addTo(map);
-
+    layer.addTo(map, 'watername_ocean');
   </script>
 </body>
 

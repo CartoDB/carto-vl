@@ -1,5 +1,6 @@
 import carto from '../../../../src/index';
 import * as util from '../../util';
+import { OTHERS_LABEL } from '../../../../src/renderer/viz/expressions/constants';
 
 describe('viewportHistogram', () => {
     let div, map, source, viz, layer;
@@ -138,7 +139,7 @@ describe('viewportHistogram', () => {
             const histogram = viz.variables.histogram.value;
             expect(histogram).toEqual([
                 { x: 'a', y: 2 },
-                { x: 'b', y: 1 }
+                { x: OTHERS_LABEL, y: 1 }
             ]);
             done();
         });

@@ -2,41 +2,41 @@
 <html>
 
 <head>
-    <title>Exported map | CARTO VL</title>
+    <title>Label clusters by count | CARTO VL</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="../../dist/carto-vl.js"></script>
     <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
     <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../examples/style.css">
-    <style>
-        html,
-        body {
-            margin: 0;
-        }
-
-        #map {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
 
 <body>
     <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Average temperatures</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Symbolize and label global cluster averages</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
     <script>
         const map = new mapboxgl.Map({
             container: 'map',
-            style: carto.basemaps.darkmatter,
-            center: [-93.374509, 35.786814],
-            zoom: 3
+            style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+            center: [-95.491724, 38.685047],
+            zoom: 4,
+            scrollZoom: false
         });
 
         const nav = new mapboxgl.NavigationControl({
             showCompass: false
         });
         map.addControl(nav, 'top-left');
-
 
         carto.setDefaultConfig({
             serverURL: 'https://{user}.carto.com'
@@ -47,22 +47,19 @@
             apiKey: 'default_public'
         });
 
-
-        const source = new carto.source.SQL(`select * from monarch_migration_1`);
+        const source = new carto.source.Dataset('july_temps');
         const viz = new carto.Viz(`
-
-        @cc: clusterCount()
-        @v_features: viewportFeatures(@cc);
-
-        width: sqrt(@cc)*10
-        color: opacity(ramp(linear(@cc,5,50),redor),0.7)
-        strokeColor: ramp(linear(@cc,5,50),redor)
-        strokeWidth: 1
-        order: asc(width())
-        resolution: 16
-        filter:ramp(zoomrange([3,4,5,6]),[@cc>20,@cc>10,@cc>5,true])
-
-    `);
+            @clusterAverage: clusterAVG($value)
+            @v_features: viewportFeatures(@clusterAverage)
+            @g_min: globalMIN(@clusterAverage)
+            @g_max: globalMAX(@clusterAverage)
+            @color: ramp(linear(@clusterAverage, @g_min, @g_max), [blue, turquoise, yellow, red])
+            
+            width: 30
+            color: opacity(@color, 0.8)
+            strokeWidth: 0
+            resolution: 16
+        `);
         const layer = new carto.Layer('layer', source, viz);
 
         // Create labeling layer centroids
@@ -72,15 +69,15 @@
 
             const layerUpdated = function () {
                 const features = viz.variables.v_features.value;
-                const geojsonFeatures = features.map(f => {
+                const geojsonFeatures = features.map(feature => {
                     return {
                         "type": "Feature",
                         "geometry": {
                             "type": "Point",
-                            "coordinates": f.getRenderedCentroid()
+                            "coordinates": feature.getRenderedCentroid()
                         },
                         "properties": {
-                            "label_field": `${f.properties['cc']}`,
+                            "label_field": Math.round(feature.properties['clusterAverage']) //Round cluster average values for labeling purposes
                         }
                     }
                 });
@@ -100,22 +97,18 @@
                 "source": "labels",
                 "layout": {
                     "text-field": "{label_field}",
-                    "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-                    "text-size": 12,
-                    "text-offset": [-0.05, -0.65],
-                    "text-anchor": "top",
-                    "text-max-width": 8,
-                    "text-justify": "center"
+                    "text-font": ["Open Sans Semibold", "Arial Unicode MS Regular"],
+                    "text-size": 10
                 },
                 "paint": {
-                    "text-color": "white",
+                    "text-color": "#000000",
                     "text-halo-width": 0,
                     "text-halo-blur": 0
                 }
             });
         });
 
-        layer.addTo(map, 'watername_ocean');
+        layer.addTo(map);
     </script>
 </body>
 

@@ -15,7 +15,7 @@ export default class Histogram extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._metadata = metadata;
-        const name = this._propertyName;
+        const name = this.propertyName;
         this._categories = this._metadata.properties[name]
             ? this._metadata.properties[name].categories.sort(this._sortNumerically)
             : [];
@@ -28,7 +28,9 @@ export default class Histogram extends BaseExpression {
             })
             .sort(this._sortNumerically)
             .map((category, index) => {
-                const x = typeof category.x === 'number' ? this._categories[index].name : category.x;
+                const x = typeof category.x === 'number' && this._categories[index]
+                    ? this._categories[index].name
+                    : category.x;
                 const y = category.y;
 
                 return { x, y };

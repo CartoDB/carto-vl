@@ -1,5 +1,5 @@
 import Classifier from './Classifier';
-import { checkNumber, checkType, checkMaxArguments, checkMinArguments } from '../utils';
+import { checkNumber, checkType, checkMaxArguments, checkMinArguments, implicitCast } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 import { viewportHistogram } from '../../expressions';
@@ -35,7 +35,7 @@ export default class ViewportQuantiles extends Classifier {
     constructor (input, buckets, histogramSize = DEFAULT_HISTOGRAM_SIZE) {
         checkMinArguments(arguments, 2, 'viewportQuantiles');
         checkMaxArguments(arguments, 3, 'viewportQuantiles');
-
+        input = implicitCast(input);
         super({ input, buckets, _histogramSize: histogramSize });
     }
 

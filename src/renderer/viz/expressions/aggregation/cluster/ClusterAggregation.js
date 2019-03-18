@@ -2,6 +2,7 @@ import BaseExpression from '../../base';
 import PropertyExpression from '../../basic/property';
 import { checkType, checkInstance, checkExpression } from '../../utils';
 import * as schema from '../../../../schema';
+import { aggregationTypes } from '../../../../../constants/metadata';
 export default class ClusterAggregation extends BaseExpression {
     constructor ({ property, expressionName, aggName, aggType }) {
         checkExpression(expressionName, 'property', 0, property);
@@ -52,8 +53,8 @@ export default class ClusterAggregation extends BaseExpression {
 
     _getMinimumNeededSchema () {
         return {
-            [this.property.propertyName]: [{
-                type: 'aggregated',
+            [this.property.name]: [{
+                type: aggregationTypes.AGGREGATED,
                 op: this._aggName
             }]
         };

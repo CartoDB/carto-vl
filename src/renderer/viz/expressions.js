@@ -195,7 +195,7 @@
 /**
  * Constant FALSE value. Equivalent to `carto.expressions.constant(0)`
  *
- * @name expressions.FALSE
+ * @name FALSE
  * @memberof Constants
  * @api
 */
@@ -203,7 +203,7 @@
 /**
  * Constant TRUE value. Equivalent to `carto.expressions.constant(1)`
  *
- * @name expressions.TRUE
+ * @name TRUE
  * @memberof Constants
  * @api
 */
@@ -212,7 +212,7 @@
  * Constant ALIGN_CENTER translation. Equivalent to `carto.expressions.translate(0, 0)`.
  * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
  *
- * @name expressions.ALIGN_CENTER
+ * @name ALIGN_CENTER
  * @memberof Constants
  * @api
 */
@@ -221,7 +221,7 @@
  * Constant ALIGN_BOTTOM translation. Equivalent to `carto.expressions.translate(0, 1)`.
  * Read more about translation in {@link carto.expressions.translate|carto.expressions.translate}
  *
- * @name expressions.ALIGN_BOTTOM
+ * @name ALIGN_BOTTOM
  * @memberof Constants
  * @api
 */
@@ -229,7 +229,7 @@
 /**
  * Constant PI number.
  *
- * @name expressions.PI
+ * @name PI
  * @memberof Constants
  * @api
 */
@@ -237,7 +237,7 @@
 /**
  * Constant E number.
  *
- * @name expressions.E
+ * @name E
  * @memberof Constants
  * @api
 */
@@ -246,7 +246,7 @@
  * Constant HOLD number. Max Safe Integer number to be used to "hold" the Fade expression.
  * Read more about fading in {@link carto.expressions.fade|carto.expressions.fade}
  *
- * @name expressions.HOLD
+ * @name HOLD
  * @memberof Constants
  * @api
 */
@@ -263,7 +263,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.BICYCLE
+ * @name BICYCLE
  * @memberof Icons
  * @api
 */
@@ -274,7 +274,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.BUILDING
+ * @name BUILDING
  * @memberof Icons
  * @api
 */
@@ -285,7 +285,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.BUS
+ * @name BUS
  * @memberof Icons
  * @api
 */
@@ -296,7 +296,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.CAR
+ * @name CAR
  * @memberof Icons
  * @api
 */
@@ -307,7 +307,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.CIRCLE
+ * @name CIRCLE
  * @memberof Icons
  * @api
 */
@@ -318,7 +318,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.CIRCLE_OUTLINE
+ * @name CIRCLE_OUTLINE
  * @memberof Icons
  * @api
 */
@@ -329,7 +329,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.CROSS
+ * @name CROSS
  * @memberof Icons
  * @api
 */
@@ -340,7 +340,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.FLAG
+ * @name FLAG
  * @memberof Icons
  * @api
 */
@@ -351,7 +351,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.HOUSE
+ * @name HOUSE
  * @memberof Icons
  * @api
 */
@@ -362,7 +362,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.MARKER
+ * @name MARKER
  * @memberof Icons
  * @api
 */
@@ -373,7 +373,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.MARKER_OUTLINE
+ * @name MARKER_OUTLINE
  * @memberof Icons
  * @api
 */
@@ -384,7 +384,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.SQUARE
+ * @name SQUARE
  * @memberof Icons
  * @api
 */
@@ -395,7 +395,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.SQUARE_OUTLINE
+ * @name SQUARE_OUTLINE
  * @memberof Icons
  * @api
 */
@@ -406,7 +406,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.STAR
+ * @name STAR
  * @memberof Icons
  * @api
 */
@@ -417,7 +417,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.STAR_OUTLINE
+ * @name STAR_OUTLINE
  * @memberof Icons
  * @api
 */
@@ -428,7 +428,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.TRIANGLE
+ * @name TRIANGLE
  * @memberof Icons
  * @api
 */
@@ -439,7 +439,7 @@
  * They can also be used in an array, as it is shown in {@link carto.expressions.ramp|carto.expressions.ramp}.
  * There is a list with all the default {@link icons.showcase|icons} available.
  *
- * @name expressions.TRIANGLE_OUTLINE
+ * @name TRIANGLE_OUTLINE
  * @memberof Icons
  * @api
 */
@@ -558,7 +558,7 @@ import ViewportSum from './expressions/aggregation/viewport/ViewportSum';
 import ViewportCount from './expressions/aggregation/viewport/ViewportCount';
 import ViewportPercentile from './expressions/aggregation/viewport/ViewportPercentile';
 import ViewportHistogram from './expressions/histogram/ViewportHistogram';
-import GlobalHistogram from './expressions/histogram/GlobalHistogram';
+import SampleHistogram from './expressions/histogram/SampleHistogram';
 import ViewportFeatures from './expressions/viewportFeatures';
 
 import GlobalAvg from './expressions/aggregation/global/GlobalAvg';
@@ -719,7 +719,7 @@ export const globalMin = (...args) => new GlobalMin(...args);
 export const globalSum = (...args) => new GlobalSum(...args);
 export const globalCount = (...args) => new GlobalCount(...args);
 export const globalPercentile = (...args) => new GlobalPercentile(...args);
-export const globalHistogram = (...args) => new GlobalHistogram(...args);
+export const sampleHistogram = (...args) => new SampleHistogram(...args);
 
 export const zoom = (...args) => new Zoom(...args);
 export const scaled = (...args) => new Scaled(...args);

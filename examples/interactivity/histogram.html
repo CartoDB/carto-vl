@@ -17,9 +17,7 @@
         style: carto.basemaps.voyager,
         center: [0, 30],
         zoom: 2,
-        scrollZoom: false,
-
-
+        scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -44,8 +42,8 @@
     layer.addTo(map, 'watername_ocean');
 
     setInterval(() => {
-        console.log(viz.variables.categoryHistogram.eval());
-        console.log(viz.variables.numericHistogram.eval());
+        console.log(viz.variables.categoryHistogram.value);
+        console.log(viz.variables.numericHistogram.value);
     }, 500);
   </script>
 </body>
