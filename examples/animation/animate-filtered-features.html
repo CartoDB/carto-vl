@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Animate filtered features | CARTO</title>
+    <title>Animate and filter | CARTO</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
     <script src="../../dist/carto-vl.js"></script>
@@ -16,10 +16,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Manhattan Buildings Year Built</h1>
+                <h1>Collisions involving pedestrians</h1>
             </header>
             <section>
-                <p class="description open-sans">Animate features with a filter</p>
+                <p class="description open-sans">Animate a subset of features using a filter</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -36,10 +36,11 @@
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-73.954400, 40.763723],
-            zoom: 12,
+            center: [-122.33, 47.61],
+            zoom: 11,
             scrollZoom: false,
         });
+
         const nav = new mapboxgl.NavigationControl({
             showCompass: false
         });
@@ -50,14 +51,15 @@
             apiKey: 'default_public'
         });
 
-        const source = new carto.source.Dataset('mnmappluto');
+        const source = new carto.source.Dataset('seattle_collisions');
 
         // Define animation viz
         const viz = new carto.Viz(`
-        color: ramp(linear($yearbuilt,1900,2018),prism)
-        filter: $numfloors > 2 and animation(linear($yearbuilt,1900,2018), 20, fade(0.1, hold))
-        strokeWidth: 0
-    `);
+            filter: $pedcount >= 1 and animation($incdate,20,fade(0.5,0.5))
+            color: opacity(turquoise,0.8)      
+            strokeWidth: 0
+            width: 3
+        `);
 
         const layer = new carto.Layer('layer', source, viz);
 

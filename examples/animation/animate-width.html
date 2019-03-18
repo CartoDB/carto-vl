@@ -54,10 +54,9 @@
 
         // Define animation viz
         const viz = new carto.Viz(`
-            @animation: animation(linear($incdate),20,fade(1,1))
-            width: ramp(linear($personcount,2,5),[5,20])* @animation
-            strokeWidth: 0
+            width: ramp(linear($personcount,2,5),[5,20]) * animation(linear($incdate),20,fade(1,1))
             color: opacity(turquoise,0.8)
+            strokeWidth: 0
         `);
 
         const layer = new carto.Layer('layer', source, viz);
