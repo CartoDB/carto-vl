@@ -276,12 +276,14 @@ export default class Interactivity {
 
     async _createFeatureEvent (eventData) {
         const layerFeatures = await this._getFeaturesAtPosition(eventData.point);
-        const features = [].concat(...layerFeatures);
+        const features = layerFeatures.map(layerFeature => layerFeature.features);
+        const clusterData = layerFeatures.map(layerFeature => layerFeature.clusterData);
 
         return {
             coordinates: eventData.lngLat,
             position: eventData.point,
-            features
+            features: [].concat(...features),
+            clusterData: [].concat(...clusterData)
         };
     }
 

@@ -262,7 +262,7 @@ export default class Layer {
     }
 
     // TODO document
-    _getClusterFeatures (layerIndex, clusterId) {
+    _getClusterData (layerIndex, clusterId) {
         const zoom = this.map.getZoom();
         const layergroupid = this.layergroupid;
 
@@ -421,20 +421,25 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    async getFeaturesAtPosition (position, index = 0, showClusterAggregation = false) {
-        const isAggregated = this.isAggregated;
+    async getFeaturesAtPosition (position, index, showClusterAggregation) {
         const features = this.visible
             ? this._renderLayer.getFeaturesAtPosition(position).map(this._addLayerIdToFeature.bind(this))
             : [];
 
+        const clusterData = await this._getClusterFeaturesData(features, index, showClusterAggregation);
+
+        return { features, clusterData };
+    }
+
+    async _getClusterFeaturesData (features, index = 0, showClusterAggregation = false) {
+        const isAggregated = this.isAggregated;
+
         if (isAggregated && showClusterAggregation) {
             const clusterId = this._getClusterId(features);
-            const clusterFeatures = await this._getClusterFeatures(index, clusterId);
+            const clusterData = await this._getClusterData(index, clusterId);
 
-            return clusterFeatures;
+            return clusterData;
         }
-
-        return features;
     }
 
     _getClusterId (features) {
