@@ -58,10 +58,6 @@ export default class Property extends BaseExpression {
         return this.name;
     }
 
-    get _propertyName () {
-        return this.propertyName;
-    }
-
     eval (feature) {
         if (!feature) {
             throw new CartoValidationError(`${cvt.MISSING_REQUIRED} A property needs to be evaluated in a 'feature'.`);
@@ -109,7 +105,9 @@ export default class Property extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
-        const type = aggregationTypes.UNKNOWN;
+        const type = this._variableName
+            ? aggregationTypes.UNKNOWN
+            : aggregationTypes.UNAGGREGATED;
 
         return {
             [this.name]: [{ type }]

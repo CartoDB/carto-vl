@@ -1,40 +1,44 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Exported map | CARTO VL</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="../../dist/carto-vl.js"></script>
-<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
-<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-<link rel="stylesheet" type="text/css" href="../style.css">
-<style>
-    html, body {
-        margin: 0;
+  <title>Exported map | CARTO VL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../examples/style.css">
+  <style>
+    html,
+    body {
+      margin: 0;
     }
+
     #map {
-        position: absolute;
-        width: 100%;
-        height: 100%;
+      position: absolute;
+      width: 100%;
+      height: 100%;
     }
-</style>
+  </style>
 </head>
+
 <body>
-<div id="map"></div>
-<script>
+  <div id="map"></div>
+  <script>
     const map = new mapboxgl.Map({
-        container: 'map',
-        style: carto.basemaps.darkmatter,
-        center: [2.1694138650888135, 41.37286330558891],
-        zoom: 21.611075639862133
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [2.1694138650888135, 41.37286330558891],
+      zoom: 21.611075639862133
     });
 
     carto.setDefaultConfig({
-        serverURL: 'https://{user}.carto.com'
+      serverURL: 'https://{user}.carto.com'
     });
 
     carto.setDefaultAuth({
-        username: 'cartovl',
-        apiKey: 'default_public'
+      username: 'cartovl',
+      apiKey: 'default_public'
     });
 
 
@@ -48,9 +52,12 @@
     `);
     const layer = new carto.Layer('layer', source, viz);
 
-        // Create labeling layer centroids
+    // Create labeling layer centroids
     layer.on('loaded', () => {
-      map.addSource('labels', { type: 'geojson', data: null });
+      map.addSource('labels', {
+        type: 'geojson',
+        data: null
+      });
       const labelSource = map.getSource('labels');
 
       const layerUpdated = function () {
@@ -99,6 +106,7 @@
     });
 
     layer.addTo(map, 'watername_ocean');
-</script>
+  </script>
 </body>
+
 </html>

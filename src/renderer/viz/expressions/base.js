@@ -172,13 +172,13 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
-    get _propertyName () {
-        return this._getChildren().map(child => child._propertyName).find(name => !!name);
+    get propertyName () {
+        return this._getChildren().map(child => child.propertyName).find(name => !!name);
     }
 
     getLegendData () {
         return {
-            name: this._propertyName,
+            name: this.propertyName,
             data: []
         };
     }
