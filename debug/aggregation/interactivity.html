@@ -53,7 +53,6 @@
         @ca: clusterAVG($number)
         @cc: clusterCount()
         @v_features: viewportFeatures(@cc, @ca);
-
         width: sqrt(@cc)*10
         color: opacity(ramp(linear(@cc,5,50),redor),0.7)
         strokeColor: ramp(linear(@cc,5,50),redor)
@@ -62,6 +61,12 @@
         resolution: 16
     `);
     const layer = new carto.Layer('layer', source, viz);
+
+    // Basic popup to check the input field values
+    const popup = new mapboxgl.Popup({
+      closeButton: false,
+      closeOnClick: false
+    });
 
     // Create labeling layer centroids
     layer.on('loaded', () => {
@@ -121,7 +126,32 @@
     let clickedFeatureId = null;
 
     interactivity.on('featureClick', event => {
-        console.log('event', event.features[0]);
+      if (event.features.length > 0) {
+        const firstFeature = event.features[0];
+        const clusterData = event.clusterData[0];
+        const value = firstFeature.variables.cc.value;
+        const titleHTML = `<strong>Count:</strong>: ${value}`;
+        const values = clusterData.rows.map((row) => row.number);
+
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+
+        popup.setHTML(`
+          <p>${titleHTML}</p>
+          <ul>
+            <li>Min: ${min}</li>
+            <li>Max: ${max}</li>
+          </ul>
+        `);
+
+        popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
+
+        if (!popup.isOpen()) {
+          popup.addTo(map);
+        }
+      } else {
+        popup.remove();
+      };
     });
 
     layer.addTo(map, 'watername_ocean');
