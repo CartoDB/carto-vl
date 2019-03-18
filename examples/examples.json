@@ -101,6 +101,10 @@
                     "file": "animation/animate-width.html"
                 },
                 {
+                    "title": "Hold features on fade out",
+                    "file": "animation/animate-and-hold.html"
+                },
+                {
                     "title": "Add animation controls",
                     "file": "animation/animation-controls.html"
                 }
