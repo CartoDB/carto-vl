@@ -165,7 +165,7 @@ export default class Interactivity {
     }
 
     _subscribeToMapEvents (map) {
-        // map.on('mousemove', this._onMouseMove.bind(this));
+        map.on('mousemove', this._onMouseMove.bind(this));
         map.on('click', this._onClick.bind(this));
         this._disableWhileMovingMap(map);
     }

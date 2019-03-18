@@ -170,7 +170,7 @@ describe('api/layer', () => {
     });
 
     describe('.getFeaturesAtPosition', () => {
-        fit('should add a layerId to every feature in the list', async () => {
+        it('should add a layerId to every feature in the list', async () => {
             const layer = new Layer('layer0', source, viz);
             const fakeFeature0 = {
                 properties: {},
