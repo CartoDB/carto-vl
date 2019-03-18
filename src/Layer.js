@@ -420,6 +420,10 @@ export default class Layer {
             ? this._renderLayer.getFeaturesAtPosition(position).map(this._addLayerIdToFeature.bind(this))
             : [];
 
+        if (!features.length) {
+            return null;
+        }
+
         const clusterData = isAggregated && showClusterAggregation
             ? await this._getClusterFeaturesData(features, index)
             : [];

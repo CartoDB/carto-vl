@@ -194,7 +194,7 @@ export default class Interactivity {
         this._onMouseMove(this._mouseEvent, true);
     }
 
-    _onMouseMove (event, emulated) {
+    async _onMouseMove (event, emulated) {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
@@ -209,8 +209,7 @@ export default class Interactivity {
             return;
         }
 
-        const featureEvent = this._createFeatureEvent(event);
-
+        const featureEvent = await this._createFeatureEvent(event);
         const featuresLeft = this._manageFeatureLeaveEvent(featureEvent);
         const featuresEntered = this._manageFeatureEnterEvent(featureEvent);
 
@@ -240,11 +239,12 @@ export default class Interactivity {
     }
 
     _fireEventIfFeatures (eventName, { featureEvent, eventFeatures }) {
-        if (eventFeatures.length > 0) {
+        if (eventFeatures.length) {
             this._fireEvent(eventName, {
                 coordinates: featureEvent.coordinates,
                 position: featureEvent.position,
-                features: eventFeatures
+                features: eventFeatures,
+                clusterData: featureEvent.clusterData
             });
         }
     }
@@ -276,14 +276,21 @@ export default class Interactivity {
 
     async _createFeatureEvent (eventData) {
         const layerFeatures = await this._getFeaturesAtPosition(eventData.point);
-        const features = layerFeatures.map(layerFeature => layerFeature.features);
-        const clusterData = layerFeatures.map(layerFeature => layerFeature.clusterData);
+        let features = [];
+        let clusterData = [];
+
+        layerFeatures.forEach(layerFeature => {
+            if (layerFeature) {
+                features.push(layerFeature.features);
+                clusterData.push(layerFeature.clusterData);
+            }
+        });
 
         return {
             coordinates: eventData.lngLat,
             position: eventData.point,
-            features: [].concat(...features),
-            clusterData: [].concat(...clusterData)
+            features: features.length ? [].concat(...features) : [],
+            clusterData: clusterData.length ? [].concat(...clusterData) : []
         };
     }
 

@@ -6,10 +6,7 @@ export default class ClusterCache {
         const lruOptions = {
             max: 256, // TODO check
             length: () => 1,
-            maxAge: 1000 * 60 * 60, // TODO check
-            dispose: (uid, n) => {
-                n.close();
-            }
+            maxAge: 1000 * 60 * 60 // TODO check
         };
 
         this._username = source._username;
