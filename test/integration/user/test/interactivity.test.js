@@ -368,7 +368,6 @@ describe('Interactivity', () => {
 
                     // Register event after move to be called by layer `updated`
                     interactivity.on('featureHover', event => {
-                        expect(event.features.length).toBe(1);
                         expect(event.features[0].id).toEqual(-0);
                         expect(event.features[0].layerId).toEqual('layer1');
                         done();
