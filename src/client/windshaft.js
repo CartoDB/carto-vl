@@ -49,14 +49,13 @@ export default class Windshaft {
         const resolution = viz.resolution.eval();
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         this._forceIncludeCartodbId(MNS);
+
         if (this._needToInstantiate(MNS, resolution, filtering)) {
             const instantiationData = await this._repeatableInstantiate(MNS, resolution, filtering);
             this._updateStateAfterInstantiating(instantiationData);
         }
-        return {
-            metadata: this.metadata,
-            layergroupid: this.layergroupid
-        };
+
+        return this.metadata;
     }
 
     _forceIncludeCartodbId (MNS) {
@@ -178,7 +177,7 @@ export default class Windshaft {
         this._mvtClient.bindLayer(this._addDataframe);
         this.urlTemplates = urlTemplates;
         this.metadata = metadata;
-        this.layergroupid = layergroupid;
+        this.metadata.layergroupid = layergroupid;
         this._MNS = MNS;
         this.filtering = filters;
         this.resolution = resolution;

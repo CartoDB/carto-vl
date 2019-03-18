@@ -72,9 +72,10 @@ export default class Layer {
         this._renderLayer = new RenderLayer();
 
         this.concurrencyHelper = new LayerConcurrencyHelper();
+        this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
-        this._init(source, viz);
+        this._clusterCache = new ClusterCache(source);
     }
 
     /**
@@ -223,13 +224,6 @@ export default class Layer {
         return this._update(source, viz, true);
     }
 
-    async _init (source, viz) {
-        this._sourcePromise = this.update(source, viz);
-        await this._sourcePromise;
-
-        this._clusterCache = new ClusterCache(source);
-    }
-
     async _update (source, viz, majorChange) {
         this._checkSource(source);
         this._checkViz(viz);
@@ -237,13 +231,13 @@ export default class Layer {
         const safeSource = this._cloneSourceIfDifferent(source);
 
         let change = this._initChange(majorChange);
-        const [, data] = await Promise.all([
+        const [, metadata] = await Promise.all([
             viz.loadImages(), // start requesting images ASAP
             safeSource.requestMetadata(viz)
         ]);
         await this._context;
         this._endChange(majorChange, change);
-        this._commitSuccesfulUpdate(data.metadata, data.layergroupid, viz, safeSource);
+        this._commitSuccesfulUpdate(metadata, viz, safeSource);
     }
 
     _initChange (majorChange) {
@@ -264,7 +258,7 @@ export default class Layer {
     // TODO document
     _getClusterData (layerIndex, clusterId) {
         const zoom = this.map.getZoom();
-        const layergroupid = this.layergroupid;
+        const layergroupid = this.metadata.layergroupid;
 
         return this._clusterCache.get(layerIndex, zoom, clusterId, layergroupid);
     }
@@ -276,9 +270,8 @@ export default class Layer {
      * @param {carto.Viz} newViz
      * @param {carto.source} newSource
      */
-    _commitSuccesfulUpdate (metadata, layergroupid, newViz, newSource) {
+    _commitSuccesfulUpdate (metadata, newViz, newSource) {
         this.metadata = metadata;
-        this.layergroupid = layergroupid;
         this._commitVizChange(newViz);
         this._commitSourceChange(newSource);
 
@@ -421,25 +414,24 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    async getFeaturesAtPosition (position, index, showClusterAggregation) {
+    async getFeaturesAtPosition (position, index, showClusterAggregation = false) {
+        const isAggregated = this.isAggregated;
         const features = this.visible
             ? this._renderLayer.getFeaturesAtPosition(position).map(this._addLayerIdToFeature.bind(this))
             : [];
 
-        const clusterData = await this._getClusterFeaturesData(features, index, showClusterAggregation);
+        const clusterData = isAggregated && showClusterAggregation
+            ? await this._getClusterFeaturesData(features, index)
+            : [];
 
         return { features, clusterData };
     }
 
-    async _getClusterFeaturesData (features, index = 0, showClusterAggregation = false) {
-        const isAggregated = this.isAggregated;
+    async _getClusterFeaturesData (features, index = 0) {
+        const clusterId = this._getClusterId(features);
+        const clusterData = await this._getClusterData(index, clusterId);
 
-        if (isAggregated && showClusterAggregation) {
-            const clusterId = this._getClusterId(features);
-            const clusterData = await this._getClusterData(index, clusterId);
-
-            return clusterData;
-        }
+        return clusterData;
     }
 
     _getClusterId (features) {
