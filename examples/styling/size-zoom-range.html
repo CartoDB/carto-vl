@@ -16,10 +16,10 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Size features based on zoom range</h1>
+                <h1>Symbolize features by zoom range</h1>
             </header>
             <section>
-                <p class="description open-sans">Interpolate feature widths through zoom</p>
+                <p class="description open-sans">Set feature style properties through zoom</p>
             </section>
             <footer class="js-footer"></footer>
         </div>
@@ -53,8 +53,9 @@
         const source = new carto.source.Dataset('taxi_50k');
 
         const viz = new carto.Viz(`
-            width: ramp(zoomrange([12,18]),[1,20])
-            strokeWidth: ramp(zoomrange([12,18]),[0.5,2])
+            width: ramp(zoomrange([12,18]),[1,16])
+            color: ramp(zoomrange([12,18]),[blue,red])
+            strokeWidth: 0
         `);
 
         const layer = new carto.Layer('layer', source, viz);
