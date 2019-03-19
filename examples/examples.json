@@ -15,20 +15,29 @@
                     "file": "basics/basic-style.html"
                 },
                 {
-                    "title": "SQL Source layer",
-                    "file": "basics/sql-source-layer.html"
-                },
-                {
-                    "title": "Add multiple layers",
-                    "file": "basics/multiple-layers.html"
-                },
-                {
-                    "title": "Select layer",
-                    "file": "basics/select-layer.html"
-                },
-                {
                     "title": "Check for browser support",
                     "file": "basics/browser-support.html"
+                }
+            ]
+        },
+        {
+            "title": "Sources",
+            "samples": [
+                {
+                    "title": "Add SQL source layer",
+                    "file": "sources/sql-source-layer.html"
+                },
+                {
+                    "title": "Add GeoJSON source layer",
+                    "file": "sources/geojson-source-layer.html"
+                },
+                {
+                    "title": "Add multiple source layers",
+                    "file": "sources/multiple-layers.html"
+                },
+                {
+                    "title": "Select drawing layer",
+                    "file": "sources/select-layer.html"
                 }
             ]
         },
