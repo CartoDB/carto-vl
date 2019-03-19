@@ -209,8 +209,10 @@ export default class Viz {
     }
 
     getMinimumNeededSchema () {
-        const exprs = this._getRootExpressions().filter(x => x && x._getMinimumNeededSchema);
-        return exprs.map(expr => expr._getMinimumNeededSchema()).reduce(schema.union, schema.IDENTITY);
+        return this._getRootExpressions()
+            .filter(x => x && x._getMinimumNeededSchema)
+            .map(expr => expr._getMinimumNeededSchema())
+            .reduce(schema.union, schema.IDENTITY);
     }
 
     setDefaultsIfRequired (geomType) {

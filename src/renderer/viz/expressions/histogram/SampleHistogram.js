@@ -67,7 +67,7 @@ import { OTHERS_LABEL, DEFAULT_OPTIONS } from '../constants';
  *
  * Generates a histogram based on the samples from the metadata.
  * This class is instanced automatically by using the `sampleHistogram` function. It is documented for its methods.
- * Read more about histogram expression at {@link carto.expressions.globalhistogram}.
+ * Read more about histogram expression at {@link carto.expressions.sampleHistogram}.
  *
  * @name expressions.SampleHistogram
  * @abstract
@@ -269,7 +269,7 @@ export default class SampleHistogram extends Histogram {
     }
 
     _setHistogramForNumericValues () {
-        const name = this._propertyName;
+        const name = this.propertyName;
         const ratio = this._metadata.featureCount / this._metadata.sample.length;
 
         this._metadata.sample.forEach((feature) => {

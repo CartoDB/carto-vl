@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
 
 ### Added
@@ -14,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Throw error when using `clusterCount` in a global classifier
 - Label example with `clusterAVG` expression
 - Label example with `clusterCount` expression
+- Add `sampleHistogram` expression
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons
@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix WebGL incompatibility in Edge
 - Fix regression in `toString` Viz method
 - Fix variables for aggregated values
+- Fix nesting `top` expression in histogram expressions
 
 ## [1.1.1] - 2019-01-16
 

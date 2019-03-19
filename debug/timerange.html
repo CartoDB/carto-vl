@@ -114,8 +114,7 @@
         console.log(viz);
         console.log("Min Month", viz.variables.minMonth.value);
         console.log("Max Month", viz.variables.maxMonth.value);
-        console.log('Months:', viz.variables.list.value.map(f => viz.variables.month.eval(f.properties).text));
-        // console.log('Months:',viz.variables.list.value.map(f => f[viz.variables.month.propertyName]));
+        console.log('Months:', viz.variables.list.value.map(f => f.properties.month.text));
       }
       if (animation) {
         const time = animation.getProgressValue();
