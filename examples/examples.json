@@ -77,24 +77,28 @@
                     "file": "styling/viewport.html"
                 },
                 {
-                    "title": "Single Image",
+                    "title": "Size by zoom range",
+                    "file": "styling/size-zoom-range.html"
+                },
+                {
+                    "title": "Scaled width",
+                    "file": "styling/scaled.html"
+                },
+                {
+                    "title": "Single image",
                     "file": "styling/image-single.html"
                 },
                 {
-                    "title": "Multiple Images",
+                    "title": "Multiple images",
                     "file": "styling/image-multiple.html"
                 },
                 {
-                    "title": "External Image",
+                    "title": "External image",
                     "file": "styling/image-external.html"
                 },
                 {
                     "title": "Draw Order",
                     "file": "styling/draw-order.html"
-                },
-                {
-                    "title": "Scaled width",
-                    "file": "styling/scaled.html"
                 }
             ]
         },
