@@ -40,7 +40,7 @@
                     "file": "sources/select-layer.html"
                 },
                 {
-                    "title": "External GeoJSON layer",
+                    "title": "Load external GeoJSON layer",
                     "file": "sources/external-geojson.html"
                 }
             ]
