@@ -209,7 +209,7 @@
                     "file": "widgets/histogram-widget-viewport.html"
                 },
                 {
-                    "title": "Viewport weighted-histogram table",
+                    "title": "Viewport table",
                     "file": "widgets/weighted-histogram.html"
                 }
             ]
