@@ -53,7 +53,7 @@
     const source = new carto.source.Dataset('spend_data');
 
     const viz = new carto.Viz(`
-      width: sqrt($amount)/2
+      width: sqrt($amount)/4
       color: ramp(linear($amount,viewportMax($amount),viewportMin($amount)),bluyl)
       strokeColor: rgba(51,51,51,0.3)
     `);
