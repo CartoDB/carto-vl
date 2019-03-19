@@ -226,7 +226,7 @@
                 },
                 {
                     "title": "Viewport table",
-                    "file": "widgets/weighted-histogram.html"
+                    "file": "widgets/weighted-histogram-table.html"
                 }
             ]
         },
