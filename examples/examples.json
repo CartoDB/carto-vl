@@ -56,10 +56,6 @@
                     "file": "styling/style-with-variables.html"
                 },
                 {
-                    "title": "Animate by date/time",
-                    "file": "styling/animation.html"
-                },
-                {
                     "title": "Filter based styling",
                     "file": "styling/filter.html"
                 },
@@ -90,6 +86,39 @@
             ]
         },
         {
+            "title": "Animation",
+            "samples": [
+                {
+                    "title": "Animate and color by date",
+                    "file": "animation/animate-color-by-date.html"
+                },
+                {
+                    "title": "Animate by date range",
+                    "file": "animation/animate-by-date-range.html"
+                },
+                {
+                    "title": "Animate feature width",
+                    "file": "animation/animate-width.html"
+                },
+                {
+                    "title": "Animate filtered features",
+                    "file": "animation/animate-filtered-features.html"
+                },
+                {
+                    "title": "Hold features on fade out",
+                    "file": "animation/animate-and-hold.html"
+                },
+                {
+                    "title": "Add background feature visibility",
+                    "file": "animation/add-feature-visibility.html"
+                },
+                {
+                    "title": "Add animation controls",
+                    "file": "animation/animation-controls.html"
+                }
+            ]
+        },
+        {
             "title": "Interactivity",
             "samples": [
                 {
@@ -111,10 +140,6 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
-                },
-                {
-                    "title": "Animation controls",
-                    "file": "interactivity/animation-controls.html"
                 }
             ]
         },
