@@ -50,14 +50,15 @@
       apiKey: 'default_public'
     });
 
-    // Define layer
     const source = new carto.source.Dataset('vancouver_trees');
+
     const viz = new carto.Viz(`
       // 3 pixels at zoom level 13
       // 6 pixels at zoom level 14
       // 12 pixels at zoom level 15
       width: scaled(6, 14)
     `);
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
