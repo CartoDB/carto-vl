@@ -2,33 +2,30 @@
 <html>
 
 <head>
-  <title>Numeric Chart | CARTO</title>
+  <title>Numeric chart | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../../../dist/carto-vl.js"></script>
+  <script src="../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
-
   <!-- Include Chart JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
 </head>
 
 <body>
   <div id="map"></div>
-  <aside class="toolbox chart-toolbox chart-toolbox-large">
-    <div class="box chart-box">
+  <aside class="toolbox chart-toolbox">
+    <div class="box">
       <header>
-        <h1>Transactions by hour</h1>
+        <h1>Tree Diameter</h1>
       </header>
       <section>
-        <div id="controls">
-          <canvas id="histogram" width="600" height="300"></canvas>
-        </div>
+        <canvas id="histogram" width="300" height="300"></canvas>
       </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
+
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -41,8 +38,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [2.2, 41.4],
-      zoom: 12
+      center: [-123.1205, 49.2617],
+      zoom: 12.41
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -57,17 +54,14 @@
 
     const ctx = document.getElementById('histogram').getContext('2d');
 
-    // Define the source
-    const source = new carto.source.Dataset('spend_data');
+    const source = new carto.source.Dataset('vancouver_trees');
 
     // Define the visualization
     const viz = new carto.Viz(`
-      @color: ramp($hour, sunset)
-      @histogram: viewportHistogram($hour, 12)
-
-      color: @color
+      @v_histogram: viewportHistogram($diameter, [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+      color: #00718b
       width: 5
-      strokeWidth: 0
+      strokeWidth: 0.5
     `);
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
@@ -85,6 +79,8 @@
             display: false
           },
           ticks: {
+            suggestedMin: 1,
+            beginAtZero: true,
             display: false
           }
         }],
@@ -94,16 +90,12 @@
             display: false
           },
           ticks: {
-            callback: function (tick, index, ticks) {
-              if (!Number.isNaN(tick[0])) {
-                return `${tick[0]}-${tick[1]}h`;
-              }
-            },
-            autoSkip: false,
-            maxRotation: 0,
-            minRotation: 0
+            display: true,
+            callback: function (value, index, values) {
+              return `[${value.join(', ')}]`;
+            }
           },
-          barPercentage: 0.95,
+          barPercentage: 0.9,
           categoryPercentage: 1.0
         }]
       }
@@ -118,57 +110,32 @@
 
     layer.addTo(map, 'watername_ocean');
 
-    layer.on('loaded', () => {
-      hideLoader();
-      drawHistogramLegend();
-    });
+    layer.on('loaded', hideLoader);
 
-    layer.on('updated', drawHistogramLegend);
-
-    function drawHistogramLegend() {
-      // Get the color ramp
-      const colorRamp = layer.viz.color;
-      // Get the viewport histogram
-      const histogram = layer.viz.variables.histogram.value.map(roundedValue);
-      // Get labels (x)
-      const labels = histogram.map(value => value.x);
-      // Get data (y)
-      const data = histogram.map(value => value.y);
-
-      // Get chart bars colors
-      const colors = colorRamp
-        .getLegendData()
-        .data
-        .map(legend => computeColor(legend.value));
+    layer.on('updated', () => {
+      // Save histogram variable
+      const histogram = layer.viz.variables.v_histogram;
+      // Get histogram data
+      const histogramData = histogram.value;
+      // Chart.js set up
+      const labels = histogramData.map(elem => elem.x);
+      const data = histogramData.map(elem => elem.y);
+      const backgroundColor = '#00718b';
 
       chart.data = {
         labels,
         datasets: [{
           data,
-          backgroundColor: '#86d7ff'
+          backgroundColor
         }]
-      }
+      };
 
       chart.update();
-    }
+    });
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
-
-    function computeColor(color) {
-      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
-    }
-
-    function roundedValue(value) {
-      const x = [Math.round(value.x[0]), Math.round(value.x[1])];
-      const y = value.y;
-      return {
-        x,
-        y
-      };
-    }
-
   </script>
 </body>
 
