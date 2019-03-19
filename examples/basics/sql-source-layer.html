@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Query layer | CARTO</title>
+  <title>SQL Source Layer | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -38,8 +38,6 @@
       center: [0, 30],
       zoom: 3,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -47,13 +45,12 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
+    // Define layer with SQL source
     const source = new carto.source.SQL(`
       SELECT *
         FROM populated_places
