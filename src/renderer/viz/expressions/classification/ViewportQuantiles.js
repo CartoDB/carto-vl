@@ -72,7 +72,10 @@ export default class ViewportQuantiles extends Classifier {
 
     _genBreakpoints () {
         const histogram = this._histogram.value;
-        if (histogram === undefined) { return; }
+
+        if (!histogram) {
+            return;
+        }
 
         const accumHistogram = this._getAccumHistogramFrom(histogram);
         const [min, max] = this._getMinMaxFrom(histogram);
