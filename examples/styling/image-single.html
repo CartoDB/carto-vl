@@ -38,8 +38,6 @@
       center: [0, 30],
       zoom: 3,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -53,10 +51,10 @@
     });
 
     const source = new carto.source.Dataset('populated_places');
+
     const viz = new carto.Viz(`
     symbol: star
     `);
-
 
     const layer = new carto.Layer('layer', source, viz);
 

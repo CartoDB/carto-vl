@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Style with variables | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -35,8 +37,6 @@
       center: [0, 30],
       zoom: 2,
       scrollZoom: false,
-
-
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -44,14 +44,13 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
     const source = new carto.source.Dataset('world_population_2015');
+
     const viz = new carto.Viz(`
       @pop: sqrt($pop_2015) / 200
       @style: ramp($country_name, bold)
@@ -61,6 +60,7 @@
       strokeColor: @style
       strokeWidth: 1.5
     `);
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -71,4 +71,5 @@
     }
   </script>
 </body>
+
 </html>

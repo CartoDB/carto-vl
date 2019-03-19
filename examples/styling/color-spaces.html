@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Color spaces | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <!-- Include CARTO VL JS -->
   <script src="../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -18,7 +19,7 @@
         <h1>Color spaces</h1>
       </header>
       <section>
-        <p class="description open-sans">The color spaces that we support</p>
+        <p class="description open-sans">The color spaces that CARTO VL supports</p>
         <div id="controls">
           <ul>
             <li>
@@ -74,13 +75,11 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define styles
     const vizGreen = new carto.Viz(`
       color: #00874D
     `);
@@ -100,7 +99,6 @@
       color: cielab(90, 10, 60)
     `);
 
-    // Define layer
     const source = new carto.source.Dataset('populated_places');
     const layer = new carto.Layer('layer', source, vizGreen);
 
@@ -130,4 +128,5 @@
     }
   </script>
 </body>
+
 </html>
