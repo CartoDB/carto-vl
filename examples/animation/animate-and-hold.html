@@ -19,7 +19,7 @@
 				<h1>Seattle Collisions</h1>
 			</header>
 			<section>
-				<p class="description open-sans">Hold fade out of animated features</p>
+				<p class="description open-sans">Hold fade out for cumulative animation</p>
 			</section>
 			<footer class="js-footer"></footer>
 		</div>
@@ -38,7 +38,7 @@
 			container: 'map',
 			style: carto.basemaps.darkmatter,
 			center: [-122.33, 47.61],
-			zoom: 11,
+			zoom: 10,
 			scrollZoom: false,
 		});
 
@@ -57,8 +57,8 @@
 		// Define animation viz
 		const viz = new carto.Viz(`
 			filter: animation($incdate, 30, fade(0.1, hold))
-			color: ramp(linear($incdate), sunset)
 			width: 3
+			color: turquoise
 			strokeWidth: 0
 		`);
 
