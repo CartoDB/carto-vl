@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Add pop-ups | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -19,16 +21,16 @@
       <section>
         <p class="description open-sans">Create pop-up information windows and interact with your map</p>
         <div id="controls">
-            <ul class="actions">
-              <li>
-                <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
-                <label for="click">Pop-ups on click</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
-                <label for="hover">Pop-ups on hover</label>
-              </li>
-            </ul>
+          <ul class="actions">
+            <li>
+              <input type="radio" name="style" onclick="setPopupsClick()" id="click" checked>
+              <label for="click">Pop-ups on click</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setPopupsHover()" id="hover">
+              <label for="hover">Pop-ups on hover</label>
+            </li>
+          </ul>
         </div>
       </section>
       <footer class="js-footer"></footer>
@@ -61,13 +63,11 @@
       closeOnClick: false
     });
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
     const source = new carto.source.Dataset('world_population_2015');
     const viz = new carto.Viz(`
       @country_name: $country_name
@@ -155,4 +155,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -122,15 +122,15 @@
             "title": "Interactivity",
             "samples": [
                 {
-                    "title": "Hover",
+                    "title": "Feature hover",
                     "file": "interactivity/hover.html"
                 },
                 {
-                    "title": "Click",
+                    "title": "Feature click",
                     "file": "interactivity/click.html"
                 },
                 {
-                    "title": "Interact with multiple layers",
+                    "title": "Multi-layer interactivitiy",
                     "file": "interactivity/interact-multiple-layers.html"
                 },
                 {
@@ -140,6 +140,10 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
+                },
+                {
+                    "title": "Interactive based filter",
+                    "file": "interactivity/interactive-filter.html"
                 }
             ]
         },
