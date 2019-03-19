@@ -7,7 +7,7 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add CARTO dataset layer",
+                    "title": "Add CARTO layer",
                     "file": "basics/add-layer.html"
                 },
                 {
