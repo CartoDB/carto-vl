@@ -280,7 +280,7 @@
             "title": "Advanced",
             "samples": [
                 {
-                    "title": "Classification with variables",
+                    "title": "Interactive classification",
                     "file": "advanced/classification-variables.html"
                 },
                 {
