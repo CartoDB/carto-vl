@@ -77,12 +77,16 @@
                     "file": "styling/viewport.html"
                 },
                 {
-                    "title": "Style by zoom range",
-                    "file": "styling/size-zoom-range.html"
-                },
-                {
                     "title": "Scaled width",
                     "file": "styling/scaled.html"
+                },
+                {
+                    "title": "Style by zoom range",
+                    "file": "styling/zoom-range-style.html"
+                },
+                {
+                    "title": "Filter by zoom range",
+                    "file": "styling/zoom-range-filter.html"
                 },
                 {
                     "title": "Single image",
