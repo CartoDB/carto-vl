@@ -52,7 +52,7 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [2.1734, 41.3851],
-      zoom: 12,
+      zoom: 13,
       scrollZoom: false,
     });
 
@@ -69,15 +69,21 @@
     // Define styles
     const rampAutoViz = new carto.Viz(`
       color: ramp($category, vivid)
-      strokeWidth: 0
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
     const rampBucketsViz = new carto.Viz(`
-      color: ramp(buckets($category, ['Moda y calzado']), vivid)
-      strokeWidth: 0
+      color: ramp(buckets($category, ['Moda y calzado','Salud','Alimentación']), vivid)
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
     const rampTopViz = new carto.Viz(`
-      color: ramp(top($category, 3), vivid)
-      strokeWidth: 0
+      color: ramp(top($category, 5), vivid)
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
 
     const source = new carto.source.Dataset('spend_data');
