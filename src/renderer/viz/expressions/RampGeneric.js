@@ -1,4 +1,4 @@
-import { checkType, mix, fract } from './utils';
+import { checkType, mix, fract, clamp } from './utils';
 
 import Property from './basic/property';
 import Linear from './linear';
@@ -61,9 +61,12 @@ export default class RampGeneric extends Base {
         const maxValues = paletteValues.length - 1;
         const min = Math.floor(input * maxValues);
         const max = Math.ceil(input * maxValues);
+
+        const clampMin = clamp(min, 0, maxValues);
+        const clampMax = clamp(max, 0, maxValues);
         const m = fract(input * maxValues);
 
-        return mix(paletteValues[min], paletteValues[max], m);
+        return mix(paletteValues[clampMin], paletteValues[clampMax], m);
     }
 
     getLegendData (options) {

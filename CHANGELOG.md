@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Fix regression in `toString` Viz method
 - Fix variables for aggregated values
 - Fix nesting `top` expression in histogram expressions
+- Fix `ramp` when evaluating a numeric property using `linear`
 
 ## [1.1.1] - 2019-01-16
 
