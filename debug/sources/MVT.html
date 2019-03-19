@@ -48,16 +48,16 @@
 
     async function loadMVT() {
       const mapConfig = {
-        buffersize: { mvt: 0 },
-        layers: [
-          {
-            id: 'europeLayer',
-            type: 'mapnik',
-            options: {
-              sql: `SELECT * FROM mnmappluto`
-            }
+        buffersize: {
+          mvt: 0
+        },
+        layers: [{
+          id: 'europeLayer',
+          type: 'mapnik',
+          options: {
+            sql: `SELECT * FROM mnmappluto`
           }
-        ]
+        }]
       }
       const response = await fetch('https://cartovl.carto.com/api/v1/map', {
         method: 'POST',
@@ -71,19 +71,24 @@
       const tilejson = layergroup.metadata.tilejson.vector;
       const source = new carto.source.MVT(tilejson.tiles, {
         properties: {
-          numfloors: { type: 'number' },
-          cartodb_id: { type: 'number' }
+          numfloors: {
+            type: 'number'
+          },
+          cartodb_id: {
+            type: 'number'
+          }
         },
         idProperty: 'cartodb_id',
       }, {
-          layerID: 'europeLayer',
-          viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 1), 11)
+        layerID: 'europeLayer',
+        viewportZoomToSourceZoom: zoom => Math.min(Math.max(Math.ceil(zoom), 1), 11)
       });
 
       const viz = new carto.Viz(`
-      color: ramp(linear($numfloors, 0, 20), temps)
-      strokeWidth: 0
+        color: ramp(linear($numfloors, 0, 20), temps)
+        strokeWidth: 0
       `);
+
       const layer = new carto.Layer('layer', source, viz);
 
       layer.addTo(map, 'watername_ocean');

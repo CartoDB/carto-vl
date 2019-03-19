@@ -37,9 +37,7 @@
       style: carto.basemaps.voyager,
       center: [-73.97720677029952, 40.77784846220871],
       zoom: 13,
-      scrollZoom: false,
-
-
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -60,7 +58,9 @@
 
     const metadata = {
       properties: {
-        numfloors: { type: 'number' }
+        numfloors: {
+          type: 'number'
+        }
       }
     };
 

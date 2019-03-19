@@ -39,9 +39,10 @@
 
         async function loadMVT() {
             const mapConfig = {
-                buffersize: { mvt: 0 },
-                layers: [
-                    {
+                buffersize: {
+                    mvt: 0
+                },
+                layers: [{
                         id: 'myCartoLayer',
                         type: 'mapnik',
                         options: {
@@ -69,13 +70,10 @@
             const tilejson = layergroup.metadata.tilejson.vector;
 
             const source = new carto.source.MVT(tilejson.tiles[0], {
-                properties: {
-                }
-            },
-                {
-                    layerID: 'myCartoLayer2'
-                }
-            );
+                properties: {}
+            }, {
+                layerID: 'myCartoLayer2'
+            });
 
             const viz = new carto.Viz();
             const layer = new carto.Layer('myCartoLayer2', source, viz);
@@ -87,7 +85,6 @@
         }
 
         loadMVT();
-
     </script>
 </body>
 
