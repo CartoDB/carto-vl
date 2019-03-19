@@ -140,10 +140,6 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
-                },
-                {
-                    "title": "Animation controls",
-                    "file": "interactivity/animation-controls.html"
                 }
             ]
         },
