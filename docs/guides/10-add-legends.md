@@ -10,8 +10,8 @@ If you completed the data-driven visualization guide, the map below will look fa
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
+        id="intro-guides-legend"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -175,14 +175,14 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
+        id="guides-legend-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-2.html)
 
 ### Overwrite defaults
 
@@ -192,8 +192,8 @@ For example, the map below symbolizes only the `top` three weather conditions in
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-4"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-4.html"
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -213,15 +213,15 @@ With that change, the map labels other categories as "Other weather" in the lege
 
 <div class="example-map">
     <iframe
-        id="accidents-all-top-legend"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
+        id="guides-legend-step-4"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-4.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-4.html)
 
 ### Assign opacity with variables
 
@@ -289,15 +289,15 @@ Now when you load the map, you will see that both the features on the map and th
 
 <div class="example-map">
     <iframe
-        id="accidents-all-transparent-legend"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        id="guides-legend-step-5"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
 
 ### More examples
 
@@ -308,6 +308,20 @@ View the source of the maps below to see how legends work for different map and 
 <div class="example-map">
     <iframe
         id="guides-legend-step-6"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
+
+#### Categorical lines
+
+<div class="example-map">
+    <iframe
+        id="guides-legend-step-7"
         src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
@@ -317,11 +331,11 @@ View the source of the maps below to see how legends work for different map and 
 </div>
 You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-7.html)
 
-#### Categorical lines
+#### Image markers
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-7"
+        id="guides-legend-step-8"
         src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
@@ -331,11 +345,11 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 </div>
 You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
 
-#### Image markers
+#### Unclassed points
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-8"
+        id="guides-legend-step-9"
         src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
         width="100%"
         height="500"
@@ -344,17 +358,3 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
     </iframe>
 </div>
 You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-9.html)
-
-#### Unclassed points
-
-<div class="example-map">
-    <iframe
-        id="guides-legend-step-9"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-10.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-10.html)

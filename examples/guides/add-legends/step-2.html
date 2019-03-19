@@ -21,6 +21,12 @@
             <header>
                 <h1>Rail Accidents by Weather</h1>
             </header>
+            <!-- Add legend data -->
+            <section>
+                <div id="controls">
+                    <ul id="content"></ul>
+                </div>
+            </section>
         </div>
     </aside>
 
@@ -31,6 +37,8 @@
             center: [-96, 41],
             zoom: 3
         });
+
+        //** CARTO VL functionality begins here **//
 
         carto.setDefaultAuth({
             username: 'cartovl',
@@ -46,6 +54,34 @@
         `);
         const layer = new carto.Layer('layer', source, viz);
         layer.addTo(map);
+
+        //** ADD LEGEND **//
+
+        // A function to convert map colors to HEX values for legend
+        function rgbToHex(color) {
+            return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
+        }
+
+        // When layer loads, trigger legend event
+        layer.on('loaded', () => {
+
+            // Request data for legend from the layer viz
+            const colorLegend = layer.viz.color.getLegendData();
+            let colorLegendList = '';
+
+            // Create list elements for legend
+            colorLegend.data.forEach((legend, index) => {
+                const color = rgbToHex(legend.value);
+
+                // Style for legend items based on geometry type
+                colorLegendList +=
+                    `<li><span class="point-mark" style="background-color:${color};border: 1px solid black;"></span> <span>${legend.key}</span></li>\n`;
+            });
+
+            // Place list items in the content section of the title/legend box
+            document.getElementById('content').innerHTML = colorLegendList;
+        });
+
     </script>
 
 </body>
