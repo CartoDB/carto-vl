@@ -40,7 +40,7 @@
     // Define layer
     const source = new carto.source.Dataset('county_points_with_population');
     const viz = new carto.Viz(`
-      width:   75*sqrt($estimate_total)/sqrt(viewportMax($estimate_total))
+      width: 75 * sqrt($estimate_total) / sqrt(viewportMax($estimate_total))
       color: opacity(ramp(linear($estimate_total,viewportMax($estimate_total),viewportMin($estimate_total)),purpor),0.7)
       strokeWidth: 0.05*sqrt($estimate_total/sqrt(viewportMax($estimate_total)))
       strokeColor: opacity(ramp(linear($estimate_total,viewportMax($estimate_total),viewportMin($estimate_total)),purpor),0.8)
