@@ -46,8 +46,11 @@
         version: 8,
         sources: {},
         layers: [{
-          id: 'background', type: 'background',
-          paint: { 'background-color': 'black' }
+          id: 'background',
+          type: 'background',
+          paint: {
+            'background-color': 'black'
+          }
         }]
       },
       center: [0, 0],
@@ -72,8 +75,8 @@
         '${animStart}'::timestamp AS min_st,
         '${animEnd}'::timestamp AS max_st,
         0.0 AS x0, 0.0 AS y0,     -- center at the equator
-        200 AS length,         -- line length: 600 km
-        50 AS n                  -- 100 points
+        200 AS length,            -- line length: 600 km
+        50 AS n                   -- 100 points
       ),
       positions AS (
         SELECT
@@ -96,14 +99,18 @@
       duration,
       s.fade(duration / 10, duration / 5)
     );
+
     const viz = new carto.Viz({
       strokeWidth: 1,
       color: s.hsv(animation, 1, 1),
       width: s.add(1, s.mul(animation, 30)),
       order: s.desc(s.width())
     });
+
     const layer = new carto.Layer('layer', source, viz);
+
     layer.addTo(map, 'background');
+
     layer.on('updated', () => {
       const time = animation.getProgressValue().toISOString();
       document.getElementById("timer").textContent = time;

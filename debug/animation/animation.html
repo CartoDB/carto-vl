@@ -87,18 +87,22 @@
       duration,
       s.fade(duration/10, duration/5)
     );
+
     const viz = new carto.Viz({
         strokeWidth: 1,
         color: s.hsv(animation, 1, 1),
         width: s.add(1,s.mul(animation,30)),
         order: s.desc(s.width())
     });
+
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
+
     layer.on('updated', () => {
         const time = animation.getProgressValue().toISOString();
         document.getElementById("timer").textContent = time;
     });
+
   </script>
 </body>
 </html>

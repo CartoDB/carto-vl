@@ -41,8 +41,11 @@
         version: 8,
         sources: {},
         layers: [{
-          id: 'background', type: 'background',
-          paint: { 'background-color': 'black' }
+          id: 'background',
+          type: 'background',
+          paint: {
+            'background-color': 'black'
+          }
         }]
       },
       center: [0, 0],
@@ -62,7 +65,8 @@
     const lineLength = 600000;
 
     const s = carto.expressions;
-    const source = new carto.source.SQL(`
+    const source = new carto.source.SQL(
+      `
       WITH params AS (
         SELECT
         -- simulation time limits:
@@ -84,28 +88,22 @@
         ST_SetSRID(ST_MakePoint(x, y), 4326) AS the_geom,
         ST_Transform(ST_SetSRID(ST_MakePoint(x, y), 4326), 3857) AS the_geom_webmercator
         FROM params, positions
-    `);
+    `
+    );
     const viz = new carto.Viz(`
       @month: clusterTime($date, 'month', 'Europe/Madrid')
-
-      // linear uses start date value
-      // width: linear(@month)*60
-      width: linear(@month, '2018-01', '2018-09')*60
-      color: ramp(linear(@month), SUNSET)
-
-      // filter: animation(@month, 10, fade(0.01, 0.01))
-      filter: animation(@month)
-
-      // TODO: buckets should use category?
-      // @selMonths: buckets(@month, ['2018-04', '2018-06', '2018-07', '2018-09'])
-      // width: ramp(@selMonths, [60, 50, 40, 30], 20)
-
       @list: viewportFeatures(@month)
       @maxMonth: globalMax(@month)
       @minMonth: globalMin(@month)
+
+      width: linear(@month, '2018-01', '2018-09') * 60
+      color: ramp(linear(@month), SUNSET)
+      filter: animation(@month)
     `);
+
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map, 'background');
+    
     let info = true;
     const animation = ['animation'].includes(viz.filter.expressionName) ? viz.filter : null;
     layer.on('updated', () => {

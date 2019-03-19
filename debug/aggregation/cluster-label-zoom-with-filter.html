@@ -47,27 +47,28 @@
             apiKey: 'default_public'
         });
 
-
         const source = new carto.source.SQL(`select * from monarch_migration_1`);
         const viz = new carto.Viz(`
+            @cc: clusterCount()
+            @v_features: viewportFeatures(@cc);
 
-        @cc: clusterCount()
-        @v_features: viewportFeatures(@cc);
+            width: sqrt(@cc)*10
+            color: opacity(ramp(linear(@cc,5,50),redor),0.7)
+            strokeColor: ramp(linear(@cc,5,50),redor)
+            strokeWidth: 1
+            order: asc(width())
+            resolution: 16
+            filter:ramp(zoomrange([3,4,5,6]),[@cc>20,@cc>10,@cc>5,true])
+        `);
 
-        width: sqrt(@cc)*10
-        color: opacity(ramp(linear(@cc,5,50),redor),0.7)
-        strokeColor: ramp(linear(@cc,5,50),redor)
-        strokeWidth: 1
-        order: asc(width())
-        resolution: 16
-        filter:ramp(zoomrange([3,4,5,6]),[@cc>20,@cc>10,@cc>5,true])
-
-    `);
         const layer = new carto.Layer('layer', source, viz);
 
         // Create labeling layer centroids
         layer.on('loaded', () => {
-            map.addSource('labels', { type: 'geojson', data: null });
+            map.addSource('labels', {
+                type: 'geojson',
+                data: null
+            });
             const labelSource = map.getSource('labels');
 
             const layerUpdated = function () {
