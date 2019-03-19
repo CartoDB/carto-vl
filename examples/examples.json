@@ -139,16 +139,20 @@
                     "file": "interactivity/click.html"
                 },
                 {
+                    "title": "Add pop-ups on hover",
+                    "file": "interactivity/pop-up-on-hover.html"
+                },
+                {
+                    "title": "Add pop-ups on click",
+                    "file": "interactivity/pop-up-click.html"
+                },
+                {
                     "title": "Multi-layer interactivitiy",
                     "file": "interactivity/interact-multiple-layers.html"
                 },
                 {
                     "title": "Interactive based styling",
                     "file": "interactivity/interactive-based-styling.html"
-                },
-                {
-                    "title": "Add pop-ups",
-                    "file": "interactivity/pop-ups.html"
                 },
                 {
                     "title": "Interactive based filter",
