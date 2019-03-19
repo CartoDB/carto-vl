@@ -16,7 +16,7 @@
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Number of People Invlovled in Collisions</h1>
+                <h1>Number of People Involved in Collisions</h1>
             </header>
             <section>
                 <p class="description open-sans">Animate the width of features over time</p>
@@ -54,8 +54,8 @@
 
         // Define animation viz
         const viz = new carto.Viz(`
-            width: ramp(linear($personcount,2,5),[5,20]) * animation(linear($incdate),20,fade(1,1))
-            color: opacity(turquoise,0.8)
+            width: ramp(linear($personcount, 2, 5), [5, 20]) * animation(linear($incdate), 20,fade(1, 1))
+            color: opacity(turquoise, 0.8)
             strokeWidth: 0
         `);
 
