@@ -36,7 +36,7 @@
                     "file": "sources/multiple-layers.html"
                 },
                 {
-                    "title": "Select drawing layer",
+                    "title": "Select between source layers",
                     "file": "sources/select-layer.html"
                 }
             ]
