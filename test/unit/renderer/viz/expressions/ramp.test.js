@@ -95,6 +95,44 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 });
             });
         });
+
+        describe('when palettes are numbers', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    price: { type: 'number', min: 1, max: 10 }
+                },
+                sample: [
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                    { price: 6 },
+                    { price: 7 },
+                    { price: 8 },
+                    { price: 9 },
+                    { price: 10 }
+                ]
+            });
+            describe('and values are numeric', () => {
+                it('should get the correct values, when property is inside of mapping interval', () => {
+                    const r = ramp(linear(property('price'), 1, 10), [8, 32]);
+                    // const r = ramp(property('price'), [8, 32]); // same as previous
+                    r._bindMetadata(METADATA);
+
+                    expect(r.eval({ price: 1 })).toEqual(8);
+                    expect(r.eval({ price: 10 })).toEqual(32);
+                });
+
+                it('should get the correct (clamped) values, even when property is out of mapping interval', () => {
+                    const r = ramp(linear(property('price'), 1, 5), [8, 32]);
+                    r._bindMetadata(METADATA);
+
+                    expect(r.eval({ price: 0 })).toEqual(8);
+                    expect(r.eval({ price: 10 })).toEqual(32);
+                });
+            });
+        });
     });
 
     describe('.eval with buckets', () => {
