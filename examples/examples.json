@@ -38,6 +38,10 @@
                 {
                     "title": "Select between source layers",
                     "file": "sources/select-layer.html"
+                },
+                {
+                    "title": "External GeoJSON layer",
+                    "file": "sources/external-geojson.html"
                 }
             ]
         },
@@ -275,10 +279,6 @@
         {
             "title": "Advanced",
             "samples": [
-                {
-                    "title": "External GeoJSON layer",
-                    "file": "advanced/external-geojson.html"
-                },
                 {
                     "title": "Classification with variables",
                     "file": "advanced/classification-variables.html"
