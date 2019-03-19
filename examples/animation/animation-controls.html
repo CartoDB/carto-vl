@@ -185,17 +185,16 @@
 </head>
 
 <body>
-    <!-- Map goes here -->
     <div id="map"></div>
 
     <!-- Animation control elements -->
     <aside class="toolbox">
         <div class="box">
             <header>
-                <h1>Animation controls</h1>
+                <h1>Seattle Collisions</h1>
             </header>
             <section>
-                <p class="description open-sans">Control animations by issuing "play", "pause" and "set" commands</p>
+                <p class="description open-sans">Add animation controls for "play", "pause" and "set" commands</p>
             </section>
             <section style="margin-top: 15px;">
                 <input type="button" id="js-play-button">
@@ -222,41 +221,36 @@
         </div>
     </div>
     <script>
-        // Add basemap and set properties
         const map = new mapboxgl.Map({
             container: 'map',
             style: carto.basemaps.darkmatter,
-            center: [-73.96, 40.75],
+            center: [-122.33, 47.61],
             zoom: 11,
-            scrollZoom: false
+            scrollZoom: false,
         });
 
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-left');
 
-        //** CARTO VL functionality begins here **//
-
-        // Autenticate the client
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
         });
 
-        // Define source
-        const source = new carto.source.Dataset('taxi_50k');
+        const source = new carto.source.Dataset('seattle_collisions');
 
-        // Define and style Viz object
+        // Define animation viz with variables
         const viz = new carto.Viz(`
             @duration: 30
-            @animation: animation(linear($tpep_pickup_datetime, time('2016-05-01T00:00:07Z'), time('2016-05-06T10:40:59Z')), @duration, fade(0.1, 0.5))
+            @animation: animation($incdate, @duration, fade(1, 1))
             filter: @animation
+            color: ramp(linear($incdate), sunset)
+            strokeWidth: 0
         `);
 
-        // Define map layer
         const layer = new carto.Layer('layer', source, viz);
 
-        // Add map layer
-        layer.addTo(map, 'watername_ocean');
+        layer.addTo(map);
 
         // Get HTML elements
         const $playbutton = document.getElementById('js-play-button');

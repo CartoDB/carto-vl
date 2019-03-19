@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>Animate and color by date | CARTO</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8">
+	<script src="../../dist/carto-vl.js"></script>
+	<script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+	<link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+	<div id="map"></div>
+	<aside class="toolbox">
+		<div class="box">
+			<header>
+				<h1>Seattle Collisions</h1>
+			</header>
+			<section>
+				<p class="description open-sans">Animate and color features over a date/time field</p>
+			</section>
+			<footer class="js-footer"></footer>
+		</div>
+	</aside>
+	<div id="loader">
+		<div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+			<svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+				<circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+			</svg>
+		</div>
+	</div>
+	<script>
+		const map = new mapboxgl.Map({
+			container: 'map',
+			style: carto.basemaps.darkmatter,
+			center: [-122.33, 47.61],
+			zoom: 10,
+			scrollZoom: false,
+		});
+
+		const nav = new mapboxgl.NavigationControl({
+			showCompass: false
+		});
+		map.addControl(nav, 'top-left');
+
+		carto.setDefaultAuth({
+			username: 'cartovl',
+			apiKey: 'default_public'
+		});
+
+		const source = new carto.source.Dataset('seattle_collisions');
+
+		// Define animation viz
+		const viz = new carto.Viz(`
+			filter: animation($incdate, 30, fade(1, 1))
+			color: ramp(linear($incdate), sunset)
+			strokeWidth: 0
+		`);
+
+		const layer = new carto.Layer('layer', source, viz);
+
+		layer.addTo(map);
+		layer.on('loaded', hideLoader);
+
+		function hideLoader() {
+			document.getElementById('loader').style.opacity = '0';
+		}
+	</script>
+</body>
+
+</html>
