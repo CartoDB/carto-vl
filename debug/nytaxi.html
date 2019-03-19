@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Animation demo | CARTO VL</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +8,18 @@
   <script src="../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-<style>
+  <style>
     body {
       margin: 0;
       padding: 0;
     }
+
     #map {
       position: absolute;
       height: 100%;
       width: 100%;
     }
+
     #timer {
       position: absolute;
       top: 20px;
@@ -27,16 +30,17 @@
     }
   </style>
 </head>
+
 <body>
   <div id="map"></div>
   <div id="timer"></div>
   <script>
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: carto.basemaps.darkmatter,
-            center: [-74.0032059, 40.7482066],
-            zoom: 12,
-        });
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.darkmatter,
+      center: [-74.0032059, 40.7482066],
+      zoom: 12,
+    });
 
 
     carto.setDefaultAuth({
@@ -63,16 +67,15 @@
     const layer = new carto.Layer('layer', source, viz);
     layer.addTo(map);
     let info = true;
-    console.log('FIL',viz.filter.expressionName)
-    const animation = ['animation'].includes(viz.filter.expressionName ) ? viz.filter : null;
+    console.log('FIL', viz.filter.expressionName)
+    const animation = ['animation'].includes(viz.filter.expressionName) ? viz.filter : null;
     layer.on('updated', () => {
       if (info) {
         info = !animation;
         console.log(viz);
         console.log("Min hour", viz.variables.minhour.value.text);
         console.log("Max hour", viz.variables.maxhour.value.text);
-        console.log('hours:',viz.variables.list.value.map(f => viz.variables.hour.eval(f.properties).text));
-        // console.log('Hours:',viz.variables.list.value.map(f => f[viz.variables.hour.propertyName]));
+        console.log('Hours:', viz.variables.list.value.map(f => f.properties.hour.text));
       }
       if (animation) {
         const time = animation.getProgressValue();
@@ -101,6 +104,5 @@
     });
   </script>
 </body>
+
 </html>
-
-
