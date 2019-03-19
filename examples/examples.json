@@ -140,17 +140,6 @@
                 {
                     "title": "Add pop-ups",
                     "file": "interactivity/pop-ups.html"
-<<<<<<< HEAD
-                },
-                {
-                    "title": "Interactive Filter",
-                    "file": "interactivity/interactive-filter.html"
-                },
-                {
-                    "title": "Animation controls",
-                    "file": "interactivity/animation-controls.html"
-=======
->>>>>>> master
                 }
             ]
         },
