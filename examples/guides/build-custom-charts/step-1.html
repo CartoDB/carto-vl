@@ -60,7 +60,7 @@
     // Define the visualization
     const viz = new carto.Viz(`
       @v_viewportHistogram: viewportHistogram($diameter, [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
-      @v_sampleHistogram: sampleHistogram($diameter, [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
+      @v_globalHistogram: globalHistogram($diameter, [[1, 2], [2, 3], [3, 4], [4, 5], [5, 6], [6, 7]])
       color: #00718b
       width: 5
       strokeWidth: 0.5
@@ -119,16 +119,16 @@
     layer.on('updated', () => {
       // Save histograms variable
       const viewportHistogram = layer.viz.variables.v_viewportHistogram;
-      const sampleHistogram = layer.viz.variables.v_sampleHistogram;
+      const globalHistogram = layer.viz.variables.v_globalHistogram;
 
       // Get histograms data
       const viewportHistogramData = viewportHistogram.value;
-      const sampleHistogramData = sampleHistogram.value;
+      const globalHistogramData = globalHistogram.value;
 
       // Chart.js set up
       const labels = viewportHistogramData.map(elem => elem.x);
       const viewportData = viewportHistogramData.map(elem => elem.y);
-      const globalData = sampleHistogramData.map(elem => elem.y);
+      const globalData = globalHistogramData.map(elem => elem.y);
       const viewportColor = '#00718b';
       const globalColor = '#F2B701';
 
