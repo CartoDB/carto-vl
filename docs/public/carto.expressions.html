@@ -2791,7 +2791,8 @@ const viz = new carto.Viz({
 
 <div class="description">
     <p>Count of features per cluster.</p>
-<p>Note: <code>clusterCount</code> has no input parameters and if data is not aggregated, it always returns 1</p>
+<p>The <code>clusterCount</code> expression has no input parameters and if data is not aggregated, it always returns 1.
+It is not possible to use it as an input in global aggregations such as <code>globalMin</code> or <code>globalQuantiles</code>.</p>
 </div>
 
 
@@ -2893,6 +2894,23 @@ const viz = new carto.Viz({
     <pre class="prettyprint"><code>const viz = new carto.Viz(`
   width: clusterCount() / 50
 `);</code></pre>
+
+        <p class="code-caption">Use cluster count with viewportQuantiles in a ramp for width and color.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz({
+  color: s.ramp(s.viewportQuantiles(s.clusterCount(), 5), [1, 20])
+  width: s.ramp(s.viewportQuantiles(s.clusterCount(), 5), s.palettes.PINKYL))
+});
+// Note: this is not possible with globalQuantiles</code></pre>
+
+        <p class="code-caption">Use cluster count with viewportQuantiles in a ramp for width and color. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+  width: ramp(viewportQuantiles(clusterCount(), 5), [1, 20])
+  color: ramp(viewportQuantiles(clusterCount(), 5), Pinkyl)
+`);
+// Note: this is not possible with globalQuantiles</code></pre>
 
 
 
@@ -3582,7 +3600,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".ClusterTime"><span class="type-signature">(static) </span>ClusterTime<span class="signature">(property, units, timezone)</span><span class="type-signature"> &rarr; {TimeRange|Number}</span></h4>
+    <h4 class="name" id=".clusterTime"><span class="type-signature">(static) </span>clusterTime<span class="signature">(property, units, timezone)</span><span class="type-signature"> &rarr; {TimeRange|Number}</span></h4>
     
 
     
@@ -13126,6 +13144,230 @@ const viz = new carto.Viz({
     
 
     
+    <h4 class="name" id=".sampleHistogram"><span class="type-signature">(static) </span>sampleHistogram<span class="signature">(input, sizeOrBuckets)</span><span class="type-signature"> &rarr; {SampleHistogram}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    <p>Generates a histogram based on a representative sample of the data.</p>
+<p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.</p>
+<p>The histogram can be based on a numeric expression, the buckets for the histogram is controllable through the <code>sizeOrBuckets</code> parameter.
+For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
+When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin &lt;= value &lt; bucketMax].</p>
+<p>The sampleHistogram can also be combined with the <code>top()</code> expression.</p>
+<p>Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>input</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>expression to base the histogram</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sizeOrBuckets</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+|
+
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Optional (defaults to 20). Number of bars to use if <code>x</code> is a numeric expression; or user-defined buckets for numeric expressions.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>SampleHistogram</p>
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">SampleHistogram</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">Create and use an histogram.</p>
+    
+    <pre class="prettyprint"><code>const s = carto.expressions;
+const viz = new carto.Viz(
+    variables: {
+      categoryHistogram: s.sampleHistogram(s.prop('type')),
+      numericHistogram: s.sampleHistogram(s.prop('amount'), 3, 1),
+      userDefinedHistogram: s.sampleHistogram(s.prop('amount', [[0, 10], [10, 20], [20, 30]], 1),
+      topCategoryHistogram: s.sampleHistogram(s.top(s.prop('type'), 3))
+    }
+);
+// ...
+console.log(viz.variables.categoryHistogram.value);
+// [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+// There are 10 features of type A and 20 of type B
+
+console.log(viz.variables.numericHistogram.value);
+// [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+// There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
+
+        <p class="code-caption">Create and use an histogram. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   @categoryHistogram:    sampleHistogram($type)
+   @numericHistogram:     sampleHistogram($amount, 3, 1)
+   @userDefinedHistogram: sampleHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+   @topCategoryHistogram: sampleHistogram(top($type, 3))
+`);
+// ...
+console.log(viz.variables.categoryHistogram.value);
+// [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+// There are 10 features of type A and 20 of type B
+
+console.log(viz.variables.numericHistogram.value);
+// [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+// There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
+
+
+
+        
+            
+
+    
+
+    
     <h4 class="name" id=".scaled"><span class="type-signature">(static) </span>scaled<span class="signature">(width, zoomlevel<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Number}</span></h4>
     
 
@@ -14374,7 +14616,7 @@ const viz = new carto.Viz({
     
 
     
-    <h4 class="name" id=".TimeRangeExpr"><span class="type-signature">(static) </span>TimeRangeExpr<span class="signature">(value)</span><span class="type-signature"> &rarr; {TimeRange}</span></h4>
+    <h4 class="name" id=".timeRange"><span class="type-signature">(static) </span>timeRange<span class="signature">(value)</span><span class="type-signature"> &rarr; {TimeRange}</span></h4>
     
 
     
@@ -15915,7 +16157,7 @@ layer.on('updated', () => {
     
 
     
-    <h4 class="name" id=".viewportHistogram"><span class="type-signature">(static) </span>viewportHistogram<span class="signature">(input, sizeOrBuckets, weight)</span><span class="type-signature"> &rarr; {Histogram}</span></h4>
+    <h4 class="name" id=".viewportHistogram"><span class="type-signature">(static) </span>viewportHistogram<span class="signature">(input, sizeOrBuckets, weight)</span><span class="type-signature"> &rarr; {ViewportHistogram}</span></h4>
     
 
     
@@ -15923,11 +16165,12 @@ layer.on('updated', () => {
 
 
 <div class="description">
-    <p>Generates a histogram.</p>
+    <p>Generates a histogram based on the data from the features present in the viewport.</p>
 <p>The histogram can be based on a categorical expression, in which case each category will correspond to a histogram bar.</p>
 <p>The histogram can be based on a numeric expression, the buckets for the histogram is controllable through the <code>sizeOrBuckets</code> parameter.
 For numeric values of sizeOrBuckets, the minimum and maximum will be computed automatically and bars will be generated at regular intervals between the minimum and maximum.
 When providing sizeOrBuckets as a list of buckets, the values will get assigned to the first bucket matching the criteria [bucketMin &lt;= value &lt; bucketMax].</p>
+<p>The viewportHistogram can also be combined with the <code>top()</code> expression.</p>
 <p>Histograms are useful to get insights and create widgets outside the scope of CARTO VL, see the following example for more info.</p>
 </div>
 
@@ -16092,7 +16335,7 @@ When providing sizeOrBuckets as a list of buckets, the values will get assigned 
 
         
 <div class="param-desc">
-    <p>Histogram</p>
+    <p>ViewportHistogram</p>
 </div>
 
 
@@ -16103,7 +16346,7 @@ When providing sizeOrBuckets as a list of buckets, the values will get assigned 
     </dt>
     <dd>
         
-<span class="param-type">Histogram</span>
+<span class="param-type">ViewportHistogram</span>
 
 
     </dd>
@@ -16114,22 +16357,42 @@ When providing sizeOrBuckets as a list of buckets, the values will get assigned 
 
 
 
-    <h5>Example</h5>
+    <h5>Examples</h5>
     
-        <p class="code-caption">Create and use an histogram. (String)</p>
+        <p class="code-caption">Create and use an histogram.</p>
     
     <pre class="prettyprint"><code>const s = carto.expressions;
-const viz = new carto.Viz(`
-         @categoryHistogram:    viewportHistogram($type)
-         @numericHistogram:     viewportHistogram($amount, 3, 1)
-         @userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
-`);
-...
-console.log(viz.variables.categoryHistogram.eval());
+const viz = new carto.Viz(
+    variables: {
+      categoryHistogram: s.viewportHistogram(s.prop('type')),
+      numericHistogram: s.viewportHistogram(s.prop('amount'), 3, 1),
+      userDefinedHistogram: s.viewportHistogram(s.prop('amount', [[0, 10], [10, 20], [20, 30]], 1),
+      topCategoryHistogram: s.viewportHistogram(s.top(s.prop('type'), 3))
+    }
+);
+// ...
+console.log(viz.variables.categoryHistogram.value);
 // [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
 // There are 10 features of type A and 20 of type B
 
-console.log(viz.variables.numericHistogram.eval());
+console.log(viz.variables.numericHistogram.value);
+// [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
+// There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
+
+        <p class="code-caption">Create and use an histogram. (String)</p>
+    
+    <pre class="prettyprint"><code>const viz = new carto.Viz(`
+   @categoryHistogram:    viewportHistogram($type)
+   @numericHistogram:     viewportHistogram($amount, 3, 1)
+   @userDefinedHistogram: viewportHistogram($amount, [[0, 10], [10, 20], [20, 30]], 1)
+   @topCategoryHistogram: viewportHistogram(top($type, 3))
+`);
+// ...
+console.log(viz.variables.categoryHistogram.value);
+// [{x: 'typeA', y: 10}, {x: 'typeB', y: 20}]
+// There are 10 features of type A and 20 of type B
+
+console.log(viz.variables.numericHistogram.value);
 // [{x: [0,10],  y: 20}, {x: [10,20],  y: 7}, {x: [20, 30], y: 3}]
 // There are 20 features with an amount between 0 and 10, 7 features with an amount between 10 and 20, and 3 features with an amount between 20 and 30</code></pre>
 
@@ -17781,13 +18044,13 @@ const viz = new carto.Viz({
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="carto.Interactivity.html">carto.Interactivity</a></li><li><a href="carto.Layer.html">carto.Layer</a></li><li><a href="carto.TimeRange.html">carto.TimeRange</a></li><li><a href="carto.Viz.html">carto.Viz</a></li><li><a href="Expression.html">Expression</a></li><li><a href="expressions.Animation.html">expressions.Animation</a></li><li><a href="expressions.Ramp.html">expressions.Ramp</a></li><li><a href="expressions.SampleHistogram.html">expressions.SampleHistogram</a></li><li><a href="expressions.ViewportHistogram.html">expressions.ViewportHistogram</a></li></ul><h3>Events</h3><ul><li><a href="global.html#event:CartoError">CartoError</a></li><li><a href="global.html#event:featureClick">featureClick</a></li><li><a href="global.html#event:featureClickOut">featureClickOut</a></li><li><a href="global.html#event:featureEnter">featureEnter</a></li><li><a href="global.html#event:featureHover">featureHover</a></li><li><a href="global.html#event:featureLeave">featureLeave</a></li></ul><h3>Namespaces</h3><ul><li><a href="carto.html">carto</a></li><li><a href="carto.basemaps.html">carto.basemaps</a></li><li><a href="carto.expressions.html">carto.expressions</a></li><li><a href="carto.source.html">carto.source</a></li><li><a href="Constants.html">Constants</a></li><li><a href="Features.html">Features</a></li><li><a href="Icons.html">Icons</a></li><li><a href="Types.html">Types</a></li></ul><h3>Global</h3><ul><li><a href="global.html#fromStartEndValues">fromStartEndValues</a></li><li><a href="global.html#fromText">fromText</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Jan 16 2019 14:06:09 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Mar 20 2019 14:31:19 GMT+0100 (Central European Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
