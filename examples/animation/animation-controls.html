@@ -225,8 +225,8 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-122.33, 47.61],
-            zoom: 11,
-            scrollZoom: false,
+            zoom: 10,
+            scrollZoom: false
         });
 
         const nav = new mapboxgl.NavigationControl();
@@ -244,7 +244,7 @@
             @duration: 30
             @animation: animation($incdate, @duration, fade(1, 1))
             filter: @animation
-            color: ramp(linear($incdate), sunset)
+            color: turquoise
             strokeWidth: 0
         `);
 

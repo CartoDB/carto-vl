@@ -37,7 +37,7 @@
       style: carto.basemaps.darkmatter,
       center: [-95.907985, 37.746163],
       zoom: 4,
-
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -52,8 +52,8 @@
 
     const source = new carto.source.Dataset('walmarts');
     const viz = new carto.Viz(`
-    width: 25
-    symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
+      width: 25
+      symbol: image('https://libs.cartocdn.com/carto-vl/assets/walmart.svg')
     `);
 
     const layer = new carto.Layer('layer', source, viz);

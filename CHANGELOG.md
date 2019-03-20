@@ -14,6 +14,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Label example with `clusterAVG` expression
 - Label example with `clusterCount` expression
 - Add `sampleHistogram` expression
+- Add Animation examples
+- Clean and reorganize examples in the documentation
 
 ### Fixed
 - Fix regression in `Interactivity` using MVT and polygons

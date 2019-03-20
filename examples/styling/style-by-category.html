@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Style by category | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -50,10 +52,8 @@
       container: 'map',
       style: carto.basemaps.darkmatter,
       center: [2.1734, 41.3851],
-      zoom: 12,
-      scrollZoom: false,
-
-
+      zoom: 13,
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -61,7 +61,6 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
@@ -70,18 +69,23 @@
     // Define styles
     const rampAutoViz = new carto.Viz(`
       color: ramp($category, vivid)
-      strokeWidth: 0
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
     const rampBucketsViz = new carto.Viz(`
-      color: ramp(buckets($category, ['Moda y calzado']), vivid)
-      strokeWidth: 0
+      color: ramp(buckets($category, ['Moda y calzado','Salud','Alimentación']), vivid)
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
     const rampTopViz = new carto.Viz(`
-      color: ramp(top($category, 3), vivid)
-      strokeWidth: 0
+      color: ramp(top($category, 5), vivid)
+      width: 5
+      strokeColor: black
+      strokeWidth: 0.5
     `);
 
-    // Define layer
     const source = new carto.source.Dataset('spend_data');
     const layer = new carto.Layer('layer', source, rampAutoViz);
 
@@ -102,4 +106,5 @@
     }
   </script>
 </body>
+
 </html>

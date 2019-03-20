@@ -44,8 +44,21 @@
         };
         map.on('move', displayCenter);
 
+
         //** CARTO VL functionality begins here **//
 
+
+        // LAYER EVENTS
+        carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
+        const source = new carto.source.Dataset('populated_places');
+        const viz = new carto.Viz();
+        const layer = new carto.Layer('Cities', source, viz);
+        layer.addTo(map);
+
+        // Add on 'loaded' event handler to layer
+        layer.on('loaded', () => {
+            console.log('Cities layer has been loaded!');
+        });
 
     </script>
 </body>

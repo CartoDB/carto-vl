@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Draw order  | CARTO</title>
+  <title>Draw order | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -9,51 +10,50 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Draw Order</h1>
-        </header>
-        <section>
-          <p class="description open-sans">How to use CARTO ordering style property</p>
-          <div id="controls">
-            <ul>
-              <li>
-                <input type="radio" name="style" onclick="setAscOrder()" id="Asc" checked>
-                <label for="Asc">Asc</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setDescOrder()" id="Desc">
-                <label for="Desc">Desc</label>
-              </li>
-              <li>
-                <input type="radio" name="style" onclick="setDefaultOrder()" id="Default">
-                <label for="Default">Default / No order</label>
-              </li>
-            </ul>
-          </div>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Draw Order</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Order point features by width</p>
+        <div id="controls">
+          <ul>
+            <li>
+              <input type="radio" name="style" onclick="setAscOrder()" id="Asc" checked>
+              <label for="Asc">Ascending</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setDescOrder()" id="Desc">
+              <label for="Desc">Descending</label>
+            </li>
+            <li>
+              <input type="radio" name="style" onclick="setDefaultOrder()" id="Default">
+              <label for="Default">Default / No order</label>
+            </li>
+          </ul>
+        </div>
+      </section>
+      <footer class="js-footer"></footer>
     </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [2.1734, 41.3851],
       zoom: 14,
-      scrollZoom: false,
-
-
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -61,25 +61,22 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
     // Define layer
-    const source = new carto.source.Dataset(`
-      spend_data
-    `);
+    const source = new carto.source.Dataset(`spend_data`);
     const s = carto.expressions;
 
     // Define style
     const viz = new carto.Viz({
-        width: s.sqrt(s.prop('amount')),
-        color: s.ramp(s.prop('category'), s.palettes.PRISM),
-        strokeColor: s.rgba(255, 255, 255, 0.5),
-        strokeWidth: 1,
-        order: s.asc(s.width())
+      width: s.sqrt(s.prop('amount')),
+      color: s.ramp(s.prop('category'), s.palettes.PRISM),
+      strokeColor: s.rgba(255, 255, 255, 0.5),
+      strokeWidth: 1,
+      order: s.asc(s.width())
     });
     const layer = new carto.Layer('layer', source, viz);
 
@@ -87,37 +84,38 @@
 
     function setDefaultOrder() {
       layer.blendToViz(new carto.Viz({
-          width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.PRISM),
-          strokeColor: s.rgba(255, 255, 255, 0.5),
-          strokeWidth: 1,
+        width: s.sqrt(s.prop('amount')),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
+        strokeWidth: 1,
       }));
     }
 
     function setAscOrder() {
       layer.blendToViz(new carto.Viz({
-          width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.PRISM),
-          strokeColor: s.rgba(255, 255, 255, 0.5),
-          strokeWidth: 1,
-          order: s.asc(s.width())
+        width: s.sqrt(s.prop('amount')),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
+        strokeWidth: 1,
+        order: s.asc(s.width())
       }));
     }
 
     function setDescOrder() {
       layer.blendToViz(new carto.Viz({
-          width: s.sqrt(s.prop('amount')),
-          color: s.ramp(s.prop('category'), s.palettes.PRISM),
-          strokeColor: s.rgba(255, 255, 255, 0.5),
-          strokeWidth: 1,
-          order: s.desc(s.width())
+        width: s.sqrt(s.prop('amount')),
+        color: s.ramp(s.prop('category'), s.palettes.PRISM),
+        strokeColor: s.rgba(255, 255, 255, 0.5),
+        strokeWidth: 1,
+        order: s.desc(s.width())
       }));
     }
 
     layer.on('loaded', hideLoader);
     function hideLoader() {
-          document.getElementById('loader').style.opacity = '0';
+      document.getElementById('loader').style.opacity = '0';
     }
   </script>
 </body>
+
 </html>

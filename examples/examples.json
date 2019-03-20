@@ -7,7 +7,7 @@
             "title": "Basics",
             "samples": [
                 {
-                    "title": "Add CARTO dataset layer",
+                    "title": "Add CARTO layer",
                     "file": "basics/add-layer.html"
                 },
                 {
@@ -15,20 +15,33 @@
                     "file": "basics/basic-style.html"
                 },
                 {
-                    "title": "SQL Source layer",
-                    "file": "basics/query-layer.html"
-                },
-                {
-                    "title": "Add multiple layers",
-                    "file": "basics/multiple-layers.html"
-                },
-                {
-                    "title": "Select layer",
-                    "file": "basics/select-layer.html"
-                },
-                {
                     "title": "Check for browser support",
                     "file": "basics/browser-support.html"
+                }
+            ]
+        },
+        {
+            "title": "Sources",
+            "samples": [
+                {
+                    "title": "Add SQL source layer",
+                    "file": "sources/sql-source-layer.html"
+                },
+                {
+                    "title": "Add GeoJSON source layer",
+                    "file": "sources/geojson-source-layer.html"
+                },
+                {
+                    "title": "Add multiple source layers",
+                    "file": "sources/multiple-layers.html"
+                },
+                {
+                    "title": "Select between source layers",
+                    "file": "sources/select-layer.html"
+                },
+                {
+                    "title": "Load external GeoJSON layer",
+                    "file": "sources/external-geojson.html"
                 }
             ]
         },
@@ -64,24 +77,32 @@
                     "file": "styling/viewport.html"
                 },
                 {
-                    "title": "Single Image",
+                    "title": "Scaled width",
+                    "file": "styling/scaled.html"
+                },
+                {
+                    "title": "Style by zoom range",
+                    "file": "styling/zoom-range-style.html"
+                },
+                {
+                    "title": "Filter by zoom range",
+                    "file": "styling/zoom-range-filter.html"
+                },
+                {
+                    "title": "Single image",
                     "file": "styling/image-single.html"
                 },
                 {
-                    "title": "Multiple Images",
+                    "title": "Multiple images",
                     "file": "styling/image-multiple.html"
                 },
                 {
-                    "title": "External Image",
+                    "title": "External image",
                     "file": "styling/image-external.html"
                 },
                 {
                     "title": "Draw Order",
                     "file": "styling/draw-order.html"
-                },
-                {
-                    "title": "Scaled width",
-                    "file": "styling/scaled.html"
                 }
             ]
         },
@@ -122,15 +143,23 @@
             "title": "Interactivity",
             "samples": [
                 {
-                    "title": "Hover",
+                    "title": "Feature hover",
                     "file": "interactivity/hover.html"
                 },
                 {
-                    "title": "Click",
+                    "title": "Feature click",
                     "file": "interactivity/click.html"
                 },
                 {
-                    "title": "Interact with multiple layers",
+                    "title": "Add pop-ups on hover",
+                    "file": "interactivity/pop-up-on-hover.html"
+                },
+                {
+                    "title": "Add pop-ups on click",
+                    "file": "interactivity/pop-up-on-click.html"
+                },
+                {
+                    "title": "Multi-layer interactivitiy",
                     "file": "interactivity/interact-multiple-layers.html"
                 },
                 {
@@ -138,8 +167,8 @@
                     "file": "interactivity/interactive-based-styling.html"
                 },
                 {
-                    "title": "Add pop-ups",
-                    "file": "interactivity/pop-ups.html"
+                    "title": "Interactive based filter",
+                    "file": "interactivity/interactive-filter.html"
                 }
             ]
         },
@@ -196,8 +225,8 @@
                     "file": "widgets/histogram-widget-viewport.html"
                 },
                 {
-                    "title": "Viewport weighted-histogram table",
-                    "file": "widgets/weighted-histogram.html"
+                    "title": "Viewport table",
+                    "file": "widgets/weighted-histogram-table.html"
                 }
             ]
         },
@@ -259,11 +288,7 @@
             "title": "Advanced",
             "samples": [
                 {
-                    "title": "External GeoJSON layer",
-                    "file": "advanced/external-geojson.html"
-                },
-                {
-                    "title": "Classification with variables",
+                    "title": "Interactive classification",
                     "file": "advanced/classification-variables.html"
                 },
                 {

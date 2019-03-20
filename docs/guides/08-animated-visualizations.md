@@ -3,7 +3,7 @@ With CARTO VL you can make animated maps of points, lines and polygons using the
 
 <div class="example-map">
     <iframe
-        id="guides-animation-step-7"
+        id="intro-guides-animation"
         src="/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html"
         width="100%"
         height="500"
@@ -405,12 +405,12 @@ As you can see in the result, you are able to visualize, via color, where each b
 
 <div class="example-map">
     <iframe
-        id="guides-animation-step-7"
-        src="/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html"
+        id="guides-animation-step-6"
+        src="/developers/carto-vl/examples/maps/guides/animated-viz/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-7.html)
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/animated-viz/step-6.html)

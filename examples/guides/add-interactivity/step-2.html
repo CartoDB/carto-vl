@@ -48,10 +48,14 @@
         //** CARTO VL functionality begins here **//
 
 
-        // LAYER EVENTS
+        // LAYER EVENTS & VARIABLES
         carto.setDefaultAuth({ username: 'cartovl', apiKey: 'default_public' });
         const source = new carto.source.Dataset('populated_places');
-        const viz = new carto.Viz();
+
+        // Viz using a dynamic variable
+        const viz = new carto.Viz(`
+            @currentFeatures: viewportCount()
+        `);
         const layer = new carto.Layer('Cities', source, viz);
         layer.addTo(map);
 
@@ -59,6 +63,16 @@
         layer.on('loaded', () => {
             console.log('Cities layer has been loaded!');
         });
+
+        // Disable map move listener
+        map.off('move', displayCenter);
+
+        // Add on 'updated' event handler to layer
+        const displayNumberOfCities = () => {
+            const numberOfFeatures = viz.variables.currentFeatures.value;
+            console.log(`Now you can see ${numberOfFeatures} cities`);
+        };
+        layer.on('updated', displayNumberOfCities);
 
     </script>
 </body>

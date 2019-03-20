@@ -5,7 +5,7 @@ By the end of the guide you will have built a visualization like this one where 
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
-        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -70,7 +70,7 @@ Load the file in your browser and open the console. This time, you will see two 
 
 If you were adding more than one layer to your map, you could use a single function to handle all of them. For these cases, **on** and **off** methods are available at the `carto` namespace. For example: `carto.on('loaded', [layer1, layer2], () => { console.log('All layers have loaded'); })` would show the message `All layers have loaded` once layer1 and layer2 draw on the map.
 
-There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/landing-page/hurricane-harvey.html)).
+There are multiple ways you can build on the `loaded` event. For example, you could use it to add a status bar on your map for when a layer is loading and then hide it once the layer loads. You can see a similar example in this [visualization](/developers/carto-vl/examples/maps/advanced/hurricane-harvey.html)).
 
 **Note:**
 It is important to note that the name of this event is **`loaded`**, not `load`.
@@ -81,15 +81,15 @@ The `updated` event, is useful for cases when a layer gets updated. It will be t
 If you check your work now, it should look like this:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-step-2"
-        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html"
+        id="guides-interactivity-step-1"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-1.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-You should now open the [map](/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html) and explore the _console_ to check the current events.
+You should now open the [map](/developers/carto-vl/examples/maps/guides/add-interactivity/step-1.html) and explore the _console_ to check the current events.
 
 ### Using variables
 *Variables* are a way to store and reuse expressions, and that can definitively help you when adding interactions to your visualization, so let's practice a bit with them.
@@ -124,15 +124,15 @@ map.off('move', displayCenter);
 You have already advanced a lot in this guide. Now take a small rest and check your work with this:
 <div class="example-map">
     <iframe
-        id="guides-interactivity-step-3"
-        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html"
+        id="guides-interactivity-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-Open the map at [this step](/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
+Open the map at [this step](/developers/carto-vl/examples/maps/guides/add-interactivity/step-2.html) and explore its console. Check how the amount of cities in the log messages reduces as you zoom in.
 
 
 #### Data-driven variables
@@ -255,14 +255,14 @@ Congrats! You've finished this guide. The final map should look like this:
 <div class="example-map">
     <iframe
         id="guides-interactivity-step-final"
-        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html"
+        src="/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
 
-You can explore the final step [here](/developers/carto-vl/examples/maps/guides/add-interactivity/step-4.html)
+You can explore the final step [here](/developers/carto-vl/examples/maps/guides/add-interactivity/step-3.html)
 
 
 Here it is the full example:

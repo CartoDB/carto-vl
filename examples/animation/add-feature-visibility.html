@@ -36,8 +36,8 @@
             container: 'map',
             style: carto.basemaps.darkmatter,
             center: [-122.33, 47.61],
-            zoom: 11,
-            scrollZoom: false,
+            zoom: 10,
+            scrollZoom: false
         });
 
         const nav = new mapboxgl.NavigationControl({
@@ -56,6 +56,7 @@
         const viz = new carto.Viz(`
             filter: animation($incdate, 20, fade(0.5, 0.5)) + 0.05
             width: 3
+            color: turquoise
             strokeWidth: 0
         `);
 
