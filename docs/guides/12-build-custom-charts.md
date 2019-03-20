@@ -1,6 +1,6 @@
 ## Build custom charts
 
-In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the [`getLegendsData`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in custom charts using the `viewportHistogram` and `sampleHistogram` expressions and an external charting library.
+In the [Add legends](/developers/carto-vl/guides/add-legends/) guide, you saw how to add legends to a map using the [`getLegendsData`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and how to display widgets using histogram expressions in the [Add widgets](/developers/carto-vl/guides/add-widgets/) guide. In this guide, you will build upon those concepts and learn how to obtain and display information in custom charts using the `viewportHistogram` and `globalHistogram` expressions and an external charting library.
 
 ### Overview
 
@@ -8,16 +8,16 @@ In the [previous guide](/developers/carto-vl/guides/add-widgets/) histogram widg
 
 ### Histogram expressions
 
-CARTO VL has two expressions to create histograms: [`viewportHistogram`](/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) and [`sampleHistogram`](/developers/carto-vl/reference/#cartoexpressionssamplehistogram). Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `sampleHistogram` expression returns a list based on a data sample.
+CARTO VL has two expressions to create histograms: [`viewportHistogram`](/developers/carto-vl/reference/#cartoexpressionsviewporthistogram) and [`globalHistogram`](/developers/carto-vl/reference/#cartoexpressionsglobalhistogram). Both expressions return a list of values grouped by a column but differ in the way values are grouped. The `viewportHistogram` expression returns a list based off of features that are in the viewport, while the `globalHistogram` expression returns a list based on a data sample.
 
-#### `viewportHistogram` vs `sampleHistogram`
+#### `viewportHistogram` vs `globalHistogram`
 
-The map below combines both `viewportHistogram` and `sampleHistogram` expressions to compare the information returned for viewport vs sample feature calculations. If you interact with the map, you'll see how the bars for `sampleHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport.
+The map below combines both `viewportHistogram` and `globalHistogram` expressions to compare the information returned for viewport vs global feature calculations. If you interact with the map, you'll see how the bars for `globalHistogram` remain static, while the ones for `viewportHistogram` change depending on the features present in the viewport.
 
-What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `sampleHistogram` chart. This is because the data returned for the `sampleHistogram`, as indicated by its name, is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset.
+What you may notice is that if you zoom out, the `viewportHistogram` chart doesn't match the `globalHistogram` chart. This is because the data returned for the `globalHistogram` is a **representative sample** of the data. Therefore, the results may vary since we're comparing the viewport data with a representative sample of the whole dataset.
 
 **Note:**
-If you need higher accuracy in your `sampleHistogram`,  we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) with a [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql) source.
+If you need higher accuracy in your `globalHistogram`,  we recommend creating a [custom query](https://wiki.postgresql.org/wiki/Aggregate_Histogram) with a [`carto.source.SQL`](/developers/carto-vl/reference/#cartosourcesql) source.
 
 <div class="example-map">
   <iframe
@@ -31,7 +31,7 @@ If you need higher accuracy in your `sampleHistogram`,  we recommend creating a 
 </div>
 You can explore this step [here](/developers/carto-vl/examples/maps/guides/build-custom-charts/step-1.html)
 
-Now that you know the differences between viewport and sample histograms, next, let's look at using these expressions to draw charts.
+Now that you know the differences between viewport and global histograms, next, let's look at using these expressions to draw charts.
 
 ### Bar chart for categories
 
@@ -196,7 +196,7 @@ In all of the examples above, you will notice that the bar colors are a solid de
 
 What if you want to create a bar chart, and assign colors to each bar that correspond with the associated features on the map?
 
-You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of `viewportHistogram` and `sampleHistogram`.
+You can do this with a `ramp` expression, the [`getLegendData()`](/developers/carto-vl/reference/#expressionsrampgetlegenddata) method, and the [`getJoinedValues()`](/developers/carto-vl/reference/#expressionsviewporthistogramgetjoinedvalues) method which is part of `viewportHistogram` and `globalHistogram`.
 
 The `ramp` expression (`@v_color`) is used to in two ways: to color the features on the map and to color the chart's bars with the same colors using the `getLegendData()` method:
 

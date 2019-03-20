@@ -2,7 +2,7 @@ import carto from '../../../../src/index';
 import * as util from '../../util';
 import { OTHERS_LABEL } from '../../../../src/renderer/viz/expressions/constants';
 
-describe('sampleHistogram', () => {
+describe('globalHistogram', () => {
     let div, map, source, viz, layer;
 
     function createFeature (id, value) {
@@ -66,7 +66,7 @@ describe('sampleHistogram', () => {
     ];
 
     it('should get correct data with categorical values', (done) => {
-        const histogramViz = '@histogram: sampleHistogram($value)';
+        const histogramViz = '@histogram: globalHistogram($value)';
 
         createMapWith(histogramViz, categoryFeatures);
 
@@ -85,7 +85,7 @@ describe('sampleHistogram', () => {
 
     it('should get correct data with categorical values in buckets', (done) => {
         const top = 1;
-        const histogramViz = `@histogram: sampleHistogram(top($value, ${top}))`;
+        const histogramViz = `@histogram: globalHistogram(top($value, ${top}))`;
         createMapWith(histogramViz, categoryFeatures);
 
         layer.on('loaded', () => {
@@ -102,7 +102,7 @@ describe('sampleHistogram', () => {
         const size = 4;
         const min = 0;
         const max = 100;
-        const histogramViz = `@histogram: sampleHistogram($value, ${size})`;
+        const histogramViz = `@histogram: globalHistogram($value, ${size})`;
         createMapWith(histogramViz, numericFeatures);
 
         layer.on('loaded', () => {
@@ -121,7 +121,7 @@ describe('sampleHistogram', () => {
     it('should get correct data labeled when there are "others" values', (done) => {
         const top = 1;
         const histogramViz = `
-            @histogram: sampleHistogram(top($value, ${top}))
+            @histogram: globalHistogram(top($value, ${top}))
             @color: ramp(top($value, ${top}), [ red, blue ], green )
         `;
 

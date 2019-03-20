@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Throw error when using `clusterCount` in a global classifier
 - Label example with `clusterAVG` expression
 - Label example with `clusterCount` expression
-- Add `sampleHistogram` expression
+- Add `globalHistogram` expression
 - Add Animation examples
 - Clean and reorganize examples in the documentation
 
