@@ -71,6 +71,7 @@
         const interactivity = new carto.Interactivity(layer);
         const delay = 50;
         let clickedFeatureId = null;
+
         interactivity.on('featureClick', event => {
             if (event.features.length) {
                 const feature = event.features[0];
@@ -80,6 +81,7 @@
                 feature.strokeColor.blendTo('opacity(LimeGreen, 0.8)', delay);
             }
         });
+
         interactivity.on('featureClickOut', event => {
             if (event.features.length) {
                 const feature = event.features[0];
@@ -99,11 +101,11 @@
             if (event.features.length > 0) {
                 const vars = event.features[0].variables;
                 popup.setHTML(`
-        <div>
-          <h3 class ="h3">${vars.country_name.value}</h3>
-          <p class="description open-sans">Population: ${vars.pop_2015.value}</h3>
-        </div>
-        `);
+                    <div>
+                        <h3 class ="h3">${vars.country_name.value}</h3>
+                        <p class="description open-sans">Population: ${vars.pop_2015.value}</h3>
+                    </div>
+                `);
                 popup.setLngLat([event.coordinates.lng, event.coordinates.lat]);
                 if (!popup.isOpen()) {
                     popup.addTo(map);
