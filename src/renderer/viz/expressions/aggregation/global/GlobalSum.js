@@ -36,7 +36,7 @@ import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../.
 export default class GlobalSum extends GlobalAggregation {
     constructor (property) {
         checkMaxArguments(arguments, 1, 'globalSum');
-
+        const type = property.type;
         let baseStats = false;
         if (property && (property.isA(ClusterAggregation) || property.isA(ClusterCount))) {
             if (property.isA(ClusterSum)) {
@@ -48,6 +48,6 @@ export default class GlobalSum extends GlobalAggregation {
             }
         }
 
-        super({ property, name: 'sum', baseStats });
+        super({ property, name: 'sum', baseStats, type });
     }
 }

@@ -44,8 +44,14 @@ export default class CategoryIndex extends BaseExpression {
     }
 
     get numCategories () {
-        const metaColumn = this._metadata.properties[this.property.name];
-        return metaColumn.categories.length;
+        return this.metaColumn.categories.length;
+    }
+
+    get metaColumn () {
+        const propertyName = this.property.propertyName;
+        return this._metadata.properties[propertyName]
+            ? this._metadata.properties[propertyName]
+            : this._metadata.properties[this.property.name];
     }
 
     get numCategoriesWithoutOthers () {
@@ -107,14 +113,13 @@ export default class CategoryIndex extends BaseExpression {
     }
 
     _calcTranslated () {
-        const metaColumn = this._metadata.properties[this.property.name];
         const numCategories = this.numCategories;
 
         if (this._numTranslatedCategories !== numCategories) {
             this._numTranslatedCategories = numCategories;
 
             for (let i = 0; i < numCategories; i++) {
-                const id = this._metadata.categoryToID.get(metaColumn.categories[i].name);
+                const id = this._metadata.categoryToID.get(this.metaColumn.categories[i].name);
                 const value = i / (numCategories - 1);
                 const vec2Id = {
                     x: id % SQRT_MAX_CATEGORIES_PER_PROPERTY,
@@ -127,8 +132,8 @@ export default class CategoryIndex extends BaseExpression {
         }
     }
 
-    _getLegendData () {
-        const categories = this._metadata.properties[this.property.name].categories;
+    getLegendData () {
+        const categories = this._metadata.properties[this.property.propertyName].categories;
         const categoriesLength = categories.length;
         const divisor = categoriesLength - 1;
         const data = [];

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Scaled width | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,35 +10,34 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Scaled width</h1>
-        </header>
-        <section>
-          <p class="description open-sans">How to keep feature at constant widths in real meters</p>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
-    <div id="loader">
-      <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
-        <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
-          <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
-        </svg>
-      </div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Scaled width</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Set features to constant widths in real meters</p>
+      </section>
+      <footer class="js-footer"></footer>
     </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.darkmatter,
-      center: [-73.96, 40.75],
+      center: [-123.1103, 49.2450],
       zoom: 14,
-      scrollZoom: false,
-
-
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -45,20 +45,20 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
-    const source = new carto.source.Dataset('taxi_50k');
+    const source = new carto.source.Dataset('vancouver_trees');
+
     const viz = new carto.Viz(`
       // 3 pixels at zoom level 13
       // 6 pixels at zoom level 14
       // 12 pixels at zoom level 15
       width: scaled(6, 14)
     `);
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -69,4 +69,5 @@
     }
   </script>
 </body>
+
 </html>

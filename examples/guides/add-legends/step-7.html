@@ -2,11 +2,12 @@
 <html>
 
 <head>
+  <title>Line legend | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
   <script src="../../../dist/carto-vl.js"></script>
-
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
-
   <link rel="stylesheet" type="text/css" href="../../style.css">
 </head>
 
@@ -15,11 +16,10 @@
   <aside class="toolbox">
     <div class="box">
       <header>
-        <h1>Percent Master's Degree</h1>
+        <h1>San Francisco Streets</h1>
       </header>
       <section>
         <div id="controls">
-          <p id="content-title"></p>
           <ul id="content"></ul>
         </div>
       </section>
@@ -42,48 +42,40 @@
       zoom: 12
     });
 
+    const nav = new mapboxgl.NavigationControl({
+      showCompass: false
+    });
+    map.addControl(nav, 'top-left');
+
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    const source = new carto.source.Dataset('demographics_sf');
+    const source = new carto.source.Dataset('sf_stclines');
     const viz = new carto.Viz(`
-      color: ramp(globalquantiles($masters_percent,5),purp)
-      strokeWidth: 1
+      color: ramp(top($st_type, 5), bold)
+      width: 2
     `);
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
-
     layer.on('loaded', () => {
       hideLoader();
 
       const colorLegend = layer.viz.color.getLegendData({
-        othersLabel: 'Default',
-        samples: 20
+        othersLabel: 'Others'
       });
 
       let colorLegendList = '';
-
       colorLegend.data.forEach((legend) => {
         const colorHex = rgbToHex(legend.value);
-        const keyMin = legend.key[0].toFixed(2);
-        const keyMax = legend.key[1].toFixed(2);
-        let bucket = `${keyMin} - ${keyMax}`;
-        if (keyMin==='-Infinity'){
-          bucket = `<${keyMax}`;
-        }else if (keyMax==='Infinity'){
-          bucket = `>${keyMin}`;
-        }
-
-      colorLegendList +=
-          `<li><span class="polygon-mark" style="background-color:${colorHex};"></span> <span>${bucket}</span></li>\n`;
+        colorLegendList +=
+          `<li><span class="${viz.geometryType}-mark" style="border-color:${colorHex};"></span> <span>${legend.key}</span></li>\n`;
       });
 
       document.getElementById('content').innerHTML = colorLegendList;
-
-   });
+    });
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
@@ -92,7 +84,6 @@
     function rgbToHex(color) {
       return "#" + ((1 << 24) + (color.r << 16) + (color.g << 8) + color.b).toString(16).slice(1);
     }
-
   </script>
 </body>
 

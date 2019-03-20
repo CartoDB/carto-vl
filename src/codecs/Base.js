@@ -13,6 +13,12 @@
 // * Scalar (simple) encoder: source value is encoded as a single internal value
 // * Range encoder: a source value encodes as a pair [lo, hi] of values.
 export default class BaseCodec {
+    constructor (metadata, propertyName) {
+        if (metadata && propertyName) {
+            this._baseName = metadata.baseName(propertyName);
+        }
+    }
+
     isRange () {
         return false;
     }

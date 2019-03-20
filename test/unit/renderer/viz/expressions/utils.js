@@ -1,6 +1,7 @@
 import Metadata from '../../../../../src/renderer/Metadata';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import IdentityCodec from '../../../../../src/codecs/Identity';
+import { regExpThatContains } from '../../../../../src/utils/util';
 
 const metadata = new Metadata({
     properties: {
@@ -50,7 +51,23 @@ export function validateMaxArgumentsError (expressionName, args) {
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             s[expressionName](...args.map(arg => arg[0]));
-        }).toThrowError(new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*accepts.*arguments[\\s\\S]*passed[\\s\\S]*`, 'g'));
+        }).toThrowError(regExpThatContains('accepts just'));
+    });
+}
+
+export function validateMinArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(regExpThatContains('accepts at least'));
+    });
+}
+
+export function validateExactNumArgumentsError (expressionName, args) {
+    it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
+        expect(() => {
+            s[expressionName](...args.map(arg => arg[0]));
+        }).toThrowError(regExpThatContains('accepts exactly'));
     });
 }
 
@@ -159,22 +176,27 @@ function equalArgs (argsA, argsB) {
 }
 
 function _validateCompileTimeTypeError (expressionName, args, regexGenerator = null) {
-    const regex = regexGenerator ? regexGenerator(expressionName, args)
+    const regex = regexGenerator
+        ? regexGenerator(expressionName, args)
         : new RegExp(`[\\s\\S]*${expressionName}[\\s\\S]*invalid.*parameter[\\s\\S]*type[\\s\\S]*`, 'g');
+
     it(`${expressionName}(${args.map(arg => arg[1]).join(', ')}) should throw at compile time`, () => {
         expect(() => {
             const expression = s[expressionName](...args.map(arg => arg[0]));
+            expression._resolveAliases();
             expression._bindMetadata(metadata);
         }).toThrowError(regex);
     });
 }
-
 class MockMetadata {
     constructor (data) {
         Object.keys(data).forEach(key => {
             this[key] = data[key];
         });
         this._codec = new IdentityCodec();
+    }
+    baseName (propertyName) {
+        return propertyName;
     }
     stats (propertyName) {
         return this.properties[propertyName];

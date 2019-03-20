@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>External Image | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <script src="../../dist/carto-vl.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="../../examples/style.css">
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>External Image with interactivity</h1>
+      </header>
+      <section>
+        <p class="description open-sans">
+          Symbolize points with an external image, interactivity and no default color.
+          The circle around the symbol comes from another layer using 'transparent' color.
+        </p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    const map = new mapboxgl.Map({
+      container: 'map',
+      style: carto.basemaps.positron,
+      center: [-95.907985, 37.746163],
+      zoom: 4
+    });
+
+    const nav = new mapboxgl.NavigationControl();
+    map.addControl(nav, 'top-left');
+
+    carto.setDefaultAuth({
+      username: 'cartovl',
+      apiKey: 'default_public'
+    });
+
+    const source = new carto.source.Dataset('walmarts');
+    const wallmartIcon = 'https://libs.cartocdn.com/carto-vl/assets/walmart.svg';
+    const viz = new carto.Viz(`
+      width: 25
+      // symbol: image('${wallmartIcon}') // symbol not set here...
+      symbolPlacement: ALIGN_CENTER
+    `);
+    viz.symbol.blendTo(`image('${wallmartIcon}')`); // ...but here, with same results
+    const layer = new carto.Layer('layer', source, viz);
+    layer.addTo(map, 'watername_ocean');
+
+    const source2 = new carto.source.Dataset('walmarts');
+    const viz2 = new carto.Viz(`
+      width: 50
+      strokeColor: DarkOrange
+      strokeWidth: 3
+      color: transparent
+    `);
+    const layer2 = new carto.Layer('layer2', source2, viz2);
+    layer2.addTo(map, 'layer');
+
+    const DURATION = 10;
+    const interactivity = new carto.Interactivity(layer);
+
+    interactivity.on('featureEnter', (event) => {
+      event.features.forEach((feature) => {
+        feature.blendTo({ 'color': 'green', 'width': 50 }, DURATION);
+      });
+    });
+    interactivity.on('featureLeave', (event) => {
+      event.features.forEach((feature) => {
+        feature.reset(DURATION);
+      });
+    });
+
+    layer.on('loaded', hideLoader);
+    function hideLoader() {
+      document.getElementById('loader').style.opacity = '0';
+    }
+  </script>
+</body>
+
+</html>

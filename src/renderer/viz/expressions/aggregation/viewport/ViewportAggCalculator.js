@@ -32,6 +32,7 @@ function _getViewportExpressions (rootExpressions) {
     }
 
     rootExpressions.map(dfs);
+
     return viewportExpressions;
 }
 
@@ -97,7 +98,8 @@ function _runImprovedForPartialFeatures (viewportExpressions, renderLayer, inVie
  */
 function _runInDataframe (viz, viewportExpressions, dataframe, processedFeaturesIDs, inViewportFeaturesIDs) {
     for (let i = 0; i < dataframe.numFeatures; i++) {
-        const featureId = dataframe.properties[viz.metadata.idProperty][i];
+        const idProperty = viz.metadata.idProperty;
+        const featureId = dataframe.properties[idProperty][i];
 
         const featureAlreadyAccumulated = processedFeaturesIDs.has(featureId);
         if (featureAlreadyAccumulated) {
@@ -118,7 +120,7 @@ function _runInDataframe (viz, viewportExpressions, dataframe, processedFeatures
             continue;
         }
 
-        inViewportFeaturesIDs.add(featureId); // inViewport & in filter
+        inViewportFeaturesIDs.add(feature[idProperty]); // inViewport & in filter
 
         // not a filtered feature, so pass the rawFeature to viewport expressions
         viewportExpressions.forEach(expr => expr.accumViewportAgg(feature));

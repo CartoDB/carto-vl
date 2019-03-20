@@ -2,10 +2,10 @@
 <html>
 
 <head>
-  <title>Category Chart | CARTO</title>
+  <title>Category chart | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <script src="../../../dist/carto-vl.js"></script>
+  <script src="../../dist/carto-vl.js"></script>
   <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
@@ -16,21 +16,16 @@
 <body>
   <div id="map"></div>
   <aside class="toolbox chart-toolbox">
-    <div class="box chart-box">
+    <div class="box">
       <header>
-        <h1>Tree species distribution</h1>
+        <h1>Stree Side of Tree</h1>
       </header>
       <section>
-        <p class="description open-sans">Hover over each bar to see species name and count</p>
+        <canvas id="histogram" width="300" height="300"></canvas>
       </section>
-      <section>
-        <div id="controls">
-          <canvas id="histogram" width="500" height="300"></canvas>
-        </div>
-      </section>
-      <footer class="js-footer"></footer>
     </div>
   </aside>
+
   <div id="loader">
     <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
       <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
@@ -43,8 +38,8 @@
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
-      center: [-122.424818, 37.777323],
-      zoom: 16
+      center: [-123.1205, 49.2617],
+      zoom: 12.41
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -58,16 +53,16 @@
     });
 
     const ctx = document.getElementById('histogram').getContext('2d');
+
     // Define the source
-    const source = new carto.source.Dataset('trees_sf');
+    const source = new carto.source.Dataset('vancouver_trees');
+
     // Define the visualization
     const viz = new carto.Viz(`
-      @color: ramp($common_species, bold)
-      @histogram: viewportHistogram($common_species)
-
-      color: @color
-      width: ramp(zoomrange([8,16]),[1,8])
-      strokeWidth: ramp(zoomrange([8,16]),[0,2])
+      @v_histogram: viewportHistogram($street_side_name)
+      color: #00718b
+      width: 5
+      strokeWidth: 0.5
     `);
 
     // Draw chart using Chart.js library (https://www.chartjs.org/)
@@ -96,9 +91,13 @@
             display: false
           },
           ticks: {
-            display: false
+            display: true,
+            fontSize: 7,
+            autoSkip: false,
+            maxRotation: 0,
+            minRotation: 0
           },
-          barPercentage: 1.0,
+          barPercentage: 0.9,
           categoryPercentage: 1.0
         }]
       }
@@ -110,31 +109,20 @@
     });
 
     const layer = new carto.Layer('layer', source, viz);
+
     layer.addTo(map, 'watername_ocean');
 
+    layer.on('loaded', hideLoader);
 
-    layer.on('loaded', () => {
-      hideLoader();
-      drawHistogramLegend();
-    });
-
-    layer.on('updated', drawHistogramLegend);
-
-    function drawHistogramLegend() {
-      // Get histogram variable
-      const histogram = layer.viz.variables.histogram;
-      // Get color ramp
-      const colorRamp = layer.viz.color;
-
-      // Use getLegendData to get color values from the ramp
-      const legendData = colorRamp.getLegendData().data;
-      // Use getJoinedValues to get sorted colors by frequency
-      const histogramData = histogram.getJoinedValues(legendData);
-
+    layer.on('updated', () => {
+      // Save histogram variable
+      const histogram = layer.viz.variables.v_histogram;
+      // Get histogram data
+      const histogramData = histogram.value;
       // Chart.js set up
-      const data = histogramData.map(elem => elem.frequency);
-      const labels = histogramData.map(elem => elem.key);
-      const backgroundColor = histogramData.map(elem => computeColor(elem.value));
+      const labels = histogramData.map(elem => elem.x);
+      const data = histogramData.map(elem => elem.y);
+      const backgroundColor = '#00718b';
 
       chart.data = {
         labels,
@@ -145,16 +133,11 @@
       };
 
       chart.update();
-    }
+    });
 
     function hideLoader() {
       document.getElementById('loader').style.opacity = '0';
     }
-
-    function computeColor(color) {
-      return `rgba(${color.r},${color.g},${color.b},${color.a})`;
-    }
-
   </script>
 </body>
 

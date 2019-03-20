@@ -39,12 +39,14 @@ export default class Between extends BaseExpression {
         this.type = 'number';
         this.inlineMaker = inline => `((${inline.input} >= ${inline.lowerLimit} &&  ${inline.input} <= ${inline.upperLimit}) ? 1. : 0.)`;
     }
+
     eval (feature) {
         const input = this.input.eval(feature);
         const lower = this.lowerLimit.eval(feature);
         const upper = this.upperLimit.eval(feature);
         return (input >= lower && input <= upper) ? 1 : 0;
     }
+
     _bindMetadata (meta) {
         super._bindMetadata(meta);
 

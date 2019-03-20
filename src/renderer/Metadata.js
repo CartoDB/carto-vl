@@ -17,6 +17,9 @@ export default class Metadata {
         this.geomType = geomType;
         this.isAggregated = isAggregated;
         this.idProperty = idProperty || 'cartodb_id';
+        if (!this.properties.hasOwnProperty(this.idProperty)) {
+            this.properties[this.idProperty] = { type: 'number' };
+        }
 
         this.categoryToID = new Map();
         this.IDToCategory = new Map();
@@ -79,7 +82,10 @@ export default class Metadata {
     }
 
     codec (propertyName) {
-        // FIXME: default identity code for debugging purposes
-        return this.properties[this.baseName(propertyName)].codec || new IdentityCodec();
+        const name = this.baseName(propertyName);
+
+        return this.properties[name] && this.properties[name].codec
+            ? this.properties[name].codec
+            : new IdentityCodec();
     }
 }

@@ -1,7 +1,10 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkNumber, checkInstance, checkType, checkExpression, checkMaxArguments } from '../utils';
+import { checkMaxArguments, checkMinArguments, checkNumber } from '../utils';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
+import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../../../../errors/carto-runtime-error';
+
 import { average, standardDeviation } from '../stats';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
 
 /**
  * Classify `input` by using the Mean-Standard Deviation method with `n` buckets.
@@ -48,30 +51,42 @@ import { average, standardDeviation } from '../stats';
  */
 export default class GlobalStandardDev extends Classifier {
     constructor (input, buckets, classSize = 1.0) {
+        checkMinArguments(arguments, 2, 'globalStandardDev');
         checkMaxArguments(arguments, 3, 'globalStandardDev');
-        checkInstance('globalStandardDev', 'input', 0, Property, input && (input.property || input));
-        checkNumber('globalStandardDev', 'buckets', 1, buckets);
-        checkNumber('globalStandardDev', 'classSize', 2, classSize);
 
+        super({ input, buckets, _classSize: classSize });
+    }
+
+    _resolveAliases (aliases) {
+        super._resolveAliases(aliases);
+
+        this._validateClassSizeIsProperNumber();
+    }
+
+    _validateClassSizeIsProperNumber () {
+        const classSize = this._classSize.value;
+        checkNumber(this.expressionName, 'classSize', 2, classSize);
         if (classSize <= 0) {
-            throw new RangeError(`The 'classSize must be > 0.0, but '${classSize}' was used.`);
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} The 'classSize' must be > 0.0, but ${classSize} was used.`);
         }
-
-        super({ input }, buckets);
-        this._classSize = classSize;
-        this._sample = [];
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalStandardDev', 'input', 0, this.input);
-        checkType('globalStandardDev', 'input', 0, 'number', this.input);
 
-        const sample = metadata.sample.map(s => s[this.input.name]);
+        this._updateBreakpointsWith(metadata);
+    }
+
+    _updateBreakpointsWith (metadata) {
+        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalStandardDev. Consider using ViewportStandardDev instead`);
+        }
+        const name = this.input.name;
+        const sample = metadata.sample.map(s => s[name]);
         const avg = average(sample);
         const standardDev = standardDeviation(sample);
-        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize);
 
+        const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
         this.breakpoints.forEach((breakpoint, index) => {
             breakpoint.expr = breaks[index];
         });
@@ -89,6 +104,12 @@ export default class GlobalStandardDev extends Classifier {
  * @returns {Number[]}
  */
 export function calculateBreakpoints (avg, stDev, buckets, classSize) {
+    if (stDev === 0 || isNaN(stDev)) {
+        throw new CartoRuntimeError(
+            `${runtimeErrors.NOT_SUPPORTED} There is no Standard Deviation, not possible to compute ${buckets} buckets (just one feature or maybe all share the same value...?)`
+        );
+    }
+
     let breaks;
     let over = [];
     let under = [];

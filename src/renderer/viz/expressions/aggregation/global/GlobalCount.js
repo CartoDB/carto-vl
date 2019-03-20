@@ -29,14 +29,16 @@ export default class GlobalCount extends GlobalAggregation {
         checkMaxArguments(arguments, 0, 'globalCount');
         super({ name: 'count', type: 'number' });
     }
+
     toString () {
         return `${this.expressionName}()`;
     }
+
     _bindMetadata (metadata) {
         this._value.expr = metadata.featureCount;
     }
+
     _getMinimumNeededSchema () {
-        return {
-        };
+        return {};
     }
 }

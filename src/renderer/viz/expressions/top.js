@@ -44,8 +44,17 @@ export default class Top extends BaseExpression {
         this.type = 'category';
     }
 
+    get value () {
+        const buckets = [];
+        for (let i = 0; i < this.buckets - 1; i++) {
+            buckets.push(this[`_top${i}`].value);
+        }
+
+        return buckets;
+    }
+
     eval (feature) {
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -53,7 +62,9 @@ export default class Top extends BaseExpression {
         const index = orderedCategoryNames.findIndex(category => category.name === categoryName);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
 
-        return index >= this.numBuckets || index === -1 ? OTHERS_INDEX : index / divisor;
+        return index >= this.numBuckets || index === -1
+            ? { label: OTHERS_LABEL, index: OTHERS_INDEX }
+            : { label: categoryName, index: index / divisor };
     }
 
     _bindMetadata (metadata) {
@@ -155,7 +166,7 @@ export default class Top extends BaseExpression {
 
     _preDraw (program, drawMetadata, gl) {
         const buckets = this.numBuckets;
-        const metaColumn = this._metadata.properties[this.property.name];
+        const metaColumn = this._metadata.properties[this.property.propertyName];
 
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
@@ -175,8 +186,8 @@ export default class Top extends BaseExpression {
         super._preDraw(program, drawMetadata, gl);
     }
 
-    _getLegendData () {
-        const metaColumn = this._metadata.properties[this.property.name];
+    getLegendData (options) {
+        const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
             b.frequency - a.frequency
         );
@@ -193,7 +204,7 @@ export default class Top extends BaseExpression {
         });
 
         data.push({
-            key: OTHERS_LABEL,
+            key: options.othersLabel,
             value: OTHERS_INDEX
         });
 

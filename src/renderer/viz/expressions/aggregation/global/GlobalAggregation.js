@@ -2,6 +2,7 @@ import BaseExpression from '../../base';
 import { number } from '../../../expressions';
 import { implicitCast } from '../../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../errors/carto-validation-error';
+import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
 
 /**
  * Global aggregation expressions compute summary stats of properties for the whole dataset.
@@ -63,6 +64,7 @@ export default class GlobalAggregation extends BaseExpression {
     toString () {
         return `${this.expressionName}(${this.property.toString()})`;
     }
+
     isFeatureDependent () {
         return false;
     }
@@ -80,25 +82,25 @@ export default class GlobalAggregation extends BaseExpression {
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this.property._bindMetadata(metadata);
-        const propertyName = this.property.propertyName || this.property.name;
+        const propertyName = this.property.name || this.property.propertyName;
         const value = this._getValueFromStats(metadata, propertyName);
         this._value.expr = metadata.codec(propertyName).sourceToExternal(metadata, value);
     }
 
     _getValueFromStats (metadata, propertyName) {
         let value;
+
         if (this.baseStats) {
-            // Use base stats (pre-aggregation)
             if (this.baseStats === '_count') {
-                // Use count
                 value = metadata.featureCount;
             } else {
-                // Use some specific column stat
                 const stats = metadata.stats(this.property.name);
                 value = stats && stats[this.baseStats];
             }
         } else {
-            // Use stats from actual column corresponding to this aggregate function
+            if (propertyName === CLUSTER_FEATURE_COUNT) {
+                throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in ${this.expressionName}.`);
+            }
             const stats = metadata.stats(propertyName);
             value = stats && stats[this._name];
         }

@@ -1,6 +1,7 @@
 import { validateTypeErrors, validateStaticType, validateFeatureDependentErrors, validateMaxArgumentsError } from './utils';
 import * as s from '../../../../../src/renderer/viz/expressions';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../../src/errors/carto-validation-error';
+import { OTHERS_LABEL } from '../../../../../src/renderer/viz/expressions/constants';
 
 describe('src/renderer/viz/expressions/top', () => {
     describe('error control', () => {
@@ -77,28 +78,28 @@ describe('src/renderer/viz/expressions/top', () => {
         it('should work with 1 bucket', () => {
             const top = s.top(s.prop('wadus'), 1);
             top._bindMetadata(meta);
-            expect(top.eval({ wadus: 'A' })).toEqual(0);
-            expect(top.eval({ wadus: 'B' })).toEqual(-1);
-            expect(top.eval({ wadus: 'C' })).toEqual(-1);
-            expect(top.eval({ wadus: 'D' })).toEqual(-1);
+            expect(top.eval({ wadus: 'A' })).toEqual({ label: 'A', index: 0 });
+            expect(top.eval({ wadus: 'B' })).toEqual({ label: OTHERS_LABEL, index: -1 });
+            expect(top.eval({ wadus: 'C' })).toEqual({ label: OTHERS_LABEL, index: -1 });
+            expect(top.eval({ wadus: 'D' })).toEqual({ label: OTHERS_LABEL, index: -1 });
         });
 
         it('should work with 2 buckets', () => {
             const top = s.top(s.prop('wadus'), 2);
             top._bindMetadata(meta);
-            expect(top.eval({ wadus: 'A' })).toEqual(0);
-            expect(top.eval({ wadus: 'B' })).toEqual(1);
-            expect(top.eval({ wadus: 'C' })).toEqual(-1);
-            expect(top.eval({ wadus: 'D' })).toEqual(-1);
+            expect(top.eval({ wadus: 'A' })).toEqual({ label: 'A', index: 0 });
+            expect(top.eval({ wadus: 'B' })).toEqual({ label: 'B', index: 1 });
+            expect(top.eval({ wadus: 'C' })).toEqual({ label: OTHERS_LABEL, index: -1 });
+            expect(top.eval({ wadus: 'D' })).toEqual({ label: OTHERS_LABEL, index: -1 });
         });
 
         it('should work with 4 bucket', () => {
             const top = s.top(s.prop('wadus'), 4);
             top._bindMetadata(meta);
-            expect(top.eval({ wadus: 'A' })).toEqual(0);
-            expect(top.eval({ wadus: 'B' })).toEqual(1 / 3);
-            expect(top.eval({ wadus: 'C' })).toEqual(3 / 3);
-            expect(top.eval({ wadus: 'D' })).toEqual(2 / 3);
+            expect(top.eval({ wadus: 'A' })).toEqual({ label: 'A', index: 0 });
+            expect(top.eval({ wadus: 'B' })).toEqual({ label: 'B', index: 1 / 3 });
+            expect(top.eval({ wadus: 'C' })).toEqual({ label: 'C', index: 3 / 3 });
+            expect(top.eval({ wadus: 'D' })).toEqual({ label: 'D', index: 2 / 3 });
         });
     });
 });

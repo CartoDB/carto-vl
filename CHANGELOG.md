@@ -4,9 +4,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-
 ## [Unreleased]
 
+## [1.2.0] - 2019-03-20
+
+### Added
+- Allow the use of variables for all classifiers: `globalQuantiles`, `globalEqIntervals`, `globalStandardDev`, `viewportQuantiles`, `viewportEqIntervals` and `viewportStandardDev`
+- Improve MVT decoding error messages
+- Add interactive filter example
+- Throw error when using `clusterCount` in a global classifier
+- Label example with `clusterAVG` expression
+- Label example with `clusterCount` expression
+- Add `sampleHistogram` expression
+- Add Animation examples
+- Clean and reorganize examples in the documentation
+
+### Fixed
+- Fix regression in `Interactivity` using MVT and polygons
+- Raise an error when the idProperty is not specified in the metadata and is not a number
+- Fix getting aggregation expression values passed to `viewportFeatures` expression
+- Fix WebGL incompatibility in Edge
+- Fix regression in `toString` Viz method
+- Fix variables for aggregated values
+- Fix nesting `top` expression in histogram expressions
+- Fix `ramp` when evaluating a numeric property using `linear`
 
 ## [1.1.1] - 2019-01-16
 

@@ -26,10 +26,10 @@ export default class Base {
      */
     constructor (children) {
         this._initializeChildren(children);
-        this._addParentToChildren();
         this.preface = '';
         this._shaderBindings = new Map();
         this.expressionName = _toCamelCase(this.constructor.name);
+        this._variableName = null;
     }
 
     /**
@@ -172,6 +172,17 @@ export default class Base {
         return Promise.all(this._getChildren().map(child => child.loadImages()));
     }
 
+    get propertyName () {
+        return this._getChildren().map(child => child.propertyName).find(name => !!name);
+    }
+
+    getLegendData () {
+        return {
+            name: this.propertyName,
+            data: []
+        };
+    }
+
     _bindMetadata (metadata) {
         this._getChildren().forEach(child => child._bindMetadata(metadata));
     }
@@ -182,6 +193,7 @@ export default class Base {
         } else {
             this._initializeChildrenObject(children);
         }
+        this._addParentToChildren();
     }
 
     _initializeChildrenArray (children) {
@@ -201,7 +213,10 @@ export default class Base {
     }
 
     _initializeChildrenObject (children) {
-        this.childrenNames = Object.keys(children);
+        if (this.childrenNames === undefined) {
+            this.childrenNames = [];
+        }
+        this.childrenNames.push(...Object.keys(children));
 
         if (this.maxParameters && this.maxParameters < this.childrenNames.length) {
             throw new CartoValidationError(

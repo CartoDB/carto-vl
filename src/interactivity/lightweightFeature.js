@@ -1,6 +1,6 @@
-import VIZ_PROPERTIES from '../renderer/viz/utils/properties';
 import { generateBlenderFunction, generateResetFunction } from './blendUtils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
+import { SUPPORTED_VIZ_PROPERTIES } from '../constants/viz';
 
 /**
  * Generate a lightweight Feature-like class
@@ -41,8 +41,8 @@ function _defineIdProperty (targetObject, renderLayer) {
 }
 
 function _defineVizProperties (targetObject, renderLayer) {
-    VIZ_PROPERTIES.forEach(prop => {
-        _createLightweightFeatureVizProperty(targetObject, renderLayer, prop);
+    SUPPORTED_VIZ_PROPERTIES.forEach(property => {
+        _createLightweightFeatureVizProperty(targetObject, renderLayer, property);
     });
 }
 
@@ -97,9 +97,10 @@ function _defineFeatureProperties (targetObject, propertyNames) {
         get: function () {
             if (this._featureProperties === null) {
                 this._featureProperties = {};
-                // feature properties
-                propertyNames.forEach(propertyName => {
-                    this._featureProperties[propertyName] = this._rawFeature[propertyName];
+
+                propertyNames.forEach(({ property, variable }) => {
+                    const propertyName = variable || property;
+                    this._featureProperties[propertyName] = this._rawFeature[property];
                 });
             }
             return this._featureProperties;
@@ -112,7 +113,7 @@ function _defineRootBlendToMethod (targetObject) {
         get: function () {
             const blendTo = (newVizProperties, duration = 500) => {
                 Object.keys(newVizProperties).forEach((property) => {
-                    if (!(VIZ_PROPERTIES.includes(property))) {
+                    if (!(SUPPORTED_VIZ_PROPERTIES.includes(property))) {
                         throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Property '${property}' is not a valid viz property`);
                     }
                     const newValue = newVizProperties[property];
@@ -128,10 +129,9 @@ function _defineRootResetMethod (targetObject) {
     Object.defineProperty(targetObject, 'reset', {
         get: function () {
             const reset = (duration = 500) => {
-                VIZ_PROPERTIES.forEach((property) => {
+                SUPPORTED_VIZ_PROPERTIES.forEach((property) => {
                     this[property].reset(duration);
                 });
-
                 for (let key in this.variables) {
                     this.variables[key].reset(duration);
                 }

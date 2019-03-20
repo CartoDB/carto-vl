@@ -1,6 +1,6 @@
 import ViewportAggregation from './ViewportAggregation';
 import { implicitCast, clamp, checkMaxArguments, checkType, checkExpression } from '../../utils';
-import { CLUSTER_FEATURE_COUNT } from '../../../../schema';
+import { CLUSTER_FEATURE_COUNT } from '../../../../../constants/metadata';
 /**
  * Return the Nth percentile of an expression for the features showed in the viewport (features outside the viewport and features that don't pass the filter will be excluded).
  *

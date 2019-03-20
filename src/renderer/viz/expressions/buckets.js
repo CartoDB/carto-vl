@@ -75,6 +75,10 @@ export default class Buckets extends BaseExpression {
         this.type = 'category';
     }
 
+    get value () {
+        return this.list.elems.map(elem => elem.value);
+    }
+
     eval (feature) {
         const v = this.input.eval(feature);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
@@ -155,7 +159,7 @@ export default class Buckets extends BaseExpression {
         };
     }
 
-    _getLegendData (config) {
+    getLegendData (config) {
         const name = this.toString();
         const list = this.list.elems.map(elem => elem.eval());
         const data = this.input.type === 'number'

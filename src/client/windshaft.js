@@ -3,15 +3,14 @@ import MVT from '../sources/MVT';
 import Metadata from './WindshaftMetadata';
 import schema from '../renderer/schema';
 import * as windshaftFiltering from './windshaft-filtering';
-import { CLUSTER_FEATURE_COUNT } from '../renderer/schema';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
 import CartoMapsAPIError, { CartoMapsAPITypes as cmt } from '../errors/carto-maps-api-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
+import { CLUSTER_FEATURE_COUNT, aggregationTypes } from '../constants/metadata';
 
 const SAMPLE_ROWS = 1000;
 const MIN_FILTERING = 2000000;
 const REQUEST_GET_MAX_URL_LENGTH = 2048;
-
 const TILE_EXTENT = 2048;
 
 export default class Windshaft {
@@ -47,7 +46,7 @@ export default class Windshaft {
     async getMetadata (viz) {
         const MNS = viz.getMinimumNeededSchema();
         this._checkAcceptableMNS(MNS);
-        const resolution = viz.resolution;
+        const resolution = viz.resolution.eval();
         const filtering = windshaftFiltering.getFiltering(viz, { exclusive: this._exclusive });
         this._forceIncludeCartodbId(MNS);
         if (this._needToInstantiate(MNS, resolution, filtering)) {
@@ -61,7 +60,7 @@ export default class Windshaft {
         // Force to include `cartodb_id` in the MNS columns.
         // TODO: revisit this request to Maps API
         if (!MNS['cartodb_id']) {
-            MNS['cartodb_id'] = [{ type: 'unaggregated' }];
+            MNS['cartodb_id'] = [{ type: aggregationTypes.UNAGGREGATED }];
         }
     }
 
@@ -77,8 +76,8 @@ export default class Windshaft {
     _checkAcceptableMNS (MNS) {
         Object.keys(MNS).forEach(propertyName => {
             const usages = MNS[propertyName];
-            const aggregatedUsage = usages.some(x => x.type !== 'unaggregated');
-            const unAggregatedUsage = usages.some(x => x.type === 'unaggregated');
+            const aggregatedUsage = usages.some(x => x.type === aggregationTypes.AGGREGATED);
+            const unAggregatedUsage = usages.some(x => x.type === aggregationTypes.UNAGGREGATED);
             if (aggregatedUsage && unAggregatedUsage) {
                 throw new CartoValidationError(`${cvt.INCORRECT_VALUE} Incompatible combination of cluster aggregation usages (${
                     JSON.stringify(usages.filter(x => x.type !== 'aggregated'))
@@ -216,7 +215,7 @@ export default class Windshaft {
     }
 
     _requiresAggregation (MNS) {
-        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type !== 'unaggregated'));
+        return Object.values(MNS).some(propertyUsages => propertyUsages.some(u => u.type === aggregationTypes.AGGREGATED));
     }
 
     _generateAggregation (MNS, resolution) {
@@ -350,11 +349,18 @@ export default class Windshaft {
         Object.keys(agg.columns).forEach(aggName => {
             const basename = agg.columns[aggName].aggregated_column;
             const fnName = agg.columns[aggName].aggregate_function;
+
             if (!properties[basename].aggregations) {
                 properties[basename].aggregations = {};
             }
+
             properties[basename].aggregations[fnName] = aggName;
+
+            if (basename !== aggName) {
+                properties[aggName] = JSON.parse(JSON.stringify(properties[basename]));
+            }
         });
+
         Object.keys(agg.dimensions).forEach(dimName => {
             const dimension = agg.dimensions[dimName];
             if (stats.dimensions && stats.dimensions[dimName].type) {
@@ -374,6 +380,7 @@ export default class Windshaft {
                     max: dimensionStats.max
                 };
                 const range = MNS[column].some(c => c.range);
+
                 if (range > 0) {
                     properties[column].dimension.range = ['start', 'end'].map(mode => `${dimName}_${mode}`);
                 }

@@ -2,6 +2,7 @@ import BaseExpression from '../base';
 import { checkString, checkMaxArguments } from '../utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 import { FP32_DESIGNATED_NULL_VALUE } from '../constants';
+import { aggregationTypes } from '../../../../constants/metadata';
 /**
  * Evaluates the value of a column for every row in the dataset.
  *
@@ -104,10 +105,12 @@ export default class Property extends BaseExpression {
     }
 
     _getMinimumNeededSchema () {
+        const type = this._variableName
+            ? aggregationTypes.UNKNOWN
+            : aggregationTypes.UNAGGREGATED;
+
         return {
-            [this.name]: [{
-                type: 'unaggregated'
-            }]
+            [this.name]: [{ type }]
         };
     }
 }

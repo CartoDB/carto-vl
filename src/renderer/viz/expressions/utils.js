@@ -8,7 +8,19 @@ export const DEFAULT = undefined;
 
 export function checkMaxArguments (constructorArguments, maxArguments, expressionName) {
     if (constructorArguments.length > maxArguments) {
-        throw new CartoValidationError(`${cvt.TOO_MANY_ARGS} Expression '${expressionName}' accepts ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+        throw new CartoValidationError(`${cvt.TOO_MANY_ARGS} Expression '${expressionName}' accepts just ${maxArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkMinArguments (constructorArguments, minArguments, expressionName) {
+    if (constructorArguments.length < minArguments) {
+        throw new CartoValidationError(`${cvt.NOT_ENOUGH_ARGS} Expression '${expressionName}' accepts at least ${minArguments} arguments, but ${constructorArguments.length} were passed.`);
+    }
+}
+
+export function checkExactNumberOfArguments (constructorArguments, numArguments, expressionName) {
+    if (constructorArguments.length !== numArguments) {
+        throw new CartoValidationError(`${cvt.WRONG_NUMBER_ARGS} Expression '${expressionName}' accepts exactly ${numArguments} arguments, but ${constructorArguments.length} were passed.`);
     }
 }
 
@@ -94,14 +106,18 @@ export function getOrdinalFromIndex (index) {
 export function getStringErrorPreface (expressionName, parameterName, parameterIndex) {
     return `${expressionName}(): invalid ${getOrdinalFromIndex(parameterIndex + 1)} parameter '${parameterName}'`;
 }
+
 export function throwInvalidType (expressionName, parameterName, parameterIndex, expectedType, actualType) {
     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
     expected type was '${expectedType}', actual type was '${actualType}'`);
 }
 
 export function throwInvalidInstance (expressionName, parameterName, parameterIndex, expectedClass) {
+    const expectedClassNames = Array.isArray(expectedClass)
+        ? expectedClass.join(', ')
+        : expectedClass.name;
     throw new CartoValidationError(`${cvt.INCORRECT_TYPE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
-    expected type was instance of '${expectedClass.name}'`);
+    expected type was instance of '${expectedClassNames}'`);
 }
 
 export function throwInvalidNumber (expressionName, parameterName, parameterIndex, number) {
@@ -161,10 +177,19 @@ export function checkType (expressionName, parameterName, parameterIndex, expect
     }
 }
 
-export function checkInstance (expressionName, parameterName, parameterIndex, expectedClass, parameter) {
+export function checkInstance (expressionName, parameterName, parameterIndex, expectedExpression, parameter) {
     checkExpression(expressionName, parameterName, parameterIndex, parameter);
-    if (!(parameter.isA(expectedClass))) {
-        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedClass);
+
+    if (Array.isArray(expectedExpression)) {
+        const ok = expectedExpression.some(expression => {
+            return parameter.isA(expression);
+        });
+
+        if (!ok) {
+            throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedExpression);
+        }
+    } else if (!(parameter.isA(expectedExpression))) {
+        throwInvalidInstance(expressionName, parameterName, parameterIndex, expectedExpression);
     }
 }
 
@@ -198,6 +223,13 @@ export function checkFeatureIndependent (expressionName, parameterName, paramete
     if (parameter.isFeatureDependent()) {
         throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
         parameter cannot be feature dependent`);
+    }
+}
+
+export function checkFeatureDependent (expressionName, parameterName, parameterIndex, parameter) {
+    if (!parameter.isFeatureDependent()) {
+        throw new CartoValidationError(`${cvt.INCORRECT_VALUE} ${getStringErrorPreface(expressionName, parameterName, parameterIndex)}
+        parameter must be feature dependent`);
     }
 }
 

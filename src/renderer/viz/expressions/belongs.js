@@ -27,7 +27,7 @@ import BaseExpression from './base';
 export const In = generateBelongsExpression('in', IN_INLINE_MAKER, (input, list) => list.some(item => item === input) ? 1 : 0);
 
 function IN_INLINE_MAKER (list) {
-    if (list.length === 0) {
+    if (!list || list.length === 0) {
         return () => '0.';
     }
     return inline => `((${list.map((cat, index) => `(${inline.input} == ${inline.list[index]})`).join(' || ')})? 1.: 0.)`;
@@ -74,10 +74,10 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             list = implicitCast(list);
 
             checkExpression(name, 'input', 0, input);
-            checkExpression(name, 'list', 1, list);
+            checkExpression(name, ['list', 'variable'], 1, list);
 
             super({ input, list });
-            this.inlineMaker = inlineMaker(this.list.elems);
+
             this.type = 'number';
         }
 
@@ -89,6 +89,8 @@ function generateBelongsExpression (name, inlineMaker, jsEval) {
             super._bindMetadata(meta);
             checkType(name, 'input', 0, 'category', this.input);
             checkType(name, 'list', 1, 'category-list', this.list);
+
+            this.inlineMaker = inlineMaker(this.list.elems);
         }
     };
 }

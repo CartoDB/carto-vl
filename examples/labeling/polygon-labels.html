@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Labels & useLines | CARTO</title>
+  <title>Label polygons | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <script src="../../dist/carto-vl.js"></script>
@@ -13,13 +13,25 @@
 
 <body>
   <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>San Francisco neighborhoods</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Style and label polygons</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
 
   <script>
     const map = new mapboxgl.Map({
       container: 'map',
       style: carto.basemaps.voyager,
       center: [-122.406855, 37.744263],
-      zoom: 11
+      zoom: 11,
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -32,13 +44,13 @@
       apiKey: 'default_public'
     });
 
-    // Polygon layer
     const source = new carto.source.Dataset('sf_neighborhoods');
     const viz = new carto.Viz(`
+      @v_features: viewportFeatures($name)
+
       color: ramp($name,vivid)
       strokeWidth: 1
       strokeColor: black
-      @v_features: viewportFeatures($name)
     `);
     const layer = new carto.Layer('polygons', source, viz);
 
@@ -49,15 +61,15 @@
 
       const layerUpdated = function () {
         const features = viz.variables.v_features.value;
-        const geojsonFeatures = features.map(f => {
+        const geojsonFeatures = features.map(feature => {
           return {
             "type": "Feature",
             "geometry": {
               "type": "Point",
-              "coordinates": f.getRenderedCentroid()
+              "coordinates": feature.getRenderedCentroid()
             },
             "properties": {
-              "label_field": `${f.properties['name']}`,
+              "label_field": `${feature.properties['name']}`,
             }
           }
         });

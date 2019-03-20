@@ -38,8 +38,6 @@
             zoom: 3
         });
 
-        //** CARTO VL functionality begins here **//
-
         carto.setDefaultAuth({
             username: 'cartovl',
             apiKey: 'default_public'
@@ -48,7 +46,7 @@
         const source = new carto.source.Dataset("railroad_accidents");
         const viz = new carto.Viz(`
             width: 5
-            color: ramp($weather,[darkorange,darkviolet,darkturquoise])
+            color: ramp(top($weather,3),[darkorange,darkviolet,darkturquoise])
             strokeWidth: 0.2
             strokeColor: black
         `);

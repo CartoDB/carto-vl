@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Label clusters by count | CARTO VL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="../../dist/carto-vl.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+    <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+    <div id="map"></div>
+    <aside class="toolbox">
+        <div class="box">
+            <header>
+                <h1>Montreal parking signs</h1>
+            </header>
+            <section>
+                <p class="description open-sans">Symbolize and label by viewport cluster count</p>
+            </section>
+            <footer class="js-footer"></footer>
+        </div>
+    </aside>
+
+    <script>
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+            center: [-73.605089, 45.536127],
+            zoom: 10,
+            scrollZoom: false
+        });
+
+        const nav = new mapboxgl.NavigationControl({
+            showCompass: false
+        });
+        map.addControl(nav, 'top-left');
+
+
+        carto.setDefaultConfig({
+            serverURL: 'https://{user}.carto.com'
+        });
+
+        carto.setDefaultAuth({
+            username: 'cartovl',
+            apiKey: 'default_public'
+        });
+
+
+        const source = new carto.source.Dataset('montreal_parking_signs');
+        const viz = new carto.Viz(`
+            @count: clusterCount()
+            @v_features: viewportFeatures(@count)
+            
+            width: ramp(linear(@count, viewportMIN(@count), viewportMAX(@count)), [5,50])
+            color: opacity(#C91329,0.9)
+            strokeWidth: 0
+            resolution: 32
+        `);
+        const layer = new carto.Layer('layer', source, viz);
+
+        // Create labeling layer centroids
+        layer.on('loaded', () => {
+            map.addSource('labels', { type: 'geojson', data: null });
+            const labelSource = map.getSource('labels');
+
+            const layerUpdated = function () {
+                const features = viz.variables.v_features.value;
+                const geojsonFeatures = features.map(feature => {
+                    return {
+                        "type": "Feature",
+                        "geometry": {
+                            "type": "Point",
+                            "coordinates": feature.getRenderedCentroid()
+                        },
+                        "properties": {
+                            "label_field": `${feature.properties['count']}`,
+                        }
+                    }
+                });
+
+                labelSource.setData({
+                    type: 'FeatureCollection',
+                    features: geojsonFeatures
+                });
+            };
+
+            layer.on('updated', layerUpdated);
+
+            // Style labels
+            map.addLayer({
+                "id": "my-labels",
+                "type": "symbol",
+                "source": "labels",
+                "layout": {
+                    "text-field": "{label_field}",
+                    "text-font": ["Open Sans Semibold", "Arial Unicode MS Regular"],
+                    "text-size": 10,
+                    "text-justify": "center"
+                },
+                "paint": {
+                    "text-color": "#FFFFFF",
+                    "text-halo-width": 0,
+                    "text-halo-blur": 0
+                },
+                filter: ['!=', ['string', ['get', 'label_field']], '1']
+            });
+        });
+
+        layer.addTo(map);
+
+    </script>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 import Classifier from './Classifier';
-import Property from '../basic/property';
-import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArguments } from '../utils';
+import { checkExactNumberOfArguments, checkType } from '../utils';
+import { CLUSTER_FEATURE_COUNT } from '../../../../constants/metadata';
+import CartoValidationError, { CartoValidationTypes as cvt } from '../../../../errors/carto-validation-error';
 
 /**
  * Classify `input` by using the quantiles method with `n` buckets.
@@ -29,19 +30,26 @@ import { checkInstance, checkType, checkExpression, checkNumber, checkMaxArgumen
  */
 export default class GlobalQuantiles extends Classifier {
     constructor (input, buckets) {
-        checkMaxArguments(arguments, 2, 'globalQuantiles');
-        checkInstance('globalQuantiles', 'input', 0, Property, input && (input.property || input));
-        checkNumber('globalQuantiles', 'buckets', 1, buckets);
-        super({ input }, buckets);
+        checkExactNumberOfArguments(arguments, 2, 'globalQuantiles');
+        super({ input, buckets });
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkExpression('globalQuantiles', 'input', 0, this.input);
+
         checkType('globalQuantiles', 'input', 0, 'number', this.input);
+        this._updateBreakpointsWith(metadata);
+    }
 
-        const copy = metadata.sample.map(s => s[this.input.name]);
+    _validateInputIsNumericProperty () { /* noop */ }
 
+    _updateBreakpointsWith (metadata) {
+        if (this.input.propertyName === CLUSTER_FEATURE_COUNT) {
+            throw new CartoValidationError(`${cvt.INCORRECT_TYPE} 'clusterCount' can not be used in GlobalQuantiles. Consider using ViewportQuantiles instead`);
+        }
+
+        const name = this.input.name;
+        const copy = metadata.sample.map(s => s[name]);
         copy.sort((x, y) => x - y);
 
         this.breakpoints.map((breakpoint, index) => {

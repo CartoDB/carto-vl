@@ -5,7 +5,7 @@ import { decodeLines, decodePolygons } from '../client/mvt/feature-decoder';
 import MVTMetadata from './MVTMetadata';
 import DummyDataframe from '../renderer/DummyDataframe';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../errors/carto-validation-error';
-import CartoRuntimeError, { CartoRuntimeTypes as crt } from '../errors/carto-runtime-error';
+import CartoRuntimeError, { CartoRuntimeTypes as runtimeErrors } from '../errors/carto-runtime-error';
 import { GEOMETRY_TYPE } from '../utils/geometry';
 
 // TODO import correctly
@@ -154,7 +154,7 @@ export class MVTWorker {
             }
             if (f.properties[metadata.idProperty] === undefined) {
                 throw new CartoRuntimeError(
-                    `${crt.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
+                    `${runtimeErrors.MVT} MVT feature with undefined idProperty '${metadata.idProperty}'`
                 );
             }
             this._decodeProperties(metadata, scalarPropertyCodecs, rangePropertyCodecs, properties, f, numFeatures);
@@ -170,7 +170,7 @@ export class MVTWorker {
         const actual = MVT_TO_CARTO_TYPES[type];
         if (actual !== expected) {
             throw new CartoRuntimeError(
-                `${crt.MVT} MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`
+                `${runtimeErrors.MVT} MVT: mixed geometry types in the same layer. Layer has type: ${expected} but feature was ${actual}`
             );
         }
     }

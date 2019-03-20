@@ -52,9 +52,9 @@
 
     const source = new carto.source.Dataset('populated_places');
     const viz = new carto.Viz(`
+      symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [star,triangle,marker])
       width: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [30,20,10])
       color: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated Place']), [violet,limegreen,gray])
-      symbol: ramp(buckets($featurecla, ['Admin-0 capital','Admin-1 capital','Populated place']), [star,triangle,marker])
     `);
 
     const layer = new carto.Layer('layer', source, viz);

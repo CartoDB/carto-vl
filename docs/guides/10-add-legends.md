@@ -10,8 +10,8 @@ If you completed the data-driven visualization guide, the map below will look fa
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
+        id="intro-guides-legend"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
@@ -175,20 +175,41 @@ Now, when you load the map, you will see the complete legend. You will also noti
 
 <div class="example-map">
     <iframe
-        id="guides-legend-step-3"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
+        id="guides-legend-step-2"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-2.html"
         width="100%"
         height="500"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-3.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-2.html)
 
 ### Overwrite defaults
 
 In the map above, we are symbolizing all six weather categories in the data and therefore have an entry for each type in the legend. There are other times when there is symbology applied to some categories but not all of them. In this case, you will have an "others" legend item.
 
 For example, the map below symbolizes only the `top` three weather conditions in the rail accident data. The legend labels the top three categories with all other categories labelled as `CARTO_VL_OTHERS`:
+
+<div class="example-map">
+    <iframe
+        id="guides-legend-step-3"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-3.html"
+        width="100%"
+        height="500"
+        style="margin: 20px auto !important"
+        frameBorder="0">
+    </iframe>
+</div>
+
+You can overwrite the default `CARTO_VL_OTHERS` value by setting the `othersLabel` option when using `getLegendData`:
+
+```js
+const colorLegend = layer.viz.color.getLegendData({
+    othersLabel: 'Other Weather'
+});
+```
+
+With that change, the map labels other categories as "Other weather" in the legend:
 
 <div class="example-map">
     <iframe
@@ -200,27 +221,7 @@ For example, the map below symbolizes only the `top` three weather conditions in
         frameBorder="0">
     </iframe>
 </div>
-
-You can overwrite this default label in the style for the `colorLegendList` with `${legend.key.replace()}`:
-
-```js
-colorLegendList +=
-    `<li><span class="point-mark" style="background-color:${color}; border: 1px solid black;"></span><span>${legend.key.replace('CARTO_VL_OTHERS', 'Other weather')}</span></li>\n`;
-```
-
-With that change, the map labels other categories as "Other weather" in the legend:
-
-<div class="example-map">
-    <iframe
-        id="accidents-all-top-legend"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
-        width="100%"
-        height="500"
-        style="margin: 20px auto !important"
-        frameBorder="0">
-    </iframe>
-</div>
-You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
+You can explore this step [here](/developers/carto-vl/examples/maps/guides/add-legends/step-4.html)
 
 ### Assign opacity with variables
 
@@ -288,15 +289,15 @@ Now when you load the map, you will see that both the features on the map and th
 
 <div class="example-map">
     <iframe
-        id="accidents-all-transparent-legend"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
+        id="guides-legend-step-5"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-5.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
         frameBorder="0">
     </iframe>
 </div>
-You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-6.html)
+You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-5.html)
 
 ### More examples
 
@@ -307,7 +308,7 @@ View the source of the maps below to see how legends work for different map and 
 <div class="example-map">
     <iframe
         id="guides-legend-step-6"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-6.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -321,7 +322,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-7"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-7.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -335,7 +336,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 <div class="example-map">
     <iframe
         id="guides-legend-step-8"
-        src="/developers/carto-vl/examples/maps/guides/add-legends/step-9.html"
+        src="/developers/carto-vl/examples/maps/guides/add-legends/step-8.html"
         width="100%"
         height="500"
         style="margin: 20px auto !important"
@@ -344,7 +345,7 @@ You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-le
 </div>
 You can explore this map [here](/developers/carto-vl/examples/maps/guides/add-legends/step-8.html)
 
-#### Unclassed latitudes
+#### Unclassed points
 
 <div class="example-map">
     <iframe

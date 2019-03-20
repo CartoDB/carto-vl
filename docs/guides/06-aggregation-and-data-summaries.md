@@ -286,11 +286,7 @@ const viz = new carto.Viz(`
 `);
 ```
 
-And to fix some errors caused by the lack of previous variables, deactivate these handlers:
-```js
-layer.off('loaded', displayGlobalValues)
-layer.off('updated', displayViewportValues);
-```
+And let's remove the methods `displayGlobalValues` and `displayViewportValues` since we're not using anymore to display information.
 
 ---
 

@@ -95,6 +95,44 @@ describe('src/renderer/viz/expressions/ramp', () => {
                 });
             });
         });
+
+        describe('when palettes are numbers', () => {
+            const METADATA = new Metadata({
+                properties: {
+                    price: { type: 'number', min: 1, max: 10 }
+                },
+                sample: [
+                    { price: 1 },
+                    { price: 2 },
+                    { price: 3 },
+                    { price: 4 },
+                    { price: 5 },
+                    { price: 6 },
+                    { price: 7 },
+                    { price: 8 },
+                    { price: 9 },
+                    { price: 10 }
+                ]
+            });
+            describe('and values are numeric', () => {
+                it('should get the correct values, when property is inside of mapping interval', () => {
+                    const r = ramp(linear(property('price'), 1, 10), [8, 32]);
+                    // const r = ramp(property('price'), [8, 32]); // same as previous
+                    r._bindMetadata(METADATA);
+
+                    expect(r.eval({ price: 1 })).toEqual(8);
+                    expect(r.eval({ price: 10 })).toEqual(32);
+                });
+
+                it('should get the correct (clamped) values, even when property is out of mapping interval', () => {
+                    const r = ramp(linear(property('price'), 1, 5), [8, 32]);
+                    r._bindMetadata(METADATA);
+
+                    expect(r.eval({ price: 0 })).toEqual(8);
+                    expect(r.eval({ price: 10 })).toEqual(32);
+                });
+            });
+        });
     });
 
     describe('.eval with buckets', () => {
@@ -562,6 +600,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 4);
                         const r = ramp(q, [red, blue, yellow, purple, green]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -580,6 +619,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should not show interpolation', () => {
                         const q = globalQuantiles($price, 4);
                         const r = ramp(q, [red, blue, yellow, purple]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -603,6 +643,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     it('should show interpolation', () => {
                         const q = globalQuantiles($price, 3);
                         const r = ramp(q, [red, blue]);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -717,6 +758,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[3];
                         const q = globalQuantiles($price, 3);
                         const r = ramp(q, palettes.SUNSET);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 1 });
@@ -736,7 +778,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     });
                 });
 
-                describe('and there more than 7 colors', () => {
+                describe('and there are more than 7 colors', () => {
                     const METADATA = new Metadata({
                         properties: {
                             price: { type: 'number', min: 0, max: 10 }
@@ -764,6 +806,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         const RAMP_COLORS = cartocolor.Sunset[7];
                         const q = globalQuantiles($price, 10);
                         const r = ramp(q, palettes.SUNSET);
+                        r._resolveAliases();
                         r._bindMetadata(METADATA);
 
                         actual = r.eval({ price: 0 });
@@ -990,7 +1033,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     let expected;
 
                     const r = ramp(globalEqIntervals($price, 2), [red, blue]);
-
+                    r._resolveAliases();
                     r._bindMetadata(METADATA);
 
                     actual = r.getLegendData().data;

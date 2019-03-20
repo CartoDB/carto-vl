@@ -202,6 +202,14 @@ body {
   width: calc(100% - 24px);
 }
 
+.box header h2 {
+  display: inline-block;
+  color: #2E3C43;
+  font-size: 16px;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;;
+  margin: 8px auto;
+}
+
 .box section .separator {
   min-height: 1px;
   background-color: rgba(46, 60, 67, 0.08);
@@ -535,12 +543,13 @@ body {
 }
 
 .point-mark {
-  min-width: 10px;
-  min-height: 10px;
+  width: 10px;
+  height: 10px;
   align-self: center;
   border-radius: 50%;
   margin-right: 12px;
   box-sizing: border-box;
+  display: inline-block;
 }
 
 .image-mark {

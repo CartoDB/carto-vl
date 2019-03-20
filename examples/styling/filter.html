@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Filter based styling | CARTO</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,7 @@
   <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="../style.css">
 </head>
+
 <body>
   <div id="map"></div>
   <aside class="toolbox">
@@ -35,9 +37,7 @@
       style: carto.basemaps.darkmatter,
       center: [0, 30],
       zoom: 2,
-      scrollZoom: false,
-
-
+      scrollZoom: false
     });
 
     const nav = new mapboxgl.NavigationControl({
@@ -45,20 +45,20 @@
     });
     map.addControl(nav, 'top-left');
 
-    // Define user
     carto.setDefaultAuth({
       username: 'cartovl',
       apiKey: 'default_public'
     });
 
-    // Define layer
     const source = new carto.source.Dataset('populated_places');
+
     const viz = new carto.Viz(`
         color: ramp(viewportQuantiles($pop_max, 5), redor)
         width: 5
         strokeWidth: 0
         filter: between($pop_max, 10000, 100000)
     `);
+
     const layer = new carto.Layer('layer', source, viz);
 
     layer.addTo(map, 'watername_ocean');
@@ -69,4 +69,5 @@
     }
   </script>
 </body>
+
 </html>

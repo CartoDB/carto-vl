@@ -12,13 +12,13 @@
 - Full control over everything happening on the map and can provide rich reactions to user interactions.
 - New and intuitive map styling language that is designed specifically for multi-scale, thematic cartography. With just a few lines, complex visualizations can be created. Non-programmers can create their first map easily, while programmers will still be able to exploit the full potential of the CARTO ecosystem.
 
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interpolated-lines.82265604.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interpolated-lines.gif)
 
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interactivity.44cada98.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/interactivity.gif)
 
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/polygon-animation.bf485125.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/polygon-animation.gif)
 
-![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/line-animation.c9c09239.gif)
+![](https://carto.com/blog/img/posts/2018/2018-05-21-carto-vl-vector-library/line-animation.gif)
 
 ## Example
 
@@ -125,3 +125,9 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## License
 
 This project is licensed under the BSD 3-clause "New" or "Revised" License - see the [LICENSE](LICENSE) file for details.
+
+## BrowserStack
+
+[BrowserStack](https://www.browserstack.com/) supports this OpenSource project, providing us with valuable tools to test CARTO VL over different systems and browsers configurations.
+
+<img src="https://raw.githubusercontent.com/CartoDB/carto-vl/master/test/browserstack-logo.png" width="200" alt="BrowserStack Logo">
