@@ -1,6 +1,6 @@
 {
   "name": "@carto/carto-vl",
-  "version": "1.2.0",
+  "version": "1.2.3",
   "sideEffects": false,
   "description": "CARTO Vector library",
   "repository": {
@@ -25,7 +25,7 @@
   "license": "BSD-3-Clause",
   "files": [
     "src",
-    "dist/carto-vl*.*"
+    "dist"
   ],
   "dependencies": {
     "@babel/runtime": "^7.0.0",
