@@ -1,3 +1,4 @@
+import mitt from 'mitt';
 import * as rsys from '../client/rsys';
 import Dataframe from '../renderer/Dataframe';
 import Metadata from './GeoJSONMetadata';
@@ -14,7 +15,7 @@ export default class GeoJSON extends Base {
     /**
      * Create a carto.source.GeoJSON source from a GeoJSON object.
      *
-     * @param {Object} data - A GeoJSON data object
+     * @param {Object|String} data - A GeoJSON data object or a URL to fetch the GeoJSON object
      * @param {Object} options - Options
      * @param {array<string>} options.dateColumns - List of columns that contain dates.
      *
@@ -40,19 +41,44 @@ export default class GeoJSON extends Base {
      */
     constructor (data, options = {}) {
         super();
-        this._checkData(data);
+        // this._checkData(data);
 
         this._type = ''; // Point, LineString, MultiLineString, Polygon, MultiPolygon
         this._categoryStringToIDMap = {};
         this._numCategories = 0;
+        this._options = options;
         this._numFields = new Set();
         this._catFields = new Set();
         this._dateFields = new Set();
         this._providedDateColumns = new Set(options.dateColumns);
         this._properties = {};
         this._boundColumns = new Set();
+        this._emitter = mitt();
 
-        this._data = data;
+        if (util.isString(data)) {
+            this._url = data;
+            this._data = this._fetchData(data);
+
+            if (options && options.reload) {
+                this._reload();
+            }
+        } else {
+            this._data = data;
+            this._initData(data);
+        }
+    }
+
+    _reload () {
+        const milliseconds = this._options && this._options.milliseconds
+            ? this._options.milliseconds
+            : 5000;
+
+        this._reloadInterval = setInterval(() => {
+            this._data = this._fetchData(this._url);
+        }, milliseconds);
+    }
+
+    _initData (data) {
         if (data.type === 'FeatureCollection') {
             this._features = data.features;
         } else if (data.type === 'Feature') {
@@ -62,8 +88,26 @@ export default class GeoJSON extends Base {
         }
 
         this._features = this._initializeFeatureProperties(this._features);
-
         this._setCoordinatesCenter();
+    }
+
+    on (eventName, callback) {
+        return this._emitter.on(eventName, callback);
+    }
+
+    off (eventName, callback) {
+        return this._emitter.off(eventName, callback);
+    }
+
+    async _fetchData (url) {
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            this._emitter.emit('update', data);
+            return data;
+        } catch (error) {
+            throw new CartoValidationError(`${cvt.INCORRECT_VALUE} 'data' property must be a GeoJSON object.`);
+        }
     }
 
     bindLayer (addDataframe) {
@@ -103,8 +147,11 @@ export default class GeoJSON extends Base {
         return false;
     }
 
-    _clone () {
-        return new GeoJSON(this._data, { dateColumns: Array.from(this._providedDateColumns) });
+    async _clone () {
+        const data = await this._data;
+        if (data) {
+            return new GeoJSON(data, { dateColumns: Array.from(this._providedDateColumns) });
+        }
     }
 
     _checkData (data) {

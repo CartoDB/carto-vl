@@ -222,8 +222,7 @@ export default class Layer {
         this._checkSource(source);
         this._checkViz(viz);
 
-        const safeSource = this._cloneSourceIfDifferent(source);
-
+        const safeSource = await this._cloneSourceIfDifferent(source); 
         let change = this._initChange(majorChange);
         const [, metadata] = await Promise.all([
             viz.loadImages(), // start requesting images ASAP
@@ -304,16 +303,22 @@ export default class Layer {
      * @param {carto.source} source
      * @returns {carto.source} safeSource
      */
-    _cloneSourceIfDifferent (source) {
+    async _cloneSourceIfDifferent (source) {
         // The cloning allows the source to be safely used in other layers.
         // That's because using `source.requestMetadata()` can update later on its internal state (depending on what's required by the viz)
+        source.on('update', () => {
+            if (this._viz) {
+                this._update(source, this._viz, false);
+            }
+        });
 
         let safeSource;
         if (source !== this._source) {
-            safeSource = source._clone();
+            safeSource = await source._clone();
         } else {
             safeSource = source;
         }
+
         return safeSource;
     }
 
