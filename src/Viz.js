@@ -14,7 +14,7 @@ import lineVertexShaderGLSL from './renderer/shaders/geometry/line/lineVertexSha
 import lineFragmentShaderGLSL from './renderer/shaders/geometry/line/lineFragmentShader.glsl';
 import polygonVertexShaderGLSL from './renderer/shaders/geometry/polygon/polygonVertexShader.glsl';
 import polygonFragmentShaderGLSL from './renderer/shaders/geometry/polygon/polygonFragmentShader.glsl';
-import SVG from './renderer/viz/expressions/SVG';
+import Image from './renderer/viz/expressions/Image';
 import svgs from './renderer/viz/defaultSVGs';
 import Placement from './renderer/viz/expressions/Placement';
 import Translate from './renderer/viz/expressions/transformation/Translate';
@@ -27,7 +27,7 @@ const DEFAULT_STROKE_COLOR_EXPRESSION = () => _markDefault(s.rgb(0, 0, 0));
 const DEFAULT_STROKE_WIDTH_EXPRESSION = () => _markDefault(s.number(0));
 const DEFAULT_ORDER_EXPRESSION = () => _markDefault(s.noOrder());
 const DEFAULT_FILTER_EXPRESSION = () => _markDefault(s.constant(1));
-const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new SVG(svgs.circle));
+const DEFAULT_SYMBOL_EXPRESSION = () => _markDefault(new Image(svgs.circle));
 const DEFAULT_SYMBOLPLACEMENT_EXPRESSION = () => _markDefault(new Placement(s.constant(0), s.constant(1)));
 const DEFAULT_TRANSFORM_EXPRESSION = () => _markDefault(new Translate(s.constant(0), s.constant(0)));
 const DEFAULT_RESOLUTION = () => _markDefault(s.number(1));

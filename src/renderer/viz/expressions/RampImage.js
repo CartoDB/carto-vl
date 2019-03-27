@@ -3,11 +3,11 @@ import { checkType, checkInstance } from './utils';
 import Property from './basic/property';
 import CategoryIndex from './CategoryIndex';
 import ListImage from './ListImage';
-import SVG from './SVG';
+import Image from './Image';
 import Base from './base';
 import { OTHERS_GLSL_VALUE, DEFAULT_OPTIONS, DEFAULT_RAMP_OTHERS } from './constants';
 
-const DEFAULT_RAMP_OTHERS_IMAGE = new SVG(defaultSVGs.circle);
+const DEFAULT_RAMP_OTHERS_IMAGE = new Image(defaultSVGs.circle);
 export default class RampImage extends Base {
     _bindMetadata (metadata) {
         Base.prototype._bindMetadata.call(this, metadata);
