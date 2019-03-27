@@ -399,7 +399,8 @@ describe('api/viz', () => {
                     order: noOrder()
                     resolution: 1
                     strokeColor: rgba(0,0,0)
-                    strokeWidth:0 symbol: svg()
+                    strokeWidth:0
+                    symbol: image()
                     symbolPlacement: placement(0,1)
                     transform: translate(0,0)
                     width:1
@@ -431,7 +432,7 @@ describe('api/viz', () => {
                     resolution: 1
                     strokeColor: ramp($category,Prism)
                     strokeWidth: 0
-                    symbol: svg()
+                    symbol: image()
                     symbolPlacement: placement(0,1)
                     transform: translate(0,0)
                     width: 1
