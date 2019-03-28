@@ -4,7 +4,7 @@ CARTO VL is an open-source library. We are more than happy to receive your contr
 
 ## <a name="prerequisites">Prerequisites</a>
 
-To clone and run this library, you'll need [Node.js](https://nodejs.org/en/download/) >=6.11.5 (which comes with [npm](http://npmjs.com)) installed on your computer.
+To clone and run this library, you'll need [Node.js](https://nodejs.org/en/download/) >=6.11.5 (which comes with [npm](http://npmjs.com)) installed on your computer. If you're using [yarn](https://yarnpkg.com/en/) instead of npm, please use the last stable version.
 
 ## <a name="install">Install</a>
 
@@ -133,18 +133,17 @@ Adding `f-` at the beginning of any test folder marks this test to be executed w
 
 Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
+## Workflow
+
+Our main branch is `master`. This branch is stable and has the same content as the last published version. The branch with the new changes for the next **major** or **minor** release is `development`. It means that:
+
+* For very small changes that imply a patch release, open a PR against `master` branch.
+* The rest of PR should be open agains `development` branch.
+
+When a PR is merged into `master` for a patch release, after releasing, we merge `master` back into `development` (because `development` always have to be updated with `master`).
+
+PRs are very welcome :)
+
 ## Release
 
-First create a release. This command bumps the version, creates a tag and uploads all to GitHub.
-
-```
-yarn version
-```
-
-Then, use this command to publish to our `CDN` and `npm`.
-
-```
-yarn publish
-```
-
-NOTE: `yarn publish` calls `yarn version` at the beginning of the process. If you don't want to bump the version just press `Enter` to skip the prompt and use the current version instead.
+The release workflow is docummented internally.
