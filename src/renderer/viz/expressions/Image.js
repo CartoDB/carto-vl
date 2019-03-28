@@ -33,11 +33,11 @@ export default class Image extends Base {
         this.type = 'image';
         this.canvas = null;
         this.url = url;
+        this._loaded = false;
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
-                this.canvas = _getCanvasFromImage(this.image);
-                this.image = null;
+                this._loaded = true;
                 resolve();
             };
             this.image.onerror = reject;
@@ -80,43 +80,26 @@ export default class Image extends Base {
     }
 
     _preDraw (program, drawMetadata, gl) {
-        if (!this.init && this.canvas) {
-            this.init = true;
-            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+        if (!this.texture) {
             this.texture = gl.createTexture();
+        }
+
+        gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(4));
+        gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
+        drawMetadata.freeTexUnit++;
+
+        if (this._loaded) {
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.canvas);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+            this.image.width = this.image.width || 150;
+            this.image.height = this.image.height || 150;
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.generateMipmap(gl.TEXTURE_2D);
-            this.canvas = null;
-        }
-
-        if (this.texture) {
-            gl.activeTexture(gl.TEXTURE0 + drawMetadata.freeTexUnit);
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
-            drawMetadata.freeTexUnit++;
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.image);
         }
     }
-}
-
-function _getCanvasFromImage (img) {
-    const CANVAS_SIZE = 256;
-    const canvas = document.createElement('canvas');
-    canvas.width = CANVAS_SIZE;
-    canvas.height = CANVAS_SIZE;
-
-    const ctx = canvas.getContext('2d');
-
-    const max = Math.max(img.width, img.height);
-    const width = img.width / max * CANVAS_SIZE;
-    const height = img.height / max * CANVAS_SIZE;
-
-    ctx.drawImage(img, (CANVAS_SIZE - width) / 2, (CANVAS_SIZE - height) / 2, width, height);
-
-    return canvas;
 }
