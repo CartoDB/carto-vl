@@ -33,11 +33,11 @@ export default class Image extends Base {
         this.type = 'image';
         this.canvas = null;
         this.url = url;
-        this._loaded = false;
+        this.isLoaded = false;
         this._promise = new Promise((resolve, reject) => {
             this.image = new window.Image();
             this.image.onload = () => {
-                this._loaded = true;
+                this.isLoaded = true;
                 resolve();
             };
             this.image.onerror = reject;
@@ -90,7 +90,7 @@ export default class Image extends Base {
         gl.uniform1i(this._getBinding(program)._texLoc, drawMetadata.freeTexUnit);
         drawMetadata.freeTexUnit++;
 
-        if (this._loaded) {
+        if (this.isLoaded) {
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
 

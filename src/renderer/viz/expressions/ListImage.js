@@ -36,14 +36,14 @@ export default class ListImage extends Base {
         this._getBinding(program).texLoc = gl.getUniformLocation(program, `atlas${this._uid}`);
     }
 
+    isLoaded () {
+        return this._getChildren().every((image) => image.isLoaded);
+    }
+
     _preDraw (program, drawMetadata, gl) {
         this.init = true;
-        for (let i = 0; i < this.numImages; i++) {
-            const image = this[`image-${i}`];
-            this.init = this.init && image.canvas;
-        }
 
-        if (this.init && !this.texture) {
+        if (this.isLoaded && !this.texture) {
             const textureAtlasSize = 4096;
             const imageSize = 256;
 
@@ -52,17 +52,20 @@ export default class ListImage extends Base {
             gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, textureAtlasSize, textureAtlasSize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
             let offsetX = 0;
             let offsetY = 0;
             for (let i = 0; i < this.numImages; i++) {
-                const image = this[`image-${i}`];
+                const image = this[`image-${i}`].image;
+                image.width = imageSize;
+                image.height = imageSize;
+
                 // get image, push image to texture atlas
-                gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, image.canvas);
+                gl.texSubImage2D(gl.TEXTURE_2D, 0, offsetX, offsetY, gl.RGBA, gl.UNSIGNED_BYTE, image);
                 offsetX += imageSize;
 
                 if (offsetX + imageSize > textureAtlasSize) {
