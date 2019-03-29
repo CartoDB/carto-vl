@@ -147,7 +147,7 @@ We follow this convention when naming branches:
 ### What does it mean?
 
 * _Features_ and _Fixes_ are created from `develop`. PRs must be against `develop`.
-* _Hotfix_ are created from `master`. They contain very small changes that imply a *patch* release. PRs must be agains `master`
+* _Hotfix_ are created from `master`. They contain very small changes that imply a *patch* release. PRs must be against `master`
 * _Release_ branches must be created from `develop` branch.
 
 When a PR is merged into `master` for a patch release, after releasing, we merge `master` back into `develop`, because `develop` always have to be updated with `master`.
