@@ -139,7 +139,7 @@ Our main branch is `master`. This branch is stable and has the same content as t
 
 We follow this convention when naming branches:
 
-* Features: `feat/<id>-<description>` (i.e: feature/1303-add-global-histogram-expression)
+* Features: `feature/<id>-<description>` (i.e: feature/1303-add-global-histogram-expression)
 * Fixes: `fix/<id>-<description>`  (i.e: fix/2065-svg-icons-not-working-in-firefox)
 * Hotfix: `hotfix/<id>-<description>` (i.e: hotfix/1342-revert-api-call)
 * Release (minor & major): `release/<version>` (i.e: release/v1.2.5)
@@ -154,4 +154,4 @@ When a PR is merged into `master` for a patch release, after releasing, we merge
 
 ## Release
 
-The release workflow is docummented internally.
+The release workflow is documented internally.
