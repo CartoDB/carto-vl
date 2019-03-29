@@ -135,14 +135,22 @@ Adding `x-` at the beginning of any test folder marks this test to be ignored.
 
 ## Workflow
 
-Our main branch is `master`. This branch is stable and has the same content as the last published version. The branch with the new changes for the next **major** or **minor** release is `development`. It means that:
+Our main branch is `master`. This branch is stable and has the same content as the last published version. The branch with the new changes for the next **major** or **minor** release is `develop`.
 
-* For very small changes that imply a patch release, open a PR against `master` branch.
-* The rest of PR should be open agains `development` branch.
+We follow this convention when naming branches:
 
-When a PR is merged into `master` for a patch release, after releasing, we merge `master` back into `development` (because `development` always have to be updated with `master`).
+* Features: `feat/<id>-<description>` (i.e: feature/1303-add-global-histogram-expression)
+* Fixes: `fix/<id>-<description>`  (i.e: fix/2065-svg-icons-not-working-in-firefox)
+* Hotfix: `hotfix/<id>-<description>` (i.e: hotfix/1342-revert-api-call)
+* Release (minor & major): `release/<version>` (i.e: release/v1.2.5)
 
-PRs are very welcome :)
+### What does it mean?
+
+* _Features_ and _Fixes_ are created from `develop`. PRs must be against `develop`.
+* _Hotfix_ are created from `master`. They contain very small changes that imply a *patch* release. PRs must be agains `master`
+* _Release_ branches must be created from `develop` branch.
+
+When a PR is merged into `master` for a patch release, after releasing, we merge `master` back into `develop`, because `develop` always have to be updated with `master`.
 
 ## Release
 
