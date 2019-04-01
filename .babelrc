@@ -3,7 +3,14 @@
     [
       "@babel/preset-env",
       {
-        "useBuiltIns": "entry"
+        "debug": true,
+        "useBuiltIns": true,
+        "targets": {
+          "browsers": [
+              "last 2 versions",
+              "ie >= 10"
+          ]
+        }
       }
     ]
   ],

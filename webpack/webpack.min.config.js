@@ -36,6 +36,11 @@ module.exports = {
                     }
                 }
             },
+            {
+                test: /\.js$/,
+                enforce: 'pre',
+                loader: 'proxy-polyfill-loader'
+            },
             { test: /\.glsl$/, use: 'webpack-glsl-loader' },
             { test: /\.svg$/, use: 'svg-inline-loader' },
             {

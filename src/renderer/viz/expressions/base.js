@@ -347,6 +347,10 @@ export default class Base {
 }
 
 function _toCamelCase (str) {
+    if (!str) {
+        return null;
+    }
+
     if (str.toUpperCase() === str) {
         return str.toLowerCase();
     }

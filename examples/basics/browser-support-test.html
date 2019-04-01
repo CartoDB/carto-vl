@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Check for browser support | CARTO</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <!-- <script src="https://libs.cartocdn.com/carto-vl/v1.2.4/carto-vl.min.js"></script> -->
+  <script src="../../dist/carto-vl.min.js"></script>
+  <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.js"></script>
+  <link href="https://api.tiles.mapbox.com/mapbox-gl-js/v0.52.0/mapbox-gl.css" rel="stylesheet" />
+  <style>
+    html,
+    body {
+      margin: 0;
+    }
+
+    #map {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
+
+    .toolbox {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      min-width: 250px;
+      max-width: 250px;
+      z-index: 2;
+      overflow-wrap: break-word;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <aside class="toolbox">
+    <div class="box">
+      <header>
+        <h1>Check for browser support</h1>
+      </header>
+      <section>
+        <p class="description open-sans">Check if the browser supports CARTO VL and get the reasons if it doesn't.</p>
+      </section>
+      <footer class="js-footer"></footer>
+    </div>
+  </aside>
+  <div id="loader">
+    <div class="CDB-LoaderIcon CDB-LoaderIcon--big">
+      <svg class="CDB-LoaderIcon-spinner" viewBox="0 0 50 50">
+        <circle class="CDB-LoaderIcon-path" cx="25" cy="25" r="20" fill="none"></circle>
+      </svg>
+    </div>
+  </div>
+  <script>
+    if (!carto.isBrowserSupported()) {
+      var reasons = carto.unsupportedBrowserReasons();
+      document.getElementById('loader').innerHTML = reasons.join(', ');
+    }
+  </script>
+</body>
+
+</html>
