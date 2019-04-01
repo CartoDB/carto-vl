@@ -24,7 +24,7 @@ export default class ViewportAggregation extends BaseExpression {
     }
 
     _preDraw (...args) {
-        this._impostor.expr = this.eval();
+        this._impostor.value = this.eval();
         super._preDraw(...args);
     }
 }

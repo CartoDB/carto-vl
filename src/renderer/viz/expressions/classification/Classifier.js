@@ -17,6 +17,26 @@ export default class Classifier extends BaseExpression {
         this._GLSLhelper = new ClassifierGLSLHelper(this);
     }
 
+    get value () {
+        return this.getLegendData().data;
+    }
+
+    eval (feature) {
+        const inputValue = this.input.eval(feature);
+        const breakpoint = this.breakpoints.findIndex((breakpoint) => {
+            return inputValue <= breakpoint.value;
+        });
+
+        const divisor = this.numCategories - 1 || 1;
+        const index = breakpoint === -1 ? 1 : breakpoint / divisor;
+
+        return index;
+    }
+
+    toString () {
+        return `${this.expressionName}(${this.input.toString()}, ${this.numCategories})`;
+    }
+
     _resolveAliases (aliases) {
         super._resolveAliases(aliases);
 
@@ -69,29 +89,9 @@ export default class Classifier extends BaseExpression {
         checkType(this.expressionName, 'input', 0, 'number', this.input);
     }
 
-    toString () {
-        return `${this.expressionName}(${this.input.toString()}, ${this.numCategories})`;
-    }
-
-    get value () {
-        return this.breakpoints.map(br => br.expr);
-    }
-
-    eval (feature) {
-        const inputValue = this.input.eval(feature);
-        const breakpoint = this.breakpoints.findIndex((br) => {
-            return inputValue <= br.expr;
-        });
-
-        const divisor = this.numCategories - 1 || 1;
-        const index = breakpoint === -1 ? 1 : breakpoint / divisor;
-
-        return index;
-    }
-
-    getBreakpointList () {
+    _getBreakpointList () {
         this._genBreakpoints();
-        return this.breakpoints.map(br => br.expr);
+        return this.breakpoints.map(breakpoint => breakpoint.value);
     }
 
     _genBreakpoints () { }
@@ -106,7 +106,7 @@ export default class Classifier extends BaseExpression {
     }
 
     getLegendData () {
-        const breakpoints = this.getBreakpointList();
+        const breakpoints = this._getBreakpointList();
         const breakpointsLength = breakpoints.length;
         const data = [];
 

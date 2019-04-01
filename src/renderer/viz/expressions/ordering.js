@@ -2,7 +2,7 @@ import BaseExpression from './base';
 import { checkInstance, checkMaxArguments, implicitCast, checkExpression } from './utils';
 
 /**
- * Order ascending by a provided expression. NOTE: only works with `width()`.
+ * Order ascending input a provided expression. NOTE: only works with `width()`.
  *
  * Note: ordering expressions won't assure a perfect ordering.
  * Features will be distributed in different buckets with the original order, and those buckets will be ordered.
@@ -10,7 +10,7 @@ import { checkInstance, checkMaxArguments, implicitCast, checkExpression } from 
  * For most operations this is imperceptible, but usage of `order` in combination with animation or multi-scale expressions (`zoomrange` and `scaled`)
  * may result in artifacts.
  *
- * @param {carto.expressions.Width} by - must be `width()`
+ * @param {carto.expressions.Width} input - must be `width()`
  * @return {Order}
  *
  * @example <caption>Ascending order based on width.</caption>
@@ -30,26 +30,30 @@ import { checkInstance, checkMaxArguments, implicitCast, checkExpression } from 
  * @api
  */
 export class Asc extends BaseExpression {
-    constructor (by) {
+    constructor (input) {
         checkMaxArguments(arguments, 1, 'asc');
-        by = implicitCast(by);
-        checkExpression('asc', 'by', 0, by);
-        super({ by });
+        input = implicitCast(input);
+        checkExpression('asc', 'input', 0, input);
+        super({ input });
         this.type = 'orderer';
     }
 
-    eval () {
+    get value () {
         return 'asc';
+    }
+
+    eval () {
+        return this.value;
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkInstance('asc', 'by', 0, Width, this.by);
+        checkInstance('asc', 'input', 0, Width, this.input);
     }
 }
 
 /**
- * Order descending by a provided expression. NOTE: only works with `width()`.
+ * Order descending input a provided expression. NOTE: only works with `width()`.
  *
  * Note: ordering expressions won't assure a perfect ordering.
  * Features will be distributed in different buckets with the original order, and those buckets will be ordered.
@@ -57,7 +61,7 @@ export class Asc extends BaseExpression {
  * For most operations this is imperceptible, but usage of `order` in combination with animation or multi-scale expressions (`zoomrange` and `scaled`)
  * may result in artifacts.
  *
- * @param {carto.expressions.Width} by - must be `width()`
+ * @param {carto.expressions.Width} input - must be `width()`
  * @return {Order}
  *
  * @example <caption>Descending order based on width.</caption>
@@ -77,21 +81,25 @@ export class Asc extends BaseExpression {
  * @api
  */
 export class Desc extends BaseExpression {
-    constructor (by) {
+    constructor (input) {
         checkMaxArguments(arguments, 1, 'desc');
-        by = implicitCast(by);
-        checkExpression('desc', 'by', 0, by);
-        super({ by });
+        input = implicitCast(input);
+        checkExpression('desc', 'input', 0, input);
+        super({ input });
         this.type = 'orderer';
     }
 
-    eval () {
+    get value () {
         return 'desc';
+    }
+
+    eval () {
+        return this.value;
     }
 
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
-        checkInstance('desc', 'by', 0, Width, this.by);
+        checkInstance('desc', 'input', 0, Width, this.input);
     }
 }
 
@@ -124,8 +132,12 @@ export class NoOrder extends BaseExpression {
         this.type = 'orderer';
     }
 
-    eval () {
+    get value () {
         return 'noOrder';
+    }
+
+    eval () {
+        return this.value;
     }
 }
 

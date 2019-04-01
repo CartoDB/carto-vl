@@ -88,7 +88,7 @@ export default class GlobalStandardDev extends Classifier {
 
         const breaks = calculateBreakpoints(avg, standardDev, this.numCategories, this._classSize.value);
         this.breakpoints.forEach((breakpoint, index) => {
-            breakpoint.expr = breaks[index];
+            breakpoint.value = breaks[index];
         });
     }
 }

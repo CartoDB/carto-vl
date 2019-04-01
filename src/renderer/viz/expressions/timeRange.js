@@ -30,11 +30,25 @@ export default class TimeRangeExpr extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
+        return {
+            iso: this.range.iso.value,
+            timeZone: this.range.timeZone.value,
+            startValue: this.range.startValue.value,
+            endValue: this.range.endValue.value,
+            startDate: this.range.startDate.value,
+            endDate: this.range.endDate.value
+        };
     }
 
-    eval () {
-        return this.range;
+    eval (feature) {
+        return {
+            iso: this.range.iso.eval(feature),
+            timeZone: this.range.timeZone.eval(feature),
+            startValue: this.range.startValue.eval(feature),
+            endValue: this.range.endValue.eval(feature),
+            startDate: this.range.startDate.eval(feature),
+            endDate: this.range.endDate.eval(feature)
+        };
     }
 
     isAnimated () {

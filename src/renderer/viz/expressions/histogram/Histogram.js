@@ -6,10 +6,14 @@ export default class Histogram extends BaseExpression {
         this.inlineMaker = () => null;
     }
 
-    eval () {
+    get value () {
         return this.input.type === 'number'
             ? (this._hasBuckets ? this._getBucketsValue(this._histogram, this._sizeOrBuckets) : this._getNumericValue(this._histogram, this._sizeOrBuckets))
             : this._getCategoryValue(this._histogram);
+    }
+
+    eval () {
+        return this.value;
     }
 
     _bindMetadata (metadata) {

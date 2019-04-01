@@ -44,9 +44,11 @@ export function castDate (date) {
     if (date instanceof Date) {
         return date;
     }
+
     if (typeof (date) === 'number') {
         return msToDate(date);
     }
+
     if (isString(date)) {
         return new Date(date);
     } else {
@@ -154,6 +156,7 @@ export function castTimeRange (v, tz = null) {
         }
         return v;
     }
+
     if (typeof v === 'string') {
         return timeRange({ iso: v, timeZone: tz });
     }
@@ -161,11 +164,8 @@ export function castTimeRange (v, tz = null) {
 
 export function timeRange (parameters) {
     const { start, end, iso, timeZone } = parameters;
-    if (iso) {
-        return TimeRange.fromText(iso, timeZone);
-    } else {
-        return TimeRange.fromStartEndValues(start, end, timeZone);
-    }
+
+    return new TimeRange(timeZone, iso, start, end);
 }
 
 export function isTimeRange (t) {

@@ -114,7 +114,7 @@ export default class ViewportStandardDev extends Classifier {
         const breaks = calculateBreakpoints(avg, stdev, this.numCategories, this._classSize.value);
 
         this.breakpoints.forEach((breakpoint, index) => {
-            breakpoint.expr = breaks[index];
+            breakpoint.value = breaks[index];
         });
     }
 

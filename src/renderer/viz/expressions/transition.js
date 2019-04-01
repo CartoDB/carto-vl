@@ -29,10 +29,14 @@ export default class Transition extends BaseExpression {
         this.type = 'number';
     }
 
-    eval () {
+    get value () {
         const time = Date.now();
         this.mix = (time - this.aTime) / (this.bTime - this.aTime);
         return Math.min(this.mix, 1.0);
+    }
+
+    eval () {
+        return this.value;
     }
 
     isAnimated () {

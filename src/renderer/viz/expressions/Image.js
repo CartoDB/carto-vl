@@ -28,7 +28,6 @@ export default class Image extends Base {
     constructor (url) {
         checkMaxArguments(arguments, 1, 'image');
         checkString('image', 'url', 0, url);
-
         super({});
         this.type = 'image';
         this.canvas = null;
@@ -58,8 +57,12 @@ export default class Image extends Base {
         }
     }
 
-    eval () {
+    get value () {
         return this.url;
+    }
+
+    eval () {
+        return this.value;
     }
 
     _free (gl) {

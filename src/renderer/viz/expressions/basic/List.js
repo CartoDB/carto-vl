@@ -59,6 +59,14 @@ export default class List extends Base {
         this.elems = elems;
     }
 
+    get value () {
+        return this.elems.map(elem => elem.value);
+    }
+
+    eval (feature) {
+        return this.elems.map(elem => elem.eval(feature));
+    }
+
     _bindMetadata (metadata) {
         super._bindMetadata(metadata);
         this._setTypes();

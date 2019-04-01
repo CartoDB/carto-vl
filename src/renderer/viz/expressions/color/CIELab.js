@@ -45,7 +45,22 @@ export default class CIELab extends BaseExpression {
             CIELabGLSL
         );
     }
-    // TODO EVAL
+
+    get value () {
+        return {
+            l: this.l.value,
+            a: this.a.value,
+            b: this.b.value
+        };
+    }
+
+    eval (feature) {
+        return {
+            l: this.l.eval(feature),
+            a: this.a.eval(feature),
+            b: this.b.eval(feature)
+        };
+    }
 
     _bindMetadata (meta) {
         super._bindMetadata(meta);

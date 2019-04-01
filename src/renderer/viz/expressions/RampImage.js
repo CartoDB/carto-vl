@@ -31,6 +31,10 @@ export default class RampImage extends Base {
         this.childrenNames.push('others');
     }
 
+    get value () {
+        return this.getLegendData().data;
+    }
+
     eval (feature) {
         const index = this.input.eval(feature);
         return this._calcEval(index);

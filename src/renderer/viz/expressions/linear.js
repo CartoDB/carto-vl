@@ -120,6 +120,10 @@ export default class Linear extends BaseExpression {
         return [min, max];
     }
 
+    get value () {
+        return this.getLegendData().data;
+    }
+
     eval (feature) {
         if (this.input.type === 'timerange') {
             let inputIndex;

@@ -459,12 +459,15 @@ function genBinaryOp (name, allowedSignature, jsFn, glsl) {
             this.expressionName = name;
             this.inlineMaker = inline => glsl(inline.a, inline.b);
         }
+
         get value () {
-            return this.eval();
+            return jsFn(this.a.value, this.b.value);
         }
+
         eval (feature) {
             return jsFn(this.a.eval(feature), this.b.eval(feature));
         }
+
         _bindMetadata (meta) {
             super._bindMetadata(meta);
             const [a, b] = [this.a, this.b];

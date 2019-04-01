@@ -65,8 +65,8 @@ export default class Base {
      * // `color` will have the same color as the features with an amount of 123
      *
      */
-    eval (feature) {
-        throw new CartoRuntimeError('Unimplemented');
+    eval () {
+        return this.value;
     }
 
     /**
@@ -77,7 +77,7 @@ export default class Base {
      * @name value
      */
     get value () {
-        return this.eval();
+        throw new CartoRuntimeError('Must evaluate a feature using .eval(feature)');
     }
 
     /**

@@ -50,22 +50,20 @@ export default class ViewportPercentile extends ViewportAggregation {
         checkType('viewportPercentile', 'percentile', 1, 'number', this.percentile);
     }
 
+    get value () {
+        return _nearestRankMethod(this.percentile.value, this._total, this._values);
+    }
+
     eval (feature) {
         if (this._value === null) {
-            // See Nearest rank method: https://en.wikipedia.org/wiki/Percentile
-            const unclampedIndex = Math.ceil(this.percentile.eval(feature) / 100 * this._total) - 1;
-            const index = clamp(unclampedIndex, 0, this._total - 1);
-            const array = [...this._map.entries()];
-            array.sort((a, b) => a[0] - b[0]);
-            let accum = 0;
-            for (let i = 0; i < array.length; i++) {
-                accum += array[i][1];
-                array[i][1] = accum;
-            }
-            this._value = binarySearch(array, index, 0, array.length - 1);
+            this._value = _nearestRankMethod(this.percentile.eval(feature), this._total, this._values);
         }
 
         return this._value;
+    }
+
+    get _values () {
+        return [...this._map.entries()];
     }
 
     _resetViewportAgg () {
@@ -80,6 +78,21 @@ export default class ViewportPercentile extends ViewportAggregation {
         this._map.set(v, (this._map.get(v) || 0) + clusterCount);
         this._total += clusterCount;
     }
+}
+
+function _nearestRankMethod (value, total, values) {
+    const unclampedIndex = Math.ceil(value / 100 * total) - 1;
+    const index = clamp(unclampedIndex, 0, total - 1);
+
+    values.sort((a, b) => a[0] - b[0]);
+
+    let accum = 0;
+    for (let i = 0; i < values.length; i++) {
+        accum += values[i][1];
+        values[i][1] = accum;
+    }
+
+    return binarySearch(values, index, 0, values.length - 1);
 }
 
 function binarySearch (array, index, begin, end) {

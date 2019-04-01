@@ -57,12 +57,14 @@ export default class Blend extends BaseExpression {
         }
         this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
+
     eval (feature) {
         const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
         const y = this.b.eval(feature);
         return mix(x, y, a);
     }
+
     replaceChild (toReplace, replacer) {
         if (toReplace === this.mix) {
             this.originalMix = replacer;

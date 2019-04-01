@@ -30,20 +30,22 @@ export default class Time extends BaseExpression {
 
         super({});
         this.type = 'date';
+
         try {
             this.date = util.castDate(date);
         } catch (error) {
             throwInvalidType('time', 'date', 0, 'Date or string or number', 'other type');
         }
+
         this.inlineMaker = () => undefined;
     }
 
     get value () {
-        return this.eval();
+        return this.date;
     }
 
     eval () {
-        return this.date;
+        return this.value;
     }
 
     isAnimated () {

@@ -54,9 +54,15 @@ export default class Placement extends BaseExpression {
         this.inlineMaker = inline => `vec2(${inline.x}, ${inline.y})`;
         this.type = 'placement';
     }
-    eval (v) {
-        return [this.x.eval(v), this.y.eval(v)];
+
+    get value () {
+        return [this.x.value, this.y.value];
     }
+
+    eval (feature) {
+        return [this.x.eval(feature), this.y.eval(feature)];
+    }
+
     _bindMetadata (meta) {
         super._bindMetadata(meta);
         checkType('placement', 'x', 0, 'number', this.x);

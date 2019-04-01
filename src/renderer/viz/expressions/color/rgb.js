@@ -77,15 +77,20 @@ function genRGB (name, alpha) {
         }
 
         get value () {
-            return this.eval();
+            return {
+                r: this.r.value,
+                g: this.g.value,
+                b: this.b.value,
+                a: alpha ? this.a.value : 1
+            };
         }
 
-        eval (f) {
+        eval (feature) {
             return {
-                r: this.r.eval(f),
-                g: this.g.eval(f),
-                b: this.b.eval(f),
-                a: alpha ? this.a.eval(f) : 1
+                r: this.r.eval(feature),
+                g: this.g.eval(feature),
+                b: this.b.eval(feature),
+                a: alpha ? this.a.eval(feature) : 1
             };
         }
 

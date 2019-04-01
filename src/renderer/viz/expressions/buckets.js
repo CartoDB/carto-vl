@@ -76,7 +76,7 @@ export default class Buckets extends BaseExpression {
     }
 
     get value () {
-        return this.list.elems.map(elem => elem.value);
+        return this.getLegendData().data;
     }
 
     eval (feature) {

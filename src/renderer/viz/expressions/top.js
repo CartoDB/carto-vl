@@ -45,12 +45,7 @@ export default class Top extends BaseExpression {
     }
 
     get value () {
-        const buckets = [];
-        for (let i = 0; i < this.buckets - 1; i++) {
-            buckets.push(this[`_top${i}`].value);
-        }
-
-        return buckets;
+        return this.getLegendData().data;
     }
 
     eval (feature) {
@@ -173,12 +168,12 @@ export default class Top extends BaseExpression {
         );
 
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
-            this[`_top${i}`].expr = Number.POSITIVE_INFINITY;
+            this[`_top${i}`].value = Number.POSITIVE_INFINITY;
         }
 
         orderedCategoryNames.forEach((cat, i) => {
             if (i < buckets) {
-                this[`_top${i}`].expr = this._metadata.categoryToID.get(cat.name);
+                this[`_top${i}`].value = this._metadata.categoryToID.get(cat.name);
             }
         });
 

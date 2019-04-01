@@ -58,10 +58,10 @@ export default class AlphaNormalize extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
+        return this._impostor.value;
     }
 
-    eval (f) {
-        return this._impostor.eval(f);
+    eval (feature) {
+        return this._impostor.eval(feature);
     }
 }

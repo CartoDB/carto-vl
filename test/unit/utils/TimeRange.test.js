@@ -5,15 +5,19 @@ function time (y, m = 1, d = 1, h = 0, min = 0, sec = 0) {
 }
 
 function startTimeValue (iso) {
-    return TimeRange.fromText(iso).startValue;
+    const tz = null;
+    return new TimeRange(tz, iso).startValue;
 }
 
 function endTimeValue (iso) {
-    return TimeRange.fromText(iso).endValue;
+    const tz = null;
+    return new TimeRange(tz, iso).endValue;
 }
 
 function ISOperiod (start, end) {
-    return TimeRange.fromStartEndValues(start, end).text;
+    const tz = null;
+    const iso = null;
+    return new TimeRange(tz, iso, start, end).iso;
 }
 
 describe('TimeRange defined by a ISO string', () => {

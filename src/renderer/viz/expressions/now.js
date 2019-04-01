@@ -33,11 +33,11 @@ export default class Now extends BaseExpression {
     }
 
     get value () {
-        return this.eval();
+        return this.now.value;
     }
 
     eval () {
-        return this.now.expr;
+        return this.value;
     }
 
     isAnimated () {
@@ -49,6 +49,6 @@ export default class Now extends BaseExpression {
     }
 
     _setTimestamp (timestamp) {
-        this.now.expr = timestamp;
+        this.now.value = timestamp;
     }
 }
