@@ -57,7 +57,7 @@ export default class ClusterCount extends BaseExpression {
         return true;
     }
 
-    get value () {
+    get values () {
         return this.getLegendData().data;
     }
 

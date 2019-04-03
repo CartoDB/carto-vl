@@ -32,6 +32,10 @@ export default class RampImage extends Base {
     }
 
     get value () {
+        return this.eval();
+    }
+
+    get values () {
         return this.getLegendData().data;
     }
 

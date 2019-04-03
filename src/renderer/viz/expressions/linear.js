@@ -125,6 +125,10 @@ export default class Linear extends BaseExpression {
     }
 
     get value () {
+        return this.eval();
+    }
+
+    get values () {
         return this.getLegendData().data;
     }
 
