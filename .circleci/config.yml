@@ -10,8 +10,8 @@ orbs:
 jobs:
   test-e2e:
     docker:
-      - image: circleci/node:8-browsers
-      - image: carto/windshaft-cartovl-testing
+      - image: circleci/node:10.15.1-jessie-browsers
+      - image: carto/windshaft-cartovl-testing-pg11
     working_directory: ~/repo
     steps:
       - checkout
@@ -27,7 +27,7 @@ jobs:
   test-unit-lint-docs:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -45,7 +45,7 @@ jobs:
   test-user:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -64,7 +64,7 @@ jobs:
   test-render:
     docker:
       # specify the version you desire here
-      - image: circleci/node:8-browsers
+      - image: circleci/node:10.15.1-jessie-browsers
     working_directory: ~/repo
     steps:
       - checkout
@@ -82,7 +82,7 @@ jobs:
       - run: xvfb-run -a yarn test:render:min
 
 workflows:
-  version: 2
+  version: 2.1
   build_and_test:
     jobs:
       - test-e2e

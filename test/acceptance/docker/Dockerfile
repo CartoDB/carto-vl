@@ -1,7 +1,7 @@
 FROM carto/nodejs6-xenial-pg101
 
 RUN set -ex \
-    && npm install -g yarn@0.27.5
+    && npm install -g yarn@1.15.2
 
 WORKDIR /srv
 
