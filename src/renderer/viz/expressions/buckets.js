@@ -1,8 +1,7 @@
 import BaseExpression from './base';
 import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
-import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
-
+import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
 /**
  * Given a property create "sub-groups" based on the given breakpoints.
  *
@@ -58,15 +57,17 @@ import { OTHERS_INDEX, OTHERS_GLSL_VALUE } from './constants';
  * @api
  */
 export default class Buckets extends BaseExpression {
-    constructor (input, list) {
+    constructor (input, list, othersLabel = OTHERS_LABEL) {
         checkMaxArguments(arguments, 2, 'buckets');
 
         input = implicitCast(input);
         list = implicitCast(list);
+        othersLabel = implicitCast(othersLabel);
 
         let children = {
             input,
-            list
+            list,
+            othersLabel
         };
 
         super(children);
@@ -159,9 +160,12 @@ export default class Buckets extends BaseExpression {
         };
     }
 
-    getLegendData (config) {
+    getLegendData (options) {
         const name = this.toString();
-        const list = this.list.elems.map(elem => elem.eval());
+        const list = this.list.elems.map(elem => elem.value);
+        const config = {
+            othersLabel: options && options.othersLabel ? options.othersLabel : this.othersLabel.value
+        };
         const data = this.input.type === 'number'
             ? _getLegendDataNumeric(list)
             : _getLegendDataCategory(list, config);

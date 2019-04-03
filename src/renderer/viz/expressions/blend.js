@@ -58,6 +58,14 @@ export default class Blend extends BaseExpression {
         this.inlineMaker = inline => `mix(${inline.a}, ${inline.b}, clamp(${inline.mix}, 0., 1.))`;
     }
 
+    get value () {
+        const a = clamp(this.mix.value, 0, 1);
+        const x = this.a.value;
+        const y = this.b.value;
+
+        return mix(x, y, a);
+    }
+
     eval (feature) {
         const a = clamp(this.mix.eval(feature), 0, 1);
         const x = this.a.eval(feature);
@@ -79,6 +87,7 @@ export default class Blend extends BaseExpression {
 
         this.type = this.a.type;
     }
+
     _preDraw (...args) {
         super._preDraw(...args);
         if (this.originalMix.isA(Transition) && !this.originalMix.isAnimated()) {

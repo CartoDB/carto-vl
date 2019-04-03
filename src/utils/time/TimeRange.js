@@ -1,6 +1,6 @@
 import periodISO from './periodISO';
 import parseISO from './parseISO';
-import timeZoneDate from './TZDate';
+import timeZoneDate from './TimeZoneDate';
 
 /**
  * Class TimeRange represents an interval of time between to instants.

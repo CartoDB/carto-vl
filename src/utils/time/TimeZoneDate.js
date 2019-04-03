@@ -11,21 +11,20 @@ import periodISO from './periodISO';
 // so we want to avoid the time zone handling that Date does.
 // (this dates cannot be converted from the tz they're specified in,
 // not even to UTC)
-export default class TZDate {
+export default class TimeZoneDate {
     constructor (milliseconds, tz) {
         this._value = milliseconds;
         this._date = msToDate(milliseconds);
         this._timeZone = tz; // informational
     }
+
     static fromValue (milliseconds, tz) {
-        return new TZDate(milliseconds, tz);
+        return new TimeZoneDate(milliseconds, tz);
     }
+
     static from (year, month, day, hour, minute, second, tz) {
         return this.fromValue(Date.UTC(year, (month || 1) - 1, day, hour, minute, second), tz);
     }
-    // static fromUTCDate (date) {
-    //     return this.fromValue(date.getTime());
-    // }
 
     get year () {
         return this._date.getUTCFullYear();

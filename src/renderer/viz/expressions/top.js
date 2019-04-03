@@ -32,11 +32,13 @@ const MAX_TOP_BUCKETS = 16;
  * @api
  */
 export default class Top extends BaseExpression {
-    constructor (property, buckets) {
+    constructor (property, buckets, othersLabel = OTHERS_LABEL) {
         checkMaxArguments(arguments, 2, 'top');
 
         buckets = implicitCast(buckets);
-        const children = { property, buckets };
+        othersLabel = implicitCast(othersLabel);
+
+        const children = { property, buckets, othersLabel };
         for (let i = 0; i < MAX_TOP_BUCKETS; i++) {
             children[`_top${i}`] = number(0);
         }
@@ -190,6 +192,10 @@ export default class Top extends BaseExpression {
         const data = [];
         const name = this.toString();
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;
+        const othersLabel = options && options.othersLabel
+            ? options.othersLabel
+            : this.othersLabel.value;
+
         orderedCategoryNames.forEach((category, i) => {
             if (i < buckets) {
                 const key = category.name;
@@ -198,10 +204,12 @@ export default class Top extends BaseExpression {
             }
         });
 
-        data.push({
-            key: options.othersLabel,
-            value: OTHERS_INDEX
-        });
+        if (othersLabel) {
+            data.push({
+                key: othersLabel,
+                value: OTHERS_INDEX
+            });
+        }
 
         return { name, data };
     }

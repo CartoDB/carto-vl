@@ -181,7 +181,7 @@ export default class AnimationGeneral extends BaseExpression {
      * @api
      */
     getProgressValue () {
-        const progress = this.progress.eval();
+        const progress = this.progress.value;
         return this._input.converse(progress);
     }
 

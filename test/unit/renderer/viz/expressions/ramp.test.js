@@ -1135,7 +1135,6 @@ describe('src/renderer/viz/expressions/ramp', () => {
             describe('and it is a top input', () => {
                 it('should return legend data', () => {
                     const r = ramp(top($grade, 2), [red, blue]);
-
                     r._bindMetadata(METADATA);
                     actual = r.getLegendData().data;
                     expected = [
@@ -1173,7 +1172,7 @@ describe('src/renderer/viz/expressions/ramp', () => {
                         },
                         {
                             key: OTHERS_LABEL,
-                            value: r.others.eval()
+                            value: r.others.value
                         }
                     ];
 
