@@ -59,21 +59,22 @@ export default class RenderLayer {
         }
     }
 
-    getFeaturesAtPosition (pos) {
+    getFeaturesAtPosition (position) {
         if (!this.viz) {
             return [];
         }
 
         const noPossiblePartialFeatures = (this.viz.geometryType === GEOMETRY_TYPE.POINT);
+
         if (noPossiblePartialFeatures) {
-            return this._getPointFeaturesAtPosition(pos);
+            return this._getPointFeaturesAtPosition(position);
         } else {
-            return this._getPartialFeaturesAtPosition(pos);
+            return this._getPartialFeaturesAtPosition(position);
         }
     }
 
-    _getPointFeaturesAtPosition (pos) {
-        const rawFeatures = this._getRawFeaturesAtPosition(pos);
+    _getPointFeaturesAtPosition (position) {
+        const rawFeatures = this._getRawFeaturesAtPosition(position);
         return rawFeatures.map((raw) => { return this._buildFeatureFromRaw(raw); });
     }
 
@@ -90,23 +91,28 @@ export default class RenderLayer {
         return rawFeatures;
     }
 
-    _getPartialFeaturesAtPosition (pos) {
-        const rawFeatures = this._getRawFeaturesAtPosition(pos);
-        if (rawFeatures.length === 0) return [];
+    _getPartialFeaturesAtPosition (position) {
+        const rawFeatures = this._getRawFeaturesAtPosition(position);
+
+        if (rawFeatures.length === 0) {
+            return [];
+        }
 
         const rawPartialFeatures = this._getPartialFeaturesFromSingle(rawFeatures);
-
         const compoundFeatures = this._getCompoundFeaturesFrom(rawPartialFeatures);
+
         return compoundFeatures;
     }
 
     _getCompoundFeaturesFrom (rawPartialFeatures) {
         const features = [];
+
         for (let featureId in rawPartialFeatures) {
             const viewporFeaturePieces = rawPartialFeatures[featureId];
             const featurePieces = viewporFeaturePieces.map((raw) => { return this._buildFeatureFromRaw(raw); });
             features.push(getCompoundFeature(featurePieces));
         }
+
         return features;
     }
 

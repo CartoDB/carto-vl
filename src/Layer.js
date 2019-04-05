@@ -11,6 +11,7 @@ import { cubic } from './renderer/viz/expressions';
 import { mat4 } from 'gl-matrix';
 import { computeViewportFromCameraMatrix } from './utils/util';
 import LayerConcurrencyHelper from './LayerConcurrencyHelper';
+import ClusterCache from './sources/ClusterCache';
 
 // There is one renderer per map, so the layers added to the same map
 // use the same renderer with each renderLayer
@@ -74,6 +75,7 @@ export default class Layer {
         this._sourcePromise = this.update(source, viz);
         this._renderWaiters = [];
         this._cameraMatrix = mat4.identity([]);
+        this._clusterCache = new ClusterCache(source);
     }
 
     /**
@@ -95,6 +97,10 @@ export default class Layer {
         if (visible !== initial) {
             this._fire('updated', 'visibility change');
         }
+    }
+
+    get isAggregated () {
+        return this.viz && this.viz.metadata.isAggregated;
     }
 
     /**
@@ -230,9 +236,7 @@ export default class Layer {
             safeSource.requestMetadata(viz)
         ]);
         await this._context;
-
         this._endChange(majorChange, change);
-
         this._commitSuccesfulUpdate(metadata, viz, safeSource);
     }
 
@@ -251,6 +255,14 @@ export default class Layer {
         }
     }
 
+    // TODO document
+    _getClusterData (layerIndex, clusterId) {
+        const zoom = this.map.getZoom();
+        const layergroupid = this.metadata.layergroupid;
+
+        return this._clusterCache.get(layerIndex, zoom, clusterId, layergroupid);
+    }
+
     /**
      * Updating viz and source, after having checked them and having required new metadata
      *
@@ -260,7 +272,6 @@ export default class Layer {
      */
     _commitSuccesfulUpdate (metadata, newViz, newSource) {
         this.metadata = metadata;
-
         this._commitVizChange(newViz);
         this._commitSourceChange(newSource);
 
@@ -375,7 +386,9 @@ export default class Layer {
             // FIXME viz.symbol._blendFrom(this._viz.symbol, ms, interpolator);
             // FIXME viz.symbolPlacement._blendFrom(this._viz.symbolPlacement, ms, interpolator);
         }
-        return this._update(this._source, viz, false);
+
+        this._sourcePromise = await this._update(this._source, viz, false);
+        return this._sourcePromise;
     }
 
     /**
@@ -401,10 +414,34 @@ export default class Layer {
         return this._renderLayer.getNumFeatures();
     }
 
-    getFeaturesAtPosition (pos) {
-        return this.visible
-            ? this._renderLayer.getFeaturesAtPosition(pos).map(this._addLayerIdToFeature.bind(this))
+    async getFeaturesAtPosition (position, index, showClusterAggregation = false) {
+        const isAggregated = this.isAggregated;
+        const features = this.visible
+            ? this._renderLayer.getFeaturesAtPosition(position).map(this._addLayerIdToFeature.bind(this))
             : [];
+
+        if (!features.length) {
+            return null;
+        }
+
+        const clusterData = isAggregated && showClusterAggregation
+            ? await this._getClusterFeaturesData(features, index)
+            : [];
+
+        return { features, clusterData };
+    }
+
+    async _getClusterFeaturesData (features, index = 0) {
+        const clusterId = this._getClusterId(features);
+        const clusterData = await this._getClusterData(index, clusterId);
+
+        return clusterData;
+    }
+
+    _getClusterId (features) {
+        return features.reduce((previousFeature, feature) => {
+            return previousFeature.id < feature.id ? previousFeature : feature;
+        }).id;
     }
 
     isAnimated () {

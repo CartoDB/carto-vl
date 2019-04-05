@@ -15,6 +15,11 @@ const MAP_STATE = {
     MOVING: 'moving'
 };
 
+const DEFAULT_OPTIONS = {
+    autoChangePointer: true,
+    showClusterAggregation: false
+};
+
 export default class Interactivity {
     /**
     *
@@ -46,7 +51,7 @@ export default class Interactivity {
     * @name carto.Interactivity
     * @api
     */
-    constructor (layerList, options = { autoChangePointer: true }) {
+    constructor (layerList, options = DEFAULT_OPTIONS) {
         if (layerList instanceof Layer) {
             layerList = [layerList]; // Allow one layer as input
         }
@@ -65,6 +70,7 @@ export default class Interactivity {
      */
     on (eventName, callback) {
         checkEvent(eventName);
+
         const currentCount = this._numListeners[eventName] || 0;
         this._numListeners[eventName] = currentCount + 1;
         return this._emitter.on(eventName, callback);
@@ -128,6 +134,7 @@ export default class Interactivity {
         this._prevHoverFeatures = [];
         this._prevClickFeatures = [];
         this._numListeners = {};
+        this._showClusterAggregation = options.showClusterAggregation;
 
         const allLayersReadyPromises = layerList.map(layer => layer._context);
         return Promise.all(allLayersReadyPromises)
@@ -187,7 +194,7 @@ export default class Interactivity {
         this._onMouseMove(this._mouseEvent, true);
     }
 
-    _onMouseMove (event, emulated) {
+    async _onMouseMove (event, emulated) {
         // Store mouse event to be used in `onLayerUpdated`
         this._mouseEvent = event;
 
@@ -202,8 +209,7 @@ export default class Interactivity {
             return;
         }
 
-        const featureEvent = this._createFeatureEvent(event);
-
+        const featureEvent = await this._createFeatureEvent(event);
         const featuresLeft = this._manageFeatureLeaveEvent(featureEvent);
         const featuresEntered = this._manageFeatureEnterEvent(featureEvent);
 
@@ -233,16 +239,17 @@ export default class Interactivity {
     }
 
     _fireEventIfFeatures (eventName, { featureEvent, eventFeatures }) {
-        if (eventFeatures.length > 0) {
+        if (eventFeatures.length) {
             this._fireEvent(eventName, {
                 coordinates: featureEvent.coordinates,
                 position: featureEvent.position,
-                features: eventFeatures
+                features: eventFeatures,
+                clusterData: featureEvent.clusterData
             });
         }
     }
 
-    _onClick (event) {
+    async _onClick (event) {
         if (!this.isEnabled) {
             return;
         }
@@ -252,7 +259,7 @@ export default class Interactivity {
             return;
         }
 
-        const featureEvent = this._createFeatureEvent(event);
+        const featureEvent = await this._createFeatureEvent(event);
         this._manageClickOutEvent(featureEvent);
 
         this._prevClickFeatures = featureEvent.features;
@@ -267,13 +274,23 @@ export default class Interactivity {
         return featuresClickedOut;
     }
 
-    _createFeatureEvent (eventData) {
-        // a potentially very intensive task
-        const features = this._getFeaturesAtPosition(eventData.point);
+    async _createFeatureEvent (eventData) {
+        const layerFeatures = await this._getFeaturesAtPosition(eventData.point);
+        let features = [];
+        let clusterData = [];
+
+        layerFeatures.forEach(layerFeature => {
+            if (layerFeature) {
+                features.push(layerFeature.features);
+                clusterData.push(layerFeature.clusterData);
+            }
+        });
+
         return {
             coordinates: eventData.lngLat,
             position: eventData.point,
-            features
+            features: features.length ? [].concat(...features) : [],
+            clusterData: clusterData.length ? [].concat(...clusterData) : []
         };
     }
 
@@ -281,8 +298,16 @@ export default class Interactivity {
         this._emitter.emit(type, featureEvent);
     }
 
-    _getFeaturesAtPosition (point) {
-        return [].concat(...this._layerList.map(layer => layer.getFeaturesAtPosition(point)));
+    async _getFeaturesAtPosition (point) {
+        const showClusterAgg = this._showClusterAggregation;
+        const features = await this._layerList
+            .map(this._getLayerFeaturesAtPosition.bind(this, point, showClusterAgg));
+
+        return Promise.all(features);
+    }
+
+    async _getLayerFeaturesAtPosition (point, showClusterAgg, layer, index) {
+        return layer.getFeaturesAtPosition(point, index, showClusterAgg);
     }
 
     /**

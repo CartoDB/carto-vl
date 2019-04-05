@@ -170,7 +170,7 @@ describe('api/layer', () => {
     });
 
     describe('.getFeaturesAtPosition', () => {
-        it('should add a layerId to every feature in the list', () => {
+        it('should add a layerId to every feature in the list', async () => {
             const layer = new Layer('layer0', source, viz);
             const fakeFeature0 = {
                 properties: {},
@@ -181,10 +181,13 @@ describe('api/layer', () => {
                 properties: {},
                 id: 'fakeId0'
             };
-            spyOn(layer._renderLayer, 'getFeaturesAtPosition').and.returnValue([{ fakeFeature0, fakeFeature1 }]);
 
-            expect(layer.getFeaturesAtPosition()[0].layerId).toEqual('layer0');
-            expect(layer.getFeaturesAtPosition()[0].layerId).toEqual('layer0');
+            spyOn(layer._renderLayer, 'getFeaturesAtPosition').and.returnValue([[{ fakeFeature0 }], [{ fakeFeature1 }]]);
+
+            const layerFeatures = await layer.getFeaturesAtPosition();
+
+            expect(layerFeatures.features[0].layerId).toEqual('layer0');
+            expect(layerFeatures.features[1].layerId).toEqual('layer0');
         });
     });
 });
