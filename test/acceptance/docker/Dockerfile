@@ -12,8 +12,7 @@ RUN set -ex \
     && . ~/.nvm/nvm.sh \
     && nvm install $NODE_VERSION $NODE_VERSION_OPTIONS \
     && nvm alias default $NODE_VERSION \
-    && nvm use default \
-    && npm install -g yarn@0.27.5
+    && nvm use default
 
 ENV NODE_PATH $NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
 ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
