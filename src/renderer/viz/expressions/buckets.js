@@ -75,7 +75,7 @@ import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
  */
 export default class Buckets extends BaseExpression {
     constructor (input, list, othersLabel = OTHERS_LABEL) {
-        checkMaxArguments(arguments, 2, 'buckets');
+        checkMaxArguments(arguments, 3, 'buckets');
 
         input = implicitCast(input);
         list = implicitCast(list);

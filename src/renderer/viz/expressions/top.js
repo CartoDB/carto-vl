@@ -47,7 +47,7 @@ const MAX_TOP_BUCKETS = 16;
  */
 export default class Top extends BaseExpression {
     constructor (property, buckets, othersLabel = OTHERS_LABEL) {
-        checkMaxArguments(arguments, 2, 'top');
+        checkMaxArguments(arguments, 3, 'top');
 
         buckets = implicitCast(buckets);
         othersLabel = implicitCast(othersLabel);
