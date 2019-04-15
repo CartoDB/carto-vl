@@ -173,7 +173,7 @@ i.e: Let's asume there're three cities in the dataset
 */
 ```
 
-The `.values` method will only return the list of values, while `getLegendData()` will return also the name of the full expression and the data type. This last use case is very useful for creating **legends**. In the [Add Legends](/developers/carto-vl/guides/add-legends/) guide it's explained more in detail.
+The `.values` method will only return the list of values, while `getLegendData()` will return also the name of the full expression and the data type. This last use case is very useful for creating **legends**. In the [Add Legends](/developers/carto-vl/guides/add-legends/) guide it's explained in more detail.
 
 #### Modify
 
