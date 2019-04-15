@@ -211,6 +211,7 @@ export default class Linear extends BaseExpression {
             checkType('linear', 'input', 0, ['number', 'date'], this.input);
             checkType('linear', 'min', 1, ['number', 'date'], this.min);
             checkType('linear', 'max', 2, ['number', 'date'], this.max);
+            checkType('linear', 'samples', 4, ['number'], this.samples);
             // Should actually check:
             // checkType('linear', 'min', 1, this.input.type, this.min);
             // checkType('linear', 'max', 2, this.input.type, this.max);
@@ -231,12 +232,17 @@ export default class Linear extends BaseExpression {
     getLegendData (options) {
         const min = this.min.value;
         const max = this.max.value;
+        const name = this.toString();
+
+        if (min === max) {
+            return { min, max, name, data: [] };
+        }
+
         const samples = options && options.samples
             ? options.samples
             : this.samples;
 
         const INC = 1 / (samples - 1);
-        const name = this.toString();
         const data = [];
 
         for (let i = 0; data.length < samples; i += INC) {

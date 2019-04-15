@@ -1,5 +1,5 @@
 import BaseExpression from './base';
-import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType } from './utils';
+import { implicitCast, getOrdinalFromIndex, checkMaxArguments, checkType, checkFeatureIndependent } from './utils';
 import CartoValidationError, { CartoValidationTypes as cvt } from '../../../errors/carto-validation-error';
 import { OTHERS_INDEX, OTHERS_LABEL, OTHERS_GLSL_VALUE } from './constants';
 /**
@@ -130,6 +130,8 @@ export default class Buckets extends BaseExpression {
         }
 
         checkType('buckets', 'list', 1, ['number-list', 'category-list'], this.list);
+        checkType('buckets', 'othersLabel', 2, 'category', this.othersLabel);
+        checkFeatureIndependent('buckets', 'othersLabel', 2, this.othersLabel);
 
         this.list.elems.map((item, index) => {
             if (this.input.type !== item.type) {

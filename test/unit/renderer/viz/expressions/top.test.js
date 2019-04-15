@@ -8,7 +8,8 @@ describe('src/renderer/viz/expressions/top', () => {
         validateFeatureDependentErrors('top', ['category-property', 'dependent']);
         validateTypeErrors('top', ['number', 10]);
         validateTypeErrors('top', ['color', 10]);
-        validateMaxArgumentsError('top', ['category', 10, 'number']);
+        validateTypeErrors('top', ['color', 10, 2]);
+        validateMaxArgumentsError('top', ['category', 10, 'number', 'number']);
     });
 
     describe('type', () => {

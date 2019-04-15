@@ -85,6 +85,8 @@ export default class Top extends BaseExpression {
         checkType('top', 'property', 0, 'category', this.property);
         checkFeatureIndependent('top', 'buckets', 1, this.buckets);
         checkType('top', 'buckets', 1, 'number', this.buckets);
+        checkType('top', 'othersLabel', 2, 'category', this.othersLabel);
+        checkFeatureIndependent('top', 'othersLabel', 2, this.othersLabel);
 
         this._metadata = metadata;
         this._textureBuckets = null;

@@ -1111,6 +1111,14 @@ describe('src/renderer/viz/expressions/ramp', () => {
                     const colorLegend = r.getLegendData();
                     expect(colorLegend.name).toEqual('linear($price, globalMin($price), globalMax($price))');
                 });
+
+                it('should return an empty array if min and max values are the same', () => {
+                    const r = ramp(linear($price, 10, 10), [red, blue]);
+
+                    r._bindMetadata(METADATA);
+                    const colorLegend = r.getLegendData();
+                    expect(colorLegend.data).toEqual([]);
+                });
             });
         });
 
