@@ -108,7 +108,7 @@ Once you have a `Visualization` object, you can:
 
 #### Access
 
-There three main use cases:
+There are three main use cases:
 
 1. When you need a single value
 
