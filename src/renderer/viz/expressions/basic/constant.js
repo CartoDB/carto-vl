@@ -29,7 +29,7 @@ export default class Constant extends BaseExpression {
         checkNumber('constant', 'x', 0, x);
 
         super({});
-        this.value = x;
+        this._value = x;
         this.type = 'number';
         this.inlineMaker = () => `(${x.toFixed(20)})`;
     }
