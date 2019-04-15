@@ -51,7 +51,6 @@ export default class RampImage extends Base {
     }
 
     getLegendData (options) {
-        // const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;
         const legendData = this.input.getLegendData(options);
         const data = legendData.data.map(({ key, value }) => {
