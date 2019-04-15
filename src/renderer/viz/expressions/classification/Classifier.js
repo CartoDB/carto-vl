@@ -21,10 +21,6 @@ export default class Classifier extends BaseExpression {
         return this.eval();
     }
 
-    get values () {
-        return this.getLegendData().data;
-    }
-
     eval (feature) {
         const inputValue = this.input.eval(feature);
         const breakpoint = this.breakpoints.findIndex((breakpoint) => {

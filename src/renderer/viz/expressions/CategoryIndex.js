@@ -69,10 +69,6 @@ export default class CategoryIndex extends BaseExpression {
         return this.eval();
     }
 
-    get values () {
-        return this.getLegendData().data;
-    }
-
     eval (feature) {
         const name = this.property.eval(feature);
         const id = this._metadata.categoryToID.get(name);

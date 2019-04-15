@@ -80,10 +80,6 @@ export default class Buckets extends BaseExpression {
         return this.eval();
     }
 
-    get values () {
-        return this.getLegendData().data;
-    }
-
     eval (feature) {
         const v = this.input.eval(feature);
         const divisor = this.numCategoriesWithoutOthers - 1 || 1;

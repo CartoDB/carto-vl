@@ -73,10 +73,6 @@ export default class RampGeneric extends Base {
         return this.eval();
     }
 
-    get values () {
-        return this.getLegendData().data;
-    }
-
     getLegendData (options) {
         const config = Object.assign({}, DEFAULT_OPTIONS, options);
         const type = this.input.type;

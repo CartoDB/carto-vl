@@ -70,14 +70,25 @@ export default class Base {
     }
 
     /**
-     * Get the expression value
+     * Get the expression value. It gets the data from the `getLegendData` method.
      *
      * @api
      * @memberof Expression
      * @name value
-     */
+    */
     get value () {
         throw new CartoRuntimeError('Must evaluate a feature using .eval(feature)');
+    }
+
+    /**
+     * Get the expression values
+     *
+     * @api
+     * @memberof Expression
+     * @name values
+     */
+    get values () {
+        return this.getLegendData().data;
     }
 
     /**
@@ -176,6 +187,17 @@ export default class Base {
         return this._getChildren().map(child => child.propertyName).find(name => !!name);
     }
 
+    /**
+     * Get information data from the expression.
+     *
+     * @api
+     * @memberof Expression
+     * @name getLegendData
+     * @typedef {String} PropertyName
+     * @typedef {Array} LegendData
+     * @returns {Object} - { PropertyName, LegendData }
+     * @instance
+    */
     getLegendData () {
         return {
             name: this.propertyName,

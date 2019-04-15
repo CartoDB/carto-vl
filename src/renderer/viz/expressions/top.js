@@ -50,10 +50,6 @@ export default class Top extends BaseExpression {
         return this.eval();
     }
 
-    get values () {
-        return this.getLegendData().data;
-    }
-
     eval (feature) {
         const metaColumn = this._metadata.properties[this.property.propertyName];
         const orderedCategoryNames = [...metaColumn.categories].sort((a, b) =>
